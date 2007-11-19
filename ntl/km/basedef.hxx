@@ -35,6 +35,7 @@ using nt::io_apc_routine;
 using nt::device_power_state;
 using nt::system_power_state;
 
+struct kthread;
 
 //enum mode { KernelMode, UserMode };
 struct kprocessor_mode { uint8_t mode; };
@@ -536,6 +537,85 @@ struct kmutant
   struct _KTHREAD   * OwnerThread;
   unsigned char       Abandoned;
   unsigned char       ApcDisable;
+};
+
+struct fast_mutex
+{
+	/*<thisrel this+0x0>*/ /*|0x4|*/ int32_t Count;
+	/*<thisrel this+0x4>*/ /*|0x4|*/ kthread* Owner;
+	/*<thisrel this+0x8>*/ /*|0x4|*/ uint32_t Contention;
+	/*<thisrel this+0xc>*/ /*|0x10|*/ kevent Event;
+	/*<thisrel this+0x1c>*/ /*|0x4|*/ uint32_t OldIrql;
+};
+
+//
+//  executive resource data structures.
+//
+
+typedef uintptr_t eresource_thread_t;
+
+struct owner_entry {
+	eresource_thread_t OwnerThread;
+	union {
+		int32_t OwnerCount;
+		uint32_t TableSize;
+	};
+
+};
+
+struct eresource {
+	list_entry SystemResourcesList;
+	owner_entry* OwnerTable;
+
+	int16_t ActiveCount;
+	enum Flags {
+		ResourceNeverExclusive		= 0x10,
+		ResourceReleaseByOtherThread= 0x20,
+		ResourceOwnedExclusive		= 0x80
+	};
+	uint16_t Flag;
+
+	volatile ksemaphore* SharedWaiters;
+	volatile kevent* ExclusiveWaiters;
+
+	owner_entry OwnerEntry;
+	uint32_t ActiveEntries;
+	uint32_t ContentionCount;
+	uint32_t NumberOfSharedWaiters;
+	uint32_t NumberOfExclusiveWaiters;
+#if defined(_M_X64)
+	void* Reserved2;
+#endif
+	union {
+		void* Address;
+		uintptr_t CreatorBackTraceIndex;
+	};
+
+	kspin_lock SpinLock;
+};
+
+
+#define RESOURCE_HASH_TABLE_SIZE 64
+
+struct resource_hash_entry {
+	list_entry ListEntry;
+	void* Address;
+	uint32_t ContentionCount;
+	uint32_t Number;
+};
+
+struct resource_performance_data {
+	uint32_t ActiveResourceCount;
+	uint32_t TotalResourceCount;
+	uint32_t ExclusiveAcquire;
+	uint32_t SharedFirstLevel;
+	uint32_t SharedSecondLevel;
+	uint32_t StarveFirstLevel;
+	uint32_t StarveSecondLevel;
+	uint32_t WaitForExclusive;
+	uint32_t OwnerTableExpands;
+	uint32_t MaximumTableExpand;
+	list_entry HashTable[RESOURCE_HASH_TABLE_SIZE];
 };
 
 

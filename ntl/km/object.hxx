@@ -20,6 +20,13 @@ namespace km {
 using nt::security_descriptor;
 using nt::security_quality_of_service;
 
+using nt::object_information_class;
+using nt::object_basic_information;
+using nt::object_name_information;
+using nt::object_type_information;
+using nt::object_types_information;
+using nt::object_handle_flag_information;
+using nt::object_session_information;
 
 struct device_object;
 struct file_object;
@@ -93,8 +100,8 @@ STATIC_ASSERT(sizeof(object_type) ==0x190);
 
 struct object_handle_information
 {
-  uint32_t HandleAttributes;
-  uint32_t GrantedAccess;
+	uint32_t HandleAttributes;
+	uint32_t GrantedAccess;
 };
 
 

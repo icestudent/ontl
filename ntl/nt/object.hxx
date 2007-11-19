@@ -11,11 +11,10 @@
 #include "basedef.hxx"
 #include "string.hxx"
 #include "handle.hxx"
-
+#include "status.hxx"
 
 namespace ntl {
 namespace nt {
-
 
 struct security_descriptor;
 struct security_quality_of_service;
@@ -72,6 +71,88 @@ struct object_attributes
 
 };
 
+enum object_information_class
+{
+	ObjectBasicInformation,
+	ObjectNameInformation,
+	ObjectTypeInformation,
+	ObjectTypesInformation,
+	ObjectHandleFlagInformation,
+	ObjectSessionInformation,
+	MaxObjectInfoClass
+};
+
+struct object_basic_information
+{
+	uint32_t Attributes;
+	access_mask GrantedAccess;
+	uint32_t HandleCount;
+	uint32_t PointerCount;
+	uint32_t PagedPoolCharge;
+	uint32_t NonPagedPoolCharge;
+	uint32_t Reserved[3];
+	uint32_t NameInfoSize;
+	uint32_t TypeInfoSize;
+	uint32_t SecurityDescriptorSize;
+	int64_t CreationTime;
+};
+
+struct object_name_information
+{
+	unicode_string Name;
+};
+
+struct object_type_information
+{
+	unicode_string TypeName;
+	uint32_t TotalNumberOfObjects;
+	uint32_t TotalNumberOfHandles;
+	uint32_t TotalPagedPoolUsage;
+	uint32_t TotalNonPagedPoolUsage;
+	uint32_t TotalNamePoolUsage;
+	uint32_t TotalHandleTableUsage;
+	uint32_t HighWaterNumberOfObjects;
+	uint32_t HighWaterNumberOfHandles;
+	uint32_t HighWaterPagedPoolUsage;
+	uint32_t HighWaterNonPagedPoolUsage;
+	uint32_t HighWaterNamePoolUsage;
+	uint32_t HighWaterHandleTableUsage;
+	uint32_t InvalidAttributes;
+	generic_mapping GenericMapping;
+	uint32_t ValidAccessMask;
+	bool SecurityRequired;
+	bool MaintainHandleCount;
+	uint32_t PoolType;
+	uint32_t DefaultPagedPoolCharge;
+	uint32_t DefaultNonPagedPoolCharge;
+};
+
+struct object_types_information
+{
+	uint32_t NumberOfObjectTypes;
+	object_type_information ObjectTypeInformation[1];
+};
+
+struct object_handle_flag_information
+{
+	bool InheritHandle;
+	bool ProtectFromClose;
+};
+
+struct object_session_information
+{
+	uint32_t SessionId;
+};
+
+NTL__EXTERNAPI
+ntstatus __stdcall
+NtQueryObject(
+		legacy_handle ObjectHandle,
+		object_information_class ObjectInformationClass,
+		void* ObjectInformation,
+		int32_t Length,
+		int32_t* ResultLength
+	  );
 
 }//namespace nt
 }//namespace ntl

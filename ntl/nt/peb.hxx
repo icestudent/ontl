@@ -15,10 +15,54 @@
 namespace ntl {
 namespace nt {
 
-struct rtl_user_process_parameters;
 struct rtl_critacal_section;
 struct rtl_heap;
 
+struct curdir
+{
+	/*<thisrel this+0x0>*/ /*|0x8|*/ unicode_string DosPath;
+	/*<thisrel this+0x8>*/ /*|0x4|*/ legacy_handle Handle;
+};
+
+struct rtl_drive_letter_curdir
+{
+	/*<thisrel this+0x0>*/ /*|0x2|*/ uint16_t Flags;
+	/*<thisrel this+0x2>*/ /*|0x2|*/ uint16_t Length;
+	/*<thisrel this+0x4>*/ /*|0x4|*/ uint32_t TimeStamp;
+	/*<thisrel this+0x8>*/ /*|0x8|*/ ansi_string DosPath;
+};
+
+struct rtl_user_process_parameters
+{
+	/*<thisrel this+0x0>*/ /*|0x4|*/ uint32_t MaximumLength;
+	/*<thisrel this+0x4>*/ /*|0x4|*/ uint32_t Length;
+	/*<thisrel this+0x8>*/ /*|0x4|*/ uint32_t Flags;
+	/*<thisrel this+0xc>*/ /*|0x4|*/ uint32_t DebugFlags;
+	/*<thisrel this+0x10>*/ /*|0x4|*/ void* ConsoleHandle;
+	/*<thisrel this+0x14>*/ /*|0x4|*/ uint32_t ConsoleFlags;
+	/*<thisrel this+0x18>*/ /*|0x4|*/ void* StandardInput;
+	/*<thisrel this+0x1c>*/ /*|0x4|*/ void* StandardOutput;
+	/*<thisrel this+0x20>*/ /*|0x4|*/ void* StandardError;
+	/*<thisrel this+0x24>*/ /*|0xc|*/ curdir CurrentDirectory;
+	/*<thisrel this+0x30>*/ /*|0x8|*/ unicode_string DllPath;
+	/*<thisrel this+0x38>*/ /*|0x8|*/ unicode_string ImagePathName;
+	/*<thisrel this+0x40>*/ /*|0x8|*/ unicode_string CommandLine;
+	/*<thisrel this+0x48>*/ /*|0x4|*/ void* Environment;
+	/*<thisrel this+0x4c>*/ /*|0x4|*/ uint32_t StartingX;
+	/*<thisrel this+0x50>*/ /*|0x4|*/ uint32_t StartingY;
+	/*<thisrel this+0x54>*/ /*|0x4|*/ uint32_t CountX;
+	/*<thisrel this+0x58>*/ /*|0x4|*/ uint32_t CountY;
+	/*<thisrel this+0x5c>*/ /*|0x4|*/ uint32_t CountCharsX;
+	/*<thisrel this+0x60>*/ /*|0x4|*/ uint32_t CountCharsY;
+	/*<thisrel this+0x64>*/ /*|0x4|*/ uint32_t FillAttribute;
+	/*<thisrel this+0x68>*/ /*|0x4|*/ uint32_t WindowFlags;
+	/*<thisrel this+0x6c>*/ /*|0x4|*/ uint32_t ShowWindowFlags;
+	/*<thisrel this+0x70>*/ /*|0x8|*/ unicode_string WindowTitle;
+	/*<thisrel this+0x78>*/ /*|0x8|*/ unicode_string DesktopInfo;
+	/*<thisrel this+0x80>*/ /*|0x8|*/ unicode_string ShellInfo;
+	/*<thisrel this+0x88>*/ /*|0x8|*/ unicode_string RuntimeData;
+	/*<thisrel this+0x90>*/ /*|0x200|*/ rtl_drive_letter_curdir CurrentDirectores[32];
+};
 
 struct peb
 {

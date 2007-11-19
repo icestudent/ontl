@@ -15,6 +15,15 @@
 #include "../pe/image.hxx"
 
 namespace ntl {
+
+	/// Exception filter return values
+	enum exception_filter
+	{
+		exception_continue_execution = -1,
+		exception_continue_search,
+		exception_execute_handler
+	};
+
 namespace nt {
 
 /**\addtogroup  native_types_support *** NT Types support library ***********

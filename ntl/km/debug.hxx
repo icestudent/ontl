@@ -15,6 +15,18 @@
 namespace ntl {
 namespace km {
 
+extern "C" bool* KdDebuggerNotPresent;
+extern "C" bool* KdDebuggerEnabled;
+
+NTL__EXTERNAPI
+void __stdcall
+  DbgBreakPointWithStatus(
+    ntstatus Status
+  );
+
+NTL__EXTERNAPI
+bool __stdcall
+  KdRefreshDebuggerNotPresent();
 
 NTL__EXTERNAPI
 ntstatus __stdcall
@@ -60,11 +72,15 @@ ntstatus __stdcall
 #pragma warning(disable:4100)
 
 #if defined(_DEBUG) || defined(DBG)
-#define KdPrint(X) DbgPrint X
-#define KdPrintEx(X) DbgPrintEx X
+#	define KdBreakPoint() intrinsic::debugbreak()
+#	define KdBreakPointWithStatus() DbgBreakPointWithStatus(X)
+#	define KdPrint(X) DbgPrint X
+#	define KdPrintEx(X) DbgPrintEx X
 #else
-#define KdPrint(X)
-#define KdPrintEx(X)
+#	define KdBreakPoint()
+#	define KdBreakPointWithStatus()
+#	define KdPrint(X)
+#	define KdPrintEx(X)
 #endif
 
 template <dpfltr::level DefaultLevel  = dpfltr::error,
