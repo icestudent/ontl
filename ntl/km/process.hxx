@@ -527,6 +527,16 @@ NTL__EXTERNAPI
 kprocess * __stdcall
   PsGetCurrentProcess();
 
+NTL__EXTERNAPI
+legacy_handle __stdcall
+  PsGetCurrentProcessId();
+
+///\note XP+ only
+NTL__EXTERNAPI
+legacy_handle __stdcall
+  PsGetCurrentProcessSessionId();
+
+
 ///\note XP+ only
 NTL__EXTERNAPI
 char * __stdcall
@@ -570,6 +580,7 @@ void __stdcall
   KeUnstackDetachProcess(
     kapc_state *  ApcState
     );
+
 
 
 typedef

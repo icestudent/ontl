@@ -33,6 +33,10 @@ NTL__EXTERNAPI
 kthread * __stdcall
   PsGetCurrentThread();
 
+NTL__EXTERNAPI
+kthread * __stdcall
+  PsGetCurrentThreadId();
+
 
 NTL__EXTERNAPI
 ntstatus __stdcall
