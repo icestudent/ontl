@@ -45,8 +45,57 @@ static const kprocessor_mode UserMode = { 1 };
 
 typedef long kpriority;
 
-#if 0
-struct kirql{ uint8_t _; };
+#if 1
+
+/// interrupt request level
+NTL__EXTERNAPI
+uint8_t __stdcall
+  KeGetCurrentIrql();
+
+
+struct kirql
+{ 
+	typedef uint8_t type;
+protected:
+	type _;
+	kirql(type irql)
+	{
+		_ = irql;
+	}
+public:
+	static kirql get_current()
+	{
+		return kirql(KeGetCurrentIrql());
+	}
+
+	enum level {
+		passive_level = 0,             // passive release level
+		low_level = 0,                 // lowest interrupt level
+		apc_level = 1,                 // apc interrupt level
+		dispatch_level = 2,            // dispatcher level
+
+		profile_level = 27,            // timer used for profiling.
+		clock1_level = 28,             // interval clock 1 level - not used on x86
+		clock2_level = 28,             // interval clock 2 level
+		ipi_level = 29,                // interprocessor interrupt level
+		power_level = 30,              // power failure level
+		high_level = 31                // highest interrupt level
+	};
+
+	friend static bool operator == (const kirql irql, level l)
+	{
+		return irql._ == (type)l;
+	}
+	friend static bool operator < (const kirql irql, level l)
+	{
+		return irql._ < (type)l;
+	}
+	friend static bool operator > (const kirql irql, level l)
+	{
+		return irql._ > (type)l;
+	}
+	
+};
 #else
 typedef uint8_t kirql;
 #endif

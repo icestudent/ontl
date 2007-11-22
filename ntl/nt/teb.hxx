@@ -15,11 +15,45 @@
 namespace ntl {
 
 namespace intrinsic {
-extern "C" uint32_t __cdecl __readfsdword(uint32_t);
-extern "C" void __cdecl __writefsdword(uint32_t Offset, uint32_t Data);
+	extern "C" uint8_t __cdecl __readfsbyte(uint32_t);
+	extern "C" uint8_t __cdecl __readgsbyte(uint32_t);
+	extern "C" uint16_t __cdecl __readfsword(uint32_t);
+	extern "C" uint16_t __cdecl __readgsword(uint32_t);
+	extern "C" uint32_t __cdecl __readfsdword(uint32_t);
+	extern "C" uint32_t __cdecl __readgsdword(uint32_t);
+
+	extern "C" void __cdecl __writefsdword(uint32_t Offset, uint32_t Data);
 
 #ifdef _M_IX86
 #	pragma intrinsic(__readfsdword)
+#	pragma intrinsic(__writefsdword)
+
+__forceinline uint16_t __cdecl __readgsword(uint32_t off)
+{
+	__asm {
+		// movzx eax, word ptr fs:[0] KPCR.PrcbData.DpcRoutineActive
+		mov		eax,off
+		movzx	eax,word ptr gs:[eax]
+	}
+}
+__forceinline uint32_t __cdecl __readgsdword(uint32_t off)
+{
+	__asm {
+		mov		eax,off
+		mov		eax,gs:[eax]
+	}
+}
+
+
+#elif _M_AMD64
+#	pragma intrinsic(__readfsbyte)
+#	pragma intrinsic(__readgsbyte)
+#	pragma intrinsic(__readfsword)
+#	pragma intrinsic(__readgsword)
+#	pragma intrinsic(__readfsdword)
+#	pragma intrinsic(__readgsdword)
+#	pragma intrinsic(__readfsqword)
+#	pragma intrinsic(__readgsqword)
 #	pragma intrinsic(__writefsdword)
 #endif
 }//namespace intrin
