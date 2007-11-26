@@ -82,6 +82,10 @@ public:
 		high_level = 31                // highest interrupt level
 	};
 
+	operator int()
+	{
+		return (int)_;
+	}
 	friend static bool operator == (const kirql irql, level l)
 	{
 		return irql._ == (type)l;
@@ -578,24 +582,6 @@ struct work_queue_item
   void      * Parameter;
 };
 
-
-struct kmutant 
-{
-  dispatcher_header   Header;
-  list_entry          MutantListEntry;
-  struct _KTHREAD   * OwnerThread;
-  unsigned char       Abandoned;
-  unsigned char       ApcDisable;
-};
-
-struct fast_mutex
-{
-	/*<thisrel this+0x0>*/ /*|0x4|*/ int32_t Count;
-	/*<thisrel this+0x4>*/ /*|0x4|*/ kthread* Owner;
-	/*<thisrel this+0x8>*/ /*|0x4|*/ uint32_t Contention;
-	/*<thisrel this+0xc>*/ /*|0x10|*/ kevent Event;
-	/*<thisrel this+0x1c>*/ /*|0x4|*/ uint32_t OldIrql;
-};
 
 //
 //  executive resource data structures.
