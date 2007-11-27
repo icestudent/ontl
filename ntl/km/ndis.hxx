@@ -62,9 +62,12 @@ class ndis
       {
         success             = 0,
         pending             = 0x00000103,
+		    closing				      = (int)0xC0010002,
         bad_version         = (int)0xC0010004,
         bad_characteristics = (int)0xC0010005,
-        resources           = (int)0xC000009A,
+		    adapter_not_found   = (int)0xC0010006,
+		    open_failed			    = (int)0xC0010007,
+        resources           = (int)0xC000009A
       };
     };
 
@@ -120,7 +123,6 @@ class ndis
 
     struct reference
     {
-//        uintptr_t SpinLock;
       kspin_lock  SpinLock;
       uint16_t    ReferenceCount;
       bool        Closing;
