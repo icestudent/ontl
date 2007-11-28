@@ -24,6 +24,7 @@ namespace ntl {
 		exception_execute_handler
 	};
 
+
 namespace nt {
 
 /**\addtogroup  native_types_support *** NT Types support library ***********
