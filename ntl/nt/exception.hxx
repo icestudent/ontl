@@ -10,9 +10,13 @@
 
 #include "basedef.hxx"
 
-#define exception_code              (uint32_t)_exception_code()
-#define exception_info              (struct exception::pointers*)_exception_info
-#define abnormal_termination        (bool)(_abnormal_termination() != 0)
+#undef exception_code
+#undef exception_info
+#undef abnormal_termination
+
+#define exception_code              _exception_code()
+#define exception_info()            reinterpret_cast<struct exception::pointers*>(_exception_info())
+#define abnormal_termination        (_abnormal_termination() != 0)
 
 extern "C" {
 unsigned long __cdecl _exception_code(void);

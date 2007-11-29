@@ -116,7 +116,7 @@ public:
   }
   void raise(const level NewIrql)
   {
-    _ = KfRaiseIrql((kirql_t)NewIrql);
+    _ = KfRaiseIrql(NewIrql);
   }
   void raisetodpc()
   {
@@ -132,17 +132,17 @@ public:
   }
 
 
-	friend static bool operator == (const kirql irql, level l)
+	friend bool operator == (const kirql irql, level l)
 	{
-		return irql._ == (kirql_t)l;
+		return irql._ == static_cast<kirql_t>(l);
 	}
-	friend static bool operator < (const kirql irql, level l)
+	friend bool operator < (const kirql irql, level l)
 	{
-		return irql._ < (kirql_t)l;
+		return irql._ < static_cast<kirql_t>(l);
 	}
-	friend static bool operator > (const kirql irql, level l)
+	friend bool operator > (const kirql irql, level l)
 	{
-		return irql._ > (kirql_t)l;
+		return irql._ > static_cast<kirql_t>(l);
 	}
 };
 
