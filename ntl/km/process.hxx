@@ -39,7 +39,7 @@ struct kprocess
 #ifndef NTL_SUPPRESS_IMPORT
     return IoGetCurrentProcess();
 #else
-    return kthread::get_current()->ApcState.Process;    
+    return kthread::get_current()->ApcState.Process;
 #endif
   }
 

@@ -137,7 +137,7 @@ class atomic_exec<Lock, void>
     atomic_exec(Lock & lock)
     : lock(lock)
     { 
-      lock.acquire()
+      lock.acquire();
     }
 
     template<class AnyLock>
@@ -152,7 +152,7 @@ class atomic_exec<Lock, void>
     atomic_exec(Lock * lock)
     : lock(*lock)
     { 
-      lock.acquire()
+      lock.acquire();
     }
 
     template<class AnyLock>

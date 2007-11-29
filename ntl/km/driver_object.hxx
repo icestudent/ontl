@@ -71,6 +71,30 @@ ntstatus device_object::call(irp * pirp)
 }
 
 
+typedef void
+(__stdcall *driver_reinitialize_t)(
+                                   driver_object* DriverObject,
+                                   void* Context,
+                                   uint32_t Count
+                                   );
+
+NTL__EXTERNAPI
+void __stdcall
+IoRegisterBootDriverReinitialization(
+                                     driver_object* DriverObject,
+                                     driver_reinitialize_t DriverReinitializationRoutine,
+                                     void* Context
+                                     );
+
+NTL__EXTERNAPI
+void __stdcall
+IoRegisterDriverReinitialization(
+                                 driver_object* DriverObject,
+                                 driver_reinitialize_t DriverReinitializationRoutine,
+                                 void* Context
+                                 );
+
+
 }//namspace km
 }//namespace ntl
 
