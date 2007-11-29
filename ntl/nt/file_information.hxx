@@ -10,6 +10,7 @@
 
 #include "basedef.hxx"
 #include "handle.hxx"
+#include <memory>
 
 
 namespace ntl {
@@ -122,7 +123,7 @@ struct file_information_base
 
     operator bool() const { return nt::success(status_); }
 
-    ntstatus status() const { return status_; }
+    operator ntstatus() const { return status_; }
 
     static __forceinline
     ntstatus
@@ -208,6 +209,91 @@ struct file_standard_information
 };
 
 
+///\  FileRenameInformation == 10
+struct file_rename_information
+{
+  static const file_information_class info_class_type = FileRenameInformation;
+
+  static inline
+    std::auto_ptr<file_rename_information>
+      alloc(
+        const const_unicode_string &  new_name,
+        bool                          replace_if_exists,
+        legacy_handle                 root_directory = legacy_handle())
+    {
+      return std::auto_ptr<file_rename_information>(
+            new (new_name.size()*sizeof(wchar_t))
+            file_rename_information(new_name, replace_if_exists, root_directory));
+    }
+
+    bool          ReplaceIfExists;
+    legacy_handle RootDirectory;
+    uint32_t      FileNameLength;
+    wchar_t       FileName[1];
+
+  protected:
+
+    file_rename_information(
+      const const_unicode_string &  new_name,
+      bool                          replace_if_exists,
+      legacy_handle                 root_directory)
+    : ReplaceIfExists(replace_if_exists),
+      RootDirectory(root_directory),
+      FileNameLength(new_name.size()*sizeof(wchar_t))
+    {
+      std::copy(new_name.begin(), new_name.end(), FileName);
+    }
+
+  void * operator new(std::size_t size, uint32_t filename_length) throw()
+  {
+    return ::operator new[](size + filename_length);
+  }
+
+  void operator delete(void* p)
+  {
+    ::operator delete[](p);
+  }
+
+  friend class 
+std::auto_ptr<file_rename_information>;
+
+};
+
+template<>
+struct file_information<file_rename_information>
+{
+    file_information(
+      legacy_handle                   file_handle,
+      const file_rename_information & info) throw()
+    : status_(_set(file_handle, &info,
+              sizeof(info) + info.FileNameLength - sizeof(wchar_t)))
+    {/**/}
+
+    operator bool() const { return nt::success(status_); }
+
+    operator ntstatus() const { return status_; }
+
+    static __forceinline
+    ntstatus
+      _set(
+        legacy_handle   file_handle,
+        const void *    info,
+        unsigned long   info_length
+        )
+    {
+      io_status_block iosb;
+      return NtSetInformationFile(file_handle, &iosb, info, info_length,
+                                  file_rename_information::info_class_type);
+    }
+
+  ///////////////////////////////////////////////////////////////////////////
+  private:
+
+    ntstatus    status_;
+    
+};
+
+
 ///\name  FileDispositionInformation == 13
 template<bool Del = true>
 struct file_disposition_information
@@ -227,8 +313,10 @@ struct file_end_of_file_information
   int64_t EndOfFile;
 };
 
+
 ///\name FileNetworkOpenInformation == 34
-struct file_network_open_information {
+struct file_network_open_information
+{
 	int64_t CreationTime;
 	int64_t LastAccessTime;
 	int64_t LastWriteTime;

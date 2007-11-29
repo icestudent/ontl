@@ -39,6 +39,12 @@ struct status
 
     insufficient_resources    = (int)0xC000009A,
 
+    invalid_image_not_mz      = (int)0xC000012F,
+    invalid_image_win_32      = (int)0xC0000359,
+    entrypoint_not_found      = (int)0xC0000139,
+
+    driver_entrypoint_not_found = (int)0xC0000263,
+
     device_configuraton_error = (int)0xC0000182,
   };
 };

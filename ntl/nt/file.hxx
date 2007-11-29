@@ -96,6 +96,8 @@ class file_handler;
 template<>
 struct device_traits<nt::file_handler> : public device_traits<>
 {
+  bool success(ntstatus s) { return nt::success(s); }
+  
   typedef int64_t size_type;
 
   enum access_mask
@@ -242,7 +244,7 @@ class file_handler : public handle, public device_traits<file_handler>
   public:
 
     __forceinline
-    bool
+    ntstatus
       create(
         const object_attributes &   oa, 
         const creation_disposition  cd              = creation_disposition_default,
@@ -256,13 +258,12 @@ class file_handler : public handle, public device_traits<file_handler>
         ) throw()
     {
       reset();
-      const ntstatus s = NtCreateFile(this, desired_access, &oa, &iosb,
+      return NtCreateFile(this, desired_access, &oa, &iosb,
                     allocation_size, attr, share, cd, co, ea_buffer, ea_length);
-      return nt::success(s);
     }
 
     __forceinline
-    bool
+    ntstatus
       create(
         const std::wstring &        file_name, 
         const creation_disposition  cd              = creation_disposition_default,
@@ -278,12 +279,11 @@ class file_handler : public handle, public device_traits<file_handler>
       reset();
       const const_unicode_string uname(file_name);
       const object_attributes oa(uname);
-      const ntstatus s = NtCreateFile(this, desired_access, &oa, &iosb,
+      return NtCreateFile(this, desired_access, &oa, &iosb,
                     allocation_size, attr, share, cd, co, ea_buffer, ea_length);
-      return nt::success(s);
     }
 
-    bool
+    ntstatus
       open(
         const object_attributes &   oa, 
         const access_mask           desired_access,
@@ -292,22 +292,22 @@ class file_handler : public handle, public device_traits<file_handler>
         ) throw()
     {
       reset();
-      const ntstatus s = NtOpenFile(this, desired_access, &oa, &iosb, share, co);
-      return nt::success(s);
+      return NtOpenFile(this, desired_access, &oa, &iosb, share, co);
     }
 
     operator const void*() { return get(); } 
 
     void close() { reset(); }
 
-    bool erase()
+    ntstatus erase()
     {
       file_disposition_information<> del;
       file_information<file_disposition_information<> > file_info(get(), del);
+      close();
       return file_info;
     }
 
-    bool
+    ntstatus
       read(
         void *            out_buf,
         const uint32_t    out_size,
@@ -318,12 +318,11 @@ class file_handler : public handle, public device_traits<file_handler>
         const uint32_t *  blocking_key      = 0
         ) const throw()
     {
-      const ntstatus s = NtReadFile(get(), completion_event, apc_routine, apc_context,
+      return NtReadFile(get(), completion_event, apc_routine, apc_context,
                           &iosb, out_buf, out_size, offset, blocking_key);
-      return nt::success(s);
     }
 
-    bool
+    ntstatus
       write(
         const void *      in_buf,
         const uint32_t    in_size,
@@ -334,9 +333,8 @@ class file_handler : public handle, public device_traits<file_handler>
         const uint32_t *  blocking_key      = 0
         ) throw()
     {
-      const ntstatus s = NtWriteFile(get(), completion_event, apc_routine, apc_context,
+      return NtWriteFile(get(), completion_event, apc_routine, apc_context,
                           &iosb, in_buf, in_size, offset, blocking_key);
-      return nt::success(s);
     }
 
     size_type size() const
@@ -345,11 +343,22 @@ class file_handler : public handle, public device_traits<file_handler>
       return file_info ? file_info.data()->size() : 0;
     }
 
-    bool size(const size_type & new_size)
+    ntstatus size(const size_type & new_size)
     {
       const file_end_of_file_information & fi = 
         *reinterpret_cast<const file_end_of_file_information*>(&new_size);
       file_information<file_end_of_file_information> file_info(get(), fi);
+      return file_info;
+    }
+
+    ntstatus rename(
+      const const_unicode_string &  new_name,
+      bool                          replace_if_exists)
+    {
+      std::auto_ptr<file_rename_information> fi = 
+                    file_rename_information::alloc(new_name, replace_if_exists);
+      if ( !fi.get() ) return status::insufficient_resources;
+      file_information<file_rename_information> file_info(get(), *fi);
       return file_info;
     }
 

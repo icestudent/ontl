@@ -11,6 +11,7 @@
 #include "basedef.hxx"
 #include "string.hxx"
 #include "../pe/image.hxx"
+#include "teb.hxx"
 
 namespace ntl {
 namespace nt {
@@ -32,17 +33,19 @@ struct rtl_drive_letter_curdir
 	/*<thisrel this+0x8>*/ /*|0x8|*/ ansi_string DosPath;
 };
 
+static const unsigned rtl_max_drive_letters = 32;
+
 struct rtl_user_process_parameters
 {
 	/*<thisrel this+0x0>*/ /*|0x4|*/ uint32_t MaximumLength;
 	/*<thisrel this+0x4>*/ /*|0x4|*/ uint32_t Length;
 	/*<thisrel this+0x8>*/ /*|0x4|*/ uint32_t Flags;
 	/*<thisrel this+0xc>*/ /*|0x4|*/ uint32_t DebugFlags;
-	/*<thisrel this+0x10>*/ /*|0x4|*/ void* ConsoleHandle;
+	/*<thisrel this+0x10>*/ /*|0x4|*/ legacy_handle ConsoleHandle;
 	/*<thisrel this+0x14>*/ /*|0x4|*/ uint32_t ConsoleFlags;
-	/*<thisrel this+0x18>*/ /*|0x4|*/ void* StandardInput;
-	/*<thisrel this+0x1c>*/ /*|0x4|*/ void* StandardOutput;
-	/*<thisrel this+0x20>*/ /*|0x4|*/ void* StandardError;
+	/*<thisrel this+0x18>*/ /*|0x4|*/ legacy_handle StandardInput;
+	/*<thisrel this+0x1c>*/ /*|0x4|*/ legacy_handle StandardOutput;
+	/*<thisrel this+0x20>*/ /*|0x4|*/ legacy_handle StandardError;
 	/*<thisrel this+0x24>*/ /*|0xc|*/ curdir CurrentDirectory;
 	/*<thisrel this+0x30>*/ /*|0x8|*/ unicode_string DllPath;
 	/*<thisrel this+0x38>*/ /*|0x8|*/ unicode_string ImagePathName;
@@ -61,11 +64,17 @@ struct rtl_user_process_parameters
 	/*<thisrel this+0x78>*/ /*|0x8|*/ unicode_string DesktopInfo;
 	/*<thisrel this+0x80>*/ /*|0x8|*/ unicode_string ShellInfo;
 	/*<thisrel this+0x88>*/ /*|0x8|*/ unicode_string RuntimeData;
-	/*<thisrel this+0x90>*/ /*|0x200|*/ rtl_drive_letter_curdir CurrentDirectores[32];
+	/*<thisrel this+0x90>*/ /*|0x200|*/ rtl_drive_letter_curdir CurrentDirectores[rtl_max_drive_letters];
 };
 
 struct peb
 {
+  static __forceinline
+  peb& instance()
+  {
+    return *teb::get(&teb::ProcessEnvironmentBlock);
+  }
+  
   struct ldr_data
   {
     /* 0x00 */  uint32_t      Length;

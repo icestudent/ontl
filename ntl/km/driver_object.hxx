@@ -10,6 +10,7 @@
 
 #include "basedef.hxx"
 #include "string.hxx"
+#include "device_object.hxx"
 #include "irp.hxx"
 
 namespace ntl {
@@ -17,7 +18,7 @@ namespace km {
 
 struct device_object;
 struct driver_object;
-struct fast_io_dispatch_t;
+struct fast_io_dispatch;
 
 struct driver_extension
 {
@@ -42,16 +43,32 @@ struct driver_object
   driver_extension *          DriverExtension;
   unicode_string              DriverName;
   unicode_string *            HardwareDatabase;
-  fast_io_dispatch_t *        FastIoDispatch;
+  fast_io_dispatch *          FastIoDispatch;
   ntstatus(__stdcall *        DriverInit)(driver_object*, unicode_string*);
   void    (__stdcall *        DriverStartIo)(driver_object*, irp*);
   void    (__stdcall *        DriverUnload)(driver_object*);
-  driver_dispatch_t*          MajorFunction[28];
+
+  device_object::dispatch_ptr MajorFunction[28];
+
 };
 
 STATIC_ASSERT(sizeof(driver_object) == 0xA8 || sizeof(driver_object) == 0x150);
 
-STATIC_ASSERT(offsetof(driver_object, MajorFunction) == 0x38 || offsetof(driver_object, MajorFunction) == 0x70);
+__forceinline
+ntstatus device_object::call(irp * pirp)
+{
+//    pirp->CurrentLocation--;
+//    io_stack_location * const stack = pirp->get_next_stack_location();
+//    pirp->Tail.Overlay.CurrentStackLocation = stack;
+  pirp->set_next_stack_location();
+#if 0//defined(_DEBUG)
+  if( pirp->CurrentLocation <= 0 )
+      KeBugCheckEx(NO_MORE_IRP_STACK_LOCATIONS, pirp, 0, 0, 0);
+#endif
+  io_stack_location * const stack = pirp->get_current_stack_location();
+  stack->DeviceObject = this;
+  return DriverObject->MajorFunction[stack->MajorFunction](this, pirp);
+}
 
 
 }//namspace km

@@ -9,6 +9,7 @@
 #define NTL__KM_THREAD
 
 #include "basedef.hxx"
+#include "object.hxx"
 #include "apc.hxx"
 #include "handle.hxx"
 #include "../nt/teb.hxx"

@@ -15,6 +15,15 @@
 namespace ntl {
 
 
+template<typename T, typename T2>
+static __forceinline
+T brute_cast(T2 pf)
+{
+  STATIC_ASSERT(sizeof(T) == sizeof(T2));
+  return *reinterpret_cast<const T*>(&pf);
+}
+
+
 #ifdef _MSC_VER
 
 namespace intrinsic {

@@ -18,22 +18,18 @@
 #define exception_info()            reinterpret_cast<struct exception::pointers*>(_exception_info())
 #define abnormal_termination        (_abnormal_termination() != 0)
 
-extern "C" {
-unsigned long __cdecl _exception_code(void);
-void *        __cdecl _exception_info(void);
-int           __cdecl _abnormal_termination(void);
-
-
-//#pragma intrinsic(_exception_code, _exception_info, _abnormal_termination)
+extern "C" 
+{
+  unsigned long __cdecl _exception_code(void);
+  void *        __cdecl _exception_info(void);
+  int           __cdecl _abnormal_termination(void);
 }
 
 
 namespace ntl {
 namespace nt {
 
-
 struct context;
-
 
 class exception
 {
@@ -89,23 +85,7 @@ class exception
       record*   ExceptionRecord;
       context*  ContextRecord;
     };
-#if 0
-    static uint32_t code() 
-    {
-      return _exception_code();
-    }
-    
 
-    static pointers* information() 
-    {
-      return reinterpret_cast<pointers*>(_exception_info());
-    }
-
-    static bool abnormal_termination() 
-    {
-      return _abnormal_termination() != 0;
-    }
-#endif
 };//class exception
 
 

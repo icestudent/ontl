@@ -9,12 +9,10 @@
 #define NTL__KM_DEVICE_OBJECT
 
 #include "object.hxx"
-#include "driver_object.hxx"
+#include "irp.hxx"
 
 namespace ntl {
 namespace km {
-
-struct driver_object;
 
 
 enum device_type {};
@@ -65,6 +63,9 @@ struct device_object
   devobj_extension *    DeviceObjectExtension;
   void *                Reserved;
 
+  typedef ntstatus __stdcall dispatch_t(device_object *, irp *);
+  typedef dispatch_t *  dispatch_ptr;
+
   device_object * get_attached_device()
   {
     device_object * pdo = this;
@@ -93,20 +94,7 @@ struct device_object
     return pdo;
   }
 
-  ntstatus call(irp * pirp)
-  {
-//    pirp->CurrentLocation--;
-//    io_stack_location * const stack = pirp->get_next_stack_location();
-//    pirp->Tail.Overlay.CurrentStackLocation = stack;
-    pirp->set_next_stack_location();
-#if 0//defined(_DEBUG)
-    if( pirp->CurrentLocation <= 0 )
-        KeBugCheckEx(NO_MORE_IRP_STACK_LOCATIONS, pirp, 0, 0, 0);
-#endif
-    io_stack_location * const stack = pirp->get_current_stack_location();
-    stack->DeviceObject = this;
-    return DriverObject->MajorFunction[stack->MajorFunction](this, pirp);
-  }
+  ntstatus call(irp * pirp);
   
 }; // struct device_object
 

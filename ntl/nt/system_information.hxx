@@ -381,8 +381,8 @@ struct system_modules_information //RTL_PROCESS_MODULES
 
   iterator                begin()       { return &Modules[0]; }
   const_iterator          begin() const { return &Modules[0]; }
-  iterator                end()         { return &Modules[NumberOfModules + 1]; }
-  const_iterator          end()   const { return &Modules[NumberOfModules + 1]; }
+  iterator                end()         { return &Modules[NumberOfModules]; }
+  const_iterator          end()   const { return &Modules[NumberOfModules]; }
   reverse_iterator        rbegin()      { return reverse_iterator(end()); }
   const_reverse_iterator  rbegin() const { return const_reverse_iterator(end()); }
   reverse_iterator        rend()        { return reverse_iterator(begin()); }

@@ -346,7 +346,7 @@ class key : public handle, public device_traits<key>
         void *                        information,
         uint32_t                      length,
         uint32_t &                    result_length
-        ) throw()
+        ) const throw()
     {
       return ZwQueryValueKey(this->get(), &value_name, info_class, information,
                               length, &result_length);
@@ -357,7 +357,7 @@ class key : public handle, public device_traits<key>
       query(
         const const_unicode_string &  value_name,
         std::wstring &                value_string
-        )
+        ) const
     {
       uint32_t size = query_buf_default_size;
       STATIC_ASSERT(query_buf_default_size > sizeof(value_partial_information));
@@ -394,7 +394,7 @@ class key : public handle, public device_traits<key>
       query(
         const const_unicode_string &  value_name,
         std::vector<uint8_t> &        data
-        )
+        ) const
     {
       uint32_t size = 0;
       uint8_t * buf = 0;
@@ -422,7 +422,7 @@ class key : public handle, public device_traits<key>
       query(
         const const_unicode_string &  value_name,
         uint32_t &                    value
-        )
+        ) const
     {
       uint32_t dummy_size;
       uint8_t buf[sizeof(value_partial_information)+sizeof(uint32_t)-sizeof(uint8_t)];
@@ -470,10 +470,10 @@ class key : public handle, public device_traits<key>
       set(
         const const_unicode_string &  value_name,
         const std::wstring &          value,
-        value_type                    type)
+        value_type                    type        = reg_sz)
     {
       return nt::success(set(value_name, type, value.begin(),
-                              (uint32_t)(value.size() * sizeof(std::wstring::value_type))));
+                              value.size() * sizeof(std::wstring::value_type)));
     }
 
 

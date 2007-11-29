@@ -20,7 +20,7 @@ namespace nt {
  *@{*/
 
 template <class charT,
-          class traits    = std::char_traits<std::remove_const<charT>::type>,
+          class traits    = std::char_traits<typename std::remove_const<charT>::type>,
           class Allocator = std::allocator<charT> >
 class native_string
 {
@@ -59,6 +59,14 @@ class native_string
       buffer_(str.begin())
     {/**/}
 
+ friend class native_string;
+
+    native_string(const native_string<value_type>& str)
+    : length_(str.length_),
+      maximum_length_(maximum_length_),
+      buffer_(str.buffer_)
+    {/**/}
+
     native_string(charT* s, size_t n)
     : length_(size_type(n) * sizeof(value_type)),
       maximum_length_(size_type(n) * sizeof(value_type)), 
@@ -72,13 +80,15 @@ class native_string
       buffer_(&str[0])
     {/**/}
 
-    const native_string& operator=(const native_string & s)
+    const native_string& operator=(const native_string & s);
+#if 0
     {
       length_ = s.length_;
       maximum_length_ = s.maximum_length_;
       buffer_ = s.buffer_;
 	  return *this;
     }
+#endif
     
     ///\name  native_string connversions
 

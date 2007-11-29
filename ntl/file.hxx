@@ -57,7 +57,7 @@ class basic_file : public traits
         const attributes            attr            = traits::attribute_default
         ) throw()
     {
-      return f.create(object, cd, desired_access, share_access, co, attr);
+      return success(f.create(object, cd, desired_access, share_access, co, attr));
     }
 
     /*
@@ -70,12 +70,12 @@ class basic_file : public traits
 
     bool read(void * out, const uint32_t out_size) throw()
     {
-      return f.read(out, out_size);
+      return success(f.read(out, out_size));
     }
 
     bool write(const void * in, const uint32_t in_size) throw()
     {
-      return f.write(in, in_size);
+      return success(f.write(in, in_size));
     }
 
     size_type size() const throw()
@@ -85,7 +85,20 @@ class basic_file : public traits
 
     bool size(const size_type & new_size) throw()
     {
-      return f.size(new_size);
+      return success(f.size(new_size));
+    }
+
+    bool erase()
+    {
+      return success(f.erase());
+    }
+
+    template<class NameType>
+    bool rename(
+      const NameType &  new_name,
+      bool              replace_if_exists)
+    {
+      return success(f.rename(new_name, replace_if_exists));
     }
 
     __forceinline

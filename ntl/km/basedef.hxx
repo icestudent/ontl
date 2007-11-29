@@ -74,14 +74,14 @@ struct kirql
 		apc_level = 1,                 // apc interrupt level
 		dispatch_level = 2,            // dispatcher level
 
-#ifdef _X86_
+#ifdef _M_IX86
 		profile_level = 27,            // timer used for profiling.
 		clock1_level = 28,             // interval clock 1 level - not used on x86
 		clock2_level = 28,             // interval clock 2 level
 		ipi_level,                     // interprocessor interrupt level
 		power_level,                   // power failure level
 		high_level,                    // highest interrupt level
-#elif _M_AMD64
+#elif _M_X64
     clock_level = 13,              // interval clock level
     ipi_level,                     // interprocessor interrupt level
     power_level,                   // power failure level
@@ -195,17 +195,6 @@ ntstatus __stdcall
     bool            Alertable,
     const int64_t * Interval
     );
-
-enum times
-{
-  nanoseconds   = 1,
-  microseconds  = 10   * nanoseconds,
-  milliseconds  = 1000 * microseconds,
-  seconds       = 1000 * milliseconds,
-  minutes       = 60   * seconds, 
-//  hours         = int64_t(60)   * minutes,
-//  days          = int64_t(24)   * hours,
-};
 
 
 template<times TimeResolution>
@@ -475,6 +464,13 @@ void * __stdcall
     );
 
 NTL__EXTERNAPI
+void * __stdcall
+  MmUnmapLockedPages(
+    void *      BaseAddress,
+    const mdl * MemoryDescriptorList
+    );
+
+NTL__EXTERNAPI
 mdl * __stdcall
   IoAllocateMdl(
     void *    VirtualAddress,
@@ -564,6 +560,11 @@ struct mdl
     void * map_locked_pages(kprocessor_mode AccessMode = KernelMode) const
     {
       return MmMapLockedPages(this, AccessMode);
+    }
+
+    void unmap_locked_pages(void * base_address) const
+    {
+      MmUnmapLockedPages(base_address, this);
     }
 
     void * system_address() const

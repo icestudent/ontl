@@ -11,10 +11,11 @@
 #include "basedef.hxx"
 #include "string.hxx"
 #include "handle.hxx"
-#include "status.hxx"
+
 
 namespace ntl {
 namespace nt {
+
 
 struct security_descriptor;
 struct security_quality_of_service;

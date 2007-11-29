@@ -8,6 +8,8 @@
 #ifndef NTL__STLX_FUNCTIONAL
 #define NTL__STLX_FUNCTIONAL
 
+#include "type_traits.hxx"
+
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable:4820) // X bytes padding added...
@@ -120,7 +122,7 @@ struct greater : binary_function<T, T, bool>
 template <class T>
 struct less : binary_function<T, T, bool>
 {
-  bool operator()(const T& x, const T& y) const { return x< y; }
+  bool operator()(const T& x, const T& y) const { return x < y; }
 };
 
 template <class T>
@@ -238,8 +240,9 @@ class binder1st
               const typename Operation::first_argument_type& y)
     : op(x), value(y) {}
 
+    ///\note extended with remove_reference 
     typename Operation::result_type
-      operator()(const typename Operation::second_argument_type& x) const
+      operator()(const typename remove_reference<typename Operation::second_argument_type>::type& x) const
     {
       return op(value, x);
     }
@@ -271,6 +274,13 @@ class binder2nd
     
     typename Operation::result_type
       operator()(const typename Operation::first_argument_type& x) const
+    {
+      return op(x, value);
+    }
+
+    ///\note extension
+    typename Operation::result_type
+      operator()(typename Operation::first_argument_type& x) const
     {
       return op(x, value);
     }

@@ -9,43 +9,39 @@
 #define NTL__NT_TEB
 
 #include "exception.hxx"
-#include "peb.hxx"
-
 
 namespace ntl {
 
 namespace intrinsic {
-	extern "C" uint8_t __cdecl __readfsbyte(uint32_t);
-	extern "C" uint8_t __cdecl __readgsbyte(uint32_t);
-	extern "C" uint16_t __cdecl __readfsword(uint32_t);
-	extern "C" uint16_t __cdecl __readgsword(uint32_t);
+	extern "C" uint8_t  __cdecl __readfsbyte (uint32_t);
+	extern "C" uint16_t __cdecl __readfsword (uint32_t);
 	extern "C" uint32_t __cdecl __readfsdword(uint32_t);
-	extern "C" uint32_t __cdecl __readgsdword(uint32_t);
 
+  extern "C" void __cdecl __writefsbyte (uint32_t Offset, uint8_t Data);
+  extern "C" void __cdecl __writefsword (uint32_t Offset, uint16_t Data);
 	extern "C" void __cdecl __writefsdword(uint32_t Offset, uint32_t Data);
 
 #ifdef _M_IX86
-#	pragma intrinsic(__readfsdword)
-#	pragma intrinsic(__writefsdword)
+//#	pragma intrinsic(__readfsdword)
+//#	pragma intrinsic(__writefsdword)
+//
+//__forceinline uint16_t __cdecl __readgsword(uint32_t off)
+//{
+//	__asm {
+//		// movzx eax, word ptr fs:[0] KPCR.PrcbData.DpcRoutineActive
+//		mov		eax,off
+//		movzx	eax,word ptr gs:[eax]
+//	}
+//}
+//__forceinline uint32_t __cdecl __readgsdword(uint32_t off)
+//{
+//	__asm {
+//		mov		eax,off
+//		mov		eax,gs:[eax]
+//	}
+//}
 
-__forceinline uint16_t __cdecl __readgsword(uint32_t off)
-{
-	__asm {
-		// movzx eax, word ptr fs:[0] KPCR.PrcbData.DpcRoutineActive
-		mov		eax,off
-		movzx	eax,word ptr gs:[eax]
-	}
-}
-__forceinline uint32_t __cdecl __readgsdword(uint32_t off)
-{
-	__asm {
-		mov		eax,off
-		mov		eax,gs:[eax]
-	}
-}
-
-
-#elif _M_AMD64
+#elif _M_X64
 #	pragma intrinsic(__readfsbyte)
 #	pragma intrinsic(__readgsbyte)
 #	pragma intrinsic(__readfsword)
@@ -60,6 +56,7 @@ __forceinline uint32_t __cdecl __readgsdword(uint32_t off)
 
 namespace nt {
 
+struct peb;
 
 /// Thread information block
 /// @note mapped at fs:0x00

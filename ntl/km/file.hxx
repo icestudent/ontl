@@ -12,6 +12,7 @@
 #include "basedef.hxx"
 #include "object.hxx"
 #include "file_information.hxx"
+#include <memory>
 
 namespace ntl {
 namespace km {
@@ -105,7 +106,7 @@ class file_handler : public handle, public device_traits<file_handler>
   public:
 
     __forceinline
-    bool
+    ntstatus
       create(
         const object_attributes &   oa, 
         const creation_disposition  cd              = creation_disposition_default,
@@ -119,13 +120,12 @@ class file_handler : public handle, public device_traits<file_handler>
         ) throw()
     {
       reset();
-      const ntstatus s = ZwCreateFile(this, desired_access, &oa, &iosb,
+      return ZwCreateFile(this, desired_access, &oa, &iosb,
                     allocation_size, attr, share, cd, co, ea_buffer, ea_length);
-      return nt::success(s);
     }
 
     __forceinline
-    bool
+    ntstatus
       create(
         const std::wstring &        file_name, 
         const creation_disposition  cd              = creation_disposition_default,
@@ -141,13 +141,12 @@ class file_handler : public handle, public device_traits<file_handler>
       reset();
       const const_unicode_string uname(file_name);
       const object_attributes oa(uname);
-      const ntstatus s = ZwCreateFile(this, desired_access, &oa, &iosb,
+      return ZwCreateFile(this, desired_access, &oa, &iosb,
                     allocation_size, attr, share, cd, co, ea_buffer, ea_length);
-      return nt::success(s);
     }
 
     __forceinline
-    bool
+    ntstatus
       open(
         const object_attributes &   oa, 
         const access_mask           desired_access,
@@ -156,22 +155,22 @@ class file_handler : public handle, public device_traits<file_handler>
         ) throw()
     {
       reset();
-      const ntstatus s = ZwOpenFile(this, desired_access, &oa, &iosb, share, co);
-      return nt::success(s);
+      return ZwOpenFile(this, desired_access, &oa, &iosb, share, co);
     }
 
     operator const void*() { return get(); } 
 
     void close() { reset(); }
 
-    bool erase()
+    ntstatus erase()
     {
       file_disposition_information<> del;
       file_information<file_disposition_information<> > file_info(get(), del);
+      close();
       return file_info;
     }
 
-    bool
+    ntstatus
       read(
         void *            out_buf,
         const uint32_t    out_size,
@@ -182,13 +181,11 @@ class file_handler : public handle, public device_traits<file_handler>
         const uint32_t *  key               = 0
         ) throw()
     {
-      const ntstatus s = ZwReadFile(get(), completion_event, apc_routine, apc_context,
-                          &iosb, out_buf, out_size, offset, key);
-      return nt::success(s);
+      return ZwReadFile(get(), completion_event, apc_routine, apc_context,
+                        &iosb, out_buf, out_size, offset, key);
     }
 
-
-    bool
+    ntstatus
       write(
         const void *      in_buf,
         const uint32_t    in_size,
@@ -199,9 +196,8 @@ class file_handler : public handle, public device_traits<file_handler>
         const uint32_t *  key               = 0
         ) throw()
     {
-      const ntstatus s = ZwWriteFile(get(), completion_event, apc_routine, apc_context,
+      return ZwWriteFile(get(), completion_event, apc_routine, apc_context,
                           &iosb, in_buf, in_size, offset, key);
-      return nt::success(s);
     }
 
 
@@ -212,6 +208,27 @@ class file_handler : public handle, public device_traits<file_handler>
       return file_info ? file_info.data()->size() : 0;
     }
   
+    ntstatus size(const size_type & new_size)
+    {
+      const file_end_of_file_information & fi = 
+        *reinterpret_cast<const file_end_of_file_information*>(&new_size);
+      file_information<file_end_of_file_information> file_info(get(), fi);
+      return file_info;
+    }
+
+    ntstatus rename(
+      const const_unicode_string &  new_name,
+      bool                          replace_if_exists)
+    {
+      std::auto_ptr<file_rename_information> fi = 
+                    file_rename_information::alloc(new_name, replace_if_exists);
+      if ( !fi.get() ) return status::insufficient_resources;
+      file_information<file_rename_information> file_info(get(), *fi);
+      return file_info;
+    }
+
+    const io_status_block & get_io_status_block() { return iosb; }
+
   ////////////////////////////////////////////////////////////////////////////
   private:
 

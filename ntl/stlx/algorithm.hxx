@@ -95,7 +95,7 @@ ForwardIterator
 {
   // the code is a bit messy to gain Named Return Value optimization
   if ( first == last )  return first;
-  while ( true )
+  for ( ; ; )
   {
     ForwardIterator i = first;
     if ( ++i == last )  return ++first;
@@ -112,7 +112,7 @@ ForwardIterator
                 BinaryPredicate pred)
 {
   if ( first == last )  return first;
-  while ( true )
+  for ( ; ; )
   {
     ForwardIterator i = first;
     if ( ++i == last )  return ++first;
@@ -177,7 +177,7 @@ pair<InputIterator1, InputIterator2>
 
 /// 25.1.8 Equal [lib.alg.equal]
 template<class InputIterator1, class InputIterator2>
-__forceinline
+//__forceinline
 bool
   equal(InputIterator1 first1, InputIterator1 last1, InputIterator2 first2)
 {
@@ -208,11 +208,11 @@ ForwardIterator1
 {
   // iterators are of forward category, so do a brute force search
   // @todo: specializations for other iterator categories?
-  while ( true )
+  for ( ; ; )
   {
     ForwardIterator1 i1 = first1;
     ForwardIterator2 i2 = first2;
-    while ( true )
+    for ( ; ; )
     {
       if ( i1 == last1 ) return first1; // not found, first1 == last1
       if ( i2 == last2 ) return first1; // found
@@ -232,11 +232,11 @@ ForwardIterator1
          ForwardIterator2 first2, ForwardIterator2 last2,
          BinaryPredicate pred)
 {
-  while ( true )
+  for ( ; ; )
   {
     ForwardIterator1 i1 = first1;
     ForwardIterator2 i2 = first2;
-    while ( true )
+    for ( ; ; )
     {
       if ( i1 == last1 ) return first1; // not found, first1 == last1
       if ( i2 == last2 ) return first1; // found
@@ -255,11 +255,11 @@ ForwardIterator
   search_n(ForwardIterator first, ForwardIterator last, Size count,
            const T& value)
 {
-  while ( true )
+  for ( ; ; )
   {
     ForwardIterator i = first;
     Size n = count;
-    while ( true )
+    for ( ; ; )
     {
       if ( i == last ) return first; // not found, first == last
       if ( n == 0 ) return first; // found
@@ -278,11 +278,11 @@ ForwardIterator
   search_n(ForwardIterator first, ForwardIterator last,
            Size count, const T& value, BinaryPredicate pred)
 {
-  while ( true )
+  for ( ; ; )
   {
     ForwardIterator i = first;
     Size n = count;
-    while ( true )
+    for ( ; ; )
     {
       if ( i == last ) return first; // not found, first == last
       if ( n == 0 ) return first; // found

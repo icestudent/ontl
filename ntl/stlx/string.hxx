@@ -215,8 +215,8 @@ class basic_string
 
     const_reference operator[](size_type pos) const
     {
-      static const charT zero_char = charT();
-      return pos < str.size() ? str[pos] : zero_char;
+      static const charT zero_char;// = charT();
+      return pos < str.size() ? *(begin() + pos) : zero_char;
     }
 
     reference operator[](size_type pos)   { return str[pos];  }
@@ -449,10 +449,29 @@ class basic_string
 
     ///\name   basic_string::find [21.3.6.1 lib.string::find]
 
-    size_type find (const basic_string& str, size_type pos = 0) const;
-    size_type find (const charT* s, size_type pos, size_type n) const;
-    size_type find (const charT* s, size_type pos = 0) const;
-    size_type find (charT c, size_type pos = 0) const;
+    size_type find(const basic_string& str, size_type pos = 0) const
+    {
+      for ( size_type xpos = pos; xpos + str.size() <= size(); ++xpos )
+      {
+        for ( size_type i = 0; i != str.size(); ++i )
+          if ( !traits_type::eq(*(begin() + xpos + i), *(str.begin() + i)) ) ///\note at() by Standard
+            goto next_xpos;
+        return xpos;
+      next_xpos:;
+      }
+      return npos;
+    }
+    
+    size_type find(const charT* s, size_type pos, size_type n) const;
+    size_type find(const charT* s, size_type pos = 0) const;
+    
+    size_type find(charT c, size_type pos = 0) const
+    {
+      for ( size_type xpos = pos; xpos < size(); ++xpos )
+        if ( traits_type::eq(*(begin() + xpos), c) )
+          return xpos;
+      return npos;
+    }
 
     ///\name   basic_string::rfind [21.3.6.2 lib.string::rfind]
 
@@ -464,7 +483,7 @@ class basic_string
     {
       size_type xpos = size();
       while ( xpos-- )
-        if ( str[xpos] == c ) return xpos;
+        if ( traits_type::eq(str[xpos], c) ) return xpos;
       return npos;
     }
 
@@ -475,7 +494,7 @@ class basic_string
       size_type & xpos = pos;
       if ( xpos > size() ) xpos = size();
       while ( xpos )
-        if ( begin()[xpos] == c ) return xpos;
+        if ( traits_type::eq(str[xpos], c) ) return xpos;
         else --xpos;
       return npos;
     }
@@ -662,7 +681,7 @@ class basic_string
     void alloc__new(size_type n)
     {
       str.end_ = str.begin_ = str.array_allocator.allocate(n + sizeof('\0'));
-      str.capacity_ = n;
+      str.capacity_ = n + 1;
     }
 
 };//class basic_string

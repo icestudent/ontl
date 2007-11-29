@@ -29,6 +29,7 @@ namespace std {
  *@{*/
 
 /// Class template list [23.2.2]
+///\todo  node caching
 template <class T, class Allocator = allocator<T> >
 class list
 {
@@ -116,7 +117,7 @@ class list
         const_iterator__impl(const const_iterator__impl& i) : p(i.p) {}
 
         const_reference operator* () const 
-          { return static_cast<node_type*>(this->p)->elem; }
+          { return static_cast<const node_type*>(this->p)->elem; }
         const_pointer   operator->() const { return &operator*(); }
         const_iterator__impl & operator++() { p = p->next; return *this; }
         const_iterator__impl & operator--() { p = p->prev; return *this; }
@@ -136,8 +137,8 @@ class list
       friend class list;
 
       private:
-        const_iterator__impl(double_linked * const p) : p(p) {}
-        double_linked * p;
+        const_iterator__impl(const double_linked * const p) : p(p) {}
+        const double_linked * p;
     };
 
   public:

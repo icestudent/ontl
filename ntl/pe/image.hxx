@@ -8,6 +8,7 @@
 #ifndef NTL__PE_IMAGE
 #define NTL__PE_IMAGE
 
+#include "../stdlib.hxx"
 #include "../basedef.hxx"
 #include "../cstring"
 
@@ -39,7 +40,7 @@ class image
     static __forceinline
     bool in_range(uintptr_t first, uintptr_t last, T p)
     {
-      return first <= (uintptr_t)p && (uintptr_t)p < last;
+      return first <= brute_cast<uintptr_t>(p) && brute_cast<uintptr_t>(p) < last;
     }
     
     ///\ name   Headers
@@ -300,6 +301,35 @@ class image
       return va<const nt_headers*>(get_dos_header()->e_lfanew); 
     }
 
+    uint32_t checksum() const
+    {
+      const dos_header * const dh = get_dos_header();
+      if ( !dh->is_valid() ) return 0;
+      const nt_headers * const nth = get_nt_headers();
+      uint32_t sum = 0;
+      for ( const uint16_t * p = va<uint16_t*>(0);
+            p < va<uint16_t*>(nth->OptionalHeader32.SizeOfImage); // care about odd SizeOfImage
+            ++p )
+      {
+        // Can not use C flag in HLL :-(
+        sum += *p;
+        sum += sum >> 16;
+        sum &= 0xFFFF;
+      }
+      sum -= ( sum < static_cast<uint16_t>(nth->OptionalHeader32.CheckSum) );
+      sum -= static_cast<uint16_t>(nth->OptionalHeader32.CheckSum);
+      sum -= ( sum < static_cast<uint16_t>(nth->OptionalHeader32.CheckSum >> 16) );
+      sum -= static_cast<uint16_t>(nth->OptionalHeader32.CheckSum >> 16);
+      return nth->OptionalHeader32.SizeOfImage + sum;
+    }
+
+    uint32_t checksum(bool update)
+    {
+      const uint32_t sum = checksum();
+      if ( update ) get_nt_headers()->OptionalHeader32.CheckSum = sum;
+      return sum;
+    }
+
 
     struct section_header  
     {
@@ -403,23 +433,13 @@ class image
           ? pe->va<void*>(pe->va<uint32_t*>(AddressOfFunctions)[ordinal]) : 0;
       }
 
-#if 0
-      bool is_forwarded(void * p) const
-      {
-//        __assume(this && uintptr_t(this + 1) < uintptr_t(-1));
-        return p // obviously nullptr can't be forwarded, but should it be checked here?
-            && (uintptr_t)this <= (uintptr_t)p
-            && (uintptr_t)p < (uintptr_t)&this[1];
-      }
-#endif
-
     }; // struct export_directory
 
     typedef
       const image * find_dll_t(const char * dll_name);
 
-    template<typename ExportType>
-    void * find_export(ExportType exp) const
+    template<typename PtrType, typename ExportType>
+    PtrType * find_export(ExportType exp) const
     {
       const data_directory * const export_table = 
                               get_data_directory(data_directory::export_table);
@@ -427,11 +447,11 @@ class image
       export_directory * exports = va<export_directory*>(export_table->VirtualAddress);
       void * const f = exports->function(this, exports->ordinal(this, exp));
       const uintptr_t ex = reinterpret_cast<uintptr_t>(exports);
-      return in_range(ex, ex + export_table->Size, f) ? 0 : f;
+      return in_range(ex, ex + export_table->Size, f) ? 0 : brute_cast<PtrType*>(f);
     }
 
-    template<typename DllFinder>
-    void * find_export(const char * exp, DllFinder find_dll) const
+    template<typename PtrType, typename DllFinder>
+    PtrType * find_export(const char * exp, DllFinder find_dll) const
     {
       const data_directory * const export_table = 
                               get_data_directory(data_directory::export_table);
@@ -459,7 +479,7 @@ class image
       dll_name[i++] = 'l';
       dll_name[i] = '\0';
       const image * forwarded_dll = find_dll(dll_name);
-      return forwarded_dll ? forwarded_dll->find_export(forward, find_dll) : 0;
+      return forwarded_dll ? forwarded_dll->find_export<PtrType>(forward, find_dll) : 0;
     }
 
     ///\name  Imports
@@ -479,6 +499,19 @@ class image
       bool is_terminating() const { return Characteristics == 0; }
       bool bound() const { return TimeDateStamp != 0; }
       bool no_forwarders() const { return ForwarderChain == -1; }
+
+      uintptr_t * find(const image * const img, const char * const import_name)
+      {
+        uintptr_t * iat = img->va<uintptr_t*>(FirstThunk);
+        for ( uintptr_t * hint_name = img->va<uintptr_t*>(OriginalFirstThunk);
+              *hint_name;
+              ++hint_name, ++iat )
+          if ( !std::strcmp(img->va<const char*>(*hint_name) + 2, // skip Hint
+                            import_name) )
+            return iat;
+        return 0;
+      }
+
     };
 
     static inline uintptr_t & null_import()
@@ -486,51 +519,59 @@ class image
       static uintptr_t _0;
       return _0;
     }
-  
-    uintptr_t &
-      find_bound_import(
-        const char *  import_name,
-        const char *  const module = 0) const
+    
+    import_descriptor *
+      get_first_import_entry() const
     {
       const data_directory * const import_table = 
                               get_data_directory(data_directory::import_table);
-      if ( import_table && import_table->VirtualAddress )
-        for ( import_descriptor * import_entry = va<import_descriptor*>(import_table->VirtualAddress);
-              ! import_entry->is_terminating();
+      return import_table && import_table->VirtualAddress 
+             ? va<import_descriptor*>(import_table->VirtualAddress)
+             : 0;
+    }
+  
+    import_descriptor *
+      find_import_entry(const char * const module_name) const
+    {
+      if ( !module_name ) return 0;
+      for ( import_descriptor * import_entry = get_first_import_entry();
+            import_entry && !import_entry->is_terminating();
+            ++import_entry )
+      {
+        if ( !import_entry->Name ) continue;
+        // compare names case-insensitive (simpified)
+        const char * const name = va<const char*>(import_entry->Name);
+        for ( unsigned i = 0; module_name[i]; ++i )
+          if ( (module_name[i] ^ name[i]) & 0x5F) continue;
+        return import_entry;
+      }
+      return 0;
+    }
+  
+    uintptr_t &
+      find_bound_import(
+        const char *  const import_name,
+        const char *  const module = 0) const
+    {
+      import_descriptor * import_entry;
+      uintptr_t * iat = 0;
+      if ( module && (import_entry = find_import_entry(module)) )
+        iat = import_entry->find(this, import_name);
+      else
+        for ( import_entry = get_first_import_entry();
+              import_entry && !import_entry->is_terminating();
               ++import_entry )
-        {
-          if ( module )
-          {
-            if ( !import_entry->Name ) goto next_import;
-            // compare names case-insensitive (simpified)
-            const char * const name = va<const char*>(import_entry->Name);
-            for ( unsigned i = 0; module[i]; ++i )
-              if ( (module[i] ^ name[i]) & 0x5F) goto next_import;
-          }
-          {
-            uintptr_t * iat = va<uintptr_t*>(import_entry->FirstThunk);
-            for ( uintptr_t * hint_name = va<uintptr_t*>(import_entry->OriginalFirstThunk);
-                  *hint_name;
-                  ++hint_name, ++iat )
-              if ( !std::strcmp(va<const char*>(*hint_name) + 2, // skip Hint
-                                import_name) )
-                return *iat;
-          }
-        next_import:;
-        }
-      return null_import();
+          if ( (iat = import_entry->find(this, import_name)) )
+            break;
+      return iat ? *iat : null_import();
     }
     
 
     template<typename DllFinder>
     bool bind_import(const DllFinder & find_dll)
     {
-      const data_directory * const import_table = 
-                     get_data_directory(data_directory::import_table);
-      if ( !import_table || !import_table->VirtualAddress )
-        return false;
-      for ( import_descriptor * import_entry = va<import_descriptor*>(import_table->VirtualAddress);
-            ! import_entry->is_terminating();
+      for ( import_descriptor * import_entry = get_first_import_entry();
+            import_entry && !import_entry->is_terminating();
             ++import_entry )
       {
         if ( ! import_entry->Name ) return false;
