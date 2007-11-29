@@ -10,6 +10,7 @@
 
 #include "../nt/basedef.hxx"
 #include "../stdlib.hxx"
+#include "../nt/exception.hxx"
 
 namespace ntl {
 namespace km {
@@ -24,6 +25,7 @@ using nt::slist_entry;
 using nt::list_entry;
 using nt::list_head;
 using nt::status;
+using nt::exception;
 
 using nt::access_mask;
 using nt::synchronize;
@@ -48,58 +50,102 @@ typedef long kpriority;
 #if 1
 
 /// interrupt request level
+typedef uint8_t kirql_t;
+
 NTL__EXTERNAPI
-uint8_t __stdcall
+kirql_t __stdcall
   KeGetCurrentIrql();
 
+NTL__EXTERNAPI
+kirql_t __fastcall
+  KfLowerIrql(kirql_t NewIrql);
 
+NTL__EXTERNAPI
+kirql_t __fastcall
+  KfRaiseIrql(kirql_t NewIrql);
+
+/** Interrupt request level RAII wrapper */
 struct kirql
 { 
-	typedef uint8_t type;
-protected:
-	type _;
-	kirql(type irql)
-	{
-		_ = irql;
-	}
-public:
-	static kirql get_current()
-	{
-		return kirql(KeGetCurrentIrql());
-	}
-
-	enum level {
+  /// level definitions
+  enum level {
 		passive_level = 0,             // passive release level
 		low_level = 0,                 // lowest interrupt level
 		apc_level = 1,                 // apc interrupt level
 		dispatch_level = 2,            // dispatcher level
 
+#ifdef _X86_
 		profile_level = 27,            // timer used for profiling.
 		clock1_level = 28,             // interval clock 1 level - not used on x86
 		clock2_level = 28,             // interval clock 2 level
-		ipi_level = 29,                // interprocessor interrupt level
-		power_level = 30,              // power failure level
-		high_level = 31                // highest interrupt level
+		ipi_level,                     // interprocessor interrupt level
+		power_level,                   // power failure level
+		high_level,                    // highest interrupt level
+#elif _M_AMD64
+    clock_level = 13,              // interval clock level
+    ipi_level,                     // interprocessor interrupt level
+    power_level,                   // power failure level
+    profile_level,                 // timer used for profiling
+    high_level,                    // highest interrupt level
+#endif
+
+#ifdef NT_UP
+    // UP
+    synch_level = dispatch_level  // synchronization level
+#else
+    // MP
+    synch_level = ipi_level-2
+#endif
 	};
 
-	operator int()
+protected:
+	kirql_t _;
+	kirql(kirql_t irql)
 	{
-		return (int)_;
+		_ = irql;
 	}
+
+public:
+	static kirql get_current()
+	{
+		return kirql(KeGetCurrentIrql());
+	}
+  kirql()
+  {
+    _ = KeGetCurrentIrql();
+  }
+  void raise(const level NewIrql)
+  {
+    _ = KfRaiseIrql((kirql_t)NewIrql);
+  }
+  void raisetodpc()
+  {
+    _ = KfRaiseIrql(dispatch_level);
+  }
+  void raisetosynch()
+  {
+    _ = KfRaiseIrql(synch_level);
+  }
+  void lower()
+  {
+    KfLowerIrql(_);
+  }
+
+
 	friend static bool operator == (const kirql irql, level l)
 	{
-		return irql._ == (type)l;
+		return irql._ == (kirql_t)l;
 	}
 	friend static bool operator < (const kirql irql, level l)
 	{
-		return irql._ < (type)l;
+		return irql._ < (kirql_t)l;
 	}
 	friend static bool operator > (const kirql irql, level l)
 	{
-		return irql._ > (type)l;
+		return irql._ > (kirql_t)l;
 	}
-	
 };
+
 #else
 typedef uint8_t kirql;
 #endif
@@ -183,23 +229,6 @@ ntstatus sleep(
   const int64_t interval = int64_t(-1) * milliseconds * ms;
   return KeDelayExecutionThread(wait_mode, alertable, &interval);
 }
-
-
-NTL__EXTERNAPI
-void __fastcall
-KfLowerIrql(
-    const kirql NewIrql
-    );
-
-NTL__EXTERNAPI
-kirql __fastcall
-KfRaiseIrql (
-    const kirql NewIrql
-    );
-
-NTL__EXTERNAPI
-kirql __stdcall
-KeRaiseIrqlToDpcLevel();
 
 
 NTL__EXTERNAPI

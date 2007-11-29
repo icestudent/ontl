@@ -13,6 +13,14 @@
 #include "pool.hxx"
 #include <new>
 
+namespace ntl {
+  namespace km {
+    __declspec(selectany)
+      extern
+      const std::nothrow_t nonpaged;
+  }
+}
+
 ///\name  Single-object forms
 
 __forceinline

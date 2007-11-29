@@ -168,6 +168,16 @@ struct dbgprint
     printf("%s%u", msg, u);
   }
 
+  void operator()(const char msg[], long i) const
+  { 
+    printf("%s%i", msg, i);
+  }
+
+  void operator()(const char msg[], unsigned long u) const
+  { 
+    printf("%s%u", msg, u);
+  }
+
   void operator()(const char msg[], const void* p) const
   { 
     printf("%s%p", msg, p);
