@@ -100,12 +100,12 @@ struct kirql
 
 protected:
 	kirql_t _;
-	kirql(kirql_t irql)
-	{
-		_ = irql;
-	}
 
 public:
+  kirql(kirql_t irql)
+  {
+    _ = irql;
+  }
 	static kirql get_current()
 	{
 		return kirql(KeGetCurrentIrql());
@@ -116,7 +116,7 @@ public:
   }
   void raise(const level NewIrql)
   {
-    _ = KfRaiseIrql(NewIrql);
+    _ = KfRaiseIrql(static_cast<kirql_t>(NewIrql));
   }
   void raisetodpc()
   {
@@ -131,6 +131,10 @@ public:
     KfLowerIrql(_);
   }
 
+  operator kirql_t() const
+  {
+    return _;
+  }
 
 	friend bool operator == (const kirql irql, level l)
 	{
@@ -221,14 +225,14 @@ ntstatus sleep(
 
 
 NTL__EXTERNAPI
-kirql __fastcall
+kirql_t __fastcall
   KfAcquireSpinLock(kspin_lock * SpinLock);
 
 NTL__EXTERNAPI
 void __fastcall
   KfReleaseSpinLock(
     kspin_lock *  SpinLock,
-    const kirql   NewIrql
+    const kirql_t   NewIrql
     );
 
 
