@@ -114,6 +114,10 @@ public:
   {
     _ = KeGetCurrentIrql();
   }
+  kirql(kirql_t irql)
+  {
+    _ = irql;
+  }
   void raise(const level NewIrql)
   {
     _ = KfRaiseIrql(static_cast<kirql_t>(NewIrql));

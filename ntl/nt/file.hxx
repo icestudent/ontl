@@ -16,6 +16,7 @@
 namespace ntl {
 namespace nt {
 
+
 /**\addtogroup  io ********************* I/O API ****************************
  *@{*/
 
@@ -80,6 +81,49 @@ ntstatus __stdcall
     const uint64_t *  ByteOffset    __optional,
     const uint32_t *  Key           __optional
     );
+
+NTL__EXTERNAPI
+ntstatus __stdcall
+  NtCreateSection(
+    handle*           SectionHandle,
+    access_mask       DesiredAccess,
+    const object_attributes* ObjectAttributes __optional,
+    const int64_t*    MaximumSize   __optional,
+    uint32_t          SectionPageProtection,
+    uint32_t          AllocationAttributes,
+    legacy_handle     FileHandle    __optional
+    );
+
+NTL__EXTERNAPI
+ntstatus __stdcall
+  NtOpenSection(
+    handle*           SectionHandle,
+    access_mask       DesiredAccess,
+    const object_attributes* ObjectAttributes
+    );
+
+NTL__EXTERNAPI
+ntstatus __stdcall
+  NtMapViewOpSection(
+    legacy_handle   SectionHandle,
+    legacy_handle   ProcessHandle,
+    void**          BaseAddress,
+    uintptr_t       ZeroBits,
+    size_t          CommitSize,
+    int64_t*        SectionOffset   __optional,
+    size_t*         ViewSize,
+    SectionInherit  InheritDisposition,
+    uint32_t        AllocationType,
+    uint32_t        Win32Protect
+    );
+
+NTL__EXTERNAPI
+ntstatus __stdcall
+  NtUnmapViewOfSection(
+    legacy_handle   ProcessHandle,
+    void*           BaseAddress
+    );
+
 
 #pragma warning(pop)
 

@@ -34,6 +34,7 @@ struct status
     invalid_device_request    = (int)0xC0000010,
 
     more_processing_required  = (int)0xC0000016,
+    conflicting_addresses     = (int)0xC0000018,
 
     buffer_too_small          = (int)0xC0000023,
 
