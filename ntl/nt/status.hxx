@@ -22,6 +22,10 @@ struct status
     success               = 0,
     pending               = 0x00000103,
 
+    guard_page_violation      = (int)0x80000001,
+    datatype_misalignment     = (int)0x80000002,
+    breakpoint                = (int)0x80000003,
+    single_step               = (int)0x80000004,
     buffer_overflow           = (int)0x80000005,
 
     no_more_entries           = (int)0x8000001A,
@@ -30,6 +34,8 @@ struct status
     not_implemented           = (int)0xC0000002,
 
     info_length_mismatch      = (int)0xC0000004,
+    access_violation          = (int)0xC0000005,
+    invalid_handle            = (int)0xC0000008,
 
     invalid_device_request    = (int)0xC0000010,
 
@@ -37,16 +43,21 @@ struct status
     conflicting_addresses     = (int)0xC0000018,
 
     buffer_too_small          = (int)0xC0000023,
+    noncontinuable_exception  = (int)0xC0000025,
+    invalid_disposition       = (int)0xC0000026,
 
+    privileged_instruction    = (int)0xC0000096,
     insufficient_resources    = (int)0xC000009A,
 
+    illegal_instruction       = (int)0xC000001D,
+    stack_overflow            = (int)0xC00000FD,
     invalid_image_not_mz      = (int)0xC000012F,
-    invalid_image_win_32      = (int)0xC0000359,
     entrypoint_not_found      = (int)0xC0000139,
 
-    driver_entrypoint_not_found = (int)0xC0000263,
-
     device_configuraton_error = (int)0xC0000182,
+    driver_entrypoint_not_found = (int)0xC0000263,
+    invalid_image_win_32      = (int)0xC0000359,
+
   };
 };
 

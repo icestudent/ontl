@@ -15,7 +15,7 @@
 #undef abnormal_termination
 
 #define exception_code              _exception_code()
-#define exception_info()            reinterpret_cast<struct exception::pointers*>(_exception_info())
+#define exception_info()            reinterpret_cast<struct ntl::nt::exception::pointers*>(_exception_info())
 #define abnormal_termination        (_abnormal_termination() != 0)
 
 extern "C" 
