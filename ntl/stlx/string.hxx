@@ -549,7 +549,7 @@ class basic_string
     {
       const int r = traits_type::compare(begin(), s, size());
       // s may be longer than *this
-      return r != 0 ? r : traits_type::eq(s[size()+1], charT()) ? r : r - 1; // r == 0 here
+      return r != 0 ? r : traits_type::eq(s[size()], charT()) ? r : r - 1; // r == 0 here
     }
 
     int compare(size_type pos1, size_type n1, const charT* s) const;
