@@ -185,12 +185,14 @@ struct device_traits<nt::file_handler> : public device_traits<>
   {
     supersede,
     open,
+    open_existing = open,
     create,
+    create_new = create,
     open_if,
     overwrite,
     overwrite_if,
   };
-  static const creation_disposition creation_disposition_default = open;
+  static const creation_disposition creation_disposition_default = open_existing;
 
   enum created_disposition
   {

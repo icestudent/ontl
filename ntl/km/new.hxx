@@ -8,11 +8,6 @@
 #ifndef NTL__KM_NEW
 #define NTL__KM_NEW
 
-#ifndef NTL_NO_NEW 
-
-#include "pool.hxx"
-#include <new>
-
 namespace ntl {
   namespace km {
     __declspec(selectany)
@@ -20,6 +15,11 @@ namespace ntl {
       const std::nothrow_t nonpaged;
   }
 }
+
+#ifndef NTL_NO_NEW 
+
+#include "pool.hxx"
+#include <new>
 
 ///\name  Single-object forms
 
