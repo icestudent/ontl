@@ -45,6 +45,7 @@ struct status
     buffer_too_small          = (int)0xC0000023,
     noncontinuable_exception  = (int)0xC0000025,
     invalid_disposition       = (int)0xC0000026,
+    object_name_collision     = (int)0xC0000035,
 
     privileged_instruction    = (int)0xC0000096,
     insufficient_resources    = (int)0xC000009A,
