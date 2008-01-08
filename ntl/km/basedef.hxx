@@ -54,6 +54,11 @@ using nt::io_apc_routine;
 using nt::device_power_state;
 using nt::system_power_state;
 
+using nt::ansi_string;
+using nt::unicode_string;
+using nt::const_unicode_string;
+using nt::const_ansi_string;
+
 struct kthread;
 
 //enum mode { KernelMode, UserMode };
@@ -238,14 +243,90 @@ struct kspin_lock_queue
   kspin_lock* volatile Lock;
 };
 
+#define MAXIMUM_LEADBYTES   12
+
+struct cptableinfo {
+  uint16_t CodePage;                    // code page number
+  uint16_t MaximumCharacterSize;        // max length (bytes) of a char
+  uint16_t DefaultChar;                 // default character (MB)
+  uint16_t UniDefaultChar;              // default character (Unicode)
+  uint16_t TransDefaultChar;            // translation of default char (Unicode)
+  uint16_t TransUniDefaultChar;         // translation of Unic default char (MB)
+  uint16_t DBCSCodePage;                // Non 0 for DBCS code pages
+  uint8_t  LeadByte[MAXIMUM_LEADBYTES]; // lead byte ranges
+  uint16_t*MultiByteTable;             // pointer to MB translation table
+  void*    WideCharTable;              // pointer to WC translation table
+  uint16_t*DBCSRanges;                 // pointer to DBCS ranges
+  uint16_t*DBCSOffsets;                // pointer to DBCS offsets
+};
+
+struct nlstableinfo {
+  cptableinfo OemTableInfo;
+  cptableinfo AnsiTableInfo;
+  uint16_t*   UpperCaseTable;             // 844 format upcase table
+  uint16_t*   LowerCaseTable;             // 844 format lower case table
+};
+
+extern unicode_string NtSystemRoot;
+extern uint32_t NtBuildNumber;
+extern const uint32_t NtMajorVersion;
+extern const uint32_t NtMinorVersion;
+extern uint32_t CmNtCSDVersion;
+extern uint32_t CmNtCSDReleaseType;
+extern uint32_t CmNtSpBuildNumber;
+extern unicode_string CmVersionString;
+extern unicode_string CmCSDVersionString;
+
+extern const char NtBuildLab[];
+
+extern nlstableinfo InitTableInfo;
+extern uint32_t InitNlsTableSize;
+extern void* InitNlsTableBase;
+extern uint32_t InitAnsiCodePageDataOffset;
+extern uint32_t InitOemCodePageDataOffset;
+extern uint32_t InitUnicodeCaseTableDataOffset;
+extern void* InitNlsSectionPointer;
+extern bool InitSafeModeOptionPresent;
+extern uint32_t InitSafeBootMode;
+
+extern bool InitIsWinPEMode;
+extern uint32_t InitWinPEModeType;
+
+#ifndef NTL_SUPPRESS_IMPORT
+
 NTL__EXTERNAPI
 bool __stdcall
   PsGetVersion(
     uint32_t *        MajorVersion,
     uint32_t *        MinorVersion,
     uint32_t *        BuildNumber,
-    void/*unicode_string*/ *  CSDVersion
+    unicode_string *  CSDVersion
     );
+#else
+
+static bool
+PsGetVersion(
+             uint32_t *        MajorVersion,
+             uint32_t *        MinorVersion,
+             uint32_t *        BuildNumber,
+             unicode_string *  CSDVersion
+             )
+{
+  if(MajorVersion)
+    *MajorVersion = NtMajorVersion;
+
+  if(MinorVersion)
+    *MinorVersion = NtMinorVersion;
+
+  if(BuildNumber)
+    *BuildNumber = NtBuildNumber & 0x3FFF;
+
+  if(CSDVersion)
+    *CSDVersion = CmCSDVersionString;
+
+  return (NtBuildNumber >> 28) == 0xC;
+}
+#endif
 
 static inline
 bool get_version(uint32_t & major_version, uint32_t & minor_version)
@@ -359,6 +440,7 @@ struct dispatcher_header
   list_entry  WaitListHead;
 };
 
+struct kgate { dispatcher_header Header; };
 
 struct kevent { dispatcher_header Header; };
 
@@ -817,6 +899,34 @@ struct resource_performance_data {
 	list_entry HashTable[RESOURCE_HASH_TABLE_SIZE];
 };
 
+struct ex_rundown_ref
+{
+  union
+  {
+    /*<thisrel this+0x0>*/ /*|0x4|*/ uint32_t Count;
+    /*<thisrel this+0x0>*/ /*|0x4|*/ void* Ptr;
+  };
+};
+
+struct ex_fast_ref
+{
+  union {
+    /*<thisrel this+0x0>*/ /*|0x4|*/ void* Object;
+    /*<bitfield this+0x0>*/ /*|0x4|*/ uint32_t RefCnt:3;
+    /*<thisrel this+0x0>*/ /*|0x4|*/ uint32_t Value;
+  };
+};// <size 0x4>
+
+struct ex_push_lock
+{
+  union {
+    /*<bitfield this+0x0>*/ /*|0x4|*/ uint32_t Waiting:1;
+    /*<bitfield this+0x0>*/ /*|0x4|*/ uint32_t Exclusive:1;
+    /*<bitfield this+0x0>*/ /*|0x4|*/ uint32_t Shared:0x1E;
+    /*<thisrel this+0x0>*/ /*|0x4|*/ uint32_t Value;
+    /*<thisrel this+0x0>*/ /*|0x4|*/ void* Ptr;
+  };
+};// <size 0x4>
 
 }//namespace ntl
 }//namespace nt
