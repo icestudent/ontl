@@ -13,6 +13,23 @@
 #include "../nt/exception.hxx"
 
 namespace ntl {
+
+  namespace intrinsic {
+
+#if defined(_M_IX86)
+
+#elif defined(_M_X64)
+    extern "C" uint64_t __cdecl __readcr8();
+    extern "C" void __cdecl __writecr8(uint64_t);
+
+#	pragma intrinsic(__readcr8)
+#	pragma intrinsic(__writecr8)
+
+#endif
+
+  }//namespace intrinsic
+
+
 namespace km {
 
 #ifndef SYSTEM_CACHE_ALIGNMENT_SIZE
@@ -52,6 +69,7 @@ typedef long kpriority;
 /// interrupt request level
 typedef uint8_t kirql_t;
 
+#if defined(_M_IX86)
 NTL__EXTERNAPI
 kirql_t __stdcall
   KeGetCurrentIrql();
@@ -64,6 +82,30 @@ NTL__EXTERNAPI
 kirql_t __fastcall
   KfRaiseIrql(kirql_t NewIrql);
 
+#elif defined(_M_X64)
+
+__forceinline
+kirql_t KeGetCurrentIrql()
+{
+  return (kirql_t)ntl::intrinsic::__readcr8();
+}
+
+__forceinline
+kirql_t KfRaiseIrql(kirql_t NewIrql)
+{
+  kirql_t OldIrql = KeGetCurrentIrql();
+  ntl::intrinsic::__writecr8(NewIrql);
+  return OldIrql;
+}
+
+__forceinline
+void KfLowerIrql(kirql_t NewIrql)
+{
+  ntl::intrinsic::__writecr8(NewIrql);
+}
+
+#endif
+
 /** Interrupt request level RAII wrapper */
 struct kirql
 { 
@@ -74,14 +116,14 @@ struct kirql
 		apc_level = 1,                 // apc interrupt level
 		dispatch_level = 2,            // dispatcher level
 
-#ifdef _M_IX86
+#if defined(_M_IX86)
 		profile_level = 27,            // timer used for profiling.
 		clock1_level = 28,             // interval clock 1 level - not used on x86
 		clock2_level = 28,             // interval clock 2 level
 		ipi_level,                     // interprocessor interrupt level
 		power_level,                   // power failure level
 		high_level,                    // highest interrupt level
-#elif _M_X64
+#elif defined(_M_X64)
     clock_level = 13,              // interval clock level
     ipi_level,                     // interprocessor interrupt level
     power_level,                   // power failure level
@@ -166,6 +208,35 @@ struct kspin_lock
     /*volatile*/ uintptr_t _;
 };
 
+typedef uint64_t kspin_lock_queue_number_t;
+enum kspin_lock_queue_number 
+{
+  LockQueueDispatcherLock,
+  LockQueueExpansionLock,
+  LockQueuePfnLock,
+  LockQueueSystemSpaceLock,
+  LockQueueVacbLock,
+  LockQueueMasterLock,
+  LockQueueNonPagedPoolLock,
+  LockQueueIoCancelLock,
+  LockQueueWorkQueueLock,
+  LockQueueIoVpbLock,
+  LockQueueIoDatabaseLock,
+  LockQueueIoCompletionLock,
+  LockQueueNtfsStructLock,
+  LockQueueAfdWorkQueueLock,
+  LockQueueBcbLock,
+  LockQueueMmNonPagedPoolLock,
+  LockQueueUnusedSpare16,
+  LockQueueTimerTableLock,
+  LockQueueMaximumLock = LockQueueTimerTableLock + (1 << (8-4))
+};
+
+struct kspin_lock_queue
+{
+  kspin_lock_queue* volatile Next;
+  kspin_lock* volatile Lock;
+};
 
 NTL__EXTERNAPI
 bool __stdcall
@@ -394,6 +465,7 @@ ntstatus
   return KeWaitForSingleObject(Object, WaitReason, WaitMode, Alertable, Timeout);
 }
 
+#if 0
 
 struct kdpc;
 
@@ -420,6 +492,63 @@ struct kdpc
   void *                DpcData;
 };
 
+#else
+
+struct kdpc_data 
+{
+  list_entry DpcListHead;
+  kspin_lock DpcLock;
+#if defined(_M_IX86)
+  volatile int32_t DpcQueueDepth;
+#elif defined(_M_X64)
+  volatile int32_t DpcQueueDepth;
+#endif
+  uint32_t DpcCount;
+};
+
+struct kdpc 
+{
+  enum DpcType {
+    Normal,
+    Threaded
+  };
+  enum DpcImportance {
+    LowImportance,
+    MediumImportance,
+    HighImportance
+  };
+
+  uint8_t Type;
+#if defined(_M_IX86)
+  uint8_t Number;
+  uint8_t Importance;
+#elif defined(_M_X64)
+  uint8_t Importance;
+  uint8_t Number;
+  uint8_t Expedite;
+#endif
+  list_entry DpcListEntry;
+
+  void (__stdcall *DeferredRoutine)(
+    const kdpc* Dpc, 
+    const void* DeferredContext, 
+    const void* SystemArgument1, 
+    const void* SystemArgument2);
+
+  void* DeferredContext;
+  void* SystemArgument1;
+  void* SystemArgument2;
+
+  kdpc_data* DpcData;
+};
+
+#if defined(_M_IX86)
+STATIC_ASSERT(sizeof(kdpc) == 0x20);
+#elif  _M_X64
+STATIC_ASSERT(sizeof(kdpc) == 0x40);
+#endif
+
+#endif
 
 NTL__EXTERNAPI void *     MmHighestUserAddress;
 NTL__EXTERNAPI void *     MmSystemRangeStart;

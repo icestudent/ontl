@@ -108,7 +108,7 @@ namespace ntl {
           delay_import_table  = 13,
           com_descriptor      = 14,
 
-          number_of_directory_entryes = 16
+          number_of_directory_entries = 16
         };
 
       };
@@ -128,7 +128,7 @@ namespace ntl {
         uint32_t        AddressOfEntryPoint;
         uint32_t        BaseOfCode;
         uint32_t        BaseOfData;
-        void*           ImageBase;
+        uint32_t        ImageBase;
         uint32_t        SectionAlignment;
         uint32_t        FileAlignment;
         uint16_t        MajorOperatingSystemVersion;
@@ -149,7 +149,7 @@ namespace ntl {
         uint32_t        SizeOfHeapCommit;
         uint32_t        LoaderFlags;
         uint32_t        NumberOfRvaAndSizes;
-        data_directory  DataDirectory[data_directory::number_of_directory_entryes];
+        data_directory  DataDirectory[data_directory::number_of_directory_entries];
       }; // struct optional_header32
 
       STATIC_ASSERT(sizeof(optional_header32) == 224);
@@ -167,7 +167,7 @@ namespace ntl {
         uint32_t        SizeOfUninitializedData;
         uint32_t        AddressOfEntryPoint;
         uint32_t        BaseOfCode;
-        void*           ImageBase;
+        uint64_t        ImageBase;
         uint32_t        SectionAlignment;
         uint32_t        FileAlignment;
         uint16_t        MajorOperatingSystemVersion;
@@ -188,7 +188,7 @@ namespace ntl {
         uint64_t        SizeOfHeapCommit;
         uint32_t        LoaderFlags;
         uint32_t        NumberOfRvaAndSizes;
-        data_directory  DataDirectory[data_directory::number_of_directory_entryes];
+        data_directory  DataDirectory[data_directory::number_of_directory_entries];
       }; // struct optional_header64
 
       STATIC_ASSERT(sizeof(optional_header64) == 240);
@@ -632,7 +632,7 @@ namespace ntl {
             switch ( entry->Type )
           {
             case base_relocation::highlow:
-              *reinterpret_cast<uint32_t*>(addr + entry->Offset) += delta;
+              *reinterpret_cast<uint32_t*>(addr + entry->Offset) += static_cast<uint32_t>(delta);
               break;
             default:
               break;

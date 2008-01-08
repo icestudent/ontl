@@ -136,7 +136,7 @@ struct cached_child_list
 ///\warning XP SP2
 struct cm_key_control_block
 {
-#ifndef _WIN64
+#ifndef _M_X64
   /* 0x00 */ uint16_t                 RefCount;
   /* 0x02 */ uint16_t                 Flags;
 #else
@@ -177,7 +177,7 @@ struct cm_key_control_block
   /* 0x40 */ uint16_t                 KcbMaxNameLen;
   /* 0x42 */ uint16_t                 KcbMaxValueNameLen;
   /* 0x44 */ uint32_t                 KcbMaxValueDataLen;
-#if defined(_WIN64)
+#ifdef _M_X64
 	uint32_t						  KcbUserFlags:4;
 	uint32_t						  KcbVirtControlFlags:4;
 	uint32_t						  KcbDebug:8;

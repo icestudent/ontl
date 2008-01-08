@@ -79,12 +79,12 @@ struct kwait_block
   uint16_t      WaitType;
 };
 
-
+typedef uintptr_t kaffinity_t;
 struct kaffinity
 {
   kaffinity() {}
-  kaffinity(uintptr_t affinity) : affinity(affinity) { }
-  uintptr_t affinity;
+  kaffinity(kaffinity_t affinity) : affinity(affinity) { }
+  kaffinity_t affinity;
 };
 
 

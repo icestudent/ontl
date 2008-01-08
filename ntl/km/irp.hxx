@@ -66,9 +66,9 @@ namespace ntl {
         device_object *PhysicalDeviceObject
         );
 
-#ifdef _M_IX86
+#if defined(_M_IX86)
 #   pragma pack(push, 4)
-#elif _M_X64
+#elif defined(_M_X64)
 #   pragma pack(push, 8)
 #endif
 
@@ -96,9 +96,9 @@ namespace ntl {
 
       union
       {
-#ifdef _M_IX86
+#if defined(_M_IX86)
         uint8_t _[0x10];
-#elif _M_X64
+#elif defined(_M_X64)
         __declspec(align(8))
           uint8_t _[0x20];
 #endif

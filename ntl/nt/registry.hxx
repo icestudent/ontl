@@ -473,7 +473,7 @@ class key : public handle, public device_traits<key>
         value_type                    type        = reg_sz)
     {
       return nt::success(set(value_name, type, value.begin(),
-                              value.size() * sizeof(std::wstring::value_type)));
+                              (uint32_t)(value.size() * sizeof(std::wstring::value_type))));
     }
 
 
