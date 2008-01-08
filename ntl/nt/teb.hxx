@@ -184,6 +184,7 @@ struct teb: public tib
   static __forceinline
     teb & instance() { return *static_cast<teb*>(get(&tib::Self)); }
 
+  // common part
   /* 0x1c */  void *    EnvironmentPointer;
   /* 0x20 */  client_id ClientId;
   /* 0x28 */  void *    ActiveRpcHandle;
@@ -196,7 +197,7 @@ struct teb: public tib
   /*<thisrel this+0x40>*/ /*|0x4|*/ void* Win32ThreadInfo;
   /*<thisrel this+0x44>*/ /*|0x68|*/ unsigned long User32Reserved[26];
   /*<thisrel this+0xac>*/ /*|0x14|*/ unsigned long UserReserved[5];
-  /*<thisrel this+0xc0>*/ /*|0x4|*/ void* WOW32Reserved;
+  /*<thisrel this+0xc0>*/ /*|0x4|*/ void* WOW32Reserved;                      // wntdll!X86SwitchTo64BitMode()
   /*<thisrel this+0xc4>*/ /*|0x4|*/ unsigned long CurrentLocale;
   /*<thisrel this+0xc8>*/ /*|0x4|*/ unsigned long FpSoftwareStatusRegister;
   /*<thisrel this+0xcc>*/ /*|0xd8|*/ void* SystemReserved1[54];
@@ -230,7 +231,7 @@ struct teb: public tib
   /*<thisrel this+0xf28>*/ /*|0x4|*/ unsigned long HardErrorsAreDisabled;
   /*<thisrel this+0xf2c>*/ /*|0x40|*/ void* Instrumentation[16];
   /*<thisrel this+0xf6c>*/ /*|0x4|*/ void* WinSockData;
-  /*<thisrel this+0xf70>*/ /*|0x4|*/ unsigned long GdiBatchCount;
+  /*<thisrel this+0xf70>*/ /*|0x4|*/ uintptr_t GdiBatchCount                  // teb64* on win32 process (on wow64)
   /*<thisrel this+0xf74>*/ /*|0x1|*/ unsigned char InDbgPrint;
   /*<thisrel this+0xf75>*/ /*|0x1|*/ unsigned char FreeStackOnTermination;
   /*<thisrel this+0xf76>*/ /*|0x1|*/ unsigned char HasFiberData;
