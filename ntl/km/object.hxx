@@ -32,27 +32,28 @@ struct device_object;
 struct file_object;
 
 
-struct object_attributes : public nt::object_attributes
+struct object_attributes:
+  public nt::object_attributes
 {
-    object_attributes(
-      const const_unicode_string &  name,
-      const attributes              attr      = case_insensitive | kernel_handle,
-      const security_descriptor *   security  = 0)
+  object_attributes(
+    const const_unicode_string &  name,
+    const attributes              attr      = case_insensitive | kernel_handle,
+    const security_descriptor *   security  = 0)
     : nt::object_attributes(name, attr, security)
-    {/**/}
+  {/**/}
 
-    object_attributes(
-      const legacy_handle           root,
-      const const_unicode_string &  name,
-      const attributes              attr      = case_insensitive | kernel_handle,
-      const security_descriptor *   security  = 0)
+  object_attributes(
+    const legacy_handle           root,
+    const const_unicode_string &  name,
+    const attributes              attr      = case_insensitive | kernel_handle,
+    const security_descriptor *   security  = 0)
     : nt::object_attributes(root, name, attr, security)
-    {/**/}
+  {/**/}
 
-  private:
+private:
 
-    //object_attributes(const object_attributes &);
-//    const object_attributes & operator=(const object_attributes &);
+  //object_attributes(const object_attributes &);
+  const object_attributes & operator=(const object_attributes &);
 
 };
 
