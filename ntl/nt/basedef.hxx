@@ -202,9 +202,9 @@ namespace ntl {
 
     struct ldr_data_table_entry
     {
-      /* 0x00 */ list_entry           InLoadOrderLinks;
-      /* 0x08 */ list_entry           InMemoryOrderLinks;
-      /* 0x10 */ list_entry           InInitializationOrderLinks;
+      /* 0x00 */ list_head            InLoadOrderLinks;
+      /* 0x08 */ list_head            InMemoryOrderLinks;
+      /* 0x10 */ list_head            InInitializationOrderLinks;
       /* 0x18 */ pe::image *          DllBase;
       /* 0x1c */ void *               EntryPoint;
       /* 0x20 */ uint32_t             SizeOfImage;
@@ -223,6 +223,15 @@ namespace ntl {
       /* 0x48 */ void *               EntryPointActivationContext;
       /* 0x4c */ void *               PatchInformation;
 
+#if 0
+      // nt 6.0+
+      /*<thisrel this+0x50>*/ /*|0x8|*/ list_entry ForwarderLinks;
+      /*<thisrel this+0x58>*/ /*|0x8|*/ list_entry ServiceTagLinks;
+      /*<thisrel this+0x60>*/ /*|0x8|*/ list_entry StaticLinks;
+      // // <size 0x68>
+#endif
+
+
       struct find_dll
       {
         find_dll(list_head * head) : head(head) {}
@@ -231,16 +240,14 @@ namespace ntl {
 
         const pe::image * operator()(const char name[]) const
         {
-          if ( head )
-            for ( list_entry * it = head->begin(); it != head->end(); it = it->next )
+          if (head)
+            for (list_entry * it = head->begin(); it != head->end(); it = it->next)
             {
               const ldr_data_table_entry * const entry =
                 reinterpret_cast<ldr_data_table_entry *>(it);
-              for ( unsigned short i = 0; i != entry->BaseDllName.size(); ++i )
-              {
-                if ( (entry->BaseDllName[i] ^ name[i]) & 0x5F )
+              for (size_t i = 0; i != entry->BaseDllName.size(); ++i)
+                if ((entry->BaseDllName[i] ^ name[i]) & 0x5F)
                   goto other_name;
-              }
               return entry->DllBase;
 other_name:;
             }
