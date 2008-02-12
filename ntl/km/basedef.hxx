@@ -111,6 +111,14 @@ void KfLowerIrql(kirql_t NewIrql)
 
 #endif
 
+#ifdef _DEBUG
+NTL__EXTERNAPI
+void __stdcall
+DbgBreakPointWithStatus(
+                        ntstatus Status
+                        );
+#endif
+
 /** Interrupt request level RAII wrapper */
 struct kirql
 { 
@@ -149,29 +157,48 @@ protected:
 	kirql_t _;
 
 public:
-  kirql(kirql_t irql)
-  {
-    _ = irql;
-  }
-	static kirql get_current()
-	{
-		return kirql(KeGetCurrentIrql());
-	}
   kirql()
   {
     _ = KeGetCurrentIrql();
   }
+  kirql(kirql_t irql)
+  {
+    _ = irql;
+  }
+
+	static kirql get_current()
+	{
+		return kirql(KeGetCurrentIrql());
+	}
 
   void raise(const level NewIrql)
   {
+#ifdef _DEBUG
+    if(KeGetCurrentIrql() > static_cast<kirql_t>(NewIrql))
+      // lower irql is impossible
+      // IRQL_NOT_GREATER_OR_EQUAL
+      DbgBreakPointWithStatus((ntstatus)0x00000009);
+#endif
     _ = KfRaiseIrql(static_cast<kirql_t>(NewIrql));
   }
   void raisetodpc()
   {
+#ifdef _DEBUG
+    if(KeGetCurrentIrql() > static_cast<kirql_t>(dispatch_level))
+      // lower irql is impossible
+      // IRQL_NOT_GREATER_OR_EQUAL
+      DbgBreakPointWithStatus((ntstatus)0x00000009);
+#endif
     _ = KfRaiseIrql(dispatch_level);
   }
   void raisetosynch()
   {
+#ifdef _DEBUG
+    if(KeGetCurrentIrql() > static_cast<kirql_t>(synch_level))
+      // lower irql is impossible
+      // IRQL_NOT_GREATER_OR_EQUAL
+      DbgBreakPointWithStatus((ntstatus)0x00000009);
+#endif
     _ = KfRaiseIrql(synch_level);
   }
   void lower()
@@ -267,30 +294,32 @@ struct nlstableinfo {
   uint16_t*   LowerCaseTable;             // 844 format lower case table
 };
 
-extern unicode_string NtSystemRoot;
-extern uint32_t NtBuildNumber;
-extern const uint32_t NtMajorVersion;
-extern const uint32_t NtMinorVersion;
-extern uint32_t CmNtCSDVersion;
-extern uint32_t CmNtCSDReleaseType;
-extern uint32_t CmNtSpBuildNumber;
-extern unicode_string CmVersionString;
-extern unicode_string CmCSDVersionString;
+extern "C" {
+  extern unicode_string NtSystemRoot;
+  extern uint32_t NtBuildNumber;
+  extern const uint32_t NtMajorVersion;
+  extern const uint32_t NtMinorVersion;
+  extern uint32_t CmNtCSDVersion;
+  extern uint32_t CmNtCSDReleaseType;
+  extern uint32_t CmNtSpBuildNumber;
+  extern unicode_string CmVersionString;
+  extern unicode_string CmCSDVersionString;
 
-extern const char NtBuildLab[];
+  extern const char NtBuildLab[];
 
-extern nlstableinfo InitTableInfo;
-extern uint32_t InitNlsTableSize;
-extern void* InitNlsTableBase;
-extern uint32_t InitAnsiCodePageDataOffset;
-extern uint32_t InitOemCodePageDataOffset;
-extern uint32_t InitUnicodeCaseTableDataOffset;
-extern void* InitNlsSectionPointer;
-extern bool InitSafeModeOptionPresent;
-extern uint32_t InitSafeBootMode;
+  extern nlstableinfo InitTableInfo;
+  extern uint32_t InitNlsTableSize;
+  extern void* InitNlsTableBase;
+  extern uint32_t InitAnsiCodePageDataOffset;
+  extern uint32_t InitOemCodePageDataOffset;
+  extern uint32_t InitUnicodeCaseTableDataOffset;
+  extern void* InitNlsSectionPointer;
+  extern bool InitSafeModeOptionPresent;
+  extern uint32_t InitSafeBootMode;
 
-extern bool InitIsWinPEMode;
-extern uint32_t InitWinPEModeType;
+  extern bool InitIsWinPEMode;
+  extern uint32_t InitWinPEModeType;
+}
 
 #ifndef NTL_SUPPRESS_IMPORT
 
