@@ -396,7 +396,7 @@ struct kprocess50
   uint8_t PowerState;
   bool DisableQuantum;
   uint8_t Spare[2];
-};
+}; // <size 0x6c> 
 
 struct kprocess51
 {
@@ -430,7 +430,7 @@ struct kprocess51
 	/*<thisrel this+0x6b>*/ /*|0x1|*/ kexecute_options Flags;
 }; // sizeof = 0x6C
 
-struct kprocess52: kprocess51{};  // same on xp & 2k3 (x32)
+struct kprocess52: kprocess51{};  // same on xp & 2k3 sp0 (x32)
 
 struct kprocess60
 {
@@ -536,7 +536,7 @@ struct eprocess50
   uint32_t SessionId;
   list_entry PhysicalVadList;
   hardware_pte PageDirectoryPte;
-  int64_t Filler;
+  uint32_t reserved;
   uint32_t PaePageDirectoryPage;
   uint8_t ImageFileName[ 16 ];
   uint32_t VmTrimFaultValue;
@@ -563,7 +563,7 @@ struct eprocess50
   struct rtl_bitmap* VadPhysicalPagesBitMap;
   uintptr_t VadPhysicalPages;
   kspin_lock AweLock;
-};
+}; // <size 0x288>
 
 struct eprocess51
 {

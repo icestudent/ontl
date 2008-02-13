@@ -245,9 +245,12 @@ namespace ntl {
             {
               const ldr_data_table_entry * const entry =
                 reinterpret_cast<ldr_data_table_entry *>(it);
-              for (size_t i = 0; i != entry->BaseDllName.size(); ++i)
+              if(!entry->BaseDllName.size())
+                continue;
+              for (size_t i = 0; i != entry->BaseDllName.size(); ++i) {
                 if ((entry->BaseDllName[i] ^ name[i]) & 0x5F)
                   goto other_name;
+              }
               return entry->DllBase;
 other_name:;
             }

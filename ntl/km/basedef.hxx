@@ -295,30 +295,30 @@ struct nlstableinfo {
 };
 
 extern "C" {
-  extern unicode_string NtSystemRoot;
-  extern uint32_t NtBuildNumber;
-  extern const uint32_t NtMajorVersion;
-  extern const uint32_t NtMinorVersion;
-  extern uint32_t CmNtCSDVersion;
-  extern uint32_t CmNtCSDReleaseType;
-  extern uint32_t CmNtSpBuildNumber;
-  extern unicode_string CmVersionString;
-  extern unicode_string CmCSDVersionString;
+  extern unicode_string* NtSystemRoot;
+  extern uint32_t* NtBuildNumber;
+  extern const uint32_t* NtMajorVersion;
+  extern const uint32_t* NtMinorVersion;
+  extern uint32_t* CmNtCSDVersion;
+  extern uint32_t* CmNtCSDReleaseType;
+  extern uint32_t* CmNtSpBuildNumber;
+  extern unicode_string* CmVersionString;
+  extern unicode_string* CmCSDVersionString;
 
   extern const char NtBuildLab[];
 
-  extern nlstableinfo InitTableInfo;
-  extern uint32_t InitNlsTableSize;
-  extern void* InitNlsTableBase;
-  extern uint32_t InitAnsiCodePageDataOffset;
-  extern uint32_t InitOemCodePageDataOffset;
-  extern uint32_t InitUnicodeCaseTableDataOffset;
-  extern void* InitNlsSectionPointer;
-  extern bool InitSafeModeOptionPresent;
-  extern uint32_t InitSafeBootMode;
+  extern nlstableinfo* InitTableInfo;
+  extern uint32_t* InitNlsTableSize;
+  extern void** InitNlsTableBase;
+  extern uint32_t* InitAnsiCodePageDataOffset;
+  extern uint32_t* InitOemCodePageDataOffset;
+  extern uint32_t* InitUnicodeCaseTableDataOffset;
+  extern void** InitNlsSectionPointer;
+  extern bool* InitSafeModeOptionPresent;
+  extern uint32_t* InitSafeBootMode;
 
-  extern bool InitIsWinPEMode;
-  extern uint32_t InitWinPEModeType;
+  extern bool* InitIsWinPEMode;
+  extern uint32_t* InitWinPEModeType;
 }
 
 #ifndef NTL_SUPPRESS_IMPORT

@@ -36,6 +36,7 @@ struct status
     info_length_mismatch      = (int)0xC0000004,
     access_violation          = (int)0xC0000005,
     invalid_handle            = (int)0xC0000008,
+    invalid_parameter         = (int)0xC000000D,
 
     invalid_device_request    = (int)0xC0000010,
 
