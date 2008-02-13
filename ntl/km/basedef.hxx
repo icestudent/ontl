@@ -295,8 +295,10 @@ struct nlstableinfo {
 };
 
 extern "C" {
-  extern unicode_string* NtSystemRoot;
   extern uint32_t* NtBuildNumber;
+  extern uint32_t* InitSafeBootMode;
+#if 0
+  extern unicode_string* NtSystemRoot;
   extern const uint32_t* NtMajorVersion;
   extern const uint32_t* NtMinorVersion;
   extern uint32_t* CmNtCSDVersion;
@@ -315,13 +317,11 @@ extern "C" {
   extern uint32_t* InitUnicodeCaseTableDataOffset;
   extern void** InitNlsSectionPointer;
   extern bool* InitSafeModeOptionPresent;
-  extern uint32_t* InitSafeBootMode;
 
   extern bool* InitIsWinPEMode;
   extern uint32_t* InitWinPEModeType;
+#endif
 }
-
-#ifndef NTL_SUPPRESS_IMPORT
 
 NTL__EXTERNAPI
 bool __stdcall
@@ -331,34 +331,9 @@ bool __stdcall
     uint32_t *        BuildNumber,
     unicode_string *  CSDVersion
     );
-#else
-
-static bool
-PsGetVersion(
-             uint32_t *        MajorVersion,
-             uint32_t *        MinorVersion,
-             uint32_t *        BuildNumber,
-             unicode_string *  CSDVersion
-             )
-{
-  if(MajorVersion)
-    *MajorVersion = NtMajorVersion;
-
-  if(MinorVersion)
-    *MinorVersion = NtMinorVersion;
-
-  if(BuildNumber)
-    *BuildNumber = NtBuildNumber & 0x3FFF;
-
-  if(CSDVersion)
-    *CSDVersion = CmCSDVersionString;
-
-  return (NtBuildNumber >> 28) == 0xC;
-}
-#endif
 
 static inline
-bool get_version(uint32_t & major_version, uint32_t & minor_version)
+bool get_version(uint32_t& major_version, uint32_t& minor_version)
 {
   return PsGetVersion(&major_version, &minor_version, 0, 0);
 }

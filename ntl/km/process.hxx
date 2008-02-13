@@ -357,14 +357,15 @@ struct alpc_process_context
 
 // 32bit structures
 struct kprocess50;  // 2k
-struct kprocess51;  // xp
-struct kprocess52;  // 2k3
+struct kprocess51;  // xp, 2k3 sp0
+struct kprocess52;  // 2k3 sp1+
 struct kprocess60;  // vista
 struct kprocess61;  // 2k8
 
 struct eprocess50;  // 2k
 struct eprocess51;  // xp
-struct eprocess52;  // 2k3
+struct eprocess52;  // 2k3 sp0
+struct eprocess521; // 2k3 sp1
 struct eprocess60;  // vista
 struct kprocess61;  // 2k8
 
@@ -430,7 +431,43 @@ struct kprocess51
 	/*<thisrel this+0x6b>*/ /*|0x1|*/ kexecute_options Flags;
 }; // sizeof = 0x6C
 
-struct kprocess52: kprocess51{};  // same on xp & 2k3 sp0 (x32)
+struct kprocess52
+{
+  /*<thisrel this+0x0>*/ /*|0x10|*/ struct _DISPATCHER_HEADER Header;
+  /*<thisrel this+0x10>*/ /*|0x8|*/ struct _LIST_ENTRY ProfileListHead;
+  /*<thisrel this+0x18>*/ /*|0x8|*/ unsigned long DirectoryTableBase[2];
+  /*<thisrel this+0x20>*/ /*|0x8|*/ struct _KGDTENTRY LdtDescriptor;
+  /*<thisrel this+0x28>*/ /*|0x8|*/ struct _KIDTENTRY Int21Descriptor;
+  /*<thisrel this+0x30>*/ /*|0x2|*/ unsigned short IopmOffset;
+  /*<thisrel this+0x32>*/ /*|0x1|*/ unsigned char Iopl;
+  /*<thisrel this+0x33>*/ /*|0x1|*/ unsigned char Unused;
+  /*<thisrel this+0x34>*/ /*|0x4|*/ unsigned long ActiveProcessors;
+  /*<thisrel this+0x38>*/ /*|0x4|*/ unsigned long KernelTime;
+  /*<thisrel this+0x3c>*/ /*|0x4|*/ unsigned long UserTime;
+  /*<thisrel this+0x40>*/ /*|0x8|*/ struct _LIST_ENTRY ReadyListHead;
+  /*<thisrel this+0x48>*/ /*|0x4|*/ struct _SINGLE_LIST_ENTRY SwapListEntry;
+  /*<thisrel this+0x4c>*/ /*|0x4|*/ void* VdmTrapcHandler;
+  /*<thisrel this+0x50>*/ /*|0x8|*/ struct _LIST_ENTRY ThreadListHead;
+  /*<thisrel this+0x58>*/ /*|0x4|*/ unsigned long ProcessLock;
+  /*<thisrel this+0x5c>*/ /*|0x4|*/ unsigned long Affinity;
+  /*<bitfield this+0x60>*/ /*|0x4|*/ long AutoAlignment:0:1;
+  /*<bitfield this+0x60>*/ /*|0x4|*/ long DisableBoost:1:1;
+  /*<bitfield this+0x60>*/ /*|0x4|*/ long DisableQuantum:2:1;
+  /*<bitfield this+0x60>*/ /*|0x4|*/ long ReservedFlags:3:1d;
+  /*<thisrel this+0x60>*/ /*|0x4|*/ long ProcessFlags;
+  /*<thisrel this+0x64>*/ /*|0x1|*/ char BasePriority;
+  /*<thisrel this+0x65>*/ /*|0x1|*/ char QuantumReset;
+  /*<thisrel this+0x66>*/ /*|0x1|*/ unsigned char State;
+  /*<thisrel this+0x67>*/ /*|0x1|*/ unsigned char ThreadSeed;
+  /*<thisrel this+0x68>*/ /*|0x1|*/ unsigned char PowerState;
+  /*<thisrel this+0x69>*/ /*|0x1|*/ unsigned char IdealNode;
+  /*<thisrel this+0x6a>*/ /*|0x1|*/ unsigned char Visited;
+  /*<thisrel this+0x6b>*/ /*|0x1|*/ struct _KEXECUTE_OPTIONS Flags;
+  /*<thisrel this+0x6b>*/ /*|0x1|*/ unsigned char ExecuteOptions;
+  /*<thisrel this+0x6c>*/ /*|0x4|*/ unsigned long StackCount;
+  /*<thisrel this+0x70>*/ /*|0x8|*/ struct _LIST_ENTRY ProcessListEntry;
+}; // <size 0x78>
+
 
 struct kprocess60
 {
@@ -675,6 +712,112 @@ struct eprocess51
 
 struct eprocess52
 {
+  /*<thisrel this+0x0>*/ /*|0x6c|*/ kprocess51 Pcb;
+  /*<thisrel this+0x6c>*/ /*|0x4|*/ ex_push_lock ProcessLock;
+  /*<thisrel this+0x70>*/ /*|0x8|*/ int64_t CreateTime;
+  /*<thisrel this+0x78>*/ /*|0x8|*/ int64_t ExitTime;
+  /*<thisrel this+0x80>*/ /*|0x4|*/ ex_rundown_ref RundownProtect;
+  /*<thisrel this+0x84>*/ /*|0x4|*/ void* UniqueProcessId;
+  /*<thisrel this+0x88>*/ /*|0x8|*/ list_entry ActiveProcessLinks;
+  /*<thisrel this+0x90>*/ /*|0xc|*/ uint32_t QuotaUsage[3];
+  /*<thisrel this+0x9c>*/ /*|0xc|*/ uint32_t QuotaPeak[3];
+  /*<thisrel this+0xa8>*/ /*|0x4|*/ uint32_t CommitCharge;
+  /*<thisrel this+0xac>*/ /*|0x4|*/ uint32_t PeakVirtualSize;
+  /*<thisrel this+0xb0>*/ /*|0x4|*/ uint32_t VirtualSize;
+  /*<thisrel this+0xb4>*/ /*|0x8|*/ list_entry SessionProcessLinks;
+  /*<thisrel this+0xbc>*/ /*|0x4|*/ void* DebugPort;
+  /*<thisrel this+0xc0>*/ /*|0x4|*/ void* ExceptionPort;
+  /*<thisrel this+0xc4>*/ /*|0x4|*/ handle_table* ObjectTable;
+  /*<thisrel this+0xc8>*/ /*|0x4|*/ ex_fast_ref Token;
+  /*<thisrel this+0xcc>*/ /*|0x4|*/ uint32_t WorkingSetPage;
+  /*<thisrel this+0xd0>*/ /*|0x20|*/ kguarded_mutex AddressCreationLock;
+  /*<thisrel this+0xf0>*/ /*|0x4|*/ uint32_t HyperSpaceLock;
+  /*<thisrel this+0xf4>*/ /*|0x4|*/ struct ethread* ForkInProgress;
+  /*<thisrel this+0xf8>*/ /*|0x4|*/ uint32_t HardwareTrigger;
+  /*<thisrel this+0xfc>*/ /*|0x4|*/ struct mm_avl_table* PhysicalVadRoot;
+  /*<thisrel this+0x100>*/ /*|0x4|*/ void* CloneRoot;
+  /*<thisrel this+0x104>*/ /*|0x4|*/ uint32_t NumberOfPrivatePages;
+  /*<thisrel this+0x108>*/ /*|0x4|*/ uint32_t NumberOfLockedPages;
+  /*<thisrel this+0x10c>*/ /*|0x4|*/ void* Win32Process;
+  /*<thisrel this+0x110>*/ /*|0x4|*/ ejob* Job;
+  /*<thisrel this+0x114>*/ /*|0x4|*/ void* SectionObject;
+  /*<thisrel this+0x118>*/ /*|0x4|*/ void* SectionBaseAddress;
+  /*<thisrel this+0x11c>*/ /*|0x4|*/ eprocess_quota_block* QuotaBlock;
+  /*<thisrel this+0x120>*/ /*|0x4|*/ pagefault_history* WorkingSetWatch;
+  /*<thisrel this+0x124>*/ /*|0x4|*/ void* Win32WindowStation;
+  /*<thisrel this+0x128>*/ /*|0x4|*/ void* InheritedFromUniqueProcessId;
+  /*<thisrel this+0x12c>*/ /*|0x4|*/ void* LdtInformation;
+  /*<thisrel this+0x130>*/ /*|0x4|*/ void* VadFreeHint;
+  /*<thisrel this+0x134>*/ /*|0x4|*/ void* VdmObjects;
+  /*<thisrel this+0x138>*/ /*|0x4|*/ void* DeviceMap;
+  /*<thisrel this+0x13c>*/ /*|0xc|*/ void* Spare0[3];
+  /*<thisrel this+0x148>*/ /*|0x4|*/ hardware_pte PageDirectoryPte;
+  /*<thisrel this+0x150>*/ /*|0x4|*/ void* Session;
+  /*<thisrel this+0x154>*/ /*|0x10|*/ uint8_t ImageFileName[16];
+  /*<thisrel this+0x164>*/ /*|0x8|*/ list_entry JobLinks;
+  /*<thisrel this+0x16c>*/ /*|0x4|*/ void* LockedPagesList;
+  /*<thisrel this+0x170>*/ /*|0x8|*/ list_entry ThreadListHead;
+  /*<thisrel this+0x178>*/ /*|0x4|*/ void* SecurityPort;
+  /*<thisrel this+0x17c>*/ /*|0x4|*/ void* PaeTop;
+  /*<thisrel this+0x180>*/ /*|0x4|*/ uint32_t ActiveThreads;
+  /*<thisrel this+0x184>*/ /*|0x4|*/ uint32_t GrantedAccess;
+  /*<thisrel this+0x188>*/ /*|0x4|*/ uint32_t DefaultHardErrorProcessing;
+  /*<thisrel this+0x18c>*/ /*|0x4|*/ int32_t LastThreadExitStatus;
+  /*<thisrel this+0x190>*/ /*|0x4|*/ nt::peb* Peb;
+  /*<thisrel this+0x194>*/ /*|0x4|*/ ex_fast_ref PrefetchTrace;
+  /*<thisrel this+0x198>*/ /*|0x8|*/ int64_t ReadOperationCount;
+  /*<thisrel this+0x1a0>*/ /*|0x8|*/ int64_t WriteOperationCount;
+  /*<thisrel this+0x1a8>*/ /*|0x8|*/ int64_t OtherOperationCount;
+  /*<thisrel this+0x1b0>*/ /*|0x8|*/ int64_t ReadTransferCount;
+  /*<thisrel this+0x1b8>*/ /*|0x8|*/ int64_t WriteTransferCount;
+  /*<thisrel this+0x1c0>*/ /*|0x8|*/ int64_t OtherTransferCount;
+  /*<thisrel this+0x1c8>*/ /*|0x4|*/ uint32_t CommitChargeLimit;
+  /*<thisrel this+0x1cc>*/ /*|0x4|*/ uint32_t CommitChargePeak;
+  /*<thisrel this+0x1d0>*/ /*|0x4|*/ void* AweInfo;
+  /*<thisrel this+0x1d4>*/ /*|0x4|*/ se_audit_process_creation_info SeAuditProcessCreationInfo;
+  /*<thisrel this+0x1d8>*/ /*|0x60|*/ mmsupport52 Vm;
+  /*<thisrel this+0x238>*/ /*|0x8|*/ list_entry MmProcessLinks;
+  /*<thisrel this+0x240>*/ /*|0x4|*/ uint32_t ModifiedPageCount;
+  /*<thisrel this+0x244>*/ /*|0x4|*/ uint32_t JobStatus;
+  /*<bitfield this+0x248>*/ /*|0x4|*/ uint32_t CreateReported:1;
+  /*<bitfield this+0x248>*/ /*|0x4|*/ uint32_t NoDebugInherit:1;
+  /*<bitfield this+0x248>*/ /*|0x4|*/ uint32_t ProcessExiting:1;
+  /*<bitfield this+0x248>*/ /*|0x4|*/ uint32_t ProcessDelete:1;
+  /*<bitfield this+0x248>*/ /*|0x4|*/ uint32_t Wow64SplitPages:1;
+  /*<bitfield this+0x248>*/ /*|0x4|*/ uint32_t VmDeleted:1;
+  /*<bitfield this+0x248>*/ /*|0x4|*/ uint32_t OutswapEnabled:1;
+  /*<bitfield this+0x248>*/ /*|0x4|*/ uint32_t Outswapped:1;
+  /*<bitfield this+0x248>*/ /*|0x4|*/ uint32_t ForkFailed:1;
+  /*<bitfield this+0x248>*/ /*|0x4|*/ uint32_t Wow64VaSpace4Gb:1;
+  /*<bitfield this+0x248>*/ /*|0x4|*/ uint32_t AddressSpaceInitialized:2;
+  /*<bitfield this+0x248>*/ /*|0x4|*/ uint32_t SetTimerResolution:1;
+  /*<bitfield this+0x248>*/ /*|0x4|*/ uint32_t BreakOnTermination:1;
+  /*<bitfield this+0x248>*/ /*|0x4|*/ uint32_t SessionCreationUnderway:1;
+  /*<bitfield this+0x248>*/ /*|0x4|*/ uint32_t WriteWatch:1;
+  /*<bitfield this+0x248>*/ /*|0x4|*/ uint32_t ProcessInSession:1;
+  /*<bitfield this+0x248>*/ /*|0x4|*/ uint32_t OverrideAddressSpace:1;
+  /*<bitfield this+0x248>*/ /*|0x4|*/ uint32_t HasAddressSpace:1;
+  /*<bitfield this+0x248>*/ /*|0x4|*/ uint32_t LaunchPrefetched:1;
+  /*<bitfield this+0x248>*/ /*|0x4|*/ uint32_t InjectInpageErrors:1;
+  /*<bitfield this+0x248>*/ /*|0x4|*/ uint32_t VmTopDown:1;
+  /*<bitfield this+0x248>*/ /*|0x4|*/ uint32_t ImageNotifyDone:1;
+  /*<bitfield this+0x248>*/ /*|0x4|*/ uint32_t PdeUpdateNeeded:1;
+  /*<bitfield this+0x248>*/ /*|0x4|*/ uint32_t VdmAllowed:1;
+  /*<bitfield this+0x240>*/ /*|0x4|*/ uint32_t SmapAllowed:1;
+  /*<bitfield this+0x240>*/ /*|0x4|*/ uint32_t CreateFailed:1;
+  /*<bitfield this+0x240>*/ /*|0x4|*/ uint32_t DefaultIoPriority:3;
+  /*<bitfield this+0x240>*/ /*|0x4|*/ uint32_t Spare1:1;
+  /*<bitfield this+0x240>*/ /*|0x4|*/ uint32_t Spare2:1;
+  /*<thisrel this+0x24c>*/ /*|0x4|*/ int32_t ExitStatus;
+  /*<thisrel this+0x250>*/ /*|0x2|*/ uint16_t NextPageColor;
+  /*<thisrel this+0x252>*/ /*|0x1|*/ uint8_t SubSystemMinorVersion;
+  /*<thisrel this+0x253>*/ /*|0x1|*/ uint8_t SubSystemMajorVersion;
+  /*<thisrel this+0x254>*/ /*|0x1|*/ uint8_t PriorityClass;
+  /*<thisrel this+0x258>*/ /*|0x20|*/ mm_avl_table VadRoot;
+}; // <size 0x278>
+
+struct eprocess521
+{
   /*<thisrel this+0x0>*/ /*|0x6c|*/ kprocess52 Pcb;
   /*<thisrel this+0x6c>*/ /*|0x4|*/ ex_push_lock ProcessLock;
   /*<thisrel this+0x70>*/ /*|0x8|*/ int64_t CreateTime;
@@ -766,7 +909,11 @@ struct eprocess52
   /*<bitfield this+0x248>*/ /*|0x4|*/ uint32_t ImageNotifyDone:1;
   /*<bitfield this+0x248>*/ /*|0x4|*/ uint32_t PdeUpdateNeeded:1;
   /*<bitfield this+0x248>*/ /*|0x4|*/ uint32_t VdmAllowed:1;
-  /*<bitfield this+0x248>*/ /*|0x4|*/ uint32_t Unused:7;
+  /*<bitfield this+0x240>*/ /*|0x4|*/ uint32_t SmapAllowed:1;
+  /*<bitfield this+0x240>*/ /*|0x4|*/ uint32_t CreateFailed:1;
+  /*<bitfield this+0x240>*/ /*|0x4|*/ uint32_t DefaultIoPriority:3;
+  /*<bitfield this+0x240>*/ /*|0x4|*/ uint32_t Spare1:1;
+  /*<bitfield this+0x240>*/ /*|0x4|*/ uint32_t Spare2:1;
   /*<thisrel this+0x24c>*/ /*|0x4|*/ int32_t ExitStatus;
   /*<thisrel this+0x250>*/ /*|0x2|*/ uint16_t NextPageColor;
   /*<thisrel this+0x252>*/ /*|0x1|*/ uint8_t SubSystemMinorVersion;
