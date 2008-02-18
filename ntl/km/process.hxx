@@ -433,6 +433,7 @@ struct kprocess51
 
 struct kprocess52
 {
+#if 0
   /*<thisrel this+0x0>*/ /*|0x10|*/ struct _DISPATCHER_HEADER Header;
   /*<thisrel this+0x10>*/ /*|0x8|*/ struct _LIST_ENTRY ProfileListHead;
   /*<thisrel this+0x18>*/ /*|0x8|*/ unsigned long DirectoryTableBase[2];
@@ -466,6 +467,7 @@ struct kprocess52
   /*<thisrel this+0x6b>*/ /*|0x1|*/ unsigned char ExecuteOptions;
   /*<thisrel this+0x6c>*/ /*|0x4|*/ unsigned long StackCount;
   /*<thisrel this+0x70>*/ /*|0x8|*/ struct _LIST_ENTRY ProcessListEntry;
+#endif
 }; // <size 0x78>
 
 
@@ -712,6 +714,7 @@ struct eprocess51
 
 struct eprocess52
 {
+#if 0
   /*<thisrel this+0x0>*/ /*|0x6c|*/ kprocess51 Pcb;
   /*<thisrel this+0x6c>*/ /*|0x4|*/ ex_push_lock ProcessLock;
   /*<thisrel this+0x70>*/ /*|0x8|*/ int64_t CreateTime;
@@ -814,6 +817,7 @@ struct eprocess52
   /*<thisrel this+0x253>*/ /*|0x1|*/ uint8_t SubSystemMajorVersion;
   /*<thisrel this+0x254>*/ /*|0x1|*/ uint8_t PriorityClass;
   /*<thisrel this+0x258>*/ /*|0x20|*/ mm_avl_table VadRoot;
+#endif
 }; // <size 0x278>
 
 struct eprocess521
@@ -1446,6 +1450,45 @@ nt::peb * __stdcall
 // XP+ only
 NTL__EXTERNAPI
 get_process_peb_t PsGetProcessPeb;
+
+
+
+
+typedef	void 
+(__stdcall* PCreateProcessNotifyRoutine)(
+  legacy_handle ParentId,
+  legacy_handle ProcessId,
+  bool Create
+  );
+
+typedef void 
+(__stdcall* PCreateThreadNotifyRoutine)(
+                                        legacy_handle ProcessId,
+                                        legacy_handle ThreadId,
+                                        bool Create
+                                        );
+
+
+NTL__EXTERNAPI
+ntstatus __stdcall
+PsSetCreateProcessNotifyRoutine(
+                                PCreateProcessNotifyRoutine NotifyRoutine,
+                                bool Remove
+                                );
+
+NTL__EXTERNAPI
+ntstatus __stdcall
+PsSetCreateThreadNotifyRoutine(
+                               PCreateThreadNotifyRoutine NotifyRoutine
+                               );
+
+#if (NTDDI_VERSION >= NTDDI_WINXP)
+NTL__EXTERNAPI
+ntstatus __stdcall
+PsRemoveCreateThreadNotifyRoutine (
+                                   PCreateThreadNotifyRoutine NotifyRoutine
+                                   );
+#endif
 
 
 }//namspace km

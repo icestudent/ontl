@@ -68,6 +68,7 @@ static const kprocessor_mode KernelMode = { 0 };
 static const kprocessor_mode UserMode = { 1 };
 
 typedef long kpriority;
+typedef uintptr_t kaffinity_t;
 
 #if 1
 
@@ -834,6 +835,163 @@ struct work_queue_item
 
 
 //
+// fast mutexes.
+//
+struct fast_mutex;
+
+NTL__EXTERNAPI
+void __fastcall
+ExAcquireFastMutexUnsafe (fast_mutex* FastMutex);
+
+NTL__EXTERNAPI
+void __fastcall
+ExReleaseFastMutexUnsafe (fast_mutex* FastMutex);
+
+
+#if defined(_NTHAL_) && defined(_M_IX86)
+
+NTL__EXTERNAPI
+void __fastcall
+ExiAcquireFastMutex (fast_mutex* FastMutex);
+
+NTL__EXTERNAPI
+void __fastcall
+ExiReleaseFastMutex (fast_mutex* FastMutex);
+
+NTL__EXTERNAPI
+void __fastcall
+ExiTryToAcquireFastMutex (fast_mutex* FastMutex);
+
+#else
+
+NTL__EXTERNAPI
+void __fastcall
+ExAcquireFastMutex (fast_mutex* FastMutex);
+
+NTL__EXTERNAPI
+void __fastcall
+ExReleaseFastMutex (fast_mutex* FastMutex);
+
+NTL__EXTERNAPI
+bool __fastcall
+ExTryToAcquireFastMutex (fast_mutex* FastMutex);
+
+#endif // _NTHAL_ && _M_IX86
+
+
+struct kthread;
+struct fast_mutex {
+
+  enum {
+    FM_LOCK_BIT_V        = 0x0, // Lock bit as a bit number
+    FM_LOCK_BIT          = 0x1, // Actual lock bit, 1 = Unlocked, 0 = Locked
+    FM_LOCK_WAITER_WOKEN = 0x2, // A single waiter has been woken to acquire this lock
+    FM_LOCK_WAITER_INC   = 0x4 // Increment value to change the waiters count
+  };
+  volatile uint32_t Count;
+  kthread* Owner;
+  uint32_t Contention;
+  synchronization_event Gate;
+  uint32_t OldIrql;
+
+  fast_mutex()
+    :Count(FM_LOCK_BIT), Owner(NULL),
+    Contention(0)
+  {
+  }
+
+  void acquire()
+  {
+    ExAcquireFastMutex(this);
+  }
+  bool try_acquire()
+  {
+    return ExTryToAcquireFastMutex(this);
+  }
+  void release()
+  {
+    ExReleaseFastMutex(this);
+  }
+  void acquire_unsafe()
+  {
+    ExAcquireFastMutexUnsafe(this);
+  }
+  void release_unsafe()
+  {
+    ExReleaseFastMutexUnsafe(this);
+  }
+};
+
+
+//
+// Mutex object
+//
+struct kmutant;
+
+NTL__EXTERNAPI
+void __stdcall
+KeInitializeMutex (
+                   kmutant* Mutex,
+                   uint32_t Level
+                   );
+NTL__EXTERNAPI
+int32_t __stdcall
+KeReadStateMutex (
+                  kmutant* Mutex
+                  );
+NTL__EXTERNAPI
+int32_t __stdcall
+KeReleaseMutex (
+                kmutant* Mutex,
+                bool Wait
+                );
+
+struct kmutant 
+{
+  dispatcher_header   Header;
+  list_entry          MutantListEntry;
+  kthread            *OwnerThread;
+  bool                Abandoned;
+  bool                ApcDisable;
+
+  kmutant()
+  {
+    KeInitializeMutex(this, 0);
+  }
+
+  int32_t release(bool wait = false)
+  {
+    return KeReleaseMutex(this, wait);
+  }
+
+  int32_t read_state()
+  {
+    return KeReadStateMutex(this);
+  }
+};
+
+
+// guarded mutex
+
+struct kguarded_mutex 
+{
+  enum lock
+  {
+    bit_v = 0x00,
+    bit   = 0x01,
+    waiter_woken  = 0x02,
+    waiter_inc    = 0x04
+  };
+
+  int32_t   Count;
+  kthread*  Owner;
+  uint32_t  Contention;
+  kgate     Gate;
+  int16_t   KernelApcDisable;
+  int16_t   SpecialApcDisable;
+};
+
+//
 //  executive resource data structures.
 //
 
@@ -932,7 +1090,730 @@ struct ex_push_lock
   };
 };// <size 0x4>
 
+
+#define PROCESSOR_FEATURE_MAX 64
+#define MAX_WOW64_SHARED_ENTRIES 16
+
+    enum AlternativeArchitectureType 
+    {
+      StandardDesign,                 // None == 0 == standard design
+      NEC98x86,                       // NEC PC98xx series on X86
+      EndAlternatives                 // past end of known alternatives
+    };
+
+    enum nt_product_type 
+    {
+      NtProductWinNt = 1,
+      NtProductLanManNt,
+      NtProductServer
+    };
+
+    // time
+    struct ksystem_time
+    {
+      uint32_t LowPart;
+      int32_t High1Time;
+      int32_t High2Time;
+    };
+
+    struct time_fields
+    {
+      int16_t Year;        // range [1601...]
+      int16_t Month;       // range [1..12]
+      int16_t Day;         // range [1..31]
+      int16_t Hour;        // range [0..23]
+      int16_t Minute;      // range [0..59]
+      int16_t Second;      // range [0..59]
+      int16_t Milliseconds;// range [0..999]
+      int16_t Weekday;     // range [0..6] == [Sunday..Saturday]
+    };
+
+
+    // user shared data
+    struct kuser_shared_data 
+    {
+      static const kuser_shared_data& instance()
+      {
+        const kuser_shared_data* const kusd = reinterpret_cast<const kuser_shared_data* const>
+#if defined(_M_IX86)
+          (0xffdf0000);
+#elif defined(_M_X64)
+          (0xFFFFF78000000000UI64);
+#endif
+        return *kusd;
+      }
+
+
+      //
+      // Current low 32-bit of tick count and tick count multiplier.
+      //
+      // N.B. The tick count is updated each time the clock ticks.
+      //
+
+      uint32_t TickCountLowDeprecated;
+      uint32_t TickCountMultiplier;
+
+      //
+      // Current 64-bit interrupt time in 100ns units.
+      //
+
+      volatile ksystem_time InterruptTime;
+
+      //
+      // Current 64-bit system time in 100ns units.
+      //
+
+      volatile ksystem_time SystemTime;
+
+      //
+      // Current 64-bit time zone bias.
+      //
+
+      volatile ksystem_time TimeZoneBias;
+
+      //
+      // Support image magic number range for the host system.
+      //
+      // N.B. This is an inclusive range.
+      //
+
+      uint16_t ImageNumberLow;
+      uint16_t ImageNumberHigh;
+
+      //
+      // Copy of system root in unicode.
+      //
+
+      wchar_t NtSystemRoot[260];
+
+      //
+      // Maximum stack trace depth if tracing enabled.
+      //
+
+      uint32_t MaxStackTraceDepth;
+
+      //
+      // Crypto exponent value.
+      //
+
+      uint32_t CryptoExponent;
+
+      //
+      // Time zone ID.
+      //
+
+      uint32_t TimeZoneId;
+      uint32_t LargePageMinimum;
+      uint32_t Reserved2[7];
+
+      //
+      // Product type.
+      //
+
+      nt_product_type NtProductType;
+      bool ProductTypeIsValid;
+
+      //
+      // The NT Version.
+      //
+      // N. B. Note that each process sees a version from its PEB, but if the
+      //       process is running with an altered view of the system version,
+      //       the following two fields are used to correctly identify the
+      //       version
+      //
+
+      uint32_t NtMajorVersion;
+      uint32_t NtMinorVersion;
+
+      //
+      // Processor features.
+      //
+
+
+      bool ProcessorFeatures[PROCESSOR_FEATURE_MAX];
+
+      //
+      // Reserved fields - do not use.
+      //
+
+      uint32_t Reserved1;
+      uint32_t Reserved3;
+
+      //
+      // Time slippage while in debugger.
+      //
+
+      volatile uint32_t TimeSlip;
+
+      //
+      // Alternative system architecture, e.g., NEC PC98xx on x86.
+      //
+
+      AlternativeArchitectureType AlternativeArchitecture;
+
+      //
+      // If the system is an evaluation unit, the following field contains the
+      // date and time that the evaluation unit expires. A value of 0 indicates
+      // that there is no expiration. A non-zero value is the UTC absolute time
+      // that the system expires.
+      //
+
+      int64_t SystemExpirationDate;
+
+      //
+      // Suite support.
+      //
+
+      uint32_t SuiteMask;
+
+      //
+      // TRUE if a kernel debugger is connected/enabled.
+      //
+
+      bool KdDebuggerEnabled;
+
+      //
+      // NX support policy.
+      //
+
+      uint8_t NXSupportPolicy;
+
+      //
+      // Current console session Id. Always zero on non-TS systems.
+      //
+
+      volatile uint32_t ActiveConsoleId;
+
+      //
+      // Force-dismounts cause handles to become invalid. Rather than always
+      // probe handles, a serial number of dismounts is maintained that clients
+      // can use to see if they need to probe handles.
+      //
+
+      volatile uint32_t DismountCount;
+
+      //
+      // This field indicates the status of the 64-bit COM+ package on the
+      // system. It indicates whether the Intermediate Language (IL) COM+
+      // images need to use the 64-bit COM+ runtime or the 32-bit COM+ runtime.
+      //
+
+      uint32_t ComPlusPackage;
+
+      //
+      // Time in tick count for system-wide last user input across all terminal
+      // sessions. For MP performance, it is not updated all the time (e.g. once
+      // a minute per session). It is used for idle detection.
+      //
+
+      uint32_t LastSystemRITEventTickCount;
+
+      //
+      // Number of physical pages in the system. This can dynamically change as
+      // physical memory can be added or removed from a running system.
+      //
+
+      uint32_t NumberOfPhysicalPages;
+
+      //
+      // True if the system was booted in safe boot mode.
+      //
+
+      bool SafeBootMode;
+
+      //
+      // The following field is used for heap and critcial sectionc tracing. The
+      // last bit is set for critical section collision tracing and second last
+      // bit is for heap tracing.  Also the first 16 bits are used as counter.
+      //
+
+      uint32_t TraceLogging;
+
+      //
+      // Depending on the processor, the code for fast system call will differ,
+      // Stub code is provided pointers below to access the appropriate code.
+      //
+      // N.B. The following two fields are only used on 32-bit systems.
+      //
+
+      uint64_t TestRetInstruction;
+      uint32_t SystemCall;
+      uint32_t SystemCallReturn;
+      uint64_t SystemCallPad[3];
+
+      //
+      // The 64-bit tick count.
+      //
+
+      union {
+        volatile ksystem_time TickCount;
+        volatile uint64_t TickCountQuad;
+      };
+
+      //
+      // Cookie for encoding pointers system wide.
+      //
+
+      uint32_t Cookie;
+
+      // xp64+
+
+      //
+      // Shared information for Wow64 processes.
+      //
+
+      uint32_t Wow64SharedInformation[MAX_WOW64_SHARED_ENTRIES];
+
+      // vista?+
+
+      //
+      // The following field is used for ETW user mode global logging
+      // (UMGL).
+      //
+
+      uint16_t UserModeGlobalLogger[8];
+      uint32_t HeapTracingPid[2];
+      uint32_t CritSecTracingPid[2];
+
+      //
+      // Settings that can enable the use of Image File Execution Options
+      // from HKCU in addition to the original HKLM.
+      //
+
+      uint32_t ImageFileExecutionOptions;
+
+      //
+      // This represents the affinity of active processors in the system.
+      // This is updated by the kernel as processors are added\removed from
+      // the system.
+      //
+
+      union {
+        uint64_t    AffinityPad;
+        kaffinity_t ActiveProcessorAffinity;
+      };
+
+      //
+      // Current 64-bit interrupt time bias in 100ns units.
+      //
+
+      volatile uint64_t InterruptTimeBias;
+    };
+
+
+
+
+    __forceinline
+      void KeQuerySystemTime(int64_t* CurrentTime)
+    {
+      *CurrentTime = *reinterpret_cast<const volatile int64_t*>(&kuser_shared_data::instance().SystemTime);
+    }
+
+    __forceinline
+      void KeQueryTickCount(int64_t* TickCount)
+    {
+      *TickCount = kuser_shared_data::instance().TickCountQuad;
+    }
+
+    NTL__EXTERNAPI
+      void __stdcall
+      ExSystemTimeToLocalTime(int64_t* SystemTime, int64_t* LocalTime);
+
+    NTL__EXTERNAPI
+      void __stdcall
+      RtlTimeToTimeFields(int64_t* Time, time_fields* TimeFields);
+
+
+    struct pp_lookaside_list {
+      struct _general_lookaside *P;
+      struct _general_lookaside *L;
+    };
+
+#define POOL_SMALL_LISTS 32
+
+    // mm
+
+    struct mmsupport_flags {
+
+      //
+      // The next 8 bits are protected by the expansion lock.
+      //
+
+      uint8_t SessionSpace : 1;
+      uint8_t BeingTrimmed : 1;
+      uint8_t SessionLeader : 1;
+      uint8_t TrimHard : 1;
+      uint8_t MaximumWorkingSetHard : 1;
+      uint8_t ForceTrim : 1;
+      uint8_t MinimumWorkingSetHard : 1;
+      uint8_t Available0 : 1;
+
+      uint8_t MemoryPriority : 8;
+
+      //
+      // The next 16 bits are protected by the working set mutex.
+      //
+
+      uint16_t GrowWsleHash : 1;
+      uint16_t AcquiredUnsafe : 1;
+      uint16_t Available : 14;
+    };
+
+    struct mmsupport_flags50
+    {
+      uint32_t SessionSpace : 1;
+      uint32_t BeingTrimmed : 1;
+      uint32_t ProcessInSession : 1;
+      uint32_t SessionLeader : 1;
+      uint32_t TrimHard : 1;
+      uint32_t WorkingSetHard : 1;
+      uint32_t WriteWatch : 1;
+      uint32_t Filler : 25;
+    };
+
+    typedef uint32_t wsle_number_t;
+    typedef uint32_t pfn_number_t;
+
+    struct mmsupport50
+    {
+      int64_t LastTrimTime;
+      uint32_t LastTrimFaultCount;
+      uint32_t PageFaultCount;
+      uint32_t PeakWorkingSetSize;
+      uint32_t WorkingSetSize;
+      uint32_t MinimumWorkingSetSize;
+      uint32_t MaximumWorkingSetSize;
+      struct mmwsl *VmWorkingSetList;
+      list_entry WorkingSetExpansionLinks;
+      uint8_t AllowWorkingSetAdjustment;
+      bool AddressSpaceBeingDeleted;
+      uint8_t ForegroundSwitchCount;
+      uint8_t MemoryPriority;
+      mmsupport_flags50 Flags;
+      uint32_t Claim;
+      uint32_t NextEstimationSlot;
+      uint32_t NextAgingSlot;
+      uint32_t EstimatedAvailable;
+      uint32_t GrowthSinceLastEstimate;
+    };
+
+    struct mmsupport51
+    {
+      int64_t LastTrimTime;
+
+      mmsupport_flags Flags;
+      uint32_t PageFaultCount;
+      wsle_number_t PeakWorkingSetSize;
+      wsle_number_t GrowthSinceLastEstimate;
+
+      wsle_number_t MinimumWorkingSetSize;
+      wsle_number_t MaximumWorkingSetSize;
+      struct mmwsl *VmWorkingSetList;
+      wsle_number_t Claim;
+
+      wsle_number_t NextEstimationSlot;
+      wsle_number_t NextAgingSlot;
+      wsle_number_t EstimatedAvailable;
+      wsle_number_t WorkingSetSize;
+
+      ex_push_lock WorkingSetMutex;
+    };
+
+    struct mmsupport52
+    {
+      list_entry WorkingSetExpansionLinks;
+      int64_t LastTrimTime;
+
+      mmsupport_flags Flags;
+      uint32_t PageFaultCount;
+      wsle_number_t PeakWorkingSetSize;
+      wsle_number_t GrowthSinceLastEstimate;
+
+      wsle_number_t MinimumWorkingSetSize;
+      wsle_number_t MaximumWorkingSetSize;
+      struct mmwsl *VmWorkingSetList;
+      wsle_number_t Claim;
+
+      wsle_number_t NextEstimationSlot;
+      wsle_number_t NextAgingSlot;
+      wsle_number_t EstimatedAvailable;
+      wsle_number_t WorkingSetSize;
+#if defined(_M_IX86)
+      kguarded_mutex WorkingSetMutex;
+#elif defined(_M_X64)
+      ex_push_lock WorkingSetMutex;
+#endif
+    };
+
+    struct mmsupport60
+    {
+      /*<thisrel this+0x0>*/ /*|0x8|*/ list_entry WorkingSetExpansionLinks;
+      /*<thisrel this+0x8>*/ /*|0x2|*/ uint16_t LastTrimStamp;
+      /*<thisrel this+0xa>*/ /*|0x2|*/ uint16_t NextPageColor;
+      /*<thisrel this+0xc>*/ /*|0x4|*/ mmsupport_flags Flags;
+      /*<thisrel this+0x10>*/ /*|0x4|*/ int32_t PageFaultCount;
+      /*<thisrel this+0x14>*/ /*|0x4|*/ int32_t PeakWorkingSetSize;
+      /*<thisrel this+0x18>*/ /*|0x4|*/ int32_t ChargedWslePages;
+      /*<thisrel this+0x1c>*/ /*|0x4|*/ int32_t MinimumWorkingSetSize;
+      /*<thisrel this+0x20>*/ /*|0x4|*/ int32_t MaximumWorkingSetSize;
+      /*<thisrel this+0x24>*/ /*|0x4|*/ struct mmwsl* VmWorkingSetList;
+      /*<thisrel this+0x28>*/ /*|0x4|*/ int32_t Claim;
+      /*<thisrel this+0x2c>*/ /*|0x4|*/ int32_t ActualWslePages;
+      /*<thisrel this+0x30>*/ /*|0x4|*/ int32_t WorkingSetPrivateSize;
+      /*<thisrel this+0x34>*/ /*|0x4|*/ int32_t WorkingSetSizeOverhead;
+      /*<thisrel this+0x38>*/ /*|0x4|*/ int32_t WorkingSetSize;
+      /*<thisrel this+0x3c>*/ /*|0x4|*/ kgate* ExitGate;
+      /*<thisrel this+0x40>*/ /*|0x4|*/ ex_push_lock WorkingSetMutex;
+      /*<thisrel this+0x44>*/ /*|0x4|*/ void* AccessLog;
+    };
+
+#if defined(_M_IX86)
+#   define _MI_PAGING_LEVELS 2
+#   define PDE_PER_PAGE 1024
+#   define MM_USER_PAGE_TABLE_PAGES 768
+#elif defined(_M_X64)
+#   define _MI_PAGING_LEVELS 4
+#   define PDE_PER_PAGE 512
+#   define MM_USER_PXES (0x10)
+#   define MM_USER_PAGE_TABLE_PAGES ((ULONG_PTR)PDE_PER_PAGE * PPE_PER_PAGE * MM_USER_PXES)
+#   define MM_USER_PAGE_DIRECTORY_PAGES (PPE_PER_PAGE * MM_USER_PXES)
+#   define MM_USER_PAGE_DIRECTORY_PARENT_PAGES (MM_USER_PXES)
+
+#endif
+
+    struct mmaddress_node 
+    {
+      union {
+        intptr_t Balance : 2;
+        mmaddress_node *Parent;
+      };
+      mmaddress_node *LeftChild;
+      mmaddress_node *RightChild;
+      uintptr_t StartingVpn;
+      uintptr_t EndingVpn;
+    };
+
+    struct mm_avl_table {
+      mmaddress_node  BalancedRoot;
+      uintptr_t DepthOfTree: 5;
+      uintptr_t Unused: 3;
+#if defined (_M_X64)
+      uintptr_t NumberGenericTableElements: 56;
+#else
+      uintptr_t NumberGenericTableElements: 24;
+#endif
+      void* NodeHint;
+      void* NodeFreeHint;
+    };
+
+    struct mmwsle_hash {
+      void*         Key;
+      wsle_number_t Index;
+    };
+
+    struct mmwsl {
+      wsle_number_t FirstFree;
+      wsle_number_t FirstDynamic;
+      wsle_number_t LastEntry;
+      wsle_number_t NextSlot;               // The next slot to trim
+      struct mmwsle* Wsle;
+      wsle_number_t LastInitializedWsle;
+      wsle_number_t NonDirectCount;
+      mmwsle_hash* HashTable;
+      uint32_t HashTableSize;
+      uint32_t NumberOfCommittedPageTables;
+      void* HashTableStart;
+      void* HighestPermittedHashAddress;
+      uint32_t NumberOfImageWaiters;
+      uint32_t VadBitMapHint;
+
+#if defined _M_X64
+      void* HighestUserAddress;           // Maintained for wow64 processes only
+#endif
+
+#if (_MI_PAGING_LEVELS >= 3)
+      uint32_t MaximumUserPageTablePages;
+#endif
+
+#if (_MI_PAGING_LEVELS >= 4)
+      uint32_t MaximumUserPageDirectoryPages;
+      uint32_t* CommittedPageTables;
+
+      uint32_t NumberOfCommittedPageDirectories;
+      uint32_t* CommittedPageDirectories;
+
+      uint32_t NumberOfCommittedPageDirectoryParents;
+      uintptr_t CommittedPageDirectoryParents[(MM_USER_PAGE_DIRECTORY_PARENT_PAGES + sizeof(uintptr_t)*8-1)/(sizeof(uintptr_t)*8)];
+
+#elif (_MI_PAGING_LEVELS >= 3)
+      uint32_t* CommittedPageTables;
+
+      uint32_t NumberOfCommittedPageDirectories;
+      uintptr_t CommittedPageDirectories[(MM_USER_PAGE_DIRECTORY_PAGES + sizeof(uintptr_t)*8-1)/(sizeof(uintptr_t)*8)];
+
+#else
+
+      //
+      // This must be at the end.
+      // Not used in system cache or session working set lists.
+      //
+
+      uint16_t UsedPageTableEntries[MM_USER_PAGE_TABLE_PAGES];
+
+      uint32_t CommittedPageTables[MM_USER_PAGE_TABLE_PAGES/(sizeof(uint32_t)*8)];
+#endif
+
+    };
+
+
+    //
+    // Define executive resource function prototypes.
+    //
+    NTL__EXTERNAPI
+      ntstatus __stdcall
+      ExInitializeResourceLite (
+      __out eresource* Resource
+      );
+
+    NTL__EXTERNAPI
+      ntstatus __stdcall
+      ExReinitializeResourceLite (
+      __inout eresource* Resource
+      );
+
+    NTL__EXTERNAPI
+      bool
+      ExAcquireResourceSharedLite (
+      __inout eresource* Resource,
+      __in bool Wait
+      );
+
+#if (NTDDI_VERSION >= NTDDI_LONGHORN || NTDDI_VERSION >= NTDDI_WS03SP1)
+    NTL__EXTERNAPI
+      void*
+      ExEnterCriticalRegionAndAcquireResourceShared (
+      __inout eresource* Resource
+      );
+#endif
+
+    NTL__EXTERNAPI
+      bool
+      ExAcquireResourceExclusiveLite (
+      __inout eresource* Resource,
+      __in bool Wait
+      );
+
+#if (NTDDI_VERSION >= NTDDI_LONGHORN || NTDDI_VERSION >= NTDDI_WS03SP1)
+    NTL__EXTERNAPI
+      void*
+      ExEnterCriticalRegionAndAcquireResourceExclusive (
+      __inout eresource* Resource
+      );
+#endif
+
+    NTL__EXTERNAPI
+      bool
+      ExAcquireSharedStarveExclusive(
+      __inout eresource* Resource,
+      __in bool Wait
+      );
+
+    NTL__EXTERNAPI
+      bool
+      ExAcquireSharedWaitForExclusive(
+      __inout eresource* Resource,
+      __in bool Wait
+      );
+
+#if (NTDDI_VERSION >= NTDDI_LONGHORN || NTDDI_VERSION >= NTDDI_WS03SP1)
+    NTL__EXTERNAPI
+      void*
+      ExEnterCriticalRegionAndAcquireSharedWaitForExclusive (
+      __inout eresource* Resource
+      );
+#endif
+
+    //
+    //  void
+    //  ExReleaseResource(
+    //      IN eresource* Resource
+    //      );
+    //
+
+#if PRAGMA_DEPRECATED_DDK
+#pragma deprecated(ExReleaseResource)       // Use ExReleaseResourceLite
+#endif
+#define ExReleaseResource(R) (ExReleaseResourceLite(R))
+
+    NTL__EXTERNAPI
+      void
+      __fastcall
+      ExReleaseResourceLite(
+      __inout eresource* Resource
+      );
+
+#if (NTDDI_VERSION >= NTDDI_LONGHORN || NTDDI_VERSION >= NTDDI_WS03SP1)
+    NTL__EXTERNAPI
+      void
+      __fastcall
+      ExReleaseResourceAndLeaveCriticalRegion(
+      __inout eresource* Resource
+      );
+#endif
+
+    NTL__EXTERNAPI
+      void
+      ExReleaseResourceForThreadLite(
+      __inout eresource* Resource,
+      __in eresource_thread_t ResourceThreadId
+      );
+
+    NTL__EXTERNAPI
+      void
+      ExSetResourceOwnerPointer(
+      __inout eresource* Resource,
+      __in void* OwnerPointer
+      );
+
+    NTL__EXTERNAPI
+      void
+      ExConvertExclusiveToSharedLite(
+      __inout eresource* Resource
+      );
+
+    NTL__EXTERNAPI
+      ntstatus __stdcall
+      ExDeleteResourceLite (
+      __inout eresource* Resource
+      );
+
+    NTL__EXTERNAPI
+      uint32_t
+      ExGetExclusiveWaiterCount (
+      __in eresource* Resource
+      );
+
+    NTL__EXTERNAPI
+      uint32_t
+      ExGetSharedWaiterCount (
+      __in eresource* Resource
+      );
+
+    NTL__EXTERNAPI
+      bool
+      ExIsResourceAcquiredExclusiveLite (
+      __in eresource* Resource
+      );
+
+    NTL__EXTERNAPI
+      uint32_t
+      ExIsResourceAcquiredSharedLite (
+      __in eresource* Resource
+      );
+
+#define ExIsResourceAcquiredLite ExIsResourceAcquiredSharedLite
+
+}//namespace km
 }//namespace ntl
-}//namespace nt
 
 #endif//#ifndef NTL__KM_BASEDEF

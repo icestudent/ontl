@@ -87,6 +87,773 @@ struct kaffinity
   kaffinity_t affinity;
 };
 
+#define LOW_PRIORITY 0              // Lowest thread priority level
+#define LOW_REALTIME_PRIORITY 16    // Lowest realtime priority level
+#define HIGH_PRIORITY 31            // Highest thread priority level
+#define MAXIMUM_PRIORITY 32         // Number of thread priority levels
+
+#if defined(_M_IX86)
+struct kpcr
+{
+  union {
+    nt::tib NtTib;
+    struct {
+      ntl::nt::exception::registration *Used_ExceptionList;
+      void*     Used_StackBase;
+      void*     Spare2;
+      void*     TssCopy;
+      uint32_t  ContextSwitches;
+      kaffinity SetMemberCopy;
+      void*     Used_Self;
+    };
+  };
+
+  struct kpcr*  SelfPcr;
+  struct kpcrb* Pcrb;
+  kirql Irql;
+
+  uint32_t    IRR;
+  uint32_t    IrrActive;
+  uint32_t    IDR;
+  void*       KdVersionBlock;
+
+  struct kidtentry*  IDT;
+  struct kgdtentry*  GDT;
+  struct ktss*       TSS;
+  uint16_t    MajorVersion;
+  uint16_t    MinorVersion;
+  kaffinity   SetMember;
+  uint32_t    StallScaleFactor;
+  uint8_t     SpareUnused;
+  uint8_t     Number;
+
+  uint8_t     Spare0;
+  uint8_t     SecondLevelCacheAssociativity;
+  uint32_t    VdmAlert;
+  uint32_t    KernelReserved[14];
+  uint32_t    SecondLevelCacheSize;
+  uint32_t    HalReserved[16];
+};
+#elif defined(_M_X64)
+
+#define MAXIMUM_PROCESSORS 64
+//
+// Define 128-bit 16-byte aligned xmm register type.
+//
+
+struct __declspec(align(16)) m128_t
+{
+  uint64_t Low;
+  int64_t High;
+};
+
+//
+// Format of data for 32-bit fxsave/fxrstor instructions.
+//
+
+struct xmm_save_area32 
+{
+  uint16_t ControlWord;
+  uint16_t StatusWord;
+  uint8_t TagWord;
+  uint8_t Reserved1;
+  uint16_t ErrorOpcode;
+  uint32_t ErrorOffset;
+  uint16_t ErrorSelector;
+  uint16_t Reserved2;
+  uint32_t DataOffset;
+  uint16_t DataSelector;
+  uint16_t Reserved3;
+  uint32_t MxCsr;
+  uint32_t MxCsr_Mask;
+  m128_t FloatRegisters[8];
+  m128_t XmmRegisters[16];
+  uint8_t Reserved4[96];
+};
+
+struct __declspec(align(16)) context {
+
+  //
+  // Register parameter home addresses.
+  //
+  // N.B. These fields are for convience - they could be used to extend the
+  //      context record in the future.
+  //
+
+  uint64_t P1Home;
+  uint64_t P2Home;
+  uint64_t P3Home;
+  uint64_t P4Home;
+  uint64_t P5Home;
+  uint64_t P6Home;
+
+  //
+  // Control flags.
+  //
+
+  uint32_t ContextFlags;
+  uint32_t MxCsr;
+
+  //
+  // Segment Registers and processor flags.
+  //
+
+  uint16_t SegCs;
+  uint16_t SegDs;
+  uint16_t SegEs;
+  uint16_t SegFs;
+  uint16_t SegGs;
+  uint16_t SegSs;
+  uint32_t EFlags;
+
+  //
+  // Debug registers
+  //
+
+  uint64_t Dr0;
+  uint64_t Dr1;
+  uint64_t Dr2;
+  uint64_t Dr3;
+  uint64_t Dr6;
+  uint64_t Dr7;
+
+  //
+  // Integer registers.
+  //
+
+  uint64_t Rax;
+  uint64_t Rcx;
+  uint64_t Rdx;
+  uint64_t Rbx;
+  uint64_t Rsp;
+  uint64_t Rbp;
+  uint64_t Rsi;
+  uint64_t Rdi;
+  uint64_t R8;
+  uint64_t R9;
+  uint64_t R10;
+  uint64_t R11;
+  uint64_t R12;
+  uint64_t R13;
+  uint64_t R14;
+  uint64_t R15;
+
+  //
+  // Program counter.
+  //
+
+  uint64_t Rip;
+
+  //
+  // Floating point state.
+  //
+
+  union {
+    xmm_save_area32 FltSave;
+    struct {
+      m128_t Header[2];
+      m128_t Legacy[8];
+      m128_t Xmm0;
+      m128_t Xmm1;
+      m128_t Xmm2;
+      m128_t Xmm3;
+      m128_t Xmm4;
+      m128_t Xmm5;
+      m128_t Xmm6;
+      m128_t Xmm7;
+      m128_t Xmm8;
+      m128_t Xmm9;
+      m128_t Xmm10;
+      m128_t Xmm11;
+      m128_t Xmm12;
+      m128_t Xmm13;
+      m128_t Xmm14;
+      m128_t Xmm15;
+    };
+  };
+
+  //
+  // Vector registers.
+  //
+
+  m128_t VectorRegister[26];
+  uint64_t VectorControl;
+
+  //
+  // Special debug control registers.
+  //
+
+  uint64_t DebugControl;
+  uint64_t LastBranchToRip;
+  uint64_t LastBranchFromRip;
+  uint64_t LastExceptionToRip;
+  uint64_t LastExceptionFromRip;
+};
+
+struct kdescriptor 
+{
+  uint16_t Pad[3];
+  uint16_t Limit;
+  void* Base;
+};
+
+struct kdescriptor32
+{
+  uint16_t Pad[3];
+  uint16_t Limit;
+  uint32_t Base;
+};
+
+struct kspecial_registers {
+  uint64_t Cr0;
+  uint64_t Cr2;
+  uint64_t Cr3;
+  uint64_t Cr4;
+  uint64_t KernelDr0;
+  uint64_t KernelDr1;
+  uint64_t KernelDr2;
+  uint64_t KernelDr3;
+  uint64_t KernelDr6;
+  uint64_t KernelDr7;
+  kdescriptor Gdtr;
+  kdescriptor Idtr;
+  uint16_t Tr;
+  uint16_t Ldtr;
+  uint32_t MxCsr;
+  uint64_t DebugControl;
+  uint64_t LastBranchToRip;
+  uint64_t LastBranchFromRip;
+  uint64_t LastExceptionToRip;
+  uint64_t LastExceptionFromRip;
+  uint64_t Cr8;
+  uint64_t MsrGsBase;
+  uint64_t MsrGsSwap;
+  uint64_t MsrStar;
+  uint64_t MsrLStar;
+  uint64_t MsrCStar;
+  uint64_t MsrSyscallMask;
+};
+
+struct kprocessor_state
+{
+  kspecial_registers SpecialRegisters;
+  context ContextFrame;
+};
+
+struct processor_idle_times {
+  uint64_t  StartTime;
+  uint64_t  EndTime;
+  uint32_t  IdleHandlerReserved[4];
+};
+
+struct processor_perf_state {
+  uint8_t                       PercentFrequency;   // max == POWER_PERF_SCALE
+  uint8_t                       MinCapacity;        // battery capacity %
+  uint16_t                      Power;              // in milliwatts
+  uint8_t                       IncreaseLevel;      // goto higher state
+  uint8_t                       DecreaseLevel;      // goto lower state
+  uint16_t                      Flags;
+  uint32_t                       IncreaseTime;       // in tick counts
+  uint32_t                       DecreaseTime;       // in tick counts
+  uint32_t                       IncreaseCount;      // goto higher state
+  uint32_t                       DecreaseCount;      // goto lower state
+  uint64_t                       PerformanceTime;    // Tick count
+};
+
+struct processor_power_state {
+  void (__fastcall* IdleFunction)(processor_power_state* PState);
+  uint32_t                    Idle0KernelTimeLimit;
+  uint32_t                    Idle0LastTime;
+
+  void*                       IdleHandlers;
+  void*                       IdleState;
+  uint32_t                    IdleHandlersCount;
+
+  uint64_t                    LastCheck;
+  processor_idle_times        IdleTimes;
+
+  uint32_t                    IdleTime1;
+  uint32_t                    PromotionCheck;
+  uint32_t                    IdleTime2;
+
+  uint8_t                       CurrentThrottle;    // current throttle setting
+  uint8_t                       ThermalThrottleLimit;   // max available throttle setting
+  uint8_t                       CurrentThrottleIndex;
+  uint8_t                       ThermalThrottleIndex;
+
+  uint32_t                       LastKernelUserTime;
+  uint32_t                       PerfIdleTime;
+
+  // temp for debugging
+  uint64_t                   DebugDelta;
+  uint32_t                       DebugCount;
+
+  uint32_t                       LastSysTime;
+  uint64_t                   TotalIdleStateTime[3];
+  uint32_t                       TotalIdleTransitions[3];
+  uint64_t                   PreviousC3StateTime;
+  uint8_t                       KneeThrottleIndex;
+  uint8_t                       ThrottleLimitIndex;
+  uint8_t                       PerfStatesCount;
+  uint8_t                       ProcessorMinThrottle;
+  uint8_t                       ProcessorMaxThrottle;
+  uint8_t                       LastBusyPercentage;
+  uint8_t                       LastC3Percentage;
+  uint8_t                       LastAdjustedBusyPercentage;
+  uint32_t                    PromotionCount;
+  uint32_t                    DemotionCount;
+  uint32_t                    ErrorCount;
+  uint32_t                    RetryCount;
+  uint32_t                    Flags;
+  int64_t               PerfCounterFrequency;
+  uint32_t                    PerfTickCount;
+  ktimer                      PerfTimer;
+  kdpc                        PerfDpc;
+  processor_perf_state*       PerfStates;
+  ntstatus (__fastcall* PerfSetThrottle)(uint8_t Throttle);
+  uint32_t                       LastC3KernelUserTime;
+  uint32_t                       Spare1[1];
+};
+
+
+//
+// Interprocessor interrupt worker routine function prototype.
+//
+
+typedef void* kipi_context;
+
+//
+// Define request packet structure.
+//
+
+struct krequest_packet {
+  void* CurrentPacket[3];
+  void (__stdcall* WorkerRoutine)(kipi_context, void*, void*, void*);
+};
+
+//
+// Define request mailbox structure.
+//
+
+struct request_mailbox {
+  int64_t RequestSummary;
+  union {
+    krequest_packet RequestPacket;
+    void* Virtual[7];
+  };
+};
+
+enum processor_cache_type {
+  CacheUnified,
+  CacheInstruction,
+  CacheData,
+  CacheTrace
+};
+
+struct cache_descriptor {
+  uint8_t  Level;
+  uint8_t  Associativity;
+  uint16_t LineSize;
+  uint32_t  Size;
+  processor_cache_type Type;
+};
+
+
+
+struct kprcb
+{
+  uint32_t MxCsr;
+  uint8_t Number;
+  uint8_t NestingLevel;
+  bool InterruptRequest;
+  bool IdleHalt;
+  struct kthread *CurrentThread;
+  struct kthread *NextThread;
+  struct kthread *IdleThread;
+  uint64_t UserRsp;
+  uint64_t RspBase;
+  kspin_lock PrcbLock;
+  kaffinity SetMember;
+  kprocessor_state ProcessorState;
+  int8_t CpuType;
+  int8_t CpuID;
+  uint16_t CpuStep;
+  uint32_t MHz;
+  uint64_t HalReserved[8];
+  uint16_t MinorVersion;
+  uint16_t MajorVersion;
+  uint8_t BuildType;
+  uint8_t CpuVendor;
+  uint8_t InitialApicId;
+  uint8_t LogicalProcessorsPerPhysicalProcessor;
+  uint32_t ApicMask;
+  uint8_t CFlushSize;
+  uint8_t PrcbPad0x[3];
+  void* AcpiReserved;
+  uint64_t PrcbPad00[4];
+
+  //
+  // End of the architecturally defined section of the PRCB.
+  //
+  // end_nthal end_ntosp
+  //
+  // Numbered queued spin locks - 128-byte aligned.
+  //
+
+  kspin_lock_queue LockQueue[LockQueueMaximumLock];
+
+  //
+  // Nonpaged per processor lookaside lists - 128-byte aligned.
+  //
+
+  pp_lookaside_list PPLookasideList[16];
+
+  //
+  // Nonpaged per processor small pool lookaside lists - 128-byte aligned.
+  //
+
+  pp_lookaside_list PPNPagedLookasideList[POOL_SMALL_LISTS];
+
+  //
+  // Paged per processor small pool lookaside lists.
+  //
+
+  pp_lookaside_list PPPagedLookasideList[POOL_SMALL_LISTS];
+
+  //
+  // MP interprocessor request packet barrier - 128-byte aligned.
+  //
+  // This cache line shares per processor data with the packet barrier which
+  // is used to signal the completion of an IPI request.
+  //
+  // The packet barrier variable is written by the initiating processor when
+  // an IPI request is distributed to more than one target processor (sharing
+  // other data in the cache line increases the probability that the write will
+  // hit in the cache).
+  //
+  // The initiating processor waits (at elevated IRQL - generally SYNCH level)
+  // for the last finishing processor to clear packet barrier which will cause
+  // the packet barrier cache line to transfer to the last finishing processor
+  // then back to respective processor. 
+  //
+  // N.B. This results in minimal sharing of the cache line (no more than would
+  // have occurred if the packet barrier was in a cache line all by itself)) and
+  // increases the probability of a cache hit when packet barrier is initialized.
+  //
+
+  volatile kaffinity PacketBarrier;
+  single_list_entry DeferredReadyListHead;
+
+  //
+  // Memory management counters.
+  //
+
+  volatile int32_t MmPageFaultCount;
+  volatile int32_t MmCopyOnWriteCount;
+  volatile int32_t MmTransitionCount;
+  volatile int32_t MmCacheTransitionCount;
+  volatile int32_t MmDemandZeroCount;
+  volatile int32_t MmPageReadCount;
+  volatile int32_t MmPageReadIoCount;
+  volatile int32_t MmCacheReadCount;
+  volatile int32_t MmCacheIoCount;
+  volatile int32_t MmDirtyPagesWriteCount;
+  volatile int32_t MmDirtyWriteIoCount;
+  volatile int32_t MmMappedPagesWriteCount;
+  volatile int32_t MmMappedWriteIoCount;
+
+  //
+  // I/O IRP float.
+  //
+
+  int32_t LookasideIrpFloat;
+
+  //
+  // Number of system calls.
+  //
+
+  uint32_t KeSystemCalls;
+
+  //
+  // I/O system counters.
+  //
+
+  volatile int32_t IoReadOperationCount;
+  volatile int32_t IoWriteOperationCount;
+  volatile int32_t IoOtherOperationCount;
+  int64_t IoReadTransferCount;
+  int64_t IoWriteTransferCount;
+  int64_t IoOtherTransferCount;
+
+  //
+  // Context switch count.
+  //
+
+  uint32_t KeContextSwitches;
+  uint8_t PrcbPad2[12];
+
+  //
+  // MP interprocessor request packet and summary - 128-byte aligned.
+  //
+
+  volatile kaffinity TargetSet;
+  volatile uint32_t IpiFrozen;
+  uint8_t PrcbPad3[116];
+
+  //
+  // Interprocessor request summary - 128-byte aligned.
+  //
+
+  request_mailbox RequestMailbox[MAXIMUM_PROCESSORS];
+
+  //
+  // Interprocessor sender summary;
+  //
+
+  volatile kaffinity SenderSummary;
+  uint8_t PrcbPad4[120];
+
+  //
+  // DPC listhead, counts, and batching parameters - 128-byte aligned.
+  //
+
+  kdpc_data DpcData[2];
+  void* DpcStack;
+  void* SavedRsp;
+  int32_t MaximumDpcQueueDepth;
+  uint32_t DpcRequestRate;
+  uint32_t MinimumDpcRate;
+  volatile bool DpcInterruptRequested;
+  volatile bool DpcThreadRequested;
+
+  //
+  // N.B. the following two fields must be on a word boundary.
+  //
+
+  volatile bool DpcRoutineActive;
+  volatile bool DpcThreadActive;
+  union {
+    volatile uint64_t TimerHand;
+    volatile uint64_t TimerRequest;
+  };
+
+  int32_t TickOffset;
+  int32_t MasterOffset;
+  uint32_t DpcLastCount;
+  bool ThreadDpcEnable;
+  volatile bool QuantumEnd;
+  uint8_t PrcbPad50;
+  volatile bool IdleSchedule;
+  int32_t DpcSetEventRequest;
+  int32_t PrcbPad40;
+
+  //
+  // DPC thread and generic call DPC - 128-byte aligned
+  //
+
+  void* DpcThread;
+  kevent DpcEvent;
+  kdpc CallDpc;
+  uint64_t PrcbPad7[4];
+
+  //
+  // Per-processor ready summary and ready queues - 128-byte aligned.
+  //
+  // N.B. Ready summary is in the first cache line as the queue for priority
+  //      zero is never used.
+  //
+
+  list_entry WaitListHead;
+  uint32_t ReadySummary;
+  uint32_t QueueIndex;
+  list_entry DispatcherReadyListHead[MAXIMUM_PRIORITY];
+
+  //
+  // Miscellaneous counters.
+  //
+
+  uint32_t InterruptCount;
+  uint32_t KernelTime;
+  uint32_t UserTime;
+  uint32_t DpcTime;
+  uint32_t InterruptTime;
+  uint32_t AdjustDpcThreshold;
+  bool SkipTick;
+  kirql DebuggerSavedIRQL;
+  uint8_t PollSlot;
+  uint8_t PrcbPad8[13];
+  struct _KNODE * ParentNode;
+  kaffinity MultiThreadProcessorSet;
+  struct _KPRCB * MultiThreadSetMaster;
+  int32_t Sleeping;
+  uint32_t PrcbPad90[1];
+  uint32_t DebugDpcTime;
+  uint32_t PageColor;
+  uint32_t NodeColor;
+  uint32_t NodeShiftedColor;
+  uint32_t SecondaryColorMask;
+  uint8_t PrcbPad9[12];
+
+  //
+  // Performance counters - 128-byte aligned.
+  //
+  // Cache manager performance counters.
+  //
+
+  uint32_t CcFastReadNoWait;
+  uint32_t CcFastReadWait;
+  uint32_t CcFastReadNotPossible;
+  uint32_t CcCopyReadNoWait;
+  uint32_t CcCopyReadWait;
+  uint32_t CcCopyReadNoWaitMiss;
+
+  //
+  // Kernel performance counters.
+  //
+
+  uint32_t KeAlignmentFixupCount;
+  uint32_t KeDcacheFlushCount;
+  uint32_t KeExceptionDispatchCount;
+  uint32_t KeFirstLevelTbFills;
+  uint32_t KeFloatingEmulationCount;
+  uint32_t KeIcacheFlushCount;
+  uint32_t KeSecondLevelTbFills;
+
+  //
+  // Processor information.
+  //
+
+  uint8_t VendorString[13];
+  uint8_t PrcbPad10[2];
+  uint32_t FeatureBits;
+  int64_t UpdateSignature;
+
+  //
+  // Processors power state
+  //
+
+  processor_power_state PowerState;
+
+  //
+  // Logical Processor Cache Information  
+  //
+
+  cache_descriptor Cache[5];
+  uint32_t CacheCount;
+};
+
+struct kpcr
+{
+  template<typename type>
+  static inline type get(type kpcr::* member, Int2Type<sizeof(uint8_t)>)
+  {
+    return (type)
+#if defined(_M_IX86)
+      ntl::intrinsic::__readfsbyte
+#elif defined(_M_X64)
+      ntl::intrinsic::__readgsbyte
+#endif
+      ((uint32_t)offsetof(kpcr,*member));
+  }  
+  template<typename type>
+  static inline type get(type kpcr::* member, Int2Type<sizeof(uint16_t)>)
+  {
+    return (type)
+#if defined(_M_IX86)
+      ntl::intrinsic::__readfsword
+#elif defined(_M_X64)
+      ntl::intrinsic::__readgsword
+#endif
+      ((uint32_t)offsetof(kpcr,*member));
+  }  
+  template<typename type>
+  static inline type get(type kpcr::* member, Int2Type<sizeof(uint32_t)>)
+  {
+    return (type)
+#if defined(_M_IX86)
+      ntl::intrinsic::__readfsdword
+#elif defined(_M_X64)
+      ntl::intrinsic::__readgsdword
+#endif
+      ((uint32_t)offsetof(kpcr,*member));
+  }  
+  template<typename type>
+  static inline type get(type kpcr::* member, Int2Type<sizeof(uint64_t)>)
+  {
+    return (type)
+#if defined(_M_IX86)
+      ntl::intrinsic::__readfsqword
+#elif defined(_M_X64)
+      ntl::intrinsic::__readgsqword
+#endif
+      ((uint32_t)offsetof(kpcr,*member));
+  }  
+  template<typename type>
+  static inline type get(type kpcr::* member)
+  {
+    return get( member, Int2Type<sizeof(type)>() );
+  }
+
+  static __forceinline
+    kpcr& instance() { return *static_cast<kpcr*>(get(&kpcr::Self)); }
+
+
+
+  union {
+    nt::tib NtTib;
+    struct {
+      struct kgdtentry* GdtBase;
+      struct ktss*      TssBase;
+      void*             PerfGlobalGroupMask;
+      kpcr*             Self;
+      kprcb*            CurrentPcrb;
+      kspin_lock_queue  LockArray;
+      void*             Used_Self;
+    };
+  };
+  struct kidtentry*   IdtBase;
+  uint64_t Unused[2];
+  kirql    Irql;
+  uint8_t  SecondLevelCacheAssociativity;
+  uint8_t  ObsoleteNumber;
+  uint8_t  Fill0;
+  uint32_t Unused0[3];
+  uint16_t MajorVersion;
+  uint16_t MinorVersion;
+  uint32_t StallScaleFactor;
+  void*    Unused1[3];
+  uint32_t KernelReserved[15];
+  uint32_t SecondLevelCacheSize;
+  uint32_t HalReserved[16];
+  uint32_t Unused2;
+  void*    KdVersionBlock;
+  void*    Unused3;
+  uint32_t PcrAlign1[24];
+  kprcb Prcb;
+};
+#endif
+
+//
+// Is the current processor executing a DPC (either a threaded DPC or a
+// legacy DPC).
+//
+#if defined(_M_IX86)
+
+NTL__EXTERNAPI
+bool __stdcall
+KeIsExecutingDpc();
+
+#elif defined(_M_X64)
+
+__forceinline
+bool KeIsExecutingDpc()
+{
+  const kpcr& pcr = kpcr::instance();
+  return pcr.Prcb.DpcRoutineActive || pcr.Prcb.DpcThreadActive;
+}
+
+#endif
+
 
 /// Common KTHREAD region
 struct kthread32

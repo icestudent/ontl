@@ -247,7 +247,7 @@ namespace ntl {
                 reinterpret_cast<ldr_data_table_entry *>(it);
               if(!entry->BaseDllName.size())
                 continue;
-              for (size_t i = 0; i != entry->BaseDllName.size(); ++i) {
+              for (uint16_t i = 0; i != entry->BaseDllName.size(); ++i) {
                 if ((entry->BaseDllName[i] ^ name[i]) & 0x5F)
                   goto other_name;
               }
