@@ -47,18 +47,30 @@ struct status
     buffer_too_small          = (int)0xC0000023,
     noncontinuable_exception  = (int)0xC0000025,
     invalid_disposition       = (int)0xC0000026,
+    parity_error              = (int)0xC000002B,
     object_name_collision     = (int)0xC0000035,
 
     privileged_instruction    = (int)0xC0000096,
     insufficient_resources    = (int)0xC000009A,
 
     illegal_instruction       = (int)0xC000001D,
+    device_data_error         = (int)0xC000009C,
+    device_not_connected,
+    device_power_failure,
+    device_not_ready          = (int)0xC00000A3,
     stack_overflow            = (int)0xC00000FD,
     invalid_image_not_mz      = (int)0xC000012F,
     entrypoint_not_found      = (int)0xC0000139,
 
     device_configuraton_error = (int)0xC0000182,
+    device_internal_error,
+    invalid_device_state,
+    io_device_error,
+    device_protocol_error,
     driver_entrypoint_not_found = (int)0xC0000263,
+    device_requires_cleaning  = (int)0x80000288,
+    device_door_open,
+    device_removed            = (int)0xC00002B6,
     invalid_image_win_32      = (int)0xC0000359,
 
   };
