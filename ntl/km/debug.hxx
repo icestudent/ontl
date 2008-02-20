@@ -173,6 +173,21 @@ namespace ntl {
         printf("%s%i", msg, i);
       }
 
+      void operator()(const char msg[], size_t i) const
+      { 
+        printf("%s%Iu", msg, i);
+      }
+
+      void operator()(const char msg[], int64_t i) const
+      { 
+        printf("%s%I64i", msg, i);
+      }
+
+      void operator()(const char msg[], uint64_t i) const
+      { 
+        printf("%s%I64u", msg, i);
+      }
+
       void operator()(const char msg[], unsigned long u) const
       { 
         printf("%s%u", msg, u);
