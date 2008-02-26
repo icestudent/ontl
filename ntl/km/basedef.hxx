@@ -637,9 +637,16 @@ STATIC_ASSERT(sizeof(kdpc) == 0x40);
 
 #endif
 
+
 NTL__EXTERNAPI void *     MmHighestUserAddress;
 NTL__EXTERNAPI void *     MmSystemRangeStart;
 NTL__EXTERNAPI uintptr_t  MmUserProbeAddress;
+
+enum memory_caching_type {
+  MmNonCached,
+  MmCached,
+  MmWriteCombined
+};
 
 static inline
 void * highest_user_address()
@@ -650,7 +657,7 @@ void * highest_user_address()
 static inline
 void * lowest_user_address()
 {
-  return (void*)0x10000;
+  return reinterpret_cast<void*>(0x10000);
 }
 
 static inline
@@ -672,6 +679,66 @@ struct physical_memory_range
 NTL__EXTERNAPI
 physical_address __stdcall
   MmGetPhysicalAddress(const void * BaseAddress);
+
+NTL__EXTERNAPI
+void* __stdcall
+  MmMapIoSpace(
+    const physical_address PhysicalAddress,
+    uint32_t NumberOfBytes,
+    memory_caching_type CacheType
+  );
+
+NTL__EXTERNAPI
+void __stdcall
+  MmUnmapIoSpace(
+   const void* BaseAddress,
+   uint32_t NumberOfBytes
+   );
+
+
+NTL__EXTERNAPI
+void* __stdcall
+  MmAllocateNonCachedMemory(
+    uint32_t NumberOfBytes
+    );
+
+NTL__EXTERNAPI
+void __stdcall
+  MmFreeNonCachedMemory(
+   const void* BaseAddress,
+   uint32_t NumberOfBytes
+   );
+
+NTL__EXTERNAPI
+void* __stdcall
+  MmAllocateContiguousMemory(
+   uint32_t NumberOfBytes,
+   physical_address HighestAcceptableAddress
+   );
+
+NTL__EXTERNAPI
+void __stdcall
+  MmFreeContiguousMemory(
+   const void* BaseAddress
+   );
+
+NTL__EXTERNAPI
+void* __stdcall
+  MmAllocateContiguousMemorySpecifyCache(
+   uint32_t NumberOfBytes,
+   physical_address LowestAcceptableAddress,
+   physical_address HighestAcceptableAddress,
+   physical_address BoundaryAddressMultiple,
+   memory_caching_type CacheType
+   );
+
+NTL__EXTERNAPI
+void __stdcall
+  MmFreeContiguousMemorySpecifyCache(
+   const void* BaseAddress,
+   uint32_t NumberOfBytes,
+   memory_caching_type CacheType
+   );
 
 
 struct mdl;

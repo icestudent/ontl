@@ -105,7 +105,7 @@ class console
     static
     uint32_t write(const charT msg[])
     {
-      return write<charT>(msg, std::char_traits<charT>::length(msg));
+      return write<charT>(msg, static_cast<uint32_t>(std::char_traits<charT>::length(msg)));
     }    
 
     template<typename charT>

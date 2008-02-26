@@ -28,6 +28,16 @@ NTL__EXTERNAPI
 wchar_t * __stdcall
   GetCommandLineW();
 
+NTL__EXTERNAPI
+uint32_t __stdcall
+  GetLastError();
+
+NTL__EXTERNAPI
+void __stdcall
+  SetLastError(
+    uint32_t dwErrCode
+    );
+
 
 /**\addtogroup  win_application *** Win32 Application support library *******
  *@{*/
@@ -141,6 +151,11 @@ class application
       }
 
     };
+
+    static uint32_t last_error()
+    {
+      return GetLastError();
+    }
 
 };
 
