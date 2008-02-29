@@ -1211,262 +1211,60 @@ struct ex_push_lock
       }
 
 
-      //
-      // Current low 32-bit of tick count and tick count multiplier.
-      //
-      // N.B. The tick count is updated each time the clock ticks.
-      //
-
       uint32_t TickCountLowDeprecated;
       uint32_t TickCountMultiplier;
-
-      //
-      // Current 64-bit interrupt time in 100ns units.
-      //
-
       volatile ksystem_time InterruptTime;
-
-      //
-      // Current 64-bit system time in 100ns units.
-      //
-
       volatile ksystem_time SystemTime;
-
-      //
-      // Current 64-bit time zone bias.
-      //
-
       volatile ksystem_time TimeZoneBias;
-
-      //
-      // Support image magic number range for the host system.
-      //
-      // N.B. This is an inclusive range.
-      //
-
       uint16_t ImageNumberLow;
       uint16_t ImageNumberHigh;
-
-      //
-      // Copy of system root in unicode.
-      //
-
       wchar_t NtSystemRoot[260];
-
-      //
-      // Maximum stack trace depth if tracing enabled.
-      //
-
       uint32_t MaxStackTraceDepth;
-
-      //
-      // Crypto exponent value.
-      //
-
       uint32_t CryptoExponent;
-
-      //
-      // Time zone ID.
-      //
-
       uint32_t TimeZoneId;
       uint32_t LargePageMinimum;
       uint32_t Reserved2[7];
-
-      //
-      // Product type.
-      //
-
       nt_product_type NtProductType;
       bool ProductTypeIsValid;
-
-      //
-      // The NT Version.
-      //
-      // N. B. Note that each process sees a version from its PEB, but if the
-      //       process is running with an altered view of the system version,
-      //       the following two fields are used to correctly identify the
-      //       version
-      //
-
       uint32_t NtMajorVersion;
       uint32_t NtMinorVersion;
-
-      //
-      // Processor features.
-      //
-
-
       bool ProcessorFeatures[PROCESSOR_FEATURE_MAX];
-
-      //
-      // Reserved fields - do not use.
-      //
-
       uint32_t Reserved1;
       uint32_t Reserved3;
-
-      //
-      // Time slippage while in debugger.
-      //
-
       volatile uint32_t TimeSlip;
-
-      //
-      // Alternative system architecture, e.g., NEC PC98xx on x86.
-      //
-
       AlternativeArchitectureType AlternativeArchitecture;
-
-      //
-      // If the system is an evaluation unit, the following field contains the
-      // date and time that the evaluation unit expires. A value of 0 indicates
-      // that there is no expiration. A non-zero value is the UTC absolute time
-      // that the system expires.
-      //
-
       int64_t SystemExpirationDate;
-
-      //
-      // Suite support.
-      //
-
       uint32_t SuiteMask;
-
-      //
-      // TRUE if a kernel debugger is connected/enabled.
-      //
-
       bool KdDebuggerEnabled;
-
-      //
-      // NX support policy.
-      //
-
       uint8_t NXSupportPolicy;
-
-      //
-      // Current console session Id. Always zero on non-TS systems.
-      //
-
       volatile uint32_t ActiveConsoleId;
-
-      //
-      // Force-dismounts cause handles to become invalid. Rather than always
-      // probe handles, a serial number of dismounts is maintained that clients
-      // can use to see if they need to probe handles.
-      //
-
       volatile uint32_t DismountCount;
-
-      //
-      // This field indicates the status of the 64-bit COM+ package on the
-      // system. It indicates whether the Intermediate Language (IL) COM+
-      // images need to use the 64-bit COM+ runtime or the 32-bit COM+ runtime.
-      //
-
       uint32_t ComPlusPackage;
-
-      //
-      // Time in tick count for system-wide last user input across all terminal
-      // sessions. For MP performance, it is not updated all the time (e.g. once
-      // a minute per session). It is used for idle detection.
-      //
-
       uint32_t LastSystemRITEventTickCount;
-
-      //
-      // Number of physical pages in the system. This can dynamically change as
-      // physical memory can be added or removed from a running system.
-      //
-
       uint32_t NumberOfPhysicalPages;
-
-      //
-      // True if the system was booted in safe boot mode.
-      //
-
       bool SafeBootMode;
-
-      //
-      // The following field is used for heap and critcial sectionc tracing. The
-      // last bit is set for critical section collision tracing and second last
-      // bit is for heap tracing.  Also the first 16 bits are used as counter.
-      //
-
       uint32_t TraceLogging;
-
-      //
-      // Depending on the processor, the code for fast system call will differ,
-      // Stub code is provided pointers below to access the appropriate code.
-      //
-      // N.B. The following two fields are only used on 32-bit systems.
-      //
-
       uint64_t TestRetInstruction;
       uint32_t SystemCall;
       uint32_t SystemCallReturn;
       uint64_t SystemCallPad[3];
-
-      //
-      // The 64-bit tick count.
-      //
-
       union {
         volatile ksystem_time TickCount;
         volatile uint64_t TickCountQuad;
       };
-
-      //
-      // Cookie for encoding pointers system wide.
-      //
-
       uint32_t Cookie;
-
       // xp64+
-
-      //
-      // Shared information for Wow64 processes.
-      //
-
       uint32_t Wow64SharedInformation[MAX_WOW64_SHARED_ENTRIES];
-
-      // vista?+
-
-      //
-      // The following field is used for ETW user mode global logging
-      // (UMGL).
-      //
-
       uint16_t UserModeGlobalLogger[8];
       uint32_t HeapTracingPid[2];
       uint32_t CritSecTracingPid[2];
-
-      //
-      // Settings that can enable the use of Image File Execution Options
-      // from HKCU in addition to the original HKLM.
-      //
-
       uint32_t ImageFileExecutionOptions;
-
-      //
-      // This represents the affinity of active processors in the system.
-      // This is updated by the kernel as processors are added\removed from
-      // the system.
-      //
-
       union {
         uint64_t    AffinityPad;
         kaffinity_t ActiveProcessorAffinity;
       };
-
-      //
-      // Current 64-bit interrupt time bias in 100ns units.
-      //
-
       volatile uint64_t InterruptTimeBias;
     };
-
 
 
 
