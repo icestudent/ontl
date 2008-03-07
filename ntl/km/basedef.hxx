@@ -1201,7 +1201,7 @@ struct ex_push_lock
     {
       static const kuser_shared_data& instance()
       {
-        const kuser_shared_data* const kusd = reinterpret_cast<const kuser_shared_data* const>
+        const kuser_shared_data* kusd = reinterpret_cast<const kuser_shared_data*>
 #if defined(_M_IX86)
           (0xffdf0000);
 #elif defined(_M_X64)
