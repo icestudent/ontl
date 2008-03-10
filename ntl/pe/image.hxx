@@ -75,6 +75,11 @@ namespace ntl {
 
       struct file_header
       {
+        enum Machines {
+          unknown,
+          i386 = 0x014C,
+          amd64= 0x8664
+        };
         uint16_t  Machine;
         uint16_t  NumberOfSections;
         uint32_t  TimeDateStamp;

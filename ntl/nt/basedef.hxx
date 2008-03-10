@@ -334,7 +334,7 @@ ntstatus __stdcall
   NtFreeVirtualMemory(
     legacy_handle ProcessHandle,
     void*         BaseAddress,
-    uint32_t*     RegionSize,
+    size_t*       RegionSize,
     uint32_t      FreeType
     );
 

@@ -54,6 +54,7 @@ struct status
     insufficient_resources    = (int)0xC000009A,
 
     illegal_instruction       = (int)0xC000001D,
+    invalid_image_format      = (int)0xC000007B,
     device_data_error         = (int)0xC000009C,
     device_not_connected,
     device_power_failure,
