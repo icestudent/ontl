@@ -27,6 +27,12 @@ static inline legacy_handle current_process()
   return current_process;
 }
 
+static inline legacy_handle current_thread()
+{
+  const legacy_handle current_thread = legacy_handle(-2);
+  return current_thread;
+}
+
 
 NTL__EXTERNAPI
 ntstatus __stdcall

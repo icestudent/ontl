@@ -221,9 +221,11 @@ struct file_rename_information
         bool                          replace_if_exists,
         legacy_handle                 root_directory = legacy_handle())
     {
+#pragma warning(disable:4291)
       return std::auto_ptr<file_rename_information>(
             new (new_name.size()*sizeof(wchar_t))
             file_rename_information(new_name, replace_if_exists, root_directory));
+#pragma warning(default:4291)
     }
 
     bool          ReplaceIfExists;

@@ -10,12 +10,12 @@
 #define NTL__KM_APC
 
 #include "basedef.hxx"
-
+#include "../nt/apc.hxx"
 
 namespace ntl {
 namespace km {
 
-
+using nt::knormal_routine_t;
 struct kprocess;
 
 /// KAPC_STATE
@@ -30,14 +30,6 @@ struct kapc_state
 
 
 struct kapc;
-
-typedef
-void __stdcall
-  knormal_routine_t(
-    const void *  NormalContext,
-    const void *  SystemArgument1,
-    const void *  SystemArgument2
-    );
 
 typedef
 void __stdcall

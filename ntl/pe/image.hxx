@@ -653,7 +653,7 @@ namespace ntl {
       {
         union 
         {
-          struct 
+          struct names
           {
             uint32_t  NameOffset:31;
             uint32_t  NameIsString:1;

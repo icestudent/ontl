@@ -58,6 +58,14 @@ struct object_attributes
       Attributes(attr), SecurityDescriptor(security), SecurityQualityOfService(0)
     {/**/}
 
+    object_attributes(
+      const attributes              attr      = case_insensitive,
+      const security_descriptor *   security  = 0)
+      : Length(sizeof(*this)), RootDirectory(0), ObjectName(0),
+      Attributes(attr), SecurityDescriptor(security), SecurityQualityOfService(0)
+    {/**/}
+
+
     uint32_t                            Length;
     legacy_handle                       RootDirectory;
     const const_unicode_string *        ObjectName;

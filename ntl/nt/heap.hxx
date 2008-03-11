@@ -9,7 +9,7 @@
 #define NTL__NT_HEAP
 
 #include "basedef.hxx"
-#include "teb.hxx"
+#include "peb.hxx"
 
 #pragma comment(lib,    "ntdll.lib")
 

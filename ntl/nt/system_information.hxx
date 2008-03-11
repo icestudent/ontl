@@ -218,7 +218,7 @@ struct system_process_information
 
   uint32_t              NextEntryOffset;
   uint32_t              NumberOfThreads;
-  uint8_t               _unknown1[24];
+  uint64_t              SpareLi[3];
   int64_t               CreateTime;
   int64_t               UserTime;
   int64_t               KernelTime;
@@ -228,7 +228,7 @@ struct system_process_information
   legacy_handle         InheritedFromUniqueProcessId;
   int32_t               HandleCount;
   uint32_t              SessionId;
-  uint32_t              _unknown2;
+  uint32_t              PageDirectoryBase;
   // VM counters
   size_t                PeakVirtualSize;
   size_t                VirtualSize;

@@ -31,6 +31,10 @@ namespace intrinsic {
 	extern "C" void __cdecl __writefsdword(uint32_t Offset, uint32_t Data);
   extern "C" void __cdecl __writefsqword(uint32_t Offset, uint64_t Data);
 
+#	pragma intrinsic(__readfsbyte)
+#	pragma intrinsic(__readfsword)
+#	pragma intrinsic(__readfsdword)
+
 #elif defined(_M_X64)
   extern "C" uint8_t  __cdecl __readgsbyte (uint32_t);
   extern "C" uint16_t __cdecl __readgsword (uint32_t);
@@ -118,13 +122,26 @@ struct teb: public tib
   template<typename type>
   static inline type get(type teb::* member, Int2Type<sizeof(uint64_t)>)
   {
-    return (type)
-#if defined(_M_IX86)
-      ntl::intrinsic::__readfsqword
-#elif defined(_M_X64)
-      ntl::intrinsic::__readgsqword
+    // bin_cast support for client id
+    union {
+      type t;
+      uint64_t v;
+#ifdef _M_IX86
+      struct {
+        uint32_t low;
+        uint32_t hi;
+      } u32;
 #endif
-      ((uint32_t)offsetof(teb,*member));
+    };
+
+#if defined(_M_IX86)
+      u32.low = ntl::intrinsic::__readfsdword((uint32_t)offsetof(teb,*member)),
+      u32.hi = ntl::intrinsic::__readfsdword((uint32_t)offsetof(teb,*member)+4);
+#elif defined(_M_X64)
+      v = ntl::intrinsic::__readgsqword((uint32_t)offsetof(teb,*member));
+#endif
+      
+    return t;
   }  
   template<typename type>
   static inline type get(type teb::* member)
