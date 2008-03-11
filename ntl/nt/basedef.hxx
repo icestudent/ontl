@@ -261,6 +261,35 @@ other_name:;
     };
     STATIC_ASSERT(sizeof(ldr_data_table_entry) == 0x50 || sizeof(ldr_data_table_entry) == 0x98);
 
+
+NTL__EXTERNAPI
+ntstatus __stdcall
+  NtDelayExecution(
+    bool            Alertable,
+    const int64_t * DelayInterval
+    );
+
+
+template<times TimeResolution>
+static inline
+ntstatus sleep(
+  uint32_t        time_resolution,
+  bool            alertable = false)
+{
+  const int64_t interval = int64_t(-1) * TimeResolution * time_resolution;
+  return NtDelayExecution(alertable, &interval);
+}
+
+/// default milliseconds
+static inline
+ntstatus sleep(
+  uint32_t        ms,
+  bool            alertable = false)
+{
+  const int64_t interval = int64_t(-1) * milliseconds * ms;
+  return NtDelayExecution(alertable, &interval);
+}
+
     typedef const struct _opaque { } * legacy_handle;
 
     enum SectionInherit
