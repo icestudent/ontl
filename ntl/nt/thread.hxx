@@ -21,21 +21,25 @@ namespace ntl {
 struct context;
 struct initial_tib;
 
-typedef 
-ntstatus __stdcall
-  control_thread_t(
-    const handle* ThreadHandle,
-    uint32_t* PreviousSuspendCount
-    );
-
 typedef
 uint32_t __stdcall 
 thread_start_routine_t(
    void* Parameter
    );
 
+typedef 
+ntstatus __stdcall
+  control_thread_t(
+    legacy_handle       ThreadHandle,
+    uint32_t*           PreviousSuspendCount
+    );
+
+
 NTL__EXTERNAPI
 control_thread_t NtResumeThread;
+
+NTL__EXTERNAPI
+control_thread_t NtAlertResumeThread;
 
 NTL__EXTERNAPI
 control_thread_t NtSuspendThread;
@@ -65,11 +69,20 @@ enum thread_info_class {
 NTL__EXTERNAPI
 ntstatus __stdcall
   NtQueryInformationThread (
-    handle* ThreadHandle,
+    legacy_handle     ThreadHandle,
     thread_info_class ThreadInformationClass,
-    void* ThreadInformation,
-    uint32_t ThreadInformationLength,
-    uint32_t* ReturnLength
+    void*             ThreadInformation,
+    uint32_t          ThreadInformationLength,
+    uint32_t*         ReturnLength
+    );
+
+NTL__EXTERNAPI
+ntstatus __stdcall
+  NtSetInformationThread (
+    legacy_handle     ThreadHandle,
+    thread_info_class ThreadInformationClass,
+    void*             ThreadInformation,
+    uint32_t          ThreadInformationLength
     );
 
 class user_tread;
@@ -102,62 +115,83 @@ namespace nt{
 NTL__EXTERNAPI
 ntstatus __stdcall
   NtCreateThread(
-    legacy_handle*  ThreadHandle,
-    uint32_t     DesiredAccess,
+    handle*         ThreadHandle,
+    uint32_t        DesiredAccess,
     object_attributes* ObjectAttributes,
     legacy_handle   ProcessHandle,
     client_id*      ClientId,
     context*        ThreadContext,
-    initial_tib*     UserStack,
+    initial_tib*    UserStack,
     bool            CreateSuspended
   );
 
 NTL__EXTERNAPI
 ntstatus __stdcall
   RtlCreateUserThread(
-    legacy_handle Process,
-    security_descriptor* ThreadSecurityDescriptor,
-    bool CreateSuspended,
-    uint32_t ZeroBits,
-    size_t MaximumStackSize,
-    size_t CommittedStackSize,
+    legacy_handle           Process,
+    security_descriptor*    ThreadSecurityDescriptor,
+    bool                    CreateSuspended,
+    uint32_t                ZeroBits,
+    size_t                  MaximumStackSize,
+    size_t                  CommittedStackSize,
     thread_start_routine_t* StartAddress,
-    void* Parameter,
-    handle* Thread,
-    client_id* ClientId
+    void*                   Parameter,
+    handle*                 Thread,
+    client_id*              ClientId
     );
 
 NTL__EXTERNAPI
 ntstatus __stdcall
   NtOpenThread(
-    handle* ThreadHandle,
-    uint32_t DesiredAccess,
-    object_attributes* ObjectAttributes,
-    client_id* ClientId
+    handle*             ThreadHandle,
+    uint32_t            DesiredAccess,
+    object_attributes*  ObjectAttributes,
+    client_id*          ClientId
     );
 
 NTL__EXTERNAPI
 ntstatus __stdcall
   NtTerminateThread(
-    handle* ThreadHandle,
-    ntstatus ExitStatus
+    legacy_handle       ThreadHandle,
+    ntstatus            ExitStatus
     );
 
 NTL__EXTERNAPI
 ntstatus __stdcall
+  NtAlertThread(
+    legacy_handle       ThreadHandle
+    );
+
+NTL__EXTERNAPI
+ntstatus __stdcall
+  NtGetContexThread(
+    legacy_handle       ThreadHandle,
+    context*            ThreadContext
+    );
+
+NTL__EXTERNAPI
+ntstatus __stdcall
+  NtSetContexThread(
+    legacy_handle       ThreadHandle,
+    context*            ThreadContext
+    );
+
+
+NTL__EXTERNAPI
+ntstatus __stdcall
   NtQueueApcThread(
-    handle* ThreadHandle,
-    knormal_routine_t* ApcRoutine,
-    const void *  ApcContext,
-    const void *  Argument1,
-    const void *  Argument2
+    legacy_handle       ThreadHandle,
+    knormal_routine_t*  ApcRoutine,
+    const void *        ApcContext,
+    const void *        Argument1,
+    const void *        Argument2
     );
 
 NTL__EXTERNAPI
 ntstatus __stdcall
   NtTerminateProcess(
-    legacy_handle ProcessHandle,
-    ntstatus ExitStatus
+    legacy_handle       ProcessHandle,
+    ntstatus            ExitStatus
     );
 
 
@@ -250,9 +284,19 @@ public:
     return NtOpenThread(ThreadHandle, DesiredAccess, &oa, ClientId);
   }
 
-  ntstatus control(bool suspend)
+  ntstatus control(bool suspend) 
   {
-    return (suspend ? NtSuspendThread : NtResumeThread)(this, NULL);
+    return (suspend ? NtSuspendThread : NtResumeThread)(get(), NULL);
+  }
+
+  ntstatus suspend(uint32_t* PreviousSuspendCount = 0) const
+  {
+    return NtSuspendThread(get(), PreviousSuspendCount);
+  }
+
+  ntstatus resume(bool alert = false, uint32_t* PreviousSuspendCount = 0) const
+  {
+    return (alert ? NtAlertResumeThread : NtResumeThread)(get(), PreviousSuspendCount);
   }
 
   void exit(ntstatus st)

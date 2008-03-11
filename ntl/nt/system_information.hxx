@@ -242,7 +242,7 @@ struct system_process_information
   size_t                PagefileUsage;
   size_t                PeakPagefileUsage;
   size_t                PrivatePageCount;
-  // IO counters
+  // IO counters (win2k+)
   uint64_t              ReadOperationCount;
   uint64_t              WriteOperationCount;
   uint64_t              OtherOperationCount;
@@ -255,7 +255,7 @@ struct system_process_information
   typedef const system_thread_information *     const_iterator;
   typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
 
-
+#if 0
   const_iterator begin() const
   { 
     return end() - NumberOfThreads;
@@ -267,7 +267,17 @@ struct system_process_information
       uintptr_t(this) + NextEntryOffset
       - (ImageName.size() ? ImageName.max_size()*sizeof(const_unicode_string::value_type) : 0));
   }
+#else
+  const_iterator begin() const
+  { 
+    return reinterpret_cast<system_thread_information*>(uintptr_t(this) + sizeof(system_process_information));
+  }
 
+  const_iterator end() const
+  {
+    return begin() + NumberOfThreads;
+  }
+#endif
   const_reverse_iterator  rbegin() const { return const_reverse_iterator(end()); }
   const_reverse_iterator  rend() const  { return const_reverse_iterator(begin()); }
 

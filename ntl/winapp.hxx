@@ -14,7 +14,7 @@
 
 namespace ntl {
 
-#pragma comment(linker, "/subsystem:windows")
+//#pragma comment(linker, "/subsystem:windows")
 #pragma comment(linker, "/entry:_Winapp_entry")
 
 #pragma comment(linker, "/nodefaultlib:libc")
