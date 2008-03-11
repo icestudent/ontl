@@ -653,11 +653,11 @@ namespace ntl {
       {
         union 
         {
-          struct names
+          struct
           {
-            uint32_t  NameOffset:31;
-            uint32_t  NameIsString:1;
-          };
+            uint32_t  Offset:31;
+            uint32_t  IsString:1;
+          } Name;
           uint16_t  Id;
         };
         uint32_t  OffsetToDirectory:31;

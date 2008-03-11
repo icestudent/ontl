@@ -14,11 +14,13 @@
 #include "handle.hxx"
 #include "../nt/teb.hxx"
 #include "../device_traits.hxx"
+#include "../nt/context.hxx"
 
 namespace ntl {
 namespace km {
 
 using nt::client_id;
+using nt::context;
 
 struct ktrap_frame;
 struct kqueue;
