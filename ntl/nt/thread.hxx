@@ -9,6 +9,7 @@
 #define NTL__NT_THREAD
 
 #include "basedef.hxx"
+#include "../device_traits.hxx"
 #include "object.hxx"
 #include "teb.hxx"
 #include "apc.hxx"

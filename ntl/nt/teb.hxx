@@ -122,15 +122,16 @@ struct teb: public tib
   template<typename type>
   static inline type get(type teb::* member, Int2Type<sizeof(uint64_t)>)
   {
-    // bin_cast support for client id
+    // bin_cast support for 64bit values in x86
     union {
       type t;
-      uint64_t v;
 #ifdef _M_IX86
       struct {
         uint32_t low;
         uint32_t hi;
       } u32;
+#else
+      uint64_t v;
 #endif
     };
 
@@ -149,6 +150,10 @@ struct teb: public tib
     return get( member, Int2Type<sizeof(type)>() );
   }
 
+  static inline client_id get(client_id teb::*)
+  {
+    return instance().ClientId;
+  }
 
   template<typename type, typename type2>
   static inline void set(type teb::* member, type2 value, Int2Type<sizeof(uint8_t)>)

@@ -70,8 +70,8 @@ struct context {
 
 struct __declspec(align(16)) m128_t
 {
-  uint64_t Low;
-  int64_t High;
+  uint64_t  Low;
+  int64_t   High;
 };
 
 //
