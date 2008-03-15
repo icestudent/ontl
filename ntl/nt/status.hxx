@@ -48,7 +48,9 @@ struct status
     noncontinuable_exception  = (int)0xC0000025,
     invalid_disposition       = (int)0xC0000026,
     parity_error              = (int)0xC000002B,
+    object_name_invalid       = (int)0xC0000033,
     object_name_collision     = (int)0xC0000035,
+    object_path_syntax_bad    = (int)0xC000003B,
 
     privileged_instruction    = (int)0xC0000096,
     insufficient_resources    = (int)0xC000009A,

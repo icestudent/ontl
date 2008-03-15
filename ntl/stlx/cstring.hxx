@@ -95,7 +95,7 @@ void *
   _Assert(src);
   const char * const s = reinterpret_cast<const char*>(src);
   char * const d = reinterpret_cast<char*>(dst);
-  while ( n-- ) d[n-1] = s[n-1];
+  while ( n-- ) d[n] = s[n];
   return dst;
 } }
 
