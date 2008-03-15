@@ -265,7 +265,7 @@ class vector
         old_mem = begin_;
         capacity_ = n + capacity_factor();
         const iterator new_mem = array_allocator.allocate(capacity_);
-        //new_end += new_mem - old_mem;                               // bug
+        //new_end += new_mem - old_mem;        // not a bug, but dangerous alignment
         new_end = new_mem + ptrdiff_t(end_ - begin_ + n);
         iterator dest = begin_ = new_mem;
         // this is safe for begin_ == 0 && end_ == 0, but keep vector() coherent
