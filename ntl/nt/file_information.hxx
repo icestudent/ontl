@@ -82,7 +82,7 @@ ntstatus __stdcall
     io_status_block *       IoStatusBlock,
     void *                  FileInformation,
     unsigned long           Length,
-    file_information_class  FileInformationClass
+    uint32_t  FileInformationClass
     );
 
 NTL__EXTERNAPI query_information_file_t NtQueryInformationFile;
@@ -94,7 +94,7 @@ ntstatus __stdcall
     io_status_block *       IoStatusBlock,
     const void *            FileInformation,
     unsigned long           Length,
-    file_information_class  FileInformationClass
+    uint32_t  FileInformationClass
     );
 
 NTL__EXTERNAPI set_information_file_t NtSetInformationFile;
@@ -120,6 +120,8 @@ struct file_information_base
 
     info_class * data() { return nt::success(status_) ? &info : 0; }
     const info_class * data() const { return nt::success(status_) ? &info : 0; }
+    info_class * operator->() { return data(); }
+    const info_class * operator->() const { return data(); }
 
     operator bool() const { return nt::success(status_); }
 
@@ -332,6 +334,130 @@ struct file_network_open_information
 ///}
 
 /**@} file_information */
+
+enum fs_information_class {
+  FileFsVolumeInformation = 1,
+  FileFsLabelInformation,
+  FileFsSizeInformation,
+  FileFsDeviceInformation,
+  FileFsAttributeInformation,
+  FileFsControlInformation,
+  FileFsQuotaQueryInformation,
+  FileFsQuotaSetInformation,
+  FileFsMaximumInformation
+};
+
+typedef ntstatus __stdcall
+  nt_volume_information_t(
+    legacy_handle         FileHandle,
+    io_status_block*      IoStatusBlock,
+    void*                 FsInformation,
+    uint32_t              Length,
+    fs_information_class  FsInformationClass
+    );
+
+NTL__EXTERNAPI query_information_file_t NtQueryVolumeInformationFile;
+NTL__EXTERNAPI set_information_file_t NtSetVolumeInformationFile;
+
+template<class InformationClass>
+struct volume_information:
+  public file_information_base <InformationClass,
+  NtQueryVolumeInformationFile,
+  NtSetVolumeInformationFile>
+{
+  volume_information(legacy_handle file_handle) throw()
+    : file_information_base<InformationClass, NtQueryVolumeInformationFile, NtSetVolumeInformationFile>(file_handle)
+  {/**/}
+
+  volume_information(
+    legacy_handle             file_handle,
+    const InformationClass &  info) throw()
+    : file_information_base<InformationClass,
+    NtQueryVolumeInformationFile,
+    NtSetVolumeInformationFile>(file_handle, info)
+  {/**/}
+};
+
+///\name   FileFsVolumeInformation == 1
+struct file_fs_volume_information
+{
+  static const fs_information_class info_class_type = FileFsVolumeInformation;
+
+  int64_t VolumeCreationTime;
+  uint32_t VolumeSerialNumber;
+  uint32_t VolumeLabelLength;
+  bool SupportsObjects;
+  wchar_t VolumeLabel[1];
+};
+
+///\name   FileFsLabelInformation == 2
+struct file_fs_label_information
+{
+  static const fs_information_class info_class_type = FileFsLabelInformation;
+
+  uint32_t VolumeLabelLength;
+  wchar_t VolumeLabel[1];
+};
+
+///\name   FileFsSizeInformation == 3
+struct file_fs_size_information
+{
+  static const fs_information_class info_class_type = FileFsSizeInformation;
+
+  int64_t TotalAllocationUnits;
+  int64_t AvailableAllocationUnits;
+  uint32_t SectorsPerAllocationUnit;
+  uint32_t BytesPerSector;
+};
+
+///\name   FileFsDeviceInformation == 4
+struct file_fs_device_information
+{
+  static const fs_information_class info_class_type = FileFsDeviceInformation;
+
+  device_type::type DeviceType;
+  uint32_t Characteristics;
+};
+
+///\name   FileFsAttributeInformation == 5
+struct file_fs_attribute_information
+{
+  static const fs_information_class info_class_type = FileFsAttributeInformation;
+
+  uint32_t FileSystemAttributes;
+  int32_t  MaximumComponentNameLength;
+  uint32_t FileSystemNameLength;
+  wchar_t  FileSystemName[1];
+};
+
+///\name   FileFsControlInformation == 6
+struct file_fs_control_information
+{
+  static const fs_information_class info_class_type = FileFsControlInformation;
+
+  enum flags {
+    vc_quota_none                  = 0x00000000,
+    vc_quota_track                 = 0x00000001,
+    vc_quota_enforce               = 0x00000002,
+    vc_quota_mask                  = 0x00000003,
+    vc_quotas_log_violations       = 0x00000004,
+    vc_content_index_disabled      = 0x00000008,
+    vc_log_quota_threshold         = 0x00000010,
+    vc_log_quota_limit             = 0x00000020,
+    vc_log_volume_threshold        = 0x00000040,
+    vc_log_volume_limit            = 0x00000080,
+    vc_quotas_incomplete           = 0x00000100,
+    vc_quotas_rebuilding           = 0x00000200,
+    vc_valid_mask                  = 0x000003ff
+  };
+
+  int64_t FreeSpaceStartFiltering;
+  int64_t FreeSpaceThreshold;
+  int64_t FreeSpaceStopFiltering;
+  int64_t DefaultQuotaThreshold;
+  int64_t DefaultQuotaLimit;
+  flags   FileSystemControlFlags;
+};
 
 }//namespace nt
 }//namespace ntl

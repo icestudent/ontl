@@ -621,6 +621,99 @@ class key : public handle, public device_traits<key>
 }; // class key
 
 
+namespace rtl_registry {
+  enum Relative {
+    absolute,
+    services,
+    control,
+    windows_nt,
+    devicemap,
+    user,
+    maximum,
+    handle    = 0x40000000,
+    optional  = 0x80000000
+  };
+
+  enum Flags {
+    query_subkey   = 0x00000001,
+    query_topkey   = 0x00000002,
+    query_required = 0x00000004,
+    query_novalue  = 0x00000008,
+    query_noexpand = 0x00000010,
+    query_direct   = 0x00000020,
+    query_delete   = 0x00000040
+  };
+}
+
+typedef ntstatus __stdcall QueryRoutine_t(
+    wchar_t* ValueName,
+    uint32_t ValueType,
+    void*    ValueData,
+    uint32_t ValueLength,
+    void*    Context,
+    void*    EntryContext
+    );
+
+struct rtl_query_registry_table {
+  QueryRoutine_t* QueryRoutine;
+  rtl_registry::Flags Flags;
+  wchar_t* Name;
+  void*    EntryContext;
+  uint32_t DefaultType;
+  void*    DefaultData;
+  uint32_t DefaultLength;
+};
+
+NTL__EXTERNAPI
+ntstatus __stdcall
+  RtlCreateRegistryKey(
+    rtl_registry::Relative RelativeTo,
+    const wchar_t* Path
+    );
+
+NTL__EXTERNAPI
+ntstatus __stdcall
+  RtlCheckRegistryKey(
+    rtl_registry::Relative RelativeTo,
+    const wchar_t* Path
+    );
+
+NTL__EXTERNAPI
+ntstatus __stdcall
+  RtlQueryRegistryValues(
+    rtl_registry::Relative    RelativeTo,
+    const wchar_t*            Path,
+    rtl_query_registry_table* QueryTable,
+    void*                     Context,
+    void*                     Environment
+    );
+
+NTL__EXTERNAPI
+ntstatus __stdcall
+  RtlWriteRegistryValue(
+    rtl_registry::Relative RelativeTo,
+    const wchar_t*  Path,
+    const wchar_t*  ValueName,
+    key::value_type ValueType,
+    void*           ValueData,
+    uint32_t        ValueLength
+    );
+
+NTL__EXTERNAPI
+ntstatus __stdcall
+  RtlDeleteRegistryValue(
+    rtl_registry::Relative RelativeTo,
+    const wchar_t* Path,
+    const wchar_t* ValueName
+    );
+
+NTL__EXTERNAPI
+ntstatus __stdcall
+  RtlFormatCurrentUserKeyPath(
+    unicode_string* CurrentUserKeyPath
+    );
+
+
 }//namespace nt
 }//namespace ntl
 

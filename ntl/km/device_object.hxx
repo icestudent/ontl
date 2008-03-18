@@ -14,8 +14,8 @@
 namespace ntl {
 namespace km {
 
-
-enum device_type {};
+  // device type
+namespace device_type = nt::device_type;
 
 
 struct devobj_extension
@@ -24,7 +24,7 @@ struct devobj_extension
   uint16_t        Size;
   device_object * DeviceObject;
   uint32_t        PowerFlags;
-  struct _DEVICE_OBJECT_POWER_EXTENSION* Dope;
+  struct device_object_power_extension* Dope;
   uint32_t        ExtensionFlags;
   void *          DeviceNode;
   device_object * AttachedTo;
@@ -49,7 +49,7 @@ struct device_object
   uint32_t              Characteristics;                      // See ntioapi:  FILE_...
   vpb *                 Vpb;
   void *                DeviceExtension;
-  device_type           DeviceType;
+  device_type::type     DeviceType;
   uint8_t               StackSize;
   union { list_entry ListEntry; wait_context_block  Wcb; } Queue;
   uint32_t              AlignmentRequirement;
