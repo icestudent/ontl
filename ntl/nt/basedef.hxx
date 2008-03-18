@@ -30,6 +30,7 @@ namespace ntl {
     /**\addtogroup  native_types_support *** NT Types support library ***********
     *@{*/
 
+    typedef uintptr_t kaffinity_t;
 
     struct list_entry
     {
@@ -308,7 +309,7 @@ ntstatus sleep(
 
 /// device type
 namespace device_type {
-  enum type_ {
+  enum type {
     beep = 1,
     cd_rom,
     cd_rom_file_system,
@@ -360,62 +361,62 @@ namespace device_type {
 };
 
 
-    typedef const struct _opaque { } * legacy_handle;
+  typedef const struct _opaque { } * legacy_handle;
 
-    enum SectionInherit
-    {
-      ViewShare = 1,
-      ViewUnmap = 2
-    };
+  enum SectionInherit
+  {
+    ViewShare = 1,
+    ViewUnmap = 2
+  };
 
-    enum allocation_attributes
-    {
-      mem_commit            = 0x1000,
-      mem_reserve           = 0x2000,
-      mem_decommit          = 0x4000,
-      mem_release           = 0x8000,
-      mem_free             = 0x10000,
-      mem_private          = 0x20000,
-      mem_mapped           = 0x40000,
-      mem_reset            = 0x80000,
-      mem_top_down        = 0x100000,
-      mem_image          = 0x1000000,
-      sec_reserve        = 0x4000000,
-      mem_large_pages   = 0x20000000,
-      mem_4mb_pages     = 0x80000000,
-      sec_large_pages   = 0x80000000
-    };
+  enum allocation_attributes
+  {
+    mem_commit            = 0x1000,
+    mem_reserve           = 0x2000,
+    mem_decommit          = 0x4000,
+    mem_release           = 0x8000,
+    mem_free             = 0x10000,
+    mem_private          = 0x20000,
+    mem_mapped           = 0x40000,
+    mem_reset            = 0x80000,
+    mem_top_down        = 0x100000,
+    mem_image          = 0x1000000,
+    sec_reserve        = 0x4000000,
+    mem_large_pages   = 0x20000000,
+    mem_4mb_pages     = 0x80000000,
+    sec_large_pages   = 0x80000000
+  };
 
-    enum page_protection
-    {
-      page_noaccess           = 0x01,
-      page_readonly           = 0x02,
-      page_readwrite          = 0x04,
-      page_writecopy          = 0x08,
-      page_execute            = 0x10,
-      page_execute_read       = 0x20,
-      page_execute_readwrite  = 0x40,
-      page_execute_writecopy  = 0x80,
-      page_guard             = 0x100,
-      page_nocache           = 0x200,
-      page_writecombine      = 0x400
-    };
+  enum page_protection
+  {
+    page_noaccess           = 0x01,
+    page_readonly           = 0x02,
+    page_readwrite          = 0x04,
+    page_writecopy          = 0x08,
+    page_execute            = 0x10,
+    page_execute_read       = 0x20,
+    page_execute_readwrite  = 0x40,
+    page_execute_writecopy  = 0x80,
+    page_guard             = 0x100,
+    page_nocache           = 0x200,
+    page_writecombine      = 0x400
+  };
 
-    enum memory_information_class
-    {
-      MemoryBasicInformation
-    };
+  enum memory_information_class
+  {
+    MemoryBasicInformation
+  };
 
-    struct memory_basic_information
-    {
-      void*     BaseAddress;
-      void*     AllocationBase;
-      uint32_t  AllocationProtect;
-      size_t    RegionSize;
-      uint32_t  State;
-      uint32_t  Protect;
-      uint32_t  Type;
-    };
+  struct memory_basic_information
+  {
+    void*     BaseAddress;
+    void*     AllocationBase;
+    uint32_t  AllocationProtect;
+    size_t    RegionSize;
+    uint32_t  State;
+    uint32_t  Protect;
+    uint32_t  Type;
+  };
 
 NTL__EXTERNAPI
 ntstatus __stdcall
@@ -484,6 +485,170 @@ ntstatus __stdcall
     size_t*       LockSize,
     uint32_t      LockType
     );
+
+
+/// shared user data
+static const size_t processor_feature_max = 64;
+static const size_t max_wow64_shared_entries = 16;
+
+enum AlternativeArchitectureType 
+{
+  StandardDesign,                 // None == 0 == standard design
+  NEC98x86,                       // NEC PC98xx series on X86
+  EndAlternatives                 // past end of known alternatives
+};
+
+enum nt_product_type 
+{
+  NtProductWinNt = 1,
+  NtProductLanManNt,
+  NtProductServer
+};
+
+// time
+struct ksystem_time
+{
+  uint32_t LowPart;
+  int32_t High1Time;
+  int32_t High2Time;
+};
+
+struct time_fields
+{
+  int16_t Year;        // range [1601...]
+  int16_t Month;       // range [1..12]
+  int16_t Day;         // range [1..31]
+  int16_t Hour;        // range [0..23]
+  int16_t Minute;      // range [0..59]
+  int16_t Second;      // range [0..59]
+  int16_t Milliseconds;// range [0..999]
+  int16_t Weekday;     // range [0..6] == [Sunday..Saturday]
+};
+
+
+// user shared data
+struct kuser_shared_data 
+{
+  static const kuser_shared_data& instance()
+  {
+    const kuser_shared_data* kusd = reinterpret_cast<const kuser_shared_data*>
+#if defined(_M_IX86)
+      (0xffdf0000);
+#elif defined(_M_X64)
+      (0xFFFFF78000000000UI64);
+#endif
+    return *kusd;
+  }
+
+  uint32_t TickCountLowDeprecated;
+  uint32_t TickCountMultiplier;
+  volatile ksystem_time InterruptTime;
+  volatile ksystem_time SystemTime;
+  volatile ksystem_time TimeZoneBias;
+  uint16_t ImageNumberLow;
+  uint16_t ImageNumberHigh;
+  wchar_t NtSystemRoot[260];
+  uint32_t MaxStackTraceDepth;
+  uint32_t CryptoExponent;
+  uint32_t TimeZoneId;
+  uint32_t LargePageMinimum;
+  uint32_t Reserved2[7];
+  nt_product_type NtProductType;
+  bool ProductTypeIsValid;
+  uint32_t NtMajorVersion;
+  uint32_t NtMinorVersion;
+  bool ProcessorFeatures[processor_feature_max];
+  uint32_t Reserved1;
+  uint32_t Reserved3;
+  volatile uint32_t TimeSlip;
+  AlternativeArchitectureType AlternativeArchitecture;
+  int64_t SystemExpirationDate;
+  uint32_t SuiteMask;
+  bool KdDebuggerEnabled;
+  uint8_t NXSupportPolicy;
+  volatile uint32_t ActiveConsoleId;
+  volatile uint32_t DismountCount;
+  uint32_t ComPlusPackage;
+  uint32_t LastSystemRITEventTickCount;
+  uint32_t NumberOfPhysicalPages;
+  bool SafeBootMode;
+  uint32_t TraceLogging;
+  uint64_t TestRetInstruction;
+  uint32_t SystemCall;
+  uint32_t SystemCallReturn;
+  uint64_t SystemCallPad[3];
+  union {
+    volatile ksystem_time TickCount;
+    volatile uint64_t TickCountQuad;
+  };
+  uint32_t Cookie;
+  // xp64+
+  uint32_t Wow64SharedInformation[max_wow64_shared_entries];
+  uint16_t UserModeGlobalLogger[8];
+  uint32_t HeapTracingPid[2];
+  uint32_t CritSecTracingPid[2];
+  uint32_t ImageFileExecutionOptions;
+  union {
+    uint64_t    AffinityPad;
+    kaffinity_t ActiveProcessorAffinity;
+  };
+  volatile uint64_t InterruptTimeBias;
+};
+
+#ifdef NTL__SUPPRESS_IMPORTS
+__forceinline
+  ntstatus NtQuerySystemTime(int64_t* SystemTime)
+  {
+#ifdef _M_IX86
+    static const kuser_shared_data& usd = kuser_shared_data::instance();
+    do{
+      *(reinterpret_cast<uint32_t*>(SystemTime)+1) = usd.SystemTime.High1Time;
+      *reinterpret_cast<uint32_t*>(SystemTime) = usd.SystemTime.LowPart;
+    }while(*(reinterpret_cast<uint32_t*>(SystemTime)+1) != usd.SystemTime.High2Time);
+#else
+    *SystemTime = *reinterpret_cast<const volatile int64_t*>(&kuser_shared_data::instance().SystemTime);
+#endif
+    return status::success;
+  }
+#else
+NTL__EXTERNAPI ntstatus __stdcall NtQuerySystemTime(int64_t* SystemTime);
+#endif
+
+NTL__EXTERNAPI
+void __stdcall
+  RtlTimeToTimeFields(int64_t* Time, time_fields* TimeFields);
+
+// wait functions
+enum wait_type { WaitAll, WaitAny };
+
+NTL__EXTERNAPI
+ntstatus __stdcall
+  NtWaitForSingleObject(
+    legacy_handle Handle,
+    bool          Alertable,
+    int64_t*      Timeout
+    );
+
+NTL__EXTERNAPI
+ntstatus __stdcall
+  NtSignalAndWaitForSingleObject(
+    legacy_handle SignalHandle,
+    legacy_handle Handle,
+    bool          Alertable,
+    int64_t*      Timeout
+    );
+
+NTL__EXTERNAPI
+ntstatus __stdcall
+  NtWaitForMultipleObjects(
+    uint32_t      Count,
+    legacy_handle Handles[],
+    wait_type     WaitType,
+    bool          Alertable,
+    int64_t*      Timeout
+    );
+
+
 
   }//namespace nt
 }//namespace ntl

@@ -299,7 +299,7 @@ public:
     return (alert ? NtAlertResumeThread : NtResumeThread)(get(), PreviousSuspendCount);
   }
 
-  void exit(ntstatus st)
+  static void exit(ntstatus st)
   {
     RtlExitUserThread(st);
   }

@@ -43,7 +43,7 @@ using nt::list_entry;
 using nt::list_head;
 using nt::status;
 using nt::exception;
-
+using nt::kaffinity_t;
 using nt::access_mask;
 using nt::synchronize;
 using nt::generic_read;
@@ -59,6 +59,8 @@ using nt::unicode_string;
 using nt::const_unicode_string;
 using nt::const_ansi_string;
 
+using nt::kuser_shared_data;
+using nt::time_fields;
 struct kthread;
 
 //enum mode { KernelMode, UserMode };
@@ -68,7 +70,6 @@ static const kprocessor_mode KernelMode = { 0 };
 static const kprocessor_mode UserMode = { 1 };
 
 typedef long kpriority;
-typedef uintptr_t kaffinity_t;
 
 #if 1
 
@@ -449,7 +450,7 @@ struct kgate { dispatcher_header Header; };
 
 struct kevent { dispatcher_header Header; };
 
-enum event_type { NotificationEvent, SynchronizationEvent };
+using nt::event_type;
 
 NTL__EXTERNAPI
 void __stdcall
@@ -1158,143 +1159,30 @@ struct ex_push_lock
 };// <size 0x4>
 
 
-#define PROCESSOR_FEATURE_MAX 64
-#define MAX_WOW64_SHARED_ENTRIES 16
+__forceinline
+void KeQuerySystemTime(int64_t* CurrentTime)
+{
+  *CurrentTime = *reinterpret_cast<const volatile int64_t*>(&kuser_shared_data::instance().SystemTime);
+}
 
-    enum AlternativeArchitectureType 
-    {
-      StandardDesign,                 // None == 0 == standard design
-      NEC98x86,                       // NEC PC98xx series on X86
-      EndAlternatives                 // past end of known alternatives
-    };
+__forceinline
+void KeQueryTickCount(int64_t* TickCount)
+{
+  *TickCount = kuser_shared_data::instance().TickCountQuad;
+}
 
-    enum nt_product_type 
-    {
-      NtProductWinNt = 1,
-      NtProductLanManNt,
-      NtProductServer
-    };
+NTL__EXTERNAPI
+  void __stdcall
+  ExSystemTimeToLocalTime(int64_t* SystemTime, int64_t* LocalTime);
 
-    // time
-    struct ksystem_time
-    {
-      uint32_t LowPart;
-      int32_t High1Time;
-      int32_t High2Time;
-    };
+using nt::RtlTimeToTimeFields;
 
-    struct time_fields
-    {
-      int16_t Year;        // range [1601...]
-      int16_t Month;       // range [1..12]
-      int16_t Day;         // range [1..31]
-      int16_t Hour;        // range [0..23]
-      int16_t Minute;      // range [0..59]
-      int16_t Second;      // range [0..59]
-      int16_t Milliseconds;// range [0..999]
-      int16_t Weekday;     // range [0..6] == [Sunday..Saturday]
-    };
+struct pp_lookaside_list {
+  struct _general_lookaside *P;
+  struct _general_lookaside *L;
+};
 
-
-    // user shared data
-    struct kuser_shared_data 
-    {
-      static const kuser_shared_data& instance()
-      {
-        const kuser_shared_data* kusd = reinterpret_cast<const kuser_shared_data*>
-#if defined(_M_IX86)
-          (0xffdf0000);
-#elif defined(_M_X64)
-          (0xFFFFF78000000000UI64);
-#endif
-        return *kusd;
-      }
-
-
-      uint32_t TickCountLowDeprecated;
-      uint32_t TickCountMultiplier;
-      volatile ksystem_time InterruptTime;
-      volatile ksystem_time SystemTime;
-      volatile ksystem_time TimeZoneBias;
-      uint16_t ImageNumberLow;
-      uint16_t ImageNumberHigh;
-      wchar_t NtSystemRoot[260];
-      uint32_t MaxStackTraceDepth;
-      uint32_t CryptoExponent;
-      uint32_t TimeZoneId;
-      uint32_t LargePageMinimum;
-      uint32_t Reserved2[7];
-      nt_product_type NtProductType;
-      bool ProductTypeIsValid;
-      uint32_t NtMajorVersion;
-      uint32_t NtMinorVersion;
-      bool ProcessorFeatures[PROCESSOR_FEATURE_MAX];
-      uint32_t Reserved1;
-      uint32_t Reserved3;
-      volatile uint32_t TimeSlip;
-      AlternativeArchitectureType AlternativeArchitecture;
-      int64_t SystemExpirationDate;
-      uint32_t SuiteMask;
-      bool KdDebuggerEnabled;
-      uint8_t NXSupportPolicy;
-      volatile uint32_t ActiveConsoleId;
-      volatile uint32_t DismountCount;
-      uint32_t ComPlusPackage;
-      uint32_t LastSystemRITEventTickCount;
-      uint32_t NumberOfPhysicalPages;
-      bool SafeBootMode;
-      uint32_t TraceLogging;
-      uint64_t TestRetInstruction;
-      uint32_t SystemCall;
-      uint32_t SystemCallReturn;
-      uint64_t SystemCallPad[3];
-      union {
-        volatile ksystem_time TickCount;
-        volatile uint64_t TickCountQuad;
-      };
-      uint32_t Cookie;
-      // xp64+
-      uint32_t Wow64SharedInformation[MAX_WOW64_SHARED_ENTRIES];
-      uint16_t UserModeGlobalLogger[8];
-      uint32_t HeapTracingPid[2];
-      uint32_t CritSecTracingPid[2];
-      uint32_t ImageFileExecutionOptions;
-      union {
-        uint64_t    AffinityPad;
-        kaffinity_t ActiveProcessorAffinity;
-      };
-      volatile uint64_t InterruptTimeBias;
-    };
-
-
-
-    __forceinline
-      void KeQuerySystemTime(int64_t* CurrentTime)
-    {
-      *CurrentTime = *reinterpret_cast<const volatile int64_t*>(&kuser_shared_data::instance().SystemTime);
-    }
-
-    __forceinline
-      void KeQueryTickCount(int64_t* TickCount)
-    {
-      *TickCount = kuser_shared_data::instance().TickCountQuad;
-    }
-
-    NTL__EXTERNAPI
-      void __stdcall
-      ExSystemTimeToLocalTime(int64_t* SystemTime, int64_t* LocalTime);
-
-    NTL__EXTERNAPI
-      void __stdcall
-      RtlTimeToTimeFields(int64_t* Time, time_fields* TimeFields);
-
-
-    struct pp_lookaside_list {
-      struct _general_lookaside *P;
-      struct _general_lookaside *L;
-    };
-
-#define POOL_SMALL_LISTS 32
+static const size_t pool_small_lists = 32;
 
     // mm
 
