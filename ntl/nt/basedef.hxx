@@ -308,7 +308,7 @@ ntstatus sleep(
 
 /// device type
 namespace device_type {
-  enum type {
+  enum type_ {
     beep = 1,
     cd_rom,
     cd_rom_file_system,

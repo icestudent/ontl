@@ -415,7 +415,7 @@ struct file_fs_device_information
 {
   static const fs_information_class info_class_type = FileFsDeviceInformation;
 
-  device_type::type DeviceType;
+  uint32_t DeviceType;
   uint32_t Characteristics;
 };
 
