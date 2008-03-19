@@ -10,6 +10,7 @@
 
 #include "basedef.hxx"
 #include "../device_traits.hxx"
+#include "object.hxx"
 
 namespace ntl {
   namespace nt {
