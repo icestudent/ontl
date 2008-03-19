@@ -695,7 +695,7 @@ ntstatus __stdcall
     const wchar_t*  Path,
     const wchar_t*  ValueName,
     key::value_type ValueType,
-    void*           ValueData,
+    const void*     ValueData,
     uint32_t        ValueLength
     );
 
