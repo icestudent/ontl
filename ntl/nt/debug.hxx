@@ -59,12 +59,20 @@ namespace ntl {
 
 #if defined(_DEBUG) || defined(DBG)
 #	define KdBreakPoint() intrinsic::debugbreak()
-#	define KdPrint(X) DbgPrint X
-#	define KdPrintEx(X) DbgPrintEx X
+# ifndef KdPrint
+#	  define KdPrint(X) DbgPrint X
+# endif
+# ifndef KdPrintEx
+#	  define KdPrintEx(X) DbgPrintEx X
+# endif
 #else
 #	define KdBreakPoint()
-#	define KdPrint(X)
-#	define KdPrintEx(X)
+# ifndef KdPrint
+# 	define KdPrint(X)
+# endif
+# ifndef KdPrintEx
+# 	define KdPrintEx(X)
+# endif
 #endif
 
     template <dpfltr::level DefaultLevel  = dpfltr::error,
