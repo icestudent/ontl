@@ -618,6 +618,11 @@ NTL__EXTERNAPI
 void __stdcall
   RtlTimeToTimeFields(int64_t* Time, time_fields* TimeFields);
 
+NTL__EXTERNAPI
+ntstatus __stdcall
+  RtlSystemTimeToLocalTime(int64_t* SystemTime, int64_t* LocalTime);
+
+
 // wait functions
 enum wait_type { WaitAll, WaitAny };
 
