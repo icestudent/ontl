@@ -85,12 +85,12 @@ ntstatus __stdcall
     uint32_t          ThreadInformationLength
     );
 
-class user_tread;
+class user_thread;
   }//namspace nt
 
 
   template<>
-  struct device_traits<nt::user_tread>: private device_traits<>
+  struct device_traits<nt::user_thread>: private device_traits<>
   {
     enum access_mask
     {
@@ -225,9 +225,9 @@ ntstatus __stdcall
 /************************************************************************/
 /* user_thread                                                          */
 /************************************************************************/
-class user_tread:
+class user_thread:
   public handle, 
-  public device_traits<user_tread>
+  public device_traits<user_thread>
 {
   ////////////////////////////////////////////////////////////////////////////
 public:
@@ -235,7 +235,7 @@ public:
   typedef thread_start_routine_t start_routine_t;
 
   explicit
-    user_tread(
+    user_thread(
     start_routine_t *   start_routine,
     void *              start_context   = 0,
     size_t              maximum_stack_size = 0,
@@ -248,7 +248,7 @@ public:
       create_suspended, client, thread_security);
   }
 
-  user_tread(
+  user_thread(
     access_mask     DesiredAccess,
     client_id*      ClientId,
     bool            InheritHandle = false)
@@ -299,9 +299,27 @@ public:
     return (alert ? NtAlertResumeThread : NtResumeThread)(get(), PreviousSuspendCount);
   }
 
+  ntstatus wait(bool alertable = true, uint32_t timeout = -1)
+  {
+    const int64_t interval = int64_t(-1) * milliseconds * timeout;
+    return NtWaitForSingleObject(get(), alertable, &interval);
+  }
+
+  template<ntl::times TimeResolution>
+  ntstatus wait(uint32_t timeout_time_resolution, bool alertable = true)
+  {
+    const int64_t interval = int64_t(-1) * TimeResolution * timeout_time_resolution;
+    return NtWaitForSingleObject(get(), alertable, &interval);
+  }
+
   static void exit(ntstatus st)
   {
     RtlExitUserThread(st);
+  }
+
+  ntstatus term(ntstatus st)
+  {
+    return NtTerminateThread(get(), st);
   }
 
   void exit_process(ntstatus st)

@@ -20,7 +20,18 @@ struct status
   enum type
   {
     success               = 0,
+    wait_0                = 0,
+    wait_1,
+    wait_2,
+    wait_3,
+    abandoned             = (int)0x00000080,
+    abandoned_wait_0      = abandoned,
+    user_apc              = (int)0x000000C0,
+    kernel_apc            = (int)0x00000100,
+    alerted,
+    timeout,
     pending               = 0x00000103,
+    more_entries          = 0x00000105,
 
     guard_page_violation      = (int)0x80000001,
     datatype_misalignment     = (int)0x80000002,
@@ -52,6 +63,8 @@ struct status
     object_name_not_found     = (int)0xC0000034,
     object_name_collision     = (int)0xC0000035,
     object_path_syntax_bad    = (int)0xC000003B,
+
+    sharing_violation         = (int)0xC0000043,
 
     privileged_instruction    = (int)0xC0000096,
     insufficient_resources    = (int)0xC000009A,

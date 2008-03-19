@@ -11,6 +11,7 @@
 #include "../nt/basedef.hxx"
 #include "../stdlib.hxx"
 #include "../nt/exception.hxx"
+#include "../nt/event.hxx"
 
 namespace ntl {
 
@@ -451,6 +452,8 @@ struct kgate { dispatcher_header Header; };
 struct kevent { dispatcher_header Header; };
 
 using nt::event_type;
+using nt::SynchronizationEvent;
+using nt::NotificationEvent;
 
 NTL__EXTERNAPI
 void __stdcall

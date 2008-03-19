@@ -631,7 +631,7 @@ ntstatus __stdcall
   NtWaitForSingleObject(
     legacy_handle Handle,
     bool          Alertable,
-    int64_t*      Timeout
+    const int64_t*Timeout
     );
 
 NTL__EXTERNAPI
@@ -640,7 +640,7 @@ ntstatus __stdcall
     legacy_handle SignalHandle,
     legacy_handle Handle,
     bool          Alertable,
-    int64_t*      Timeout
+    const int64_t*Timeout
     );
 
 NTL__EXTERNAPI
@@ -650,7 +650,7 @@ ntstatus __stdcall
     legacy_handle Handles[],
     wait_type     WaitType,
     bool          Alertable,
-    int64_t*      Timeout
+    const int64_t*Timeout
     );
 
 

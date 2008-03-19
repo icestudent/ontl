@@ -23,7 +23,7 @@ namespace nt {
 ///\name  Legacy API
 
 
-#pragma warning(push)
+//#pragma warning(push)
 //#pragma warning(disable:4190)// C-linkage specified, but returns UDT 'identifier2' which is incompatible with C
 
 NTL__EXTERNAPI
@@ -124,8 +124,17 @@ ntstatus __stdcall
     void*           BaseAddress
     );
 
+NTL__EXTERNAPI
+bool __stdcall RtlDosPathNameToNtPathName_U(
+    const wchar_t*  DosFileName,
+    unicode_string* NtFileName,
+    wchar_t**       FilePart,
+    struct rtl_relative_name* RelativeName
+    );
 
-#pragma warning(pop)
+
+
+//#pragma warning(pop)
 
 ///@}
 
