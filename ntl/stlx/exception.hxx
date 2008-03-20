@@ -1,6 +1,6 @@
 /**\file*********************************************************************
  *                                                                     \brief
- *  Exception handling [18.6 lib.support.exception]
+ *  18.7 Exception handling [support.exception]
  *
  ****************************************************************************
  */
@@ -21,9 +21,17 @@
 #endif
 
 #if STLX__USE_EXCEPTIONS
-#define do__throw(X) throw(X)
+#define __ntl_try       try
+#define __ntl_catch     catch
+#define __ntl_throw(X)  throw(X)
+#define __ntl_rethrow   throw
 #else
-#define do__throw(X)
+#define __ntl_try
+#define __ntl_catch(X)  while(false)
+#pragma warning(disable:4127)// conditional expression is constant
+inline void __ntl_throw_impl() {}
+#define __ntl_throw(X)  __ntl_throw_impl()
+#define __ntl_rethrow (0)
 #endif
 
 #ifdef _MSC_VER
@@ -39,7 +47,7 @@ namespace std {
 /**\defgroup  lib_support_exception **** Exception handling [18.6] **********
  *@{*/
 
-/// Class exception [18.6.1 lib.exception]
+/// 18.7.1 Class exception [exception]
 class exception
 {
   public:
@@ -87,5 +95,22 @@ bool uncaught_exception() throw();
 /**@} lib_language_support */
 
 }//namespace std
+
+extern "C"
+__forceinline
+void __stdcall _CxxThrowException(void * /*pObject*/, _s__ThrowInfo const * /*pObjectInfo*/)
+{
+#if 0
+    const DWORD CPP_EXCEPTION    = 0xE06D7363; 
+    const DWORD MS_MAGIC         = 0x19930520;
+    const void * args[] ={ (void*)MS_MAGIC,
+                              pObject,
+                              pObjectInfo };
+    RaiseException(CPP_EXCEPTION,
+                   EXCEPTION_NONCONTINUABLE,
+                   sizeof(args)/sizeof(args[0]),
+                   args);
+#endif
+}
 
 #endif//#ifndef NTL__STLX_EXCEPTION

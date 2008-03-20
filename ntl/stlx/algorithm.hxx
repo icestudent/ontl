@@ -177,7 +177,7 @@ pair<InputIterator1, InputIterator2>
 
 /// 25.1.8 Equal [lib.alg.equal]
 template<class InputIterator1, class InputIterator2>
-//__forceinline
+__forceinline
 bool
   equal(InputIterator1 first1, InputIterator1 last1, InputIterator2 first2)
 {
@@ -882,7 +882,7 @@ void
 template<class T>
 __forceinline
 const T&
-  min(const T& a, const T& b)
+  (min)(const T& a, const T& b)
 {
   return ( b < a ) ? b : a;
 }
@@ -890,7 +890,7 @@ const T&
 template<class T, class Compare>
 __forceinline
 const T&
-  min(const T& a, const T& b, Compare comp)
+  (min)(const T& a, const T& b, Compare comp)
 {
   return comp(b, a) ? b : a;
 }

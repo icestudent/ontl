@@ -9,6 +9,7 @@
 #define NTL__STLX_CSTDDEF
 
 #ifdef _MSC_VER
+#pragma warning(disable:4514)// unreferenced inline function has been removed
 //#define __forceinline __forceinline
 #else
 #define __forceinline inline
@@ -100,8 +101,19 @@ static const nullptr_t nullptr = {};
 #define offsetof(s,m) ((size_t)&((const char&)(((s *)0)->m)))
 #endif
 
+#define __ntl_bitmask_type(bitmask, _F)\
+  _F bitmask operator&(bitmask x, bitmask y) { return static_cast<bitmask>(x&y); }\
+  _F bitmask operator|(bitmask x, bitmask y) { return static_cast<bitmask>(x|y); }\
+  _F bitmask operator^(bitmask x, bitmask y) { return static_cast<bitmask>(x^y); }\
+  _F bitmask operator~(bitmask x) { return static_cast<bitmask >(~x); }\
+  _F bitmask& operator&=(bitmask& x, bitmask y) { x = x&y ; return x ; }\
+  _F bitmask& operator|=(bitmask& x, bitmask y) { x = x|y ; return x ; }\
+  _F bitmask& operator^=(bitmask& x, bitmask y) { x = x^y ; return x ; }
+
+
 /**@} lib_support_types */
 /**@} lib_language_support */
+
 
 }//namespace std
 

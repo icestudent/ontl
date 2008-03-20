@@ -14,10 +14,6 @@
 namespace ntl {
 namespace km {
 
-  // device type
-namespace device_type = nt::device_type;
-
-
 struct devobj_extension
 {
   uint16_t        Type;
@@ -37,6 +33,56 @@ struct devobj_extension
 
 struct device_object
 {
+  enum type {
+    beep = 1,
+    cd_rom,
+    cd_rom_file_system,
+    controller,
+    datalink,
+    dfs,
+    disk,
+    disk_file_system,
+    file_system,
+    inport_port,
+    keyboard,
+    mailslot,
+    midi_in,
+    midi_out,
+    mouse,
+    multi_unc_provider,
+    named_pipe,
+    network,
+    network_browser,
+    network_file_system,
+    null,
+    parallel_port,
+    physical_netcard,
+    printer,
+    scanner,
+    serial_mouse_port,
+    serial_port,
+    screen,
+    sound,
+    streams,
+    tape,
+    tape_file_system,
+    transport,
+    unknown,
+    video,
+    virtual_disk,
+    wave_in,
+    wave_out,
+    _8042_port,
+    network_redirector,
+    battery,
+    bus_extender,
+    modem,
+    vdm,
+    mass_storage
+  };
+  STATIC_ASSERT(mass_storage == 0x2D);
+
+
   uint16_t              Type;
   uint16_t              Size;
   int32_t               ReferenceCount;
@@ -49,7 +95,7 @@ struct device_object
   uint32_t              Characteristics;                      // See ntioapi:  FILE_...
   vpb *                 Vpb;
   void *                DeviceExtension;
-  device_type::type     DeviceType;
+  type                  DeviceType;
   uint8_t               StackSize;
   union { list_entry ListEntry; wait_context_block  Wcb; } Queue;
   uint32_t              AlignmentRequirement;
@@ -97,6 +143,8 @@ struct device_object
   ntstatus call(irp * pirp);
   
 }; // struct device_object
+
+typedef device_object::type device_type;
 
 
 }//namspace km

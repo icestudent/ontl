@@ -114,6 +114,11 @@ template <class charT,
           class Allocator = allocator<charT> >
 class basic_string
 {
+    //  N2315 21.3.1/3: 
+    //    The char-like objects in a basic_string object shall be stored contiguously.
+    //    That is, for any basic_string object s,
+    //    the identity &*(s.begin() + n) == &*s.begin() + n
+    //    shall hold for all values of n such that 0 <= n < s.size().
     typedef vector<typename traits::char_type, Allocator> stringbuf_t;
     mutable stringbuf_t str; // mutable for c_str()
 
@@ -537,7 +542,7 @@ class basic_string
 
     int compare(const basic_string& str) const
     {
-      const int r = traits<charT>::compare(begin(), &str[0],
+      const int r = traits<charT>::compare(begin(), str.begin(),
                                             std::min(size(), str.size()));
       return r != 0 ? r : size() - str.size();   
     }

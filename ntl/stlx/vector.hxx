@@ -413,7 +413,7 @@ class vector
     // hack: MSVC doesn't look inside function body
     void check_bounds(size_type n) const throw(bad_alloc)//throw(out_of_range)
     {
-      if ( n > size() ) do__throw(out_of_range);
+      if ( n > size() ) __ntl_throw(out_of_range);
     }
 
     void move(const iterator to, const iterator from) const

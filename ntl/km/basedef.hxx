@@ -11,7 +11,7 @@
 #include "../nt/basedef.hxx"
 #include "../stdlib.hxx"
 #include "../nt/exception.hxx"
-#include "../nt/event.hxx"
+//#include "../nt/event.hxx"
 
 namespace ntl {
 
@@ -44,7 +44,6 @@ using nt::list_entry;
 using nt::list_head;
 using nt::status;
 using nt::exception;
-using nt::kaffinity_t;
 using nt::access_mask;
 using nt::synchronize;
 using nt::generic_read;
@@ -71,6 +70,7 @@ static const kprocessor_mode KernelMode = { 0 };
 static const kprocessor_mode UserMode = { 1 };
 
 typedef long kpriority;
+typedef uintptr_t kaffinity_t;
 
 #if 1
 
@@ -451,9 +451,7 @@ struct kgate { dispatcher_header Header; };
 
 struct kevent { dispatcher_header Header; };
 
-using nt::event_type;
-using nt::SynchronizationEvent;
-using nt::NotificationEvent;
+enum event_type { NotificationEvent, SynchronizationEvent };
 
 NTL__EXTERNAPI
 void __stdcall

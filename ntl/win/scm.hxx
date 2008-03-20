@@ -180,7 +180,10 @@ class service_control
       return 0 != StartServiceW(handle, argc, argv);
     }
 
-    const service_status * operator->() const throw() { return &status; }
+    const service_status * operator->() const throw()
+    { 
+      return handle ? &status : reinterpret_cast<const service_status*>(handle);
+    }
 
     bool operator()(nt::service::control_code command)
     {
@@ -192,7 +195,7 @@ class service_control
     bool resume()   { return (*this)(nt::service::control_continue); }
     bool shutdown() { return (*this)(nt::service::control_shutdown); }
       
-    bool remove() const
+    bool remove()
     {
       const bool r = 0 != DeleteService(handle);
       close_handle();
@@ -205,9 +208,9 @@ class service_control
     legacy_sc_handle  handle;
     service_status    status;
 
-    void close_handle() const
+    void close_handle()
     {
-      if ( handle ) CloseServiceHandle(handle);
+      if ( handle && CloseServiceHandle(handle) ) handle = 0;
     }
 
 };//template class service_control

@@ -99,7 +99,7 @@ struct array
 
     void __check_bounds(size_type n) const throw(out_of_range)
     {
-      if ( n > size() ) do__throw(out_of_range);
+      if ( n > size() ) __ntl_throw(out_of_range);
     }
 
 };//struct array

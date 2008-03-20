@@ -312,7 +312,8 @@ class pointer_to_unary_function : public unary_function<Arg, Result>
 };
 
 template <class Arg, class Result>
-pointer_to_unary_function<Arg,Result> ptr_fun(Result (*f)(Arg))
+pointer_to_unary_function<Arg,Result>
+  ptr_fun(Result (*f)(Arg))
 {
   return pointer_to_unary_function<Arg, Result>(f);
 }
@@ -478,6 +479,67 @@ const_mem_fun1_ref_t<S, T, A>
 
 /**@} lib_member_pointer_adaptors
  */
+
+
+// DTR 2.1.1 Additions to header <functional> synopsis [tr.util.refwrp.synopsis]
+//namespace tr1 {
+
+/// 2.1.2 Class template reference_wrapper [tr.util.refwrp.refwrp]
+template <class T>
+class reference_wrapper
+//: public unary_function<T1, R> // see below
+//: public binary_function<T1, T2, R> // see below
+{
+  ///////////////////////////////////////////////////////////////////////////
+  public :
+
+    // types
+    typedef T type;
+    //typedef -- result_type; // Not always defined
+
+    // construct/copy/destroy
+    explicit reference_wrapper(T&) throw();
+    reference_wrapper(const reference_wrapper<T>& x) throw();
+
+    // assignment
+    reference_wrapper& operator=(const reference_wrapper<T>& x) throw();
+
+    // access
+    operator T& () const throw();
+    T& get() const throw();
+
+#if 0
+    // invocation
+    template <class T1, class T2, ..., class TN>
+    typename result_of<T(T1, T2, ..., TN)>::type
+      operator() (T1&, T2&, ..., TN&) const
+    {
+    // Returns: INVOKE (get(), a1, a2, ..., aN). ([3.3])
+      return get()(t1);
+    }
+#endif
+
+  ///////////////////////////////////////////////////////////////////////////
+  private:
+
+    T* ptr;
+
+};//template class reference_wrapper
+
+
+template <class T>
+inline
+reference_wrapper<T> ref(T& t) throw()
+{
+  return reference_wrapper<T>(t);
+}
+
+template <class T> reference_wrapper<const T> cref(const T&) throw();
+template <class T> reference_wrapper<T> ref(reference_wrapper<T>) throw();
+template <class T> reference_wrapper<const T> cref(reference_wrapper<T>) throw();
+
+//} // namespace tr1
+
 
 /**@} lib_function_objects */
 

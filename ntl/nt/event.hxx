@@ -11,13 +11,16 @@
 #include "basedef.hxx"
 #include "../device_traits.hxx"
 #include "object.hxx"
+#include "../km/basedef.hxx"
 
 namespace ntl {
   namespace nt {
 
     /// event
+    using km::event_type;
+    using km::SynchronizationEvent;
+    using km::NotificationEvent;
 
-    enum event_type { NotificationEvent, SynchronizationEvent };
 
     enum event_information_class 
     {
@@ -73,20 +76,20 @@ namespace ntl {
     NTL__EXTERNAPI
       ntstatus __stdcall
       NtCreateEvent(
-      handle*             EventHandle,
-      uint32_t            DesiredAccess,
-      const object_attributes*  ObjectAttributes,
-      event_type          EventType,
-      bool                InitialState
-      );
+        handle*             EventHandle,
+        uint32_t            DesiredAccess,
+        const object_attributes*  ObjectAttributes,
+        event_type          EventType,
+        bool                InitialState
+        );
 
     NTL__EXTERNAPI
       ntstatus __stdcall
       NtOpenEvent(
-      handle*             EventHandle,
-      uint32_t            DesiredAccess,
-      const object_attributes*  ObjectAttributes
-      );
+        handle*             EventHandle,
+        uint32_t            DesiredAccess,
+        const object_attributes*  ObjectAttributes
+        );
 
     /// user_event
     class user_event:

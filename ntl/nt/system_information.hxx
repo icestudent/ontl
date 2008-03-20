@@ -11,18 +11,18 @@
 #include "basedef.hxx"
 #include "string.hxx"
 #include "../iterator"
-//#include "new"
 
 // for SystemProcessInformation
 #include "teb.hxx"
-// km::kpriority
-#include "../km/basedef.hxx"
-
 // for SystemModuleInformation
 #include "../pe/image.hxx"
 
-
 namespace ntl {
+
+  namespace km {
+    typedef long kpriority;
+  }
+
 namespace nt {
 
 /**\addtogroup  system_information ********* System Information *************

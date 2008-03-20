@@ -14,6 +14,9 @@
 #include "string.hxx"
 #include "../pe/image.hxx"
 
+// for kaffinity
+//#include "../km/basedef.hxx"
+
 namespace ntl {
 
   /// Exception filter return values
@@ -24,13 +27,14 @@ namespace ntl {
     exception_execute_handler
   };
 
+  namespace km {
+    typedef uintptr_t kaffinity_t;
+  }
 
   namespace nt {
 
     /**\addtogroup  native_types_support *** NT Types support library ***********
     *@{*/
-
-    typedef uintptr_t kaffinity_t;
 
     struct list_entry
     {
@@ -307,59 +311,6 @@ ntstatus sleep(
   return NtDelayExecution(alertable, &interval);
 }
 
-/// device type
-namespace device_type {
-  enum type {
-    beep = 1,
-    cd_rom,
-    cd_rom_file_system,
-    controller,
-    datalink,
-    dfs,
-    disk,
-    disk_file_system,
-    file_system,
-    inport_port,
-    keyboard,
-    mailslot,
-    midi_in,
-    midi_out,
-    mouse,
-    multi_unc_provider,
-    named_pipe,
-    network,
-    network_browser,
-    network_file_system,
-    null,
-    parallel_port,
-    physical_netcard,
-    printer,
-    scanner,
-    serial_mouse_port,
-    serial_port,
-    screen,
-    sound,
-    streams,
-    tape,
-    tape_file_system,
-    transport,
-    unknown,
-    video,
-    virtual_disk,
-    wave_in,
-    wave_out,
-    _8042_port,
-    network_redirector,
-    battery,
-    bus_extender,
-    modem,
-    vdm,
-    mass_storage
-  };
-  //STATIC_ASSERT(beep == 0);
-  STATIC_ASSERT(mass_storage == 0x2D);
-};
-
 
   typedef const struct _opaque { } * legacy_handle;
 
@@ -590,7 +541,7 @@ struct kuser_shared_data
   uint32_t ImageFileExecutionOptions;
   union {
     uint64_t    AffinityPad;
-    kaffinity_t ActiveProcessorAffinity;
+    km::kaffinity_t ActiveProcessorAffinity;
   };
   volatile uint64_t InterruptTimeBias;
 };

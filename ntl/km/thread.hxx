@@ -363,13 +363,13 @@ struct kprcb
   // Nonpaged per processor small pool lookaside lists - 128-byte aligned.
   //
 
-  pp_lookaside_list PPNPagedLookasideList[POOL_SMALL_LISTS];
+  pp_lookaside_list PPNPagedLookasideList[pool_small_lists];
 
   //
   // Paged per processor small pool lookaside lists.
   //
 
-  pp_lookaside_list PPPagedLookasideList[POOL_SMALL_LISTS];
+  pp_lookaside_list PPPagedLookasideList[pool_small_lists];
 
   //
   // MP interprocessor request packet barrier - 128-byte aligned.

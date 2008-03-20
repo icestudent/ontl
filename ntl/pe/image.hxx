@@ -15,6 +15,9 @@
 namespace ntl {
   namespace pe {
 
+#pragma warning(push)
+#pragma warning(disable:4820) // 'X' bytes padding added after data member
+#pragma warning(disable:4347) // behavior change: va<>() is called instead of va()
 
     /**\addtogroup  pe_images_support *** Portable Executable images support*****
     *@{*/
@@ -298,12 +301,12 @@ namespace ntl {
 
       nt_headers * get_nt_headers() 
       { 
-        return va<nt_headers*>(get_dos_header()->e_lfanew); 
+      return va<nt_headers*>(static_cast<uintptr_t>(get_dos_header()->e_lfanew)); 
       }
 
       const nt_headers * get_nt_headers() const
       { 
-        return va<const nt_headers*>(get_dos_header()->e_lfanew); 
+      return va<const nt_headers*>(static_cast<uintptr_t>(get_dos_header()->e_lfanew)); 
       }
 
       uint32_t checksum() const
@@ -311,27 +314,26 @@ namespace ntl {
         const dos_header * const dh = get_dos_header();
         if ( !dh->is_valid() ) return 0;
         const nt_headers * const nth = get_nt_headers();
-        uint32_t sum = 0;
+        uint32_t sum32 = 0;
         for ( const uint16_t * p = va<uint16_t*>(0);
-          p < va<uint16_t*>(nth->OptionalHeader32.SizeOfImage); // care about odd SizeOfImage
+          p < va<uint16_t*>(nth->OptionalHeader32.SizeOfImage); // < care about odd SizeOfImage
           ++p )
         {
-          // Can not use C flag in HLL :-(
-          sum += *p;
-          sum += sum >> 16;
-          sum &= 0xFFFF;
+          sum32 += *p;
+          sum32 = (sum32 >> 16) + static_cast<uint16_t>(sum32);
         }
-        sum -= ( sum < static_cast<uint16_t>(nth->OptionalHeader32.CheckSum) );
-        sum -= static_cast<uint16_t>(nth->OptionalHeader32.CheckSum);
-        sum -= ( sum < static_cast<uint16_t>(nth->OptionalHeader32.CheckSum >> 16) );
-        sum -= static_cast<uint16_t>(nth->OptionalHeader32.CheckSum >> 16);
+        uint16_t sum = static_cast<uint16_t>((sum32 >> 16) + sum32);
+        sum = sum - ( sum < static_cast<uint16_t>(nth->OptionalHeader32.CheckSum) );
+        sum = sum - static_cast<uint16_t>(nth->OptionalHeader32.CheckSum);
+        sum = sum - ( sum < static_cast<uint16_t>(nth->OptionalHeader32.CheckSum >> 16) );
+        sum = sum - static_cast<uint16_t>(nth->OptionalHeader32.CheckSum >> 16);
         return nth->OptionalHeader32.SizeOfImage + sum;
       }
 
       uint32_t checksum(bool update)
       {
         const uint32_t sum = checksum();
-        if ( update ) get_nt_headers()->OptionalHeader32.CheckSum = sum;
+        if ( sum && update ) get_nt_headers()->OptionalHeader32.CheckSum = sum;
         return sum;
       }
 
@@ -443,8 +445,8 @@ namespace ntl {
       typedef
         const image * find_dll_t(const char * dll_name);
 
-      template<typename PtrType, typename ExportType>
-      PtrType * find_export(ExportType exp) const
+      template<typename ExportType>
+      void * find_export(ExportType exp) const
       {
         const data_directory * const export_table = 
           get_data_directory(data_directory::export_table);
@@ -452,11 +454,11 @@ namespace ntl {
         export_directory * exports = va<export_directory*>(export_table->VirtualAddress);
         void * const f = exports->function(this, exports->ordinal(this, exp));
         const uintptr_t ex = reinterpret_cast<uintptr_t>(exports);
-        return in_range(ex, ex + export_table->Size, f) ? 0 : brute_cast<PtrType*>(f);
+        return in_range(ex, ex + export_table->Size, f) ? 0 : f;
       }
 
-      template<typename PtrType, typename DllFinder>
-      PtrType * find_export(const char * exp, DllFinder find_dll) const
+      template<typename DllFinder>
+      void * find_export(const char * exp, DllFinder find_dll) const
       {
         const data_directory * const export_table = 
           get_data_directory(data_directory::export_table);
@@ -470,7 +472,7 @@ namespace ntl {
         // forward export
         static const size_t dll_name_max = 16;
         char dll_name[dll_name_max + sizeof("dll")];
-        char * forward = reinterpret_cast<char*>(f);
+        const char * forward = reinterpret_cast<char*>(f);
         size_t i = 0;
         for ( ; ; )
         {
@@ -484,7 +486,19 @@ namespace ntl {
         dll_name[i++] = 'l';
         dll_name[i] = '\0';
         const image * forwarded_dll = find_dll(dll_name);
-        return forwarded_dll ? forwarded_dll->find_export<PtrType>(forward, find_dll) : 0;
+        return forwarded_dll ? forwarded_dll->find_export(forward, find_dll) : 0;
+      }
+
+      template<typename PtrType, typename ExportType>
+      PtrType find_export(ExportType exp) const
+      {
+        return brute_cast<PtrType>(find_export(exp));
+      }
+
+      template<typename PtrType, typename DllFinder>
+      PtrType find_export(const char * exp, DllFinder find_dll) const
+      {
+        return brute_cast<PtrType>(find_export(exp, find_dll));
       }
 
       ///\name  Imports
@@ -578,6 +592,7 @@ next_entry:;
         }
         return null_import();
       }
+
 
       template<typename DllFinder>
       bool bind_import(const DllFinder & find_dll)
@@ -747,6 +762,7 @@ next_entry:;
 
     /**@} pe_images_support */
 
+#pragma warning(pop)
 
   }//namespace pe
 }//namespace ntl

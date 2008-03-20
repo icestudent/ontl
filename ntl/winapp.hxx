@@ -11,14 +11,13 @@
 #include "win/application.hxx"
 #include "win/console.hxx"
 
-
-namespace ntl {
-
 //#pragma comment(linker, "/subsystem:windows")
-#pragma comment(linker, "/entry:_Winapp_entry")
+#pragma comment(linker, "/entry:ntl::_Winapp_entry")
 
 #pragma comment(linker, "/nodefaultlib:libc")
 #pragma comment(linker, "/nodefaultlib:libcmt")
+
+namespace ntl {
 
 /**\addtogroup  application ****** Application support library **************
  *@{*/
@@ -29,7 +28,8 @@ class winapp : public win::application<win::tchar_t>
   ///////////////////////////////////////////////////////////////////////////
   public:
 
-    inline int main();
+    //static //?
+    __forceinline int main();
 
     typedef win::console console;
 
