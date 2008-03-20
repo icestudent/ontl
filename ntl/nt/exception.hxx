@@ -67,7 +67,7 @@ class exception
               void              * dispatcher_context
         );
 
-    /// SEH recod
+    /// SEH record
     struct registration
     {
       registration *  next;

@@ -67,6 +67,9 @@ struct rtl_user_process_parameters
 	/* 0x90 */ /*|0x200|*/ rtl_drive_letter_curdir CurrentDirectores[rtl_max_drive_letters];
 };
 
+#pragma warning(push)
+#pragma warning(disable:4820) // 'X' bytes padding added after data member 'peb::MinimumStackCommit'
+
 struct peb
 {
   static __forceinline
@@ -336,6 +339,7 @@ struct peb52: peb
 
 #endif
 
+#pragma warning(pop)
 
 }//namespace nt
 }//namespace ntl

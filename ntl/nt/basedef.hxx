@@ -257,8 +257,6 @@ namespace ntl {
       {
         find_dll(list_head * head) : head(head) {}
 
-        list_head * head;
-
         const pe::image * operator()(const char name[]) const
         {
           if (head)
@@ -277,6 +275,10 @@ other_name:;
             }
             return 0;
         }
+
+    private:
+      list_head * head;
+
       };
 
     };

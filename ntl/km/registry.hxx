@@ -207,8 +207,8 @@ struct cm_key_body_51 : cm_key_body
 
 struct cm_key_body_52: cm_key_body
 {
-	/* 0x18 */ uint32_t				ProcessID;
-	/* 0x20 */ list_entry			KeyBodyList;
+  legacy_handle ProcessID;
+  list_entry    KeyBodyList;
 };
 
 using nt::key_information_class;
