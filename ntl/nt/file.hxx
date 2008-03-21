@@ -12,6 +12,8 @@
 #include "basedef.hxx"
 #include "object.hxx"
 #include "file_information.hxx"
+#include "virtualmem.hxx"
+
 
 namespace ntl {
 namespace nt {

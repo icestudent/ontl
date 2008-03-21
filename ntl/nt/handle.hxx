@@ -17,7 +17,7 @@ namespace ntl {
 namespace nt {
 
 
-//typedef const struct _opaque { } * legacy_handle;
+typedef const struct _opaque { } * legacy_handle;
 
 static const legacy_handle null_handle;
 
@@ -44,6 +44,36 @@ NtDuplicateObject(
     access_mask     DesiredAccess,
     uint32_t        HandleAttributes,
     uint32_t        Options
+    );
+
+// wait functions
+enum wait_type { WaitAll, WaitAny };
+
+NTL__EXTERNAPI
+ntstatus __stdcall
+  NtWaitForSingleObject(
+    legacy_handle Handle,
+    bool          Alertable,
+    const int64_t*Timeout
+    );
+
+NTL__EXTERNAPI
+ntstatus __stdcall
+  NtSignalAndWaitForSingleObject(
+    legacy_handle SignalHandle,
+    legacy_handle Handle,
+    bool          Alertable,
+    const int64_t*Timeout
+    );
+
+NTL__EXTERNAPI
+ntstatus __stdcall
+  NtWaitForMultipleObjects(
+    uint32_t      Count,
+    legacy_handle Handles[],
+    wait_type     WaitType,
+    bool          Alertable,
+    const int64_t*Timeout
     );
 
 

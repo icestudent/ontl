@@ -9,6 +9,7 @@
 #define NTL__NT_TEB
 
 #include "exception.hxx"
+#include "handle.hxx"
 
 template<size_t v>
 struct Int2Type
