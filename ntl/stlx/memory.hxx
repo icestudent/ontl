@@ -89,7 +89,7 @@ class allocator
     __forceinline
     void deallocate(pointer p, size_type /* n */) 
     {
-      ::delete((void*)p);//(address(*p));
+      ::operator delete (p);
     }
 
     size_type max_size() const throw() { return size_t(-1) / sizeof(T); }
