@@ -112,9 +112,9 @@ ntstatus __stdcall
     void**          BaseAddress,
     uintptr_t       ZeroBits,
     size_t          CommitSize,
-    int64_t*        SectionOffset   __optional,
+    int64_t*        SectionOffset,
     size_t*         ViewSize,
-    SectionInherit  InheritDisposition,
+    section_inherit InheritDisposition,
     uint32_t        AllocationType,
     uint32_t        Win32Protect
     );

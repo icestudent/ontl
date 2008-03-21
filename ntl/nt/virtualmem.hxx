@@ -15,7 +15,7 @@ namespace ntl {
   namespace nt {
 
 
-    enum SectionInherit
+    enum section_inherit
     {
       ViewShare = 1,
       ViewUnmap = 2
@@ -52,6 +52,12 @@ namespace ntl {
       page_guard             = 0x100,
       page_nocache           = 0x200,
       page_writecombine      = 0x400
+    };
+
+    enum map_type
+    {
+      map_process = 1,
+      map_system  = 2
     };
 
     enum memory_information_class
@@ -108,7 +114,7 @@ namespace ntl {
         legacy_handle ProcessHandle,
         void**        BaseAddress,
         size_t*       LockSize,
-        uint32_t      LockOption
+        map_type      LockOption
         );
 
     NTL__EXTERNAPI
@@ -138,7 +144,7 @@ namespace ntl {
         legacy_handle ProcessHandle,
         void**        BaseAddress,
         size_t*       LockSize,
-        uint32_t      LockType
+        map_type      LockType
         );
 
   }
