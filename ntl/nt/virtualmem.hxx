@@ -61,13 +61,13 @@ namespace ntl {
 
     struct memory_basic_information
     {
-      void*     BaseAddress;
-      void*     AllocationBase;
-      uint32_t  AllocationProtect;
-      size_t    RegionSize;
-      uint32_t  State;
-      uint32_t  Protect;
-      uint32_t  Type;
+      void*                 BaseAddress;
+      void*                 AllocationBase;
+      page_protection       AllocationProtect;
+      size_t                RegionSize;
+      allocation_attributes State;
+      page_protection       Protect;
+      allocation_attributes Type;
     };
 
 
