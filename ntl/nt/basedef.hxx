@@ -13,6 +13,7 @@
 #include "../stdlib.hxx"
 #include "string.hxx"
 #include "../pe/image.hxx"
+//#include "handle.hxx"
 
 // for kaffinity
 //#include "../km/basedef.hxx"
