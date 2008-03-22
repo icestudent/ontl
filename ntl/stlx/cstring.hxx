@@ -221,7 +221,7 @@ char *
 {
   _Assert(dst);
   _Assert(src);
-  while ( *dst++ = *src++ ) {/**/}
+  while ( (*dst++ = *src++) != 0 ) {/**/}
   return dst;
 } }
 
