@@ -542,7 +542,7 @@ class basic_string
 
     int compare(const basic_string& str) const
     {
-      const int r = traits<charT>::compare(begin(), str.begin(),
+      const int r = traits_type::compare(begin(), str.begin(),
                                             std::min(size(), str.size()));
       return r != 0 ? r : size() - str.size();   
     }

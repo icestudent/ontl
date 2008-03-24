@@ -147,7 +147,7 @@ class system_information_base
             (ptr = new char[length = length ? length : i ]) != 0;
             i *= 2 )
       {
-        const ntstatus s = _query(ptr, length, &length);
+        const ntstatus s = query(ptr, length, &length);
         if ( s == status::success )
           break;
         delete[] ptr;
@@ -173,7 +173,7 @@ class system_information_base
 
     static __forceinline
     ntstatus
-      _query(
+      query(
         void *          system_nformation,
         unsigned long   system_information_length,
         unsigned long * return_length = std::nullptr
