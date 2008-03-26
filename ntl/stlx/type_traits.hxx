@@ -178,6 +178,13 @@ _CHECK_TRAIT(__alignof(aligned_storage<5, 8000>::type) == 8192);
 _CHECK_TRAIT(sizeof(aligned_storage<2, 4>::type) == 4);
 //_CHECK_TRAIT(sizeof(aligned_storage<2, 4>::type) == 2);
 
+template <class T> struct decay;
+
+template <bool, class T = void> struct enable_if { typedef T type; };
+template <class T> struct enable_if<false, T> {};
+
+template <bool, class T, class F> struct conditional { typedef T type; };
+template <class T, class F> struct conditional<false, T, F> { typedef F type; };
 
 // 4.5 Unary Type Traits [tr.meta.unary]
 
