@@ -30,6 +30,7 @@ namespace std {
     void sleep(const system_time& abs_time);
     template <class Duration>
     void sleep(const Duration& rel_time);
+
   }
 
   /// 30.2.1 thread.thread.class
@@ -81,10 +82,7 @@ namespace std {
     operator<< (basic_ostream<charT, traits>&& out, thread::id id);
 
 
-
-
-
-  /** @} syserr */
+  /** @} thread */
 } // std
 
 #endif // NTL__STLX_THREAD
