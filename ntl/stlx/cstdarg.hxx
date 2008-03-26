@@ -33,7 +33,7 @@ typedef struct { } * va_list;
 #ifdef _DEBUG
 #   define va_end(__argptr)(__argptr = (va_list)0)
 #else
-#   define va_end(__argptr)()
+#   define va_end(__argptr)
 #endif
 
 #elif defined(_M_X64)

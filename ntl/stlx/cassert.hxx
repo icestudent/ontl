@@ -22,12 +22,12 @@
   static const char m[] = msg;    \
   __asm mov ecx, offset m         \
   __asm mov edx, line             \
-  __asm _emit 0xf1  /* ICE BP */  \
+  __asm _emit 0xCC  /* ICE BP */  \
 }
 #elif defined _M_X64
 #	define _BUGCHECK(msg, line)	__debugbreak();
 #else
-#error unsupported CPU type
+# error unsupported CPU type
 #endif// CPU type
 #endif// #ifndef _BUGCHECK 
 
