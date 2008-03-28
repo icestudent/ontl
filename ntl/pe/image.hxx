@@ -745,6 +745,17 @@ next_entry:;
         uint32_t  Size;
       };
 
+      struct security_table_entry 
+      {
+        uint32_t  dwLength;
+        // 0x100 - 1.0, 0x200 - 2.0
+        uint16_t  wRevision;
+        // 1 - x509, 2 - PCS#7, 3 - reserved, 4 - Terminal Server Protocol Stack certificate  signing
+        uint16_t  wCertificateType;
+        uint8_t   cert_data[1];
+      };
+
+
       ///}
 
       ///////////////////////////////////////////////////////////////////////////
