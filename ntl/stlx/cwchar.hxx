@@ -10,6 +10,7 @@
 
 #include "cstddef.hxx"
 #include "cassert.hxx"
+#include "cstdarg.hxx"
 
 #ifndef WCHAR_MIN
 #define WCHAR_MIN   0
@@ -56,6 +57,17 @@ NTL__CRTCALL
 }
 
 __forceinline 
+wchar_t *
+  wcscpy(wchar_t * dst, const wchar_t * src)
+{
+  _Assert(dst);
+  _Assert(src);
+  while ( (*dst++ = *src++) != 0 ) {/**/}
+  return dst;
+}
+
+
+__forceinline 
 size_t
 NTL__CRTCALL
   wcslen(const wchar_t * const s)
@@ -65,6 +77,11 @@ NTL__CRTCALL
   while ( s[count] ) count++;
   return count;
 }
+
+NTL__EXTERNAPI size_t _cdecl
+  _snwprintf(wchar_t *buffer, size_t count, const wchar_t *format, ...);
+NTL__EXTERNAPI size_t _cdecl
+  _vsnwprintf(wchar_t *buffer, size_t count, const wchar_t *format, va_list argptr);
 
 /**@} lib_c_strings */
 /**@} lib_strings */
