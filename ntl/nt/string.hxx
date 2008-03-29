@@ -215,6 +215,13 @@ typedef native_string<const char>     const_ansi_string;
 
 /**@} native_types_support */
 
+NTL__EXTERNAPI
+  void __stdcall RtlFreeAnsiString(ansi_string* UnicodeString);
+
+NTL__EXTERNAPI
+  void __stdcall RtlFreeUnicodeString(unicode_string* UnicodeString);
+
+
 }//namespace nt
 }//namespace ntl
 
