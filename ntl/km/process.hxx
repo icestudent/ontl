@@ -15,7 +15,7 @@
 #include "thread.hxx"
 #include "system_information.hxx"
 #include "../pe/image.hxx"
-
+#include "mm.hxx"
 
 namespace ntl {
 namespace km {
@@ -196,101 +196,6 @@ struct pagefault_history
 	/*<thisrel this+0xc>*/ /*|0x4|*/ void* Reserved;
 	/*<thisrel this+0x10>*/ /*|0x8|*/ process_ws_watch_information WatchInfo[1];
 };
-
-struct hardware_pte
-{
-	/*<bitfield this+0x0>*/ /*|0x4|*/ uint32_t Valid:1;
-	/*<bitfield this+0x0>*/ /*|0x4|*/ uint32_t Write:1;
-	/*<bitfield this+0x0>*/ /*|0x4|*/ uint32_t Owner:1;
-	/*<bitfield this+0x0>*/ /*|0x4|*/ uint32_t WriteThrough:1;
-	/*<bitfield this+0x0>*/ /*|0x4|*/ uint32_t CacheDisable:1;
-	/*<bitfield this+0x0>*/ /*|0x4|*/ uint32_t Accessed:1;
-	/*<bitfield this+0x0>*/ /*|0x4|*/ uint32_t Dirty:1;
-	/*<bitfield this+0x0>*/ /*|0x4|*/ uint32_t LargePage:1;
-	/*<bitfield this+0x0>*/ /*|0x4|*/ uint32_t Global:1;
-	/*<bitfield this+0x0>*/ /*|0x4|*/ uint32_t CopyOnWrite:1;
-	/*<bitfield this+0x0>*/ /*|0x4|*/ uint32_t Prototype:1;
-	/*<bitfield this+0x0>*/ /*|0x4|*/ uint32_t reserved:1;
-	/*<bitfield this+0x0>*/ /*|0x4|*/ uint32_t PageFrameNumber:0x14;
-};
-// <size 0x4>
-
-#if 0
-struct mmwsle
-{
-	union {
-		/*<thisrel this+0x0>*/ /*|0x4|*/ void* VirtualAddress;
-		/*<thisrel this+0x0>*/ /*|0x4|*/ uint32_t Long;
-		/*<thisrel this+0x0>*/ /*|0x4|*/ struct mmwslentry
-		{
-			/*<bitfield this+0x0>*/ /*|0x4|*/ uint32_t Valid:1;
-			/*<bitfield this+0x0>*/ /*|0x4|*/ uint32_t LockedInWs:1;
-			/*<bitfield this+0x0>*/ /*|0x4|*/ uint32_t LockedInMemory:1;
-			/*<bitfield this+0x0>*/ /*|0x4|*/ uint32_t Protection:5;
-			/*<bitfield this+0x0>*/ /*|0x4|*/ uint32_t Hashed:1;
-			/*<bitfield this+0x0>*/ /*|0x4|*/ uint32_t Direct:1;
-			/*<bitfield this+0x0>*/ /*|0x4|*/ uint32_t Age:2;
-			/*<bitfield this+0x0>*/ /*|0x4|*/ uint32_t VirtualPageNumber:0x14;
-		}e1;
-	};
-};
-
-struct mmwsle_hash
-{
-	/*<thisrel this+0x0>*/ /*|0x4|*/ void* Key;
-	/*<thisrel this+0x4>*/ /*|0x4|*/ uint32_t Index;
-};
-
-struct mmwsl
-{
-	/*<thisrel this+0x0>*/ /*|0x4|*/ uint32_t Quota;
-	/*<thisrel this+0x4>*/ /*|0x4|*/ uint32_t FirstFree;
-	/*<thisrel this+0x8>*/ /*|0x4|*/ uint32_t FirstDynamic;
-	/*<thisrel this+0xc>*/ /*|0x4|*/ uint32_t LastEntry;
-	/*<thisrel this+0x10>*/ /*|0x4|*/ uint32_t NextSlot;
-	/*<thisrel this+0x14>*/ /*|0x4|*/ mmwsle* Wsle;
-	/*<thisrel this+0x18>*/ /*|0x4|*/ uint32_t LastInitializedWsle;
-	/*<thisrel this+0x1c>*/ /*|0x4|*/ uint32_t NonDirectCount;
-	/*<thisrel this+0x20>*/ /*|0x4|*/ mmwsle_hash* HashTable;
-	/*<thisrel this+0x24>*/ /*|0x4|*/ uint32_t HashTableSize;
-	/*<thisrel this+0x28>*/ /*|0x4|*/ uint32_t NumberOfCommittedPageTables;
-	/*<thisrel this+0x2c>*/ /*|0x4|*/ void* HashTableStart;
-	/*<thisrel this+0x30>*/ /*|0x4|*/ void* HighestPermittedHashAddress;
-	/*<thisrel this+0x34>*/ /*|0x4|*/ uint32_t NumberOfImageWaiters;
-	/*<thisrel this+0x38>*/ /*|0x4|*/ uint32_t VadBitMapHint;
-	/*<thisrel this+0x3c>*/ /*|0x600|*/ uint16_t UsedPageTableEntries[768];
-	/*<thisrel this+0x63c>*/ /*|0x60|*/ uint32_t CommittedPageTables[24];
-};
-
-struct mmsupport
-{
-	/*<thisrel this+0x0>*/ /*|0x8|*/ int64_t LastTrimTime;
-	/*<thisrel this+0x8>*/ /*|0x4|*/ struct mmsupport_flags
-	{
-		/*<bitfield this+0x0>*/ /*|0x4|*/ uint32_t SessionSpace:1;
-		/*<bitfield this+0x0>*/ /*|0x4|*/ uint32_t BeingTrimmed:1;
-		/*<bitfield this+0x0>*/ /*|0x4|*/ uint32_t SessionLeader:1;
-		/*<bitfield this+0x0>*/ /*|0x4|*/ uint32_t TrimHard:1;
-		/*<bitfield this+0x0>*/ /*|0x4|*/ uint32_t WorkingSetHard:1;
-		/*<bitfield this+0x0>*/ /*|0x4|*/ uint32_t AddressSpaceBeingDeleted:1;
-		/*<bitfield this+0x0>*/ /*|0x4|*/ uint32_t Available:0x0A;
-		/*<bitfield this+0x0>*/ /*|0x4|*/ uint32_t AllowWorkingSetAdjustment:8;
-		/*<bitfield this+0x0>*/ /*|0x4|*/ uint32_t MemoryPriority:8;
-	}Flags;
-	/*<thisrel this+0xc>*/ /*|0x4|*/ uint32_t PageFaultCount;
-	/*<thisrel this+0x10>*/ /*|0x4|*/ uint32_t PeakWorkingSetSize;
-	/*<thisrel this+0x14>*/ /*|0x4|*/ uint32_t WorkingSetSize;
-	/*<thisrel this+0x18>*/ /*|0x4|*/ uint32_t MinimumWorkingSetSize;
-	/*<thisrel this+0x1c>*/ /*|0x4|*/ uint32_t MaximumWorkingSetSize;
-	/*<thisrel this+0x20>*/ /*|0x4|*/ mmwsl* VmWorkingSetList;
-	/*<thisrel this+0x24>*/ /*|0x8|*/ list_entry WorkingSetExpansionLinks;
-	/*<thisrel this+0x2c>*/ /*|0x4|*/ uint32_t Claim;
-	/*<thisrel this+0x30>*/ /*|0x4|*/ uint32_t NextEstimationSlot;
-	/*<thisrel this+0x34>*/ /*|0x4|*/ uint32_t NextAgingSlot;
-	/*<thisrel this+0x38>*/ /*|0x4|*/ uint32_t EstimatedAvailable;
-	/*<thisrel this+0x3c>*/ /*|0x4|*/ uint32_t GrowthSinceLastEstimate;
-};
-#endif
 
 struct se_audit_process_creation_info
 {

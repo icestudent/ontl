@@ -15,6 +15,9 @@
 namespace ntl {
   namespace km {
 
+    typedef uint32_t wsle_number_t;
+    typedef uintptr_t pfn_number_t;
+
     using nt::memory_basic_information;
     using nt::NtAllocateVirtualMemory;
     using nt::NtFreeVirtualMemory;
@@ -164,6 +167,71 @@ namespace ntl {
       uint32_t PageFrameNumber : 20;
     } ;
 
+    struct hardware_pte_x86 {
+      uint32_t Valid : 1;
+      uint32_t Write : 1;
+      uint32_t Owner : 1;
+      uint32_t WriteThrough : 1;
+      uint32_t CacheDisable : 1;
+      uint32_t Accessed : 1;
+      uint32_t Dirty : 1;
+      uint32_t LargePage : 1;
+      uint32_t Global : 1;
+      uint32_t CopyOnWrite : 1; // software field
+      uint32_t Prototype : 1;   // software field
+      uint32_t reserved : 1;  // software field
+      uint32_t PageFrameNumber : 20;
+    };
+
+    struct hardware_pte_x86pae {
+      union {
+        struct {
+          uint64_t Valid : 1;
+          uint64_t Write : 1;
+          uint64_t Owner : 1;
+          uint64_t WriteThrough : 1;
+          uint64_t CacheDisable : 1;
+          uint64_t Accessed : 1;
+          uint64_t Dirty : 1;
+          uint64_t LargePage : 1;
+          uint64_t Global : 1;
+          uint64_t CopyOnWrite : 1; // software field
+          uint64_t Prototype : 1;   // software field
+          uint64_t reserved0 : 1;  // software field
+          uint64_t PageFrameNumber : 24;
+          uint64_t reserved1 : 28;  // software field
+        };
+        struct {
+          uint32_t LowPart;
+          uint32_t HighPart;
+        };
+      };
+    };
+
+    struct hardware_pte_x64 {
+      uint64_t Valid : 1;
+      uint64_t Write : 1;                // UP version
+      uint64_t Owner : 1;
+      uint64_t WriteThrough : 1;
+      uint64_t CacheDisable : 1;
+      uint64_t Accessed : 1;
+      uint64_t Dirty : 1;
+      uint64_t LargePage : 1;
+      uint64_t Global : 1;
+      uint64_t CopyOnWrite : 1;          // software field
+      uint64_t Prototype : 1;            // software field
+      uint64_t reserved0 : 1;            // software field
+      uint64_t PageFrameNumber : 28;
+      uint64_t reserved1 : 24 - (11+1);
+      uint64_t SoftwareWsIndex : 11;
+      uint64_t NoExecute : 1;
+    };
+
+#if defined (_M_IX86)
+    typedef hardware_pte_x86 hardware_pte;
+#elif defined(_M_X64)
+    typedef hardware_pte_x64 hardware_pte;
+#endif
 
     struct mmpte {
       union  {
@@ -222,7 +290,262 @@ namespace ntl {
       list_entry List;
     };
 
-    
+
+    // mm
+
+    struct mmsection_flags {
+      uint32_t BeingDeleted : 1;
+      uint32_t BeingCreated : 1;
+      uint32_t BeingPurged : 1;
+      uint32_t NoModifiedWriting : 1;
+      uint32_t FailAllIo : 1;
+      uint32_t Image : 1;
+      uint32_t Based : 1;
+      uint32_t File : 1;
+      uint32_t Networked : 1;
+      uint32_t NoCache : 1;
+      uint32_t PhysicalMemory : 1;
+      uint32_t CopyOnWrite : 1;
+      uint32_t Reserve : 1;
+      uint32_t Commit : 1;
+      uint32_t FloppyMedia : 1;
+      uint32_t WasPurged : 1;
+      uint32_t UserReference : 1;
+      uint32_t GlobalMemory : 1;
+      uint32_t DeleteOnClose : 1;
+      uint32_t FilePointerNull : 1;
+      uint32_t DebugSymbolsLoaded : 1;
+      uint32_t SetMappedFileIoComplete : 1;
+      uint32_t CollidedFlush : 1;
+      uint32_t NoChange : 1;
+      uint32_t HadUserReference : 1;
+      uint32_t ImageMappedInSystemSpace : 1;
+      uint32_t filler0 : 1;
+      uint32_t Accessed : 1;
+      uint32_t GlobalOnlyPerSession : 1;
+      uint32_t filler : 3;
+    } ;
+
+    struct mmsupport_flags {
+      uint8_t SessionSpace : 1;
+      uint8_t BeingTrimmed : 1;
+      uint8_t SessionLeader : 1;
+      uint8_t TrimHard : 1;
+      uint8_t MaximumWorkingSetHard : 1;
+      uint8_t ForceTrim : 1;
+      uint8_t MinimumWorkingSetHard : 1;
+      uint8_t Available0 : 1;
+      uint8_t MemoryPriority : 8;
+      uint16_t GrowWsleHash : 1;
+      uint16_t AcquiredUnsafe : 1;
+      uint16_t Available : 14;
+    };
+
+    struct mmsupport_flags50
+    {
+      uint32_t SessionSpace : 1;
+      uint32_t BeingTrimmed : 1;
+      uint32_t ProcessInSession : 1;
+      uint32_t SessionLeader : 1;
+      uint32_t TrimHard : 1;
+      uint32_t WorkingSetHard : 1;
+      uint32_t WriteWatch : 1;
+      uint32_t Filler : 25;
+    };
+
+
+    struct mmsupport50
+    {
+      int64_t LastTrimTime;
+      uint32_t LastTrimFaultCount;
+      uint32_t PageFaultCount;
+      uint32_t PeakWorkingSetSize;
+      uint32_t WorkingSetSize;
+      uint32_t MinimumWorkingSetSize;
+      uint32_t MaximumWorkingSetSize;
+      struct mmwsl *VmWorkingSetList;
+      list_entry WorkingSetExpansionLinks;
+      uint8_t AllowWorkingSetAdjustment;
+      bool AddressSpaceBeingDeleted;
+      uint8_t ForegroundSwitchCount;
+      uint8_t MemoryPriority;
+      mmsupport_flags50 Flags;
+      uint32_t Claim;
+      uint32_t NextEstimationSlot;
+      uint32_t NextAgingSlot;
+      uint32_t EstimatedAvailable;
+      uint32_t GrowthSinceLastEstimate;
+    };
+
+    struct mmsupport51
+    {
+      int64_t LastTrimTime;
+
+      mmsupport_flags Flags;
+      uint32_t PageFaultCount;
+      wsle_number_t PeakWorkingSetSize;
+      wsle_number_t GrowthSinceLastEstimate;
+
+      wsle_number_t MinimumWorkingSetSize;
+      wsle_number_t MaximumWorkingSetSize;
+      struct mmwsl *VmWorkingSetList;
+      wsle_number_t Claim;
+
+      wsle_number_t NextEstimationSlot;
+      wsle_number_t NextAgingSlot;
+      wsle_number_t EstimatedAvailable;
+      wsle_number_t WorkingSetSize;
+
+      ex_push_lock WorkingSetMutex;
+    };
+
+    struct mmsupport52
+    {
+      list_entry WorkingSetExpansionLinks;
+      int64_t LastTrimTime;
+
+      mmsupport_flags Flags;
+      uint32_t PageFaultCount;
+      wsle_number_t PeakWorkingSetSize;
+      wsle_number_t GrowthSinceLastEstimate;
+
+      wsle_number_t MinimumWorkingSetSize;
+      wsle_number_t MaximumWorkingSetSize;
+      struct mmwsl *VmWorkingSetList;
+      wsle_number_t Claim;
+
+      wsle_number_t NextEstimationSlot;
+      wsle_number_t NextAgingSlot;
+      wsle_number_t EstimatedAvailable;
+      wsle_number_t WorkingSetSize;
+#if defined(_M_IX86)
+      kguarded_mutex WorkingSetMutex;
+#elif defined(_M_X64)
+      ex_push_lock WorkingSetMutex;
+#endif
+    };
+
+    struct mmsupport60
+    {
+      /*<thisrel this+0x0>*/ /*|0x8|*/ list_entry WorkingSetExpansionLinks;
+      /*<thisrel this+0x8>*/ /*|0x2|*/ uint16_t LastTrimStamp;
+      /*<thisrel this+0xa>*/ /*|0x2|*/ uint16_t NextPageColor;
+      /*<thisrel this+0xc>*/ /*|0x4|*/ mmsupport_flags Flags;
+      /*<thisrel this+0x10>*/ /*|0x4|*/ int32_t PageFaultCount;
+      /*<thisrel this+0x14>*/ /*|0x4|*/ int32_t PeakWorkingSetSize;
+      /*<thisrel this+0x18>*/ /*|0x4|*/ int32_t ChargedWslePages;
+      /*<thisrel this+0x1c>*/ /*|0x4|*/ int32_t MinimumWorkingSetSize;
+      /*<thisrel this+0x20>*/ /*|0x4|*/ int32_t MaximumWorkingSetSize;
+      /*<thisrel this+0x24>*/ /*|0x4|*/ struct mmwsl* VmWorkingSetList;
+      /*<thisrel this+0x28>*/ /*|0x4|*/ int32_t Claim;
+      /*<thisrel this+0x2c>*/ /*|0x4|*/ int32_t ActualWslePages;
+      /*<thisrel this+0x30>*/ /*|0x4|*/ int32_t WorkingSetPrivateSize;
+      /*<thisrel this+0x34>*/ /*|0x4|*/ int32_t WorkingSetSizeOverhead;
+      /*<thisrel this+0x38>*/ /*|0x4|*/ int32_t WorkingSetSize;
+      /*<thisrel this+0x3c>*/ /*|0x4|*/ kgate* ExitGate;
+      /*<thisrel this+0x40>*/ /*|0x4|*/ ex_push_lock WorkingSetMutex;
+      /*<thisrel this+0x44>*/ /*|0x4|*/ void* AccessLog;
+    };
+
+#if defined(_M_IX86)
+#   define _MI_PAGING_LEVELS 2
+#   define PDE_PER_PAGE 1024
+#   define MM_USER_PAGE_TABLE_PAGES 768
+#elif defined(_M_X64)
+#   define _MI_PAGING_LEVELS 4
+#   define PDE_PER_PAGE 512
+#   define MM_USER_PXES (0x10)
+#   define MM_USER_PAGE_TABLE_PAGES ((ULONG_PTR)PDE_PER_PAGE * PPE_PER_PAGE * MM_USER_PXES)
+#   define MM_USER_PAGE_DIRECTORY_PAGES (PPE_PER_PAGE * MM_USER_PXES)
+#   define MM_USER_PAGE_DIRECTORY_PARENT_PAGES (MM_USER_PXES)
+
+#endif
+
+    struct mmaddress_node 
+    {
+      union {
+        intptr_t Balance : 2;
+        mmaddress_node *Parent;
+      };
+      mmaddress_node *LeftChild;
+      mmaddress_node *RightChild;
+      uintptr_t StartingVpn;
+      uintptr_t EndingVpn;
+    };
+
+    struct mm_avl_table {
+      mmaddress_node  BalancedRoot;
+      uintptr_t DepthOfTree: 5;
+      uintptr_t Unused: 3;
+#if defined (_M_X64)
+      uintptr_t NumberGenericTableElements: 56;
+#else
+      uintptr_t NumberGenericTableElements: 24;
+#endif
+      void* NodeHint;
+      void* NodeFreeHint;
+    };
+
+    struct mmwsle_hash {
+      void*         Key;
+      wsle_number_t Index;
+    };
+
+    struct mmwsl {
+      wsle_number_t FirstFree;
+      wsle_number_t FirstDynamic;
+      wsle_number_t LastEntry;
+      wsle_number_t NextSlot;
+      struct mmwsle* Wsle;
+      wsle_number_t LastInitializedWsle;
+      wsle_number_t NonDirectCount;
+      mmwsle_hash* HashTable;
+      uint32_t HashTableSize;
+      uint32_t NumberOfCommittedPageTables;
+      void* HashTableStart;
+      void* HighestPermittedHashAddress;
+      uint32_t NumberOfImageWaiters;
+      uint32_t VadBitMapHint;
+
+#if defined _M_X64
+      void* HighestUserAddress;
+#endif
+
+#if (_MI_PAGING_LEVELS >= 3)
+      uint32_t MaximumUserPageTablePages;
+#endif
+
+#if (_MI_PAGING_LEVELS >= 4)
+      uint32_t MaximumUserPageDirectoryPages;
+      uint32_t* CommittedPageTables;
+
+      uint32_t NumberOfCommittedPageDirectories;
+      uint32_t* CommittedPageDirectories;
+
+      uint32_t NumberOfCommittedPageDirectoryParents;
+      uintptr_t CommittedPageDirectoryParents[(MM_USER_PAGE_DIRECTORY_PARENT_PAGES + sizeof(uintptr_t)*8-1)/(sizeof(uintptr_t)*8)];
+
+#elif (_MI_PAGING_LEVELS >= 3)
+      uint32_t* CommittedPageTables;
+
+      uint32_t NumberOfCommittedPageDirectories;
+      uintptr_t CommittedPageDirectories[(MM_USER_PAGE_DIRECTORY_PAGES + sizeof(uintptr_t)*8-1)/(sizeof(uintptr_t)*8)];
+
+#else
+
+      uint16_t UsedPageTableEntries[MM_USER_PAGE_TABLE_PAGES];
+      uint32_t CommittedPageTables[MM_USER_PAGE_TABLE_PAGES/(sizeof(uint32_t)*8)];
+#endif
+
+    };
+    struct section {
+      mmaddress_node Address;
+      struct segment *Segment;
+      int64_t SizeOfSection;
+      mmsection_flags Flags;
+      uint32_t InitialPageProtection;
+    } ;
+
     struct mmbanked_section {
       pfn_number_t BasePhysicalPage;
       mmpte* BasedPte;
@@ -472,38 +795,6 @@ namespace ntl {
       list_entry ListEntry;
     } ;
 
-    struct mmsection_flags {
-      unsigned BeingDeleted : 1;
-      unsigned BeingCreated : 1;
-      unsigned BeingPurged : 1;
-      unsigned NoModifiedWriting : 1;
-      unsigned FailAllIo : 1;
-      unsigned Image : 1;
-      unsigned Based : 1;
-      unsigned File : 1;
-      unsigned Networked : 1;
-      unsigned NoCache : 1;
-      unsigned PhysicalMemory : 1;
-      unsigned CopyOnWrite : 1;
-      unsigned Reserve : 1;
-      unsigned Commit : 1;
-      unsigned FloppyMedia : 1;
-      unsigned WasPurged : 1;
-      unsigned UserReference : 1;
-      unsigned GlobalMemory : 1;
-      unsigned DeleteOnClose : 1;
-      unsigned FilePointerNull : 1;
-      unsigned DebugSymbolsLoaded : 1;
-      unsigned SetMappedFileIoComplete : 1;
-      unsigned CollidedFlush : 1;
-      unsigned NoChange : 1;
-      unsigned HadUserReference : 1;
-      unsigned ImageMappedInSystemSpace : 1;
-      unsigned filler0 : 1;
-      unsigned Accessed : 1;
-      unsigned GlobalOnlyPerSession : 1;
-      unsigned filler : 3;
-    } ;
 
     struct control_area {
       segment *Segment;
@@ -545,14 +836,14 @@ namespace ntl {
     } ;
 
     struct mmsubsection_flags {
-      unsigned ReadOnly : 1;
-      unsigned ReadWrite : 1;
-      unsigned CopyOnWrite : 1;
-      unsigned GlobalMemory: 1;
-      unsigned Protection : 5;
-      unsigned LargePages : 1;
-      unsigned StartingSector4132 : 10;
-      unsigned SectorEndOffset : 12;
+      uint32_t ReadOnly : 1;
+      uint32_t ReadWrite : 1;
+      uint32_t CopyOnWrite : 1;
+      uint32_t GlobalMemory: 1;
+      uint32_t Protection : 5;
+      uint32_t LargePages : 1;
+      uint32_t StartingSector4132 : 10;
+      uint32_t SectorEndOffset : 12;
     } ;
 
     struct subsection {
