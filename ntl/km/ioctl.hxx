@@ -144,10 +144,10 @@ namespace ioctl
     struct code
     {
       inline code(
-        file_device::type device_type,
-        access::type      access_type,
         function::type    function_type,
-        method::type      method_type
+        method::type      method_type,
+        access::type      access_type = access::any,
+        file_device::type device_type = file_device::unknown
         )
       : device_type_(device_type), access_(access_type),
         function_(function_type), method_(method_type)
