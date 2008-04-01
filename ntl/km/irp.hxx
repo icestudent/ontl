@@ -339,7 +339,7 @@ namespace ntl {
         stack.Context = completion_routine ? context : 0;
         stack.Control = completion_routine ? static_cast<uint8_t>(control) : 0;
       }
-      void complete_reqtest(priority_boost::Increment PriorityBoost = priority_boost::io_no_increment)
+      void complete_request(priority_boost::Increment PriorityBoost = priority_boost::io_no_increment)
       {
         IofCompleteRequest(this, PriorityBoost);
       }
