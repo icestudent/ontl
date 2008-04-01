@@ -22,6 +22,25 @@ namespace ntl {
     struct ethread;
     struct irp;
 
+    namespace priority_boost
+    {
+      enum Increment {
+        event_increment = 1,
+        io_no_increment = 0,
+        io_cd_rom_increment = 1,
+        io_disk_increment = 1,
+        io_keyboard_increment = 6,
+        io_mailslot_increment = 2,
+        io_mouse_increment = 6,
+        io_named_pipe_increment = 2,
+        io_network_increment = 2,
+        io_parallel_increment = 1,
+        io_serial_increment = 2,
+        io_sound_increment = 8,
+        io_video_increment = 1,
+        semaphore_increment = 1
+      };
+    }
 
     typedef
       ntstatus __stdcall
@@ -65,6 +84,14 @@ namespace ntl {
         driver_object *DriverObject,
         device_object *PhysicalDeviceObject
         );
+
+    NTL__EXTERNAPI
+    void _fastcall
+      IofCompleteRequest(
+        irp* Irp,
+        int8_t PriorityBoost
+        );
+
 
 #if defined(_M_IX86)
 #   pragma pack(push, 4)
@@ -311,6 +338,10 @@ namespace ntl {
         stack.CompletionRoutine = completion_routine;
         stack.Context = completion_routine ? context : 0;
         stack.Control = completion_routine ? static_cast<uint8_t>(control) : 0;
+      }
+      void complete_reqtest(priority_boost::Increment PriorityBoost = priority_boost::io_no_increment)
+      {
+        IofCompleteRequest(this, PriorityBoost);
       }
 
       void * operator new(std::size_t, uint8_t StackSize, bool ChargeQuota = false) throw()
