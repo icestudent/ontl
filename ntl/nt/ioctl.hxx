@@ -8,7 +8,7 @@
 #ifndef NTL__NT_IOCTL
 #define NTL__NT_IOCTL
 
-#include "native.hxx"
+#include "basedef.hxx"
 
 namespace ntl {
 namespace nt {
@@ -85,10 +85,10 @@ namespace ioctl
         user_defined        = 0x8000
       };
 
-      template<uint16 device_type>
+      template<uint16_t device_type>
       static type custom()
       {
-        NTL_STATIC_ASSERT(device_type <= _max_reserved);
+        STATIC_ASSERT(device_type <= _max_reserved);
         return static_cast<type>(user_defined + device_type);
       }
     };
@@ -126,17 +126,17 @@ namespace ioctl
         user_defined        = 0x800
       };
 
-      template<uint16 function_type>
+      template<uint16_t function_type>
       static type standard()
       {
-        NTL_STATIC_ASSERT(function_type <= _max_reserved);
+        STATIC_ASSERT(function_type <= _max_reserved);
         return static_cast<type>(function_type);
       }
 
-      template<uint16 function_type>
+      template<uint16_t function_type>
       static type custom()
       {
-        NTL_STATIC_ASSERT(function_type <= _max_reserved);
+        STATIC_ASSERT(function_type <= _max_reserved);
         return static_cast<type>(user_defined + function_type);
       }
     };
@@ -153,8 +153,8 @@ namespace ioctl
         function_(function_type), method_(method_type)
       { }
 
-      operator uint32() const { return *reinterpret_cast<const uint32*>(this); }
-      uint32 function() const { return function_; }
+      operator uint32_t() const { return *reinterpret_cast<const uint32_t*>(this); }
+      uint32_t function() const { return function_; }
       file_device::type device_type() const { return device_type_; }
     
     private:
