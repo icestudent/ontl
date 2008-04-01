@@ -82,21 +82,6 @@ struct device_object
   };
   STATIC_ASSERT(mass_storage == 0x2D);
 
-  enum method_type {
-    method_buffered,
-    method_in_direct,
-    method_out_direct,
-    method_neither
-  };
-
-  enum file_access {
-    file_any_access,
-    file_special_acess = file_any_access,
-    file_read_access,
-    file_write_access
-  };
-
-
   uint16_t              Type;
   uint16_t              Size;
   int32_t               ReferenceCount;
@@ -156,14 +141,6 @@ struct device_object
 
   ntstatus call(irp * pirp);
 
-  __ntl_bitmask_type(method_type, friend)
-  __ntl_bitmask_type(file_access, friend)
-
-  static inline uint32_t make_ctl_code(uint16_t Function, method_type Method, file_access Access = file_any_access, type DeviceType = unknown)
-  {
-    return (DeviceType << 16) | (Access << 14) | (Function << 2) | Method;
-  }
-  
 }; // struct device_object
 
 typedef device_object::type device_type;
