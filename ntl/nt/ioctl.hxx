@@ -82,6 +82,7 @@ struct file_device
   };
 };//struct file_device
 
+namespace ioctl {
 
 struct method
 {
@@ -158,6 +159,8 @@ typedef ioctl<file_device::network, function<14>::standard, method::neither, fil
   send_response;
 
 STATIC_ASSERT(0x12403B == send_response::code);
+
+} // ioctl
 
 typedef 
 ntstatus __stdcall
