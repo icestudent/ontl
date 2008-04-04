@@ -138,7 +138,7 @@ template <file_device::type DeviceType,
 struct ioctl
 {
   STATIC_ASSERT((DeviceType <= file_device::_max_reserved)
-              && Function <= function<0>::_max_reserved
+    && Function <= function<function<0>::_max_reserved>::custom
               && (Method & ~3) == 0
               && (Access & ~3) == 0);
 
