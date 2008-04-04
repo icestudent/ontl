@@ -159,6 +159,24 @@ typedef ioctl<file_device::network, function<14>::standard, method::neither, fil
 
 STATIC_ASSERT(0x12403B == send_response::code);
 
+typedef 
+ntstatus __stdcall
+  control_file_t(
+    legacy_handle FileHandle,
+    legacy_handle Event,
+    io_apc_routine* ApcRoutine,
+    void* ApcContext,
+    io_status_block* IoStatusBlock,
+    uint32_t IoControlCode,
+    void* InputBuffer,
+    uint32_t InputBufferLength,
+    void* OutputBuffer,
+    uint32_t OutputBufferLength
+    );
+
+NTL__EXTERNAPI control_file_t NtDeviceIoControlFile, NtFsControlFile;
+
+
 }//namespace nt
 }//namespace ntl
 
