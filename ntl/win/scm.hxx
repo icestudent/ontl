@@ -214,9 +214,10 @@ class service_control
       return r;
     }
 
-    bool query_status()
+    bool query_status(nt::service::status_process& service_status)
     {
-      return 0 != 
+      uint32_t cb;
+      return 0 != QueryServiceStatusEx(handle, StatusProcessInfo, &service_status, sizeof(nt::service::status_process), &cb);
     }
 
   ///////////////////////////////////////////////////////////////////////////
