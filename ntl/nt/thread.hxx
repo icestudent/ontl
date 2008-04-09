@@ -146,7 +146,7 @@ ntstatus __stdcall
     handle*             ThreadHandle,
     uint32_t            DesiredAccess,
     object_attributes*  ObjectAttributes,
-    client_id*          ClientId
+    const client_id*    ClientId
     );
 
 NTL__EXTERNAPI
@@ -249,36 +249,35 @@ public:
   }
 
   user_thread(
-    access_mask     DesiredAccess,
-    client_id*      ClientId,
-    bool            InheritHandle = false)
- {
-    open(this, DesiredAccess, InheritHandle, ClientId);
+    access_mask      DesiredAccess,
+    const client_id& ClientId,
+    bool             InheritHandle = false)
+  {
+    open(this, DesiredAccess, InheritHandle, &ClientId);
   }
 
-  static
-    ntstatus
+  static ntstatus
     create(
-    handle *            thread_handle,
-    legacy_handle       process_handle,
-    start_routine_t *   start_routine,
-    void *              start_context   = 0,
-    size_t              maximum_stack_size = 0,
-    size_t              commited_stack_size = 0,
-    bool                create_suspended = false,
-    client_id *         client          = 0,
-    security_descriptor* thread_security = 0)
+      handle *            thread_handle,
+      legacy_handle       process_handle,
+      start_routine_t *   start_routine,
+      void *              start_context   = 0,
+      size_t              maximum_stack_size = 0,
+      size_t              commited_stack_size = 0,
+      bool                create_suspended = false,
+      client_id *         client          = 0,
+      security_descriptor* thread_security = 0)
   {
     return RtlCreateUserThread(process_handle, thread_security, create_suspended, 0, 
       maximum_stack_size, commited_stack_size, start_routine, start_context, thread_handle, client);
   }
 
   static ntstatus
-    open(
-    handle*  ThreadHandle,
+  open(
+    handle*         ThreadHandle,
     access_mask     DesiredAccess,
     bool            InheritHandle,
-    client_id*      ClientId)
+    const client_id*ClientId)
   {
     object_attributes oa(InheritHandle ? object_attributes::inherit : object_attributes::none);
     return NtOpenThread(ThreadHandle, DesiredAccess, &oa, ClientId);
