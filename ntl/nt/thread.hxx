@@ -108,6 +108,21 @@ class user_thread;
       all_access                = standard_rights_required | synchronize | 0x3FF,
 #endif
     };
+
+    friend access_mask operator | (access_mask m, access_mask m2) 
+    { 
+      return bitwise_or(m, m2);
+    }
+
+    friend access_mask operator | (access_mask m, nt::access_mask m2)
+    { 
+      return m | static_cast<access_mask>(m2);
+    }
+
+    friend access_mask operator | (nt::access_mask m, access_mask m2)
+    { 
+      return m2 | m;
+    }
   };
 
 namespace nt{
