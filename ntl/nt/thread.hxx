@@ -17,7 +17,65 @@
 #include "context.hxx"
 
 namespace ntl {
+  namespace km {
+    namespace kwait_reason {
+      enum Type {
+        Executive,
+        FreePage,
+        PageIn,
+        PoolAllocation,
+        DelayExecution,
+        Suspended,
+        UserRequest,
+        WrExecutive,
+        WrFreePage,
+        WrPageIn,
+        WrPoolAllocation,
+        WrDelayExecution,
+        WrSuspended,
+        WrUserRequest,
+        WrEventPair,
+        WrQueue,
+        WrLpcReceive,
+        WrLpcReply,
+        WrVirtualMemory,
+        WrPageOut,
+        WrRendezvous,
+        Spare2,
+        Spare3,
+        Spare4,
+        Spare5,
+        Spare6,
+        WrKernel,
+        WrResource,
+        WrPushLock,
+        WrMutex,
+        WrQuantumEnd,
+        WrDispatchInt,
+        WrPreempted,
+        WrYieldExecution,
+        WrFastMutex,
+        WrGuardedMutex,
+        WrRundown,
+        MaximumWaitReason
+      };
+    }
+  } // km 
+
   namespace nt {
+
+    namespace thread_state {
+      enum Type {
+        Initialized,
+        Ready,
+        Running,
+        Standby,
+        Terminated,
+        Wait,
+        Transition,
+        Unknown
+      };
+    }
 
 struct initial_tib;
 
