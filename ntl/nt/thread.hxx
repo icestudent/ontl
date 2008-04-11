@@ -17,7 +17,8 @@
 #include "context.hxx"
 
 namespace ntl {
-  namespace km {
+  namespace nt {
+
     namespace kwait_reason {
       enum Type {
         Executive,
@@ -60,9 +61,6 @@ namespace ntl {
         MaximumWaitReason
       };
     }
-  } // km 
-
-  namespace nt {
 
     namespace thread_state {
       enum Type {

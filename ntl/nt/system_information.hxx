@@ -210,8 +210,8 @@ struct system_thread_information
   km::kpriority Priority;
   km::kpriority BasePriority;
   uint32_t      ContextSwitches;
-  thread_state::Type      ThreadState;
-  km::kwait_reason::Type  WaitReason;
+  thread_state::Type  ThreadState;
+  kwait_reason::Type  WaitReason;
 };
 
 struct system_process_information
