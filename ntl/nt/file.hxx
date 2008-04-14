@@ -172,7 +172,12 @@ struct device_traits<nt::file_handler> : public device_traits<>
       read_attributes       = 0x0080,
       write_attributes      = 0x0100,
       all_access            = standard_rights_required | synchronize | 0x1FF,
-      append                = append_data | synchronize
+      append                = append_data | synchronize,
+
+      generic_read          = standard_rights_read | read_data | read_attributes | read_ea | synchronize,
+      generic_write         = standart_rights_write | write_data | write_attributes | write_ea | append_data | synchronize,
+      generic_execute       = standart_rights_execute | execute | read_attributes | synchronize,
+      generic_all           = all_access
   };
   static const access_mask access_mask_default = 
                         access_mask(read_attributes | read_data | synchronize);
