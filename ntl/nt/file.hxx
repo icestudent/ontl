@@ -175,8 +175,8 @@ struct device_traits<nt::file_handler> : public device_traits<>
       append                = append_data | synchronize,
 
       generic_read          = standard_rights_read | read_data | read_attributes | read_ea | synchronize,
-      generic_write         = standart_rights_write | write_data | write_attributes | write_ea | append_data | synchronize,
-      generic_execute       = standart_rights_execute | execute | read_attributes | synchronize,
+      generic_write         = standard_rights_write | write_data | write_attributes | write_ea | append_data | synchronize,
+      generic_execute       = standard_rights_execute | execute | read_attributes | synchronize,
       generic_all           = all_access
   };
   static const access_mask access_mask_default = 
