@@ -20,7 +20,7 @@ namespace ntl {
   namespace nt {
 
     namespace kwait_reason {
-      enum Type {
+      enum type {
         Executive,
         FreePage,
         PageIn,
@@ -63,7 +63,7 @@ namespace ntl {
     }
 
     namespace thread_state {
-      enum Type {
+      enum type {
         Initialized,
         Ready,
         Running,
