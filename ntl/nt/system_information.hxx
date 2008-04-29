@@ -282,6 +282,10 @@ struct system_process_information
 #endif
   const_reverse_iterator  rbegin() const { return const_reverse_iterator(end()); }
   const_reverse_iterator  rend() const  { return const_reverse_iterator(begin()); }
+  const_iterator cbegin() const { return begin(); }
+  const_iterator cend()   const { return end(); }
+  const_reverse_iterator  crbegin() const { return rbegin(); }
+  const_reverse_iterator  crend()   const { return rend(); }
 
 };
 //STATIC_ASSERT(sizeof(system_process_information) == 0xB8);
@@ -337,10 +341,20 @@ struct system_processes: public system_process_information
     return 0;
   }
 
+  const_iterator cbegin() const
+  { 
+    return this;
+  }
+
+  const_iterator cend() const
+  { 
+    return 0;
+  }
+
   const system_process_information * 
   find_process(const const_unicode_string & image_name)
   {
-    for ( const_iterator it = begin(); it != end(); ++it )
+    for ( const_iterator it = cbegin(); it != cend(); ++it )
       if ( image_name == it->ImageName )
         return &*it;
     return 0;
@@ -399,6 +413,10 @@ struct system_modules_information //RTL_PROCESS_MODULES
   const_reverse_iterator  rbegin() const { return const_reverse_iterator(end()); }
   reverse_iterator        rend()        { return reverse_iterator(begin()); }
   const_reverse_iterator  rend() const  { return const_reverse_iterator(begin()); }
+  const_iterator          cbegin() const { return const_cast<const system_modules_information*>(this)->begin(); }
+  const_iterator          cend()   const { return const_cast<const system_modules_information*>(this)->end(); }
+  const_reverse_iterator  crbegin()const { return const_cast<const system_modules_information*>(this)->rbegin(); }
+  const_reverse_iterator  crend()  const { return const_cast<const system_modules_information*>(this)->rend(); }
 
   /// @note returns Modules[0] when file_name == nullptr
   __forceinline
