@@ -248,6 +248,10 @@ class list
     reverse_iterator        rend()       { return reverse_iterator(begin()); }
     const_reverse_iterator  rend() const
       { return const_reverse_iterator(begin()); }
+    const_iterator          cbegin() const { return const_cast<const list*>(this)->begin(); }
+    const_iterator          cend()   const { return const_cast<const list*>(this)->end(); }
+    const_reverse_iterator  crbegin()const { return const_cast<const list*>(this)->rbegin(); }
+    const_reverse_iterator  crend()  const { return const_cast<const list*>(this)->rend(); }
 
     ///\name capacity [23.2.2.2]
 

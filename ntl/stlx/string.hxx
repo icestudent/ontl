@@ -143,7 +143,7 @@ class basic_string
 
     static const size_type npos = static_cast<size_type>(-1);
 
-    ///\name  basic_string constructors [21.3.1 lib.string.cons]
+    ///\name  basic_string constructors [21.3.2 lib.string.cons]
 
     explicit basic_string(const Allocator& a = Allocator()) : str(a) {/**/}
 
@@ -192,7 +192,7 @@ class basic_string
     basic_string& operator=(const charT* s) { return assign(s);     }
     basic_string& operator=(charT c)        { return assign(1, c);  }
 
-    ///\name  basic_string iterator support [21.3.2 lib.string.iterators]
+    ///\name  basic_string iterator support [21.3.3 lib.string.iterators]
 
     iterator                begin()         { return str.begin();   }
     const_iterator          begin()  const  { return str.begin();   }
@@ -203,7 +203,12 @@ class basic_string
     reverse_iterator        rend()          { return str.rend();    }
     const_reverse_iterator  rend()   const  { return str.rend();    }
 
-    ///\name  basic_string capacity [21.3.3 lib.string.capacity]
+    const_iterator          cbegin()  const  { return const_cast<const basic_string*>(this)->begin();   }
+    const_iterator          cend()    const  { return const_cast<const basic_string*>(this)->end();     }
+    const_reverse_iterator  crbegin() const  { return const_cast<const basic_string*>(this)->rbegin();  }
+    const_reverse_iterator  crend()   const  { return const_cast<const basic_string*>(this)->rend();    }
+
+    ///\name  basic_string capacity [21.3.4 lib.string.capacity]
 
     size_type size()      const { return str.size();      }
     size_type length()    const { return str.size();      }
@@ -216,7 +221,7 @@ class basic_string
     void reserve(size_type res_arg = 0) { str.reserve();    }
     void clear()                        { str.clear();      }
 
-    ///\name  basic_string element access [21.3.4 lib.string.access]
+    ///\name  basic_string element access [21.3.5 lib.string.access]
 
     const_reference operator[](size_type pos) const
     {
@@ -228,9 +233,9 @@ class basic_string
     const_reference at(size_type n) const { return str.at(n); }
     reference at(size_type n)             { return str.at(n); }
 
-    // 21.3.5 basic_string modifiers [lib.string.modifiers]
+    // 21.3.6 basic_string modifiers [lib.string.modifiers]
 
-    ///\name  basic_string::operator+= [21.3.5.1 lib.string::op+=]
+    ///\name  basic_string::operator+= [21.3.6.1 lib.string::op+=]
 
     basic_string& operator+=(const basic_string& str) { return append(str);   }
     basic_string& operator+=(const charT* s)          { return append(s);     }
@@ -247,7 +252,7 @@ class basic_string
 #endif
 
 
-    ///\name  basic_string::append [21.3.5.2 lib.string::append]
+    ///\name  basic_string::append [21.3.6.2 lib.string::append]
 
     basic_string& append(const basic_string& str)
     {
@@ -289,7 +294,7 @@ class basic_string
 
     void push_back(charT c) { str.push_back(c); }
 
-    ///\name  basic_string::assign [21.3.5.3 lib.string::assign]
+    ///\name  basic_string::assign [21.3.6.3 lib.string::assign]
 
     basic_string& assign(const basic_string& str)
     {
@@ -328,7 +333,7 @@ class basic_string
       return *this;
     }
 
-    ///\name  basic_string::insert [21.3.5.4 lib.string::insert]
+    ///\name  basic_string::insert [21.3.6.4 lib.string::insert]
 
     basic_string& insert(size_type pos1, const basic_string& str)
     {
@@ -374,7 +379,7 @@ class basic_string
       str.insert(p, first, last);
     }
 
-    ///\name  basic_string::erase [21.3.5.5 lib.string::erase]
+    ///\name  basic_string::erase [21.3.6.5 lib.string::erase]
 
     basic_string& erase(size_type pos = 0, size_type n = npos)
     {
@@ -389,7 +394,7 @@ class basic_string
       return str.erase(first, last);
     }
 
-    ///\name  basic_string::replace [21.3.5.6 ib.string::replace]
+    ///\name  basic_string::replace [21.3.6.6 ib.string::replace]
 
     basic_string& replace(size_type pos1, size_type n1, const basic_string& str);
 
@@ -421,7 +426,7 @@ class basic_string
                           InputIterator j2)
                           ;
 
-    ///\name  basic_string::copy [21.3.5.7 lib.string::copy]
+    ///\name  basic_string::copy [21.3.6.7 lib.string::copy]
     size_type copy(charT* s, size_type n, size_type pos = 0) const
     {
       const size_type tail = size() - pos;
@@ -431,7 +436,7 @@ class basic_string
       return rlen;
     }
 
-    ///\name  basic_string::swap [21.3.5.8 lib.string::swap]
+    ///\name  basic_string::swap [21.3.6.8 lib.string::swap]
     void swap(basic_string& str2) { str.swap(str2.str); }
 
     ///\name  basic_string string operations [21.3.6 lib.string.ops]
