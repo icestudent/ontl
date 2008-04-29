@@ -195,13 +195,13 @@ class basic_string
     ///\name  basic_string iterator support [21.3.3 lib.string.iterators]
 
     iterator                begin()         { return str.begin();   }
-    const_iterator          begin()  const  { return str.begin();   }
+    const_iterator          begin()  const  { return str.cbegin();   }
     iterator                end()           { return str.end();     }
-    const_iterator          end()    const  { return str.end();     }
+    const_iterator          end()    const  { return str.cend();     }
     reverse_iterator        rbegin()        { return str.rbegin();  }
-    const_reverse_iterator  rbegin() const  { return str.rbegin();  }
+    const_reverse_iterator  rbegin() const  { return str.crbegin();  }
     reverse_iterator        rend()          { return str.rend();    }
-    const_reverse_iterator  rend()   const  { return str.rend();    }
+    const_reverse_iterator  rend()   const  { return str.crend();    }
 
     const_iterator          cbegin()  const  { return const_cast<const basic_string*>(this)->begin();   }
     const_iterator          cend()    const  { return const_cast<const basic_string*>(this)->end();     }
