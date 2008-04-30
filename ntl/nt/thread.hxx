@@ -382,6 +382,7 @@ public:
     return NtWaitForSingleObject(get(), alertable, &interval);
   }
 
+  __declspec(noreturn)
   static void exit(ntstatus st)
   {
     RtlExitUserThread(st);
@@ -392,6 +393,7 @@ public:
     return NtTerminateThread(get(), st);
   }
 
+  __declspec(noreturn)
   void exit_process(ntstatus st)
   {
     RtlAcquirePebLock();
