@@ -242,12 +242,14 @@ class list
     const_iterator          begin() const { return head.next; }
     iterator                end()         { return &head; }
     const_iterator          end()   const { return &head; }
+
     reverse_iterator        rbegin()      { return reverse_iterator(end()); }
     const_reverse_iterator  rbegin() const
       { return const_reverse_iterator(end()); }
     reverse_iterator        rend()       { return reverse_iterator(begin()); }
     const_reverse_iterator  rend() const
       { return const_reverse_iterator(begin()); }
+
     const_iterator          cbegin() const { return begin(); }
     const_iterator          cend()   const { return end(); }
     const_reverse_iterator  crbegin()const { return rbegin(); }

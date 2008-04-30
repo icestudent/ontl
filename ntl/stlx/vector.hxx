@@ -200,12 +200,14 @@ class vector
     const_iterator          begin() const { return begin_; }
     iterator                end()         { return end_; }
     const_iterator          end()   const { return end_; }
+
     reverse_iterator        rbegin()      { return reverse_iterator(end_); }
     const_reverse_iterator  rbegin() const
       { return const_reverse_iterator(end_); }
     reverse_iterator        rend()       { return reverse_iterator(begin_); }
     const_reverse_iterator  rend() const 
       { return const_reverse_iterator(begin_); }
+
     const_iterator          cbegin() const { return begin(); }
     const_iterator          cend()   const { return end(); }
     const_reverse_iterator  crbegin()const { return rbegin(); }

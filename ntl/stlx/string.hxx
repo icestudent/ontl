@@ -198,6 +198,7 @@ class basic_string
     const_iterator          begin()  const  { return str.cbegin();   }
     iterator                end()           { return str.end();     }
     const_iterator          end()    const  { return str.cend();     }
+
     reverse_iterator        rbegin()        { return str.rbegin();  }
     const_reverse_iterator  rbegin() const  { return str.crbegin();  }
     reverse_iterator        rend()          { return str.rend();    }

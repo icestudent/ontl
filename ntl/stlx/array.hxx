@@ -51,12 +51,14 @@ struct array
     const_iterator          begin() const { return &__elems[0]; }
     iterator                end()         { return &__elems[N]; }
     const_iterator          end()   const { return &__elems[N]; }
+
     reverse_iterator        rbegin()      { return reverse_iterator(end()); }
     const_reverse_iterator  rbegin() const
       { return const_reverse_iterator(end()); }
     reverse_iterator        rend()        { return reverse_iterator(begin()); }
     const_reverse_iterator  rend() const 
       { return const_reverse_iterator(begin()); }
+
     const_iterator          cbegin() const { begin(); }
     const_iterator          cend()   const { end();   }
     const_reverse_iterator  crbegin()const { rbegin();}
