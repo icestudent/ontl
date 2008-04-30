@@ -57,10 +57,10 @@ struct array
     reverse_iterator        rend()        { return reverse_iterator(begin()); }
     const_reverse_iterator  rend() const 
       { return const_reverse_iterator(begin()); }
-    const_iterator          cbegin() const { return const_cast<const array*>(this)->begin(); }
-    const_iterator          cend()   const { return const_cast<const array*>(this)->end(); }
-    const_reverse_iterator  crbegin() const{ return const_cast<const array*>(this)->rbegin(); }
-    const_reverse_iterator  crend() const  { return const_cast<const array*>(this)->rend() }
+    const_iterator          cbegin() const { begin(); }
+    const_iterator          cend()   const { end();   }
+    const_reverse_iterator  crbegin()const { rbegin();}
+    const_reverse_iterator  crend()  const { rend();  }
 
     ///\name  capacity
 

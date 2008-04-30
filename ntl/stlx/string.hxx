@@ -203,10 +203,10 @@ class basic_string
     reverse_iterator        rend()          { return str.rend();    }
     const_reverse_iterator  rend()   const  { return str.crend();    }
 
-    const_iterator          cbegin()  const  { return const_cast<const basic_string*>(this)->begin();   }
-    const_iterator          cend()    const  { return const_cast<const basic_string*>(this)->end();     }
-    const_reverse_iterator  crbegin() const  { return const_cast<const basic_string*>(this)->rbegin();  }
-    const_reverse_iterator  crend()   const  { return const_cast<const basic_string*>(this)->rend();    }
+    const_iterator          cbegin()  const  { return begin();   }
+    const_iterator          cend()    const  { return end();     }
+    const_reverse_iterator  crbegin() const  { return rbegin();  }
+    const_reverse_iterator  crend()   const  { return rend();    }
 
     ///\name  basic_string capacity [21.3.4 lib.string.capacity]
 
