@@ -39,6 +39,11 @@ namespace ntl {
         return reinterpret_cast<image*>(image_base);
       }
 
+      static const image * bind(const void * image_base)
+      {
+        return reinterpret_cast<const image*>(image_base);
+      }
+
       template<typename T>
       static __forceinline
         bool in_range(uintptr_t first, uintptr_t last, T p)
@@ -367,6 +372,14 @@ namespace ntl {
         return n < nth->FileHeader.NumberOfSections ? &sh[n] : 0;
       }
 
+      const section_header * get_section_header(size_t n = 0) const
+      {
+        const nt_headers * const nth = get_nt_headers();
+        const section_header * sh = (section_header*)(uintptr_t(&nth->OptionalHeader32)
+          + nth->FileHeader.SizeOfOptionalHeader);
+        return n < nth->FileHeader.NumberOfSections ? &sh[n] : 0;
+      }
+
       section_header * get_section_header(const char name[])
       {
         nt_headers * const nth = get_nt_headers();
@@ -379,6 +392,17 @@ namespace ntl {
         return 0;
       }
 
+      const section_header * get_section_header(const char name[]) const
+      {
+        const nt_headers * const nth = get_nt_headers();
+        const section_header * sh = (section_header*)(uintptr_t(&nth->OptionalHeader32)
+          + nth->FileHeader.SizeOfOptionalHeader);
+        size_t n = nth->FileHeader.NumberOfSections;
+        while ( n )
+          if ( !std::strncmp(name, &sh[--n].Name[0], sizeof(sh->Name)) )
+            return &sh[n];
+        return 0;
+      }
 
       struct import_by_name
       {
@@ -464,7 +488,10 @@ namespace ntl {
           get_data_directory(data_directory::export_table);
         if ( ! export_table || ! export_table->VirtualAddress ) return 0;
         export_directory * exports = va<export_directory*>(export_table->VirtualAddress);
-        void * const f = exports->function(this, exports->ordinal(this, exp));
+        const uint32_t ordinal = uintptr_t(exp) <= 0xFFFF 
+          ? exports->ordinal(this, reinterpret_cast<uint16_t>(exp))
+          : exports->ordinal(this, exp);
+        void * const f = exports->function(this, ordinal);
         const uintptr_t ex = reinterpret_cast<uintptr_t>(exports);
         if ( !in_range(ex, ex + export_table->Size, f) )
           return f;
@@ -499,6 +526,12 @@ namespace ntl {
       PtrType find_export(const char * exp, DllFinder find_dll) const
       {
         return brute_cast<PtrType>(find_export(exp, find_dll));
+      }
+
+      template<typename PtrType, typename DllFinder>
+      PtrType find_export(uint16_t exp, DllFinder find_dll) const
+      {
+        return brute_cast<PtrType>(find_export(reinterpret_cast<const char*>(exp), find_dll));
       }
 
       ///\name  Imports

@@ -16,6 +16,8 @@
 #include "csr.hxx"
 #include "context.hxx"
 
+#include "../pe/image.hxx"
+
 namespace ntl {
   namespace nt {
 
@@ -259,6 +261,7 @@ ntstatus __stdcall
     );
 
 NTL__EXTERNAPI
+__declspec(noreturn)
 ntstatus __stdcall
   NtTerminateProcess(
     legacy_handle       ProcessHandle,
@@ -277,10 +280,6 @@ ntstatus __stdcall
 
 NTL__EXTERNAPI
 void __stdcall
-  RtlExitUserThread(ntstatus Status);
-
-NTL__EXTERNAPI
-void __stdcall
   RtlRaiseStatus(ntstatus Status);
 
 
@@ -291,6 +290,27 @@ ntstatus __stdcall
 NTL__EXTERNAPI
 ntstatus __stdcall
   LdrShutdownThread();
+
+NTL__EXTERNAPI
+ntstatus __stdcall
+  LdrUnloadDll(legacy_handle DllHandle);
+
+#ifndef NTL_SUPPRESS_IMPORT
+#pragma message("WARNING: suppress exit thread for win2k!")
+NTL__EXTERNAPI
+__declspec(noreturn)
+void __stdcall
+  RtlExitUserThread(ntstatus Status);
+
+#endif
+
+NTL__EXTERNAPI
+__declspec(noreturn)
+void __stdcall
+  FreeLibraryAndExitThread(
+    legacy_handle DllHandle,
+    uint32_t      ExitCode
+    );
 
 
 /************************************************************************/
@@ -382,28 +402,42 @@ public:
     return NtWaitForSingleObject(get(), alertable, &interval);
   }
 
-  __declspec(noreturn)
-  static void exit(ntstatus st)
-  {
-    RtlExitUserThread(st);
-  }
-
-  ntstatus term(ntstatus st)
-  {
-    return NtTerminateThread(get(), st);
-  }
+  static legacy_handle get_current() { return reinterpret_cast<legacy_handle>(-2); }
 
   __declspec(noreturn)
-  void exit_process(ntstatus st)
+  static void exit(ntstatus Status)
+  {
+#ifndef NTL_SUPPRESS_IMPORT
+    RtlExitUserThread(Status);
+#else
+    LdrShutdownThread();
+    // TODO: set the 'free stack on termination'
+    NtTerminateThread(get_current(), Status);
+#endif
+  }
+
+  __declspec(noreturn)
+  static void exitfree(ntstatus Status)
+  {
+    FreeLibraryAndExitThread((legacy_handle) pe::image::this_module(), Status);
+  }
+
+  ntstatus term(ntstatus Status)
+  {
+    return NtTerminateThread(get(), Status);
+  }
+
+  __declspec(noreturn)
+  void exit_process(ntstatus Status)
   {
     RtlAcquirePebLock();
     __try{
-      NtTerminateProcess(NULL, st);
+      NtTerminateProcess(NULL, Status);
       LdrShutdownProcess();
       base_api_msg msg;
-      msg.u.ExitProcess.uExitCode = st;
+      msg.u.ExitProcess.uExitCode = Status;
       CsrClientCallServer((csr_api_msg*) &msg, NULL, MAKE_API_NUMBER(1, BasepExitProcess), (uint32_t)sizeof(base_exitprocess_msg));
-      NtTerminateProcess(current_process(), st);
+      NtTerminateProcess(current_process(), Status);
     }
     __finally{
       RtlReleasePebLock();

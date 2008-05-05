@@ -21,17 +21,17 @@
 #endif
 
 #if STLX__USE_EXCEPTIONS
-#define __ntl_try       try
-#define __ntl_catch     catch
-#define __ntl_throw(X)  throw(X)
-#define __ntl_rethrow   throw
+  #define __ntl_try       try
+  #define __ntl_catch     catch
+  #define __ntl_throw(X)  throw X
+  #define __ntl_rethrow   throw
 #else
-#define __ntl_try
-#define __ntl_catch(X)  while(false)
-#pragma warning(disable:4127)// conditional expression is constant
-inline void __ntl_throw_impl() {}
-#define __ntl_throw(X)  __ntl_throw_impl()
-#define __ntl_rethrow (0)
+  #define __ntl_try
+  #define __ntl_catch(X)  while(false)
+  #pragma warning(disable:4127)// conditional expression is constant
+  inline void __ntl_throw_impl() {}
+  #define __ntl_throw(X)  __ntl_throw_impl()
+  #define __ntl_rethrow (0)
 #endif
 
 #ifdef _MSC_VER

@@ -154,7 +154,7 @@ struct service
     uint32_t  dwCheckPoint;
     uint32_t  dwWaitHint;
 
-    type          service_ype() const   { return static_cast<type>(dwServiceType); }
+    type          service_type() const   { return static_cast<type>(dwServiceType); }
     state         current_state() const { return static_cast<state>(dwCurrentState); }
     control_code  controls_accepted() const { return static_cast<control_code>(dwControlsAccepted); }
     uint32_t      wait_hint() const { return dwWaitHint; }

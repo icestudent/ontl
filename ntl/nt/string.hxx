@@ -114,10 +114,16 @@ class native_string
     const_iterator          begin()  const  { return buffer_; }
     iterator                end()           { return &buffer_[length_ / sizeof(value_type)]; }
     const_iterator          end()    const  { return &buffer_[length_ / sizeof(value_type)]; }
+
     reverse_iterator        rbegin()      { return reverse_iterator(&buffer_[length_ / sizeof(value_type)]); }
     const_reverse_iterator  rbegin() const { return const_reverse_iterator(&buffer_[length_ / sizeof(value_type)]); }
     reverse_iterator        rend()       { return reverse_iterator(buffer_); }
     const_reverse_iterator  rend() const { return const_reverse_iterator(buffer_); }
+
+    const_iterator          cbegin()  const { return begin(); }
+    const_iterator          cend()    const { return end();   }
+    const_reverse_iterator  crbegin() const { return rbegin();}
+    const_reverse_iterator  crend()   const { return rend();  }
 
     ///\name  native_string capacity
 

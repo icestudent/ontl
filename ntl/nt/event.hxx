@@ -18,8 +18,8 @@ namespace ntl {
 
     /// event
     using km::event_type;
-    using km::SynchronizationEvent;
-    using km::NotificationEvent;
+    using km::SynchronizationEvent; // auto-reset
+    using km::NotificationEvent;    // manual-reset
 
 
     enum event_information_class 
@@ -97,17 +97,29 @@ namespace ntl {
       public device_traits<user_event>
     {
     public:
+
       // create
       explicit user_event(
-        const std::wstring& event_name,
+        const const_unicode_string& event_name,
         event_type          EventType,
         bool                InitialState = false,
         access_mask         DesiredAccess = event_all_access
         )
       {
-        const const_unicode_string uname(event_name);
-        const object_attributes oa(uname);
+        const object_attributes oa(event_name);
         create(this, DesiredAccess, &oa, EventType, InitialState);
+      }
+
+      explicit user_event(
+        const const_unicode_string& event_name,
+        event_type          EventType,
+        bool&               IsOpened,
+        bool                InitialState = false,
+        access_mask         DesiredAccess = event_all_access
+        )
+      {
+        const object_attributes oa(event_name, object_attributes::case_insensitive | object_attributes::openif);
+        IsOpened = create(this, DesiredAccess, &oa, EventType, InitialState) == status::object_name_exists;
       }
 
       explicit user_event(
@@ -122,12 +134,11 @@ namespace ntl {
 
       // open
       user_event(
-        const std::wstring& event_name,
+        const const_unicode_string& event_name,
         access_mask         DesiredAccess = event_modify_state
         )
       {
-        const const_unicode_string uname(event_name);
-        const object_attributes oa(uname);
+        const object_attributes oa(event_name);
         open(this, &oa, DesiredAccess);
       }
 

@@ -26,7 +26,11 @@
 #endif
 
 #ifndef STATIC_ASSERT
-#define STATIC_ASSERT(e) typedef char _STATIC_ASSERT_AT_##line[(e)?1:-1]
+#define STATIC_ASSERT(e) typedef char _STATIC_ASSERT_ ## __COUNTER__ [(e)?1:-1]
+#endif
+
+#ifndef static_assert
+#define static_assert(e, Msg) STATIC_ASSERT(e)
 #endif
 
 #if defined(NTL__STLX_FORCE_CDECL) && !defined(NTL__CRTCALL)
@@ -47,14 +51,43 @@
   #endif
 #endif
 
+#ifndef alignas
+  #ifdef _MSC_VER
+    #define alignas(X) __declspec(align(X))
+  #else
+    #error unsupported compiler
+  #endif
+#endif
+
+#ifndef alignof
+  #ifdef _MSC_VER
+  #if _MSC_VER <= 1500
+    #define alignof(X) __alignof(X)
+  #endif
+  #else
+    #error unsupported compiler
+  #endif
+#endif
+static_assert(alignof(int)==alignof(unsigned int), "wierd platform");
+
 #ifndef __align
-#define __align(X) __declspec(align(X))
+  #define __align(X) __declspec(align(X))
+#endif
+
+#if __cplusplus <= 199711L
+  #define constexpr
 #endif
 
 namespace std {
 
 /**\defgroup  lib_language_support ***** Language support library [18] ******
  *@{*/
+
+#pragma warning(push)
+#pragma warning(disable:4324)
+typedef alignas(8192) struct {} max_align_t;
+#pragma warning(pop)
+
 /**\defgroup  lib_support_types ******** Types [18.1] ***********************
  *@{*/
 
@@ -67,7 +100,7 @@ typedef struct
   //  nullptr_t();// {}
   //  nullptr_t(const nullptr_t&);
   //  void operator = (const nullptr_t&);
-    void operator & ();
+    void operator &() const;
     template<typename any> void operator +(any) const { I Love MSVC 2005! }
     template<typename any> void operator -(any) const { I Love MSVC 2005! }
 //    void * _;
@@ -92,7 +125,7 @@ static const nullptr_t nullptr = {};
 #ifdef _MSC_VER
   using ::size_t;
 #else
-  typedef          unsigned int  size_t;
+  typedef unsigned int  size_t;
 #endif
   typedef          int  ssize_t;
 #endif
@@ -115,6 +148,6 @@ static const nullptr_t nullptr = {};
 /**@} lib_language_support */
 
 
-}//namespace std
+} //namespace std
 
-#endif//#ifndef NTL__STLX_CSTDDEF
+#endif //#ifndef NTL__STLX_CSTDDEF

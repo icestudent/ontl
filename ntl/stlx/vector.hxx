@@ -1,6 +1,6 @@
 /**\file*********************************************************************
  *                                                                     \brief
- *  Class template vector [23.2.4 lib.vector]
+ *  Class template vector [23.2.6 lib.vector]
  *
  ****************************************************************************
  */
@@ -15,10 +15,10 @@
 #include "type_traits.hxx"
 
 #ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable:4127) // conditional expression is constant - clear()
-#pragma warning(disable:4820) // X bytes padding added...
-#pragma warning(disable:4710) // insert__blank_space(char * const,unsigned int)' : function not inlined
+# pragma warning(push)
+# pragma warning(disable:4127) // conditional expression is constant - clear()
+# pragma warning(disable:4820) // X bytes padding added...
+# pragma warning(disable:4710) // insert__blank_space(char * const,unsigned int)' : function not inlined
 #endif
 
 namespace std {
@@ -32,7 +32,7 @@ namespace std {
  *    all of the same type, into a strictly linear arrangement.
  */
 
-/// Class template vector [23.2.4]
+/// Class template vector [23.2.6]
 template <class T, class Allocator = allocator<T> >
 class vector
 {
@@ -95,7 +95,7 @@ class vector
 
   public:
 
-    ///\name construct/copy/destroy [23.2.4.1]
+    ///\name construct/copy/destroy [23.2.6.1]
 
     explicit vector(const Allocator& a = Allocator())
     : array_allocator(a), begin_(0), end_(0), capacity_(0) {}
@@ -213,7 +213,7 @@ class vector
     const_reverse_iterator  crbegin()const { return rbegin(); }
     const_reverse_iterator  crend()  const { return rend(); }
 
-    ///\name  capacity [23.2.4.2]
+    ///\name  capacity [23.2.6.2]
 
     size_type size()      const { return static_cast<size_type>(end_- begin_); }
     size_type max_size()  const { return array_allocator.max_size(); }
@@ -327,7 +327,7 @@ class vector
 
   public:
 
-    ///\name  modifiers [23.2.4.3]
+    ///\name  modifiers [23.2.6.3]
 
     __forceinline
     void push_back(const T& x)
@@ -516,7 +516,7 @@ void swap(vector<T, Allocator>& x, vector<T, Allocator>& y) throw()
 }//namespace std
 
 #ifdef _MSC_VER
-#pragma warning(pop)//disable:4820
+# pragma warning(pop)//disable:4820
 #endif
 
 #endif//#ifndef NTL__STLX_VECTOR

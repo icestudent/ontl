@@ -1,6 +1,6 @@
 /**\file*********************************************************************
  *                                                                     \brief
- *  Class template stack [23.2.3.3 lib.stack]
+ *  Class template stack [23.2.5.3 lib.stack]
  *
  ****************************************************************************
  */
@@ -24,10 +24,10 @@ namespace std {
 /**\addtogroup  lib_sequence *********** Sequences [23.2] *******************
  *@{*/
 
-/**\defgroup  lib_container_adaptors *** Container adaptors [23.2.3]*********
+/**\defgroup  lib_container_adaptors *** Container adaptors [23.2.5]*********
  *@{*/
 
-/// Class template stack 23.2.3.3
+/// Class template stack 23.2.5.3
 template <class T, class Container = STLX__STACK_CONTAINER>
 class stack
 {

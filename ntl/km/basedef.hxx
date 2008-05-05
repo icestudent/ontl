@@ -954,64 +954,64 @@ static const size_t pool_small_lists = 32;
     NTL__EXTERNAPI
       ntstatus __stdcall
       ExInitializeResourceLite (
-      __out eresource* Resource
+      eresource* Resource
       );
 
     NTL__EXTERNAPI
       ntstatus __stdcall
       ExReinitializeResourceLite (
-      __inout eresource* Resource
+      eresource* Resource
       );
 
     NTL__EXTERNAPI
       bool
       ExAcquireResourceSharedLite (
-      __inout eresource* Resource,
-      __in bool Wait
+      eresource* Resource,
+      bool Wait
       );
 
 #if (NTDDI_VERSION >= NTDDI_LONGHORN || NTDDI_VERSION >= NTDDI_WS03SP1)
     NTL__EXTERNAPI
       void*
       ExEnterCriticalRegionAndAcquireResourceShared (
-      __inout eresource* Resource
+      eresource* Resource
       );
 #endif
 
     NTL__EXTERNAPI
       bool
       ExAcquireResourceExclusiveLite (
-      __inout eresource* Resource,
-      __in bool Wait
+      eresource* Resource,
+      bool Wait
       );
 
 #if (NTDDI_VERSION >= NTDDI_LONGHORN || NTDDI_VERSION >= NTDDI_WS03SP1)
     NTL__EXTERNAPI
       void*
       ExEnterCriticalRegionAndAcquireResourceExclusive (
-      __inout eresource* Resource
+      eresource* Resource
       );
 #endif
 
     NTL__EXTERNAPI
       bool
       ExAcquireSharedStarveExclusive(
-      __inout eresource* Resource,
-      __in bool Wait
+      eresource* Resource,
+      bool Wait
       );
 
     NTL__EXTERNAPI
       bool
       ExAcquireSharedWaitForExclusive(
-      __inout eresource* Resource,
-      __in bool Wait
+      eresource* Resource,
+      bool Wait
       );
 
 #if (NTDDI_VERSION >= NTDDI_LONGHORN || NTDDI_VERSION >= NTDDI_WS03SP1)
     NTL__EXTERNAPI
       void*
       ExEnterCriticalRegionAndAcquireSharedWaitForExclusive (
-      __inout eresource* Resource
+      eresource* Resource
       );
 #endif
 
@@ -1031,7 +1031,7 @@ static const size_t pool_small_lists = 32;
       void
       __fastcall
       ExReleaseResourceLite(
-      __inout eresource* Resource
+      eresource* Resource
       );
 
 #if (NTDDI_VERSION >= NTDDI_LONGHORN || NTDDI_VERSION >= NTDDI_WS03SP1)
@@ -1039,58 +1039,58 @@ static const size_t pool_small_lists = 32;
       void
       __fastcall
       ExReleaseResourceAndLeaveCriticalRegion(
-      __inout eresource* Resource
+      eresource* Resource
       );
 #endif
 
     NTL__EXTERNAPI
       void
       ExReleaseResourceForThreadLite(
-      __inout eresource* Resource,
-      __in eresource_thread_t ResourceThreadId
+      eresource* Resource,
+      eresource_thread_t ResourceThreadId
       );
 
     NTL__EXTERNAPI
       void
       ExSetResourceOwnerPointer(
-      __inout eresource* Resource,
-      __in void* OwnerPointer
+      eresource* Resource,
+      void* OwnerPointer
       );
 
     NTL__EXTERNAPI
       void
       ExConvertExclusiveToSharedLite(
-      __inout eresource* Resource
+      eresource* Resource
       );
 
     NTL__EXTERNAPI
       ntstatus __stdcall
       ExDeleteResourceLite (
-      __inout eresource* Resource
+      eresource* Resource
       );
 
     NTL__EXTERNAPI
       uint32_t
       ExGetExclusiveWaiterCount (
-      __in eresource* Resource
+      eresource* Resource
       );
 
     NTL__EXTERNAPI
       uint32_t
       ExGetSharedWaiterCount (
-      __in eresource* Resource
+      eresource* Resource
       );
 
     NTL__EXTERNAPI
       bool
       ExIsResourceAcquiredExclusiveLite (
-      __in eresource* Resource
+      eresource* Resource
       );
 
     NTL__EXTERNAPI
       uint32_t
       ExIsResourceAcquiredSharedLite (
-      __in eresource* Resource
+      eresource* Resource
       );
 
 #define ExIsResourceAcquiredLite ExIsResourceAcquiredSharedLite

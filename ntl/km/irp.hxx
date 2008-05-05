@@ -24,6 +24,7 @@ namespace ntl {
 
     namespace priority_boost
     {
+#if 0
       enum Increment {
         event_increment = 1,
         io_no_increment = 0,
@@ -40,6 +41,23 @@ namespace ntl {
         io_video_increment = 1,
         semaphore_increment = 1
       };
+#else
+      typedef int8_t Increment;
+      static const Increment event_increment = 1;
+      static const Increment io_no_increment = 0;
+      static const Increment io_cd_rom_increment = 1;
+      static const Increment io_disk_increment = 1;
+      static const Increment io_keyboard_increment = 6;
+      static const Increment io_mailslot_increment = 2;
+      static const Increment io_mouse_increment = 6;
+      static const Increment io_named_pipe_increment = 2;
+      static const Increment io_network_increment = 2;
+      static const Increment io_parallel_increment = 1;
+      static const Increment io_serial_increment = 2;
+      static const Increment io_sound_increment = 8;
+      static const Increment io_video_increment = 1;
+      static const Increment semaphore_increment = 1;
+#endif
     }
 
     typedef

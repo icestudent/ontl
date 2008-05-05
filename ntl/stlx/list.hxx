@@ -1,6 +1,6 @@
 /**\file*********************************************************************
  *                                                                     \brief
- *  Class template list [23.2.2 lib.list]
+ *  Class template list [23.2.4 lib.list]
  *
  ****************************************************************************
  */
@@ -28,7 +28,7 @@ namespace std {
 /**\addtogroup  lib_sequence *********** Sequences [23.2] *******************
  *@{*/
 
-/// Class template list [23.2.2]
+/// Class template list [23.2.4]
 ///\todo  node caching
 template <class T, class Allocator = allocator<T> >
 class list
@@ -148,7 +148,7 @@ class list
     typedef std::reverse_iterator<iterator>       reverse_iterator;
     typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
 
-    ///\name construct/copy/destroy [23.2.2.1]
+    ///\name construct/copy/destroy [23.2.4.1]
 
     explicit list(const Allocator& a = Allocator())
     : node_allocator(a), size_(0) 
@@ -255,7 +255,7 @@ class list
     const_reverse_iterator  crbegin()const { return rbegin(); }
     const_reverse_iterator  crend()  const { return rend(); }
 
-    ///\name capacity [23.2.2.2]
+    ///\name capacity [23.2.4.2]
 
     bool      empty()     const { return size_ == 0; }
     size_type size()      const { return size_; }
@@ -275,7 +275,7 @@ class list
     reference       back()        { return *(--end()); }
     const_reference back()  const { return *(--end()); }
 
-    ///\name modifiers [23.2.2.3]
+    ///\name modifiers [23.2.4.3]
 
     __forceinline
     void push_front(const T& x) { insert(begin(), x); }
@@ -355,7 +355,7 @@ class list
 
   public:
 
-    ///\name list operations [23.2.2.4]
+    ///\name list operations [23.2.4.4]
 
     void splice(iterator position, list<T, Allocator>& x);
 
@@ -489,7 +489,7 @@ bool operator<=(const list<T,Allocator>& x, const list<T,Allocator>& y) throw ()
   return ! (y < x);
 }
 
-///\name  List specialized algorithms [23.2.2.5]
+///\name  List specialized algorithms [23.2.4.5]
 
 template <class T, class Allocator>
 void swap(list<T, Allocator>& x, list<T, Allocator>& y) throw ()

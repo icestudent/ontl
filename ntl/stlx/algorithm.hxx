@@ -898,7 +898,7 @@ const T&
 template<class T>
 __forceinline
 const T&
-  max(const T& a, const T& b)
+  (max)(const T& a, const T& b)
 {
   return ( a < b ) ? b : a;
 }
@@ -906,7 +906,7 @@ const T&
 template<class T, class Compare>
 __forceinline
 const T&
-  max(const T& a, const T& b, Compare comp)
+  (max)(const T& a, const T& b, Compare comp)
 {
   return comp(a, b) ? b : a;
 }

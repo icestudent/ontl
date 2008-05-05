@@ -84,13 +84,18 @@ _CHECK_TRAIT((is_same<add_cv<int>::type, volatile const int>::value));
 
 template <class T> struct remove_reference     { typedef T type; };
 template <class T> struct remove_reference<T&> { typedef T type; };
+#ifdef NTL__CXX
+template <class T> struct remove_reference<T&&> { typedef T type; };
 _CHECK_TRAIT((is_same<remove_reference<int&>::type, int&>::value) == 0);
 _CHECK_TRAIT((is_same<remove_reference<int&>::type, int>::value));
+#endif
 
-template <class T> struct add_reference     { typedef T& type; };
-template <class T> struct add_reference<T&> { typedef T& type; };
-_CHECK_TRAIT((is_same<add_reference<int&>::type, int&>::value));
-_CHECK_TRAIT((is_same<add_reference<int>::type, int&>::value));
+template <class T> struct add_lvalue_reference     { typedef T& type; };
+template <class T> struct add_lvalue_reference<T&> { typedef T& type; };
+_CHECK_TRAIT((is_same<add_lvalue_reference<int&>::type, int&>::value));
+_CHECK_TRAIT((is_same<add_lvalue_reference<int>::type, int&>::value));
+
+template <class T> struct add_reference : add_lvalue_reference<T> {};
 
 // 4.7.3 Array modifications [tr.meta.trans.arr]
 
@@ -145,7 +150,7 @@ template <> struct aligner<256> { __declspec(align(256)) class type {}; };
 template <> struct aligner<512> { __declspec(align(512)) class type {}; };
 template <> struct aligner<1024> { __declspec(align(1024)) class type {}; };
 template <> struct aligner<4096> { __declspec(align(4096)) class type {}; };
-template <> struct aligner<8192> { __declspec(align(8192)) class type {}; };
+template <> struct aligner<sizeof(max_align_t)> { __declspec(align(8192)) class type {}; };
 }
 
 template <std::size_t Len, std::size_t Align>
@@ -180,11 +185,12 @@ _CHECK_TRAIT(sizeof(aligned_storage<2, 4>::type) == 4);
 
 template <class T> struct decay;
 
-template <bool, class T = void> struct enable_if { typedef T type; };
-template <class T> struct enable_if<false, T> {};
+template <bool, class T = void> struct enable_if {};
+template <class T> struct enable_if<true, T> { typedef T type; };
 
-template <bool, class T, class F> struct conditional { typedef T type; };
-template <class T, class F> struct conditional<false, T, F> { typedef F type; };
+template <bool, class T, class F> struct conditional;
+template <class T, class F> struct conditional<true, T, F>  { typedef T type; }; 
+template <class T, class F> struct conditional<false, T, F> { typedef F type; }; 
 
 // 4.5 Unary Type Traits [tr.meta.unary]
 
@@ -228,9 +234,11 @@ _CHECK_TRAIT(is_pointer<void* const>::value);
 _CHECK_TRAIT(is_pointer<void* volatile>::value);
 _CHECK_TRAIT(is_pointer<void* const volatile>::value);
 
-template <class T> struct is_reference     : public false_type {};
-template <class T> struct is_reference<T&> : public true_type {};
-_CHECK_TRAIT(is_reference<volatile int&>::value);
+template <class T> struct is_lvalue_reference     : public false_type {};
+template <class T> struct is_lvalue_reference<T&> : public true_type {};
+_CHECK_TRAIT(is_lvalue_reference<volatile int&>::value);
+
+template <class T> struct is_rvalue_reference     : public false_type {};
 
 template <class T>
 struct is_member_object_pointer : public false_type {};
@@ -397,7 +405,26 @@ _CHECK_TRAIT(is_function<void()>::value);
 _CHECK_TRAIT(is_function<void(int, int, ...)>::value);
 
 
+template <class T> struct decay
+{
+  private: typedef typename remove_reference<T>::type U;
+  public:  typedef
+    typename conditional<is_array<U>::value,
+                          typename remove_extent<U>::type*,
+                          typename conditional<is_function<U>::value,
+                                                typename add_pointer<U>::type,
+                                                typename remove_cv<U>::type
+                                              >
+                        >::type   type;
+};
+
+
 // 4.5.2 Composite type traits [tr.meta.unary.comp]
+
+template <class T> struct is_reference
+: public integral_constant<
+    bool, is_lvalue_reference<T>::value || is_rvalue_reference<T>::value
+    > {};
 
 template <class T> struct is_arithmetic
 : public integral_constant<
@@ -491,10 +518,12 @@ NTL__STLX_DEF_TRAIT(has_nothrow_assign)
 NTL__STLX_DEF_TRAIT(has_virtual_destructor)
 
 template <class T> struct is_signed
+//: public integral_constant<bool, (is_arithmetic<T>::value && T(-1) < T(0))> {};
 : public integral_constant<bool, (static_cast<T>(-1) < 0)> {};
 _CHECK_TRAIT(is_signed<int>::value);
 
 template <class T> struct is_unsigned
+//: public integral_constant<bool, (is_arithmetic<T>::value && T(-1) > T(0))> {};
 : public integral_constant<bool, (static_cast<T>(-1) > 0)> {};
 _CHECK_TRAIT(is_unsigned<unsigned>::value);
 _CHECK_TRAIT(is_unsigned<float>::value == 0);
