@@ -18,6 +18,14 @@
 #define exception_info()            reinterpret_cast<struct ntl::nt::exception::pointers*>(_exception_info())
 #define abnormal_termination        (_abnormal_termination() != 0)
 
+/// Exception filter return values
+enum exception_filter
+{
+  exception_continue_execution = -1,
+  exception_continue_search,
+  exception_execute_handler
+};
+
 extern "C" 
 {
   unsigned long __cdecl _exception_code(void);

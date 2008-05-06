@@ -68,10 +68,10 @@ namespace ntl {
 #else
 #	define KdBreakPoint()
 # ifndef KdPrint
-# 	define KdPrint(X)
+# 	define KdPrint(X) __noop
 # endif
 # ifndef KdPrintEx
-# 	define KdPrintEx(X)
+# 	define KdPrintEx(X) __noop
 # endif
 #endif
 

@@ -16,6 +16,7 @@
 
 namespace ntl {
 
+#if 0
   /// Exception filter return values
   enum exception_filter
   {
@@ -23,6 +24,7 @@ namespace ntl {
     exception_continue_search,
     exception_execute_handler
   };
+#endif
 
   namespace km {
     typedef uintptr_t kaffinity_t;
@@ -158,10 +160,10 @@ namespace ntl {
     typedef
       void __stdcall
       io_apc_routine(
-      const void *            ApcContext,
-      const io_status_block * IoStatusBlock,
-      uint32_t                Reserved
-      );
+        const void *            ApcContext,
+        const io_status_block * IoStatusBlock,
+        uint32_t                Reserved
+        );
 
 
     /**@} native_types_support */
