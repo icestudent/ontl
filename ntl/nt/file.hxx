@@ -413,6 +413,33 @@ class file_handler : public handle, public device_traits<file_handler>
       return file_info;
     }
 
+    size_type tell() const
+    {
+      file_information<file_position_information> file_info(get());
+      return file_info ? file_info.data()->CurrentByteOffset : 0;
+    }
+
+    enum Origin { file_begin, file_current, file_end };
+    ntstatus seek(const size_type& offset, Origin origin)
+    {
+      file_position_information fi = {offset};
+      if(origin != file_begin){
+        if(origin == file_current){
+          file_information<file_position_information> file_info(get());
+          if(!file_info)
+            return file_info;
+          fi.CurrentByteOffset += file_info.data()->CurrentByteOffset;
+        }else if(origin == file_end){
+          file_information<file_standard_information> file_info(get());
+          if(!file_info)
+            return file_info;
+          fi.CurrentByteOffset += file_info.data()->EndOfFile;
+        }
+      }
+      file_information<file_position_information> file_info(get(), fi);
+      return file_info;
+    }
+
     ntstatus rename(
       const const_unicode_string &  new_name,
       bool                          replace_if_exists)

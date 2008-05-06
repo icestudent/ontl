@@ -308,6 +308,14 @@ struct file_disposition_information
   bool  Delete;
 };
 
+///\name  FilePositionInformation == 14
+struct file_position_information
+{
+  static const file_information_class info_class_type = FilePositionInformation;
+
+  int64_t CurrentByteOffset;
+};
+
 
 ///\name  FileEndOfFileInformation == 20
 struct file_end_of_file_information
