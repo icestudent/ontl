@@ -126,12 +126,26 @@ ntstatus __stdcall
     void*           BaseAddress
     );
 
+struct rtl_relative_name
+{
+  unicode_string    RelativeName;
+  union 
+  {
+    legacy_handle   ContainingDirectory;
+    uint64_t        wow64Handle;
+  };
+  
+  rtl_relative_name()
+    :wow64Handle()
+  {}
+};
+
 NTL__EXTERNAPI
 bool __stdcall RtlDosPathNameToNtPathName_U(
     const wchar_t*  DosFileName,
     unicode_string* NtFileName,
     wchar_t**       FilePart,
-    struct rtl_relative_name* RelativeName
+    rtl_relative_name* RelativeName
     );
 
 

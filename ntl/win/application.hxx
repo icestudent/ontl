@@ -109,10 +109,17 @@ class application
       int               argc;
 
       typedef const char_type * * iterator;
+      typedef const char_type* const * const_iterator;
       typedef std::reverse_iterator<iterator> reverse_iterator;
 
       iterator begin() { return &argv[0]; }
       iterator end()   { return &argv[argc]; }
+
+      const_iterator begin() const { return &argv[0]; }
+      const_iterator end() const   { return &argv[argc]; }
+
+      const_iterator cbegin() const{ return begin(); }
+      const_iterator cend() const  { return end(); }
 
       int size() const { return argc; }
       bool empty() const { return false; }
