@@ -143,7 +143,6 @@ namespace ntl {
       return bitwise_and(m, m2);
     }
 
-
     struct generic_mapping
     {
       access_mask generic_read;

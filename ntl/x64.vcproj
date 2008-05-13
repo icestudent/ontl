@@ -81,9 +81,9 @@
 			/>
 		</Configuration>
 		<Configuration
-			Name="Release|x64"
-			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			Name="Debug|Win32"
+			OutputDirectory="$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="4"
 			>
 			<Tool
@@ -104,8 +104,11 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;"
-				RuntimeLibrary="2"
+				Optimization="0"
+				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;_M_X64"
+				MinimalRebuild="true"
+				BasicRuntimeChecks="3"
+				RuntimeLibrary="3"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
@@ -140,9 +143,9 @@
 			/>
 		</Configuration>
 		<Configuration
-			Name="Debug|Win32"
-			OutputDirectory="$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			Name="Release|x64"
+			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="4"
 			>
 			<Tool
@@ -163,11 +166,8 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="0"
-				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;_M_X64"
-				MinimalRebuild="true"
-				BasicRuntimeChecks="3"
-				RuntimeLibrary="3"
+				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;"
+				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
@@ -274,11 +274,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\nt\apc.hxx"
+				RelativePath=".\km\apc.hxx"
 				>
 			</File>
 			<File
-				RelativePath=".\km\apc.hxx"
+				RelativePath=".\nt\apc.hxx"
 				>
 			</File>
 			<File
@@ -366,11 +366,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\nt\debug.hxx"
+				RelativePath=".\km\debug.hxx"
 				>
 			</File>
 			<File
-				RelativePath=".\km\debug.hxx"
+				RelativePath=".\nt\debug.hxx"
 				>
 			</File>
 			<File
@@ -390,11 +390,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\nt\exception.hxx"
+				RelativePath=".\stlx\exception.hxx"
 				>
 			</File>
 			<File
-				RelativePath=".\stlx\exception.hxx"
+				RelativePath=".\nt\exception.hxx"
 				>
 			</File>
 			<File
@@ -414,11 +414,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\km\file_information.hxx"
+				RelativePath=".\nt\file_information.hxx"
 				>
 			</File>
 			<File
-				RelativePath=".\nt\file_information.hxx"
+				RelativePath=".\km\file_information.hxx"
 				>
 			</File>
 			<File
@@ -438,10 +438,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\handle.hxx"
-				>
-			</File>
-			<File
 				RelativePath=".\nt\handle.hxx"
 				>
 			</File>
@@ -451,6 +447,10 @@
 			</File>
 			<File
 				RelativePath=".\win\handle.hxx"
+				>
+			</File>
+			<File
+				RelativePath=".\handle.hxx"
 				>
 			</File>
 			<File
@@ -466,11 +466,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\km\ioctl.hxx"
+				RelativePath=".\nt\ioctl.hxx"
 				>
 			</File>
 			<File
-				RelativePath=".\nt\ioctl.hxx"
+				RelativePath=".\km\ioctl.hxx"
 				>
 			</File>
 			<File
@@ -522,11 +522,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\stlx\memory.hxx"
+				RelativePath=".\km\memory.hxx"
 				>
 			</File>
 			<File
-				RelativePath=".\km\memory.hxx"
+				RelativePath=".\stlx\memory.hxx"
 				>
 			</File>
 			<File
@@ -558,11 +558,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\km\object.hxx"
+				RelativePath=".\nt\object.hxx"
 				>
 			</File>
 			<File
-				RelativePath=".\nt\object.hxx"
+				RelativePath=".\km\object.hxx"
 				>
 			</File>
 			<File
@@ -582,15 +582,19 @@
 				>
 			</File>
 			<File
-				RelativePath=".\km\registry.hxx"
-				>
-			</File>
-			<File
 				RelativePath=".\nt\registry.hxx"
 				>
 			</File>
 			<File
+				RelativePath=".\km\registry.hxx"
+				>
+			</File>
+			<File
 				RelativePath=".\win\scm.hxx"
+				>
+			</File>
+			<File
+				RelativePath=".\nt\security.hxx"
 				>
 			</File>
 			<File
@@ -626,11 +630,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\km\string.hxx"
+				RelativePath=".\stlx\string.hxx"
 				>
 			</File>
 			<File
-				RelativePath=".\stlx\string.hxx"
+				RelativePath=".\km\string.hxx"
 				>
 			</File>
 			<File
@@ -646,11 +650,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\km\system_information.hxx"
+				RelativePath=".\nt\system_information.hxx"
 				>
 			</File>
 			<File
-				RelativePath=".\nt\system_information.hxx"
+				RelativePath=".\km\system_information.hxx"
 				>
 			</File>
 			<File
@@ -666,15 +670,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\nt\thread.hxx"
+				>
+			</File>
+			<File
 				RelativePath=".\km\thread.hxx"
 				>
 			</File>
 			<File
 				RelativePath=".\stlx\thread.hxx"
-				>
-			</File>
-			<File
-				RelativePath=".\nt\thread.hxx"
 				>
 			</File>
 			<File
@@ -727,7 +731,7 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Release|x64"
+					Name="Debug|Win32"
 					ExcludedFromBuild="true"
 					>
 					<Tool
@@ -735,7 +739,7 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Debug|Win32"
+					Name="Release|x64"
 					ExcludedFromBuild="true"
 					>
 					<Tool
