@@ -454,6 +454,77 @@ NTL__EXTERNAPI
 ntstatus __stdcall
   RtlSystemTimeToLocalTime(int64_t* SystemTime, int64_t* LocalTime);
 
+/// rtl compression
+
+namespace compression
+{
+  enum engines
+  {
+    engine_standart,
+    engine_maximum   = 0x0100
+  };
+
+  enum formats
+  {
+    format_none,
+    format_default,
+    format_lznt1
+  };
+
+  //inline uint16_t operator|(formats f, engines e)
+  //{
+  //  return static_cast<uint16_t>( uint16_t(f) | uint16_t(e) );
+  //}
+
+  static const uint16_t default_format = engine_maximum|format_lznt1;
+
+} // compression
+
+NTL__EXTERNAPI
+ntstatus __stdcall
+  RtlGetCompressionWorkSpaceSize (
+    uint16_t CompressionFormatAndEngine,
+    uint32_t* CompressBufferWorkSpaceSize,
+    uint32_t* CompressFragmentWorkSpaceSize
+    );
+
+NTL__EXTERNAPI
+ntstatus __stdcall
+  RtlCompressBuffer (
+    uint16_t CompressionFormatAndEngine,
+    const void* UncompressedBuffer,
+    uint32_t UncompressedBufferSize,
+    void* CompressedBuffer,
+    uint32_t CompressedBufferSize,
+    uint32_t UncompressedChunkSize,
+    uint32_t* FinalCompressedSize,
+    void* WorkSpace
+    );
+
+NTL__EXTERNAPI
+ntstatus __stdcall
+  RtlDecompressFragment (
+    uint16_t CompressionFormat,
+    void* UncompressedFragment,
+    uint32_t UncompressedFragmentSize,
+    const void* CompressedBuffer,
+    uint32_t CompressedBufferSize,
+    uint32_t FragmentOffset,
+    uint32_t* FinalUncompressedSize,
+    void* WorkSpace
+    );
+
+NTL__EXTERNAPI
+ntstatus __stdcall
+  RtlDecompressBuffer (
+    uint16_t CompressionFormat,
+    void* UncompressedBuffer,
+    uint32_t UncompressedBufferSize,
+    const void* CompressedBuffer,
+    uint32_t CompressedBufferSize,
+    uint32_t* FinalUncompressedSize
+    );
+
 
   }//namespace nt
 }//namespace ntl
