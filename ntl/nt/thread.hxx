@@ -296,7 +296,7 @@ ntstatus __stdcall
   LdrUnloadDll(legacy_handle DllHandle);
 
 #ifndef NTL_SUPPRESS_IMPORT
-#pragma message("WARNING: suppress exit thread for win2k!")
+
 NTL__EXTERNAPI
 __declspec(noreturn)
 void __stdcall

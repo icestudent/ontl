@@ -464,6 +464,17 @@ namespace ntl {
             ? pe->va<void*>(pe->va<uint32_t*>(AddressOfFunctions)[ordinal]) : 0;
         }
 
+        template<class Hash>
+        uint32_t ordinal(const image* pe, Hash hash, const uint32_t function_hash) const
+        {
+          const uint32_t * const name_table = pe->va<uint32_t*>(AddressOfNames);
+          for(uint32_t n = 0; n < NumberOfNames-1; n++){
+            if(hash(pe->va<const char*>(name_table[n])) == function_hash)
+              return pe->va<const uint16_t*>(AddressOfNameOrdinals)[n];
+          }
+          return 0xffffffff;
+        }
+
       }; // struct export_directory
 
       typedef
@@ -477,6 +488,20 @@ namespace ntl {
         if ( ! export_table || ! export_table->VirtualAddress ) return 0;
         export_directory * exports = va<export_directory*>(export_table->VirtualAddress);
         void * const f = exports->function(this, exports->ordinal(this, exp));
+        const uintptr_t ex = reinterpret_cast<uintptr_t>(exports);
+        return in_range(ex, ex + export_table->Size, f) ? 0 : f;
+      }
+
+      template<class Hash>
+      void* find_export(Hash hash, const uint32_t function_hash) const
+      {
+        const data_directory * const export_table = 
+          get_data_directory(data_directory::export_table);
+        if (!export_table || !export_table->VirtualAddress)
+          return 0;
+
+        export_directory* exports = va<export_directory*>(export_table->VirtualAddress);
+        void * const f = exports->function(this, exports->ordinal(this, hash, function_hash));
         const uintptr_t ex = reinterpret_cast<uintptr_t>(exports);
         return in_range(ex, ex + export_table->Size, f) ? 0 : f;
       }
@@ -521,7 +546,11 @@ namespace ntl {
       {
         return brute_cast<PtrType>(find_export(exp));
       }
-
+      template<typename PtrType, class Hash>
+      PtrType find_export(Hash hash, uint32_t exp) const
+      {
+        return brute_cast<PtrType>(find_export(hash, exp));
+      }
       template<typename PtrType, typename DllFinder>
       PtrType find_export(const char * exp, DllFinder find_dll) const
       {

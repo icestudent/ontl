@@ -552,7 +552,10 @@ struct eprocess51
 	/*<thisrel this+0x158>*/ /*|0x4|*/ void* VdmObjects;
 	/*<thisrel this+0x15c>*/ /*|0x4|*/ void* DeviceMap;
 	/*<thisrel this+0x160>*/ /*|0x8|*/ list_entry PhysicalVadList;
-	/*<thisrel this+0x168>*/ /*|0x4|*/ hardware_pte PageDirectoryPte;
+  union {
+    /*<thisrel this+0x168>*/ /*|0x4|*/ hardware_pte PageDirectoryPte;
+    uint64_t Filler;
+  };
 	/*<thisrel this+0x170>*/ /*|0x4|*/ void* Session;
 	/*<thisrel this+0x174>*/ /*|0x10|*/ uint8_t ImageFileName[16];
 	/*<thisrel this+0x184>*/ /*|0x8|*/ list_entry JobLinks;

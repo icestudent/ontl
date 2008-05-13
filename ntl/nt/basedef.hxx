@@ -83,7 +83,10 @@ namespace ntl {
 
       list_entry * begin() { return next; }
       list_entry * end()   { return this; }
-
+      const list_entry * begin() const { return next; }
+      const list_entry * end()   const { return this; }
+      const list_entry * cbegin()const { return next; }
+      const list_entry * cend()  const { return this; }
     };
 
 
@@ -233,12 +236,16 @@ namespace ntl {
       /* 0x34 */ uint32_t             Flags;
       /* 0x38 */ uint16_t             LoadCount;
       /* 0x3a */ uint16_t             TlsIndex;
-      //  /* 0x3c */ list_entry           HashLinks;
-      /* 0x3c */ void *               SectionPointer;
-      /* 0x40 */ uint32_t             CheckSum;
       union {
-        /* 0x44 */ uint32_t             TimeDateStamp;
-        /* 0x44 */ void *               LoadedImports;
+        /* 0x3c */ list_entry         HashLinks;
+        struct {
+          /* 0x3c */ void *           SectionPointer;
+          /* 0x40 */ uint32_t         CheckSum;
+        } ext;
+      };
+      union {
+        /* 0x44 */ uint32_t           TimeDateStamp;
+        /* 0x44 */ void *             LoadedImports;
       };
       /* 0x48 */ void *               EntryPointActivationContext;
       /* 0x4c */ void *               PatchInformation;
