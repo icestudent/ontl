@@ -219,7 +219,7 @@ class basic_string
 
     void resize(size_type n, charT c)   { str.resize(n, c); }
     void resize(size_type n)            { str.resize(n);    }
-    void reserve(size_type res_arg = 0) { str.reserve();    }
+    void reserve(size_type res_arg = 0) { str.reserve(res_arg); }
     void clear()                        { str.clear();      }
 
     ///\name  basic_string element access [21.3.5 lib.string.access]
