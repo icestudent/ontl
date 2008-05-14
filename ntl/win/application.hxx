@@ -134,26 +134,34 @@ class application
       int parse(char_type * p = get())
       {
         argc = 0;
-        if ( *p == '"' )
-        {
+        // self
+        if(*p == '"'){
           argv[argc++] = ++p;
-          while ( *p && *p != '"' ) p++;
-          if ( ! *p ) return -1;
+          while(*p && *p != '"') p++;
+          if(!*p) return -1;
           *p++ = '\0';
-        }
-        else
-        {
+        }else{
           argv[argc++] = p;
-          while ( *p < '\0' || *p > ' ' ) p++;
-          if ( *p ) *p++ = '\0';
+          while(*p < '\0' || *p > ' ') p++;
+          if(*p) *p++ = '\0';
         }
-        while ( *p )
-        {
-          while ( *p > '\0' && *p <= ' ') p++;
-          if ( ! *p ) break;
-          argv[argc++] = p;
-          while ( *p < '\0' || *p > ' ' ) p++;
-          if ( *p ) *p++ = '\0';           
+        // arguments
+        while(*p){
+          while(*p > '\0' && *p <= ' ') p++;
+          if(!*p) break;
+          if(*p == '"'){
+            argv[argc++] = ++p;
+            while(*p && *p != '"') p++;
+            if(!*p) return -1;
+            *p++ = '\0';
+          }else{
+            argv[argc++] = p;
+            while(*p < '\0' || *p > ' ') p++;
+            if(*p) *p++ = '\0';
+          }
+          //argv[argc++] = p;
+          //while(*p < '\0' || *p > ' ') p++;
+          //if(*p) *p++ = '\0';           
         }
         return argc;
       }
