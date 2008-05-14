@@ -63,7 +63,7 @@ class native_string
 
     native_string(const native_string<value_type>& str)
     : length_(str.length_),
-      maximum_length_(maximum_length_),
+      maximum_length_(str.maximum_length_),
       buffer_(str.buffer_)
     {/**/}
 
