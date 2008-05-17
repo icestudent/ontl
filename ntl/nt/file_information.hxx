@@ -391,11 +391,57 @@ struct file_fs_volume_information
 {
   static const fs_information_class info_class_type = FileFsVolumeInformation;
 
-  int64_t VolumeCreationTime;
+  int64_t  VolumeCreationTime;
   uint32_t VolumeSerialNumber;
   uint32_t VolumeLabelLength;
-  bool SupportsObjects;
-  wchar_t VolumeLabel[1];
+  bool     SupportsObjects;
+  wchar_t  VolumeLabel[1];
+
+  const_unicode_string label() const { return const_unicode_string(VolumeLabel, VolumeLabelLength / sizeof(wchar_t)); }
+};
+
+template<>
+struct volume_information<file_fs_volume_information>
+{
+  typedef file_fs_volume_information info_class;
+
+  volume_information(legacy_handle volume_handle)
+  {
+    // length of the label is 34 characters long max
+    for(uint32_t length = sizeof(info_class)+sizeof(wchar_t)*34; ptr.reset(new char[length]), ptr; length*= 2)
+    {
+      status_ = query(volume_handle, ptr.get(), length);
+      if(status_ == status::success){
+        break;
+      }else if(status_ != status::buffer_overflow){
+        ptr.release();
+        break;
+      }
+    }
+  }
+
+  const info_class* operator->() const { return data(); }
+  info_class* operator->() { return data(); }
+
+  info_class* data() { return reinterpret_cast<info_class*>(ptr.get()); }
+  const info_class* data() const { return reinterpret_cast<const info_class*>(ptr.get()); }
+
+  operator const void*() const { return ptr.get(); }
+
+  static __forceinline
+    ntstatus query(
+    legacy_handle volume_handle,
+    void*     volume_information,
+    uint32_t  volume_information_length
+    )
+  {
+    io_status_block iosb;
+    return NtQueryVolumeInformationFile(volume_handle, &iosb,
+      volume_information, volume_information_length, info_class::info_class_type);
+  }
+private:
+  std::unique_ptr<char[]> ptr;
+  ntstatus status_;
 };
 
 ///\name   FileFsLabelInformation == 2

@@ -80,16 +80,6 @@ class native_string
       buffer_(&str[0])
     {/**/}
 
-    const native_string& operator=(const native_string & s);
-#if 0
-    {
-      length_ = s.length_;
-      maximum_length_ = s.maximum_length_;
-      buffer_ = s.buffer_;
-	  return *this;
-    }
-#endif
-    
     ///\name  native_string connversions
 
     std::basic_string<value_type>
@@ -208,6 +198,8 @@ class native_string
     {
       if ( n > size() ) throw(std::out_of_range);
     }
+    const native_string& operator=(const native_string & s);
+
 
 };//class native_string
 

@@ -54,16 +54,16 @@
   _BUGCHECK("Assertion ("#expr") failed in "__FUNCSIG__" //"__FILE__,__LINE__);\
   ((void)0)
 #else
-#define _Assert(expr)
+# define _Assert(expr)
 #endif
 
 
 #undef assert
 
 #ifdef NDEBUG
-#define assert(expr) ((void)0)
+# define assert(expr) ((void)0)
 #else
-#define assert(expr) (not implemented)
+# define assert(expr) _Assert(expr)
 #endif
 
 //}//namespace std
