@@ -355,7 +355,7 @@ namespace std {
     void check_bounds(const size_t pos) const throw(out_of_range)
     {
       if(pos >= N)
-        __ntl_throw(out_of_range);
+        __ntl_throw(out_of_range(__FUNCTION__));
     }
 
     template<typename T>

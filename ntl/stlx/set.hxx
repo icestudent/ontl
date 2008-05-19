@@ -117,7 +117,7 @@ namespace std {
 
     // observers:
     key_compare key_comp() const { return tree_type::value_comp(); }
-    value_compare value_comp() const;
+    value_compare value_comp() const { return tree_type::value_comp(); }
 
     // set operations:
     //iterator find(const key_type& x);

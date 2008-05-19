@@ -615,7 +615,7 @@ class basic_string
       basic_string<charT, traits, Allocator> sum;
       sum.alloc__new(lhs.size() + 1);
       sum.append_to__reserved(lhs.begin(), lhs.end());
-      sum.push_back(rhs)
+      sum.push_back(rhs);
       return sum;
     }
 

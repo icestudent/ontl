@@ -59,18 +59,12 @@ namespace tree
       struct iterator_impl:
         std::iterator<std::bidirectional_iterator_tag, value_type, difference_type, pointer, reference>
       {
-#ifdef _DEBUG
-        iterator_impl()
-          :p(), tree_()
-        {}
-#else
         iterator_impl(){}
-#endif
-        //iterator_impl(const iterator_impl& i)
-        //  :p(i.p), tree_(i.tree_) {}
+        iterator_impl(const iterator_impl& i)
+          :p(i.p), tree_(i.tree_) {}
 
         reference operator* () const { return p->elem; }
-        pointer   operator->() const { return &operator*(); }
+        pointer   operator->() const { return &p->elem; }
         iterator_impl& operator++()  { p = tree_->next(p, right ); return *this; }
         iterator_impl& operator--()  { p = tree_->next(p, left  ); return *this; }
         iterator_impl operator++(int){ iterator_impl tmp( *this ); ++*this; return tmp; }
@@ -81,12 +75,13 @@ namespace tree
         friend bool operator!=(const iterator_impl& x, const iterator_impl& y)
         { return x.p != y.p; }
 
-      private:
+      protected:
         node_type* p;
         rbtree<T, Compare, Allocator>* tree_;
 
         friend struct const_iterator_impl;
         friend class rbtree<T,Compare, Allocator>;
+        
         iterator_impl(node_type* /*const*/ p, rbtree<T, Compare, Allocator>* tree)
           :p(p), tree_(tree)
         {}
@@ -316,7 +311,10 @@ namespace tree
 
         if(y != z){
           // copy y to z?
-          *z = *y;
+          dbg::bp();
+          node_allocator.destroy(z);
+          node_allocator.construct(z, *y);
+          //*z = *y;
         }
         if(y->color == node::black && x){
           if(!prev_root)
@@ -383,8 +381,10 @@ namespace tree
           return NULL;
 
         // create head
-        node* h = node_allocator.allocate(2);
-        *h++ = *head();
+        node* h = node_allocator.allocate(2), *ph = head();
+        h->left = ph->left, h->right = ph->right,
+          h->parent = ph->parent, h->color = ph->color;
+        //*h++ = *head();
         // copy data to the new root
         node_allocator.construct(h, from->elem);
         h->left = from->left; h->right = from->right;
@@ -549,7 +549,18 @@ namespace tree
       {
         return comparator_(y, x);
       }
-    private:
+
+      iterator make_iterator(node* p)
+      {
+        return iterator(p, this);
+      }
+
+      const_iterator make_iterator(const node* p) const
+      {
+        return const_iterator(p, this);
+      }
+
+    protected:
       typename allocator_type::template rebind<node_type>::other node_allocator;
       value_compare comparator_;
 
