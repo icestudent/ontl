@@ -60,68 +60,40 @@ namespace std {
 
     set(const set<Key,Compare,Allocator>& x)
     {}
-
-    //set(set<Key,Compare,Allocator>&& x);
+#ifdef NTL__CXX
+    set(set<Key,Compare,Allocator>&& x);
+#endif
     
     set(const Allocator&);
-    
     set(const set& x, const Allocator& a)
     {}
 
-    //set(set&&, const Allocator&);
-    
+#ifdef NTL__CXX
+    set(set&&, const Allocator&);
+#endif
     ~set()
     {}
 
     set<Key,Compare,Allocator>& operator= (const set<Key,Compare,Allocator>& x)
     {}
 
-    //set<Key,Compare,Allocator>& operator=
-    //  (set<Key,Compare,Allocator>&& x);
-
-    //allocator_type get_allocator() const;
-
-    // iterators:
-    //iterator begin();
-    //const_iterator begin() const;
-    //iterator end();
-    //const_iterator end() const;
-    //reverse_iterator rbegin();
-    //const_reverse_iterator rbegin() const;
-    //reverse_iterator rend();
-    //const_reverse_iterator rend() const;
-    //const_iterator cbegin() const;
-    //const_iterator cend() const;
-    //const_reverse_iterator crbegin() const;
-    //const_reverse_iterator crend() const;
-
-    // capacity:
-    //bool empty() const;
-    //size_type size() const;
-    //size_type max_size() const;
+#ifdef NTL__CXX
+    set<Key,Compare,Allocator>& operator= (set<Key,Compare,Allocator>&& x);
+#endif
 
     // modifiers:
-    //template <class... Args> pair<iterator, bool> emplace(Args&&... args);
-    //template <class... Args> iterator emplace(const_iterator position, Args&&... args);
-    //pair<iterator,bool> insert(const value_type& x);
-    //pair<iterator,bool> insert(value_type&& x);
-    //iterator insert(const_iterator position, const value_type& x);
-    //iterator insert(const_iterator position, value_type&& x);
-    //template <class InputIterator>
-    //void insert(InputIterator first, InputIterator last);
-    //iterator erase(const_iterator position);
-    //size_type erase(const key_type& x);
-    //iterator erase(const_iterator first, const_iterator last);
-    //void swap(set<Key,Compare,Allocator>&);
-    //void clear();
+#ifdef NTL__CXX
+    template <class... Args> pair<iterator, bool> emplace(Args&&... args);
+    template <class... Args> iterator emplace(const_iterator position, Args&&... args);
+    pair<iterator,bool> insert(value_type&& x);
+    iterator insert(const_iterator position, value_type&& x);
+#endif
 
     // observers:
     key_compare key_comp() const { return tree_type::value_comp(); }
     value_compare value_comp() const { return tree_type::value_comp(); }
 
     // set operations:
-    //iterator find(const key_type& x);
-    //const_iterator find(const key_type& x) const;
     size_type count(const key_type& x) const
     {
       return find(x) != end() ? 1 : 0;
@@ -159,25 +131,6 @@ namespace std {
     }
   };
 
-  //template <class Key, class Compare, class Allocator>
-  //bool operator==(const set<Key,Compare,Allocator>& x,
-  //  const set<Key,Compare,Allocator>& y);
-  //template <class Key, class Compare, class Allocator>
-  //bool operator< (const set<Key,Compare,Allocator>& x,
-  //  const set<Key,Compare,Allocator>& y);
-  //template <class Key, class Compare, class Allocator>
-  //bool operator!=(const set<Key,Compare,Allocator>& x,
-  //  const set<Key,Compare,Allocator>& y);
-  //template <class Key, class Compare, class Allocator>
-  //bool operator> (const set<Key,Compare,Allocator>& x,
-  //  const set<Key,Compare,Allocator>& y);
-  //template <class Key, class Compare, class Allocator>
-  //bool operator>=(const set<Key,Compare,Allocator>& x,
-  //  const set<Key,Compare,Allocator>& y);
-  //template <class Key, class Compare, class Allocator>
-  //bool operator<=(const set<Key,Compare,Allocator>& x,
-  //  const set<Key,Compare,Allocator>& y);
-
   // specialized algorithms:
   template <class Key, class Compare, class Allocator>
   void swap(set<Key,Compare,Allocator>& x, set<Key,Compare,Allocator>& y)
@@ -185,10 +138,12 @@ namespace std {
     x.swap(y);
   }
 
-  //template <class Key, class Compare, class Allocator>
-  //void swap(set<Key,Compare,Allocator&& x, set<Key,Compare,Allocator>& y);
-  //template <class Key, class Compare, class Allocator>
-  //void swap(set<Key,Compare,Allocator& x, set<Key,Compare,Allocator>&& y);
+#ifdef NTL__CXX
+  template <class Key, class Compare, class Allocator>
+  void swap(set<Key,Compare,Allocator&& x, set<Key,Compare,Allocator>& y);
+  template <class Key, class Compare, class Allocator>
+  void swap(set<Key,Compare,Allocator& x, set<Key,Compare,Allocator>&& y);
+#endif
 
   template <class Key, class Compare, class Alloc>
   struct constructible_with_allocator_suffix<

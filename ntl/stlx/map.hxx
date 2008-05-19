@@ -332,6 +332,11 @@ void swap(map<Key,T,Compare,Allocator& x, map<Key,T,Compare,Allocator>&& y);
 
 #endif
 
+template <class Key, class T, class Compare, class Alloc>
+struct constructible_with_allocator_suffix< map<Key, T, Compare, Alloc> >
+  :true_type 
+{};
+
 /// [23.3.2 lib.multimap]
 #if 0
 template <class Key, class T, class Compare = less<Key>, class Allocator = allocator<pair<const Key, T> > >
