@@ -125,7 +125,7 @@ namespace std {
       typename basic_string<charT,traits,Allocator>::size_type pos = 0,
       typename basic_string<charT,traits,Allocator>::size_type n =
       basic_string<charT,traits,Allocator>::npos
-      ) throw(out_of_range, invalid_argument)
+      ) __ntl_throws(out_of_range, invalid_argument)
     {
       typedef basic_string<charT,traits,Allocator> string_type;
       
@@ -220,7 +220,7 @@ namespace std {
       return *this;
     }
 
-    bitset<N>& set(size_t pos, bool val = true) throw(out_of_range)
+    bitset<N>& set(size_t pos, bool val = true) __ntl_throws(out_of_range)
     {
       check_bounds(pos);
       storage_type xval = storage_[pos / element_size_];
@@ -238,7 +238,7 @@ namespace std {
       return *this;
     }
 
-    bitset<N>& reset(size_t pos) throw(out_of_range)
+    bitset<N>& reset(size_t pos) __ntl_throws(out_of_range)
     {
       check_bounds(pos);
       storage_type val = storage_[pos / element_size_];
@@ -260,7 +260,7 @@ namespace std {
       return *this;
     }
 
-    bitset<N>& flip(size_t pos) throw(out_of_range)
+    bitset<N>& flip(size_t pos) __ntl_throws(out_of_range)
     {
       check_bounds(pos);
       storage_type val = storage_[pos / element_size_];
@@ -270,20 +270,20 @@ namespace std {
       return *this;
     }
 
-    constexpr bool operator[](size_t pos) const throw()
+    constexpr bool operator[](size_t pos) const __ntl_nothrow
     { return test(pos); }
 
-    reference operator[](size_t pos) throw()
+    reference operator[](size_t pos) __ntl_nothrow
     {
       return reference(*this, pos);
     }
 
-    unsigned long to_ulong() const throw (overflow_error)
+    unsigned long to_ulong() const __ntl_throws (overflow_error)
     {
       return to_T<unsigned long>();
     }
 
-    unsigned long long to_ullong() const throw (overflow_error)
+    unsigned long long to_ullong() const __ntl_throws (overflow_error)
     {
       return to_T<unsigned long long>();
     }
@@ -330,7 +330,7 @@ namespace std {
       return !(*this==rhs);
     }
 
-    bool test(size_t pos) const throw(out_of_range)
+    bool test(size_t pos) const __ntl_throws (out_of_range)
     {
       check_bounds(pos);
       const storage_type val = storage_[pos / element_size_];
@@ -352,14 +352,14 @@ namespace std {
     }
 
   private:
-    void check_bounds(const size_t pos) const throw(out_of_range)
+    void check_bounds(const size_t pos) const __ntl_throws (out_of_range)
     {
       if(pos >= N)
         __ntl_throw(out_of_range(__FUNCTION__));
     }
 
     template<typename T>
-    T to_T() const throw (overflow_error)
+    T to_T() const __ntl_throws (overflow_error)
     {
       if(sizeof(T)*8 < N){
         // check that all upper bits are zero

@@ -169,7 +169,7 @@ namespace tree
         return *this;
       }
 
-      ~rbtree() throw()
+      ~rbtree() __ntl_nothrow
       {
         clear();
       }
@@ -373,7 +373,7 @@ namespace tree
 
     protected:
       // left: most less, right: most greater
-      node* head() const throw() { return root_-1; }
+      node* head() const __ntl_nothrow { return root_-1; }
 
       node* make_root(node* from)
       {
@@ -392,7 +392,7 @@ namespace tree
         return h;
       }
 
-      node* end(bool direction) const throw()
+      node* end(bool direction) const __ntl_nothrow
       {
         if(!root_)
           return NULL;
@@ -402,7 +402,7 @@ namespace tree
         return p;
       }
 
-      node* next(node* from, bool direction) const throw()
+      node* next(node* from, bool direction) const __ntl_nothrow
       {
         // if --begin() || ++end(), do nothing;
         // if --end(), return last.
@@ -428,22 +428,22 @@ namespace tree
         }
       }
 
-      const node* next(const node* from, bool direction) const throw()
+      const node* next(const node* from, bool direction) const __ntl_nothrow
       {
         return next(const_cast<node*>(from), direction);
       }
 
-      node* first() const throw()
+      node* first() const __ntl_nothrow
       {
         return root_ ? head()->left : NULL;
       }
 
-      node* last() const throw()
+      node* last() const __ntl_nothrow
       {
         return root_ ? head()->right: NULL;
       }
 
-      void rotate(node* x, bool direction) throw()
+      void rotate(node* x, bool direction) __ntl_nothrow
       {
         const bool right = direction, left = !direction;
         node* y = x->link[right];
@@ -466,7 +466,7 @@ namespace tree
           x->parent = y;
       }
 
-      node* fixup_insert(node* x, bool direction) throw()
+      node* fixup_insert(node* x, bool direction) __ntl_nothrow
       {
         const bool right = direction, left = !direction;
 
@@ -491,7 +491,7 @@ namespace tree
         return x;
       }
 
-      void fixup_delete(node* x, bool direction) throw()
+      void fixup_delete(node* x, bool direction) __ntl_nothrow
       {
         const bool right = direction, left = !direction;
 
@@ -520,7 +520,7 @@ namespace tree
         }
       }
 
-      void fixup_insert(node* x) throw()
+      void fixup_insert(node* x) __ntl_nothrow
       {
         while(x != root_ && x->parent->color == node::red){
           x = fixup_insert(x, x->parent != x->parent->parent->left);
@@ -528,7 +528,7 @@ namespace tree
         root_->color = node::black;
       }
 
-      void fixup_delete(node* x) throw()
+      void fixup_delete(node* x) __ntl_nothrow
       {
         if(!x) return;
         while(x != root_ && x->color == node::black){

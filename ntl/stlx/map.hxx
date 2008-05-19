@@ -167,7 +167,7 @@ class map:
     T& operator[](key_type&& x);
 #endif
 
-    T& at(const key_type& x) throw(out_of_range)
+    T& at(const key_type& x) __ntl_throws(out_of_range)
     {
       iterator iter = find(x);
       if(iter == end())
@@ -175,7 +175,7 @@ class map:
       return iter->second;
     }
 
-    const T& at(const key_type& x) const throw(out_of_range)
+    const T& at(const key_type& x) const __ntl_throws(out_of_range)
     {
       const_iterator iter = find(x);
       if(iter == end())
