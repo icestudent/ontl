@@ -126,6 +126,9 @@ ntstatus __stdcall
     void*           BaseAddress
     );
 
+
+
+
 struct rtl_relative_name
 {
   unicode_string    RelativeName;
