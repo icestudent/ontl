@@ -100,10 +100,10 @@ namespace tree
         const_iterator_impl(){}
 #endif
         const_iterator_impl(const iterator_impl& i)
-          :p(i.p)
+          :p(i.p), tree_(i.tree_)
         {}
         const_iterator_impl(const const_iterator_impl& i)
-          :p(i.p) {}
+          :p(i.p), tree_(i.tree_) {}
 
         reference operator* () const { return p->elem; }
         pointer   operator->() const { return &operator*(); }

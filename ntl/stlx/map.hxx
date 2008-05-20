@@ -42,10 +42,10 @@ namespace std {
               class Allocator
               >
     class value_compare: 
-      public binary_function<pair<Key, T>, pair<Key, T>, bool>
+      public binary_function<pair<const Key, T>, pair<const Key, T>, bool>
     {
     public:
-      typedef pair<Key, T> value_type;
+      typedef pair<const Key, T> value_type;
 
       __forceinline
       bool operator()(const value_type& x, const value_type& y) const

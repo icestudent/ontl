@@ -599,7 +599,7 @@ public:
   void* mmap(
     size_t    ViewSize,
     uint32_t  RegionProtection,
-    uint32_t  AllocationType = mem_commit
+    uint32_t  AllocationType = 0
     )
   {
     ntstatus st = NtMapViewOfSection(get(), current_process(), &base_, 0, 0, NULL, &ViewSize, ViewUnmap, AllocationType, RegionProtection);
@@ -610,7 +610,7 @@ public:
     int64_t&  SectionOffset,
     size_t    ViewSize,
     uint32_t  RegionProtection,
-    uint32_t  AllocationType = mem_commit
+    uint32_t  AllocationType = 0
     )
   {
     ntstatus st = NtMapViewOfSection(get(), current_process(), &base_, 0, 0, &SectionOffset, &ViewSize, ViewUnmap, AllocationType, RegionProtection);
