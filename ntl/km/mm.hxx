@@ -782,6 +782,7 @@ namespace ntl {
 #endif
 
     };
+
     struct section {
       mmaddress_node Address;
       struct segment *Segment;

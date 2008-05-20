@@ -402,7 +402,7 @@ public:
     return NtWaitForSingleObject(get(), alertable, &interval);
   }
 
-  static legacy_handle get_current() { return reinterpret_cast<legacy_handle>(-2); }
+  static legacy_handle get_current() { return current_thread(); }
 
   __declspec(noreturn)
   static void exit(ntstatus Status)

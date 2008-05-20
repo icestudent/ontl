@@ -88,7 +88,7 @@ NTL__EXTERNAPI
 ntstatus __stdcall
   NtCreateSection(
     handle*           SectionHandle,
-    access_mask       DesiredAccess,
+    uint32_t          DesiredAccess,
     const object_attributes* ObjectAttributes __optional,
     const int64_t*    MaximumSize   __optional,
     uint32_t          SectionPageProtection,
@@ -100,13 +100,13 @@ NTL__EXTERNAPI
 ntstatus __stdcall
   NtOpenSection(
     handle*           SectionHandle,
-    access_mask       DesiredAccess,
+    uint32_t          DesiredAccess,
     const object_attributes* ObjectAttributes
     );
 
 NTL__EXTERNAPI
 ntstatus __stdcall
-  NtMapViewOpSection(
+  NtMapViewOfSection(
     legacy_handle   SectionHandle,
     legacy_handle   ProcessHandle,
     void**          BaseAddress,
@@ -158,6 +158,7 @@ bool __stdcall RtlDosPathNameToNtPathName_U(
 ///@}
 
 class file_handler;
+class section;
 
 /**@} io */
 
@@ -311,6 +312,40 @@ struct device_traits<nt::file_handler> : public device_traits<>
   { 
     return bitwise_or(m, m2);
   }
+
+};
+
+template<>
+struct device_traits<nt::section>:
+  public device_traits<>
+{
+  enum access_mask
+  {
+    query       = 0x0001,
+    map_write   = 0x0002,
+    map_read    = 0x0004,
+    map_execute = 0x0008,
+    extend_size = 0x0010,
+    all_access  = standard_rights_required | query | map_write | map_read | map_execute | extend_size
+  };
+
+  static const access_mask access_mask_default = map_read;
+
+  friend access_mask operator | (access_mask m, access_mask m2) 
+  { 
+    return bitwise_or(m, m2);
+  }
+
+  friend access_mask operator | (access_mask m, nt::access_mask m2)
+  { 
+    return m | static_cast<access_mask>(m2);
+  }
+
+  friend access_mask operator | (nt::access_mask m, access_mask m2)
+  { 
+    return m2 | m;
+  }
+
 
 };
 
@@ -478,6 +513,165 @@ class file_handler : public handle, public device_traits<file_handler>
 }; // class file_handler
 
 typedef basic_file<file_handler> file;
+
+
+class section:
+  public handle,
+  public device_traits<section>
+{
+public:
+  // create
+  explicit section(
+    access_mask DesiredAccess,
+    uint32_t    SectionPageProtection,
+    uint32_t    AllocationAttributes = mem_commit
+    ):base_()
+  {
+    create(this, DesiredAccess, NULL, NULL, SectionPageProtection, AllocationAttributes, NULL);
+  }
+
+  explicit section(
+    access_mask   DesiredAccess,
+    uint32_t      SectionPageProtection,
+    int64_t&      MaximumSize,
+    uint32_t      AllocationAttributes = mem_commit
+    ):base_()
+  {
+    create(this, DesiredAccess, NULL, &MaximumSize, SectionPageProtection, AllocationAttributes, NULL);
+  }
+
+  explicit section(
+    legacy_handle FileHandle,
+    access_mask   DesiredAccess,
+    uint32_t      SectionPageProtection,
+    uint32_t      AllocationAttributes = mem_commit
+    ):base_()
+  {
+    create(this, DesiredAccess, NULL, NULL, SectionPageProtection, AllocationAttributes, FileHandle);
+  }
+
+  explicit section(
+    const const_unicode_string& SectionName,
+    access_mask           DesiredAccess,
+    uint32_t              SectionPageProtection,
+    uint32_t              AllocationAttributes = mem_commit
+    ):base_()
+  {
+    const object_attributes oa(SectionName);
+    create(this, DesiredAccess, &oa, NULL, SectionPageProtection, AllocationAttributes, NULL);
+  }
+
+  explicit section(
+    const const_unicode_string& SectionName,
+    access_mask           DesiredAccess,
+    uint32_t              SectionPageProtection,
+    int64_t&              MaximumSize,
+    uint32_t              AllocationAttributes = mem_commit
+    ):base_()
+  {
+    const object_attributes oa(SectionName);
+    create(this, DesiredAccess, &oa, &MaximumSize, SectionPageProtection, AllocationAttributes, NULL);
+  }
+
+  // open
+  section(
+    access_mask  DesiredAccess
+    ):base_()
+  {
+    open(this, DesiredAccess, NULL);
+  }
+
+  section(
+    const const_unicode_string& SectionName,
+    access_mask           DesiredAccess
+    ):base_()
+  {
+    const object_attributes oa(SectionName);
+    open(this, DesiredAccess, &oa);
+  }
+
+  ~section()
+  {
+    munmap();
+  }
+
+  // map
+  void* mmap(
+    size_t    ViewSize,
+    uint32_t  RegionProtection,
+    uint32_t  AllocationType = mem_commit
+    )
+  {
+    ntstatus st = NtMapViewOfSection(get(), current_process(), &base_, 0, 0, NULL, &ViewSize, ViewUnmap, AllocationType, RegionProtection);
+    return base_;
+  }
+
+  void* mmap(
+    int64_t&  SectionOffset,
+    size_t    ViewSize,
+    uint32_t  RegionProtection,
+    uint32_t  AllocationType = mem_commit
+    )
+  {
+    ntstatus st = NtMapViewOfSection(get(), current_process(), &base_, 0, 0, &SectionOffset, &ViewSize, ViewUnmap, AllocationType, RegionProtection);
+    return base_;
+  }
+
+  bool munmap()
+  {
+    ntstatus st = NtUnmapViewOfSection(current_process(), base_);
+    base_ = NULL;
+    return success(st);
+  }
+
+  bool flush()
+  {
+    void* base = base_;
+    io_status_block iosb;
+    size_t size = 0;
+    ntstatus st = NtFlushVirtualMemory(current_process(), &base, &size, &iosb);
+    return success(st);
+  }
+
+  bool flush(size_t size)
+  {
+    void* base = base_;
+    io_status_block iosb;
+    ntstatus st = NtFlushVirtualMemory(current_process(), &base, &size, &iosb);
+    return success(st);
+  }
+
+
+  // static helpers
+  __forceinline
+    static ntstatus 
+      create(
+        handle*             SectionHandle,
+        access_mask         DesiredAccess,
+        const object_attributes*  ObjectAttributes,
+        int64_t*            MaximumSize,
+        uint32_t            SectionPageProtection,
+        uint32_t            AllocationAttributes,
+        legacy_handle       FileHandle
+        )
+    {
+      return NtCreateSection(SectionHandle, DesiredAccess, ObjectAttributes, MaximumSize, SectionPageProtection, AllocationAttributes, FileHandle);
+    }
+
+  __forceinline
+    static ntstatus
+      open(
+        handle*             SectionHandle,
+        access_mask         DesiredAccess,
+        const object_attributes*  ObjectAttributes
+        )
+  {
+    return NtOpenSection(SectionHandle, DesiredAccess, ObjectAttributes);
+  }
+
+private:
+  void* base_;
+};
 
 }//namespace nt
 }//namespace ntl
