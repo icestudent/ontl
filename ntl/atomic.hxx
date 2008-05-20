@@ -97,6 +97,9 @@ struct atomic_t
 
 
 template <class Lock, class T = void>
+class atomic_exec;
+
+template <class Lock, class T>
 class atomic_exec
 {
     atomic_exec();
