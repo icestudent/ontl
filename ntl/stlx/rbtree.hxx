@@ -40,17 +40,18 @@ namespace tree
         T elem;
         int8_t color;
 
-        explicit node(const T elem, node* parent, node* left = NULL, node* right = NULL)
+        explicit node(const T& elem, node* parent, node* left = NULL, node* right = NULL)
           :elem(elem), parent(parent), left(left), right(right), 
           color(black)
         {}
-        node(const T elem)
+        node(const T& elem)
           :elem(elem), 
           parent(NULL), left(NULL), right(NULL),
           color(red)
         {}
         node(const node& n)
-          :elem(n.elem)
+          :elem(n.elem),
+          parent(n.parent), left(n.left), right(n.right), color(n.color)
         {}
       };
 
@@ -225,7 +226,8 @@ namespace tree
           // insert x as the root node
           root_ = node_allocator.allocate(2);
           root_->parent = NULL;
-          root_->left = root_->right = root_+1; root_->color = node::red;
+          root_->left = root_->right = root_+1;
+          root_->color = 13;
           node_allocator.construct(++root_, x);
           root_->color = node::black;
           ++count_;
@@ -386,7 +388,7 @@ namespace tree
           h->parent = ph->parent, h->color = ph->color;
         //*h++ = *head();
         // copy data to the new root
-        node_allocator.construct(h, from->elem);
+        node_allocator.construct(++h, from->elem);
         h->left = from->left; h->right = from->right;
         h->color = from->color;
         return h;
