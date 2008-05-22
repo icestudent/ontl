@@ -138,14 +138,14 @@ namespace tree
     public:
       explicit rbtree(const Compare& comp = Compare(), const Allocator& a = Allocator())
         :comparator_(comp), node_allocator(a),
-        root_(), count_(0)
+        root_(), first_(), last_(), count_(0)
       {}
 
       template<class InputIterator>
       rbtree(InputIterator first, InputIterator last, 
         const Compare& comp = Compare(), const Allocator& a = Allocator())
         :comparator_(comp), node_allocator(a),
-        root_(), count_()
+        root_(), first_(), last_(), count_()
       {
         insert(first, last);
       }
@@ -153,11 +153,11 @@ namespace tree
       rbtree(const Allocator& a);
       
       rbtree(const rbtree<T, Compare, Allocator>& x)
-        :root_(x.root_), count_(x.count_), node_allocator(x.node_allocator), comparator_(x.comparator_)
+        :root_(x.root_), first_(x.first_), last_(x.last_), count_(x.count_), node_allocator(x.node_allocator), comparator_(x.comparator_)
       {}
       
       rbtree(const rbtree& x, const Allocator& a)
-        :root_(x.root_), count_(x.count_), node_allocator(a), comparator_(x.comparator_)
+        :root_(x.root_), first_(x.first_), last_(x.last_), count_(x.count_), node_allocator(a), comparator_(x.comparator_)
       {}
 
       rbtree& operator=(const rbtree<T, Compare, Allocator>& x)
@@ -184,15 +184,15 @@ namespace tree
       size_type max_size()  const { return node_allocator.max_size(); }
 
       // iterators
-      iterator                begin()        { return iterator(first(), this); }
-      const_iterator          begin()  const { return const_iterator(first(), this); }
+      iterator                begin()        { return iterator(first_, this); }
+      const_iterator          begin()  const { return const_iterator(first_, this); }
       iterator                end()          { return iterator(NULL, this);  }
       const_iterator          end()    const { return const_iterator(NULL, this);  }
 
       reverse_iterator        rbegin()       { return reverse_iterator(iterator(NULL, this));  }
       const_reverse_iterator  rbegin() const { return const_reverse_iterator(const_iterator(NULL, this));  }
-      reverse_iterator        rend()         { return reverse_iterator(iterator(first(), this)); }
-      const_reverse_iterator  rend()   const { return const_reverse_iterator(const_iterator(first(), this)); }
+      reverse_iterator        rend()         { return reverse_iterator(iterator(first_, this)); }
+      const_reverse_iterator  rend()   const { return const_reverse_iterator(const_iterator(first_, this)); }
 
       const_iterator          cbegin() const { return begin(); }
       const_iterator          cend()   const { return end();   }
@@ -224,12 +224,10 @@ namespace tree
 
         if(empty()){
           // insert x as the root node
-          root_ = node_allocator.allocate(2);
-          root_->parent = NULL;
-          root_->left = root_->right = root_+1;
-          root_->color = 13;
-          node_allocator.construct(++root_, x);
+          root_ = node_allocator.allocate(1);
+          node_allocator.construct(root_, x);
           root_->color = node::black;
+          first_ = last_ = root_;
           ++count_;
           return make_pair(iterator(root_, this), true);
         }
@@ -244,22 +242,22 @@ namespace tree
         }
 
         // create node
-        node_type* const p = node_allocator.allocate(1);
-        node_allocator.construct(p, x);
-        p->parent = q;
+        node_type* const np = node_allocator.allocate(1);
+        node_allocator.construct(np, x);
+        np->parent = q;
 
         // link
-        q->link[greater] = p;
-        if(q == first() && !greater)
-          head()->left = p;
-        else if(q == last() && greater)
-          head()->right= p;
+        q->link[greater] = np;
+        if(q == first_ && !greater)
+          first_ = np;
+        else if(q == last_ && greater)
+          last_  = np;
 
         ++count_;
 
         // balance tree
-        fixup_insert(p);
-        return make_pair(iterator(p, this), true);
+        fixup_insert(np);
+        return make_pair(iterator(np, this), true);
       }
 
       iterator insert(iterator /*position*/, const value_type& x)
@@ -285,11 +283,10 @@ namespace tree
         ++position;
 
         // check limits
-        if(z == first()){
-          head()->left = next(z, right);
-        }else if(z == last()){
-          head()->right= next(z, left);
-        }
+        if(z == first_)
+          first_ = next(z, right);
+        if(z == last_)
+          last_  = next(z, left);
 
         if(z->left == NULL || z->right == NULL){
           y = z;
@@ -300,6 +297,7 @@ namespace tree
             y = y->left;
         }
         node* x = y->link[ y->left == NULL ];
+
         // remove y from the parent chain
         node* prev_root = NULL;
         if(x)
@@ -308,15 +306,20 @@ namespace tree
           y->parent->link[ y != y->parent->left ] = x;
         else{
           prev_root = root_;
-          root_ = make_root(x);
+          root_ = x;
         }
 
         if(y != z){
-          // copy y to z?
-          dbg::bp();
+          //z->data = y->data;
+          // save z fields
+          node* l[3] = {z->left, z->right, z->parent};
+          int8_t c = y->color;
           node_allocator.destroy(z);
           node_allocator.construct(z, *y);
-          //*z = *y;
+          z->color = c,
+            z->left = l[0],
+            z->right= l[1],
+            z->parent=l[2];
         }
         if(y->color == node::black && x){
           if(!prev_root)
@@ -325,13 +328,7 @@ namespace tree
             x->color = node::black;
         }
         node_allocator.destroy(y);
-        if(!prev_root)
-          node_allocator.deallocate(y, 1);
-        else{
-          //if(count_ != 1)
-            --prev_root;
-          node_allocator.deallocate(prev_root, 2);
-        }
+        node_allocator.deallocate(y, 1);
         if(count_)
           --count_;
         return position;
@@ -374,47 +371,17 @@ namespace tree
       value_compare value_comp() const { return comparator_; }
 
     protected:
-      // left: most less, right: most greater
-      node* head() const __ntl_nothrow { return root_-1; }
-
-      node* make_root(node* from)
-      {
-        if(!from)
-          return NULL;
-
-        // create head
-        node* h = node_allocator.allocate(2), *ph = head();
-        h->left = ph->left, h->right = ph->right,
-          h->parent = ph->parent, h->color = ph->color;
-        //*h++ = *head();
-        // copy data to the new root
-        node_allocator.construct(++h, from->elem);
-        h->left = from->left; h->right = from->right;
-        h->color = from->color;
-        return h;
-      }
-
-      node* end(bool direction) const __ntl_nothrow
-      {
-        if(!root_)
-          return NULL;
-        node* p = root_;
-        while(p->link[direction])
-          p = p->link[direction];
-        return p;
-      }
-
       node* next(node* from, bool direction) const __ntl_nothrow
       {
         // if --begin() || ++end(), do nothing;
         // if --end(), return last.
-        if(!direction && from == first())
+        if(!direction && from == first_)
           return from;
         else if(!from){
           if(direction)
             return from;
           else
-            return last();
+            return last_;
         }
 
         const bool indirection = !direction;
@@ -435,19 +402,12 @@ namespace tree
         return next(const_cast<node*>(from), direction);
       }
 
-      node* first() const __ntl_nothrow
-      {
-        return root_ ? head()->left : NULL;
-      }
-
-      node* last() const __ntl_nothrow
-      {
-        return root_ ? head()->right: NULL;
-      }
-
+      // true to rotateRight
       void rotate(node* x, bool direction) __ntl_nothrow
       {
-        const bool right = direction, left = !direction;
+        // rotateLeft: right = true
+        const bool right = !direction, left = direction;
+
         node* y = x->link[right];
 
         // right x link
@@ -456,11 +416,17 @@ namespace tree
           y->link[left]->parent = x;
 
         // parent y link
-        y->parent = x->parent;
-        if(x->parent)
-          x->parent->link[ x != x->parent->link[left] ] = y;
-        else
+        if(y)
+          y->parent = x->parent;
+
+        if(x->parent){
+          bool l = x == x->parent->link[left];
+          if(!direction)
+            l = !l;
+          x->parent->link[ l ] = y;
+        }else{
           root_ = y;
+        }
 
         // x-y
         y->link[left] = x;
@@ -493,7 +459,7 @@ namespace tree
         return x;
       }
 
-      void fixup_delete(node* x, bool direction) __ntl_nothrow
+      node* fixup_delete(node* x, bool direction) __ntl_nothrow
       {
         const bool right = direction, left = !direction;
 
@@ -504,7 +470,10 @@ namespace tree
           rotate(x->parent, left);
           w = x->parent->link[right];
         }
-        if(w->link[left]->color == node::black && w->link[right]->color == node::black){
+        if( 
+          (!w->link[left] || w->link[left] ->color == node::black) && 
+          (!w->link[right]|| w->link[right]->color == node::black))
+        {
           w->color = node::red;
           x = x->parent;
         }else{
@@ -520,12 +489,13 @@ namespace tree
           rotate(x->parent, left);
           x = root_;
         }
+        return x;
       }
 
       void fixup_insert(node* x) __ntl_nothrow
       {
         while(x != root_ && x->parent->color == node::red){
-          x = fixup_insert(x, x->parent != x->parent->parent->left);
+          x = fixup_insert(x, x->parent == x->parent->parent->left);
         }
         root_->color = node::black;
       }
@@ -534,7 +504,7 @@ namespace tree
       {
         if(!x) return;
         while(x != root_ && x->color == node::black){
-          fixup_delete(x, x != x->parent->left);
+          x = fixup_delete(x, x == x->parent->left);
         }
         x->color = node::black;
       }
@@ -567,7 +537,9 @@ namespace tree
       value_compare comparator_;
 
       node* root_;
+      node *first_, *last_;
       size_type count_;
+
 
       static const bool left = false, right = true;
     };

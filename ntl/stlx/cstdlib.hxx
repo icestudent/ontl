@@ -10,6 +10,8 @@
 
 #include "cstddef.hxx"
 
+extern "C"
+{
 
 #ifndef _INC_STDLIB// MSVC compatibility
 
@@ -227,6 +229,7 @@ long long int
 NTL__CRTCALL
   llabs(long long int j);
 
+};
 ///@}
 
 
