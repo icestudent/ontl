@@ -464,20 +464,24 @@ namespace tree
         const bool right = direction, left = !direction;
 
         node* w = x->parent->link[right];
+        if(!w)
+          return x->parent;
         if(w->color == node::red){
           w->color = node::black;
           x->parent->color = node::red;
           rotate(x->parent, left);
           w = x->parent->link[right];
         }
-        if( 
+        if(!w)
+          return x->parent;
+        if(
           (!w->link[left] || w->link[left] ->color == node::black) && 
           (!w->link[right]|| w->link[right]->color == node::black))
         {
           w->color = node::red;
           x = x->parent;
         }else{
-          if(w->link[right]->color = node::black){
+          if(!w->link[right] || w->link[right]->color == node::black){
             w->link[left]->color = node::black;
             w->color = node::red;
             rotate(w, right);

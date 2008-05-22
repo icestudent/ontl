@@ -105,10 +105,11 @@ NTL__CRTCALL
   abort();
 
 /// 7.20.4.2 The atexit function
+#if 0
 int
 NTL__CRTCALL
   atexit(void (*func)());
-
+#endif
 #define EXIT_SUCCESS  0
 #define EXIT_FAILURE  1
 
@@ -229,7 +230,7 @@ long long int
 NTL__CRTCALL
   llabs(long long int j);
 
-};
+}; // extern "C"
 ///@}
 
 

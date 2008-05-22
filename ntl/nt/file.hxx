@@ -602,7 +602,7 @@ public:
     uint32_t  AllocationType = 0
     )
   {
-    ntstatus st = NtMapViewOfSection(get(), current_process(), &base_, 0, 0, NULL, &ViewSize, ViewUnmap, AllocationType, RegionProtection);
+    NtMapViewOfSection(get(), current_process(), &base_, 0, 0, NULL, &ViewSize, ViewUnmap, AllocationType, RegionProtection);
     return base_;
   }
 
@@ -613,7 +613,7 @@ public:
     uint32_t  AllocationType = 0
     )
   {
-    ntstatus st = NtMapViewOfSection(get(), current_process(), &base_, 0, 0, &SectionOffset, &ViewSize, ViewUnmap, AllocationType, RegionProtection);
+    NtMapViewOfSection(get(), current_process(), &base_, 0, 0, &SectionOffset, &ViewSize, ViewUnmap, AllocationType, RegionProtection);
     return base_;
   }
 
