@@ -65,10 +65,26 @@ namespace ntl {
     private device_traits<>
   {
     enum access_mask {
-      event_query_state   = 1, 
-      event_modify_state  = 2, 
-      event_all_access    = standard_rights_required | synchronize | 0x3
+      query_state   = 1,
+      modify_state  = 2,
+      synchronize   = device_traits<>::synchronize,
+      all_access    = standard_rights_required | synchronize | 0x3
     };
+
+    friend access_mask operator | (access_mask m, access_mask m2) 
+    { 
+      return bitwise_or(m, m2);
+    }
+
+    friend access_mask operator | (access_mask m, nt::access_mask m2)
+    { 
+      return m | static_cast<access_mask>(m2);
+    }
+
+    friend access_mask operator | (nt::access_mask m, access_mask m2)
+    { 
+      return m2 | m;
+    }
   };
 
   namespace nt {
@@ -97,13 +113,12 @@ namespace ntl {
       public device_traits<user_event>
     {
     public:
-
       // create
       explicit user_event(
         const const_unicode_string& event_name,
         event_type          EventType,
         bool                InitialState = false,
-        access_mask         DesiredAccess = event_all_access
+        access_mask         DesiredAccess = all_access
         )
       {
         const object_attributes oa(event_name);
@@ -115,7 +130,7 @@ namespace ntl {
         event_type          EventType,
         bool&               IsOpened,
         bool                InitialState = false,
-        access_mask         DesiredAccess = event_all_access
+        access_mask         DesiredAccess = all_access
         )
       {
         const object_attributes oa(event_name, object_attributes::case_insensitive | object_attributes::openif);
@@ -125,7 +140,7 @@ namespace ntl {
       explicit user_event(
         event_type          EventType,
         bool                InitialState = false,
-        access_mask         DesiredAccess = event_all_access
+        access_mask         DesiredAccess = all_access
         )
       {
         create(this, DesiredAccess, NULL, EventType, InitialState);
@@ -135,7 +150,7 @@ namespace ntl {
       // open
       user_event(
         const const_unicode_string& event_name,
-        access_mask         DesiredAccess = event_modify_state
+        access_mask         DesiredAccess = modify_state
         )
       {
         const object_attributes oa(event_name);
@@ -145,18 +160,18 @@ namespace ntl {
 
       user_event(
         const object_attributes&  ObjectAttributes,
-        access_mask               DesiredAccess = event_modify_state
+        access_mask         DesiredAccess = modify_state
         )
       {
         open(this, &ObjectAttributes, DesiredAccess);
       }
       static ntstatus
         create(
-          handle*             EventHandle,
-          access_mask         DesiredAccess,
+          handle*           EventHandle,
+          access_mask       DesiredAccess,
           const object_attributes*  ObjectAttributes,
-          event_type          EventType,
-          bool                InitialState
+          event_type        EventType,
+          bool              InitialState
           )
       {
         return NtCreateEvent(EventHandle, DesiredAccess, ObjectAttributes, EventType, InitialState);
@@ -164,9 +179,9 @@ namespace ntl {
 
       static ntstatus
         open(
-          handle*             EventHandle,
+          handle*           EventHandle,
           const object_attributes* ObjectAttributes,
-          access_mask         DesiredAccess
+          access_mask       DesiredAccess
           )
       {
         return NtOpenEvent(EventHandle, DesiredAccess, ObjectAttributes);
@@ -187,17 +202,22 @@ namespace ntl {
         return success(NtPulseEvent(get(), 0));
       }
 
-      ntstatus wait(bool alertable = true, uint32_t timeout = -1)
+      ntstatus wait(uint32_t timeout = -1, bool alertable = true) const
       {
         const int64_t interval = int64_t(-1) * milliseconds * timeout;
         return NtWaitForSingleObject(get(), alertable, &interval);
       }
 
       template<ntl::times TimeResolution>
-      ntstatus wait(uint32_t timeout_time_resolution, bool alertable = true)
+      ntstatus wait(uint32_t timeout_time_resolution, bool alertable = true) const
       {
         const int64_t interval = int64_t(-1) * TimeResolution * timeout_time_resolution;
         return NtWaitForSingleObject(get(), alertable, &interval);
+      }
+
+      bool ready() const
+      {
+        return success(wait(0, false));
       }
     };
 

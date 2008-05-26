@@ -105,11 +105,10 @@ NTL__CRTCALL
   abort();
 
 /// 7.20.4.2 The atexit function
-#if 0
 int
-NTL__CRTCALL
-  atexit(void (*func)());
-#endif
+_cdecl
+  atexit(void (_cdecl *func)());
+
 #define EXIT_SUCCESS  0
 #define EXIT_FAILURE  1
 

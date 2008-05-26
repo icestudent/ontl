@@ -27,7 +27,7 @@ namespace tree
       struct node
       {
         enum color_type { black, red };
-
+#pragma warning(disable:4201)
         union 
         {
           struct 
@@ -36,6 +36,7 @@ namespace tree
           };
           node* link[2];
         };
+#pragma warning(default:4201)
         node* parent;
         T elem;
         int8_t color;
@@ -53,6 +54,8 @@ namespace tree
           :elem(n.elem),
           parent(n.parent), left(n.left), right(n.right), color(n.color)
         {}
+      private:
+        node& operator=(const node& n);
       };
 
       typedef typename rbtree<T, Compare, Allocator>::node node_type;
@@ -232,7 +235,7 @@ namespace tree
           return make_pair(iterator(root_, this), true);
         }
 
-        bool greater;
+        bool greater = false;
         node *q = NULL;
         for(node* p = root_; p != NULL; q = p, p = p->link[ greater ]){
           greater = comparator_(p->elem, x);
