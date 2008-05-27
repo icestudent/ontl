@@ -473,8 +473,25 @@ class basic_string
       return npos;
     }
     
-    size_type find(const charT* s, size_type pos, size_type n) const;
-    size_type find(const charT* s, size_type pos = 0) const;
+    size_type find(const charT* s, size_type pos, size_type n) const
+    {
+      const size_type lsize = size();
+      const_pointer lfrom = begin();
+      for(size_type xpos = pos; xpos + n <= lsize; ++xpos, ++lfrom)
+      {
+        for(size_type i = 0; i != n; ++i)
+          if(!traits_type::eq(*(lfrom + i), *(s + i)))
+            goto next_xpos;
+        return xpos;
+      next_xpos:;
+      }
+      return npos;
+    }
+
+    size_type find(const charT* s, size_type pos = 0) const
+    {
+      return find(s, pos, traits_type::length(s));
+    }
     
     size_type find(charT c, size_type pos = 0) const
     {

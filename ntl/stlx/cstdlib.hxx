@@ -12,6 +12,9 @@
 
 extern "C"
 {
+  typedef void _cdecl vfv_t(void);
+  typedef int  _cdecl ifv_t(void);
+  typedef void _cdecl vfi_t(int);
 
 #ifndef _INC_STDLIB// MSVC compatibility
 
@@ -105,9 +108,7 @@ NTL__CRTCALL
   abort();
 
 /// 7.20.4.2 The atexit function
-int
-_cdecl
-  atexit(void (_cdecl *func)());
+int _cdecl atexit(vfv_t func);
 
 #define EXIT_SUCCESS  0
 #define EXIT_FAILURE  1
@@ -229,9 +230,16 @@ long long int
 NTL__CRTCALL
   llabs(long long int j);
 
+
+
+
+//////////////////////////////////////////////////////////////////////////
+/* c++ initializers */
+extern vfv_t* __xc_a[];
+extern vfv_t* __xc_z[];    
+
 }; // extern "C"
 ///@}
-
 
 namespace std {
 
