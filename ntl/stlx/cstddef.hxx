@@ -131,7 +131,7 @@ static const nullptr_t nullptr = {};
 #endif
 
 #ifndef offsetof
-#define offsetof(s,m) ((size_t)&((const char&)(((s *)0)->m)))
+  #define offsetof(s,m) (size_t)&reinterpret_cast<const volatile char&>((((s *)0)->m))
 #endif
 
 #define __ntl_bitmask_type(bitmask, _F)\
