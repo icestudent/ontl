@@ -1,6 +1,6 @@
 /**\file*********************************************************************
  *                                                                     \brief
- *  20.3 Function objects [lib.function.objects]
+ *  20.5 Function objects [lib.function.objects]
  *
  ****************************************************************************
  */
@@ -20,13 +20,14 @@ namespace std {
 /**\addtogroup  lib_utilities ********* General utilities library [20] ******
  *@{*/
 
-/**\defgroup  lib_function_objects ***** Function objects [20.3] ************
+/**\defgroup  lib_function_objects ***** Function objects [20.5] ************
  *
  *    Function objects are objects with an operator() defined
  *@{
  */
 
-/**\defgroup  lib_base ***************** Base [20.3.1] **********************
+#pragma region lib_base
+/**\defgroup  lib_base ***************** Base [20.5.3] **********************
  *
  *    provided to simplify the typedefs of the argument and result types
  *@{
@@ -49,8 +50,74 @@ struct binary_function
 
 /**@} lib_base
  */
+#pragma endregion
 
-/**\defgroup  lib_arithmetic_operations * Arithmetic operations [20.3.2] ****
+#pragma region lib_refwrap
+/**\defgroup  lib_refwrap ***************** reference_wrapper [20.5.5] *******
+ *
+ *    reference_wrapper<T> is a CopyConstructible and Assignable wrapper 
+ *    around a reference to an object of type T.
+ *@{
+ */
+
+template <class T>
+class reference_wrapper
+//: public unary_function<T1, R> // see below
+//: public binary_function<T1, T2, R> // see below
+{
+  ///////////////////////////////////////////////////////////////////////////
+  public :
+
+    // types
+    typedef T type;
+    //typedef -- result_type; // Not always defined
+
+    // construct/copy/destroy
+    explicit reference_wrapper(T&) throw();
+    reference_wrapper(const reference_wrapper<T>& x) throw();
+
+    // assignment
+    reference_wrapper& operator=(const reference_wrapper<T>& x) throw();
+
+    // access
+    operator T& () const throw();
+    T& get() const throw();
+
+#if 0
+    // invocation
+    template <class T1, class T2, ..., class TN>
+    typename result_of<T(T1, T2, ..., TN)>::type
+      operator() (T1&, T2&, ..., TN&) const
+    {
+    // Returns: INVOKE (get(), a1, a2, ..., aN). ([3.3])
+      return get()(t1);
+    }
+#endif
+
+  ///////////////////////////////////////////////////////////////////////////
+  private:
+
+    T* ptr;
+
+};
+
+
+template <class T>
+inline
+reference_wrapper<T> ref(T& t) throw()
+{
+  return reference_wrapper<T>(t);
+}
+
+template <class T> reference_wrapper<const T> cref(const T&) throw();
+template <class T> reference_wrapper<T> ref(reference_wrapper<T>) throw();
+template <class T> reference_wrapper<const T> cref(reference_wrapper<T>) throw();
+/**@} lib_refwrap
+ */
+#pragma endregion
+
+#pragma region lib_arithmetic_operations
+/**\defgroup  lib_arithmetic_operations * Arithmetic operations [20.5.6] ****
  *
  *    functors for all of the arithmetic operators
  *@{
@@ -94,8 +161,10 @@ struct negate : unary_function<T, T>
 
 /**@} lib_arithmetic_operations
  */
+#pragma endregion
 
-/**\defgroup  lib_comparisons ********** Comparisons [20.3.3] ***************
+#pragma region lib_comparsions
+/**\defgroup  lib_comparisons ********** Comparisons [20.5.7] ***************
  *
  *   functors for all of the comparison operators
  *@{
@@ -139,8 +208,10 @@ struct less_equal : binary_function<T, T, bool>
 
 /**@} lib_comparisons
  */
+#pragma endregion
 
-/**\defgroup  lib_logical_operations *** Logical operations [20.3.4] ********
+#pragma region lib_logical_operations
+/**\defgroup  lib_logical_operations *** Logical operations [20.5.8] ********
  *
  *   functors for all of the logical operators
  *@{
@@ -166,8 +237,42 @@ struct logical_not : unary_function<T, bool>
 
 /**@} lib_logical_operations
  */
+#pragma endregion
 
-/**\defgroup  lib_negators ************* Negators [20.3.5] ******************
+#pragma region lib_bitwise_operations
+/**\defgroup  lib_bitwise_operations *** Bitwise operations [20.5.9] *********
+ *
+ *   functors for all of the bitwise operators in the language
+ *@{
+ **/
+
+template <class T> struct bit_and : binary_function<T,T,T> 
+{
+  T operator()(const T& x, const T& y) const
+  {
+    return x & y;
+  }
+};
+
+template <class T> struct bit_or : binary_function<T,T,T>
+{
+  T operator()(const T& x, const T& y) const
+  {
+    return x | y;
+  }
+};
+
+template <class T> struct bit_xor : binary_function<T,T,T> 
+{
+  T operator()(const T& x, const T& y) const
+  {
+    return x ^ y;
+  }
+};
+#pragma endregion
+
+#pragma region lib_negators
+/**\defgroup  lib_negators ************* Negators [20.5.10] ******************
  *
  *   negators take a predicate and return its complement
  *@{
@@ -220,12 +325,43 @@ binary_negate<Predicate> not2(const Predicate& pred)
 
 /**@} lib_negators
  */
+#pragma endregion
 
-/**\defgroup  lib_binders ************** Binders [20.3.6] *******************
+#pragma region lib_bind
+/**\defgroup  lib_bind ***************** bind [20.5.11] *****************
+ *
+ *   The template function bind returns an object that binds a function object passed as an argument to additional arguments.
+ *@{
+ */
+#ifdef NTL__CXX
+
+template<class T> struct is_bind_expression;
+template<class T> struct is_placeholder;
+
+template<class Fn, class... Types>
+unspecified bind(Fn, Types...);
+template<class R, class Fn, class... Types>
+unspecified bind(Fn, Types...);
+
+namespace placeholders {
+  // M is the implementation-defined number of placeholders
+  extern unspecified _1;
+  extern unspecified _2;
+  extern unspecified _M;
+}
+
+#endif // NTL__CXX
+
+/**@} lib_bind
+  **/
+#pragma endregion
+
+#pragma region lib_binders
+/**\defgroup  lib_binders ************** Binders [D8] ******************
  *@{
  */
 
-/// 20.3.6.1 Class template binder1st [lib.binder.1st]
+/// D8.1 Class template binder1st [lib.binder.1st]
 template <class Operation>
 class binder1st
 : public unary_function<typename Operation::second_argument_type,
@@ -248,7 +384,7 @@ class binder1st
     }
 };
 
-/// 20.3.6.2 bind1st [lib.bind.1st]
+/// D8.2 bind1st [lib.bind.1st]
 template <class Operation, class T>
 inline
 binder1st<Operation>
@@ -257,7 +393,7 @@ binder1st<Operation>
   return binder1st<Operation>(op, typename Operation::first_argument_type(x));
 }
 
-/// 20.3.6.3 Class template binder2nd [lib.binder.2nd]
+/// D8.3 Class template binder2nd [lib.binder.2nd]
 template <class Operation>
 class binder2nd
 : public unary_function<typename Operation::first_argument_type,
@@ -286,7 +422,7 @@ class binder2nd
     }
 };
 
-/// 20.3.6.4 bind2nd [lib.bind.2nd]
+/// D8.4 bind2nd [lib.bind.2nd]
 template <class Operation, class T>
 inline
 binder2nd<Operation>
@@ -297,8 +433,10 @@ binder2nd<Operation>
 
 /**@} lib_binders
  */
+#pragma endregion
 
-/**\defgroup  lib_function_pointer_adaptors Adaptors for pointers to functions [20.3.7]
+#pragma region lib_adaptors
+/**\defgroup  lib_function_pointer_adaptors Adaptors for pointers to functions [20.5.12]
  *@{
  */
 
@@ -337,8 +475,10 @@ pointer_to_binary_function<Arg1, Arg2, Result>
 
 /**@} lib_function_pointer_adaptors
  */
+#pragma endregion
 
-/**\defgroup  lib_member_pointer_adaptors Adaptors for pointers to members [20.3.8]
+#pragma region lib_member_pointer_adaptors
+/**\defgroup  lib_member_pointer_adaptors Adaptors for pointers to members [20.5.13]
  *@{
  */
 
@@ -479,67 +619,54 @@ const_mem_fun1_ref_t<S, T, A>
 
 /**@} lib_member_pointer_adaptors
  */
+#pragma endregion
 
+#pragma region unord.hash
+// 20.5.16 Class template hash [unord.hash]
+/**\defgroup  lib_hash Class template hash [20.5.16]
+ *
+ * The unordered associative containers defied in clause 23.4 use specializations of hash as the default
+ * hash function.
+ *
+ *@{
+ */
+// 20.5.16, hash function base template:
+template <class T> struct hash;
 
-// DTR 2.1.1 Additions to header <functional> synopsis [tr.util.refwrp.synopsis]
-//namespace tr1 {
+// Hash function specializations
+template <> struct hash<bool>;
+template <> struct hash<char>;
+template <> struct hash<signed char>;
+template <> struct hash<unsigned char>;
+//template <> struct hash<char16_t>;
+//template <> struct hash<char32_t>;
+template <> struct hash<wchar_t>;
+template <> struct hash<short>;
+template <> struct hash<unsigned short>;
+template <> struct hash<int>;
+template <> struct hash<unsigned int>;
+template <> struct hash<long>;
+template <> struct hash<long long>;
+template <> struct hash<unsigned long>;
+template <> struct hash<unsigned long long>;
+template <> struct hash<float>;
+template <> struct hash<double>;
+template <> struct hash<long double>;
+template<class T> struct hash<T*>;
+template <> struct hash<std::string>;
+//template <> struct hash<std::u16string>;
+//template <> struct hash<std::u32string>;
+template <> struct hash<std::wstring>;
+//template <> struct hash<std::error_code>;
+//template <> struct hash<std::thread::id>;
 
-/// 2.1.2 Class template reference_wrapper [tr.util.refwrp.refwrp]
-template <class T>
-class reference_wrapper
-//: public unary_function<T1, R> // see below
-//: public binary_function<T1, T2, R> // see below
+template<class T>
+struct hash: unary_function<T, size_t>
 {
-  ///////////////////////////////////////////////////////////////////////////
-  public :
+  size_t operator()(T val) const;
+};
 
-    // types
-    typedef T type;
-    //typedef -- result_type; // Not always defined
-
-    // construct/copy/destroy
-    explicit reference_wrapper(T&) throw();
-    reference_wrapper(const reference_wrapper<T>& x) throw();
-
-    // assignment
-    reference_wrapper& operator=(const reference_wrapper<T>& x) throw();
-
-    // access
-    operator T& () const throw();
-    T& get() const throw();
-
-#if 0
-    // invocation
-    template <class T1, class T2, ..., class TN>
-    typename result_of<T(T1, T2, ..., TN)>::type
-      operator() (T1&, T2&, ..., TN&) const
-    {
-    // Returns: INVOKE (get(), a1, a2, ..., aN). ([3.3])
-      return get()(t1);
-    }
-#endif
-
-  ///////////////////////////////////////////////////////////////////////////
-  private:
-
-    T* ptr;
-
-};//template class reference_wrapper
-
-
-template <class T>
-inline
-reference_wrapper<T> ref(T& t) throw()
-{
-  return reference_wrapper<T>(t);
-}
-
-template <class T> reference_wrapper<const T> cref(const T&) throw();
-template <class T> reference_wrapper<T> ref(reference_wrapper<T>) throw();
-template <class T> reference_wrapper<const T> cref(reference_wrapper<T>) throw();
-
-//} // namespace tr1
-
+#pragma endregion
 
 /**@} lib_function_objects */
 
