@@ -8,6 +8,9 @@
 #ifndef NTL__STLX_UTILITY
 #define NTL__STLX_UTILITY
 
+//#include "memory.hxx"
+#include "type_traits.hxx"
+
 /// Standard Template Library
 namespace std {
 
@@ -102,11 +105,18 @@ struct pair
 #endif
 };
 
-template <class T1, class T2, class Alloc>
-struct uses_allocator<pair<T1, T2>, Alloc>;
+// forward declarations
+template<class T, class Alloc> struct uses_allocator;
+template <class T> struct constructible_with_allocator_suffix;
+template <class T> struct constructible_with_allocator_prefix;
 
+// 20.2.3.2
+template <class T1, class T2, class Alloc>
+struct uses_allocator<pair<T1, T2>, Alloc>: true_type {};
+
+// 20.2.3.3
 template <class T1, class T2>
-struct constructible_with_allocator_prefix<pair<T1, T2>{>};
+struct constructible_with_allocator_prefix<pair<T1, T2> >: true_type {};
 
 ///\name  Comparisons
 ///@{
