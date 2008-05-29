@@ -594,7 +594,7 @@ namespace ntl {
         char      Name[1];
       };
 
-      union thunk_data86
+      union thunk_data32
       {
         uint32_t  ForwarderString;  // char*
         uint32_t  Function;         // uint32_t*
@@ -656,12 +656,12 @@ namespace ntl {
             ? pe->va<void*>(pe->va<uint32_t*>(AddressOfFunctions)[ordinal]) : 0;
         }
 
-        template<class Hash>
-        uint32_t ordinal(const image* pe, Hash hash, const uint32_t function_hash) const
+        template<class Functor>
+        uint32_t ordinal(const image* pe, Functor finder) const
         {
           const uint32_t * const name_table = pe->va<uint32_t*>(AddressOfNames);
           for(uint32_t n = 0; n < NumberOfNames-1; n++){
-            if(hash(pe->va<const char*>(name_table[n])) == function_hash)
+            if(finder(pe->va<const char*>(name_table[n])))
               return pe->va<const uint16_t*>(AddressOfNameOrdinals)[n];
           }
           return 0xffffffff;
@@ -684,8 +684,8 @@ namespace ntl {
         return in_range(ex, ex + export_table->Size, f) ? 0 : f;
       }
 
-      template<class Hash>
-      void* find_export(Hash hash, const uint32_t function_hash) const
+      template<class Functor>
+      void* find_export_f(Functor finder) const
       {
         const data_directory * const export_table = 
           get_data_directory(data_directory::export_table);
@@ -693,7 +693,7 @@ namespace ntl {
           return 0;
 
         export_directory* exports = va<export_directory*>(export_table->VirtualAddress);
-        void * const f = exports->function(this, exports->ordinal(this, hash, function_hash));
+        void * const f = exports->function(this, exports->ordinal(this, finder));
         const uintptr_t ex = reinterpret_cast<uintptr_t>(exports);
         return in_range(ex, ex + export_table->Size, f) ? 0 : f;
       }
@@ -738,10 +738,10 @@ namespace ntl {
       {
         return brute_cast<PtrType>(find_export(exp));
       }
-      template<typename PtrType, class Hash>
-      PtrType find_export(Hash hash, uint32_t exp) const
+      template<typename PtrType, class Functor>
+      PtrType find_export_f(Functor finder) const
       {
-        return brute_cast<PtrType>(find_export(hash, exp));
+        return brute_cast<PtrType>(find_export(hash));
       }
       template<typename PtrType, typename DllFinder>
       PtrType find_export(const char * exp, DllFinder find_dll) const
@@ -757,34 +757,115 @@ namespace ntl {
 
       ///\name  Imports
 
+      /** Import directory entry */
       struct import_descriptor
       {
         union
         {
+          /** obsolete */
           uint32_t  Characteristics;
+          /** The RVA of the import lookup table. This table contains a name or ordinal for each import. */
           uint32_t  OriginalFirstThunk;
         };
+        /** The stamp that is set to zero until the image is bound. 
+          After the image is bound, this field is set to the time/data stamp of the DLL. */
         uint32_t  TimeDateStamp;
+        /** The index of the first forwarder reference. */
         uint32_t  ForwarderChain;
+        /** RVA. The address of an ASCII string that contains the name of the DLL. */
         uint32_t  Name;
-        uint32_t  FirstThunk; // RVA to IAT
+        /** The RVA of the import address table. The contents of this table are identical 
+          to the contents of the import lookup table until the image is bound. */
+        uint32_t  FirstThunk;
 
-        bool is_terminating() const { return Characteristics == 0; }
+        bool is_terminating() const { return OriginalFirstThunk == 0; }
         bool bound() const { return TimeDateStamp != 0; }
         bool no_forwarders() const { return ForwarderChain == -1; }
 
-        uintptr_t * find(const image * const img, const char * const import_name)
+        uintptr_t * find(const image * const img, const char * const import_name) const
         {
           uintptr_t * iat = img->va<uintptr_t*>(FirstThunk);
-          for ( uintptr_t * hint_name = img->va<uintptr_t*>(OriginalFirstThunk);
-            *hint_name;
-            ++hint_name, ++iat )
-            if ( !std::strcmp(img->va<const char*>(*hint_name) + 2, // skip Hint
-              import_name) )
+          for (intptr_t * hint_name = img->va<intptr_t*>(OriginalFirstThunk);
+            *hint_name && *hint_name >= 0;
+            ++hint_name, ++iat)
+          {
+            if(!std::strcmp(img->va<const char*>(*hint_name) + 2, // skip Hint
+              import_name))
               return iat;
+          }
           return 0;
         }
 
+        uintptr_t * find(const image * const img, uint16_t import_ordinal) const
+        {
+          uintptr_t * iat = img->va<uintptr_t*>(FirstThunk);
+          for (intptr_t * hint_name = img->va<intptr_t*>(OriginalFirstThunk);
+            *hint_name && *hint_name < 0;
+            ++hint_name, ++iat)
+          {
+            if(static_cast<uint16_t>(*hint_name) == import_ordinal)
+              return iat;
+          }
+          return 0;
+        }
+
+        template<class Functor>
+        uintptr_t * find(const image* const img, Functor finder) const
+        {
+          uintptr_t* iat = img->va<uintptr_t*>(FirstThunk);
+          for (intptr_t * hint_name = img->va<intptr_t*>(OriginalFirstThunk);
+            *hint_name && *hint_name >= 0;
+            ++hint_name, ++iat)
+          {
+            if(finder(img->va<const char*>(*hint_name) + 2))
+              return iat;
+          }
+          return 0;
+        }
+
+
+      };
+
+      /** Import lookup table (x86) */
+      struct import_lookup_table32
+      {
+        union {
+          /** A 16-bit ordinal number. */
+          uint16_t    Ordinal;
+          struct {
+            /** A 31-bit RVA of a hint/name table entry. */
+            uint32_t  Name:31;
+            /** Ordinal/Name Flag */
+            uint32_t  IsOrdinal:1;
+          };
+        };
+      };
+
+      /**
+       *	Import lookup table (x64)
+       *  @see import_lookup_table32
+       **/
+      struct import_lookup_table64
+      {
+        union {
+          uint16_t    Ordinal;
+          struct {
+            uint64_t  Name:31;
+            uint64_t  :32;
+            uint64_t  IsOrdinal:1;
+          };
+        };
+      };
+
+      /** Hint/Name import table */
+      struct import_name_table
+      {
+        /** An index into the export name pointer table. A match is attempted first with this value. 
+          If it fails, a binary search is performed on the DLL’s export name pointer table. */
+        uint16_t Hint;
+        /** An ASCII string that contains the name to import. This is the string that must be matched 
+          to the public name in the DLL. This string is case sensitive and terminated by a null byte. */
+        char     Name;
       };
 
       static inline uintptr_t & null_import()
@@ -822,31 +903,46 @@ next_entry:;
         return 0;
       }
 
-      ///\todo have we to change its name to something like find_iat_entry?
-      uintptr_t &
-        find_bound_import(
-        const char *  const import_name,
-        const char *  const module = 0) const
+      template<class Functor>
+      const import_descriptor *
+        find_import_entry_f(Functor finder) const
       {
-        for ( import_descriptor * import_entry = get_first_import_entry();
+        for (const import_descriptor * import_entry = get_first_import_entry();
           import_entry && !import_entry->is_terminating();
-          ++import_entry )
+          ++import_entry)
         {
-          if ( module )
-          { 
-            if ( !import_entry->Name ) goto next_entry;
+          if (!import_entry->Name) continue;
+          const char * const name = va<const char*>(import_entry->Name);
+          if(finder(name))
+            return import_entry;
+        }
+        return 0;
+      }
+
+      uintptr_t& find_iat_entry(
+        const char*  const import_name,
+        const char*  const module = 0) const
+      {
+        for (import_descriptor * import_entry = get_first_import_entry();
+          import_entry && !import_entry->is_terminating();
+          ++import_entry)
+        {
+          if (module){ 
+            if (!import_entry->Name) 
+              goto next_entry;
+
             // compare names case-insensitive (simpified)
-            const char * const name = va<const char*>(import_entry->Name);
-            for ( unsigned i = 0; module[i]; ++i )
-              if ( (module[i] ^ name[i]) & 0x5F) goto next_entry;
+            const char* const name = va<const char*>(import_entry->Name);
+            for (unsigned i = 0; module[i]; ++i)
+              if((module[i] ^ name[i]) & 0x5F)
+                goto next_entry;
           }
-          if ( uintptr_t * iat = import_entry->find(this, import_name) )
+          if(uintptr_t* iat = import_entry->find(this, import_name))
             return *iat;
-next_entry:;
+  next_entry:;
         }
         return null_import();
       }
-
 
       template<typename DllFinder>
       bool bind_import(const DllFinder & find_dll)
@@ -860,7 +956,7 @@ next_entry:;
             find_dll(va<const char*>(import_entry->Name));
           if ( ! dll ) return false;
           void ** iat = va<void**>(import_entry->FirstThunk);
-          for ( int32_t * hint_name = va<int32_t*>(import_entry->OriginalFirstThunk);
+          for ( intptr_t * hint_name = va<intptr_t*>(import_entry->OriginalFirstThunk);
             *hint_name;
             ++hint_name, ++iat )
           {
@@ -901,7 +997,7 @@ next_entry:;
         };
 
         /** x86 relocations */
-        struct type86
+        struct type32
         {
           enum values {
             absolute  = 0x00,
@@ -976,7 +1072,7 @@ next_entry:;
           for ( ; reinterpret_cast<uintptr_t>(entry) < end; ++entry )
             switch ( entry->Type )
           {
-            case base_relocation::type86::highlow:
+            case base_relocation::type32::highlow:
               *reinterpret_cast<uint32_t*>(addr + entry->Offset) += static_cast<uint32_t>(delta);
               break;
             default:
