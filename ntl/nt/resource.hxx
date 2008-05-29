@@ -63,6 +63,18 @@ namespace ntl {
         resource_debug*   DebugInfo;
       };
 
+      // run once
+      union run_once
+      {
+        void* Ptr;
+      };
+
+      typedef uint32_t __stdcall run_once_init_t(
+          rtl::run_once* RunOnce, 
+          void* Parameter, 
+          void** Context
+          );
+
     } // rtl
 
 
@@ -110,6 +122,32 @@ namespace ntl {
 
     NTL__EXTERNAPI
       void __stdcall RtlpNotOwnerCriticalSection(rtl::critical_section* CriticalSection);      
+
+    // run once
+    NTL__EXTERNAPI
+      void RtlRunOnceInitialize(rtl::run_once* RunOnce);
+
+    NTL__EXTERNAPI
+      uint32_t RtlRunOnceExecuteOnce(
+        rtl::run_once*        RunOnce,
+        rtl::run_once_init_t  InitFn,
+        void*                 Parameter,
+        void**                Context
+      );
+
+    NTL__EXTERNAPI
+      uint32_t RtlRunOnceBeginInitialize(
+        rtl::run_once*        RunOnce,
+        uint32_t              Flags,
+        void**                Context
+      );
+
+   NTL__EXTERNAPI
+      uint32_t RtlRunOnceComplete(
+        rtl::run_once*        RunOnce,
+        uint32_t              Flags,
+        void**                Context
+      );
 
   } //namespace nt
 } //namespace ntl

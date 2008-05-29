@@ -11,7 +11,7 @@
 #include "basedef.hxx"
 #include "peb.hxx"
 
-#pragma comment(lib,    "ntdll.lib")
+#pragma comment(lib, "ntdll.lib")
 
 namespace ntl {
 namespace nt {

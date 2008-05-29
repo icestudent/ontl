@@ -88,6 +88,26 @@ namespace ntl {
           i386 = 0x014C,
           amd64= 0x8664
         };
+        struct characteristics
+        {
+          enum values {
+            relocs_stripped           = 0x0001,  // relocation info stripped from file.
+            executable_image          = 0x0002,  // file is executable  (i.e. no unresolved externel references).
+            line_nums_stripped        = 0x0004,  // line nunbers stripped from file.
+            local_syms_stripped       = 0x0008,  // local symbols stripped from file.
+            aggresive_ws_trim         = 0x0010,  // agressively trim working set
+            large_address_aware       = 0x0020,  // app can handle >2gb addresses
+            bytes_reversed_lo         = 0x0080,  // bytes of machine word are reversed.
+            machine_32bit             = 0x0100,  // 32 bit word machine.
+            debug_stripped            = 0x0200,  // debugging info stripped from file in .dbg file
+            removable_run_from_swap   = 0x0400,  // if image is on removable media, copy and run from the swap file.
+            net_run_from_swap         = 0x0800,  // if image is on net, copy and run from the swap file.
+            system                    = 0x1000,  // system file.
+            dll                       = 0x2000,  // file is a dll.
+            up_system_only            = 0x4000,  // file should only be run on a up machine
+            bytes_reversed_hi         = 0x8000  // bytes of machine word are reversed.
+          };
+        };
         uint16_t  Machine;
         uint16_t  NumberOfSections;
         uint32_t  TimeDateStamp;
@@ -105,31 +125,77 @@ namespace ntl {
 
         enum entry
         {
-          export_table        = 0,
-          import_table        = 1,
-          resource_table      = 2,
-          exception_table     = 3,
-          security_table      = 4,
-          basereloc_table     = 5,
-          debug_directory     = 6,
-          architecture        = 7,
-          globalptr           = 8,
-          tls_table           = 9,
-          load_config_table   = 10,
-          bound_import_table  = 11,
-          iat_table           = 12,
-          delay_import_table  = 13,
-          com_descriptor      = 14,
+          export_table,
+          import_table,
+          resource_table,
+          exception_table,
+          security_table,
+          basereloc_table,
+          debug_directory,
+          /** architecture specific (or copyright on x86) */
+          architecture,
+          globalptr,
+          tls_table,
+          load_config_table,
+          bound_import_table,
+          iat_table,
+          delay_import_table,
+          /** COM runtime descriptor */
+          com_descriptor,
 
           number_of_directory_entries = 16
         };
-
       };
 
 
       struct optional_header32
       {
         static const uint16_t signature = 0x010B;
+        struct characteristics 
+        {
+          enum values {
+            /**  DLL can move (ASLR) */
+            dynamic_base          = 0x0040,
+            /**  Code Integrity Image */
+            force_integrity       = 0x0080,
+            /** Image is NX compatible */
+            nx_compat             = 0x0100,
+            /** Image understands isolation and doesn't want it */
+            no_isolation          = 0x0200,
+            /** Image does not use SEH.  No SE handler may reside in this image */
+            no_seh                = 0x0400,
+            /** Do not bind this image. */
+            no_bind               = 0x0800,
+            /** Driver uses WDM model */
+            wdm_driver            = 0x2000,
+            terminal_server_aware = 0x8000
+          };
+        };
+        struct subsystem
+        {
+          enum values {
+            /**  // image doesn't require a subsystem. */
+            native                = 1,
+            /**                // image runs in the windows gui subsystem. */
+            windows_gui,
+            /**                // image runs in the windows character subsystem. */
+            windows_cui,
+            /**  // image runs in the os/2 character subsystem. */
+            os2_cui               = 5,
+            /**  // image runs in the posix character subsystem. */
+            posix_cui             = 7,
+            /**             // image is a native win9x driver. */
+            native_windows,
+            /**             // image runs in the windows ce subsystem. */
+            windows_ce_gui,
+            efi_application,
+            efi_boot_service_driver,
+            efi_runtime_driver,
+            efi_rom,
+            xbox,
+            windows_boot_application = 16
+          };
+        };
         bool is_valid() const { return Magic == signature; }
 
         uint16_t        Magic;
@@ -170,6 +236,51 @@ namespace ntl {
       struct optional_header64
       {
         static const uint16_t signature = 0x020B;
+        struct characteristics 
+        {
+          enum values {
+            /**  DLL can move (ASLR) */
+            dynamic_base          = 0x0040,
+            /**  Code Integrity Image */
+            force_integrity       = 0x0080,
+            /** Image is NX compatible */
+            nx_compat             = 0x0100,
+            /** Image understands isolation and doesn't want it */
+            no_isolation          = 0x0200,
+            /** Image does not use SEH.  No SE handler may reside in this image */
+            no_seh                = 0x0400,
+            /** Do not bind this image. */
+            no_bind               = 0x0800,
+            /** Driver uses WDM model */
+            wdm_driver            = 0x2000,
+            terminal_server_aware = 0x8000
+          };
+        };
+        struct subsystem
+        {
+          enum values {
+            /**  // image doesn't require a subsystem. */
+            native                = 1,
+            /**                // image runs in the windows gui subsystem. */
+            windows_gui,
+            /**                // image runs in the windows character subsystem. */
+            windows_cui,
+            /**  // image runs in the os/2 character subsystem. */
+            os2_cui               = 5,
+            /**  // image runs in the posix character subsystem. */
+            posix_cui             = 7,
+            /**             // image is a native win9x driver. */
+            native_windows,
+            /**             // image runs in the windows ce subsystem. */
+            windows_ce_gui,
+            efi_application,
+            efi_boot_service_driver,
+            efi_runtime_driver,
+            efi_rom,
+            xbox,
+            windows_boot_application = 16
+          };
+        };
         bool is_valid() const { return Magic == signature; }
 
         uint16_t        Magic;
@@ -306,12 +417,12 @@ namespace ntl {
 
       nt_headers * get_nt_headers() 
       { 
-      return va<nt_headers*>(static_cast<uintptr_t>(get_dos_header()->e_lfanew)); 
+        return va<nt_headers*>(static_cast<uintptr_t>(get_dos_header()->e_lfanew)); 
       }
 
       const nt_headers * get_nt_headers() const
       { 
-      return va<const nt_headers*>(static_cast<uintptr_t>(get_dos_header()->e_lfanew)); 
+        return va<const nt_headers*>(static_cast<uintptr_t>(get_dos_header()->e_lfanew)); 
       }
 
       uint32_t checksum() const
@@ -345,6 +456,79 @@ namespace ntl {
 
       struct section_header  
       {
+        struct characteristics
+        {
+          enum values {
+            type_reg                   = 0x00000000,
+            type_dsect                 = 0x00000001,
+            type_noload                = 0x00000002,
+            type_group                 = 0x00000004,
+            type_no_pad                = 0x00000008,
+            type_copy                  = 0x00000010,
+            /** section contains code. */
+            cnt_code                   = 0x00000020,
+            /** section contains initialized data. */
+            cnt_initialized_data       = 0x00000040,
+            /** section contains uninitialized data. */
+            cnt_uninitialized_data     = 0x00000080,
+            lnk_other                  = 0x00000100,
+            /** section contains comments or some other type of information. */
+            lnk_info                   = 0x00000200,
+            type_over                  = 0x00000400,
+            /** section contents will not become part of image. */
+            lnk_remove                 = 0x00000800,
+            /** section contents comdat. */
+            lnk_comdat                 = 0x00001000,
+            /** obsolete */
+            mem_protected              = 0x00004000,
+            /** reset speculative exceptions handling bits in the tlb entries for this section. */
+            no_defer_spec_exc          = 0x00004000,
+            /** section content can be accessed relative to gp */
+            gprel                      = 0x00008000,
+
+            mem_fardata                = 0x00008000,
+            /** obsolete */
+            mem_sysheap                = 0x00010000,
+            mem_purgeable              = 0x00020000,
+            mem_16bit                  = 0x00020000,
+            mem_locked                 = 0x00040000,
+            mem_preload                = 0x00080000,
+
+            align_1bytes               = 0x00100000,
+            align_2bytes               = 0x00200000,
+            align_4bytes               = 0x00300000,
+            align_8bytes               = 0x00400000,
+            /** default alignment if no others are specified. */
+            align_16bytes              = 0x00500000,
+            align_32bytes              = 0x00600000,
+            align_64bytes              = 0x00700000,
+            align_128bytes             = 0x00800000,
+            align_256bytes             = 0x00900000,
+            align_512bytes             = 0x00a00000,
+            align_1024bytes            = 0x00b00000,
+            align_2048bytes            = 0x00c00000,
+            align_4096bytes            = 0x00d00000,
+            align_8192bytes            = 0x00e00000,
+            align_mask                 = 0x00f00000,
+
+            /** section contains extended relocations. */
+            lnk_nreloc_ovfl            = 0x01000000,
+            /** section can be discarded. */
+            mem_discardable            = 0x02000000,
+            /** section is not cachable. */
+            mem_not_cached             = 0x04000000,
+            /** section is not pageable. */
+            mem_not_paged              = 0x08000000,
+            /** section is shareable. */
+            mem_shared                 = 0x10000000,
+            /** section is executable. */
+            mem_execute                = 0x20000000,
+            /** section is readable. */
+            mem_read                   = 0x40000000,
+            /** section is writeable. */
+            mem_write                  = 0x80000000
+          };
+        };
         static const size_t sizeof_short_name = 8;
         char        Name[sizeof_short_name];
         union
@@ -410,12 +594,20 @@ namespace ntl {
         char      Name[1];
       };
 
-      union thunk_data
+      union thunk_data86
       {
         uint32_t  ForwarderString;  // char*
         uint32_t  Function;         // uint32_t*
         uint32_t  Ordinal;
         uint32_t  AddressOfData;    // import_by_name*
+      };
+
+      union thunk_data64
+      {
+        uint64_t  ForwarderString;  // char*
+        uint64_t  Function;         // uint32_t*
+        uint64_t  Ordinal;
+        uint64_t  AddressOfData;    // import_by_name*
       };
 
       ///\name  Export support
@@ -694,13 +886,77 @@ next_entry:;
           uint16_t  Type   : 4;
         } entry[1];
 
-        enum type
+        /** base relocation types */
+        enum types
         {
-          absolute  = 0,
-          high      = 1,
-          low       = 2,
-          highlow   = 3,
-          dir64     = 10,
+          absolute,
+          high,
+          low,
+          highlow,
+          highadj,
+          mips_jmpaddr,
+          mips_jmpaddr16= 9,
+          ia64_imm64    = 9,
+          dir64
+        };
+
+        /** x86 relocations */
+        struct type86
+        {
+          enum values {
+            absolute  = 0x00,
+            high      = 0x01,
+            low       = 0x02,
+            highlow   = 0x03,
+            dir32     = 0x06,
+            dir32nb   = 0x07,
+            seg12     = 0x09,
+            section   = 0x0A,
+            secrel    = 0x0B,
+            token     = 0x0C,
+            secrel7   = 0x0D,
+            rel32     = 0x14,
+          };
+        };
+
+        /** x64 relocations */
+        struct type64
+        {
+          enum values {
+            /** reference is absolute, no relocation is necessary */
+            absolute        = 0x0000,
+            /** 64-bit address (va). */
+            addr64          = 0x0001,
+            /** 32-bit address (va). */
+            addr32          = 0x0002,
+            /** 32-bit address w/o image base (rva). */
+            addr32nb        = 0x0003,
+            /** 32-bit relative address from byte following reloc */
+            rel32           = 0x0004,
+            /** 32-bit relative address from byte distance 1 from reloc */
+            rel32_1         = 0x0005,
+            /** 32-bit relative address from byte distance 2 from reloc */
+            rel32_2         = 0x0006,
+            /** 32-bit relative address from byte distance 3 from reloc */
+            rel32_3         = 0x0007,
+            /** 32-bit relative address from byte distance 4 from reloc */
+            rel32_4         = 0x0008,
+            /** 32-bit relative address from byte distance 5 from reloc */
+            rel32_5         = 0x0009,
+            /** section index */
+            section         = 0x000a,
+            /** 32 bit offset from base of section containing target */
+            secrel          = 0x000b,
+            /** 7 bit unsigned offset from base of section containing target */
+            secrel7         = 0x000c,
+            /** 32 bit metadata token */
+            token           = 0x000d,
+            /** 32 bit signed span-dependent value emitted into object */
+            srel32          = 0x000e,
+            pair            = 0x000f,
+            /** 32 bit signed span-dependent value applied at link time */
+            sspan32         = 0x0010
+          };
         };
       };
 
@@ -720,7 +976,7 @@ next_entry:;
           for ( ; reinterpret_cast<uintptr_t>(entry) < end; ++entry )
             switch ( entry->Type )
           {
-            case base_relocation::highlow:
+            case base_relocation::type86::highlow:
               *reinterpret_cast<uint32_t*>(addr + entry->Offset) += static_cast<uint32_t>(delta);
               break;
             default:
@@ -817,6 +1073,99 @@ next_entry:;
         uint8_t   cert_data[1];
       };
 
+
+      ///\name TLS directory
+
+      typedef void __stdcall tls_callback_t (image* handle, ntl::nt::DllMainReason reason, const void*);
+      struct tls_directory32
+      {
+        uint32_t StartAddressOfRawData;
+        uint32_t EndAddressOfRawData;
+        uint32_t AddressOfIndex;             // uint32_t*
+        uint32_t AddressOfCallBacks;         // tls_callback_t**
+        uint32_t SizeOfZeroFill;
+        uint32_t Characteristics;
+      };
+
+      struct tls_directory64
+      {
+        uint64_t StartAddressOfRawData;
+        uint64_t EndAddressOfRawData;
+        uint64_t AddressOfIndex;             // uint32_t*
+        uint64_t AddressOfCallBacks;         // tls_callback_t**
+        uint64_t SizeOfZeroFill;
+        uint64_t Characteristics;
+      };
+
+      ///\name Load configuration
+      struct load_config_directory32
+      {
+        uint32_t   Size;
+        uint32_t   TimeDateStamp;
+        uint16_t   MajorVersion;
+        uint16_t   MinorVersion;
+        uint32_t   GlobalFlagsClear;
+        uint32_t   GlobalFlagsSet;
+        uint32_t   CriticalSectionDefaultTimeout;
+        uint32_t   DeCommitFreeBlockThreshold;
+        uint32_t   DeCommitTotalFreeThreshold;
+        uint32_t   LockPrefixTable;            // VA
+        uint32_t   MaximumAllocationSize;
+        uint32_t   VirtualMemoryThreshold;
+        uint32_t   ProcessHeapFlags;
+        uint32_t   ProcessAffinityMask;
+        uint16_t   CSDVersion;
+        uint16_t   Reserved1;
+        uint32_t   EditList;                   // VA
+        uint32_t   SecurityCookie;             // VA
+        uint32_t   SEHandlerTable;             // VA
+        uint32_t   SEHandlerCount;
+      };
+
+      struct load_config_directory64
+      {
+        uint32_t   Size;
+        uint32_t   TimeDateStamp;
+        uint16_t   MajorVersion;
+        uint16_t   MinorVersion;
+        uint32_t   GlobalFlagsClear;
+        uint32_t   GlobalFlagsSet;
+        uint32_t   CriticalSectionDefaultTimeout;
+        uint64_t   DeCommitFreeBlockThreshold;
+        uint64_t   DeCommitTotalFreeThreshold;
+        uint64_t   LockPrefixTable;            // VA
+        uint64_t   MaximumAllocationSize;
+        uint64_t   VirtualMemoryThreshold;
+        uint64_t   ProcessAffinityMask;
+        uint32_t   ProcessHeapFlags;
+        uint16_t   CSDVersion;
+        uint16_t   Reserved1;
+        uint64_t   EditList;                   // VA
+        uint64_t   SecurityCookie;             // VA
+        uint64_t   SEHandlerTable;             // VA
+        uint64_t   SEHandlerCount;
+      };
+
+      struct image_runtime_function_entry
+      {
+        uint32_t BeginAddress;
+        uint32_t EndAddress;
+        uint32_t UnwindInfoAddress;
+      };
+
+      struct image_function_entry
+      {
+        uint32_t StartingAddress;
+        uint32_t EndingAddress;
+        uint32_t EndOfPrologue;
+      };
+
+      struct image_function_entry64
+      {
+        uint64_t StartingAddress;
+        uint64_t EndingAddress;
+        uint64_t EndOfPrologue;
+      };
 
       ///}
 

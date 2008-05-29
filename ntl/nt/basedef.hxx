@@ -12,22 +12,16 @@
 #include "../basedef.hxx"
 #include "../stdlib.hxx"
 #include "string.hxx"
-#include "../pe/image.hxx"
+
 
 namespace ntl {
 
-#if 0
-  /// Exception filter return values
-  enum exception_filter
-  {
-    exception_continue_execution = -1,
-    exception_continue_search,
-    exception_execute_handler
-  };
-#endif
-
   namespace km {
     typedef uintptr_t kaffinity_t;
+  }
+
+  namespace pe {
+    class image;
   }
 
   namespace nt {
@@ -205,6 +199,13 @@ namespace ntl {
       PowerDeviceMaximum
     };
 
+    enum DllMainReason 
+    {
+      DllProcessDetach,
+      DllProcessAttach,
+      DllThreadAttach,
+      DllThreadDetach
+    };
 
     struct ldr_data_table_entry
     {
