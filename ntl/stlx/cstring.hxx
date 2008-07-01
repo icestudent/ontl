@@ -11,6 +11,21 @@
 #include "cstddef.hxx"
 #include "cassert.hxx"
 
+#ifdef _MSC_VER
+// It is rumored that
+// "The compiler may call the function and not replace the function call
+// with inline instructions, _if_it_will_result_in_better_performance_"
+// And this is right in some cases.
+NTL__EXTERNAPI int    __cdecl memcmp(const void * s1, const void * s2, size_t n);
+NTL__EXTERNAPI void * __cdecl memcpy(void * const dst, const void * const src, size_t n);
+NTL__EXTERNAPI void * __cdecl memset(void * const s, int c, size_t n);
+NTL__EXTERNAPI int    __cdecl strcmp(const char * s1, const char * s2);
+NTL__EXTERNAPI char * __cdecl strcpy(char * const dst, const char * const src);
+NTL__EXTERNAPI size_t __cdecl strlen(const char * const s);
+NTL__EXTERNAPI char * __cdecl strcat(char * const dst, const char * const src);
+#pragma intrinsic(memcmp, memcpy, memset, strcmp, strcpy, strlen, strcat)
+#endif
+
 namespace std {
 
 /**\addtogroup  lib_strings ************ Strings library [21] ****************
@@ -18,7 +33,13 @@ namespace std {
 /**\addtogroup  lib_c_strings ********** Null-terminated sequence utilities [21.4]
  *@{*/
 
-//#pragma intrinsic(memchr)
+  using ::memcmp;
+  using ::memcpy;
+  using ::memset;
+  using ::strcmp;
+  using ::strcpy;
+  using ::strlen;
+  using ::strcat;
 
 __forceinline 
 const void *
@@ -46,7 +67,7 @@ NTL__CRTCALL
   return 0;
 }
 
-
+#ifndef _MSC_VER
 __forceinline 
 int
 NTL__CRTCALL
@@ -60,7 +81,7 @@ NTL__CRTCALL
     if ( *p != *p2 ) return *p - *p2;
   return 0;  
 }
-
+#endif
 
 namespace x {
 __forceinline 
@@ -75,6 +96,7 @@ void *
   return d;
 } }
 
+#ifndef _MSC_VER
 __forceinline 
 void *
 NTL__CRTCALL
@@ -85,6 +107,7 @@ NTL__CRTCALL
   x::memcpy(dst, src, n);
   return dst;
 }
+#endif
 
 namespace x {
 __forceinline 
@@ -123,6 +146,7 @@ void *
   return p;
 } }
 
+#ifndef _MSC_VER
 __forceinline 
 void *
 NTL__CRTCALL
@@ -134,6 +158,7 @@ NTL__CRTCALL
     p[i] = static_cast<unsigned char>(c);
   return s;
 }
+#endif
 
 
 namespace x {
@@ -148,6 +173,7 @@ char *
   return dst;
 } }
 
+#ifndef _MSC_VER
 __forceinline 
 char *
 NTL__CRTCALL
@@ -158,6 +184,7 @@ NTL__CRTCALL
   x::strcat(dst, src);
   return dst;
 }
+#endif
 
 
 __forceinline 
@@ -186,6 +213,7 @@ NTL__CRTCALL
 }
 
 
+#ifndef _MSC_VER
 __forceinline 
 int
 NTL__CRTCALL
@@ -198,6 +226,7 @@ NTL__CRTCALL
       return  *reinterpret_cast<const unsigned char*>(s1)
             - *reinterpret_cast<const unsigned char*>(s2);
 }
+#endif
 
 __forceinline 
 int
@@ -225,6 +254,7 @@ char *
   return dst;
 } }
 
+#ifndef _MSC_VER
 __forceinline 
 char *
 NTL__CRTCALL
@@ -246,26 +276,27 @@ NTL__CRTCALL
   while ( s[count] ) count++;
   return count;
 }
+#endif
+
+__forceinline 
+char *
+NTL__CRTCALL
+strdup(const char * const src)
+{
+  if(!src)
+    return NULL;
+  size_t len = strlen(src);
+  char* dst = new char[len];
+  strcpy(dst, src);
+  return dst;
+}
+
+
 
 /**@} lib_c_strings */
 /**@} lib_strings */
 
 }//namespace std
-
-#ifdef _MSC_VER
-// It is rumored that
-// "The compiler may call the function and not replace the function call
-// with inline instructions, _if_it_will_result_in_better_performance_"
-// And this is right in some cases.
-NTL__EXTERNAPI int    __cdecl memcmp(const void * s1, const void * s2, size_t n);
-NTL__EXTERNAPI void * __cdecl memcpy(void * const dst, const void * const src, size_t n);
-NTL__EXTERNAPI void * __cdecl memset(void * const s, int c, size_t n);
-NTL__EXTERNAPI int    __cdecl strcmp(const char * s1, const char * s2);
-NTL__EXTERNAPI char * __cdecl strcpy(char * const dst, const char * const src);
-NTL__EXTERNAPI size_t __cdecl strlen(const char * const s);
-NTL__EXTERNAPI char * __cdecl strcat(char * const dst, const char * const src);
-#pragma intrinsic(memcmp, memcpy, memset, strcmp, strcpy, strlen, strcat)
-#endif
 
 // functions exported by ntdll.dll and ntoskrnl.exe
 #ifndef _INC_STDLIB// MSVC compatibility

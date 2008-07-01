@@ -20,7 +20,7 @@
   extern "C" unsigned      __assertion_failure_at_line;
 ///\todo interlocked
 #define __ntl_assert(__msg, __line)\
-  {__assertion_failure = (__msg), __assertion_failure_at_line = (__line); __debugbreak(); }
+  {/*__assertion_failure = (__msg), __assertion_failure_at_line = (__line); */__debugbreak(); }
 
 #endif
 
