@@ -172,6 +172,10 @@ class basic_string
       while ( n-- ) traits_type::assign(str[n], s[n]);
     }
 
+    template<size_t Size>
+    basic_string(const charT (&s)[Size])
+    : str(&s[0], &s[Size]-1/*!s[Size]*/, a) {}
+
     basic_string(size_type n, charT c, const Allocator& a = Allocator())
     : str(n, c, a) {}
 
@@ -263,7 +267,9 @@ class basic_string
 
     basic_string& append(const basic_string& str, size_type pos, size_type n)
     {
-      this->str.insert(this->str.end(), str.max__it(pos, n));
+   //   this->str.insert(this->str.end(), str.max__it(pos, n));
+      this->str.insert(this->str.end(), str.begin() + pos, str.max__it(pos, n));
+
       return *this;
     }
 
@@ -668,14 +674,19 @@ class basic_string
 
   private:
 
-    iterator max__it(size_type pos, size_type n) const
+    const_iterator max__it(size_type pos, size_type n) const
+    {
+      return n < str.size() - pos ? str.begin() + pos + n : str.end();
+    }
+
+    iterator max__it(size_type pos, size_type n)
     {
       return n < str.size() - pos ? str.begin() + pos + n : str.end();
     }
 
     void append_to__reserved(charT c)
     {
-      traits_type::assign(str.end_++, c);
+      traits_type::assign(*str.end_++, c);
     }
 
     void append_to__reserved(const_pointer s)

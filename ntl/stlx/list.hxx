@@ -388,7 +388,7 @@ class list
       if ( size() < 2 ) return;
       iterator i = --end();
       do { const iterator next = i--; if ( *next == *i ) erase(next); }
-      while ( i != begin() )
+      while ( i != begin() );
     }
 
     template <class BinaryPredicate>
@@ -397,22 +397,10 @@ class list
       if ( size() < 2 ) return;
       iterator i = --end();
       do { const iterator next = i--; if ( binary_pred(*next, *i) ) erase(next); }
-      while ( i != begin() )
+      while ( i != begin() );
     }
 
     void merge(list<T, Allocator>& x);
-#if 0
-    {
-      iterator i = begin();
-      iterator x_i = x.begin();
-      while ( i != end() && x_i != x.end() )
-      {
- //       if ( *x_i < *i )
-/////
-      }
-      fix_head();
-    }
-#endif
 
     template <class Compare>
     void merge(list<T, Allocator>& x, Compare comp);
@@ -437,8 +425,6 @@ class list
 
     typename allocator_type::template rebind<node_type>::other node_allocator;
 
-    void fix_head() { head.prev->next = end(); }
-
     void init_head() { head.prev = head.next = &head; }
 
     void replace(iterator position, const T& x)
@@ -454,37 +440,37 @@ class list
 ///\name  List comparisons
 
 template <class T, class Allocator>
-bool operator==(const list<T,Allocator>& x, const list<T,Allocator>& y) throw ()
+bool operator==(const list<T,Allocator>& x, const list<T,Allocator>& y) __ntl_nothrow
 {
   return x.size() == y.size() && equal(x.begin(), x.end(), y.begin());
 }
 
 template <class T, class Allocator>
-bool operator< (const list<T,Allocator>& x, const list<T,Allocator>& y) throw ()
+bool operator< (const list<T,Allocator>& x, const list<T,Allocator>& y) __ntl_nothrow
 {
   return lexicographical_compare(x.begin(), x.end(), y.begin(), y.end());
 }
 
 template <class T, class Allocator>
-bool operator!=(const list<T,Allocator>& x, const list<T,Allocator>& y) throw ()
+bool operator!=(const list<T,Allocator>& x, const list<T,Allocator>& y) __ntl_nothrow
 {
   return ! (x == y);
 }
 
 template <class T, class Allocator>
-bool operator> (const list<T,Allocator>& x, const list<T,Allocator>& y) throw ()
+bool operator> (const list<T,Allocator>& x, const list<T,Allocator>& y) __ntl_nothrow
 {
   return y < x;
 }
 
 template <class T, class Allocator>
-bool operator>=(const list<T,Allocator>& x, const list<T,Allocator>& y) throw ()
+bool operator>=(const list<T,Allocator>& x, const list<T,Allocator>& y) __ntl_nothrow
 {
   return ! (x < y);
 }
 
 template <class T, class Allocator>
-bool operator<=(const list<T,Allocator>& x, const list<T,Allocator>& y) throw ()
+bool operator<=(const list<T,Allocator>& x, const list<T,Allocator>& y) __ntl_nothrow
 {
   return ! (y < x);
 }
@@ -492,7 +478,7 @@ bool operator<=(const list<T,Allocator>& x, const list<T,Allocator>& y) throw ()
 ///\name  List specialized algorithms [23.2.4.5]
 
 template <class T, class Allocator>
-void swap(list<T, Allocator>& x, list<T, Allocator>& y) throw ()
+void swap(list<T, Allocator>& x, list<T, Allocator>& y) __ntl_nothrow
 { 
   x.swap(y);
 }
@@ -502,7 +488,7 @@ void swap(list<T, Allocator>& x, list<T, Allocator>& y) throw ()
 /**@} lib_containers */
 
 ///////////////////////////////////////////////////////////////////////////
-#if 1
+#if 0
 
 template<>
 const char * list<int>::test__implementation()

@@ -11,33 +11,34 @@
 #ifndef NTL_NO_NEW 
 
 #include "heap.hxx"
-#include <new>
+#include "../stlx/new.hxx"
 
 ///\name  Single-object forms
-inline
+
+__forceinline
 void * __cdecl
   operator new(std::size_t size) throw(std::bad_alloc)
 {
   return ntl::nt::heap::alloc(ntl::nt::process_heap(), size);
 }
 
-inline
+__forceinline
 void __cdecl
-  operator delete(void* ptr) throw()
+  operator delete(void* ptr) __ntl_nothrow
 {
   ntl::nt::heap::free(ntl::nt::process_heap(), ptr);
 }
 
-inline
+__forceinline
 void * __cdecl
-  operator new(std::size_t size, const std::nothrow_t&) throw()
+  operator new(std::size_t size, const std::nothrow_t&) __ntl_nothrow
 {
   return ntl::nt::heap::alloc(ntl::nt::process_heap(), size);
 }
 
-inline
+__forceinline
 void __cdecl
-  operator delete(void* ptr, const std::nothrow_t&) throw()
+  operator delete(void* ptr, const std::nothrow_t&) __ntl_nothrow
 {
   ntl::nt::heap::free(ntl::nt::process_heap(), ptr);
 }
@@ -45,30 +46,30 @@ void __cdecl
 
 ///\name  Array forms
 
-inline
+__forceinline
 void * __cdecl
   operator new[](std::size_t size) throw(std::bad_alloc)
 {
   return ntl::nt::heap::alloc(ntl::nt::process_heap(), size);
 }
 
-inline
+__forceinline
 void __cdecl
-  operator delete[](void* ptr) throw()
+  operator delete[](void* ptr) __ntl_nothrow
 {
   ntl::nt::heap::free(ntl::nt::process_heap(), ptr);
 }
 
-inline
+__forceinline
 void * __cdecl
-  operator new[](std::size_t size, const std::nothrow_t&) throw()
+  operator new[](std::size_t size, const std::nothrow_t&) __ntl_nothrow
 {
   return ntl::nt::heap::alloc(ntl::nt::process_heap(), size);
 }
 
-inline
+__forceinline
 void __cdecl
-  operator delete[](void* ptr, const std::nothrow_t&) throw()
+  operator delete[](void* ptr, const std::nothrow_t&) __ntl_nothrow
 {
   ntl::nt::heap::free(ntl::nt::process_heap(), ptr);
 }

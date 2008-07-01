@@ -147,7 +147,7 @@ class system_information_base
 
     typedef InformationClass info_class;
 
-    system_information_base() throw() : ptr(0) 
+    system_information_base() __ntl_nothrow : ptr(0) 
     {
       unsigned long length = 0;
       for ( unsigned long i = sizeof(info_class);
@@ -165,7 +165,7 @@ class system_information_base
       }
     }
 
-    ~system_information_base() throw()
+    ~system_information_base() __ntl_nothrow
     {
       delete[] ptr;
     }

@@ -8,6 +8,8 @@
 #ifndef NTL__STLX_LIMITS
 #define NTL__STLX_LIMITS
 
+#include "cstddef.hxx"
+#include "cstdint.hxx"
 #include "climits.hxx"
 #include "cfloat.hxx"
 
@@ -42,16 +44,16 @@ class numeric_limits
 {
   public:
     static const  bool  is_specialized    = false;
-    static        T     (min)()         throw();
-    static        T     (max)()         throw();
+    static        T     (min)()         __ntl_nothrow;// { return T(false); }
+    static        T     (max)()         __ntl_nothrow;// { return T(false); }
     static const  int   digits            = 0;
     static const  int   digits10          = 0;
     static const  bool  is_signed         = false;
     static const  bool  is_integer        = false;
     static const  bool  is_exact          = false;
     static const  int   radix             = 0;
-    static        T     epsilon()       throw();
-    static        T     round_error()   throw();
+    static        T     epsilon()       __ntl_nothrow;// { return T(false); }
+    static        T     round_error() __ntl_nothrow;// { return T(false); }
     static const  int   min_exponent      = 0;
     static const  int   min_exponent10    = 0;
     static const  int   max_exponent      = 0;
@@ -61,10 +63,10 @@ class numeric_limits
     static const  bool  has_signaling_NaN = false;
     static const  float_denorm_style  has_denorm  = denorm_absent;
     static const  bool  has_denorm_loss   = false;
-    static        T     infinity()      throw();
-    static        T     quiet_NaN()     throw();
-    static        T     signaling_NaN() throw();
-    static        T     denorm_min()    throw();
+    static        T     infinity()      __ntl_nothrow;// { return T(false); }
+    static        T     quiet_NaN()     __ntl_nothrow;// { return T(false); }
+    static        T     signaling_NaN() __ntl_nothrow;// { return T(false); }
+    static        T     denorm_min()    __ntl_nothrow;// { return T(false); }
     static const  bool  is_iec559         = false;
     static const  bool  is_bounded        = false;
     static const  bool  is_modulo         = false;
@@ -80,16 +82,16 @@ class numeric_limits<bool>
 
   public:
     static const  bool  is_specialized    = true;
-    static        T     (min)()         throw() { return false; }
-    static        T     (max)()         throw() { return true; }
+    static        T     (min)()         __ntl_nothrow { return false; }
+    static        T     (max)()         __ntl_nothrow { return true; }
     static const  int   digits            = 1;
     static const  int   digits10          = 0;
     static const  bool  is_signed         = false;
     static const  bool  is_integer        = true;
     static const  bool  is_exact          = true;
     static const  int   radix             = 2;
-    static        T     epsilon()       throw() { return 0; }
-    static        T     round_error()   throw() { return 0; }
+    static        T     epsilon()       __ntl_nothrow { return 0; }
+    static        T     round_error()   __ntl_nothrow { return 0; }
     static const  int   min_exponent      = 0;
     static const  int   min_exponent10    = 0;
     static const  int   max_exponent      = 0;
@@ -99,10 +101,10 @@ class numeric_limits<bool>
     static const  bool  has_signaling_NaN = false;
     static const  float_denorm_style  has_denorm  = denorm_absent;
     static const  bool  has_denorm_loss   = false;
-    static        T     infinity()      throw() { return 0; }
-    static        T     quiet_NaN()     throw() { return 0; }
-    static        T     signaling_NaN() throw() { return 0; }
-    static        T     denorm_min()    throw() { return 0; }
+    static        T     infinity()      __ntl_nothrow { return 0; }
+    static        T     quiet_NaN()     __ntl_nothrow { return 0; }
+    static        T     signaling_NaN() __ntl_nothrow { return 0; }
+    static        T     denorm_min()    __ntl_nothrow { return 0; }
     static const  bool  is_iec559         = false;
     static const  bool  is_bounded        = true;
     static const  bool  is_modulo         = true;
@@ -117,16 +119,16 @@ template<> class numeric_limits<char>
 
   public:
     static const  bool  is_specialized    = true;
-    static        T     (min)()         throw() { return CHAR_MIN; }
-    static        T     (max)()         throw() { return CHAR_MAX; }
+    static        T     (min)()         __ntl_nothrow { return CHAR_MIN; }
+    static        T     (max)()         __ntl_nothrow { return CHAR_MAX; }
     static const  int   digits            = CHAR_BIT + (CHAR_MIN>>(CHAR_BIT-1));
     static const  int   digits10          = digits * 301 / 1000;
     static const  bool  is_signed         = (CHAR_MIN>>(CHAR_BIT-1)) != 0;
     static const  bool  is_integer        = true;
     static const  bool  is_exact          = true;
     static const  int   radix             = 2;
-    static        T     epsilon()       throw() { return 0; }
-    static        T     round_error()   throw() { return 0; }
+    static        T     epsilon()       __ntl_nothrow { return 0; }
+    static        T     round_error()   __ntl_nothrow { return 0; }
     static const  int   min_exponent      = 0;
     static const  int   min_exponent10    = 0;
     static const  int   max_exponent      = 0;
@@ -136,10 +138,10 @@ template<> class numeric_limits<char>
     static const  bool  has_signaling_NaN = false;
     static const  float_denorm_style  has_denorm  = denorm_absent;
     static const  bool  has_denorm_loss   = false;
-    static        T     infinity()      throw() { return 0; }
-    static        T     quiet_NaN()     throw() { return 0; }
-    static        T     signaling_NaN() throw() { return 0; }
-    static        T     denorm_min()    throw() { return 0; }
+    static        T     infinity()      __ntl_nothrow { return 0; }
+    static        T     quiet_NaN()     __ntl_nothrow { return 0; }
+    static        T     signaling_NaN() __ntl_nothrow { return 0; }
+    static        T     denorm_min()    __ntl_nothrow { return 0; }
     static const  bool  is_iec559         = false;
     static const  bool  is_bounded        = true;
     static const  bool  is_modulo         = true;
@@ -154,16 +156,16 @@ template<> class numeric_limits<wchar_t>
 
   public:
     static const  bool  is_specialized    = true;
-    static        T     (min)()         throw() { return WCHAR_MIN; }
-    static        T     (max)()         throw() { return WCHAR_MAX; }
+    static        T     (min)()         __ntl_nothrow { return WCHAR_MIN; }
+    static        T     (max)()         __ntl_nothrow { return WCHAR_MAX; }
     static const  int   digits            = sizeof(T) * CHAR_BIT - (WCHAR_MIN ? 1 : 0);
     static const  int   digits10          = digits * 301 / 1000;
     static const  bool  is_signed         = (WCHAR_MIN ? 1 : 0);
     static const  bool  is_integer        = true;
     static const  bool  is_exact          = true;
     static const  int   radix             = 2;
-    static        T     epsilon()       throw() { return 0; }
-    static        T     round_error()   throw() { return 0; }
+    static        T     epsilon()       __ntl_nothrow { return 0; }
+    static        T     round_error()   __ntl_nothrow { return 0; }
     static const  int   min_exponent      = 0;
     static const  int   min_exponent10    = 0;
     static const  int   max_exponent      = 0;
@@ -173,10 +175,10 @@ template<> class numeric_limits<wchar_t>
     static const  bool  has_signaling_NaN = false;
     static const  float_denorm_style  has_denorm  = denorm_absent;
     static const  bool  has_denorm_loss   = false;
-    static        T     infinity()      throw() { return 0; }
-    static        T     quiet_NaN()     throw() { return 0; }
-    static        T     signaling_NaN() throw() { return 0; }
-    static        T     denorm_min()    throw() { return 0; }
+    static        T     infinity()      __ntl_nothrow { return 0; }
+    static        T     quiet_NaN()     __ntl_nothrow { return 0; }
+    static        T     signaling_NaN() __ntl_nothrow { return 0; }
+    static        T     denorm_min()    __ntl_nothrow { return 0; }
     static const  bool  is_iec559         = false;
     static const  bool  is_bounded        = true;
     static const  bool  is_modulo         = true;
@@ -191,16 +193,16 @@ template<> class numeric_limits<signed char>
 
   public:
     static const  bool  is_specialized    = true;
-    static        T     (min)()         throw() { return SCHAR_MIN; }
-    static        T     (max)()         throw() { return SCHAR_MAX; }
+    static        T     (min)()         __ntl_nothrow { return SCHAR_MIN; }
+    static        T     (max)()         __ntl_nothrow { return SCHAR_MAX; }
     static const  int   digits            = CHAR_BIT - 1;
     static const  int   digits10          = digits * 301 / 1000;
     static const  bool  is_signed         = true;
     static const  bool  is_integer        = true;
     static const  bool  is_exact          = true;
     static const  int   radix             = 2;
-    static        T     epsilon()       throw() { return 0; }
-    static        T     round_error()   throw() { return 0; }
+    static        T     epsilon()       __ntl_nothrow { return 0; }
+    static        T     round_error()   __ntl_nothrow { return 0; }
     static const  int   min_exponent      = 0;
     static const  int   min_exponent10    = 0;
     static const  int   max_exponent      = 0;
@@ -210,10 +212,10 @@ template<> class numeric_limits<signed char>
     static const  bool  has_signaling_NaN = false;
     static const  float_denorm_style  has_denorm  = denorm_absent;
     static const  bool  has_denorm_loss   = false;
-    static        T     infinity()      throw() { return 0; }
-    static        T     quiet_NaN()     throw() { return 0; }
-    static        T     signaling_NaN() throw() { return 0; }
-    static        T     denorm_min()    throw() { return 0; }
+    static        T     infinity()      __ntl_nothrow { return 0; }
+    static        T     quiet_NaN()     __ntl_nothrow { return 0; }
+    static        T     signaling_NaN() __ntl_nothrow { return 0; }
+    static        T     denorm_min()    __ntl_nothrow { return 0; }
     static const  bool  is_iec559         = false;
     static const  bool  is_bounded        = true;
     static const  bool  is_modulo         = true;
@@ -228,16 +230,16 @@ template<> class numeric_limits<short>
 
   public:
     static const  bool  is_specialized    = true;
-    static        T     (min)()         throw() { return SHRT_MIN; }
-    static        T     (max)()         throw() { return SHRT_MAX; }
+    static        T     (min)()         __ntl_nothrow { return SHRT_MIN; }
+    static        T     (max)()         __ntl_nothrow { return SHRT_MAX; }
     static const  int   digits            = sizeof(T) * CHAR_BIT - 1;
     static const  int   digits10          = digits * 301 / 1000;
     static const  bool  is_signed         = true;
     static const  bool  is_integer        = true;
     static const  bool  is_exact          = true;
     static const  int   radix             = 2;
-    static        T     epsilon()       throw() { return 0; }
-    static        T     round_error()   throw() { return 0; }
+    static        T     epsilon()       __ntl_nothrow { return 0; }
+    static        T     round_error()   __ntl_nothrow { return 0; }
     static const  int   min_exponent      = 0;
     static const  int   min_exponent10    = 0;
     static const  int   max_exponent      = 0;
@@ -247,10 +249,10 @@ template<> class numeric_limits<short>
     static const  bool  has_signaling_NaN = false;
     static const  float_denorm_style  has_denorm  = denorm_absent;
     static const  bool  has_denorm_loss   = false;
-    static        T     infinity()      throw() { return 0; }
-    static        T     quiet_NaN()     throw() { return 0; }
-    static        T     signaling_NaN() throw() { return 0; }
-    static        T     denorm_min()    throw() { return 0; }
+    static        T     infinity()      __ntl_nothrow { return 0; }
+    static        T     quiet_NaN()     __ntl_nothrow { return 0; }
+    static        T     signaling_NaN() __ntl_nothrow { return 0; }
+    static        T     denorm_min()    __ntl_nothrow { return 0; }
     static const  bool  is_iec559         = false;
     static const  bool  is_bounded        = true;
     static const  bool  is_modulo         = true;
@@ -265,16 +267,16 @@ template<> class numeric_limits<int>
 
   public:
     static const  bool  is_specialized    = true;
-    static        T     (min)()         throw() { return INT_MIN; }
-    static        T     (max)()         throw() { return INT_MAX; }
+    static        T     (min)()         __ntl_nothrow { return INT_MIN; }
+    static        T     (max)()         __ntl_nothrow { return INT_MAX; }
     static const  int   digits            = sizeof(T) * CHAR_BIT - 1;
     static const  int   digits10          = digits * 301 / 1000;
     static const  bool  is_signed         = true;
     static const  bool  is_integer        = true;
     static const  bool  is_exact          = true;
     static const  int   radix             = 2;
-    static        T     epsilon()       throw() { return 0; }
-    static        T     round_error()   throw() { return 0; }
+    static        T     epsilon()       __ntl_nothrow { return 0; }
+    static        T     round_error()   __ntl_nothrow { return 0; }
     static const  int   min_exponent      = 0;
     static const  int   min_exponent10    = 0;
     static const  int   max_exponent      = 0;
@@ -284,10 +286,10 @@ template<> class numeric_limits<int>
     static const  bool  has_signaling_NaN = false;
     static const  float_denorm_style  has_denorm  = denorm_absent;
     static const  bool  has_denorm_loss   = false;
-    static        T     infinity()      throw() { return 0; }
-    static        T     quiet_NaN()     throw() { return 0; }
-    static        T     signaling_NaN() throw() { return 0; }
-    static        T     denorm_min()    throw() { return 0; }
+    static        T     infinity()      __ntl_nothrow { return 0; }
+    static        T     quiet_NaN()     __ntl_nothrow { return 0; }
+    static        T     signaling_NaN() __ntl_nothrow { return 0; }
+    static        T     denorm_min()    __ntl_nothrow { return 0; }
     static const  bool  is_iec559         = false;
     static const  bool  is_bounded        = true;
     static const  bool  is_modulo         = true;
@@ -302,16 +304,16 @@ template<> class numeric_limits<long>
 
   public:
     static const  bool  is_specialized    = true;
-    static        T     (min)()         throw() { return LONG_MIN; }
-    static        T     (max)()         throw() { return LONG_MAX; }
+    static        T     (min)()         __ntl_nothrow { return LONG_MIN; }
+    static        T     (max)()         __ntl_nothrow { return LONG_MAX; }
     static const  int   digits            = sizeof(T) * CHAR_BIT - 1;
     static const  int   digits10          = digits * 301 / 1000;
     static const  bool  is_signed         = true;
     static const  bool  is_integer        = true;
     static const  bool  is_exact          = true;
     static const  int   radix             = 2;
-    static        T     epsilon()       throw() { return 0; }
-    static        T     round_error()   throw() { return 0; }
+    static        T     epsilon()       __ntl_nothrow { return 0; }
+    static        T     round_error()   __ntl_nothrow { return 0; }
     static const  int   min_exponent      = 0;
     static const  int   min_exponent10    = 0;
     static const  int   max_exponent      = 0;
@@ -321,10 +323,10 @@ template<> class numeric_limits<long>
     static const  bool  has_signaling_NaN = false;
     static const  float_denorm_style  has_denorm  = denorm_absent;
     static const  bool  has_denorm_loss   = false;
-    static        T     infinity()      throw() { return 0; }
-    static        T     quiet_NaN()     throw() { return 0; }
-    static        T     signaling_NaN() throw() { return 0; }
-    static        T     denorm_min()    throw() { return 0; }
+    static        T     infinity()      __ntl_nothrow { return 0; }
+    static        T     quiet_NaN()     __ntl_nothrow { return 0; }
+    static        T     signaling_NaN() __ntl_nothrow { return 0; }
+    static        T     denorm_min()    __ntl_nothrow { return 0; }
     static const  bool  is_iec559         = false;
     static const  bool  is_bounded        = true;
     static const  bool  is_modulo         = true;
@@ -339,16 +341,16 @@ template<> class numeric_limits<long long>
 
   public:
     static const  bool  is_specialized    = true;
-    static        T     (min)()         throw() { return LLONG_MIN; }
-    static        T     (max)()         throw() { return LLONG_MAX; }
+    static        T     (min)()         __ntl_nothrow { return LLONG_MIN; }
+    static        T     (max)()         __ntl_nothrow { return LLONG_MAX; }
     static const  int   digits            = sizeof(T) * CHAR_BIT - 1;
     static const  int   digits10          = digits * 301 / 1000;
     static const  bool  is_signed         = true;
     static const  bool  is_integer        = true;
     static const  bool  is_exact          = true;
     static const  int   radix             = 2;
-    static        T     epsilon()       throw() { return 0; }
-    static        T     round_error()   throw() { return 0; }
+    static        T     epsilon()       __ntl_nothrow { return 0; }
+    static        T     round_error()   __ntl_nothrow { return 0; }
     static const  int   min_exponent      = 0;
     static const  int   min_exponent10    = 0;
     static const  int   max_exponent      = 0;
@@ -358,10 +360,10 @@ template<> class numeric_limits<long long>
     static const  bool  has_signaling_NaN = false;
     static const  float_denorm_style  has_denorm  = denorm_absent;
     static const  bool  has_denorm_loss   = false;
-    static        T     infinity()      throw() { return 0; }
-    static        T     quiet_NaN()     throw() { return 0; }
-    static        T     signaling_NaN() throw() { return 0; }
-    static        T     denorm_min()    throw() { return 0; }
+    static        T     infinity()      __ntl_nothrow { return 0; }
+    static        T     quiet_NaN()     __ntl_nothrow { return 0; }
+    static        T     signaling_NaN() __ntl_nothrow { return 0; }
+    static        T     denorm_min()    __ntl_nothrow { return 0; }
     static const  bool  is_iec559         = false;
     static const  bool  is_bounded        = true;
     static const  bool  is_modulo         = true;
@@ -376,16 +378,16 @@ template<> class numeric_limits<unsigned char>
 
   public:
     static const  bool  is_specialized    = true;
-    static        T     (min)()         throw() { return 0; }
-    static        T     (max)()         throw() { return UCHAR_MAX; }
+    static        T     (min)()         __ntl_nothrow { return 0; }
+    static        T     (max)()         __ntl_nothrow { return UCHAR_MAX; }
     static const  int   digits            = CHAR_BIT - 1;
     static const  int   digits10          = digits * 301 / 1000;
     static const  bool  is_signed         = false;
     static const  bool  is_integer        = true;
     static const  bool  is_exact          = true;
     static const  int   radix             = 2;
-    static        T     epsilon()       throw() { return 0; }
-    static        T     round_error()   throw() { return 0; }
+    static        T     epsilon()       __ntl_nothrow { return 0; }
+    static        T     round_error()   __ntl_nothrow { return 0; }
     static const  int   min_exponent      = 0;
     static const  int   min_exponent10    = 0;
     static const  int   max_exponent      = 0;
@@ -395,10 +397,10 @@ template<> class numeric_limits<unsigned char>
     static const  bool  has_signaling_NaN = false;
     static const  float_denorm_style  has_denorm  = denorm_absent;
     static const  bool  has_denorm_loss   = false;
-    static        T     infinity()      throw() { return 0; }
-    static        T     quiet_NaN()     throw() { return 0; }
-    static        T     signaling_NaN() throw() { return 0; }
-    static        T     denorm_min()    throw() { return 0; }
+    static        T     infinity()      __ntl_nothrow { return 0; }
+    static        T     quiet_NaN()     __ntl_nothrow { return 0; }
+    static        T     signaling_NaN() __ntl_nothrow { return 0; }
+    static        T     denorm_min()    __ntl_nothrow { return 0; }
     static const  bool  is_iec559         = false;
     static const  bool  is_bounded        = true;
     static const  bool  is_modulo         = true;
@@ -413,16 +415,16 @@ template<> class numeric_limits<unsigned short>
 
   public:
     static const  bool  is_specialized    = true;
-    static        T     (min)()         throw() { return 0; }
-    static        T     (max)()         throw() { return USHRT_MAX; }
+    static        T     (min)()         __ntl_nothrow { return 0; }
+    static        T     (max)()         __ntl_nothrow { return USHRT_MAX; }
     static const  int   digits            = sizeof(T) * CHAR_BIT;
     static const  int   digits10          = digits * 301 / 1000;
     static const  bool  is_signed         = false;
     static const  bool  is_integer        = true;
     static const  bool  is_exact          = true;
     static const  int   radix             = 2;
-    static        T     epsilon()       throw() { return 0; }
-    static        T     round_error()   throw() { return 0; }
+    static        T     epsilon()       __ntl_nothrow { return 0; }
+    static        T     round_error()   __ntl_nothrow { return 0; }
     static const  int   min_exponent      = 0;
     static const  int   min_exponent10    = 0;
     static const  int   max_exponent      = 0;
@@ -432,10 +434,10 @@ template<> class numeric_limits<unsigned short>
     static const  bool  has_signaling_NaN = false;
     static const  float_denorm_style  has_denorm  = denorm_absent;
     static const  bool  has_denorm_loss   = false;
-    static        T     infinity()      throw() { return 0; }
-    static        T     quiet_NaN()     throw() { return 0; }
-    static        T     signaling_NaN() throw() { return 0; }
-    static        T     denorm_min()    throw() { return 0; }
+    static        T     infinity()      __ntl_nothrow { return 0; }
+    static        T     quiet_NaN()     __ntl_nothrow { return 0; }
+    static        T     signaling_NaN() __ntl_nothrow { return 0; }
+    static        T     denorm_min()    __ntl_nothrow { return 0; }
     static const  bool  is_iec559         = false;
     static const  bool  is_bounded        = true;
     static const  bool  is_modulo         = true;
@@ -450,16 +452,16 @@ template<> class numeric_limits<unsigned int>
 
   public:
     static const  bool  is_specialized    = true;
-    static        T     (min)()         throw() { return 0; }
-    static        T     (max)()         throw() { return UINT_MAX; }
+    static        T     (min)()         __ntl_nothrow { return 0; }
+    static        T     (max)()         __ntl_nothrow { return UINT_MAX; }
     static const  int   digits            = sizeof(T) * CHAR_BIT;
     static const  int   digits10          = digits * 301 / 1000;
     static const  bool  is_signed         = false;
     static const  bool  is_integer        = true;
     static const  bool  is_exact          = true;
     static const  int   radix             = 2;
-    static        T     epsilon()       throw() { return 0; }
-    static        T     round_error()   throw() { return 0; }
+    static        T     epsilon()       __ntl_nothrow { return 0; }
+    static        T     round_error()   __ntl_nothrow { return 0; }
     static const  int   min_exponent      = 0;
     static const  int   min_exponent10    = 0;
     static const  int   max_exponent      = 0;
@@ -469,10 +471,10 @@ template<> class numeric_limits<unsigned int>
     static const  bool  has_signaling_NaN = false;
     static const  float_denorm_style  has_denorm  = denorm_absent;
     static const  bool  has_denorm_loss   = false;
-    static        T     infinity()      throw() { return 0; }
-    static        T     quiet_NaN()     throw() { return 0; }
-    static        T     signaling_NaN() throw() { return 0; }
-    static        T     denorm_min()    throw() { return 0; }
+    static        T     infinity()      __ntl_nothrow { return 0; }
+    static        T     quiet_NaN()     __ntl_nothrow { return 0; }
+    static        T     signaling_NaN() __ntl_nothrow { return 0; }
+    static        T     denorm_min()    __ntl_nothrow { return 0; }
     static const  bool  is_iec559         = false;
     static const  bool  is_bounded        = true;
     static const  bool  is_modulo         = true;
@@ -487,16 +489,16 @@ template<> class numeric_limits<unsigned long>
 
   public:
     static const  bool  is_specialized    = true;
-    static        T     (min)()         throw() { return 0; }
-    static        T     (max)()         throw() { return ULONG_MAX; }
+    static        T     (min)()         __ntl_nothrow { return 0; }
+    static        T     (max)()         __ntl_nothrow { return ULONG_MAX; }
     static const  int   digits            = sizeof(T) * CHAR_BIT;
     static const  int   digits10          = digits * 301 / 1000;
     static const  bool  is_signed         = false;
     static const  bool  is_integer        = true;
     static const  bool  is_exact          = true;
     static const  int   radix             = 2;
-    static        T     epsilon()       throw() { return 0; }
-    static        T     round_error()   throw() { return 0; }
+    static        T     epsilon()       __ntl_nothrow { return 0; }
+    static        T     round_error()   __ntl_nothrow { return 0; }
     static const  int   min_exponent      = 0;
     static const  int   min_exponent10    = 0;
     static const  int   max_exponent      = 0;
@@ -506,10 +508,10 @@ template<> class numeric_limits<unsigned long>
     static const  bool  has_signaling_NaN = false;
     static const  float_denorm_style  has_denorm  = denorm_absent;
     static const  bool  has_denorm_loss   = false;
-    static        T     infinity()      throw() { return 0; }
-    static        T     quiet_NaN()     throw() { return 0; }
-    static        T     signaling_NaN() throw() { return 0; }
-    static        T     denorm_min()    throw() { return 0; }
+    static        T     infinity()      __ntl_nothrow { return 0; }
+    static        T     quiet_NaN()     __ntl_nothrow { return 0; }
+    static        T     signaling_NaN() __ntl_nothrow { return 0; }
+    static        T     denorm_min()    __ntl_nothrow { return 0; }
     static const  bool  is_iec559         = false;
     static const  bool  is_bounded        = true;
     static const  bool  is_modulo         = true;
@@ -524,16 +526,16 @@ template<> class numeric_limits<unsigned long long>
 
   public:
     static const  bool  is_specialized    = true;
-    static        T     (min)()         throw() { return 0; }
-    static        T     (max)()         throw() { return ULLONG_MAX; }
+    static        T     (min)()         __ntl_nothrow { return 0; }
+    static        T     (max)()         __ntl_nothrow { return ULLONG_MAX; }
     static const  int   digits            = sizeof(T) * CHAR_BIT;
     static const  int   digits10          = digits * 301 / 1000;
     static const  bool  is_signed         = false;
     static const  bool  is_integer        = true;
     static const  bool  is_exact          = true;
     static const  int   radix             = 2;
-    static        T     epsilon()       throw() { return 0; }
-    static        T     round_error()   throw() { return 0; }
+    static        T     epsilon()       __ntl_nothrow { return 0; }
+    static        T     round_error()   __ntl_nothrow { return 0; }
     static const  int   min_exponent      = 0;
     static const  int   min_exponent10    = 0;
     static const  int   max_exponent      = 0;
@@ -543,10 +545,10 @@ template<> class numeric_limits<unsigned long long>
     static const  bool  has_signaling_NaN = false;
     static const  float_denorm_style  has_denorm  = denorm_absent;
     static const  bool  has_denorm_loss   = false;
-    static        T     infinity()      throw() { return 0; }
-    static        T     quiet_NaN()     throw() { return 0; }
-    static        T     signaling_NaN() throw() { return 0; }
-    static        T     denorm_min()    throw() { return 0; }
+    static        T     infinity()      __ntl_nothrow { return 0; }
+    static        T     quiet_NaN()     __ntl_nothrow { return 0; }
+    static        T     signaling_NaN() __ntl_nothrow { return 0; }
+    static        T     denorm_min()    __ntl_nothrow { return 0; }
     static const  bool  is_iec559         = false;
     static const  bool  is_bounded        = true;
     static const  bool  is_modulo         = true;
@@ -555,22 +557,51 @@ template<> class numeric_limits<unsigned long long>
     static const  float_round_style round_style = round_toward_zero;
 };//template class numeric_limits<unsigned long long> 
 
+union __fvalue { uint8_t raw[sizeof(float)]; float value; };
+STATIC_ASSERT(sizeof(__fvalue) == 4);
+static const __fvalue __float_infinity      = { 0x00, 0x00, 0x80, 0x7F };
+static const __fvalue __float_quiet_NaN     = { 0x00, 0x00, 0xC0, 0x7F };
+static const __fvalue __float_signaling_NaN = { 0x01, 0x00, 0x80, 0x7F };
+static const __fvalue __float_denorm_min    = { 0x01, 0x00, 0x00, 0x00 };
+
+union __dvalue { uint8_t raw[sizeof(double)]; double  value;};
+STATIC_ASSERT(sizeof(__dvalue) == 8);
+static const __dvalue __double_infinity      = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xF0, 0x7F };
+static const __dvalue __double_quiet_NaN     = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xF8, 0x7F };
+static const __dvalue __double_signaling_NaN = { 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0xF0, 0x7F };
+static const __dvalue __double_denorm_min    = { 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+
+#if DBL_DIG == LDBL_DIG
+#define __long_double_infinity      __double_infinity
+#define __long_double_quiet_NaN     __double_quiet_NaN
+#define __long_double_signaling_NaN __double_signaling_NaN
+#define __long_double_denorm_min    __double_denorm_min
+#else
+union __ldvalue { uint8_t raw[sizeof(long double)]; long double  value;};
+#error undefined
+STATIC_ASSERT(sizeof(__ldvalue) == 10);
+static const __ldvalue __long_double_infinity;
+static const __ldvalue __long_double_quiet_NaN;
+static const __ldvalue __long_double_signaling_NaN;
+static const __ldvalue __long_double_denorm_min;
+#endif
+
 template<> class numeric_limits<float>
 {
     typedef float T;
 
   public:
     static const  bool  is_specialized    = true;
-    static        T     (min)() throw() { return FLT_MIN; }
-    static        T     (max)() throw() { return FLT_MAX; }
+    static        T     (min)() __ntl_nothrow { return FLT_MIN; }
+    static        T     (max)() __ntl_nothrow { return FLT_MAX; }
     static const  int   digits            = FLT_MANT_DIG;
     static const  int   digits10          = FLT_DIG;
     static const  bool  is_signed         = true;
     static const  bool  is_integer        = false;
     static const  bool  is_exact          = false;
     static const  int   radix             = FLT_RADIX;
-    static        T     epsilon()     throw() { return FLT_EPSILON; }
-    static        T     round_error() throw() { return 0.5; }
+    static        T     epsilon()     __ntl_nothrow { return FLT_EPSILON; }
+    static        T     round_error() __ntl_nothrow { return 0.5; }
     static const  int   min_exponent      = FLT_MIN_EXP;
     static const  int   min_exponent10    = FLT_MIN_10_EXP;
     static const  int   max_exponent      = FLT_MAX_EXP;
@@ -580,10 +611,10 @@ template<> class numeric_limits<float>
     static const  bool  has_signaling_NaN = true;
     static const  float_denorm_style  has_denorm  = denorm_present;
     static const  bool  has_denorm_loss   = true;
-    static T infinity()  throw()  { extern T __float_infinity;    return __float_infinity; }
-    static T quiet_NaN() throw()  { extern T __float_quiet_NaN;   return __float_quiet_NaN; }
-    static T signaling_NaN() throw() { extern T __float_signaling_NaN; return __float_signaling_NaN; }
-    static T denorm_min() throw() { extern T __float_denorm_min;  return __float_denorm_min; }
+    static T infinity()  __ntl_nothrow      { return __float_infinity.value; }
+    static T quiet_NaN() __ntl_nothrow      { return __float_quiet_NaN.value; }
+    static T signaling_NaN() __ntl_nothrow  { return __float_signaling_NaN.value; }
+    static T denorm_min() __ntl_nothrow     { return __float_denorm_min.value; }
     static const  bool  is_iec559         = true;
     static const  bool  is_bounded        = true;
     static const  bool  is_modulo         = false;
@@ -598,16 +629,16 @@ template<> class numeric_limits<double>
 
   public:
     static const  bool  is_specialized    = true;
-    static        T     (min)() throw() { return DBL_MIN; }
-    static        T     (max)() throw() { return DBL_MAX; }
+    static        T     (min)() __ntl_nothrow { return DBL_MIN; }
+    static        T     (max)() __ntl_nothrow { return DBL_MAX; }
     static const  int   digits            = DBL_MANT_DIG;
     static const  int   digits10          = DBL_DIG;
     static const  bool  is_signed         = true;
     static const  bool  is_integer        = false;
     static const  bool  is_exact          = false;
     static const  int   radix             = DBL_RADIX;
-    static        T     epsilon()     throw() { return DBL_EPSILON; }
-    static        T     round_error() throw() { return 0.5; }
+    static        T     epsilon()     __ntl_nothrow { return DBL_EPSILON; }
+    static        T     round_error() __ntl_nothrow { return 0.5; }
     static const  int   min_exponent      = DBL_MIN_EXP;
     static const  int   min_exponent10    = DBL_MIN_10_EXP;
     static const  int   max_exponent      = DBL_MAX_EXP;
@@ -617,10 +648,10 @@ template<> class numeric_limits<double>
     static const  bool  has_signaling_NaN = true;
     static const  float_denorm_style  has_denorm  = denorm_present;
     static const  bool  has_denorm_loss   = true;
-    static T infinity()  throw()  { extern T __double_infinity;    return __double_infinity; }
-    static T quiet_NaN() throw()  { extern T __double_quiet_NaN;   return __double_quiet_NaN; }
-    static T signaling_NaN() throw() { extern T __double_signaling_NaN; return __double_signaling_NaN; }
-    static T denorm_min() throw() { extern T __double_denorm_min;  return __double_denorm_min; }
+    static T infinity()  __ntl_nothrow      { return __double_infinity.value; }
+    static T quiet_NaN() __ntl_nothrow      { return __double_quiet_NaN.value; }
+    static T signaling_NaN() __ntl_nothrow  { return __double_signaling_NaN.value; }
+    static T denorm_min() __ntl_nothrow     { return __double_denorm_min.value; }
     static const  bool  is_iec559         = true;
     static const  bool  is_bounded        = true;
     static const  bool  is_modulo         = false;
@@ -635,16 +666,16 @@ template<> class numeric_limits<long double>
 
   public:
     static const  bool  is_specialized    = true;
-    static        T     (min)() throw() { return LDBL_MIN; }
-    static        T     (max)() throw() { return LDBL_MAX; }
+    static        T     (min)() __ntl_nothrow { return LDBL_MIN; }
+    static        T     (max)() __ntl_nothrow { return LDBL_MAX; }
     static const  int   digits            = LDBL_MANT_DIG;
     static const  int   digits10          = LDBL_DIG;
     static const  bool  is_signed         = true;
     static const  bool  is_integer        = false;
     static const  bool  is_exact          = false;
     static const  int   radix             = LDBL_RADIX;
-    static        T     epsilon()     throw() { return LDBL_EPSILON; }
-    static        T     round_error() throw() { return 0.5; }
+    static        T     epsilon()     __ntl_nothrow { return LDBL_EPSILON; }
+    static        T     round_error() __ntl_nothrow { return 0.5; }
     static const  int   min_exponent      = LDBL_MIN_EXP;
     static const  int   min_exponent10    = LDBL_MIN_10_EXP;
     static const  int   max_exponent      = LDBL_MAX_EXP;
@@ -654,10 +685,10 @@ template<> class numeric_limits<long double>
     static const  bool  has_signaling_NaN = true;
     static const  float_denorm_style  has_denorm  = denorm_present;
     static const  bool  has_denorm_loss   = true;
-    static T infinity()  throw()  { extern T __long_double_infinity;    return __long_double_infinity; }
-    static T quiet_NaN() throw()  { extern T __long_double_quiet_NaN;   return __long_double_quiet_NaN; }
-    static T signaling_NaN() throw() { extern T __long_double_signaling_NaN; return __long_double_signaling_NaN; }
-    static T denorm_min() throw() { extern T __long_double_denorm_min;  return __long_double_denorm_min; }
+    static T infinity()  __ntl_nothrow      { return __long_double_infinity.value; }
+    static T quiet_NaN() __ntl_nothrow      { return __long_double_quiet_NaN.value; }
+    static T signaling_NaN() __ntl_nothrow  { return __long_double_signaling_NaN.value; }
+    static T denorm_min() __ntl_nothrow     { return __long_double_denorm_min.value; }
     static const  bool  is_iec559         = true;
     static const  bool  is_bounded        = true;
     static const  bool  is_modulo         = false;

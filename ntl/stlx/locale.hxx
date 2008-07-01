@@ -72,15 +72,15 @@ class locale
 
     ///\name 22.1.1.2 locale constructors and destructor [locale.cons]
 
-    locale() throw() {/**/}
-    locale(const locale& /*other*/) throw() {/**/}
-    const locale& operator=(const locale& other) throw();
-    explicit locale(const char* std_name) throw (runtime_error);
-    locale(const locale& other, const char* std_name, category) throw (runtime_error);
+    locale() __ntl_nothrow {/**/}
+    locale(const locale& /*other*/) __ntl_nothrow {/**/}
+    const locale& operator=(const locale& other) __ntl_nothrow;
+    explicit locale(const char* std_name) __ntl_throws(runtime_error);
+    locale(const locale& other, const char* std_name, category) __ntl_throws(runtime_error);
     template <class Facet> locale(const locale& other, Facet* f);
     locale(const locale& other, const locale& one, category);
 
-    ~locale() throw() {} // non-virtual
+    ~locale() __ntl_nothrow {} // non-virtual
 
     ///\name 22.1.1.3 locale members [locale.members]
 
@@ -110,7 +110,7 @@ class locale
 ///\name 22.1.2 locale globals [locale.global.templates]
 
 template <class Facet> const Facet& use_facet(const locale&);
-template <class Facet> bool has_facet(const locale&) throw();
+template <class Facet> bool has_facet(const locale&) __ntl_nothrow;
 
 ///\name 22.1.3 Convenience interfaces [locale.convenience]
 
@@ -413,9 +413,9 @@ template <> class ctype<char>
         delete[] tab;
     }
 
-    const mask* table() const throw() { return tab; }
+    const mask* table() const __ntl_nothrow { return tab; }
 
-    static const mask* classic_table() throw()
+    static const mask* classic_table() __ntl_nothrow
     {
       return 0;
     }
@@ -553,15 +553,15 @@ class codecvt : public locale::facet, public codecvt_base
                     internT *  to_limit,
                     internT *& to_next) const;
 
-    int encoding() const throw();
-    bool always_noconv() const throw();
+    int encoding() const __ntl_nothrow;
+    bool always_noconv() const __ntl_nothrow;
 
     int length(stateT &,
                const externT* from,
                const externT* end,
                size_t max) const;
 
-    int max_length() const throw();
+    int max_length() const __ntl_nothrow;
 
     static locale::id id;
 
@@ -578,13 +578,13 @@ class codecvt : public locale::facet, public codecvt_base
 
     virtual result do_unshift(stateT& state, externT* to, externT* to_limit, externT*& to_next) const;
 
-    virtual int do_encoding() const throw();
+    virtual int do_encoding() const __ntl_nothrow;
 
-    virtual bool do_always_noconv() const throw();
+    virtual bool do_always_noconv() const __ntl_nothrow;
 
     virtual int do_length(stateT&, const externT* from, const externT* end, size_t max) const;
 
-    virtual int do_max_length() const throw();
+    virtual int do_max_length() const __ntl_nothrow;
 
 };// codecvt
 
@@ -612,15 +612,15 @@ class codecvt_byname : public codecvt<internT, externT, stateT>
     virtual result do_in(stateT& state, const externT* from, const externT* from_end,
       const externT*& from_next, internT* to, internT* to_limit, internT*& to_next) const;
 
-    virtual int do_encoding() const throw();
+    virtual int do_encoding() const __ntl_nothrow;
 
-    virtual bool do_always_noconv() const throw();
+    virtual bool do_always_noconv() const __ntl_nothrow;
 
     virtual int do_length(stateT&, const externT* from, const externT* end, size_t max) const;
 
     virtual result do_unshift(stateT& state, externT* to, externT* to_limit, externT*& to_next) const;
 
-    virtual int do_max_length() const throw();
+    virtual int do_max_length() const __ntl_nothrow;
 
 };
 

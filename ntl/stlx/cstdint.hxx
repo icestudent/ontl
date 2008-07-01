@@ -60,6 +60,11 @@ typedef unsigned int  uintptr_t;
 typedef int64_t   intmax_t;
 typedef uint64_t  uintmax_t;
 
+#ifndef NTL__CXX
+typedef uint16_t char16_t;
+typedef uint32_t char32_t;
+#endif
+
 ///@}
 
 /**@} lib_support_types

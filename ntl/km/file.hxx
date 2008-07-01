@@ -117,7 +117,7 @@ class file_handler : public handle, public device_traits<file_handler>
         const uint64_t *            allocation_size = 0,
         const void *                ea_buffer       = 0,
         uint32_t                    ea_length       = 0
-        ) throw()
+        ) __ntl_nothrow
     {
       reset();
       return ZwCreateFile(this, desired_access, &oa, &iosb,
@@ -136,7 +136,7 @@ class file_handler : public handle, public device_traits<file_handler>
         const uint64_t *            allocation_size = 0,
         const void *                ea_buffer       = 0,
         uint32_t                    ea_length       = 0
-        ) throw()
+        ) __ntl_nothrow
     {
       reset();
       const const_unicode_string uname(file_name);
@@ -152,7 +152,7 @@ class file_handler : public handle, public device_traits<file_handler>
         const access_mask           desired_access,
         const share_mode            share,
         const creation_options      co
-        ) throw()
+        ) __ntl_nothrow
     {
       reset();
       return ZwOpenFile(this, desired_access, &oa, &iosb, share, co);
@@ -179,7 +179,7 @@ class file_handler : public handle, public device_traits<file_handler>
         io_apc_routine *  apc_routine       = 0,
         const void *      apc_context       = 0,
         const uint32_t *  key               = 0
-        ) throw()
+        ) __ntl_nothrow
     {
       return ZwReadFile(get(), completion_event, apc_routine, apc_context,
                         &iosb, out_buf, out_size, offset, key);
@@ -194,7 +194,7 @@ class file_handler : public handle, public device_traits<file_handler>
         io_apc_routine *  apc_routine       = 0,
         const void *      apc_context       = 0,
         const uint32_t *  key               = 0
-        ) throw()
+        ) __ntl_nothrow
     {
       return ZwWriteFile(get(), completion_event, apc_routine, apc_context,
                           &iosb, in_buf, in_size, offset, key);

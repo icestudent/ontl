@@ -220,7 +220,7 @@ class key : public handle, public device_traits<key>
         disposition *                 cd          = 0,
         uint32_t                      title_index = 0,
         const const_unicode_string *  key_class   = 0
-        ) throw()
+        ) __ntl_nothrow
     {
       this->handle::reset();
       return nt::success(ZwCreateKey(this, desired_access, &oa, title_index,
@@ -232,7 +232,7 @@ class key : public handle, public device_traits<key>
       open(
         const object_attributes & oa, 
         const access_mask         desired_access  = access_mask_default
-        ) throw()
+        ) __ntl_nothrow
     {
       this->handle::reset();
       return nt::success(ZwOpenKey(this, desired_access, &oa));
@@ -346,7 +346,7 @@ class key : public handle, public device_traits<key>
         void *                        information,
         uint32_t                      length,
         uint32_t &                    result_length
-        ) const throw()
+        ) const __ntl_nothrow
     {
       return ZwQueryValueKey(this->get(), &value_name, info_class, information,
                               length, &result_length);
@@ -443,7 +443,7 @@ class key : public handle, public device_traits<key>
         const void *                  information,
         uint32_t                      length,
         uint32_t                      title_index  = 0
-        ) throw()
+        ) __ntl_nothrow
     {
       return ZwSetValueKey(this->get(), &value_name, title_index, type, information,
                               length);

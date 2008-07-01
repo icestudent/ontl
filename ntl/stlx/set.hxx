@@ -25,9 +25,9 @@ namespace std {
   /// Class template set [23.3.3]
   template <class Key, class Compare = less<Key>, class Allocator = allocator<Key> >
   class set:
-    public tree::rbtree::rbtree<Key, Compare, Allocator>
+    public tree::rb_tree::rb_tree<Key, Compare, Allocator>
   {
-    typedef tree::rbtree::rbtree<Key, Compare, Allocator> tree_type;
+    typedef tree::rb_tree::rb_tree<Key, Compare, Allocator> tree_type;
   public:
     // types:
     typedef Key key_type;

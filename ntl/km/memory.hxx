@@ -35,7 +35,7 @@ namespace ntl {
       __declspec(noalias) __declspec(restrict)
         __forceinline
         pointer allocate(size_type n, std::allocator<void>::const_pointer hint = 0)
-        throw()
+        __ntl_nothrow
       {
         (hint);
         const pointer p = reinterpret_cast<T*>(::operator new(sizeof(T) * n, nonpaged));

@@ -362,7 +362,7 @@ namespace ntl {
         IofCompleteRequest(this, PriorityBoost);
       }
 
-      void * operator new(std::size_t, uint8_t StackSize, bool ChargeQuota = false) throw()
+      void * operator new(std::size_t, uint8_t StackSize, bool ChargeQuota = false) __ntl_nothrow
       {
         return allocate(StackSize, ChargeQuota);
       }

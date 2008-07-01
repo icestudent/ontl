@@ -192,7 +192,7 @@ class service_control
       return 0 != StartServiceW(handle, argc, argv);
     }
 
-    const service_status * operator->() const throw()
+    const service_status * operator->() const __ntl_nothrow
     { 
       return handle ? &status : reinterpret_cast<const service_status*>(handle);
     }

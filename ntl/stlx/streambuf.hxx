@@ -61,7 +61,13 @@ class basic_streambuf
 
     locale pubimbue(const locale& loc);
 
-    locale getloc() const { return l; }
+    locale getloc() const
+    { 
+#if !STLX__CONFORMING_LOCALE
+      locale  l;
+#endif
+      return l;
+    }
 
     ///\name  // 27.5.2.2.2 Buffer management and positioning [streambuf.buffer]
 
@@ -74,7 +80,7 @@ class basic_streambuf
                         ios_base::seekdir  way,
                         ios_base::openmode which = ios_base::in | ios_base::out)
     {
-      return seekoff(off, way which);
+      return seekoff(off, way, which);
     }
 
     pos_type pubseekpos(pos_type sp,
@@ -145,7 +151,7 @@ class basic_streambuf
     {
       const int_type ic = traits_type::to_int_type(c);
       const streamsize wavail = pend - pnext;
-      return !(0 < wavail) ? overflow(ic) : *pnext++ = ic, ic;
+      return !(0 < wavail) ? overflow(ic) : *pnext++ = traits_type::to_char_type(ic), ic;
     }
     
     streamsize sputn(const char_type* s, streamsize n)
@@ -254,7 +260,7 @@ class basic_streambuf
     { 
       ///\note The public members of basic_streambuf call this virtual function
       ///      only if gptr() is null or gptr() >= egptr()
-      assert(!gptr || gptr() >= egptr());
+      _Assert(!gptr() || gptr() >= egptr());
       //  Default behavior: Returns traits::eof().
       return traits_type::eof();
     }
@@ -276,7 +282,7 @@ class basic_streambuf
       ///      only when gptr() is null, gptr() == eback(),
       ///      or traits::eq(traits::to_char_type(c ),gptr()[-1]) returns false.
       ///      Other calls shall also satisfy that constraint.
-      assert(!gptr || gptr() >= eback()
+      _Assert(!gptr() || gptr() >= eback()
           || !traits_type::eq(traits_type::to_char_type(c),gnext[-1]));
       (c);
       //  Default behavior: Returns traits::eof().

@@ -21,8 +21,8 @@ class logic_error : public exception
   public:
     explicit logic_error(const string& what_arg) : msg(what_arg) {}
     explicit logic_error(const char* what_arg )  : msg(what_arg) {}
-    virtual const char* what() const throw() { return msg.c_str(); }
-    ~logic_error() throw() {}
+    virtual const char* what() const __ntl_nothrow { return msg.c_str(); }
+    ~logic_error() __ntl_nothrow {}
   private:
     const string msg;
   protected:
@@ -67,8 +67,8 @@ class runtime_error : public exception
   public:
     explicit runtime_error(const string& what_arg) : msg(what_arg) {}
     explicit runtime_error(const char* what_arg )  : msg(what_arg) {}
-    virtual const char* what() const throw() { return msg.c_str(); }
-    ~runtime_error() throw() {}
+    virtual const char* what() const __ntl_nothrow { return msg.c_str(); }
+    ~runtime_error() __ntl_nothrow {}
   private:
     const string msg;
   protected:

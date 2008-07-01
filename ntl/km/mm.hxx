@@ -259,12 +259,12 @@ namespace ntl {
         bool      Secondary_buffer  = false,
         bool      charge_quota     = false,
         irp *     pirp             = 0
-        ) throw()
+        ) __ntl_nothrow
       {
         return IoAllocateMdl(virtual_address, length, Secondary_buffer, charge_quota, pirp);
       }
 
-      void operator delete(void * pmdl) throw()
+      void operator delete(void * pmdl) __ntl_nothrow
       {
         if ( pmdl ) IoFreeMdl(reinterpret_cast<mdl *>(pmdl));
       }

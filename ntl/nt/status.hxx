@@ -1628,6 +1628,10 @@ struct status
     ipsec_invalid_packet                                           = (int)0xC0360005,
     ipsec_integrity_check_failed                                   = (int)0xC0360006,
     ipsec_clear_text_drop                                          = (int)0xC0360007,
+
+    cxx_exception = (int)(0xE0000000|'msc'),
+    com_exception = (int)0xE0000000|'MOC'
+
   };
 };
 

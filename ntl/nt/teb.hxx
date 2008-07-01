@@ -8,7 +8,6 @@
 #ifndef NTL__NT_TEB
 #define NTL__NT_TEB
 
-#include "exception.hxx"
 #include "handle.hxx"
 
 template<size_t v>
@@ -54,6 +53,8 @@ namespace intrinsic {
 #endif
 }//namespace intrin
 
+struct exception_registration; ///\see exception::registration. It's a forward declaration
+
 namespace nt {
 
 struct peb;
@@ -62,7 +63,7 @@ struct peb;
 /// @note mapped at fs:0x00
 struct tib
 {
-  /* 0x00 */  exception::registration * ExceptionList;
+  /* 0x00 */  exception_registration  * ExceptionList;
   /* 0x04 */  void                    * StackBase;    ///< upper stack address
   /* 0x08 */  void                    * StackLimit;  ///< lower stack address
   /* 0x0C */  void                    * SubSystemTib;

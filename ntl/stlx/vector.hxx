@@ -119,6 +119,7 @@ class vector
       vector__disp(first, last, is_integral<InputIterator>::type());
     }
 
+    __forceinline
     vector(const vector<T, Allocator>& x)
     : array_allocator(x.array_allocator)
     {
@@ -133,7 +134,7 @@ class vector
     }
 
     __forceinline
-    ~vector() throw()
+    ~vector() __ntl_nothrow
     { 
       clear();
       if ( begin_ ) array_allocator.deallocate(begin_, capacity_);
@@ -220,14 +221,14 @@ class vector
     size_type capacity()  const { return capacity_; }
     bool      empty()     const { return begin_ == end_; }
 
-    void resize(size_type sz, T c = T())
+    void resize(size_type sz, const T& c = T())
     {
       iterator new_end = begin_ + sz;
       while ( new_end < end_ ) pop_back();
       if    ( new_end > end_ ) insert(end_, new_end - end_, c);
     }
 
-    void reserve(size_type n) throw(bad_alloc) //throw(length_error)
+    void reserve(size_type n) __ntl_throws(bad_alloc) //throw(length_error)
     { 
       if ( capacity() < n ) realloc(n);
     }
@@ -249,10 +250,10 @@ class vector
       return operator[](n);
     }
 
-    reference       front()       throw() { return *begin(); }
-    const_reference front() const throw() { return *begin(); }
-    reference       back()        throw() { return *(end() - 1); }
-    const_reference back()  const throw() { return *(end() - 1); }
+    reference       front()       __ntl_nothrow { return *begin(); }
+    const_reference front() const __ntl_nothrow { return *begin(); }
+    reference       back()        __ntl_nothrow { return *(end() - 1); }
+    const_reference back()  const __ntl_nothrow { return *(end() - 1); }
 
     ///@}
 
@@ -274,7 +275,7 @@ class vector
         new_end = new_mem + difference_type(new_end - old_mem);
         //new_end += difference_type(new_mem - old_mem);        // dangerous alignment
         iterator dest = begin_ = new_mem;
-        // this is safe for begin_ == 0 && end_ == 0, but keep vector() coherent
+        // this is safe for begin_ == 0 && end_ == 0, but keep vector() intact
         for ( iterator src = old_mem; src != position; ++src, ++dest )
           move(dest, src);
       }
@@ -336,7 +337,7 @@ class vector
       array_allocator.construct(end_++, x);
     }
 
-    void pop_back() throw() { array_allocator.destroy(--end_); }
+    void pop_back() __ntl_nothrow { array_allocator.destroy(--end_); }
 
     iterator insert(iterator position, const T& x)
     {
@@ -354,12 +355,19 @@ class vector
       insert__disp(position, first, last, is_integral<InputIterator>::type());
     }
 
-    iterator erase(iterator position) throw()
+    __forceinline
+    iterator erase(iterator position) __ntl_nothrow
     { 
-      return erase(position, position + 1);
+      // return erase(position, position + 1);
+      array_allocator.destroy(position);
+      --end_;
+      iterator i = position;
+      do move(i, i + 1); while ( ++i != end_ );
+      return position;
     }
 
-    iterator erase(iterator first, iterator last) throw()
+    __forceinline
+    iterator erase(iterator first, iterator last) __ntl_nothrow
     {
       for ( iterator i = last; i != first;  ) array_allocator.destroy(--i);
       iterator const tail = first;
@@ -368,14 +376,15 @@ class vector
       return tail;
     }
 
-    void swap(vector<T, Allocator>& x) throw()
+    void swap(vector<T, Allocator>& x) __ntl_nothrow
     {
       std::swap(begin_, x.begin_);
       std::swap(end_, x.end_);
       std::swap(capacity_, x.capacity_);
     }
 
-    void clear() throw()
+    __forceinline
+    void clear() __ntl_nothrow
     {
       difference_type n = end_ - begin_;
       end_ = begin_;
@@ -417,9 +426,9 @@ class vector
 
     // "stdexcept.hxx" includes this header
     // hack: MSVC doesn't look inside function body
-    void check_bounds(size_type n) const throw(bad_alloc)//throw(out_of_range)
+    void check_bounds(size_type n) const //__ntl_throws(out_of_range)
     {
-      if ( n > size() ) __ntl_throw(out_of_range);
+      if ( n > size() ) __ntl_throw(out_of_range(__FUNCTION__));
     }
 
     void move(const iterator to, const iterator from) const
@@ -428,7 +437,8 @@ class vector
       array_allocator.destroy(from);
     }
 
-    void realloc(size_type n) throw(bad_alloc)
+
+    void realloc(size_type n) __ntl_throws(bad_alloc)
     {
       const iterator new_mem = array_allocator.allocate(n);
       const size_type old_capacity = capacity_;
@@ -456,7 +466,7 @@ class vector
 template <class T, class Allocator>
 inline
 bool operator==(const vector<T, Allocator>& x, const vector<T, Allocator>& y)
-  throw()
+  __ntl_nothrow
 {
   return x.size() == y.size() && equal(x.begin(), x.end(), y.begin());
 }
@@ -464,7 +474,7 @@ bool operator==(const vector<T, Allocator>& x, const vector<T, Allocator>& y)
 template <class T, class Allocator>
 inline
 bool operator< (const vector<T, Allocator>& x, const vector<T, Allocator>& y)
-  throw()
+  __ntl_nothrow
 {
   return lexicographical_compare(x.begin(), x.end(), y.begin(), y.end());
 }
@@ -472,7 +482,7 @@ bool operator< (const vector<T, Allocator>& x, const vector<T, Allocator>& y)
 template <class T, class Allocator>
 inline
 bool operator!=(const vector<T, Allocator>& x, const vector<T, Allocator>& y)
-  throw()
+  __ntl_nothrow
 {
   return ! (x == y);
 }
@@ -480,7 +490,7 @@ bool operator!=(const vector<T, Allocator>& x, const vector<T, Allocator>& y)
 template <class T, class Allocator>
 inline
 bool operator> (const vector<T, Allocator>& x, const vector<T, Allocator>& y)
-  throw()
+  __ntl_nothrow
 {
   return y < x;
 }
@@ -488,7 +498,7 @@ bool operator> (const vector<T, Allocator>& x, const vector<T, Allocator>& y)
 template <class T, class Allocator>
 inline
 bool operator>=(const vector<T, Allocator>& x, const vector<T, Allocator>& y)
-  throw()
+  __ntl_nothrow
 {
   return ! (x < y);
 }
@@ -496,7 +506,7 @@ bool operator>=(const vector<T, Allocator>& x, const vector<T, Allocator>& y)
 template <class T, class Allocator>
 inline
 bool operator<=(const vector<T, Allocator>& x, const vector<T, Allocator>& y)
-  throw()
+  __ntl_nothrow
 {
   return ! (y < x);
 }
@@ -504,7 +514,7 @@ bool operator<=(const vector<T, Allocator>& x, const vector<T, Allocator>& y)
 ///\name  Vector specialized algorithms
 template <class T, class Allocator>
 inline
-void swap(vector<T, Allocator>& x, vector<T, Allocator>& y) throw()
+void swap(vector<T, Allocator>& x, vector<T, Allocator>& y) __ntl_nothrow
 {
   x.swap(y);
 }

@@ -8,7 +8,6 @@
 #ifndef NTL__STLX_UTILITY
 #define NTL__STLX_UTILITY
 
-//#include "memory.hxx"
 #include "type_traits.hxx"
 
 /// Standard Template Library

@@ -17,6 +17,7 @@
 #include "utility.hxx"
 #include "new.hxx"
 #include "stdlib.hxx"
+#include "../linked_ptr.hxx"
 
 namespace std {
 
@@ -660,9 +661,17 @@ class bad_weak_ptr : public std::exception
 template<class T> class weak_ptr;
 
 /// 20.6.12.2 Class template shared_ptr [util.smartptr.shared]
+///
+/// 1 The shared_ptr class template stores a pointer, usually obtained via new.
+///   shared_ptr implements semantics of shared ownership; the last remaining
+///   owner of the pointer is responsible for destroying the object, or
+///   otherwise releasing the resources associated with the stored pointer.
+///\note no constructor throws bad_alloc, since this needs no heap memory
 template<class T>
-class shared_ptr
+class shared_ptr : ntl::linked_ptr<T>
 {
+    typedef ntl::linked_ptr<T> base_type;
+
   ///////////////////////////////////////////////////////////////////////////
   public:
 
@@ -670,52 +679,161 @@ class shared_ptr
 
     ///\name  20.6.12.2.1 shared_ptr constructors [util.smartptr.shared.const]
 
-    shared_ptr() __ntl_nothrow;
-    template<class Y> explicit shared_ptr(Y* p);
+    /// 1 Effects: Constructs an empty shared_ptr object.
+    /// 2 Postconditions: use_count() == 0 && get() == 0.
+    /// 3 Throws: nothing.
+    shared_ptr() __ntl_nothrow : base_type() {/**/}
+
+    /// 4 Requires: p shall be convertible to T*. Y shall be a complete type.
+    ///   The expression delete p shall be well-formed,
+    ///   shall have well defined behavior, and shall not throw exceptions.
+    /// 5 Effects: Constructs a shared_ptr object that owns the pointer p.
+    /// 6 Postconditions: use_count() == 1 && get() == p
+    template<class Y> explicit shared_ptr(Y* p) : base_type(p) {/**/}
+
+    /// Well, should not D & A be moved to the class template? ...
     template<class Y, class D> shared_ptr(Y* p, D d);
+    /// this needs no allolcator at all
     template<class Y, class D, class A> shared_ptr(Y* p, D d, A a);
+
+    /// 14 Effects: Constructs a shared_ptr instance that stores p and shares
+    ///    ownership with r.
+    /// 15 Postconditions: get() == p && use_count() == r.use_count()
+    /// 16 Throws: nothing.
     template<class Y> shared_ptr(const shared_ptr<Y>& r, T *p);
-    shared_ptr(const shared_ptr& r);
-    template<class Y> shared_ptr(const shared_ptr<Y>& r);
-//    shared_ptr(shared_ptr&& r);
-//    template<class Y> shared_ptr(shared_ptr<Y>&& r);
-    template<class Y> explicit shared_ptr(const weak_ptr<Y>& r);
-//    template<class Y> explicit shared_ptr(auto_ptr<Y>&& r);
+
+    /// 20 Effects: If r is empty, constructs an empty shared_ptr object;
+    ///   otherwise, constructs a shared_ptr object that shares ownership with r.
+    /// 21 Postconditions: get() == r.get() && use_count() == r.use_count().
+    /// 22 Throws: nothing.
+    shared_ptr(const shared_ptr& r) : base_type(r)
+    {
+      set(r.get());
+    }
+
+    /// see above
+    ///\todo:
+    /// 19 Requires: The constructor shall not participate in
+    ///    the overload resolution unless Y* is implicitly convertible to T*.
+    template<class Y> shared_ptr(const shared_ptr<Y>& r) : base_type(r)
+    {
+      set(r.get());
+    }
+
+#ifdef NTL__CXX
+    /// 23 Requires: For the second constructor Y* shall be convertible to T*.
+    /// 24 Effects: Move-constructs a shared_ptr instance from r.
+    /// 25 Postconditions: *this shall contain the old value of r. r shall be empty.
+    /// 26 Throws: nothing.
+    shared_ptr(shared_ptr&& r);
+    template<class Y> shared_ptr(shared_ptr<Y>&& r);
+#endif
+
+    /// 27 Requires: Y* shall be convertible to T*.
+    /// 28 Effects: Constructs a shared_ptr object that shares ownership with r
+    ///    and stores a copy of the pointer stored in r.
+    /// 29 Postconditions: use_count() == r.use_count().
+    /// 30 Throws: bad_weak_ptr when r.expired().
+    /// 31 Exception safety: If an exception is thrown, the constructor has no effect.
+    template<class Y> explicit shared_ptr(const weak_ptr<Y>& r) : base_type(r)
+    {
+      if ( r.get() ) set(r.get());
+      else throw bad_alloc();
+    }
+
+#ifdef NTL__CXX
+    /// 32 Requires: r.release() shall be convertible to T*. Y shall be a complete
+    ///    type. The expression delete r.release() shall be well-formed,
+    ///    shall have well defined behavior, and shall not throw exceptions.
+    /// 33 Effects: Constructs a shared_ptr object that stores and owns r.release().
+    /// 34 Postconditions: use_count() == 1 && r.get() == 0.
+    /// 35 Throws: bad_alloc, or an implementation-defined exception when
+    ///    a resource other than memory could not be obtained.
+    /// 36 Exception safety: If an exception is thrown, the constructor has no effect.
+    template<class Y> explicit shared_ptr(auto_ptr<Y>&& r);
+#else
+    template<class Y> explicit shared_ptr(const auto_ptr<Y>& r)
+    : base_type(r.release()) {/**/}
+#endif
+
+#ifdef NTL__CXX
+    /// 37 Effects: Equivalent to shared_ptr(r.release(), r.get_deleter())
+    ///    when D is not a reference type,
+    ///    otherwise shared_ptr(r.release(), ref(r.get_deleter())).
+    /// 38 Exception safety: If an exception is thrown, the constructor has no effect.
     template <class Y, class D> explicit shared_ptr(const unique_ptr<Y, D>& r) = delete;
-//    template <class Y, class D> explicit shared_ptr(unique_ptr<Y, D>&& r);
+    template <class Y, class D> explicit shared_ptr(unique_ptr<Y, D>&& r);
+#else
+    template <class Y, class D> explicit shared_ptr(const unique_ptr<Y, D>& r)
+    : base_type(r.release()) {/**/}
+#endif
 
-    ///\name  20.6.6.2.2 shared_ptr destructor [util.smartptr.shared.dest]
-    ~shared_ptr();
+    ///\name  20.6.12.2.2 shared_ptr destructor [util.smartptr.shared.dest]
+    ///
+    /// 1 — If *this is empty or shares ownership with another shared_ptr instance
+    ///   (use_count() > 1), there are no side effects.
+    ///\todo: (?)
+    ///   — Otherwise, if *this owns a pointer p and a deleter d, d(p) is called.
+    ///   — Otherwise, *this owns a pointer p, and delete p is called.
+    /// 2 Throws: nothing.
+    /// 3 [ Note: Since the destruction of *this decreases the number of instances
+    ///   that share ownership with *this by one, after *this has been destroyed
+    ///   all shared_ptr instances that shared ownership with *this will report
+    ///   a use_count() that is one less than its previous value. —end note ]
+    __forceinline
+    ~shared_ptr()
+    {
+      if ( unique() )
+        delete base_type::get();
+    }
 
-    ///\name  20.6.6.2.3 shared_ptr assignment [util.smartptr.shared.assign]
-    shared_ptr& operator=(shared_ptr const& r);
-    template<class Y> shared_ptr& operator=(shared_ptr<Y> const& r);
-    template<class Y> shared_ptr& operator=(auto_ptr<Y>& r);
+    ///\name  20.6.12.2.3 shared_ptr assignment [util.smartptr.shared.assign]
 
-    ///\name  20.6.6.2.4 shared_ptr modifiers [util.smartptr.shared.mod]
+    shared_ptr& operator=(const shared_ptr& r);
+    template<class Y> shared_ptr& operator=(const shared_ptr<Y>& r);
+//    shared_ptr& operator=(shared_ptr&& r);
+//    template<class Y> shared_ptr& operator=(shared_ptr<Y>&& r);
+//    template<class Y> shared_ptr& operator=(auto_ptr<Y>&& r);
+//    template <class Y, class D> shared_ptr& operator=(const unique_ptr<Y, D>& r) = delete;
+//    template <class Y, class D> shared_ptr& operator=(unique_ptr<Y, D>&& r);
 
-    void swap(shared_ptr& r);
+    ///\name  20.6.12.2.4 shared_ptr modifiers [util.smartptr.shared.mod]
+
+    /// 1 Effects: Exchanges the contents of *this and r.
+    /// 2 Throws: nothing.
+    void swap(shared_ptr& r)
+    {
+
+    }
+
     void reset();
     template<class Y> void reset(Y* p);
     template<class Y, class D> void reset(Y* p, D d);
 
     ///\name  20.6.6.2.5 shared_ptr observers [util.smartptr.shared.obs]
 
-    T & operator* ()  const __ntl_nothrow { return *get(); }
-    T * operator->()  const __ntl_nothrow { return get(); }
-    T * get()         const;//__ntl_nothrow
+    T & operator* ()  const __ntl_nothrow { return *base_type::get(); }
+    T * operator->()  const __ntl_nothrow { return base_type::get(); }
+    T * get()         const __ntl_nothrow { return base_type::get(); }
 
-    long use_count() const;//__ntl_nothrow
-    bool unique() const;//__ntl_nothrow
-    operator bool () const;//__ntl_nothrow
+    //long use_count() const __ntl_nothrow { return base_type::use_count(); }
+    using base_type::use_count;
 
+    //bool unique()    const __ntl_nothrow { return base_type::unique(); }
+    using base_type::unique;
+    
+    //operator base_type::unspecified_bool_type() const __ntl_nothrow
+    //{ 
+    //  return base_type::operator base_type::unspecified_bool_type();
+    //}
+    using base_type::operator base_type::unspecified_bool_type;
+    
     ///@}
 
   ///////////////////////////////////////////////////////////////////////////
   private:
   
-    T * ptr;
-    void set(T * p) { ptr = p; }
+    void set(T * p) { base_type::set(p); }
 };
 
 ///\name  20.6.6.2.6 shared_ptr comparison [util.smartptr.shared.cmp]

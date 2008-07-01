@@ -741,7 +741,7 @@ namespace ntl {
       template<typename PtrType, class Functor>
       PtrType find_export_f(Functor finder) const
       {
-        return brute_cast<PtrType>(find_export(hash));
+        return brute_cast<PtrType>(find_export(finder));
       }
       template<typename PtrType, typename DllFinder>
       PtrType find_export(const char * exp, DllFinder find_dll) const
@@ -837,8 +837,8 @@ namespace ntl {
             uint32_t  Name:31;
             /** Ordinal/Name Flag */
             uint32_t  IsOrdinal:1;
-          };
-        };
+          } f;
+        } u;
       };
 
       /**
@@ -853,8 +853,8 @@ namespace ntl {
             uint64_t  Name:31;
             uint64_t  :32;
             uint64_t  IsOrdinal:1;
-          };
-        };
+          } s;
+        } u;
       };
 
       /** Hint/Name import table */

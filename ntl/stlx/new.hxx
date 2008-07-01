@@ -26,11 +26,11 @@ namespace std {
 class bad_alloc : public exception
 {
   public:
-    bad_alloc() throw() {}
-    bad_alloc(const bad_alloc&) throw() {}
-    bad_alloc& operator=(const bad_alloc&) throw() {}
-    virtual ~bad_alloc() throw() {}
-    virtual const char* what() const throw() { return "bad_alloc"; }
+    bad_alloc() __ntl_nothrow {}
+    bad_alloc(const bad_alloc&) __ntl_nothrow {}
+    bad_alloc& operator=(const bad_alloc&) __ntl_nothrow {}
+    virtual ~bad_alloc() __ntl_nothrow {}
+    virtual const char* what() const __ntl_nothrow { return "bad_alloc"; }
 };
 
 struct  nothrow_t {};
@@ -42,7 +42,7 @@ const nothrow_t nothrow;
 typedef void (*new_handler)();
 
 /// set_new_handler [18.4.2.3 lib.set.new.handler]
-new_handler set_new_handler(new_handler new_p) throw();
+new_handler set_new_handler(new_handler new_p) __ntl_nothrow;
 
 /**@} lib_alloc_errors */
 /**@} lib_support_dynamic */
@@ -66,34 +66,34 @@ new_handler set_new_handler(new_handler new_p) throw();
 
 ///\name  Single-object forms [18.4.1.1 lib.new.delete.single]
 
-void* operator new      (std::size_t size) throw(std::bad_alloc);
-void  operator delete   (void* ptr) throw();
+void* operator new      (std::size_t size) __ntl_throws(std::bad_alloc);
+void  operator delete   (void* ptr) __ntl_nothrow;
 
-void* operator new      (std::size_t size, const std::nothrow_t&) throw();
-void  operator delete   (void* ptr, const std::nothrow_t&) throw();
+void* operator new      (std::size_t size, const std::nothrow_t&) __ntl_nothrow;
+void  operator delete   (void* ptr, const std::nothrow_t&) __ntl_nothrow;
 
 ///\name  Array forms [18.4.1.2 lib.new.delete.array]
 
-void* operator new[]    (std::size_t size) throw(std::bad_alloc);
-void  operator delete[] (void* ptr) throw();
+void* operator new[]    (std::size_t size) __ntl_throws(std::bad_alloc);
+void  operator delete[] (void* ptr) __ntl_nothrow;
 
-void* operator new[]    (std::size_t size, const std::nothrow_t&) throw();
-void  operator delete[] (void* ptr, const std::nothrow_t&) throw();
+void* operator new[]    (std::size_t size, const std::nothrow_t&) __ntl_nothrow;
+void  operator delete[] (void* ptr, const std::nothrow_t&) __ntl_nothrow;
 
 ///\name  Placement forms [18.4.1.3 lib.new.delete.placement]
 ///\note  Standard says nothing about inline nor static, but we're avoiding LNK2005
 
 __forceinline
-void* operator new      (std::size_t, void* ptr) throw()  { return ptr; }
+void* operator new      (std::size_t, void* ptr) __ntl_nothrow  { return ptr; }
 
 __forceinline
-void  operator delete   (void*, void*) throw()            {}
+void  operator delete   (void*, void*) __ntl_nothrow            {}
 
 __forceinline
-void* operator new[]    (std::size_t, void* ptr) throw()  { return ptr; }
+void* operator new[]    (std::size_t, void* ptr) __ntl_nothrow  { return ptr; }
 
 __forceinline
-void  operator delete[] (void*, void*) throw()            {}
+void  operator delete[] (void*, void*) __ntl_nothrow            {}
 
 #undef operator
 

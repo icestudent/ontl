@@ -85,12 +85,12 @@ struct kapc
   kprocessor_mode     ApcMode;
   bool                Inserted;
 
-  void* operator new      (std::size_t size) throw()
+  void* operator new(std::size_t size) //__ntl_nothrow
   {
     return ::operator new(size);
   }
 
-  void  operator delete   (void* ptr) throw()
+  void  operator delete(void* ptr) //__ntl_nothrow
   {
     ::delete(ptr);
   }

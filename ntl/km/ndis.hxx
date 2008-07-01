@@ -174,7 +174,7 @@ class ndis
         buffer_pool & bp,
         void *        virtual_address,
         size_t        length
-        ) throw()
+        ) __ntl_nothrow
       {
         return bp.alloc(virtual_address, length);
       }

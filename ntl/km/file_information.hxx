@@ -41,13 +41,13 @@ struct file_information
                                     ZwQueryInformationFile,
                                     ZwSetInformationFile>
 {
-  file_information(legacy_handle file_handle) throw()
+  file_information(legacy_handle file_handle) __ntl_nothrow
   : nt::file_information_base<InformationClass, ZwQueryInformationFile, ZwSetInformationFile>(file_handle)
   {/**/}
 
   file_information(
     legacy_handle             file_handle,
-    const InformationClass &  info) throw()
+    const InformationClass &  info) __ntl_nothrow
   : nt::file_information_base<InformationClass,
                               ZwQueryInformationFile,
                               ZwSetInformationFile>(file_handle, info)
@@ -60,7 +60,7 @@ struct file_information<file_rename_information>
 {
     file_information(
       legacy_handle                   file_handle,
-      const file_rename_information & info) throw()
+      const file_rename_information & info) __ntl_nothrow
     : status_(_set(file_handle, &info,
               sizeof(info) + info.FileNameLength - sizeof(wchar_t)))
     {/**/}

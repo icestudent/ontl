@@ -33,10 +33,10 @@ class native_string
     typedef typename  traits                      traits_type;
     typedef typename  traits::char_type           value_type;
     typedef           Allocator                   allocator_type;
-    typedef typename  Allocator::pointer          pointer;
-    typedef typename  Allocator::const_pointer    const_pointer;
-    typedef typename  Allocator::reference        reference;
-    typedef typename  Allocator::const_reference  const_reference;
+    typedef charT *       pointer;
+    typedef const charT * const_pointer;
+    typedef charT &       reference;
+    typedef const charT & const_reference;
     typedef typename  std::uint16_t               size_type;
     typedef typename  Allocator::difference_type  difference_type;
     typedef pointer                               iterator;
@@ -53,7 +53,9 @@ class native_string
     {/**/}
 
   explicit
-    native_string(const std::basic_string<value_type>& str)
+    native_string(
+      typename std::conditional<std::is_const<charT>::value,
+        const std::basic_string<value_type>&, std::basic_string<value_type>&>::type str)
     : length_(static_cast<size_type>(str.size() * sizeof(value_type))),
       maximum_length_(length_/* + sizeof(value_type)*/),
       buffer_(str.begin())
@@ -74,7 +76,14 @@ class native_string
     {/**/}
 
     template<uint16_t Size>
-    native_string(const charT (&str)[Size])
+    native_string(const value_type (&str)[Size])
+    : length_((Size - 1) * sizeof(value_type)),
+      maximum_length_(length_ + sizeof(value_type)),
+      buffer_(&str[0])
+    {/**/}
+
+    template<uint16_t Size>
+    native_string(value_type (&str)[Size])
     : length_((Size - 1) * sizeof(value_type)),
       maximum_length_(length_ + sizeof(value_type)),
       buffer_(&str[0])
@@ -194,9 +203,9 @@ class native_string
     uint16_t  maximum_length_;
     charT   * buffer_;
 
-    void check_bounds(size_type n) const throw(std::out_of_range)
+    void check_bounds(size_type n) const __ntl_throws(std::out_of_range)
     {
-      if ( n > size() ) throw(std::out_of_range);
+      if ( n > size() ) __ntl_throw (std::out_of_range(__FUNCTION__));
     }
     const native_string& operator=(const native_string & s);
 

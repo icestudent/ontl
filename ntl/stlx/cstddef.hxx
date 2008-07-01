@@ -25,12 +25,10 @@
 #define __thiscall 
 #endif
 
+#define _PasteToken(x,y) x##y
+#define _Join(x,y) _PasteToken(x,y)
 #ifndef STATIC_ASSERT
-#define STATIC_ASSERT(e) typedef char _STATIC_ASSERT_ ## __COUNTER__ [(e)?1:-1]
-#endif
-
-#ifndef static_assert
-#define static_assert(e, Msg) STATIC_ASSERT(e)
+#define STATIC_ASSERT(e) typedef char _Join(_STATIC_ASSERT_, __COUNTER__) [(e)?1:-1]
 #endif
 
 #if defined(NTL__STLX_FORCE_CDECL) && !defined(NTL__CRTCALL)
@@ -45,11 +43,23 @@
 
 #ifndef NTL__EXTERNAPI
   #ifdef  _MSC_VER
-    #define NTL__EXTERNAPI extern "C" __declspec(dllimport)
+    #define NTL__EXTERNAPI extern "C" __declspec(dllimport) __declspec(nothrow)
+    #define NTL__EXTERNVAR extern "C" __declspec(dllimport)
   #else
     #error usupported compiler
   #endif
 #endif
+
+#if __cplusplus > 199711L
+/// new C++ Standard
+#define NTL__CXX
+#endif
+
+#if __cplusplus <= 199711L
+
+  #ifndef static_assert
+    #define static_assert(e, Msg) STATIC_ASSERT(e)
+  #endif
 
 #ifndef alignas
   #ifdef _MSC_VER
@@ -70,13 +80,24 @@
 #endif
 static_assert(alignof(int)==alignof(unsigned int), "wierd platform");
 
+  //static const char __func__[];
+  #ifndef __func__
+    #ifdef _MSC_VER
+      //#define __func__ __FUNCDNAME__
+      #define __func__ __FUNCSIG__
+      //#define __func__ __FUNCTION__
+    #else
+      #error unsupported compiler
+    #endif
+  #endif
+
 #ifndef __align
   #define __align(X) __declspec(align(X))
 #endif
 
-#if __cplusplus <= 199711L
-  #define constexpr
-#endif
+#define constexpr
+
+#endif//__cplusplus <= 199711L
 
 namespace std {
 
@@ -134,15 +155,14 @@ static const nullptr_t nullptr = {};
   #define offsetof(s,m) (size_t)&reinterpret_cast<const volatile char&>((((s *)0)->m))
 #endif
 
-#define __ntl_bitmask_type(bitmask, _F)\
-  _F bitmask operator&(bitmask x, bitmask y) { return static_cast<bitmask>(x&y); }\
-  _F bitmask operator|(bitmask x, bitmask y) { return static_cast<bitmask>(x|y); }\
-  _F bitmask operator^(bitmask x, bitmask y) { return static_cast<bitmask>(x^y); }\
-  _F bitmask operator~(bitmask x) { return static_cast<bitmask >(~x); }\
-  _F bitmask& operator&=(bitmask& x, bitmask y) { x = x&y ; return x ; }\
-  _F bitmask& operator|=(bitmask& x, bitmask y) { x = x|y ; return x ; }\
-  _F bitmask& operator^=(bitmask& x, bitmask y) { x = x^y ; return x ; }
-
+#define __ntl_bitmask_type(bitmask, _friend)\
+  _friend bitmask operator&(bitmask x, bitmask y) { return static_cast<bitmask>(static_cast<int>(x)&static_cast<int>(y)); }\
+  _friend bitmask operator|(bitmask x, bitmask y) { return static_cast<bitmask>(static_cast<int>(x)|static_cast<int>(y)); }\
+  _friend bitmask operator^(bitmask x, bitmask y) { return static_cast<bitmask>(static_cast<int>(x)^static_cast<int>(y)); }\
+  _friend bitmask operator~(bitmask x) { return static_cast<bitmask>(~static_cast<int>(x)); }\
+  _friend bitmask& operator&=(bitmask& x, bitmask y) { x = x&y ; return x ; }\
+  _friend bitmask& operator|=(bitmask& x, bitmask y) { x = x|y ; return x ; }\
+  _friend bitmask& operator^=(bitmask& x, bitmask y) { x = x^y ; return x ; }
 
 /**@} lib_support_types */
 /**@} lib_language_support */

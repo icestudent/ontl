@@ -188,7 +188,7 @@ template <class T> struct decay;
 template <bool, class T = void> struct enable_if {};
 template <class T> struct enable_if<true, T> { typedef T type; };
 
-template <bool, class T, class F> struct conditional;
+template <bool, class IfTrueType, class IfFalseType> struct conditional;
 template <class T, class F> struct conditional<true, T, F>  { typedef T type; }; 
 template <class T, class F> struct conditional<false, T, F> { typedef F type; }; 
 
@@ -475,14 +475,15 @@ template <class T> struct is_compound
 
 template <class T> struct is_const          : public false_type {};
 template <class T> struct is_const<const T> : public true_type {};
-_CHECK_TRAIT(is_const<volatile int>::value == 0);
+_CHECK_TRAIT(is_const<volatile int>::value == false);
 _CHECK_TRAIT(is_const<const int>::value);
 
 template <class T> struct is_volatile             : public false_type {};
 template <class T> struct is_volatile<volatile T> : public true_type {};
-_CHECK_TRAIT(is_volatile<const int>::value == 0);
+_CHECK_TRAIT(is_volatile<const int>::value == false);
 _CHECK_TRAIT(is_volatile<volatile int>::value);
 
+///\warning what about std::pair<int, int> ?
 template <class T> struct is_pod
 : public integral_constant<
     bool, __is_pod(typename remove_extent<T>::type) // __is_pod will return false on fundamental types

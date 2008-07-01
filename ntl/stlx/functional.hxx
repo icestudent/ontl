@@ -73,15 +73,15 @@ class reference_wrapper
     //typedef -- result_type; // Not always defined
 
     // construct/copy/destroy
-    explicit reference_wrapper(T&) throw();
-    reference_wrapper(const reference_wrapper<T>& x) throw();
+    explicit reference_wrapper(T&) __ntl_nothrow;
+    reference_wrapper(const reference_wrapper<T>& x) __ntl_nothrow;
 
     // assignment
-    reference_wrapper& operator=(const reference_wrapper<T>& x) throw();
+    reference_wrapper& operator=(const reference_wrapper<T>& x) __ntl_nothrow;
 
     // access
-    operator T& () const throw();
-    T& get() const throw();
+    operator T& () const __ntl_nothrow;
+    T& get() const __ntl_nothrow;
 
 #if 0
     // invocation
@@ -104,14 +104,14 @@ class reference_wrapper
 
 template <class T>
 inline
-reference_wrapper<T> ref(T& t) throw()
+reference_wrapper<T> ref(T& t) __ntl_nothrow
 {
   return reference_wrapper<T>(t);
 }
 
-template <class T> reference_wrapper<const T> cref(const T&) throw();
-template <class T> reference_wrapper<T> ref(reference_wrapper<T>) throw();
-template <class T> reference_wrapper<const T> cref(reference_wrapper<T>) throw();
+template <class T> reference_wrapper<const T> cref(const T&) __ntl_nothrow;
+template <class T> reference_wrapper<T> ref(reference_wrapper<T>) __ntl_nothrow;
+template <class T> reference_wrapper<const T> cref(reference_wrapper<T>) __ntl_nothrow;
 /**@} lib_refwrap
  */
 #pragma endregion
@@ -653,10 +653,10 @@ template <> struct hash<float>;
 template <> struct hash<double>;
 template <> struct hash<long double>;
 template<class T> struct hash<T*>;
-template <> struct hash<std::string>;
+//template <> struct hash<std::string>;
 //template <> struct hash<std::u16string>;
 //template <> struct hash<std::u32string>;
-template <> struct hash<std::wstring>;
+//template <> struct hash<std::wstring>;
 //template <> struct hash<std::error_code>;
 //template <> struct hash<std::thread::id>;
 

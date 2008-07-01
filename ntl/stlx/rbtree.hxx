@@ -6,11 +6,11 @@
 
 namespace tree
 {
-  namespace rbtree
+  namespace rb_tree
   {
 
     template<class T, class Compare = std::less<T>, class Allocator = std::allocator<T> >
-    class rbtree
+    class rb_tree
     {
     public:
       typedef           T                           value_type;
@@ -27,16 +27,15 @@ namespace tree
       struct node
       {
         enum color_type { black, red };
-#pragma warning(disable:4201)
         union 
         {
           struct 
           {
             node *left, *right;
-          };
+          } s;
           node* link[2];
-        };
-#pragma warning(default:4201)
+        } u;
+
         node* parent;
         T elem;
         int8_t color;
@@ -47,18 +46,24 @@ namespace tree
         {}
         node(const T& elem)
           :elem(elem), 
-          parent(NULL), left(NULL), right(NULL),
+          parent(NULL),// left(NULL), right(NULL),
           color(red)
-        {}
+        {
+          u.s.left = NULL;
+          u.s.right= NULL;
+        }
         node(const node& n)
           :elem(n.elem),
-          parent(n.parent), left(n.left), right(n.right), color(n.color)
-        {}
+          parent(n.parent), /*left(n.left), right(n.right),*/ color(n.color)
+        {
+          u.s.left = n.u.s.left;
+          u.s.right= n.u.s.right;
+        }
       private:
         node& operator=(const node& n);
       };
 
-      typedef typename rbtree<T, Compare, Allocator>::node node_type;
+      typedef typename rb_tree<T, Compare, Allocator>::node node_type;
 
       struct iterator_impl:
         std::iterator<std::bidirectional_iterator_tag, value_type, difference_type, pointer, reference>
@@ -81,12 +86,12 @@ namespace tree
 
       protected:
         node_type* p;
-        rbtree<T, Compare, Allocator>* tree_;
+        rb_tree<T, Compare, Allocator>* tree_;
 
         friend struct const_iterator_impl;
-        friend class rbtree<T,Compare, Allocator>;
+        friend class rb_tree<T,Compare, Allocator>;
         
-        iterator_impl(node_type* /*const*/ p, rbtree<T, Compare, Allocator>* tree)
+        iterator_impl(node_type* /*const*/ p, rb_tree<T, Compare, Allocator>* tree)
           :p(p), tree_(tree)
         {}
 
@@ -108,8 +113,8 @@ namespace tree
         const_iterator_impl(const const_iterator_impl& i)
           :p(i.p), tree_(i.tree_) {}
 
-        reference operator* () const { return p->elem; }
-        pointer   operator->() const { return &operator*(); }
+        const_reference operator* () const { return p->elem; }
+        const_pointer   operator->() const { return &operator*(); }
 
         const_iterator_impl& operator++()  { p = tree_->next(p, right); return *this; }
         const_iterator_impl& operator--()  { p = tree_->next(p, left ); return *this; }
@@ -123,13 +128,13 @@ namespace tree
 
       private:
         const node_type* p;
-        const rbtree<T, Compare, Allocator>* tree_;
+        const rb_tree<T, Compare, Allocator>* tree_;
 
-        const_iterator_impl(const node_type* const p, const rbtree<T, Compare, Allocator>* tree)
+        const_iterator_impl(const node_type* const p, const rb_tree<T, Compare, Allocator>* tree)
           :p(p), tree_(tree)
         {}
 
-        friend class rbtree;
+        friend class rb_tree;
       };
 
     public:
@@ -139,13 +144,13 @@ namespace tree
       typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
 
     public:
-      explicit rbtree(const Compare& comp = Compare(), const Allocator& a = Allocator())
+      explicit rb_tree(const Compare& comp = Compare(), const Allocator& a = Allocator())
         :comparator_(comp), node_allocator(a),
         root_(), first_(), last_(), count_(0)
       {}
 
       template<class InputIterator>
-      rbtree(InputIterator first, InputIterator last, 
+      rb_tree(InputIterator first, InputIterator last, 
         const Compare& comp = Compare(), const Allocator& a = Allocator())
         :comparator_(comp), node_allocator(a),
         root_(), first_(), last_(), count_()
@@ -153,17 +158,17 @@ namespace tree
         insert(first, last);
       }
 
-      rbtree(const Allocator& a);
+      rb_tree(const Allocator& a);
       
-      rbtree(const rbtree<T, Compare, Allocator>& x)
+      rb_tree(const rb_tree<T, Compare, Allocator>& x)
         :root_(x.root_), first_(x.first_), last_(x.last_), count_(x.count_), node_allocator(x.node_allocator), comparator_(x.comparator_)
       {}
       
-      rbtree(const rbtree& x, const Allocator& a)
+      rb_tree(const rb_tree& x, const Allocator& a)
         :root_(x.root_), first_(x.first_), last_(x.last_), count_(x.count_), node_allocator(a), comparator_(x.comparator_)
       {}
 
-      rbtree& operator=(const rbtree<T, Compare, Allocator>& x)
+      rb_tree& operator=(const rb_tree<T, Compare, Allocator>& x)
       {
         if(this == &x)
           return *this;
@@ -173,7 +178,7 @@ namespace tree
         return *this;
       }
 
-      ~rbtree() __ntl_nothrow
+      ~rb_tree() __ntl_nothrow
       {
         clear();
       }
@@ -208,9 +213,9 @@ namespace tree
         node* p = root_;
         while(p){
           if(elem_less(x, p->elem))
-            p = p->left;
+            p = p->u.s.left;
           else if(elem_greater(x, p->elem))
-            p = p->right;
+            p = p->u.s.right;
           else
             return iterator(p, this);
         }
@@ -220,10 +225,10 @@ namespace tree
       const_iterator find(const value_type& x) const { return find(x); }
 
       // modifiers
-      pair<iterator, bool> insert(const value_type& x)
+      std::pair<iterator, bool> insert(const value_type& x)
       {
         if(count_ == max_size()-1)
-          __ntl_throw(std::length_error("rbtree<T> too long"));
+          __ntl_throw(std::length_error("rb_tree<T> too long"));
 
         if(empty()){
           // insert x as the root node
@@ -232,16 +237,16 @@ namespace tree
           root_->color = node::black;
           first_ = last_ = root_;
           ++count_;
-          return make_pair(iterator(root_, this), true);
+          return std::make_pair(iterator(root_, this), true);
         }
 
         bool greater = false;
         node *q = NULL;
-        for(node* p = root_; p != NULL; q = p, p = p->link[ greater ]){
+        for(node* p = root_; p != NULL; q = p, p = p->u.link[ greater ]){
           greater = comparator_(p->elem, x);
           if(!greater && !elem_less(x, p->elem))
             // equal
-            return make_pair(iterator(p, this), false);
+            return std::make_pair(iterator(p, this), false);
         }
 
         // create node
@@ -249,8 +254,8 @@ namespace tree
         node_allocator.construct(np, x);
         np->parent = q;
 
-        // link
-        q->link[greater] = np;
+        // u.link
+        q->u.link[greater] = np;
         if(q == first_ && !greater)
           first_ = np;
         else if(q == last_ && greater)
@@ -260,7 +265,7 @@ namespace tree
 
         // balance tree
         fixup_insert(np);
-        return make_pair(iterator(np, this), true);
+        return std::make_pair(iterator(np, this), true);
       }
 
       iterator insert(iterator /*position*/, const value_type& x)
@@ -291,22 +296,22 @@ namespace tree
         if(z == last_)
           last_  = next(z, left);
 
-        if(z->left == NULL || z->right == NULL){
+        if(z->u.s.left == NULL || z->u.s.right == NULL){
           y = z;
         }else{
           // find tree successor with a NULL node as a child
-          y = z->right;
-          while(y->left)
-            y = y->left;
+          y = z->u.s.right;
+          while(y->u.s.left)
+            y = y->u.s.left;
         }
-        node* x = y->link[ y->left == NULL ];
+        node* x = y->u.link[ y->u.s.left == NULL ];
 
         // remove y from the parent chain
         node* prev_root = NULL;
         if(x)
           x->parent = y->parent;
         if(y->parent)
-          y->parent->link[ y != y->parent->left ] = x;
+          y->parent->u.link[ y != y->parent->u.s.left ] = x;
         else{
           prev_root = root_;
           root_ = x;
@@ -315,13 +320,13 @@ namespace tree
         if(y != z){
           //z->data = y->data;
           // save z fields
-          node* l[3] = {z->left, z->right, z->parent};
+          node* l[3] = {z->u.s.left, z->u.s.right, z->parent};
           int8_t c = y->color;
           node_allocator.destroy(z);
           node_allocator.construct(z, *y);
           z->color = c,
-            z->left = l[0],
-            z->right= l[1],
+            z->u.s.left = l[0],
+            z->u.s.right= l[1],
             z->parent=l[2];
         }
         if(y->color == node::black && x){
@@ -353,7 +358,7 @@ namespace tree
         return pos == end() ? 0 : (erase(pos), 1);
       }
 
-      void swap(rbtree<T, Compare, Allocator>& tree)
+      void swap(rb_tree<T, Compare, Allocator>& tree)
       {
         if(this != &tree){
           //if(node_allocator == tree.node_allocator){
@@ -388,14 +393,14 @@ namespace tree
         }
 
         const bool indirection = !direction;
-        if(from->link[direction] == NULL){
+        if(from->u.link[direction] == NULL){
           for(node *p = from, *q = p->parent; ; p = q, q = q->parent)
-            if(q == NULL || p == q->link[indirection])
+            if(q == NULL || p == q->u.link[indirection])
               return q;
         }else{
-          from = from->link[direction];
-          while(from->link[indirection])
-            from = from->link[indirection];
+          from = from->u.link[direction];
+          while(from->u.link[indirection])
+            from = from->u.link[indirection];
           return from;
         }
       }
@@ -411,28 +416,28 @@ namespace tree
         // rotateLeft: right = true
         const bool right = !direction, left = direction;
 
-        node* y = x->link[right];
+        node* y = x->u.link[right];
 
-        // right x link
-        x->link[right] = y->link[left];
-        if(y->link[left])
-          y->link[left]->parent = x;
+        // right x u.link
+        x->u.link[right] = y->u.link[left];
+        if(y->u.link[left])
+          y->u.link[left]->parent = x;
 
-        // parent y link
+        // parent y u.link
         if(y)
           y->parent = x->parent;
 
         if(x->parent){
-          bool l = x == x->parent->link[left];
+          bool l = x == x->parent->u.link[left];
           if(!direction)
             l = !l;
-          x->parent->link[ l ] = y;
+          x->parent->u.link[ l ] = y;
         }else{
           root_ = y;
         }
 
         // x-y
-        y->link[left] = x;
+        y->u.link[left] = x;
         if(x)
           x->parent = y;
       }
@@ -441,7 +446,7 @@ namespace tree
       {
         const bool right = direction, left = !direction;
 
-        node* y = x->parent->parent->link[right];
+        node* y = x->parent->parent->u.link[right];
         if(y && y->color == node::red){
           // uncle is red
           x->parent->color = node::black;
@@ -450,7 +455,7 @@ namespace tree
           x = x->parent->parent;
         }else{
           // uncle is black
-          if(x == x->parent->link[right]){
+          if(x == x->parent->u.link[right]){
             x = x->parent;
             rotate(x, left);
           }
@@ -466,33 +471,33 @@ namespace tree
       {
         const bool right = direction, left = !direction;
 
-        node* w = x->parent->link[right];
+        node* w = x->parent->u.link[right];
         if(!w)
           return x->parent;
         if(w->color == node::red){
           w->color = node::black;
           x->parent->color = node::red;
           rotate(x->parent, left);
-          w = x->parent->link[right];
+          w = x->parent->u.link[right];
         }
         if(!w)
           return x->parent;
         if(
-          (!w->link[left] || w->link[left] ->color == node::black) && 
-          (!w->link[right]|| w->link[right]->color == node::black))
+          (!w->u.link[left] || w->u.link[left] ->color == node::black) && 
+          (!w->u.link[right]|| w->u.link[right]->color == node::black))
         {
           w->color = node::red;
           x = x->parent;
         }else{
-          if(!w->link[right] || w->link[right]->color == node::black){
-            w->link[left]->color = node::black;
+          if(!w->u.link[right] || w->u.link[right]->color == node::black){
+            w->u.link[left]->color = node::black;
             w->color = node::red;
             rotate(w, right);
-            w = x->parent->link[right];
+            w = x->parent->u.link[right];
           }
           w->color = x->parent->color;
           x->parent->color = node::black;
-          w->link[right]->color = node::black;
+          w->u.link[right]->color = node::black;
           rotate(x->parent, left);
           x = root_;
         }
@@ -502,7 +507,7 @@ namespace tree
       void fixup_insert(node* x) __ntl_nothrow
       {
         while(x != root_ && x->parent->color == node::red){
-          x = fixup_insert(x, x->parent == x->parent->parent->left);
+          x = fixup_insert(x, x->parent == x->parent->parent->u.s.left);
         }
         root_->color = node::black;
       }
@@ -511,7 +516,7 @@ namespace tree
       {
         if(!x) return;
         while(x != root_ && x->color == node::black){
-          x = fixup_delete(x, x == x->parent->left);
+          x = fixup_delete(x, x == x->parent->u.s.left);
         }
         x->color = node::black;
       }
@@ -552,47 +557,47 @@ namespace tree
     };
 
     template<class T, class Compare, class Allocator>
-    bool operator == (const rbtree<T, Compare, Allocator>& x, const rbtree<T, Compare, Allocator>& y)
+    bool operator == (const rb_tree<T, Compare, Allocator>& x, const rb_tree<T, Compare, Allocator>& y)
     {
       return x.size() == y.size() && equal(x.cbegin(), x.cend(), y.cbegin());
     }
 
     template<class T, class Compare, class Allocator>
-    bool operator != (const rbtree<T, Compare, Allocator>& x, const rbtree<T, Compare, Allocator>& y)
+    bool operator != (const rb_tree<T, Compare, Allocator>& x, const rb_tree<T, Compare, Allocator>& y)
     {
       return !(x == y);
     }
 
     template<class T, class Compare, class Allocator>
-    bool operator < (const rbtree<T, Compare, Allocator>& x, const rbtree<T, Compare, Allocator>& y)
+    bool operator < (const rb_tree<T, Compare, Allocator>& x, const rb_tree<T, Compare, Allocator>& y)
     {
       return lexicographical_compare(x.cbegin(), x.cend(), y.cbegin(), y.cend());
     }
 
     template<class T, class Compare, class Allocator>
-    bool operator > (const rbtree<T, Compare, Allocator>& x, const rbtree<T, Compare, Allocator>& y)
+    bool operator > (const rb_tree<T, Compare, Allocator>& x, const rb_tree<T, Compare, Allocator>& y)
     {
       return y < x;
     }
 
     template<class T, class Compare, class Allocator>
-    bool operator <= (const rbtree<T, Compare, Allocator>& x, const rbtree<T, Compare, Allocator>& y)
+    bool operator <= (const rb_tree<T, Compare, Allocator>& x, const rb_tree<T, Compare, Allocator>& y)
     {
       return !(y < x);
     }
 
     template<class T, class Compare, class Allocator>
-    bool operator >= (const rbtree<T, Compare, Allocator>& x, const rbtree<T, Compare, Allocator>& y)
+    bool operator >= (const rb_tree<T, Compare, Allocator>& x, const rb_tree<T, Compare, Allocator>& y)
     {
       return !(x < y);
     }
 
     // specialized algorithms
     template<class T, class Compare, class Allocator>
-    void swap(rbtree<T, Compare, Allocator>& x, rbtree<T, Compare, Allocator>& y)
+    void swap(rb_tree<T, Compare, Allocator>& x, rb_tree<T, Compare, Allocator>& y)
     {
       x.swap(y);
     }
 
-  } // rbtree
+  } // rb_tree
 } // tree

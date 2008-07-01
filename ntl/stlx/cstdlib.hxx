@@ -12,9 +12,9 @@
 
 extern "C"
 {
-  typedef void _cdecl vfv_t(void);
-  typedef int  _cdecl ifv_t(void);
-  typedef void _cdecl vfi_t(int);
+  typedef void __cdecl vfv_t(void);
+  typedef int  __cdecl ifv_t(void);
+  typedef void __cdecl vfi_t(int);
 
 #ifndef _INC_STDLIB// MSVC compatibility
 
@@ -108,7 +108,7 @@ NTL__CRTCALL
   abort();
 
 /// 7.20.4.2 The atexit function
-int _cdecl atexit(vfv_t func);
+int __cdecl atexit(vfv_t func);
 
 #define EXIT_SUCCESS  0
 #define EXIT_FAILURE  1

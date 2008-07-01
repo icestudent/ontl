@@ -33,11 +33,19 @@ class type_info
     bool operator==(const type_info& rhs) const;
     bool operator!=(const type_info& rhs) const;
     bool before(const type_info& rhs) const;
-    const char* name() const;
+    
+    const char* name() const
+#if !STLX__USE_RTTI
+    {
+      return mname; 
+    }
+#else
+    ;
+#endif
   private:
     type_info(const type_info& rhs);
     type_info& operator=(const type_info& rhs);
-    void *  data;
+    mutable void* data;
     char    mname[1];
 };
 

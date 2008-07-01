@@ -113,8 +113,8 @@ private:
     system_error(int ev, const error_category& ecat,
       const string& what_arg);
     system_error(int ev, const error_category& ecat);
-    const error_code& code() const throw();
-    const char* what() const throw();
+    const error_code& code() const __ntl_nothrow;
+    const char* what() const __ntl_nothrow;
   };
 
 

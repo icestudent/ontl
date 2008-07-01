@@ -41,7 +41,7 @@ class basic_file : public traits
         const share_mode            share_access    = traits::share_mode_default, 
         const creation_options      co              = traits::creation_options_default,
         const attributes            attr            = traits::attribute_default
-        ) throw()
+        ) __ntl_nothrow
     {
       f.create(object, cd, desired_access, share_access, co, attr);
     }
@@ -55,7 +55,7 @@ class basic_file : public traits
         const share_mode            share_access    = traits::share_mode_default, 
         const creation_options      co              = traits::creation_options_default,
         const attributes            attr            = traits::attribute_default
-        ) throw()
+        ) __ntl_nothrow
     {
       return success(f.create(object, cd, desired_access, share_access, co, attr));
     }
@@ -63,27 +63,27 @@ class basic_file : public traits
     /*
     bool
       operator()(
-        ) throw()
+        ) __ntl_nothrow
     {
     }
     */
 
-    bool read(void * out, const uint32_t out_size) throw()
+    bool read(void * out, const uint32_t out_size) __ntl_nothrow
     {
       return success(f.read(out, out_size));
     }
 
-    bool write(const void * in, const uint32_t in_size) throw()
+    bool write(const void * in, const uint32_t in_size) __ntl_nothrow
     {
       return success(f.write(in, in_size));
     }
 
-    size_type size() const throw()
+    size_type size() const __ntl_nothrow
     {
       return f.size();
     }
 
-    bool size(const size_type & new_size) throw()
+    bool size(const size_type & new_size) __ntl_nothrow
     {
       return success(f.size(new_size));
     }
@@ -102,7 +102,7 @@ class basic_file : public traits
     }
 
     __forceinline
-    raw_data get_data() throw(std::bad_alloc)
+    raw_data get_data() __ntl_throws(std::bad_alloc)
     {
       const size_type & file_size = size();
       raw_data file_content;

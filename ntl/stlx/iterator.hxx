@@ -8,8 +8,9 @@
 #ifndef NTL__STLX_ITERATOR
 #define NTL__STLX_ITERATOR
 
+#include "exception.hxx"
 #include "iosfwd.hxx"
-#include "cstddef.hxx"
+#include "type_traits.hxx"
 
 namespace std {
 
@@ -172,6 +173,24 @@ typename iterator_traits<AnyIterator>::difference_type
                           iterator_traits<AnyIterator>::iterator_category());
 }
 
+template <class InputIterator>
+inline
+InputIterator
+  next(InputIterator x, typename iterator_traits<InputIterator>::difference_type n = 1)
+{
+  advance(x, n);
+  return x;
+}
+
+template <class InputIterator>
+inline
+InputIterator
+  prev(InputIterator x, typename iterator_traits<InputIterator>::difference_type n = 1)
+{
+  advance(x, -n);
+  return x;
+}
+
 ///@}
 
 // 24.4, predefined iterators
@@ -198,7 +217,7 @@ class reverse_iterator
     reverse_iterator(const reverse_iterator<U>& u) : current(u.base()) {}
 
     Iterator  base()        const { return current; }
-    reference operator*()   const { Iterator tmp = current; return *--tmp; }
+    reference operator*()   const { Iterator tmp = current; return *--tmp; } ///\warning see N2588 24.4.1.3.4/2
     pointer   operator->()  const { return &(operator*()); }
 
     reverse_iterator& operator++()  { --current; return *this; }
@@ -217,47 +236,54 @@ class reverse_iterator
       { current += n; return *this; }
     reference operator[](difference_type n) const { return current[-n-1]; }
 
+  template<typename Iterator2>
   friend
     bool operator==(const reverse_iterator<Iterator>& x,
-                    const reverse_iterator<Iterator>& y)
+                    const reverse_iterator<Iterator2>& y)
       { return x.current == y.current; }
 
-  friend
-    bool operator< (const reverse_iterator<Iterator>& x, 
-                    const reverse_iterator<Iterator>& y)
-      { return x.current > y.current; }
-
+  template<typename Iterator2>
   friend
     bool operator!=(const reverse_iterator<Iterator>& x,
-                    const reverse_iterator<Iterator>& y)
+                    const reverse_iterator<Iterator2>& y)
       { return x.current != y.current; }
 
+  template<typename Iterator2>
+  friend
+    bool operator< (const reverse_iterator<Iterator>& x, 
+                    const reverse_iterator<Iterator2>& y)
+      { return x.current > y.current; }
+
+  template<typename Iterator2>
   friend
     bool operator> (const reverse_iterator<Iterator>& x, 
-                    const reverse_iterator<Iterator>& y)
+                    const reverse_iterator<Iterator2>& y)
       { return x.current < y.current; }
 
+  template<typename Iterator2>
   friend
     bool operator>=(const reverse_iterator<Iterator>& x, 
-                    const reverse_iterator<Iterator>& y)
+                    const reverse_iterator<Iterator2>& y)
       { return x.current <= y.current; }
 
+  template<typename Iterator2>
   friend
     bool operator<=(const reverse_iterator<Iterator>& x, 
-                    const reverse_iterator<Iterator>& y)
+                    const reverse_iterator<Iterator2>& y)
       { return x.current >= y.current; }
 
+  template<typename Iterator2>
   friend
     typename reverse_iterator<Iterator>::difference_type
       operator-(const reverse_iterator<Iterator>& x,
-                const reverse_iterator<Iterator>& y)
+                const reverse_iterator<Iterator2>& y)
       { return y.current - x.current; }
 
-  friend
+  friend inline
     reverse_iterator<Iterator>
       operator+(typename reverse_iterator<Iterator>::difference_type n,
                 const reverse_iterator<Iterator>& x)
-      { return reverse_iterator<Iterator> (x.current - n); }
+      { return reverse_iterator(x.current - n); }
   
   protected:
     Iterator current;
@@ -485,10 +511,10 @@ class istreambuf_iterator
         proxy(charT c, streambuf_type* sbuf) : c(c), sbuf_(sbuf) {}
     };
 
-    istreambuf_iterator()                   throw() : sbuf_(0) {}
-    istreambuf_iterator(istream_type& s)    throw() : sbuf_(s.rdbuf()) {}
-    istreambuf_iterator(streambuf_type* s)  throw() : sbuf_(s) {}
-    istreambuf_iterator(const proxy& p)     throw() : sbuf_(p.sbuf()) {}
+    istreambuf_iterator()                   __ntl_nothrow : sbuf_(0) {}
+    istreambuf_iterator(istream_type& s)    __ntl_nothrow : sbuf_(s.rdbuf()) {}
+    istreambuf_iterator(streambuf_type* s)  __ntl_nothrow : sbuf_(s) {}
+    istreambuf_iterator(const proxy& p)     __ntl_nothrow : sbuf_(p.sbuf()) {}
 
     charT operator*() const 
     { 
@@ -537,8 +563,8 @@ class ostreambuf_iterator
     typedef basic_streambuf<charT, traits>  streambuf_type;
     typedef basic_ostream<charT, traits>    ostream_type;
 
-    ostreambuf_iterator(ostream_type& s)    throw() : sbuf_(s.rdbuf()) {}
-    ostreambuf_iterator(streambuf_type* s)  throw() : sbuf_(s) {}
+    ostreambuf_iterator(ostream_type& s)    __ntl_nothrow : sbuf_(s.rdbuf()) {}
+    ostreambuf_iterator(streambuf_type* s)  __ntl_nothrow : sbuf_(s) {}
 
     ostreambuf_iterator& operator=(charT c)
     {
@@ -549,7 +575,7 @@ class ostreambuf_iterator
     ostreambuf_iterator& operator*()      { return *this; }
     ostreambuf_iterator& operator++()     { return *this; }
     ostreambuf_iterator& operator++(int)  { return *this; }
-    bool failed() const throw()           { return 0 == sbuf_; }
+    bool failed() const __ntl_nothrow           { return 0 == sbuf_; }
 
   private:
     streambuf_type * sbuf_;

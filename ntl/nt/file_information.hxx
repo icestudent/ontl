@@ -107,14 +107,14 @@ struct file_information_base
 {
     typedef InformationClass info_class;
 
-    file_information_base(legacy_handle file_handle) throw()
+    file_information_base(legacy_handle file_handle) __ntl_nothrow
     : status_(_query(file_handle, &info, sizeof(info)))
     {/**/}
 
     file_information_base(
       legacy_handle       file_handle,
       const info_class &  info
-      ) throw()
+      ) __ntl_nothrow
     : status_(_set(file_handle, &info, sizeof(info)))
     {/**/}
 
@@ -168,13 +168,13 @@ struct file_information
                                 NtQueryInformationFile,
                                 NtSetInformationFile>
 {
-  file_information(legacy_handle file_handle) throw()
+  file_information(legacy_handle file_handle) __ntl_nothrow
   : file_information_base<InformationClass, NtQueryInformationFile, NtSetInformationFile>(file_handle)
   {/**/}
 
   file_information(
     legacy_handle             file_handle,
-    const InformationClass &  info) throw()
+    const InformationClass &  info) __ntl_nothrow
   : file_information_base<InformationClass,
                           NtQueryInformationFile,
                           NtSetInformationFile>(file_handle, info)
@@ -248,7 +248,7 @@ struct file_rename_information
       std::copy(new_name.begin(), new_name.end(), FileName);
     }
 
-  void * operator new(std::size_t size, uint32_t filename_length) throw()
+  void * operator new(std::size_t size, uint32_t filename_length) __ntl_nothrow
   {
     return ::operator new[](size + filename_length);
   }
@@ -268,7 +268,7 @@ struct file_information<file_rename_information>
 {
     file_information(
       legacy_handle                   file_handle,
-      const file_rename_information & info) throw()
+      const file_rename_information & info) __ntl_nothrow
     : status_(_set(file_handle, &info,
               sizeof(info) + info.FileNameLength - sizeof(wchar_t)))
     {/**/}
@@ -373,13 +373,13 @@ struct volume_information:
   NtQueryVolumeInformationFile,
   NtSetVolumeInformationFile>
 {
-  volume_information(legacy_handle file_handle) throw()
+  volume_information(legacy_handle file_handle) __ntl_nothrow
     : file_information_base<InformationClass, NtQueryVolumeInformationFile, NtSetVolumeInformationFile>(file_handle)
   {/**/}
 
   volume_information(
     legacy_handle             file_handle,
-    const InformationClass &  info) throw()
+    const InformationClass &  info) __ntl_nothrow
     : file_information_base<InformationClass,
     NtQueryVolumeInformationFile,
     NtSetVolumeInformationFile>(file_handle, info)

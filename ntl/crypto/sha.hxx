@@ -58,8 +58,8 @@ class sha1
         bool operator !=(const digest & d, const digest & d2)
           { return ! (d == d2); }
 
-        void * operator new(size_t, void * p) throw() { return p; }
-        void operator delete(void * /*p*/, void * /*placement*/) throw() {/**/}
+        void * operator new(size_t, void * p) __ntl_nothrow { return p; }
+        void operator delete(void * /*p*/, void * /*placement*/) __ntl_nothrow {/**/}
 
       private:
         octet _[size/8];

@@ -31,29 +31,29 @@ class basic_handle
 
     typedef X element_type;
 
-    explicit basic_handle(X h = X())  throw() : h(h) {}
+    explicit basic_handle(X h = X())  __ntl_nothrow : h(h) {}
 
-    basic_handle(basic_handle & a)  throw() : h(a.release()) {}
+    basic_handle(basic_handle & a)  __ntl_nothrow : h(a.release()) {}
 
-    basic_handle & operator=(basic_handle & a) throw()
+    basic_handle & operator=(basic_handle & a) __ntl_nothrow
     {
       reset(a.release());
       return *this;
     }
 
-    ~basic_handle() throw() { if ( get() ) Delete(get()); }
+    ~basic_handle() __ntl_nothrow { if ( get() ) Delete(get()); }
 
     bool is_valid() const { return Validate(get()); }
 
-    X get() const throw() { return h; }
-    X release()   throw() { X tmp = get(); set(0); return tmp; }
+    X get() const __ntl_nothrow { return h; }
+    X release()   __ntl_nothrow { X tmp = get(); set(0); return tmp; }
 
-    basic_handle duplicate() const throw()
+    basic_handle duplicate() const __ntl_nothrow
     { 
       return basic_handle( Duplicate(get()) );
     }
 
-    void reset(X h = 0) throw()
+    void reset(X h = 0) __ntl_nothrow
     { 
       if ( get() && get() != h ) Delete(get());
       set(h);

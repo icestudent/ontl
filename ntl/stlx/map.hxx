@@ -8,6 +8,7 @@
 #ifndef NTL__STLX_MAP
 #define NTL__STLX_MAP
 
+#include "stdexcept.hxx"
 #include "functional.hxx"
 #include "memory.hxx"
 #include "utility.hxx"
@@ -54,7 +55,7 @@ namespace std {
       }
 
     //template <class Key,class T,class Compare,class Allocator>
-    friend class map<Key, T, Compare, Allocator>;
+    friend class std::map<Key, T, Compare, Allocator>;
     protected:
       Compare comp;
       value_compare(Compare c) : comp(c) {}
@@ -66,10 +67,11 @@ template <class Key,
           class Compare = less<Key>,
           class Allocator = allocator<pair<const Key, T> > >
 class map:
-  protected tree::rbtree::rbtree<pair<const Key, T>, detail::value_compare<Key, T, Compare, Allocator>, Allocator>
+  protected tree::rb_tree::rb_tree<pair<const Key, T>, detail::value_compare<Key, T, Compare, Allocator>, Allocator>
 {
   ///////////////////////////////////////////////////////////////////////////
-  typedef tree::rbtree::rbtree<pair<const Key, T>, detail::value_compare<Key, T, Compare, Allocator>, Allocator> tree_type;
+  typedef tree::rb_tree::rb_tree<pair<const Key, T>, detail::value_compare<Key, T, Compare, Allocator>, Allocator> tree_type;
+  typedef tree_type::node node;
   public:
 
     ///\name  types
@@ -225,14 +227,14 @@ class map:
     // 23.3.1.3 map operations:
     iterator find(const key_type& x)
     {
-      node* p = root_;
+      node* p = tree_type::root_;
       while(p){
         if(val_comp_.comp(x, p->elem.first))
-          p = p->left;
+          p = p->u.s.left;
         else if(val_comp_.comp(p->elem.first, x))
-          p = p->right;
+          p = p->u.s.right;
         else
-          return make_iterator(p);
+          return tree_type::make_iterator(p);
       }
       return end();
     }

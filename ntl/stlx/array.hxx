@@ -59,10 +59,10 @@ struct array
     const_reverse_iterator  rend() const 
       { return const_reverse_iterator(begin()); }
 
-    const_iterator          cbegin() const { begin(); }
-    const_iterator          cend()   const { end();   }
-    const_reverse_iterator  crbegin()const { rbegin();}
-    const_reverse_iterator  crend()  const { rend();  }
+    const_iterator cbegin() const { return begin(); }
+    const_iterator cend() const   { return end(); }
+    const_reverse_iterator crbegin() const { return rbegin(); }
+    const_reverse_iterator crend() const   { return rend(); }
 
     ///\name  capacity
 
@@ -87,10 +87,10 @@ struct array
       return operator[](n);
     }
 
-    reference       front()       throw() { return *begin(); }
-    const_reference front() const throw() { return *begin(); }
-    reference       back()        throw() { return *(--end()); }
-    const_reference back()  const throw() { return *(--end()); }
+    reference       front()       __ntl_nothrow { return *begin(); }
+    const_reference front() const __ntl_nothrow { return *begin(); }
+    reference       back()        __ntl_nothrow { return *(--end()); }
+    const_reference back()  const __ntl_nothrow { return *(--end()); }
 
           T * data()        { return __elems; }
     const T * data() const  { return __elems; }
@@ -103,9 +103,9 @@ struct array
     static const size_t __actual_size = N ? N : 1;
     T __elems[__actual_size];
 
-    void __check_bounds(size_type n) const throw(out_of_range)
+    void __check_bounds(size_type n) const __ntl_throws(out_of_range)
     {
-      if ( n > size() ) __ntl_throw(out_of_range);
+      if ( n > size() ) __ntl_throw (out_of_range());
     }
 
 };//struct array
