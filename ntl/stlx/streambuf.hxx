@@ -191,10 +191,12 @@ class basic_streambuf
     // 27.5.2.4 basic_streambuf virtual functions [streambuf.virtuals]
 
     ///\name  27.5.2.4.1 Locales [streambuf.virt.locales]
+#if STLX__CONFORMING_LOCALE
     virtual void imbue(const locale&)
     {
       // Default behavior: Does nothing.
     }
+#endif
 
     ///\name  27.5.2.4.2 Buffer management and positioning [streambuf.virt.buffer]
 

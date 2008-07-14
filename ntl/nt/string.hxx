@@ -12,6 +12,7 @@
 #include "../string"
 #include "../type_traits"
 #include "../basedef.hxx"
+#include "../stlx/cstdint.hxx"
 
 namespace ntl {
 namespace nt {
@@ -45,6 +46,8 @@ class native_string
     typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
 
     static const size_type npos = static_cast<size_type>(-1);
+
+    //STATIC_ASSERT((std::is_same<pointer, charT*>::value));
 
     ///\name  native_string constructors
 

@@ -784,18 +784,21 @@ class shared_ptr : ntl::linked_ptr<T>
     ~shared_ptr()
     {
       if ( unique() )
-        delete base_type::get();
+        free();
     }
 
     ///\name  20.6.12.2.3 shared_ptr assignment [util.smartptr.shared.assign]
 
-    shared_ptr& operator=(const shared_ptr& r);
-    template<class Y> shared_ptr& operator=(const shared_ptr<Y>& r);
-//    shared_ptr& operator=(shared_ptr&& r);
-//    template<class Y> shared_ptr& operator=(shared_ptr<Y>&& r);
-//    template<class Y> shared_ptr& operator=(auto_ptr<Y>&& r);
-//    template <class Y, class D> shared_ptr& operator=(const unique_ptr<Y, D>& r) = delete;
-//    template <class Y, class D> shared_ptr& operator=(unique_ptr<Y, D>&& r);
+#ifdef NTL__CXX
+    shared_ptr& operator=(shared_ptr&& r);
+    template<class Y> shared_ptr& operator=(shared_ptr<Y>&& r);
+    template<class Y> shared_ptr& operator=(auto_ptr<Y>&& r);
+    template <class Y, class D> shared_ptr& operator=(const unique_ptr<Y, D>& r) = delete;
+    template <class Y, class D> shared_ptr& operator=(unique_ptr<Y, D>&& r);
+#else
+    shared_ptr& operator=(const shared_ptr& r) { r.swap(this); }
+    template<class Y> shared_ptr& operator=(const shared_ptr<Y>& r) { r.swap(this); }
+#endif
 
     ///\name  20.6.12.2.4 shared_ptr modifiers [util.smartptr.shared.mod]
 
@@ -803,11 +806,13 @@ class shared_ptr : ntl::linked_ptr<T>
     /// 2 Throws: nothing.
     void swap(shared_ptr& r)
     {
-
+      base_type::swap(r);
     }
 
-    void reset();
-    template<class Y> void reset(Y* p);
+    /// 3 Effects: Equivalent to shared_ptr().swap(*this).
+    __forceinline
+    void reset() { shared_ptr().swap(*this); }
+    template<class Y> void reset(Y* p) { shared_ptr(p).swap(*this); } 
     template<class Y, class D> void reset(Y* p, D d);
 
     ///\name  20.6.6.2.5 shared_ptr observers [util.smartptr.shared.obs]
@@ -834,55 +839,105 @@ class shared_ptr : ntl::linked_ptr<T>
   private:
   
     void set(T * p) { base_type::set(p); }
+    void free() { delete base_type::get(); }
+
 };
 
-///\name  20.6.6.2.6 shared_ptr comparison [util.smartptr.shared.cmp]
+///\name  20.6.12.2.6 shared_ptr creation [util.smartptr.shared.create]
+#ifdef NTL__CXX
+/// 1 Requires: The expression new (pv) T(std::forward<Args>(args)...), where
+///   pv has type void* and points to storage suitable to hold an object of type
+///   T, shall be well-formed. A shall be an allocator (20.1.2).
+///   The copy constructor and destructor of A shall not throw exceptions.
+/// 2 Effects: Allocates memory suitable for an object of type T and constructs
+///   an object in that memory via the placement new expression new (pv) T()
+///   or new (pv) T(std::forward<Args>(args)...). The template allocate_shared
+///   uses a copy of a to allocate memory.
+///   If an exception is thrown, the functions have no effect.
+/// 3 Returns: A shared_ptr instance that stores and owns the address of
+///   the newly constructed object of type T.
+/// 4 Postconditions: get() != 0 && use_count() == 1
+/// 5 Throws: bad_alloc, or an exception thrown from A::allocate
+///   or from the constructor of T.
+template<class T, class... Args> shared_ptr<T> make_shared(Args&&... args);
+template<class T, class A, class... Args>shared_ptr<T> allocate_shared(const A& a, Args&&... args);
+#else
+
+#endif
+
+///\name  20.6.12.2.7 shared_ptr comparison [util.smartptr.shared.cmp]
 
 template<class T, class U>
+inline
 bool
-  operator==(shared_ptr<T> const& a, shared_ptr<U> const& b);
+  operator==(shared_ptr<T> const& a, shared_ptr<U> const& b)
+{
+  return a.get() == b.get();
+}
 
 template<class T, class U>
+inline
 bool
-  operator!=(shared_ptr<T> const& a, shared_ptr<U> const& b);
+  operator!=(shared_ptr<T> const& a, shared_ptr<U> const& b)
+{
+  return a.get() != b.get().
+}
 
+/// 5 Returns: an unspecified value such that
+///   — operator< is a strict weak ordering as described in 25.3;
+///   — under the equivalence relation defined by operator<, !(a < b) && !(b < a),
+///     two shared_ptr instances are equivalent if and only if they share
+///     ownership or are both empty.
+/// 6 Throws: nothing.
+/// 7 [ Note: Defining a comparison operator allows shared_ptr objects
+///   to be used as keys in associative containers. —end note ]
 template<class T, class U>
+inline
 bool
-  operator<(shared_ptr<T> const& a, shared_ptr<U> const& b);
+  operator<(shared_ptr<T> const& a, shared_ptr<U> const& b)
+{
+  return reinterpret_cast<uintptr_t>(a.get())
+       < reinterpret_cast<uintptr_t>(b.get());
+}
 
-///\name  20.6.6.2.7 shared_ptr I/O [util.smartptr.shared.io]
+///\name  20.6.12.2.8 shared_ptr I/O [util.smartptr.shared.io]
 template<class E, class T, class Y>
-basic_ostream<E, T>& 
+inline
+basic_ostream<E, T>&
   operator<< (basic_ostream<E, T>& os, shared_ptr<Y> const& p)
 {
   os << p.get();
 }
 
-///\name  20.6.6.2.8 shared_ptr specialized algorithms [util.smartptr.shared.spec]
+///\name  20.6.12.2.9 shared_ptr specialized algorithms [util.smartptr.shared.spec]
 template<class T> 
+inline
 void
   swap(shared_ptr<T>& a, shared_ptr<T>& b) __ntl_nothrow
 {
   a.swap(b);
 }
 
-///\name  20.6.6.2.9 shared_ptr casts [util.smartptr.shared.cast]
+///\name  20.6.12.2.10 shared_ptr casts [util.smartptr.shared.cast]
 
 template<class T, class U>
+inline
 shared_ptr<T>
   static_pointer_cast(shared_ptr<U> const& r);
 
 template<class T, class U>
+inline
 shared_ptr<T>
   dynamic_pointer_cast(shared_ptr<U> const& r);
 
 template<class T, class U>
+inline
 shared_ptr<T> 
   const_pointer_cast(shared_ptr<U> const& r);
 
 ///@}
 
-/// 20.6.6.2.10 get_deleter [util.smartptr.getdeleter]
+/// 20.6.12.2.11 get_deleter [util.smartptr.getdeleter]
 template<class D, class T> D* get_deleter(shared_ptr<T> const& p);
 
 

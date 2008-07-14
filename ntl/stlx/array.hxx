@@ -100,7 +100,10 @@ struct array
   // Types with private or protected data members are not aggregate
   //private:
     
-    static const size_t __actual_size = N ? N : 1;
+    /* vs2k5 debugger bug: it doesn't recognize `static const type`, we must use enum instead */
+    //static const size_t __actual_size = N ? N : 1;
+    enum { __actual_size = N ? N : 1 };
+
     T __elems[__actual_size];
 
     void __check_bounds(size_type n) const __ntl_throws(out_of_range)

@@ -76,7 +76,7 @@ struct char_traits<wchar_t>
   typedef wchar_t   char_type;
   typedef wint_t    int_type;
   typedef streamoff off_type;
-  typedef streampos pos_type;
+  typedef wstreampos pos_type;
   typedef mbstate_t state_type;
 
   static void assign(char_type& c1, const char_type& c2) { c1 = c2; }

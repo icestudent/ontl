@@ -290,9 +290,83 @@ class basic_istream : virtual public basic_ios<charT, traits>
 };
 
 
+/// 27.6.1.4 Standard basic_istream manipulators [istream.manip]
+/// 1 Effects: Behaves as an unformatted input function (as described in 27.6.1.3/1),
+///   except that it does not count the number of characters extracted and
+///   does not affect the value returned by subsequent calls to is.gcount().
+///   After constructing a sentry object extracts characters as long as
+///   the next available character c is whitespace or until there are no more
+///   characters in the sequence. Whitespace characters are distinguished with
+///   the same criterion as used by sentry::sentry (27.6.1.1.3).
+///   If ws stops extracting characters because there are no more available it
+///   sets eofbit, but not failbit.
+/// 2 Returns: is.
 template <class charT, class traits>
 basic_istream<charT,traits>&
   ws(basic_istream<charT,traits>& is);
+
+
+/// 27.6.1.5 Class template basic_iostream [iostreamclass].
+/// 1 The class basic_iostream inherits a number of functions that allow
+///   reading input and writing output to sequences controlled by a stream buffer.
+template <class charT, class traits /*= char_traits<charT>*/ >
+class basic_iostream
+: public basic_istream<charT, traits>, public basic_ostream<charT, traits>
+{
+  public:
+  
+    ///\name Types
+
+    typedef charT char_type;
+    typedef typename traits::int_type int_type;
+    typedef typename traits::pos_type pos_type;
+    typedef typename traits::off_type off_type;
+    typedef traits traits_type;
+
+    ///\name 27.6.1.5.1 basic_iostream constructors [iostream.cons]
+
+    /// 1 Effects: Constructs an object of class basic_iostream, assigning
+    ///   initial values to the base classes by calling
+    ///   basic_istream<charT,traits>(sb) (27.6.1.1)
+    ///   and basic_ostream<charT,traits>(sb) (27.6.2.1)
+    /// 2 Postcondition: rdbuf()==sb and gcount()==0.
+    explicit basic_iostream(basic_streambuf<charT,traits>* sb)
+    : basic_istream<charT, traits>(sb), basic_ostream<charT, traits>(sb)
+    {;}
+
+#ifdef NTL__CXX
+    /// 3 Effects: Move constructs from the rvalue rhs by constructing
+    ///   the basic_istream base class with move(rhs).
+    basic_iostream(basic_iostream&& rhs);
+#endif
+
+    ///\name 27.6.1.5.2 basic_iostream destructor [iostream.dest]
+    /// 1 Effects: Destroys an object of class basic_iostream.
+    /// 2 Remarks: Does not perform any operations on rdbuf().
+    virtual ~basic_iostream() {;}
+
+#ifdef NTL__CXX
+    ///\name 27.6.1.5.3 basic_iostream assign and swap [iostream.assign]
+
+    /// 1 Effects: swap(rhs).
+    basic_iostream& operator=(basic_iostream&& rhs);
+
+    /// 2 Effects: Calls basic_istream<charT, traits>::swap(rhs).
+    void swap(basic_iostream&& rhs);
+#endif
+    ///\}
+};
+
+/// 3 Effects: x.swap(y).
+template <class charT, class traits>
+void swap(basic_iostream<charT, traits>& x, basic_iostream<charT, traits>& y);
+
+#ifdef NTL__CXX
+template <class charT, class traits>
+void swap(basic_iostream<charT, traits>&& x, basic_iostream<charT, traits>& y);
+template <class charT, class traits>
+void swap(basic_iostream<charT, traits>& x, basic_iostream<charT, traits>&& y);
+#endif
 
 /**@} lib_input_streams */
 /**@} lib_iostream_format */

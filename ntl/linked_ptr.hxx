@@ -8,6 +8,7 @@
 #ifndef NTL__LINKED_PTR
 #define NTL__LINKED_PTR
  
+#include "stlx/algorithm.hxx"
 #include "linked_list.hxx"
 
 namespace ntl {
@@ -18,8 +19,12 @@ struct linked_ptr
     typedef linked_ptr  this_type;
     typedef T(this_type::*unspecified_bool_type)();
 
+    typedef T         value_type;
+    typedef T*        pointer;
+    typedef T&        reference;
+
     /// construct from the raw pointer
-    explicit this_type(T * ptr = 0)
+    explicit linked_ptr(T * ptr = 0)
     : ptr(ptr)
     {
       //links.link(&links, &links);
@@ -27,7 +32,7 @@ struct linked_ptr
     }
 
     /// copyconstruct to link to the existing ptr list
-    this_type(const this_type & other)
+    linked_ptr(const linked_ptr & other)
     {
       links.link(&other.links);
     }
@@ -64,6 +69,12 @@ struct linked_ptr
     { 
       // ptr != 0 forces a few bloat instructions
       return brute_cast<unspecified_bool_type>(ptr);
+    }
+
+    void swap(this_type & r)
+    {
+      links.swap(&r.links);
+      std::swap(ptr, r.ptr);
     }
 
   private:

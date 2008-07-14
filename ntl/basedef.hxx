@@ -10,7 +10,13 @@
 
 #include "cstddef"
 #include "cstdint"
-#include "vector"
+//#include "vector"
+
+// std::vector forward declaration
+namespace std {
+  template<class T> class allocator;
+  template <class T, class Allocator> class vector;
+} // std
 
 /// NT Native Template Lybrary
 namespace ntl {
@@ -36,7 +42,7 @@ using std::ptrdiff_t;
 
 ///\name  
 
-typedef std::vector<uint8_t> raw_data;
+typedef std::vector<uint8_t, std::allocator<uint8_t> > raw_data;
 
 enum times
 {

@@ -1647,6 +1647,7 @@ typedef nt::status::type ntstatus;
 
 }//namespace nt
 
+///\note not *status* as it is commonly used in an arbitrary client code
 using nt::ntstatus;
 
 }//namespace ntl

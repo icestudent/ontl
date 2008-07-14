@@ -10,6 +10,7 @@
 #define NTL__NT_DEBUG
 
 #include "basedef.hxx"
+#include "string.hxx"
 
 namespace ntl {
   namespace nt {
@@ -212,12 +213,12 @@ namespace ntl {
 
       void operator()(const char msg[], const const_unicode_string & msg2) const
       { 
-        printf("%s`%S'", msg, msg2.data());
+        printf("%s`%wZ'", msg, &msg2);
       }
 
       void operator()(const char msg[], const unicode_string & msg2) const
       { 
-        printf("%s`%S'", msg, msg2.data());
+        printf("%s`%wZ'", msg, &msg2);
       }
     };
 

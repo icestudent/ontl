@@ -16,33 +16,32 @@
 
 
 #if defined NTL__DEBUG || !defined NDEBUG
-  extern "C" const char *  __assertion_failure;
-  extern "C" unsigned      __assertion_failure_at_line;
-///\todo interlocked
 #define __ntl_assert(__msg, __line)\
-  {/*__assertion_failure = (__msg), __assertion_failure_at_line = (__line); */__debugbreak(); }
-
+  { const char * volatile __assertion_failure; __assertion_failure = (__msg);\
+    unsigned volatile __assertion_failure_at_line; __assertion_failure_at_line = (__line);\
+    __debugbreak(); }
 #endif
 
 
 #ifdef NTL__DEBUG
-#define _Assert(expr) \
-  if ( !!(expr) ); else \
+  #define _Assert(expr) \
+    if ( !!(expr) ); else \
     __ntl_assert("NTL Assertion ("#expr") failed in "__FUNCSIG__" //"__FILE__,__LINE__);\
-  ((void)0)
+    ((void)0)
 #else
-# define _Assert(expr)
+  #define _Assert(expr)
 #endif
 
-#ifndef assert
+/// ISO C 7.2/1 The assert macro is redefined according to the current state
+///             of NDEBUG each time that <assert.h> is included.
+#undef assert
 #ifdef NDEBUG
-# define assert(expr) ((void)0)
+  #define assert(expr) ((void)0)
 #else
-    #define assert(expr) \
-      if ( !!(expr) ); else \
-      __ntl_assert("Assertion ("#expr") failed in "__FUNCSIG__" //"__FILE__,__LINE__);\
-      ((void)0)
-  #endif
+  #define assert(expr) \
+    if ( !!(expr) ); else \
+    __ntl_assert("Assertion ("#expr") failed in "__FUNCSIG__" //"__FILE__,__LINE__);\
+    ((void)0)
 #endif
 
 //}//namespace std

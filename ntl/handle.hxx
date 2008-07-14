@@ -11,6 +11,7 @@
 
 //#include <functional>
 #include "cstdint"
+#include "stlx/exception.hxx"
 
 namespace ntl {
 

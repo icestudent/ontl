@@ -8,8 +8,9 @@
 #ifndef NTL__LINKED_LIST
 #define NTL__LINKED_LIST
 
-#include <iterator>
-#include <type_traits>
+#include "stlx/iterator.hxx"
+#include "stlx/type_traits.hxx"
+#include "stlx/algorithm.hxx"
 
 namespace ntl {
 
@@ -77,8 +78,18 @@ struct linked<2>
     unlink(this->prev, this->next);
   }
 
-  void swap(this_type * other);
-  
+  ///\todo may be better...
+  void swap(this_type * other)
+  {
+    this_type * const this_next = this->next; // the next line may change this
+    this->prev->next = other;
+    this_next->prev = other;
+    this_type * const other_next = other->next; // the next line may change this
+    other->prev->next = this;
+    other_next->prev = this;
+    std::swap(this->prev, other->prev);
+    std::swap(this->next, other->next);
+  }
 };
 
 typedef linked<2> double_linked;

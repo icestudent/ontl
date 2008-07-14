@@ -10,7 +10,7 @@
 
 #include "basedef.hxx"
 #include "handle.hxx"
-#include <memory>
+#include "../stlx/memory.hxx"
 
 
 namespace ntl {
@@ -82,7 +82,7 @@ ntstatus __stdcall
     io_status_block *       IoStatusBlock,
     void *                  FileInformation,
     unsigned long           Length,
-    uint32_t  FileInformationClass
+    file_information_class  FileInformationClass
     );
 
 NTL__EXTERNAPI query_information_file_t NtQueryInformationFile;
@@ -94,7 +94,7 @@ ntstatus __stdcall
     io_status_block *       IoStatusBlock,
     const void *            FileInformation,
     unsigned long           Length,
-    uint32_t  FileInformationClass
+    file_information_class  FileInformationClass
     );
 
 NTL__EXTERNAPI set_information_file_t NtSetInformationFile;
@@ -216,18 +216,19 @@ struct file_rename_information
 {
   static const file_information_class info_class_type = FileRenameInformation;
 
+  typedef std::unique_ptr<uint8_t[]> file_rename_information_ptr;
+
   static inline
-    std::auto_ptr<file_rename_information>
+    file_rename_information_ptr
       alloc(
         const const_unicode_string &  new_name,
         bool                          replace_if_exists,
         legacy_handle                 root_directory = legacy_handle())
     {
-#pragma warning(disable:4291)
-      return std::auto_ptr<file_rename_information>(
-            new (new_name.size()*sizeof(wchar_t))
-            file_rename_information(new_name, replace_if_exists, root_directory));
-#pragma warning(default:4291)
+      file_rename_information_ptr ptr ( 
+        new uint8_t[sizeof(file_rename_information) + new_name.size()*sizeof(wchar_t)] );
+      new (ptr.get()) file_rename_information(new_name, replace_if_exists, root_directory);
+      return ptr;
     }
 
     bool          ReplaceIfExists;
@@ -247,19 +248,6 @@ struct file_rename_information
     {
       std::copy(new_name.begin(), new_name.end(), FileName);
     }
-
-  void * operator new(std::size_t size, uint32_t filename_length) __ntl_nothrow
-  {
-    return ::operator new[](size + filename_length);
-  }
-
-  void operator delete(void* p)
-  {
-    ::operator delete[](p);
-  }
-
-  friend class 
-std::auto_ptr<file_rename_information>;
 
 };
 

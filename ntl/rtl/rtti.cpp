@@ -1,13 +1,13 @@
 #include "../stlx/cstddef.hxx"
 #include "../stlx/typeinfo.hxx"
 
-#include "../nt/new.hxx"
 #include "../nt/peb.hxx"
 #include "../pe/image.hxx"
 
 #define CRT_UNDNAME
 
 #ifdef CRT_UNDNAME
+# include "../nt/new.hxx"
 namespace x
 {
   void* __cdecl malloc(size_t size)

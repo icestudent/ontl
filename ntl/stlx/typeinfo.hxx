@@ -8,8 +8,6 @@
 #ifndef NTL__STLX_TYPEINFO
 #define NTL__STLX_TYPEINFO
 
-//#include "exception.hxx"
-
 #ifndef STLX__USE_RTTI
   #ifdef _MSC_VER
     #ifdef _CPPRTTI

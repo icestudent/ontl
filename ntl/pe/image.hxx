@@ -10,6 +10,7 @@
 
 #include "../stdlib.hxx"
 #include "../basedef.hxx"
+#include "../nt/basedef.hxx"
 #include "../cstring"
 
 namespace ntl {

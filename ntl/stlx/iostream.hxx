@@ -9,6 +9,12 @@
 #define NTL__STLX_IOSTREAM
 
 #include "iosfwd.hxx"
+#if 0
+#include <ios>
+#include <streambuf>
+#include <istream>
+#include <ostream>
+#endif
 
 namespace std {
 

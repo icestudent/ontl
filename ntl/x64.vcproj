@@ -49,7 +49,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;_M_X64"
+				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;_M_X64;_M_AMD64"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -288,11 +288,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\km\apc.hxx"
+				RelativePath=".\nt\apc.hxx"
 				>
 			</File>
 			<File
-				RelativePath=".\nt\apc.hxx"
+				RelativePath=".\km\apc.hxx"
 				>
 			</File>
 			<File
@@ -380,11 +380,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\km\debug.hxx"
+				RelativePath=".\nt\debug.hxx"
 				>
 			</File>
 			<File
-				RelativePath=".\nt\debug.hxx"
+				RelativePath=".\km\debug.hxx"
 				>
 			</File>
 			<File
@@ -404,15 +404,19 @@
 				>
 			</File>
 			<File
-				RelativePath=".\stlx\exception.hxx"
-				>
-			</File>
-			<File
 				RelativePath=".\nt\exception.hxx"
 				>
 			</File>
 			<File
+				RelativePath=".\stlx\exception.hxx"
+				>
+			</File>
+			<File
 				RelativePath=".\km\fast_io.hxx"
+				>
+			</File>
+			<File
+				RelativePath=".\file.hxx"
 				>
 			</File>
 			<File
@@ -424,15 +428,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\file.hxx"
+				RelativePath=".\nt\file_information.hxx"
 				>
 			</File>
 			<File
 				RelativePath=".\km\file_information.hxx"
-				>
-			</File>
-			<File
-				RelativePath=".\nt\file_information.hxx"
 				>
 			</File>
 			<File
@@ -460,11 +460,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\win\handle.hxx"
+				RelativePath=".\handle.hxx"
 				>
 			</File>
 			<File
-				RelativePath=".\handle.hxx"
+				RelativePath=".\win\handle.hxx"
 				>
 			</File>
 			<File
@@ -544,11 +544,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\stlx\memory.hxx"
+				RelativePath=".\km\memory.hxx"
 				>
 			</File>
 			<File
-				RelativePath=".\km\memory.hxx"
+				RelativePath=".\stlx\memory.hxx"
 				>
 			</File>
 			<File
@@ -564,15 +564,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\nt\new.hxx"
+				>
+			</File>
+			<File
 				RelativePath=".\km\new.hxx"
 				>
 			</File>
 			<File
 				RelativePath=".\stlx\new.hxx"
-				>
-			</File>
-			<File
-				RelativePath=".\nt\new.hxx"
 				>
 			</File>
 			<File
@@ -608,11 +608,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\km\registry.hxx"
+				RelativePath=".\nt\registry.hxx"
 				>
 			</File>
 			<File
-				RelativePath=".\nt\registry.hxx"
+				RelativePath=".\km\registry.hxx"
 				>
 			</File>
 			<File
@@ -656,6 +656,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\stlx\stdexception.hxx"
+				>
+			</File>
+			<File
 				RelativePath=".\stdint.h"
 				>
 			</File>
@@ -668,11 +672,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\stlx\string.hxx"
+				RelativePath=".\nt\string.hxx"
 				>
 			</File>
 			<File
-				RelativePath=".\nt\string.hxx"
+				RelativePath=".\stlx\string.hxx"
 				>
 			</File>
 			<File
@@ -688,11 +692,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\km\system_information.hxx"
+				RelativePath=".\nt\system_information.hxx"
 				>
 			</File>
 			<File
-				RelativePath=".\nt\system_information.hxx"
+				RelativePath=".\km\system_information.hxx"
 				>
 			</File>
 			<File
@@ -708,11 +712,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\km\thread.hxx"
+				RelativePath=".\nt\thread.hxx"
 				>
 			</File>
 			<File
-				RelativePath=".\nt\thread.hxx"
+				RelativePath=".\km\thread.hxx"
 				>
 			</File>
 			<File
@@ -794,6 +798,18 @@
 					>
 					<Tool
 						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\rtl\ehsup.asm"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="MASM"
 					/>
 				</FileConfiguration>
 			</File>

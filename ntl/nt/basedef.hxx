@@ -11,7 +11,6 @@
 #include "status.hxx"
 #include "../basedef.hxx"
 #include "../stdlib.hxx"
-#include "string.hxx"
 
 
 namespace ntl {
@@ -94,7 +93,7 @@ namespace ntl {
 
     typedef single_list_entry slist_entry;
 
-    __align(8)
+    alignas(8)
     struct slist_header : public slist_entry
     {
       uint16_t    Depth;
@@ -136,6 +135,7 @@ namespace ntl {
     {
       return bitwise_and(m, m2);
     }
+
 
     struct generic_mapping
     {
@@ -206,89 +206,6 @@ namespace ntl {
       DllThreadAttach,
       DllThreadDetach
     };
-
-    struct ldr_data_table_entry
-    {
-      enum flags {
-        static_link                = 0x00000002,
-        image_dll                  = 0x00000004,
-        load_in_progress           = 0x00001000,
-        unload_in_progress         = 0x00002000,
-        entry_processed            = 0x00004000,
-        entry_inserted             = 0x00008000,
-        current_load               = 0x00010000,
-        failed_builtin_load        = 0x00020000,
-        dont_call_for_threads      = 0x00040000,
-        process_attach_called      = 0x00080000,
-        debug_symbols_loaded       = 0x00100000,
-        image_not_at_base          = 0x00200000,
-        wx86_ignore_machinetype    = 0x00400000
-      };
-
-      /* 0x00 */ list_head            InLoadOrderLinks;
-      /* 0x08 */ list_head            InMemoryOrderLinks;
-      /* 0x10 */ list_head            InInitializationOrderLinks;
-      /* 0x18 */ pe::image *          DllBase;
-      /* 0x1c */ void *               EntryPoint;
-      /* 0x20 */ uint32_t             SizeOfImage;
-      /* 0x24 */ const_unicode_string FullDllName;
-      /* 0x2c */ const_unicode_string BaseDllName;
-      /* 0x34 */ uint32_t             Flags;
-      /* 0x38 */ uint16_t             LoadCount;
-      /* 0x3a */ uint16_t             TlsIndex;
-      union {
-        /* 0x3c */ list_entry         HashLinks;
-        struct {
-          /* 0x3c */ void *           SectionPointer;
-          /* 0x40 */ uint32_t         CheckSum;
-        } ext;
-      };
-      union {
-        /* 0x44 */ uint32_t           TimeDateStamp;
-        /* 0x44 */ void *             LoadedImports;
-      };
-      /* 0x48 */ void *               EntryPointActivationContext;
-      /* 0x4c */ void *               PatchInformation;
-
-#if 0
-      // nt 6.0+
-      /*<thisrel this+0x50>*/ /*|0x8|*/ list_entry ForwarderLinks;
-      /*<thisrel this+0x58>*/ /*|0x8|*/ list_entry ServiceTagLinks;
-      /*<thisrel this+0x60>*/ /*|0x8|*/ list_entry StaticLinks;
-      // // <size 0x68>
-#endif
-
-
-      struct find_dll
-      {
-        find_dll(list_head * head) : head(head) {}
-
-        const pe::image * operator()(const char name[]) const
-        {
-          if (head)
-            for (list_entry * it = head->begin(); it != head->end(); it = it->next)
-            {
-              const ldr_data_table_entry * const entry =
-                reinterpret_cast<ldr_data_table_entry *>(it);
-              if(!entry->BaseDllName.size())
-                continue;
-              for (uint16_t i = 0; i != entry->BaseDllName.size(); ++i) {
-                if ((entry->BaseDllName[i] ^ name[i]) & 0x5F)
-                  goto other_name;
-              }
-              return entry->DllBase;
-other_name:;
-            }
-            return 0;
-        }
-
-    private:
-      list_head * head;
-
-      };
-
-    };
-    STATIC_ASSERT(sizeof(ldr_data_table_entry) == 0x50 || sizeof(ldr_data_table_entry) == 0x98);
 
 
 NTL__EXTERNAPI

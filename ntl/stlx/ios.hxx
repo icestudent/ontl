@@ -11,6 +11,7 @@
 #define NTL__STLX_IOS
 
 #include "cstddef.hxx"
+#include "cstdio.hxx"
 #include "iosfwd.hxx"
 #include "stdexcept.hxx"
 #include "string.hxx"
@@ -97,7 +98,7 @@ class ios_base
     static const openmode binary  = 1 << 5;
  
     /// 27.4.2.1.5 Type ios_base::seekdir [ios::seekdir]
-    enum seekdir { beg, cur, end };
+    enum seekdir { beg, end, cur };
 
     /// 27.4.2.1.6 Class ios_base::Init [ios::Init]
     class Init
@@ -262,7 +263,7 @@ class fpos
 {
   public:
 
-    fpos(int i) : state_(i) {}
+    fpos(streamoff off) : offset(off), state_(0) {}
 
     ///\name 27.4.3.1 fpos Members [fpos.members]
 
@@ -271,7 +272,11 @@ class fpos
 
     ///@}
 
+    operator streamoff() const { return offset; }
+
   private:
+    //file_t    filepos;    
+    streamoff offset;
      stateT state_;
 };
 
