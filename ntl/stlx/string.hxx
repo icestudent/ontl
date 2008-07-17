@@ -18,8 +18,8 @@
 //#include "stdexcept.hxx"
 #include "vector.hxx"
 
-#ifndef EOF // should be removed to "stdio.hxx" ?
-#define EOF -1
+#ifndef EOF // should be moved to "stdio.hxx" ?
+# define EOF -1
 #endif
 
 namespace std {
