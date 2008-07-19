@@ -82,7 +82,7 @@ ntstatus __stdcall
     io_status_block *       IoStatusBlock,
     void *                  FileInformation,
     unsigned long           Length,
-    file_information_class  FileInformationClass
+    uint32_t                FileInformationClass
     );
 
 NTL__EXTERNAPI query_information_file_t NtQueryInformationFile;

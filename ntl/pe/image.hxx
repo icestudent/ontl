@@ -53,7 +53,7 @@ namespace ntl {
       }
 
 #ifdef _M_X64
-      static const image* bind_from(const void* address)
+      static const image* base_from(const void* address)
       {
         void* base;
         return reinterpret_cast<const image*>(nt::RtlPcToFileHeader(address, &base));
