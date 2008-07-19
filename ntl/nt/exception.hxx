@@ -275,7 +275,7 @@ class exception
       /** exception address or the address at which control left the establishing function */
       void*             ControlPc;
       /** module image base to which control left function belongs */
-      pe::image *       ImageBase;
+      class pe::image * ImageBase;
       /** function table entry holding the function and the unwind information image-base relative addresses for this function */
       runtime_function* FunctionEntry;
       /** address of the base of the fixed-stack allocation for this function */
