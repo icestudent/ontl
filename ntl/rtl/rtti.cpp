@@ -3,7 +3,6 @@
 
 #include "../pe/image.hxx"
 #include "../nt/exception.hxx"
-
 #include "../nt/status.hxx"
 #include "../nt/peb.hxx"
 
@@ -337,7 +336,7 @@ namespace {
     __try {
       const pe::image* imagebase = 
 #ifdef _M_X64
-        pe::image::bind_from(object);
+        pe::image::base_from(object);
 #else 
         NULL;
 #endif
@@ -399,7 +398,7 @@ extern "C" void* __cdecl __RTtypeid(void* object) __ntl_throws(...)
     return (void*)&locator.type.type;
 #else
     const pe::image* pe;
-    if(!locator.type || !(pe = pe::image::bind_from(object))){
+    if(!locator.type || !(pe = pe::image::base_from(object))){
       __ntl_throw(std::bad_typeid(/*"A typeid of bad pointer attempted"*/));
       return NULL;
     }
