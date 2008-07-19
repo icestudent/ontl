@@ -14,6 +14,13 @@
 #include "../cstring"
 
 namespace ntl {
+  namespace nt {
+#ifdef _M_X64
+    NTL__EXTERNAPI
+      void *__stdcall 
+        RtlPcToFileHeader(const void *PcValue, void **pBaseOfImage);
+#endif
+  }
   namespace pe {
 
 #pragma warning(push)
@@ -44,6 +51,14 @@ namespace ntl {
       {
         return reinterpret_cast<const image*>(image_base);
       }
+
+#ifdef _M_X64
+      static const image* bind_from(const void* address)
+      {
+        void* base;
+        return reinterpret_cast<const image*>(nt::RtlPcToFileHeader(address, &base));
+      }
+#endif
 
       template<typename T>
       static __forceinline
