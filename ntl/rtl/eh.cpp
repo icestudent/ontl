@@ -64,9 +64,6 @@ uint32_t get_eax()
 
 #ifdef _M_X64
 
-NTL__EXTERNAPI
-void *__stdcall 
-  RtlPcToFileHeader(const void *PcValue, void **pBaseOfImage);
 
 exception_disposition 
 ntl::cxxruntime::cxxframehandler(
@@ -215,15 +212,14 @@ __declspec(noreturn)
 extern "C"
 void __stdcall _CxxThrowException(void * object, _s__ThrowInfo const * info)
 {
-  const throwinfo* ti = reinterpret_cast<const throwinfo*>(info);
-
 #ifdef _M_IX86
   std::array<uintptr_t, 3> args = { _EH_MAGIC, (uintptr_t)object, (uintptr_t)info };
 #endif
 #ifdef _M_X64
   void* imagebase;
-  RtlPcToFileHeader(info, &imagebase);
+  ntl::nt::RtlPcToFileHeader(info, &imagebase);
   std::array<uintptr_t, 4> args = { _EH_MAGIC, (uintptr_t)object, (uintptr_t)info, (uintptr_t)imagebase};
+  const throwinfo* ti = reinterpret_cast<const throwinfo*>(info);
   if(info && (ti->e8 || !imagebase))
     args[0] = ehmagic1994;
 #endif // _M_X64
