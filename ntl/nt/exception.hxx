@@ -385,6 +385,13 @@ class exception
 
 }; //class exception
 
+#ifdef _M_X64
+
+NTL__EXTERNAPI
+void *__stdcall 
+  RtlPcToFileHeader(const void *PcValue, void **pBaseOfImage);
+
+#endif
 
 NTL__EXTERNAPI
 __declspec(noreturn)
@@ -728,6 +735,7 @@ uint32_t              :27;
     {
       // catch(...) handles them all
 #ifdef _M_IX86
+      dispatch;
       const type_info *ti1 = this->typeinfo, *ti2 = ct->typeinfo;
 #endif
 #ifdef _M_X64
@@ -1149,6 +1157,7 @@ uint32_t              :27;
       unwind(const dispatcher_context * const dispatch, const ehfuncinfo * const ehfi, ehstate_t to_state = -1) ///< defaults to empty state
     {
 #ifdef _M_IX86
+      dispatch;
       for ( ehstate_t cs = current_state(ehfi); cs != to_state; cs = ehfi->unwindtable[cs].state )
       {
         __try
@@ -1329,9 +1338,9 @@ uint32_t              :27;
       guard.funcinfo    = funcinfo;
       guard.cxxreg      = cxxreg;
       guard.catchdepth  = catchdepth + 1;
-      nt::teb::set(&nt::teb::ExceptionList, reinterpret_cast<uintptr_t>(&guard));
+      nt::teb::set(&nt::teb::ExceptionList, &guard);
       generic_function_t * const continuation = cxxreg->callsettingframe(handler, nlg_code);
-      nt::teb::set(&nt::teb::ExceptionList, reinterpret_cast<uintptr_t>(guard.next));
+      nt::teb::set(&nt::teb::ExceptionList, guard.next);
       return continuation;
     }
 
@@ -1360,7 +1369,7 @@ uint32_t              :27;
       __finally
       {
         cxxreg->stackptr() = stackptr;
-        if (is_msvc() && continuation)
+      if ( continuation )
         {
           destruct_eobject(!!_abnormal_termination());
         }
@@ -1369,13 +1378,7 @@ uint32_t              :27;
     }
 #endif // _M_IX86
 
-#ifdef _M_X64
-    __declspec(noreturn)
-      static void jumptocontinuation(generic_function_t * funclet, cxxregistration *cxxreg)
-    {
-      dbg_pause();
-    }
-#else
+#ifndef _M_X64
 #pragma warning(push)
 #pragma warning(disable:4731)//frame pointer register 'ebp' modified by inline assembly code
     // SE handlers already registered should be SAFESEH
@@ -1402,14 +1405,12 @@ uint32_t              :27;
       }
     }
 #pragma warning(pop)
-#endif
-
-#ifdef _M_X64
+#else // _M_X64
   private:
     eobject* adjust_pointer(void* p1, void* p2) const
     {
       intptr_t up1 = reinterpret_cast<intptr_t>(p1);
-      int32_t* up2 = reinterpret_cast<int32_t*>( (char*)p2 + 8 );
+      int32_t* up2 = reinterpret_cast<int32_t*>( (char*)p2 + sizeof(void*) );
       intptr_t ptr = up1 + up2[0];
       if(up2[1] < 0)
         return reinterpret_cast<eobject*>(ptr);
@@ -1419,7 +1420,7 @@ uint32_t              :27;
       return reinterpret_cast<eobject*>(ptr);
     }
   public:
-#endif
+#endif // _M_X64
 
     // ___BuildCatchObject
     /// 15.3/16 When the exception-declaration specifies a class type, a copy
@@ -1438,11 +1439,6 @@ uint32_t              :27;
       const
     {
 #ifdef _M_X64
-      // hack\fix
-      //char** place = reinterpret_cast<char**>(catchblock->eobject_bpoffset + cxxreg->fp.FramePointers);
-      //if(!*place)
-      //  *place = new char[64];
-
       // build helper
       __try {
         struct typeinfo_t { void* vtbl; void* spare; char name[1]; };
@@ -1459,7 +1455,7 @@ uint32_t              :27;
           }else if(convertable->memmoveable){
             // POD
             std::memcpy(objplace, get_object(), convertable->object_size);
-            if(convertable->object_size == 8 && *objplace)
+            if(convertable->object_size == sizeof(void*) && *objplace)
               *objplace = adjust_pointer((void*)*objplace, convertable);
           }else{
             // if copy ctor exists, call it; binary copy otherwise
@@ -1488,6 +1484,7 @@ uint32_t              :27;
         std::terminate();
       }
 #else // _M_X64
+      dispatch;
       if ( !catchblock->typeinfo ) return;
       if ( !catchblock->eobject_bpoffset ) return;
       void** catchstackframe = reinterpret_cast<void**>(cxxreg->stackbaseptr()
@@ -1551,6 +1548,7 @@ uint32_t              :27;
       uintptr_t frame = cxxreg->establisherframe(funcinfo, dispatch, &xframe);
       cxxregistration* cxxframe = reinterpret_cast<cxxregistration*>(frame);
 #else
+      recursive;
       cxxregistration* const cxxframe = cxxreg;
 #endif
 
@@ -1847,7 +1845,6 @@ next_try: ;
       // the cast is not always safe since there may be an arbitrary exception.
       // I assume find_handler will check this.
       cxxrecord * const cxxer = static_cast<cxxrecord*>(er);
-      const throwinfo* ti = cxxer->get_throwinfo();
 #ifdef NTL__OTHEREHMAGICS
       if ( cxxer->iscxx()
         && cxxer->get_ehmagic() > ehmagic1400

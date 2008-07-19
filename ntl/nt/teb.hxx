@@ -165,7 +165,7 @@ struct teb: public tib
 #elif defined(_M_X64)
     ntl::intrinsic::__writegsbyte
 #endif
-      ((uint32_t)offsetof(teb,*member), value);
+      ((uint32_t)offsetof(teb,*member), (uint8_t)value);
   }
   template<typename type, typename type2>
   static inline void set(type teb::* member, type2 value, Int2Type<sizeof(uint16_t)>)
@@ -175,7 +175,7 @@ struct teb: public tib
 #elif defined(_M_X64)
     ntl::intrinsic::__writegsword
 #endif
-      ((uint32_t)offsetof(teb,*member), value);
+      ((uint32_t)offsetof(teb,*member), (uint16_t)value);
   }
   template<typename type, typename type2>
   static inline void set(type teb::* member, type2 value, Int2Type<sizeof(uint32_t)>)
@@ -185,7 +185,7 @@ struct teb: public tib
 #elif defined(_M_X64)
     ntl::intrinsic::__writegsdword
 #endif
-      ((uint32_t)offsetof(teb,*member), value);
+      ((uint32_t)offsetof(teb,*member), (uint32_t)value);
   }
   template<typename type, typename type2>
   static inline void set(type teb::* member, type2 value, Int2Type<sizeof(uint64_t)>)
@@ -195,7 +195,7 @@ struct teb: public tib
 #elif defined(_M_X64)
     ntl::intrinsic::__writegsqword
 #endif
-      ((uint32_t)offsetof(teb,*member), value);
+      ((uint32_t)offsetof(teb,*member), (uint64_t)value);
   }
 
   template<typename type, typename type2>
