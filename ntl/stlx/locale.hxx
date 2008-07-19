@@ -19,7 +19,7 @@
 #if STLX__CONFORMING_LOCALE
 #define _NTL_LOC_VIRTUAL virtual
 #else
-#define _NTL_LOC_VIRTUAL
+#define _NTL_LOC_VIRTUAL /**/virtual/**/
 #endif
 
 #include "string.hxx"
@@ -109,7 +109,12 @@ class locale
 
 ///\name 22.1.2 locale globals [locale.global.templates]
 
+/// 1 Requires: Facet is a facet class whose definition contains the public
+///   static member id as defined in 22.1.1.1.2.
+/// 2 Returns: a reference to the corresponding facet of loc, if present.
 template <class Facet> const Facet& use_facet(const locale&);
+
+/// 5 Returns: true if the facet requested is present in loc; otherwise false.
 template <class Facet> bool has_facet(const locale&) __ntl_nothrow;
 
 ///\name 22.1.3 Convenience interfaces [locale.convenience]
@@ -483,7 +488,7 @@ template<>
 __forceinline
 const ctype<char>& use_facet<ctype<char> >(const locale&)
 {
-  // static ctype<char> is constructed with default table which is not to be freed,
+  // static ctype<char> is constructed with the default table which is not to be freed,
   // so the destructor call may be not queued up to the atexit function.
   // This is why it is implemented through placement new over a raw storage.
   static void * f[sizeof(ctype<char>)/sizeof(void*)];
@@ -630,6 +635,67 @@ class codecvt_byname : public codecvt<internT, externT, stateT>
 
 namespace std {
 
+// 22.2.3 The numeric punctuation facet [lib.facet.numpunct]
+
+/// 22.2.3.1 Class template numpunct [locale.numpunct]
+/// 1 numpunct<> specifies numeric punctuation.
+template <class charT>
+class numpunct : public locale::facet
+{
+  public:
+
+    typedef charT char_type;
+    typedef basic_string<charT> string_type;
+    
+    explicit numpunct(size_t refs = 0);
+
+    ///\name 22.2.3.1.1 numpunct members [facet.numpunct.members]
+
+    char_type decimal_point() const { return do_decimal_point(); }
+    char_type thousands_sep() const { return do_thousands_sep(); }
+    string grouping() const         { return do_grouping(); }
+    string_type truename() const    { return do_truename(); }
+    string_type falsename() const   { return do_falsename(); }
+
+    static locale::id id;
+
+  protected:
+
+    ///\name 22.2.3.1.2 numpunct virtual functions [facet.numpunct.virtuals]
+
+    ~numpunct(); // virtual
+
+    /// Returns: A character for use as the decimal radix separator.
+    /// The required specializations return ’.’ or L’.’.
+    _NTL_LOC_VIRTUAL char_type do_decimal_point() const { return '.'; }
+
+    /// 2 Returns: A character for use as the digit group separator.
+    /// The required specializations return ’,’ or L’,’.
+    _NTL_LOC_VIRTUAL char_type do_thousands_sep() const { return ','; }
+
+    /// 3 Returns: A basic_string<char> vec used as a vector of integer values,
+    ///   in which each element vec[i] represents the number of digits246)
+    ///   in the group at position i, starting with position 0 as the rightmost
+    ///   group. If vec.size() <= i, the number is the same as group (i-1);
+    ///   if (i<0 || vec[i]<=0 || vec[i]==CHAR_MAX), the size of the digit group
+    ///   is unlimited.
+    /// 4 The required specializations return the empty string, indicating no grouping.
+    _NTL_LOC_VIRTUAL string do_grouping() const { return ""; }
+
+    /// 5 Returns: A string representing the name of the boolean value true.
+    /// 6 In the base class implementation these names are "true" or L"true".
+    _NTL_LOC_VIRTUAL string_type do_truename() const { return "true"; }
+
+    /// 5 Returns: A string representing the name of the boolean value false.
+    /// 6 In the base class implementation these names are "false" or L"false".
+    _NTL_LOC_VIRTUAL string_type do_falsename() const { return "false"; }
+
+    ///\}
+};
+
+template <class charT> class numpunct_byname;
+
+
 // 22.2.2 The numeric category [lib.category.numeric]
 
 /// 22.2.2.1 Class template num_get [lib.locale.num.get]
@@ -670,7 +736,9 @@ class num_get : public locale::facet
     virtual iter_type do_get(iter_type, iter_type, ios_base&, ios_base::iostate& err, void*& v) const;
 };
 
-/// 22.2.2.2 Class template num_put [lib.locale.nm.put]
+/// 22.2.2.2 Class template num_put [lib.locale.nm.put].
+/// 1 The facet num_put is used to format numeric values to a character sequence
+///   such as an ostream.
 template <class charT, class OutputIterator = ostreambuf_iterator<charT> >
 class num_put : public locale::facet
 {
@@ -681,6 +749,9 @@ class num_put : public locale::facet
     typedef OutputIterator  iter_type;
 
     explicit num_put(size_t refs = 0);
+
+    ///\name 22.2.2.2.1 num_put members [facet.num.put.members]
+    /// 1 Returns: do_put(out, str, fill, val).
 
     iter_type put(iter_type s, ios_base& f, char_type fill, bool v) const
     {
@@ -719,13 +790,22 @@ class num_put : public locale::facet
 
     ~num_put(); //virtual
 
+    ///\name 22.2.2.2.2 num_put virtual functions [facet.num.put.virtuals]
+
+    /// 6 Returns: If (str.flags() & ios_base::boolalpha) == 0
+    ///   returns do_put(out, str, fill, (int)val),
+    ///   otherwise obtains a string s as if by
+    ///   string_type s = val ? use_facet<ctype<charT> >(loc).truename()
+    ///                   : use_facet<ctype<charT> >(loc).falsename();
+    ///   and then inserts each character c of s into out via *out++ = c and returns out.
     virtual iter_type
       do_put(iter_type out, ios_base& str, char_type fill, bool val) const
     {
       if ( (str.flags() & ios_base::boolalpha) == 0 )
-        return do_put(out, str, fill, static_cast<int>(val));
-      const numpunct<charT>& np = use_facet<numpunct<charT> >(loc);
-      string_type s = val ? np.truename() : np.falsename();
+        return do_put(out, str, fill, static_cast<long>(val));
+      const numpunct<charT>& np = use_facet<numpunct<charT> >(str.getloc());
+      const numpunct<charT>::string_type s = val ? np.truename() : np.falsename();
+      return copy(s.begin(), s.end(), out);
     }
 
     virtual iter_type do_put(iter_type, ios_base&, char_type fill, long v) const;
@@ -734,16 +814,25 @@ class num_put : public locale::facet
     virtual iter_type do_put(iter_type, ios_base&, char_type fill, long double v) const;
     virtual iter_type do_put(iter_type, ios_base&, char_type fill, const void* v) const;
 
+    ///\}
+
 };
 
-template <>
-class num_put<char>;// : public locale::facet
+#if 0
+template<class charT, class OutputIterator>
+num_put<charT, OutputIterator> &
+  use_facet<num_put<charT, OutputIterator> >(const locale&)
+{
+#if !STLX__CONFORMING_LOCALE
+  static const num_put<charT, OutputIterator> numput;
+  return numput;
+#endif
+}
+#endif
 
+//template <>
+//class num_put<char>;// : public locale::facet
 
-// 22.2.3 The numeric punctuation facet [lib.facet.numpunct]
-
-template <class charT> class numpunct;
-template <class charT> class numpunct_byname;
 
 // 22.2.4, collation:
 

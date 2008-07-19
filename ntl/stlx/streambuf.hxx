@@ -249,7 +249,7 @@ class basic_streambuf
           continue;
         }
         //__assume(n >= 0 && ravail >= 0);
-        const size_t chunksize = static_cast<size_t>(std::min(n, ravail));
+        const size_t chunksize = static_cast<size_t>(min(n, ravail));
         traits_type::copy(s, gnext, chunksize);
         s += chunksize;
         copied += chunksize;
@@ -306,7 +306,7 @@ class basic_streambuf
           continue;
         }
         //__assume(n >= 0 && ravail >= 0);
-        const size_t chunksize = static_cast<size_t>(std::min(n, wavail));
+        const size_t chunksize = static_cast<size_t>(min(n, wavail));
         traits_type::copy(pnext, s, chunksize);
         s += chunksize;
         copied += chunksize;

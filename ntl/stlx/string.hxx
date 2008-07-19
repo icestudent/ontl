@@ -32,10 +32,13 @@ typedef ptrdiff_t streamoff;
 /**\defgroup  lib_char_traits ********* Character traits [21.1] *************
  *@{*/
 
-/// Character traits [21.1]
+/// 21.1 Character traits [char.traits]
+/// a basis for explicit specializations.
 template<class charT> struct char_traits;
 
-///char_traits specializations [21.1.3]
+/// 21.1.3 char_traits specializations [char.traits.specializations]
+
+/// 21.1.3.1 struct char_traits<char> [char.traits.specializations.char]
 template<>
 struct char_traits<char>
 {
@@ -69,7 +72,7 @@ struct char_traits<char>
   static int_type eof() { return EOF; }
 };
 
-///char_traits specializations [21.1.3]
+/// 21.1.3.4 struct char_traits<wchar_t> [char.traits.specializations.wchar.t]
 template<>
 struct char_traits<wchar_t>
 {
@@ -107,25 +110,42 @@ struct char_traits<wchar_t>
 /**@} lib_char_traits
  */
 
-/// Class template basic_string [lib.basic.string]
-///\note 
+/// 21.3 Class template basic_string [basic.string]
+/// 1 The class template basic_string describes objects that can store a sequence
+///   consisting of a varying number of arbitrary char-like objects with
+///   the first element of the sequence at position zero. Such a sequence is
+///   also called a “string” if the type of the char-like objects that it holds
+///   is clear from context. In the rest of this clause, the type of the char-like
+///   objects held in a basic_string object is designated by charT.
+/// 2 The member functions of basic_string use an object of the Allocator class
+///   passed as a template parameter to allocate and free storage for the contained
+///   char-like objects. (Allocator::value_type must name the same type as charT (21.3.1))
+/// 3 The class template basic_string conforms to the requirements for a Sequence
+///   Container (23.1.3), for a Reversible Container (23.1), and for
+///   an Allocator-aware container (92). The iterators supported by basic_string
+///   are random access iterators (24.1.5).
+/// 4 In all cases, size() <= capacity().
+/// 5 The functions described in this clause can report two kinds of errors,
+///   each associated with an exception type:
+///   — a length error is associated with exceptions of type length_error (19.1.4);
+///   — an out-of-range error is associated with exceptions of type out_of_range (19.1.5).
+///\note 21.3.1/3
+///   The char-like objects in a basic_string object shall be stored contiguously.
+///   That is, for any basic_string object s,
+///   the identity &*(s.begin() + n) == &*s.begin() + n
+///   shall hold for all values of n such that 0 <= n < s.size().
 template <class charT,
           class traits    = char_traits<charT>,
           class Allocator = allocator<charT> >
 class basic_string
 {
-    //  N2315 21.3.1/3: 
-    //    The char-like objects in a basic_string object shall be stored contiguously.
-    //    That is, for any basic_string object s,
-    //    the identity &*(s.begin() + n) == &*s.begin() + n
-    //    shall hold for all values of n such that 0 <= n < s.size().
     typedef vector<typename traits::char_type, Allocator> stringbuf_t;
     mutable stringbuf_t str; // mutable for c_str()
 
   ///////////////////////////////////////////////////////////////////////////
   public:
 
-    // types:
+    ///\name Types
 
     typedef typename traits                       traits_type;
     typedef typename stringbuf_t::value_type      value_type;
@@ -143,27 +163,68 @@ class basic_string
 
     static const size_type npos = static_cast<size_type>(-1);
 
-    ///\name  basic_string constructors [21.3.2 lib.string.cons]
+    ///\name 21.3.2 basic_string constructors and assigment operators [string.cons]
 
+    /// 1 Effects: Constructs an object of class basic_string.
+    /// Postconditions: 
+    /// - data() a non-null pointer that is copyable and can have 0 added to it;
+    /// - size() == 0;
+    /// - capacity() an unspecified value.
     explicit basic_string(const Allocator& a = Allocator()) : str(a) {/**/}
 
+
+    /// 2 Effects: Constructs an object of class basic_string as indicated below.
+    ///   The stored Allocator value is copied from str.get_allocator(). 
+    /// Postconditions: 
+    /// - data() points at the first element of an allocated copy of the
+    ///   array whose first element is pointed at by str.data();
+    /// - size() == str.size();
+    /// - capacity() is at least as large as size().
     __forceinline
     basic_string(const basic_string& str) : str(str.str) {/**/}
 
+    /// 4 Requires: pos <= str.size()
+    /// 5 \todo Throws: out_of_range if pos > str.size().
+    /// 6 Effects: Constructs an object of class basic_string and determines
+    ///   the effective length rlen of the initial string value as the smaller
+    ///   of n and str.size() - pos.
+    /// Postconditions: 
+    /// - data() points at the first element of an allocated copy of rlen
+    ///   consecutive elements of the string controlled by str beginning
+    ///   at position pos;
+    /// - size() == rlen;
+    /// - capacity() is at least as large as size().
     basic_string(const basic_string & str,
                  size_type            pos,
                  size_type            n     = npos,
-                 const Allocator &    a     = Allocator())
-    // commented - "stdexcept.hxx" includes this header
-    //  throw(out_of_range)
+                 const Allocator &    a     = Allocator())//throw(out_of_range)
     : str(&str[pos], str.max__it(pos, n), a) {/**/}
 
+    /// 7 Requires: s shall not be a null pointer and n < npos.
+    /// 8 Effects: Constructs an object of class basic_string and determines
+    ///   its initial string value from the array of charT of length n whose
+    ///   first element is designated by s.
+    /// Postconditions: 
+    /// - data() points at the first element of an allocated copy of the
+    ///   array whose first element is pointed at by s;
+    /// - size() == n;
+    /// - capacity() is at least as large as size().
     basic_string(const charT* s, size_type n, const Allocator& a = Allocator())
-    : str(s, &s[n], a) {}
+    : str(assert_ptr(s), &s[n], a) {}
 
+    /// 9 Requires: s shall not be a null pointer.
+    /// 10 Effects: Constructs an object of class basic_string and determines
+    ///   its initial string value from the array of charT of length traits::length(s)
+    ///   whose first element is designated by s.
+    /// Postconditions: 
+    /// - data() points at the first element of an allocated copy of the
+    ///   array whose first element is pointed at by s;
+    /// - size() == traits::length(s);
+    /// - capacity() is at least as large as size().
     basic_string(const charT* s, const Allocator& a = Allocator())
     : str(a)
     { 
+      assert_ptr(s);
       // small hack: copy terminating 0 to avoid case when n == 0
       size_type n = traits_type::length(s) + 1; // include '\0'
       alloc__new(n - 1); // allocates (n - 1) + 1
@@ -172,73 +233,176 @@ class basic_string
       while ( n-- ) traits_type::assign(str[n], s[n]);
     }
 
+    ///\note Extension intended to avoid the traits::length(s) call.
+    /// Requires: s shall be null-terminated array of array of const charT.
+    /// Effects: Constructs an object of class basic_string and determines
+    ///   its initial string value from the array of charT of length Size
+    ///   whose elements are designated by s.
+    /// Postconditions: 
+    /// - data() points at the first element of an allocated copy of the array s;
+    /// - size() == Size;
+    /// - capacity() is at least as large as size().
     template<size_t Size>
     basic_string(const charT (&s)[Size])
     : str(&s[0], &s[Size]-1/*!s[Size]*/, a) {}
 
+    /// 12 Requires: n < npos
+    /// 13 Effects: Constructs an object of class basic_string and determines
+    ///   its initial string value by repeating the charlikeobject c for all
+    ///   n elements.
+    /// Postconditions: 
+    /// - data() points at the first element of an allocated array of
+    ///   n elements, each storing the initial value c;
+    /// - size() = n;
+    /// - capacity() is at least as large as size().
     basic_string(size_type n, charT c, const Allocator& a = Allocator())
     : str(n, c, a) {}
 
+    /// 14 Effects: If InputIterator is an integral type, equivalent to
+    ///   basic_string(static_cast<size_type>(begin), static_cast<value_type>(end), a)
+    /// 15 Otherwise constructs a string from the values in the range [begin, end)
+    ///   with Postconditions: 
+    /// - data() points at the first element of an allocated copy of
+    ///   the sequence [begin, end);
+    /// - size() == distance(begin, end);
+    /// - capacity() is at least as large as size().
     template<class InputIterator>
     basic_string(InputIterator    begin,
                  InputIterator    end,
                  const Allocator& a     = Allocator())
     : str(begin, end, a) {}
 
+//    basic_string(initializer_list<charT> il, const Allocator& a = Allocator());
+    basic_string(const basic_string& str, const Allocator& alloc);
+//    basic_string(basic_string&& str, const Allocator& alloc);
+
+    /// Effects: destructs string object.
     __forceinline
     ~basic_string() {}
 
+    /// 18 Effects: If *this and str are not the same object, modifies *this as designated below:
+    /// - data() points at the first element of an allocated copy of the
+    ///   array whose first element is pointed at by str.data()
+    /// - size() == str.size();
+    /// - capacity() is at least as large as size().
+    /// 19 If *this and str are the same object, the member has no effect.
+    /// 20 Returns: *this
     basic_string& operator=(const basic_string& str)
     {
       return this == &str ? *this : assign(str);
     }
 
+    /// 25 Returns: *this = basic_string<charT,traits,Allocator>(s).
+    /// 26 Remarks: Uses traits::length().
     basic_string& operator=(const charT* s) { return assign(s);     }
+
+    /// 27 Returns: *this = basic_string<charT,traits,Allocator>(1,c).
     basic_string& operator=(charT c)        { return assign(1, c);  }
 
-    ///\name  basic_string iterator support [21.3.3 lib.string.iterators]
+    ///\name  21.3.3 basic_string iterator support [string.iterators]
 
+    /// 1 Returns: an iterator referring to the first character in the string.
     iterator                begin()         { return str.begin();   }
     const_iterator          begin()  const  { return str.cbegin();   }
+
+    /// 2 Returns: an iterator which is the past-the-end value.
     iterator                end()           { return str.end();     }
     const_iterator          end()    const  { return str.cend();     }
 
+    /// 3 Returns: an iterator which is semantically equivalent to reverse_iterator(end()).
     reverse_iterator        rbegin()        { return str.rbegin();  }
     const_reverse_iterator  rbegin() const  { return str.crbegin();  }
+
+    /// 4 Returns: an iterator which is semantically equivalent to reverse_iterator(begin()).
     reverse_iterator        rend()          { return str.rend();    }
     const_reverse_iterator  rend()   const  { return str.crend();    }
 
+    /// Returns: const iterators.
     const_iterator          cbegin()  const  { return begin();   }
     const_iterator          cend()    const  { return end();     }
     const_reverse_iterator  crbegin() const  { return rbegin();  }
     const_reverse_iterator  crend()   const  { return rend();    }
 
-    ///\name  basic_string capacity [21.3.4 lib.string.capacity]
+    ///\name  21.3.4 basic_string capacity [string.capacity]
 
+    /// 1 Returns: a count of the number of char-like objects currently in the string.
     size_type size()      const { return str.size();      }
-    size_type length()    const { return str.size();      }
-    size_type max_size()  const { return str.max_size();  }
-    size_type capacity()  const { return str.capacity();  }
-    bool empty()          const { return str.empty();     }
 
+    /// 2 Returns: size().
+    size_type length()    const { return str.size();      }
+
+    /// 3 Returns: The maximum size of the string.
+    size_type max_size()  const { return str.max_size();  }
+
+    /// 5 Requires: n <= max_size()
+    /// 6 Throws: length_error if n > max_size().
+    /// 7 Effects: Alters the length of the string designated by *this as follows:
+    /// — If n <= size(), the function replaces the string designated by *this
+    ///   with a string of length n whose elements are a copy of the initial
+    ///   elements of the original string designated by *this.
+    /// — If n > size(), the function replaces the string designated by *this
+    ///   with a string of length n whose first size() elements are a copy of
+    ///   the original string designated by *this, and whose remaining elements
+    ///   are all initialized to c.
     void resize(size_type n, charT c)   { str.resize(n, c); }
+
+    /// 8 Effects: resize(n,charT()).
     void resize(size_type n)            { str.resize(n);    }
+
+    /// 9 Returns: the size of the allocated storage in the string.
+    size_type capacity()  const { return str.capacity();  }
+
+    /// 10 The member function reserve() is a directive that informs a basic_string
+    ///   object of a planned change in size, so that it can manage the storage
+    ///   allocation accordingly.
+    /// 11 Effects: After reserve(), capacity() is greater or equal to the argument of reserve.
+    ///\note Calling reserve() with a res_arg argument less than capacity() is
+    ///   in effect a non-binding shrink request. A call with res_arg <= size()
+    ///   is in effect a non-binding shrink-to-fit request.
     void reserve(size_type res_arg = 0) { str.reserve(res_arg); }
+
+    /// 13 Remarks: shrink_to_fit is a non-binding request to reduce capacity()
+    ///   to size(). \note The request is non-binding to allow latitude for
+    ///   implementation-specific optimizations.
+    void shrink_to_fit() {}
+
+    /// 14 Effects: Behaves as if the function calls: erase(begin(), end());
     void clear()                        { str.clear();      }
+
+    /// 15 Returns: size() == 0.
+    bool empty()          const { return str.empty();     }
 
     ///\name  basic_string element access [21.3.5 lib.string.access]
 
+    /// 1 Returns: If pos < size(), returns *(begin() + pos). Otherwise,
+    ///   if pos == size(), returns charT().
     const_reference operator[](size_type pos) const
     {
       static const charT zero_char;// = charT();
       return pos < str.size() ? *(begin() + pos) : zero_char;
     }
 
+    /// 1 Returns: If pos < size(), returns *(begin() + pos).
+    ///   Otherwise, the behavior is undefined.
     reference operator[](size_type pos)   { return str[pos];  }
+
+    /// 2 Requires: pos < size()
+    /// 3 Throws: out_of_range if pos >= size().
+    /// 4 Returns: operator[](pos).
     const_reference at(size_type n) const { return str.at(n); }
     reference at(size_type n)             { return str.at(n); }
 
-    // 21.3.6 basic_string modifiers [lib.string.modifiers]
+    /// 5 Requires: !empty()
+    /// 6 Effects: Equivalent to operator[](0).
+    const charT& front() const { _Assert(!empty()); return operator[](0); }
+    charT& front()             { _Assert(!empty()); return operator[](0); }       
+
+    /// 7 Requires: !empty()
+    /// 8 Effects: Equivalent to operator[](size() - 1).
+    const charT& back() const { _Assert(!empty()); return operator[](size() - 1); }
+    charT& back() { _Assert(!empty()); return operator[](size() - 1); }
+
+    /// 21.3.6 basic_string modifiers [string.modifiers]
 
     ///\name  basic_string::operator+= [21.3.6.1 lib.string::op+=]
 
@@ -247,6 +411,8 @@ class basic_string
     basic_string& operator+=(charT c) { push_back(c); return *this; }
 
 #ifndef NTL__STRICT_STRING
+
+    basic_string& operator+=(charT* s) { return append(s);     }
 
   template<class String>
     basic_string& operator+=(const String& str)
@@ -267,9 +433,7 @@ class basic_string
 
     basic_string& append(const basic_string& str, size_type pos, size_type n)
     {
-   //   this->str.insert(this->str.end(), str.max__it(pos, n));
       this->str.insert(this->str.end(), str.begin() + pos, str.max__it(pos, n));
-
       return *this;
     }
 
@@ -464,8 +628,16 @@ class basic_string
     
     allocator_type get_allocator() const { return str.get_allocator(); }
 
-    ///\name   basic_string::find [21.3.6.1 lib.string::find]
+    ///\name   21.3.7.2 basic_string::find [string::find]
 
+    /// 1 Effects: Determines the lowest position xpos, if possible, such that
+    ///   both of the following conditions obtain:
+    /// — pos <= xpos and xpos + str.size() <= size();
+    /// — traits::eq(at(xpos+I), str.at(I)) for all elements I of the string
+    ///   controlled by str.
+    /// 2 Returns: xpos if the function can determine such a value for xpos.
+    ///   Otherwise, returns npos.
+    /// 3 Remarks: Uses traits::eq().
     size_type find(const basic_string& str, size_type pos = 0) const
     {
       for ( size_type xpos = pos; xpos + str.size() <= size(); ++xpos )
@@ -494,11 +666,14 @@ class basic_string
       return npos;
     }
 
+    /// 5 Returns: find(basic_string<charT,traits,Allocator>(s),pos).
+    /// 6 Remarks: Uses traits::length().
     size_type find(const charT* s, size_type pos = 0) const
     {
       return find(s, pos, traits_type::length(s));
     }
     
+    /// 7 Returns: find(basic_string<charT,traits,Allocator>(1,c),pos).
     size_type find(charT c, size_type pos = 0) const
     {
       for ( size_type xpos = pos; xpos < size(); ++xpos )
@@ -509,59 +684,246 @@ class basic_string
 
     ///\name   basic_string::rfind [21.3.6.2 lib.string::rfind]
 
-    size_type rfind(const basic_string& str, size_type pos = npos) const;
-    size_type rfind(const charT* s, size_type pos, size_type n) const;
-    size_type rfind(const charT* s, size_type pos = npos) const;
-
-    size_type rfind(charT c/*, size_type pos = npos*/) const
+    /// 1 Effects: Determines the highest position xpos, if possible, such that
+    ///   both of the following conditions obtain:
+    ///   — xpos <= pos and xpos + str.size() <= size();
+    ///   — traits::eq(at(xpos+I), str.at(I)) for all elements I of the string
+    ///   controlled by str.
+    /// 2 Returns: xpos if the function can determine such a value for xpos.
+    ///   Otherwise, returns npos.
+    /// 3 Remarks: Uses traits::eq().
+    size_type rfind(const basic_string& str, size_type pos = npos) const
     {
-      size_type xpos = size();
-      while ( xpos-- )
-        if ( traits_type::eq(str[xpos], c) ) return xpos;
-      return npos;
+      return rfind(str.begin(), pos, str.size());
     }
 
+    /// 4 Returns: rfind(basic_string<charT,traits,Allocator>(s,n),pos).
+    size_type rfind(const charT* s, size_type pos, size_type n) const
+    {
+      size_type & xpos = pos;
+      if ( xpos > size() || xpos + n > size() )
+        xpos = size() - n;
+      while ( xpos + n > 0 ) 
+      {
+        for ( size_type i = 0; i != n; ++i )
+          if ( !traits_type::eq(*(begin() + xpos + i), *(s + i)) )
+            goto next_xpos;
+        return xpos;
+      next_xpos:
+        --xpos;
+      }
+      return npos;
+    }
+  
+    /// 5 Returns: rfind(basic_string<charT,traits,Allocator>(s),pos).
+    /// 6 Remarks: Uses traits::length().
+    size_type rfind(const charT* s, size_type pos = npos) const
+    {
+      return rfind(s, pos, traits_type::length(s));
+    }
+
+    /// 7 Returns: rfind(basic_string<charT,traits,Allocator>(1,c),pos).
     size_type rfind(charT c, size_type pos/* = npos*/) const
     {
       ///\note  Standard claims the use of at() member function, but
       ///       we stick to an exception-safe way
-      size_type & xpos = pos;
-      if ( xpos > size() ) xpos = size();
-      while ( xpos )
-        if ( traits_type::eq(str[xpos], c) ) return xpos;
-        else --xpos;
+      for ( size_type xpos = pos < size() ? pos + 1 : size(); xpos; )
+        if ( traits_type::eq(*(begin() + --xpos), c) )
+          return xpos;
       return npos;
     }
 
-    ///\name  basic_string::find_first_of [21.3.6.3 lib.string::find.first.of]
+    /// 7 Returns: rfind(basic_string<charT,traits,Allocator>(1,c),npos).
+    size_type rfind(charT c/*, size_type pos = npos*/) const
+    {
+      size_type xpos = size();
+      while ( xpos-- )
+        if ( traits_type::eq(*(begin() + xpos), c) )
+          return xpos;
+      return npos;
+    }
 
-    size_type find_first_of(const basic_string& str, size_type pos = 0) const;
-    size_type find_first_of(const charT* s, size_type pos, size_type n) const;
-    size_type find_first_of(const charT* s, size_type pos = 0) const;
-    size_type find_first_of(charT c, size_type pos = 0) const;
+    ///\name  21.3.7.4 basic_string::find_first_of [string::find.first.of]
 
-    ///\name  basic_string::find_last_of [21.3.6.4 lib.string::find.last.of]
+    /// 1 Effects: Determines the lowest position xpos, if possible, such that
+    ///   both of the following conditions obtain:
+    ///   — pos <= xpos and xpos < size();
+    ///   — traits::eq(at(xpos), str.at(I)) for some element I of the string
+    ///     controlled by str.
+    /// 2 Returns: xpos if the function can determine such a value for xpos.
+    ///   Otherwise, returns npos.
+    /// 3 Remarks: Uses traits::eq().
+    size_type find_first_of(const basic_string& str, size_type pos = 0) const
+    {
+      return find_first_of(str.begin(), pos, str.size());
+    }
 
-    size_type find_last_of (const basic_string& str, size_type pos = npos) const;
-    size_type find_last_of (const charT* s, size_type pos, size_type n) const;
-    size_type find_last_of (const charT* s, size_type pos = npos) const;
-    size_type find_last_of (charT c, size_type pos = npos) const;
+    /// 4 Returns: find_first_of(basic_string<charT,traits,Allocator>(s,n),pos).
+    size_type find_first_of(const charT* s, size_type pos, size_type n) const
+    {
+      for ( size_type xpos = pos; xpos < size(); ++xpos )
+        for ( size_type i = 0; i != n; ++i )
+          if ( traits_type::eq(*(begin() + xpos), *(s + i)) )
+            return xpos;
+      return npos;
+    }
 
-    ///\name  basic_string::find_first_not_of [21.3.6.5 lib.string::find.first.not.of]
+    /// 5 Returns: find_first_of(basic_string<charT,traits,Allocator>(s),pos).
+    /// 6 Remarks: Uses traits::length().
+    size_type find_first_of(const charT* s, size_type pos = 0) const
+    {
+      return find_first_of(s, pos, traits_type::length(s));
+    }
 
-    size_type find_first_not_of(const basic_string& str, size_type pos = 0) const;
-    size_type find_first_not_of(const charT* s, size_type pos, size_type n) const;
-    size_type find_first_not_of(const charT* s, size_type pos = 0) const;
-    size_type find_first_not_of(charT c, size_type pos = 0) const;
+    /// 7 Returns: find_first_of(basic_string<charT,traits,Allocator>(1,c),pos).
+    size_type find_first_of(charT c, size_type pos = 0) const
+    {
+      for ( size_type xpos = pos; xpos < size(); ++xpos )
+        if ( traits_type::eq(*(begin() + xpos), c) )
+          return xpos;
+      return npos;
+    }
 
-    ///\name  basic_string::find_last_not_of [21.3.6.6 lib.string::find.last.not.of]
+    ///\name  21.3.7.5 basic_string::find_last_of [string::find.last.of]
 
-    size_type find_last_not_of (const basic_string& str, size_type pos = npos) const;
-    size_type find_last_not_of (const charT* s, size_type pos, size_type n) const;
-    size_type find_last_not_of (const charT* s, size_type pos = npos) const;
-    size_type find_last_not_of (charT c, size_type pos = npos) const;
+    /// 1 Effects: Determines the highest position xpos, if possible, such that
+    ///   both of the following conditions obtain:
+    /// — xpos <= pos and xpos < size();
+    /// — traits::eq(at(xpos), str.at(I)) for some element I of the string
+    ///   controlled by str.
+    /// 2 Returns: xpos if the function can determine such a value for xpos.
+    ///   Otherwise, returns npos.
+    /// 3 Remarks: Uses traits::eq().
+    size_type find_last_of(const basic_string& str, size_type pos = npos) const
+    {
+      return find_last_of(str.begin(), pos, str.size());
+    }
 
-    ///\name  basic_string::substr [21.3.6.7 lib.string::substr]
+    /// 4 Returns: find_last_of(basic_string<charT,traits,Allocator>(s,n),pos).
+    size_type find_last_of(const charT* s, size_type pos, size_type n) const
+    {
+      size_type & xpos = pos;
+      if ( xpos > size() ) xpos = size();
+      while ( xpos )
+      {
+        for ( size_type i = 0; i != n; ++i )
+          if ( traits_type::eq(*(begin() + xpos), *(s + i)) )
+            return xpos;
+        --xpos;
+      }
+      return npos;
+    }
+
+    /// 5 Returns: find_last_of(basic_string<charT,traits,Allocator>(s),pos).
+    /// 6 Remarks: Uses traits::length().
+    size_type find_last_of(const charT* s, size_type pos = npos) const
+    {
+      return find_last_of(s, pos, traits_type::length(s));
+    }
+
+    /// 7 Returns: find_last_of(basic_string<charT,traits,Allocator>(1,c),pos).
+    size_type find_last_of(charT c, size_type pos = npos) const
+    {
+      return rfind(c);
+    }
+
+    ///\name  21.3.7.6 basic_string::find_first_not_of [string::find.first.not.of]
+
+    /// 1 Effects: Determines the lowest position xpos, if possible, such that
+    ///   both of the following conditions obtain:
+    /// — pos <= xpos and xpos < size();
+    /// — traits::eq(at(xpos), str.at(I)) for no element I of the string
+    ///   controlled by str.
+    /// 2 Returns: xpos if the function can determine such a value for xpos.
+    ///   Otherwise, returns npos.
+    /// 3 Remarks: Uses traits::eq().
+    size_type find_first_not_of(const basic_string& str, size_type pos = 0) const
+    {
+      return find_first_not_of(str.begin(), pos, str.size());
+    }
+
+    /// 4 Returns: find_first_not_of(basic_string<charT,traits,Allocator>(s,n),pos).
+    size_type find_first_not_of(const charT* s, size_type pos, size_type n) const
+    {
+      for ( size_type xpos = pos; xpos < size(); ++xpos )
+      {
+        for ( size_type i = 0; i != n; ++i )
+          if ( traits_type::eq(*(begin() + xpos), *(s + i)) )
+            goto next_xpos;
+        return xpos;
+      next_xpos:;
+      }
+      return npos;
+    }
+
+    /// 5 Returns: find_first_not_of(basic_string<charT,traits,Allocator>(s),pos).
+    /// 6 Remarks: Uses traits::length().
+    size_type find_first_not_of(const charT* s, size_type pos = 0) const
+    {
+      return find_first_not_of(s, pos, traits_type::length(s));
+    }
+
+    /// 7 Returns: find_first_not_of(basic_string<charT,traits,Allocator>(1,c),pos).
+    size_type find_first_not_of(charT c, size_type pos = 0) const
+    {
+      for ( size_type xpos = pos; xpos < size(); ++xpos )
+        if ( !traits_type::eq(*(begin() + xpos), c) )
+          return xpos;
+      return npos;
+    }
+
+    ///\name  21.3.7.7 basic_string::find_last_not_of [string::find.last.not.of]
+
+    /// 1 Effects: Determines the highest position xpos, if possible, such that
+    ///   both of the following conditions obtain:
+    /// — xpos <= pos and xpos < size();
+    /// — traits::eq(at(xpos), str.at(I)) for no element I of the string
+    ///   controlled by str.
+    /// 2 Returns: xpos if the function can determine such a value for xpos.
+    ///   Otherwise, returns npos.
+    /// 3 Remarks: Uses traits::eq().
+    size_type find_last_not_of(const basic_string& str, size_type pos = npos) const
+    {
+      return find_last_not_of(str.begin(), pos, str.size());
+    }
+
+    /// 4 Returns: find_last_not_of(basic_string<charT,traits,Allocator>(s,n),pos).
+    size_type find_last_not_of(const charT* s, size_type pos, size_type n) const
+    {
+      for ( size_type xpos = pos < size() ? pos + 1 : size(); xpos; )
+      {
+        --xpos;
+        for ( size_type i = 0; i != n; ++i )
+          if ( traits_type::eq(*(begin() + xpos), *(s + i)) )
+            goto next_xpos;
+        return xpos;
+      next_xpos:;
+      }
+      return npos;
+    }
+
+    /// 5 Returns: find_last_not_of(basic_string<charT,traits,Allocator>(s),pos).
+    /// 6 Remarks: Uses traits::length().
+    size_type find_last_not_of(const charT* s, size_type pos = npos) const
+    {
+      return find_last_not_of(s, pos, traits_type::length(s));
+    }
+
+    /// 7 Returns: find_last_not_of(basic_string<charT,traits,Allocator>(1,c),pos).
+    size_type find_last_not_of(charT c, size_type pos = npos) const
+    {
+      for ( size_type xpos = pos < size() ? pos + 1 : size(); xpos; )
+        if ( !traits_type::eq(*(begin() + --xpos), c) )
+          return xpos;
+      return npos;
+    }
+
+    ///\name 21.3.7.8 basic_string::substr [string::substr]
+    /// 1 Requires: pos <= size()
+    /// 2 \todo Throws: out_of_range if pos > size().
+    /// 3 Effects: Determines the effective length rlen of the string to copy as
+    ////  the smaller of n and size() - pos.
+    /// 4 Returns: basic_string<charT,traits,Allocator>(data()+pos,rlen).
     basic_string substr(size_type pos = 0, size_type n = npos) const
     {
       return basic_string(*this, pos, n);
@@ -674,6 +1036,12 @@ class basic_string
 
   private:
 
+    static const charT* assert_ptr(const charT* const p)
+    {
+      _Assert(p);
+      return p;
+    }
+
     const_iterator max__it(size_type pos, size_type n) const
     {
       return n < str.size() - pos ? str.begin() + pos + n : str.end();
@@ -719,8 +1087,9 @@ class basic_string
     /// @note allocates n + 1 bytes, possibly optimizing c_str()
     void alloc__new(size_type n)
     {
-      str.end_ = str.begin_ = str.array_allocator.allocate(n + sizeof('\0'));
-      str.capacity_ = n + 1;
+      n = __ntl_grow_heap_block_size(n + sizeof('\0'));
+      str.end_ = str.begin_ = str.array_allocator.allocate(n);
+      str.capacity_ = n;
     }
 
 };//class basic_string

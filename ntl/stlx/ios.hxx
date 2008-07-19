@@ -194,7 +194,7 @@ class ios_base
     }
 
     ///\name  27.4.2.4 ios_base static members [ios.members.static]
-    /// not implemented as is stdio
+    /// not implemented as stdio is
     static bool sync_with_stdio(bool sync = true);
 
     ///\name  27.4.2.5 ios_base storage functions [ios.base.storage]
@@ -383,11 +383,11 @@ class basic_ios : public ios_base
     iostate rdstate() const { return state; }
 
     __forceinline
-    void clear(iostate state = goodbit) throw(failure)
+    void clear(iostate state = goodbit)// throw(failure)
     {
       if ( !rdbuf() ) state |= badbit;
-      const iostate failre = static_cast<iostate>((this->state = state) & exceptmask);
-      if ( failre ) __ntl_throw(failure(__get_iostate_c_str(failre)));
+      const iostate fail = static_cast<iostate>((this->state = state) & exceptmask);
+      if ( fail ) __ntl_throw (failure(__get_iostate_c_str(fail)));
     }
 
     __forceinline
@@ -396,10 +396,10 @@ class basic_ios : public ios_base
       if ( state != goodbit ) clear(static_cast<iostate>(rdstate() | state));
     }
 
-    bool good() const { return rdstate() == goodbit; }
-    bool eof() const  { return rdstate() & eofbit != 0; }
-    bool fail() const { return rdstate() & (failbit | badbit) != 0; }
-    bool bad() const  { return rdstate() & badbit != 0; }
+    bool good() const { return (rdstate() == goodbit); }
+    bool eof() const  { return (rdstate() & eofbit) != 0; }
+    bool fail() const { return (rdstate() & (failbit | badbit)) != 0; }
+    bool bad() const  { return (rdstate() & badbit) != 0; }
 
     iostate exceptions() const { return exceptmask; }
 

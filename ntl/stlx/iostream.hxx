@@ -9,7 +9,7 @@
 #define NTL__STLX_IOSTREAM
 
 #include "iosfwd.hxx"
-#if 0
+#if 1
 #include <ios>
 #include <streambuf>
 #include <istream>

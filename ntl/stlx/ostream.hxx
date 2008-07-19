@@ -1,6 +1,6 @@
 /**\file*********************************************************************
  *                                                                     \brief
- *  N2315 27.6.2 Output streams [output.streams]
+ *  N2691 27.6.2 Output streams [output.streams]
  *
  ****************************************************************************
  */
@@ -9,7 +9,9 @@
 #define NTL__STLX_OSTREAM
 
 #include "ios.hxx"
+#include "iterator.hxx"
 #include "locale.hxx"
+#include "string.hxx"
 
 namespace std {
 
@@ -22,7 +24,10 @@ namespace std {
 /**\addtogroup  lib_output_streams ***** [27.6.2] Output streams ************
  *@{*/
 
-/// 27.6.2.1 Class template basic_ostream [ostream]
+/// 27.6.2.1 Class template basic_ostream [ostream].
+/// 1 The class basic_ostream defines a number of member function signatures
+///   that assist in formatting and writing output to output sequences
+///   controlled by a stream buffer.
 template <class charT, class traits /*= char_traits<charT>*/ >
 class basic_ostream
 : virtual public basic_ios<charT, traits>
@@ -39,21 +44,50 @@ class basic_ostream
     using this_base::off_type;
     using this_base::traits_type;
 
-    ///\name  basic_ostream constructors [27.6.2.2 lib.ostream.cons]
+    ///\name  27.6.2.2 basic_ostream constructors [ostream.cons]
+    /// 1 Effects: Constructs an object of class basic_ostream, assigning
+    ///   initial values to the base class by calling 
+    ///   basic_ios<charT,traits>::init(sb) (27.4.4.1).
+    /// 2 Postcondition: rdbuf() == sb.
     explicit basic_ostream(basic_streambuf<char_type, traits>* sb)
     {
       basic_ios<charT, traits>::init(sb);
     }
 
+#ifdef NTL__CXX
+    /// 5 Effects: Move constructs from the rvalue rhs. This is accomplished
+    ///   by default constructing the base class and calling
+    ///   basic_ios<charT, traits>::move(rhs) to initialize the base class.
+    basic_ostream(basic_ostream&& rhs);
+#endif
+
     ///\name  basic_ostream destructor
+    /// 3 Effects: Destroys an object of class basic_ostream.
+    /// 4 Remarks: Does not perform any operations on rdbuf().
     virtual ~basic_ostream() {}
     ///@}
 
-    /// Class basic_ostream::sentry [27.6.2.3 lib.ostream::sentry]
+#ifdef NTL__CXX
+    ///\name 27.6.2.3 Class basic_ostream assign and swap [ostream.assign]
+    basic_ostream& operator=((basic_ostream&& rhs);
+    void swap(basic_ostream&& rhs);
+#endif
+
+    ///\name 27.6.2.4 Class basic_ostream::sentry [ostream::sentry].
+    /// 1 The class sentry defines a class that is responsible for doing
+    ///   exception safe prefix and suffix operations.
     class sentry
     {
       public:
 
+        /// 2 If os.good() is nonzero, prepares for formatted or unformatted output.
+        ///   If os.tie() is not a null pointer, calls os.tie()->flush().
+        ///   (The call os.tie()->flush() does not necessarily occur if
+        ///    the function can determine that no synchronization is necessary)
+        /// 3 If, after any preparation is completed, os.good() is true,
+        ///   ok_ == true otherwise, ok_ == false. During preparation,
+        ///   the constructor may call setstate(failbit)
+        ///   (which may throw ios_base::failure (27.4.4.3))
         explicit sentry(basic_ostream<charT, traits>& os) : os(os)
         {
           if ( os.good() )
@@ -65,7 +99,8 @@ class basic_ostream
 
         ~sentry()
         {
-          if ( (os.flags() & ios_base::unitbuf) /*&& !uncaught_exception()*/ )
+          //if ( (os.flags() & ios_base::unitbuf) && !uncaught_exception() )
+          if ( (os.flags() & ios_base::unitbuf) && !os.rdstate() & ios_base::badbit )
             os.flush();
         }
 
@@ -81,31 +116,78 @@ class basic_ostream
         sentry& operator=(const sentry&); // not defined
     };
 
-    ///\name  basic_ostream seek members [27.6.2.4 lib.ostream.seeks]
+    ///\name  27.6.2.5 basic_ostream seek members [ostream.seeks]
 
+    /// 1 Returns: if fail() != false, returns pos_type(-1) to indicate failure.
+    ///   Otherwise, returns rdbuf()->pubseekoff(0, cur, out).
     pos_type tellp()
     { 
-      return fail() ? pos_type(-1) : rdbuf()->pubseekoff(0, cur, out);
+      return this->fail()
+            ? pos_type(-1) : this->rdbuf()->pubseekoff(0, cur, out);
     }
 
+    /// 2 Effects: If fail() != true, executes rdbuf()->pubseekpos(pos, ios_base::out).
+    ///   In case of failure, the function calls setstate(failbit)
+    ///   (which may throw ios_base::failure).
+    /// 3 Returns: *this.
     basic_ostream<charT, traits>& seekp(pos_type pos)
     {
-      if ( ! fail() && rdbuf()->pubseekpos(pos) == -1 )
-        setstate(failbit);
+      if ( ! this->fail() && this->rdbuf()->pubseekpos(pos, ios_base::out) == -1 )
+        this->setstate(ios_base::failbit);
       return *this;
     }
 
+    /// 4 Effects: If fail() != true, executes rdbuf()->pubseekoff(off, dir, ios_base::out)
+    /// 5 Returns: *this.
     basic_ostream<charT, traits>& seekp(off_type off, ios_base::seekdir dir)
     {
-      if ( ! fail() ) rdbuf()->pubseekoff(off, dir);
+      if ( ! this->fail() )
+        this->rdbuf()->pubseekoff(off, dir, ios_base::out).;
       return *this;
     }
 
-    //  Formatted output functions [27.6.2.5 lib.ostream.formatted]
+    /// 27.6.2.6 Formatted output functions [ostream.formatted].
+    /// 27.6.2.6.1 Common requirements [ostream.formatted.reqmts]
+    /// 1 Each formatted output function begins execution by constructing an object
+    ///   of class sentry. If this object returns true when converted to a value
+    ///   of type bool, the function endeavors to generate the requested output.
+    ///   If the generation fails, then the formatted output function does
+    ///   setstate(ios_base::failbit), which might throw an exception.
+    ///   If an exception is thrown during output, then ios::badbit is turned on
+    ///   (without causing an ios::failure to be thrown) in *this’s error state.
+    ///   If (exceptions()&badbit) != 0 then the exception is rethrown.
+    ///   Whether or not an exception is thrown, the sentry object is destroyed
+    ///   before leaving the formatted output function. If no exception is thrown,
+    ///   the result of the formattted output function is *this.
+    /// 2 The descriptions of the individual formatted output operations describe
+    ///   how they perform output and do not mention the sentry object.
+    
+    ///\name  27.6.2.6.2 Arithmetic Inserters [ostream.inserters.arithmetic]
+    /// 1 Effects: The classes num_get<> and num_put<> handle locale-dependent
+    ///   numeric formatting and parsing. These inserter functions use the imbued
+    ///   locale value to perform numeric formatting.
 
-    ///\name  Arithmetic Inserters [27.6.2.5.2 lib.ostream.inserters.arithmetic]
-
-    basic_ostream<charT, traits>& operator<<(bool n);
+    basic_ostream<charT, traits>& operator<<(bool n)
+    {
+      sentry good( *this );
+      ios_base::iostate state = ios_base::badbit;
+      if ( good )
+        __ntl_try
+        {
+          typedef ostreambuf_iterator<charT, traits> iterator;
+          typedef num_put<charT, iterator> numput;
+          if ( !use_facet<numput>(this->getloc()).put(iterator(*this), *this,
+                                                    this->fill(), n).failed() )
+            state = ios_base::goodbit;
+        }
+        __ntl_catch(...)
+        {
+          ///\todo shall no throw
+          //this->setstate(ios_base::badbit);
+        }
+      this->setstate(state);
+      return *this;
+    }
 
     basic_ostream<charT, traits>& operator<<(short n);
 
@@ -152,19 +234,40 @@ class basic_ostream
     basic_ostream<charT, traits>&
       operator<<(basic_streambuf<char_type, traits>* sb);
 
-    ///\name  Unformatted output functions [27.6.2.6 lib.ostream.unformatted]
+    ///\name  27.6.2.7 Unformatted output functions [ostream.unformatted]
+    /// 1 Each unformatted output function begins execution by constructing
+    ///   an object of class sentry. If this object returns true, while
+    ///   converting to a value of type bool, the function endeavors to generate
+    ///   the requested output. If an exception is thrown during output,
+    ///   then ios::badbit is turned on (without causing an ios::failure to be thrown)
+    ///   in *this’s error state. If (exceptions() & badbit) != 0 then
+    ///   the exception is rethrown. In any case, the unformatted output function
+    ///   ends by destroying the sentry object, then, if no exception was thrown,
+    ///   returning the value specified for the unformatted output function.
 
+    /// 2 Effects: Behaves as an unformatted output function (as described above).
+    ///   After constructing a sentry object, inserts the character c, if possible.
+    /// 3 Otherwise, calls setstate(badbit) (which may throw ios_base::failure (27.4.4.3)).
+    /// 4 Returns: *this.
     basic_ostream<charT, traits>& put(char_type c)
     {
       sentry good( *this );
-      if ( true == good )
-      {
-        rdbuf()->sputc(c);
-      }
+      ios_base::iostate state = ios_base::badbit;
+      if ( good )
+        __ntl_try
+        {
+          if ( this->rdbuf()->sputc(c) != traits_type::eof() )
+            state = ios_base::goodbit;;
+        }
+        __ntl_catch(...)
+        {
+        }
+      this->setstate(state);
+      return *this;
     }
 
     basic_ostream<charT, traits>& write(const char_type* s, streamsize n);
-    basic_ostream<charT, traits>& flush(){ return *this; }
+    basic_ostream<charT, traits>& flush();//{ return *this; }
 
     ///@}
 

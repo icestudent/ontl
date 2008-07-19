@@ -879,10 +879,18 @@ void
 
 /// 25.3.7, minimum and maximum:
 
+#ifdef min
+#undef min
+#endif
+
+#ifdef max
+#undef max
+#endif
+
 template<class T>
 __forceinline
 const T&
-  (min)(const T& a, const T& b)
+  min(const T& a, const T& b)
 {
   return ( b < a ) ? b : a;
 }
@@ -890,7 +898,7 @@ const T&
 template<class T, class Compare>
 __forceinline
 const T&
-  (min)(const T& a, const T& b, Compare comp)
+  min(const T& a, const T& b, Compare comp)
 {
   return comp(b, a) ? b : a;
 }
@@ -898,7 +906,7 @@ const T&
 template<class T>
 __forceinline
 const T&
-  (max)(const T& a, const T& b)
+  max(const T& a, const T& b)
 {
   return ( a < b ) ? b : a;
 }
@@ -906,7 +914,7 @@ const T&
 template<class T, class Compare>
 __forceinline
 const T&
-  (max)(const T& a, const T& b, Compare comp)
+  max(const T& a, const T& b, Compare comp)
 {
   return comp(a, b) ? b : a;
 }

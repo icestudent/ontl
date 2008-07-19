@@ -76,6 +76,7 @@ NTL__CRTCALL
 }
 #endif
 
+#ifndef _MSC_VER
 namespace x {
 __forceinline 
 void *
@@ -89,7 +90,6 @@ void *
   return d;
 } }
 
-#ifndef _MSC_VER
 __forceinline 
 void *
 NTL__CRTCALL
@@ -127,6 +127,7 @@ NTL__CRTCALL
 }
 
 
+#ifndef _MSC_VER
 namespace x {
 __forceinline 
 void *
@@ -139,7 +140,6 @@ void *
   return p;
 } }
 
-#ifndef _MSC_VER
 __forceinline 
 void *
 NTL__CRTCALL
@@ -154,6 +154,7 @@ NTL__CRTCALL
 #endif
 
 
+#ifndef _MSC_VER
 namespace x {
 __forceinline 
 char *
@@ -166,7 +167,6 @@ char *
   return dst;
 } }
 
-#ifndef _MSC_VER
 __forceinline 
 char *
 NTL__CRTCALL
@@ -236,6 +236,7 @@ NTL__CRTCALL
 }
 
 
+#ifndef _MSC_VER
 namespace x {
 __forceinline 
 char *
@@ -247,7 +248,6 @@ char *
   return dst;
 } }
 
-#ifndef _MSC_VER
 __forceinline 
 char *
 NTL__CRTCALL
