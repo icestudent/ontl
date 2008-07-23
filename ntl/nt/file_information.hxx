@@ -210,13 +210,12 @@ struct file_standard_information
   int64_t   size() const { return EndOfFile; }
 };
 
-
 ///\  FileRenameInformation == 10
 struct file_rename_information
 {
   static const file_information_class info_class_type = FileRenameInformation;
 
-  typedef std::unique_ptr<uint8_t[]> file_rename_information_ptr;
+  typedef std::unique_ptr<file_rename_information> file_rename_information_ptr;
 
   static inline
     file_rename_information_ptr
@@ -225,9 +224,7 @@ struct file_rename_information
         bool                          replace_if_exists,
         legacy_handle                 root_directory = legacy_handle())
     {
-      file_rename_information_ptr ptr ( 
-        new uint8_t[sizeof(file_rename_information) + new_name.size()*sizeof(wchar_t)] );
-      new (ptr.get()) file_rename_information(new_name, replace_if_exists, root_directory);
+      file_rename_information_ptr ptr (new (varsize, new_name.size()*sizeof(wchar_t)) file_rename_information(new_name, replace_if_exists, root_directory));
       return ptr;
     }
 

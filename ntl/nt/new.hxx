@@ -74,6 +74,18 @@ void __cdecl
   ntl::nt::heap::free(ntl::nt::process_heap(), ptr);
 }
 
+///\name Variable-size structures support
+__forceinline
+void* operator new(std::size_t size, const ntl::nt::varsize_t&, std::size_t aux_size)
+{
+  return ntl::nt::heap::alloc(ntl::nt::process_heap(), size + aux_size);
+}
+
+__forceinline
+void operator delete(void* ptr, const ntl::nt::varsize_t&, std::size_t)
+{
+  ntl::nt::heap::free(ntl::nt::process_heap(), ptr);
+}
 
 #endif//#ifndef NTL_NO_NEW 
 

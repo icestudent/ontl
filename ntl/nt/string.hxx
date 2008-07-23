@@ -13,6 +13,7 @@
 #include "../type_traits"
 #include "../basedef.hxx"
 #include "../stlx/cstdint.hxx"
+#include "../stlx/array.hxx"
 
 namespace ntl {
 namespace nt {
@@ -90,6 +91,13 @@ class native_string
     : length_((Size - 1) * sizeof(value_type)),
       maximum_length_(length_ + sizeof(value_type)),
       buffer_(&str[0])
+    {/**/}
+
+    template<size_t Size>
+    native_string(std::array<charT, Size>& str)
+      : length_((Size - 1) * sizeof(value_type)),
+      maximum_length_(length_ + sizeof(value_type)),
+      buffer_(str.data())
     {/**/}
 
     ///\name  native_string connversions
