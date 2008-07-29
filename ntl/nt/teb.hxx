@@ -88,6 +88,9 @@ struct client_id
 
 struct teb: public tib
 {
+#pragma warning(push)
+#pragma warning(disable:4311 4312) // pointer truncation & conversion from 'type1' to 'type2' of greater size
+
   template<typename type>
   static inline type get(type teb::* member, Int2Type<sizeof(uint8_t)>)
   {
@@ -197,6 +200,7 @@ struct teb: public tib
 #endif
       ((uint32_t)offsetof(teb,*member), (uint64_t)value);
   }
+#pragma warning(pop)
 
   template<typename type, typename type2>
   static inline

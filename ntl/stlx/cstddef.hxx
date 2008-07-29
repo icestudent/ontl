@@ -142,13 +142,13 @@ static const nullptr_t nullptr = {};
 #endif
   typedef          long long  ssize_t;
 #else
-  typedef          int  ptrdiff_t;
+  typedef __w64    int  ptrdiff_t;
 #ifdef _MSC_VER
   using ::size_t;
 #else
   typedef unsigned int  size_t;
 #endif
-  typedef          int  ssize_t;
+  typedef __w64    int  ssize_t;
 #endif
 
 #ifndef offsetof

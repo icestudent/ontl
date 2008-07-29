@@ -12,6 +12,7 @@
 #include "string.hxx"
 #include "device_object.hxx"
 #include "irp.hxx"
+#include "../nt/peb.hxx"
 
 namespace ntl {
 namespace km {

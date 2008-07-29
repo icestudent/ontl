@@ -580,7 +580,7 @@ namespace cxxruntime {
   /// pointer to member descriptor
   struct ptrtomember // _PMD
   {
-    typedef int32_t  mdiff_t;
+    typedef __w64 int32_t  mdiff_t;
     mdiff_t member_offset;
     mdiff_t vbtable_offset; // -1 if not a virtual base
     mdiff_t vdisp_offset;   // offset to the displacement value inside the vbtable
@@ -1391,7 +1391,7 @@ uint32_t              :27;
       exception_registration * const top = teb::get(&teb::ExceptionList);
       teb::set(&teb::ExceptionList, reinterpret_cast<uintptr_t>(top->next));
 
-      const uint32_t _ebp = cxxreg->stackbaseptr();
+      const uintptr_t _ebp = cxxreg->stackbaseptr();
       __asm
       {
         mov   ecx,  cxxreg

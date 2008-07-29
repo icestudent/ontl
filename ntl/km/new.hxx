@@ -82,6 +82,18 @@ void __cdecl
   if ( ptr ) ntl::km::pool<ntl::km::NonPagedPool>::free(ptr);
 }
 
+///\name Variable-size structures support
+__forceinline
+void* operator new(std::size_t size, const ntl::nt::varsize_t&, std::size_t aux_size)
+{
+  return ntl::km::pool<ntl::km::NonPagedPool>::alloc(size + aux_size);
+}
+
+__forceinline
+void operator delete(void* ptr, const ntl::nt::varsize_t&, std::size_t)
+{
+  if ( ptr ) ntl::km::pool<ntl::km::NonPagedPool>::free(ptr);
+}
 
 #endif//#ifndef NTL_NO_NEW 
 

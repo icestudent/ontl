@@ -52,8 +52,8 @@ typedef uint64_t  uint_fast64_t;
 typedef          long long  intptr_t;
 typedef unsigned long long  uintptr_t;
 #else
-typedef          int  intptr_t;
-typedef unsigned int  uintptr_t;
+typedef __w64          int  intptr_t;
+typedef __w64 unsigned int  uintptr_t;
 #endif
 
 ///\name  Greatest-width integer types 7.18.1.5

@@ -12,6 +12,7 @@
 #include "../stdlib.hxx"
 #include "../nt/exception.hxx"
 //#include "../nt/event.hxx"
+#include "../nt/string.hxx"
 
 namespace ntl {
 

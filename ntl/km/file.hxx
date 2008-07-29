@@ -12,7 +12,7 @@
 #include "basedef.hxx"
 #include "object.hxx"
 #include "file_information.hxx"
-#include <memory>
+#include "../stlx/memory.hxx"
 
 namespace ntl {
 namespace km {
@@ -220,9 +220,9 @@ class file_handler : public handle, public device_traits<file_handler>
       const const_unicode_string &  new_name,
       bool                          replace_if_exists)
     {
-      std::auto_ptr<file_rename_information> fi = 
-                    file_rename_information::alloc(new_name, replace_if_exists);
-      if ( !fi.get() ) return status::insufficient_resources;
+      file_rename_information::file_rename_information_ptr fi = 
+        file_rename_information::alloc(new_name, replace_if_exists);
+      if ( !fi ) return status::insufficient_resources;
       file_information<file_rename_information> file_info(get(), *fi);
       return file_info;
     }

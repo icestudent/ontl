@@ -289,7 +289,7 @@ struct kuser_shared_data
   {
     const kuser_shared_data* kusd = reinterpret_cast<const kuser_shared_data*>
 #if defined(_M_IX86)
-      (0xffdf0000);
+      (static_cast<uintptr_t>(0xffdf0000));
 #elif defined(_M_X64)
       (0xFFFFF78000000000UI64);
 #endif

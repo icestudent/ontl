@@ -80,9 +80,9 @@ namespace ntl {
 
     /// common declarations
 
-    NTL__EXTERNAPI void *     MmHighestUserAddress;
-    NTL__EXTERNAPI void *     MmSystemRangeStart;
-    NTL__EXTERNAPI uintptr_t  MmUserProbeAddress;
+    NTL__EXTERNVAR void *     MmHighestUserAddress;
+    NTL__EXTERNVAR void *     MmSystemRangeStart;
+    NTL__EXTERNVAR uintptr_t  MmUserProbeAddress;
 
     enum memory_caching_type {
       MmNonCached,

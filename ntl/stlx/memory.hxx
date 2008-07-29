@@ -602,6 +602,7 @@ class unique_ptr<T[N], default_delete<T[N]> >
 
   ///////////////////////////////////////////////////////////////////////////
   private:
+    enum { __actual_size = N };
 
     mutable element_type *  ptr;
     void set(T * p) const { ptr = p; }
