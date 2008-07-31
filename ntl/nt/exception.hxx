@@ -1310,7 +1310,8 @@ uint32_t              :27;
     };
     //STATIC_ASSERT(sizeof(catchguard) == 28);
 
-#ifdef _M_IX86
+#ifndef _M_X64
+
     static
       exception_disposition __cdecl
       catchguardhandler( 
@@ -1322,26 +1323,6 @@ uint32_t              :27;
       const catchguard &cg = *static_cast<const catchguard*>(establisher_frame);
       return cxxframehandler(er, cg.cxxreg, ctx, dispatch, cg.funcinfo,
         cg.catchdepth, &cg, false);
-    }
-
-    generic_function_t * 
-      callcatchblockhelper(
-      cxxregistration *     const cxxreg,
-      const ehfuncinfo *    const funcinfo,
-      generic_function_t *  const handler,
-      int                   const catchdepth,
-      unsigned              const nlg_code)
-    {
-      catchguard guard;
-      guard.next        = nt::teb::get(&nt::teb::ExceptionList);
-      guard.handler     = catchguardhandler;
-      guard.funcinfo    = funcinfo;
-      guard.cxxreg      = cxxreg;
-      guard.catchdepth  = catchdepth + 1;
-      nt::teb::set(&nt::teb::ExceptionList, &guard);
-      generic_function_t * const continuation = cxxreg->callsettingframe(handler, nlg_code);
-      nt::teb::set(&nt::teb::ExceptionList, guard.next);
-      return continuation;
     }
 
     generic_function_t *
@@ -1369,20 +1350,19 @@ uint32_t              :27;
       __finally
       {
         cxxreg->stackptr() = stackptr;
-      if ( continuation )
+        if ( continuation )
         {
           destruct_eobject(!!_abnormal_termination());
         }
       }
       return continuation;
     }
-#endif // _M_IX86
 
-#ifndef _M_X64
+
 #pragma warning(push)
 #pragma warning(disable:4731)//frame pointer register 'ebp' modified by inline assembly code
-    // SE handlers already registered should be SAFESEH
 #pragma warning(disable:4733)//Inline asm assigning to 'FS:0' : handler not registered as safe handler
+    // SE handlers already registered should be SAFESEH
     __declspec(noreturn)
       static void jumptocontinuation(generic_function_t * funclet, cxxregistration *cxxreg)
     {
@@ -1403,6 +1383,26 @@ uint32_t              :27;
           push  eax
           ret
       }
+    }
+
+    generic_function_t * 
+      callcatchblockhelper(
+      cxxregistration *     const cxxreg,
+      const ehfuncinfo *    const funcinfo,
+      generic_function_t *  const handler,
+      int                   const catchdepth,
+      unsigned              const nlg_code)
+    {
+      catchguard guard;
+      guard.next        = nt::teb::get(&nt::teb::ExceptionList);
+      guard.handler     = catchguardhandler;
+      guard.funcinfo    = funcinfo;
+      guard.cxxreg      = cxxreg;
+      guard.catchdepth  = catchdepth + 1;
+      nt::teb::set(&nt::teb::ExceptionList, &guard);
+      generic_function_t * const continuation = cxxreg->callsettingframe(handler, nlg_code);
+      nt::teb::set(&nt::teb::ExceptionList, guard.next);
+      return continuation;
     }
 #pragma warning(pop)
 #else // _M_X64

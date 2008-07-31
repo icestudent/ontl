@@ -295,8 +295,16 @@ namespace ntl { namespace cxxruntime
       return NULL;
     }
 
-    const base_class2* find_multiple_instance(const void* complete, ptrdiff_t ptrdelta, const typeinfo& srctype, const typeinfo& desttype, const pe::image* imagebase) const;
-    const base_class2* find_virtual_instance(const void* complete, ptrdiff_t ptrdelta, const typeinfo& srctype, const typeinfo& desttype, const pe::image* imagebase) const;
+    const base_class2* find_multiple_instance(const void* complete, ptrdiff_t ptrdelta, const typeinfo& srctype, const typeinfo& desttype, const pe::image* imagebase) const
+    {
+      __debugbreak();
+      return 0;
+    }
+    const base_class2* find_virtual_instance(const void* complete, ptrdiff_t ptrdelta, const typeinfo& srctype, const typeinfo& desttype, const pe::image* imagebase) const
+    {
+      __debugbreak();
+      return 0;
+    }
   };
 
   struct object_locator2: object_locator
