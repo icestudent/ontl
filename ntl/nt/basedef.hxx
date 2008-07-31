@@ -12,7 +12,6 @@
 #include "../basedef.hxx"
 #include "../stdlib.hxx"
 
-
 namespace ntl {
 
   namespace km {
@@ -24,12 +23,6 @@ namespace ntl {
   }
 
   namespace nt {
-
-    ///\name Variable-size structures support
-    struct varsize_t {};
-    __declspec(selectany)
-      extern
-      const varsize_t varsize;
 
     /**\addtogroup  native_types_support *** NT Types support library ***********
     *@{*/
