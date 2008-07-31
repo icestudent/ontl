@@ -85,18 +85,20 @@ class basic_ostream
         ///   (The call os.tie()->flush() does not necessarily occur if
         ///    the function can determine that no synchronization is necessary)
         /// 3 If, after any preparation is completed, os.good() is true,
-        ///   ok_ == true otherwise, ok_ == false. During preparation,
+        ///   ok == true otherwise, ok == false. During preparation,
         ///   the constructor may call setstate(failbit)
         ///   (which may throw ios_base::failure (27.4.4.3))
-        explicit sentry(basic_ostream<charT, traits>& os) : os(os)
+        __forceinline
+        explicit sentry(basic_ostream<charT, traits>& os) : os(os), ok(false)
         {
           if ( os.good() )
           {
             if ( os.tie() ) os.tie()->flush();
-            ok_ = os.good();
+            ok = true;
           }
         }
 
+        __forceinline
         ~sentry()
         {
           //if ( (os.flags() & ios_base::unitbuf) && !uncaught_exception() )
@@ -104,12 +106,12 @@ class basic_ostream
             os.flush();
         }
 
-        operator bool() const { return ok_; }
+        operator bool() const { return ok; }
 
       private:
 
         basic_ostream<charT, traits>& os;
-        bool ok_;
+        bool ok;
         
 
         sentry(const sentry&); // not defined
@@ -122,8 +124,7 @@ class basic_ostream
     ///   Otherwise, returns rdbuf()->pubseekoff(0, cur, out).
     pos_type tellp()
     { 
-      return this->fail()
-            ? pos_type(-1) : this->rdbuf()->pubseekoff(0, cur, out);
+      return this->fail() ? pos_type(-1) : this->rdbuf()->pubseekoff(0, cur, out);
     }
 
     /// 2 Effects: If fail() != true, executes rdbuf()->pubseekpos(pos, ios_base::out).
@@ -266,8 +267,37 @@ class basic_ostream
       return *this;
     }
 
+    /// 5 Effects: Behaves as an unformatted output function.
+    ///   After constructing a sentry object, obtains characters to insert from
+    ///   successive locations of an array whose first element is designated
+    ///   by s. Characters are inserted until either of the following occurs:
+    /// — n characters are inserted;
+    /// — inserting in the output sequence fails (in which case the function
+    ///   calls setstate(badbit), which may throw ios_base::failure.
     basic_ostream<charT, traits>& write(const char_type* s, streamsize n);
-    basic_ostream<charT, traits>& flush();//{ return *this; }
+
+    /// 7 Effects: Behaves as an unformatted output function.
+    ///   If rdbuf() is not a null pointer, constructs a sentry object.
+    ///   If this object returns true when converted to a value of type bool the
+    ///   function calls rdbuf()->pubsync(). If that function returns -1 calls
+    ///   setstate(badbit) (which may throw ios_base::failure (27.4.4.3)).
+    ///   Otherwise, if the sentry object returns false, does nothing.
+    /// 8 Returns: *this.
+    basic_ostream<charT, traits>& flush()
+    { 
+      if ( this->rdbuf() )
+      {
+        ///\note no sentry as it'll result in recursive call
+        if ( good() )
+        {
+          ///\note STLPort doesn't have this line (as one above, but that doesn't matter)
+          if ( tie() ) tie()->flush();
+          if ( this->rdbuf()->pubsync() == -1 )
+            this->setstate(ios_base::badbit);
+        }
+      }
+      return *this;
+    }
 
     ///@}
 

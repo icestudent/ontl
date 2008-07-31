@@ -334,12 +334,18 @@ namespace std {
     {
       check_bounds(pos);
       const storage_type val = storage_[pos / element_size_];
-      return (val & (1 << (pos & element_mod_))) != 0;
+      return (val & static_cast<storage_type>(1 << (pos & element_mod_)) ) != 0;
     }
 
+    bool none() const { return !any(); }
     bool all() const { return count() == size(); }
-    bool any() const { return count() != 0; }
-    bool none() const{ return count() == 0; }
+    bool any() const 
+    {
+      for(uint32_t i = 0; i < elements_count_; i++)
+        if(storage_[i])
+          return true;
+      return false;
+    }
 
     bitset<N> operator<<(size_t pos) const
     {
@@ -394,7 +400,7 @@ namespace std {
     typedef uintptr_t storage_type; // native platform type
 
     enum { digits = N };
-    enum { element_size_ = sizeof(storage_type) * 8 };
+    enum { element_size_ = sizeof(storage_type) * 8 }; // bits count
 
     static const size_t element_mod_ = element_size_ - 1;
     static const size_t digitd_mod_ = (1 << (N & (element_size_-1))) - 1;

@@ -495,7 +495,7 @@ const ctype<char>& use_facet<ctype<char> >(const locale&)
   ctype<char> * const p = reinterpret_cast<ctype<char>*>(f);
   // The first class member is VTable ptr or the tab ptr member,
   // both are non-null after initialization is done.
-  if ( f[0] ) new (p) ctype<char>;
+  if ( !f[0] ) new (p) ctype<char>;
   return *p;
 }
 

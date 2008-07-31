@@ -5,11 +5,9 @@
  ****************************************************************************
  */
 
-
 #ifndef NTL__CPU
 #define NTL__CPU
 
-#include "base.hxx"
 
 namespace ntl {
 namespace cpu {
@@ -17,11 +15,12 @@ namespace cpu {
 #ifdef _MSC_VER
   #ifdef _M_IX86
 
-  static inline void pause() { __asm { rep nop } }
-
+    static inline void pause() { __asm { rep nop } }
 
   #else // ! _M_IX86
-  #error unsupported CPU type
+    //#error unsupported CPU type
+    static inline void pause() { }
+    #pragma deprecated(pause)
   #endif
 #else // ! _MSC_VER
 #error unsupported compiler

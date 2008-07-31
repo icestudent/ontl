@@ -212,6 +212,11 @@ struct teb: public tib
   static __forceinline
     teb & instance() { return *static_cast<teb*>(get(&tib::Self)); }
 
+#ifdef _M_X64
+  static __forceinline
+    teb & instance32() { return *reinterpret_cast<teb*>( uintptr_t(get(&tib::Self)) + 0x4096); }
+#endif
+
   // common part
   /* 0x1c */  void *    EnvironmentPointer;
   /* 0x20 */  client_id ClientId;

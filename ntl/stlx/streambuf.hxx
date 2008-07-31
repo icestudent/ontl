@@ -41,6 +41,7 @@ class basic_streambuf
   protected:
     
     /// 27.5.2.1 basic_streambuf constructors [streambuf.cons]
+    __forceinline
     basic_streambuf()
     : gbeg(0), gend(0), gnext(0),
       pbeg(0), pend(0), pnext(0)/*, l(locale())*/
@@ -324,7 +325,7 @@ class basic_streambuf
     ///@}
 
   ///////////////////////////////////////////////////////////////////////////
-  private:
+  //private:
 
     char_type * gbeg;
     char_type * gend;

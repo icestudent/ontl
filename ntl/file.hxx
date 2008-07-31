@@ -10,7 +10,7 @@
 
 #include "device_traits.hxx"
 #include "handle.hxx"
-#include "..\stlx\stdexcept.hxx"
+
 
 namespace ntl {
 

@@ -107,7 +107,8 @@ class strstreambuf : public basic_streambuf<char>
       freeze();
       return gptr();
     }
-    
+
+    ///\note int replaced with streamsize
     streamsize pcount()
     {
       return !pptr() ? reinterpret_cast<streamsize>(pptr()) : pptr() - pbase();
@@ -147,7 +148,7 @@ class strstreambuf : public basic_streambuf<char>
         && strmode & dynamic
         && !(strmode & frozen) )
       {
-        const streamsize newsize = __grow_heap_block_size(alsize);
+        const streamsize newsize = __ntl_grow_heap_block_size(alsize);
         char * p = _alloc(newsize);
         if ( p )
         {
@@ -158,9 +159,9 @@ class strstreambuf : public basic_streambuf<char>
             std::copy(pbase(), pptr()/*epptr()*/, p);
             _free(pbase());
           }
-          const int pnextdiff = pptr() - pbase();
+          const ptrdiff_t pnextdiff = pptr() - pbase();
           setp(p, p + alsize);
-          pbump(pnextdiff);
+          pnext += pnextdiff;//pbump(pnextdiff);
           setg(p, p + (gnext - gbeg), pnext + 1/*note pnext++ below*/);
         }
       }
@@ -389,6 +390,7 @@ class strstreambuf : public basic_streambuf<char>
     /// 6 ... If palloc is not a null pointer, the function calls (*palloc)(n)
     ///   to allocate the new dynamic array object.
     ///   Otherwise, it evaluates the expression new charT[n]
+//    __forceinline
     char* _alloc(size_t size)
     {
       return palloc ? (char*)palloc(size) : new (std::nothrow) char[size];
@@ -398,6 +400,7 @@ class strstreambuf : public basic_streambuf<char>
     ///   address is p:
     ///   If pfree is not a null pointer, the function calls (*pfree)(p).
     ///   Otherwise, it evaluates the expression delete[] p.
+//    __forceinline
     void _free(char* p)
     {
       if ( pfree ) pfree(p);
@@ -486,7 +489,7 @@ class ostrstream : public ostream//basic_ostream<char>
     char *str() { return rdbuf()->str(); }
 
     /// 4 Returns: rdbuf()->pcount().
-    int pcount() const { return rdbuf()->pcount(); }
+    streamsize pcount() const { return rdbuf()->pcount(); }
 
     ///\}
 
@@ -542,7 +545,7 @@ class strstream : public iostream//basic_iostream<char>
     char *str() { return rdbuf()->str(); }
 
     /// 3 Returns: rdbuf()->pcount().
-    int pcount() const { return rdbuf()->pcount(); }
+    streamsize pcount() const { return rdbuf()->pcount(); }
 
     ///\}
 

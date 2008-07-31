@@ -21,9 +21,7 @@ namespace win {
 
 
 typedef const struct _opaque { } * legacy_sc_handle;
-enum sc_status_type {
-  StatusProcessInfo
-};
+enum sc_status_type { sc_status_process_info };
 
 NTL__EXTERNAPI
 legacy_sc_handle __stdcall

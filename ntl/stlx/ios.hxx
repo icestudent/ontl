@@ -45,23 +45,41 @@ class ios_base
 
     /// 27.4.2.1.2 Type ios_base::fmtflags [ios::fmtflags]
     typedef uint16_t fmtflags;
+    /// flushes output after each output operation
     static const fmtflags unitbuf     = 1 << 0;
+    /// replaces certain lowercase letters with their uppercase equivalents
+    /// in generated output
     static const fmtflags uppercase   = 1 << 1;
+    /// adds fill characters at a designated internal point in certain generated
+    /// output, or identical to right if no such point is designated
     static const fmtflags internal    = 1 << 2;
+    /// adds fill characters on the right (final positions) of certain generated output
     static const fmtflags left        = 1 << 3;
+    /// adds fill characters on the left (initial positions) of certain generated output
     static const fmtflags right       = 1 << 4;
     static const fmtflags adjustfield = left | right | internal;
+    /// converts integer input or generates integer output in decimal base
     static const fmtflags dec         = 1 << 5;
+    /// converts integer input or generates integer output in octal base
     static const fmtflags oct         = 1 << 6;
+    /// converts integer input or generates integer output in hexadecimal base
     static const fmtflags hex         = 1 << 7;
     static const fmtflags basefield   = dec | oct | hex;
+    /// generates a prefix indicating the numeric base of generated integer output
     static const fmtflags showbase    = 1 << 8;
+    /// generates a + sign in non-negative generated numeric output
     static const fmtflags showpos     = 1 << 9;
+    /// insert and extract bool type in alphabetic format
     static const fmtflags boolalpha   = 1 << 10;
+    /// generate floating-point output in fixed-point notation
     static const fmtflags fixed       = 1 << 11;
+    /// generates floating-point output in scientific notation
     static const fmtflags scientific  = 1 << 12;
     static const fmtflags floatfield  = scientific | fixed;
+    /// generates a decimal-point character unconditionally in generated
+    /// floating-point output
     static const fmtflags showpoint   = 1 << 13;
+    /// skips leading whitespace before certain input operations
     static const fmtflags skipws      = 1 << 14;
 
     /// 27.4.2.1.3 Type ios_base::iostate [ios::iostate]
@@ -277,7 +295,7 @@ class fpos
   private:
     //file_t    filepos;    
     streamoff offset;
-     stateT state_;
+    stateT    state_;
 };
 
 /// 27.4.4 Class template basic_ios [ios]

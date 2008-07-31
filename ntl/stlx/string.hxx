@@ -422,7 +422,6 @@ class basic_string
 
 #endif
 
-
     ///\name  basic_string::append [21.3.6.2 lib.string::append]
 
     basic_string& append(const basic_string& str)
@@ -640,25 +639,16 @@ class basic_string
     /// 3 Remarks: Uses traits::eq().
     size_type find(const basic_string& str, size_type pos = 0) const
     {
-      for ( size_type xpos = pos; xpos + str.size() <= size(); ++xpos )
-      {
-        for ( size_type i = 0; i != str.size(); ++i )
-          if ( !traits_type::eq(*(begin() + xpos + i), *(str.begin() + i)) ) ///\note at() by Standard
-            goto next_xpos;
-        return xpos;
-      next_xpos:;
-      }
-      return npos;
+      return find(str.begin(), pos, str.size());
     }
     
+    /// 4 Returns: find(basic_string<charT,traits,Allocator>(s,n),pos).
     size_type find(const charT* s, size_type pos, size_type n) const
     {
-      const size_type lsize = size();
-      const_pointer lfrom = begin();
-      for(size_type xpos = pos; xpos + n <= lsize; ++xpos, ++lfrom)
+      for ( size_type xpos = pos; xpos + n <= size(); ++xpos )
       {
         for(size_type i = 0; i != n; ++i)
-          if(!traits_type::eq(*(lfrom + i), *(s + i)))
+          if ( !traits_type::eq(*(begin() + xpos  + i), *(s + i)) )
             goto next_xpos;
         return xpos;
       next_xpos:;

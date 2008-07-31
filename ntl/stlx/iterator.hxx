@@ -226,15 +226,33 @@ class reverse_iterator
     reverse_iterator& operator--()  { ++current; return *this; }
     reverse_iterator operator--(int)
       { reverse_iterator tmp = *this; ++current; return tmp; }
+
     reverse_iterator operator+ (difference_type n) const
-      { return reverse_iterator( current - n ); }
-    reverse_iterator& operator+=(difference_type n)
-      { current -= n; return *this; }
+    { 
+      return reverse_iterator( current - n );
+    }
+
+    reverse_iterator operator+=(difference_type n)
+    { 
+      current -= n;
+      return *this;
+    }
+
     reverse_iterator operator- (difference_type n) const
-      { return reverse_iterator( current + n ); }
-    reverse_iterator& operator-=(difference_type n)
-      { current += n; return *this; }
-    reference operator[](difference_type n) const { return current[-n-1]; }
+    { 
+      return reverse_iterator( current + n );
+    }
+
+    reverse_iterator operator-=(difference_type n)
+    { 
+      current += n;
+      return *this;
+    }
+
+    reference operator[](difference_type n) const
+    { 
+      return current[-n-1];
+    }
 
   template<typename Iterator2>
   friend
@@ -283,7 +301,9 @@ class reverse_iterator
     reverse_iterator<Iterator>
       operator+(typename reverse_iterator<Iterator>::difference_type n,
                 const reverse_iterator<Iterator>& x)
-      { return reverse_iterator(x.current - n); }
+      { 
+        return reverse_iterator(x.current - n);
+      }
   
   protected:
     Iterator current;

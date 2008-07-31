@@ -13,7 +13,7 @@
 /// Standard Template Library
 namespace std {
 
-/**\defgroup  lib_utilities ************ General utilities library [20] *****
+/**\defgroup  lib_utilities *** 20 General utilities library [utilities] *****
  *
  *    Components used by other elements of the Standard C + + library.
  *@{
