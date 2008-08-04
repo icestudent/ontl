@@ -17,6 +17,8 @@
 #include "../stlx/array.hxx"
 #include "../stlx/typeinfo.hxx"
 
+#include "../pe/image.hxx"
+
 #undef exception_code
 #undef exception_info
 #undef abnormal_termination
