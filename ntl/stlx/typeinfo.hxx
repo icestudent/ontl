@@ -11,7 +11,12 @@
 #ifndef STLX__USE_RTTI
   #ifdef _MSC_VER
     #ifdef _CPPRTTI
-      #define STLX__USE_RTTI 1
+      #ifdef NTL_KM
+        #pragma message("Kernel mode RTTI support was not implemented yet)
+        #define STLX__USE_RTTI 0
+      #else
+        #define STLX__USE_RTTI 1
+      #endif
     #else
       #define STLX__USE_RTTI 0
     #endif
