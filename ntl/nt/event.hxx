@@ -1,9 +1,9 @@
 /**\file*********************************************************************
-*                                                                     \brief
-*  Events
-*
-****************************************************************************
-*/
+ *                                                                     \brief
+ *  Events
+ *
+ ****************************************************************************
+ */
 
 #ifndef NTL__NT_EVENT
 #define NTL__NT_EVENT
@@ -11,16 +11,17 @@
 #include "basedef.hxx"
 #include "../device_traits.hxx"
 #include "object.hxx"
-#include "../km/basedef.hxx"
 
 namespace ntl {
   namespace nt {
 
     /// event
-    using km::event_type;
-    using km::SynchronizationEvent; // auto-reset
-    using km::NotificationEvent;    // manual-reset
-
+    enum event_type { 
+      /** manual-reset */
+      NotificationEvent, 
+      /** auto-reset */
+      SynchronizationEvent 
+    };
 
     enum event_information_class 
     {

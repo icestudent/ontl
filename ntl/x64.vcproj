@@ -288,11 +288,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\nt\apc.hxx"
+				RelativePath=".\km\apc.hxx"
 				>
 			</File>
 			<File
-				RelativePath=".\km\apc.hxx"
+				RelativePath=".\nt\apc.hxx"
 				>
 			</File>
 			<File
@@ -380,11 +380,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\nt\debug.hxx"
+				RelativePath=".\km\debug.hxx"
 				>
 			</File>
 			<File
-				RelativePath=".\km\debug.hxx"
+				RelativePath=".\nt\debug.hxx"
 				>
 			</File>
 			<File
@@ -404,6 +404,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\km\event.hxx"
+				>
+			</File>
+			<File
 				RelativePath=".\nt\exception.hxx"
 				>
 			</File>
@@ -416,15 +420,15 @@
 				>
 			</File>
 			<File
-				RelativePath=".\nt\file.hxx"
-				>
-			</File>
-			<File
 				RelativePath=".\file.hxx"
 				>
 			</File>
 			<File
 				RelativePath=".\km\file.hxx"
+				>
+			</File>
+			<File
+				RelativePath=".\nt\file.hxx"
 				>
 			</File>
 			<File
@@ -452,14 +456,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\nt\handle.hxx"
-				>
-			</File>
-			<File
-				RelativePath=".\km\handle.hxx"
-				>
-			</File>
-			<File
 				RelativePath=".\handle.hxx"
 				>
 			</File>
@@ -468,15 +464,23 @@
 				>
 			</File>
 			<File
+				RelativePath=".\nt\handle.hxx"
+				>
+			</File>
+			<File
+				RelativePath=".\km\handle.hxx"
+				>
+			</File>
+			<File
 				RelativePath=".\nt\heap.hxx"
 				>
 			</File>
 			<File
-				RelativePath=".\km\image.hxx"
+				RelativePath=".\pe\image.hxx"
 				>
 			</File>
 			<File
-				RelativePath=".\pe\image.hxx"
+				RelativePath=".\km\image.hxx"
 				>
 			</File>
 			<File
@@ -568,11 +572,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\nt\new.hxx"
+				RelativePath=".\km\new.hxx"
 				>
 			</File>
 			<File
-				RelativePath=".\km\new.hxx"
+				RelativePath=".\nt\new.hxx"
 				>
 			</File>
 			<File
@@ -580,11 +584,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\nt\object.hxx"
+				RelativePath=".\km\object.hxx"
 				>
 			</File>
 			<File
-				RelativePath=".\km\object.hxx"
+				RelativePath=".\nt\object.hxx"
 				>
 			</File>
 			<File
@@ -608,11 +612,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\km\registry.hxx"
+				RelativePath=".\nt\registry.hxx"
 				>
 			</File>
 			<File
-				RelativePath=".\nt\registry.hxx"
+				RelativePath=".\km\registry.hxx"
 				>
 			</File>
 			<File
@@ -672,7 +676,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\km\string.hxx"
+				RelativePath=".\nt\string.hxx"
 				>
 			</File>
 			<File
@@ -680,7 +684,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\nt\string.hxx"
+				RelativePath=".\km\string.hxx"
 				>
 			</File>
 			<File
@@ -692,11 +696,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\nt\system_information.hxx"
+				RelativePath=".\km\system_information.hxx"
 				>
 			</File>
 			<File
-				RelativePath=".\km\system_information.hxx"
+				RelativePath=".\nt\system_information.hxx"
 				>
 			</File>
 			<File
@@ -712,7 +716,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\nt\thread.hxx"
+				RelativePath=".\stlx\thread.hxx"
 				>
 			</File>
 			<File
@@ -720,11 +724,15 @@
 				>
 			</File>
 			<File
-				RelativePath=".\stlx\thread.hxx"
+				RelativePath=".\nt\thread.hxx"
 				>
 			</File>
 			<File
 				RelativePath=".\nt\time.hxx"
+				>
+			</File>
+			<File
+				RelativePath=".\km\time.hxx"
 				>
 			</File>
 			<File

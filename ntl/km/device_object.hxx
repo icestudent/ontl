@@ -10,6 +10,7 @@
 
 #include "object.hxx"
 #include "irp.hxx"
+#include "event.hxx"
 
 namespace ntl {
 namespace km {

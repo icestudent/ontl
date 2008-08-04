@@ -15,6 +15,7 @@
 #include "../nt/teb.hxx"
 #include "../device_traits.hxx"
 #include "../nt/context.hxx"
+#include "time.hxx"
 
 namespace ntl {
 namespace km {
