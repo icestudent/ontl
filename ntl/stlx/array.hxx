@@ -87,10 +87,10 @@ struct array
       return operator[](n);
     }
 
-    reference       front()       __ntl_nothrow { return *begin(); }
-    const_reference front() const __ntl_nothrow { return *begin(); }
-    reference       back()        __ntl_nothrow { return *(--end()); }
-    const_reference back()  const __ntl_nothrow { return *(--end()); }
+    reference       front()       { return *begin(); }
+    const_reference front() const { return *begin(); }
+    reference       back()        { return *(--end()); }
+    const_reference back()  const { return *(--end()); }
 
           T * data()        { return __elems; }
     const T * data() const  { return __elems; }

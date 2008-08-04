@@ -227,8 +227,12 @@ namespace tree
       // modifiers
       std::pair<iterator, bool> insert(const value_type& x)
       {
-        if(count_ == max_size()-1)
-          __ntl_throw(std::length_error("rb_tree<T> too long"));
+        // I guess this is not necessary:
+        // Node_allocator.allocate shall throw bad_alloc in this case.
+        // Moreover logic_error contains std::string member which
+        // potentially could not be allocated as well. - ST
+        // if(count_ == max_size()-1)
+        // __ntl_throw(std::length_error("rb_tree<T> too long"));
 
         if(empty()){
           // insert x as the root node

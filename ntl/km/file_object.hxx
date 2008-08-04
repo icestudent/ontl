@@ -60,6 +60,7 @@ struct file_object
   list_entry                IrpList;
   void *                    FileObjectExtension;
 #endif
+
   ///@note ignores Vpb
   device_object * get_related_device_object()
   {

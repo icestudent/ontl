@@ -80,7 +80,7 @@ struct general_lookaside_pool
 
 #pragma warning(push)
 #pragma warning(disable:4324) // 'ntl::km::general_lookaside' : structure was padded due to __declspec(align())
-__align(SYSTEM_CACHE_ALIGNMENT_SIZE)
+alignas(SYSTEM_CACHE_ALIGNMENT_SIZE)
 struct general_lookaside : public general_lookaside_pool {};
 #pragma warning(pop)
 

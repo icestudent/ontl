@@ -159,9 +159,6 @@ class application
             while(*p < '\0' || *p > ' ') p++;
             if(*p) *p++ = '\0';
           }
-          //argv[argc++] = p;
-          //while(*p < '\0' || *p > ' ') p++;
-          //if(*p) *p++ = '\0';           
         }
         return argc;
       }

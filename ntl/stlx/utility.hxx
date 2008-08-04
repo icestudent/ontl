@@ -27,7 +27,9 @@ namespace std {
  */
 
 #pragma region operators
-/// Operators [20.2.1 operators]
+/// 20.2.1 Operators [operators]
+/// 1 To avoid redundant definitions of operator!= out of operator== and
+///   operators >, <=, and >= out of operator<, the library provides the following:
 namespace rel_ops {
 
 template<class T> inline
@@ -56,6 +58,9 @@ template <class T> typename remove_reference<T>::type&& move(T&&);
 
 #pragma region pairs
 /// Pairs [20.2.3 pairs]
+#pragma warning(push)
+// assignment operator could not be generated if either T is const
+#pragma warning(disable:4512)
 template<class T1, class T2>
 struct pair
 {
@@ -103,6 +108,7 @@ struct pair
     void swap(pair&& p);
 #endif
 };
+#pragma warning(pop)
 
 // forward declarations
 template<class T, class Alloc> struct uses_allocator;
