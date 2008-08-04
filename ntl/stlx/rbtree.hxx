@@ -144,7 +144,7 @@ namespace tree
       typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
 
     public:
-      explicit rb_tree(const Compare& comp = Compare(), const Allocator& a = Allocator())
+      explicit rb_tree(const Compare& comp /*= Compare()*/, const Allocator& a = Allocator())
         :comparator_(comp), node_allocator(a),
         root_(), first_(), last_(), count_(0)
       {}

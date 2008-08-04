@@ -288,11 +288,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\km\apc.hxx"
+				RelativePath=".\nt\apc.hxx"
 				>
 			</File>
 			<File
-				RelativePath=".\nt\apc.hxx"
+				RelativePath=".\km\apc.hxx"
 				>
 			</File>
 			<File
@@ -380,11 +380,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\km\debug.hxx"
+				RelativePath=".\nt\debug.hxx"
 				>
 			</File>
 			<File
-				RelativePath=".\nt\debug.hxx"
+				RelativePath=".\km\debug.hxx"
 				>
 			</File>
 			<File
@@ -408,19 +408,15 @@
 				>
 			</File>
 			<File
-				RelativePath=".\nt\exception.hxx"
-				>
-			</File>
-			<File
 				RelativePath=".\stlx\exception.hxx"
 				>
 			</File>
 			<File
-				RelativePath=".\km\fast_io.hxx"
+				RelativePath=".\nt\exception.hxx"
 				>
 			</File>
 			<File
-				RelativePath=".\file.hxx"
+				RelativePath=".\km\fast_io.hxx"
 				>
 			</File>
 			<File
@@ -429,6 +425,10 @@
 			</File>
 			<File
 				RelativePath=".\nt\file.hxx"
+				>
+			</File>
+			<File
+				RelativePath=".\file.hxx"
 				>
 			</File>
 			<File
@@ -476,19 +476,19 @@
 				>
 			</File>
 			<File
-				RelativePath=".\pe\image.hxx"
-				>
-			</File>
-			<File
 				RelativePath=".\km\image.hxx"
 				>
 			</File>
 			<File
-				RelativePath=".\nt\ioctl.hxx"
+				RelativePath=".\pe\image.hxx"
 				>
 			</File>
 			<File
 				RelativePath=".\km\ioctl.hxx"
+				>
+			</File>
+			<File
+				RelativePath=".\nt\ioctl.hxx"
 				>
 			</File>
 			<File
@@ -548,11 +548,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\stlx\memory.hxx"
+				RelativePath=".\km\memory.hxx"
 				>
 			</File>
 			<File
-				RelativePath=".\km\memory.hxx"
+				RelativePath=".\stlx\memory.hxx"
 				>
 			</File>
 			<File
@@ -568,15 +568,15 @@
 				>
 			</File>
 			<File
-				RelativePath=".\stlx\new.hxx"
-				>
-			</File>
-			<File
 				RelativePath=".\km\new.hxx"
 				>
 			</File>
 			<File
 				RelativePath=".\nt\new.hxx"
+				>
+			</File>
+			<File
+				RelativePath=".\stlx\new.hxx"
 				>
 			</File>
 			<File
@@ -612,11 +612,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\nt\registry.hxx"
+				RelativePath=".\km\registry.hxx"
 				>
 			</File>
 			<File
-				RelativePath=".\km\registry.hxx"
+				RelativePath=".\nt\registry.hxx"
 				>
 			</File>
 			<File
@@ -696,11 +696,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\km\system_information.hxx"
+				RelativePath=".\nt\system_information.hxx"
 				>
 			</File>
 			<File
-				RelativePath=".\nt\system_information.hxx"
+				RelativePath=".\km\system_information.hxx"
 				>
 			</File>
 			<File
@@ -716,10 +716,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\stlx\thread.hxx"
-				>
-			</File>
-			<File
 				RelativePath=".\km\thread.hxx"
 				>
 			</File>
@@ -728,11 +724,15 @@
 				>
 			</File>
 			<File
-				RelativePath=".\nt\time.hxx"
+				RelativePath=".\stlx\thread.hxx"
 				>
 			</File>
 			<File
 				RelativePath=".\km\time.hxx"
+				>
+			</File>
+			<File
+				RelativePath=".\nt\time.hxx"
 				>
 			</File>
 			<File
@@ -818,6 +818,14 @@
 				>
 				<FileConfiguration
 					Name="Debug|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="MASM"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|Win32"
 					ExcludedFromBuild="true"
 					>
 					<Tool

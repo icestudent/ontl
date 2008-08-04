@@ -48,17 +48,23 @@ namespace std {
     public:
       typedef pair<const Key, T> value_type;
 
+      value_compare(const value_compare& x)
+        :comp(x.comp)
+      {}
+
       __forceinline
       bool operator()(const value_type& x, const value_type& y) const
       {
         return comp(x.first, y.first);
       }
 
-    //template <class Key,class T,class Compare,class Allocator>
+
     friend class std::map<Key, T, Compare, Allocator>;
     protected:
       Compare comp;
       value_compare(Compare c) : comp(c) {}
+      value_compare();
+      value_compare& operator=(const value_compare&);
     };
   } // detail
 
@@ -115,7 +121,7 @@ class map:
     }
 
     map(const map<Key, T, Compare, Allocator> & x)
-      :val_comp_(x.val_comp_)
+      :val_comp_(x.val_comp_), tree_type(val_comp_, x.get_allocator())
     {}
 
 #ifdef NTL__CXX
@@ -241,7 +247,7 @@ class map:
 
     const_iterator find(const key_type& x) const
     {
-      return find(x);
+      return const_cast<map*>(this)->find(x);
     }
 
     size_type count(const key_type& x) const
