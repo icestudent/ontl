@@ -21,10 +21,20 @@ namespace std {
 #define CLOCKS_PER_SEC system_time_resolution
 
 typedef ntl::nt::systime_t clock_t;
+typedef ntl::nt::systime_t time_t;
 
 inline clock_t clock(void) { return ntl::nt::query_system_time(); }
 
-//time_t time(time_t *timer);
+inline time_t time(time_t* timer = 0)
+{
+  // Number of 100 nanosecond units from 1/1/1601 to 1/1/1970
+  static const int64_t epoch_bias = 116444736000000000i64;
+  ntl::nt::systime_t ntime = ntl::nt::query_system_time();
+  time_t ct = static_cast<time_t>((ntime - epoch_bias) / 10000000i64);
+  if(timer)
+    *timer = ct;
+  return ct;
+}
 
 /**@} lib_date_time */
 /**@} lib_utilities */
