@@ -13,6 +13,8 @@
 #include "climits.hxx"
 #include "cfloat.hxx"
 
+#include "excptdef.hxx"
+
 namespace std {
 
 /**\addtogroup  lib_language_support *** Language support library [18] ******

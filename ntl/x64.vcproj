@@ -384,11 +384,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\km\debug.hxx"
+				RelativePath=".\nt\debug.hxx"
 				>
 			</File>
 			<File
-				RelativePath=".\nt\debug.hxx"
+				RelativePath=".\km\debug.hxx"
 				>
 			</File>
 			<File
@@ -404,11 +404,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\km\event.hxx"
+				RelativePath=".\nt\event.hxx"
 				>
 			</File>
 			<File
-				RelativePath=".\nt\event.hxx"
+				RelativePath=".\km\event.hxx"
 				>
 			</File>
 			<File
@@ -420,7 +420,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\stlx\excptdef.hxx"
+				>
+			</File>
+			<File
 				RelativePath=".\km\fast_io.hxx"
+				>
+			</File>
+			<File
+				RelativePath=".\nt\file.hxx"
 				>
 			</File>
 			<File
@@ -432,15 +440,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\nt\file.hxx"
+				RelativePath=".\nt\file_information.hxx"
 				>
 			</File>
 			<File
 				RelativePath=".\km\file_information.hxx"
-				>
-			</File>
-			<File
-				RelativePath=".\nt\file_information.hxx"
 				>
 			</File>
 			<File
@@ -460,10 +464,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\win\handle.hxx"
-				>
-			</File>
-			<File
 				RelativePath=".\nt\handle.hxx"
 				>
 			</File>
@@ -473,6 +473,10 @@
 			</File>
 			<File
 				RelativePath=".\handle.hxx"
+				>
+			</File>
+			<File
+				RelativePath=".\win\handle.hxx"
 				>
 			</File>
 			<File
@@ -552,11 +556,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\stlx\memory.hxx"
+				RelativePath=".\km\memory.hxx"
 				>
 			</File>
 			<File
-				RelativePath=".\km\memory.hxx"
+				RelativePath=".\stlx\memory.hxx"
 				>
 			</File>
 			<File
@@ -572,15 +576,15 @@
 				>
 			</File>
 			<File
-				RelativePath=".\nt\new.hxx"
-				>
-			</File>
-			<File
 				RelativePath=".\km\new.hxx"
 				>
 			</File>
 			<File
 				RelativePath=".\stlx\new.hxx"
+				>
+			</File>
+			<File
+				RelativePath=".\nt\new.hxx"
 				>
 			</File>
 			<File
@@ -609,6 +613,10 @@
 			</File>
 			<File
 				RelativePath=".\km\process.hxx"
+				>
+			</File>
+			<File
+				RelativePath=".\stlx\ratio.hxx"
 				>
 			</File>
 			<File
@@ -684,11 +692,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\km\string.hxx"
+				RelativePath=".\nt\string.hxx"
 				>
 			</File>
 			<File
-				RelativePath=".\nt\string.hxx"
+				RelativePath=".\km\string.hxx"
 				>
 			</File>
 			<File
@@ -700,11 +708,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\km\system_information.hxx"
+				RelativePath=".\nt\system_information.hxx"
 				>
 			</File>
 			<File
-				RelativePath=".\nt\system_information.hxx"
+				RelativePath=".\km\system_information.hxx"
 				>
 			</File>
 			<File
@@ -732,11 +740,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\km\time.hxx"
+				RelativePath=".\nt\time.hxx"
 				>
 			</File>
 			<File
-				RelativePath=".\nt\time.hxx"
+				RelativePath=".\km\time.hxx"
 				>
 			</File>
 			<File

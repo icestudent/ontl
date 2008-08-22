@@ -192,6 +192,31 @@ template <bool, class IfTrueType, class IfFalseType> struct conditional;
 template <class T, class F> struct conditional<true, T, F>  { typedef T type; }; 
 template <class T, class F> struct conditional<false, T, F> { typedef F type; }; 
 
+#ifdef NTL__CXX
+
+template <class ...T> struct common_type;
+
+template <class T>
+struct common_type<T> { typedef T type; };
+
+template <class T, class U>
+struct common_type<T, U> 
+{
+private:
+  static T&& __t();
+  static U&& __u();
+public:
+  typedef decltype(true ? __t() : __u()) type;
+};
+
+template <class T, class U, class... V>
+struct common_type<T, U, V...> 
+{
+  typedef typename common_type<typename common_type<T, U>::type, V...>::type type;
+};
+
+#endif
+
 // 20.4.5 Unary Type Traits [meta.unary]
 
 #define NTL__STLX_DEF_TRAIT(X)\
