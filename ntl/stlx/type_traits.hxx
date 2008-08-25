@@ -266,6 +266,10 @@ template <class T> struct is_lvalue_reference<T&> : public true_type {};
 _CHECK_TRAIT(is_lvalue_reference<volatile int&>::value);
 
 template <class T> struct is_rvalue_reference     : public false_type {};
+#ifdef NTL__CXX
+template <class T> struct is_rvalue_reference<T&&>: public true_type {};
+_CHECK_TRAIT(is_rvalue_reference<volatile int&&>::value);
+#endif
 
 template <class T>
 struct is_member_object_pointer : public false_type {};
@@ -507,6 +511,10 @@ template <class T> struct is_volatile             : public false_type {};
 template <class T> struct is_volatile<volatile T> : public true_type {};
 _CHECK_TRAIT(is_volatile<const int>::value == false);
 _CHECK_TRAIT(is_volatile<volatile int>::value);
+
+template<class T>struct is_trivial;
+template<class T>struct is_standard_layout;
+
 
 ///\warning what about std::pair<int, int> ?
 template <class T> struct is_pod
