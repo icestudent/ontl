@@ -1,6 +1,6 @@
 /**\file*********************************************************************
  *                                                                     \brief
- *  20.4 Metaprogramming and type traits [meta]
+ *  20.5 Metaprogramming and type traits [meta]
  *
  ****************************************************************************
  */
@@ -21,7 +21,7 @@
 
 namespace std {
 
-/// 20.4.3 Helper classes [meta.help]
+/// 20.5.3 Helper classes [meta.help]
 template <class T, T v>
 struct integral_constant
 {
@@ -34,7 +34,7 @@ typedef integral_constant<bool, true>   true_type;
 typedef integral_constant<bool, false>  false_type;
 
 
-// 20.4.5 Relationships between types [meta.rel]
+// 20.5.5 Relationships between types [meta.rel]
 
 template <class T, class U> struct is_same : false_type {};
 template <class T> struct is_same<T, T> : true_type {};
@@ -47,9 +47,9 @@ template <class From, class To> struct is_convertible
 : public integral_constant<bool, __is_convertible_to(From, To)> {};
 
 
-// 20.4.6 Transformations between types [meta.trans]
+// 20.5.6 Transformations between types [meta.trans]
 
-// 20.4.6.1 Const-volatile modifications [meta.trans.cv]
+// 20.5.6.1 Const-volatile modifications [meta.trans.cv]
 
 template <class T> struct remove_const              { typedef T type; };
 template <class T> struct remove_const<const T>     { typedef T type; };
@@ -80,7 +80,7 @@ _CHECK_TRAIT((is_same<add_volatile<int>::type, volatile int>::value));
 template <class T> struct add_cv { typedef const volatile T type; };
 _CHECK_TRAIT((is_same<add_cv<int>::type, volatile const int>::value));
 
-// 20.4.6.2 Reference modifications [meta.trans.ref]
+// 20.5.6.2 Reference modifications [meta.trans.ref]
 
 template <class T> struct remove_reference     { typedef T type; };
 template <class T> struct remove_reference<T&> { typedef T type; };
@@ -97,7 +97,11 @@ _CHECK_TRAIT((is_same<add_lvalue_reference<int>::type, int&>::value));
 
 template <class T> struct add_reference : add_lvalue_reference<T> {};
 
-// 20.4.6.3 Array modifications [meta.trans.arr]
+// 20.5.6.3 Sign modifications [meta.trans.sign]
+template <class T> struct make_signed;
+template <class T> struct make_unsigned;
+
+// 20.5.6.4 Array modifications [meta.trans.arr]
 
 template <class T> struct remove_extent { typedef T type; };
 template <class T> struct remove_extent<T[]> { typedef T type; };
@@ -117,7 +121,7 @@ _CHECK_TRAIT((is_same<remove_all_extents<int[2]>::type, int>::value));
 _CHECK_TRAIT((is_same<remove_all_extents<int[2][3]>::type, int>::value));
 _CHECK_TRAIT((is_same<remove_all_extents<int[][3][6]>::type, int>::value));
 
-// 20.4.6.4 Pointer modifications [meta.trans.ptr]
+// 20.5.6.5 Pointer modifications [meta.trans.ptr]
 
 template <class T> struct remove_pointer     { typedef T type; };
 template <class T> struct remove_pointer<T*> { typedef T type; };
@@ -129,7 +133,7 @@ template <class T> struct add_pointer<T&> { typedef typename remove_reference<T>
 _CHECK_TRAIT((is_same<add_pointer<volatile int>::type, volatile int*>::value));
 _CHECK_TRAIT((is_same<add_pointer<int*&>::type, int**>::value));
 
-// 20.4.7 Other transformations [meta.trans.other]
+// 20.5.7 Other transformations [meta.trans.other]
 
 #pragma warning(push)
 #pragma warning(disable:4324) // structure was padded due to __declspec(align())
@@ -192,73 +196,15 @@ template <bool, class IfTrueType, class IfFalseType> struct conditional;
 template <class T, class F> struct conditional<true, T, F>  { typedef T type; }; 
 template <class T, class F> struct conditional<false, T, F> { typedef F type; }; 
 
-#ifdef NTL__CXX
 
-template <class ...T> struct common_type;
-
-template <class T>
-struct common_type<T> { typedef T type; };
-
-template <class T, class U>
-struct common_type<T, U> 
-{
-private:
-  static T&& __t();
-  static U&& __u();
-public:
-  typedef decltype(true ? __t() : __u()) type;
-};
-
-template <class T, class U, class... V>
-struct common_type<T, U, V...> 
-{
-  typedef typename common_type<typename common_type<T, U>::type, V...>::type type;
-};
-
-#else // NTL__CXX
-
-template<class T, class U = void, class V = void, class W = void>
-struct common_type;
-
-template <class T> 
-struct common_type<T, void, void, void>
-{
-  static_assert(sizeof(remove_cv<T>::type) > 0, "T shall be complete");
-  typedef typename remove_reference<typename remove_cv<T>::type>::type type;
-};
-
-template<class T, class U>
-struct common_type<T, U, void, void>
-{
-  static_assert(sizeof(remove_cv<T>::type) > 0, "T shall be complete");
-  static_assert(sizeof(remove_cv<T>::type) > 0, "U shall be complete");
-
-  // TODO: replace this with promote algorithm
-  typedef typename remove_reference<typename remove_cv<typename conditional<(sizeof(T) < sizeof(U)), T, U>::type>::type>::type type;
-};
-
-template<class T, class U, class V>
-struct common_type<T, U, V, void>
-{
-  typedef typename common_type<typename common_type<T, U>::type, V>::type type;
-};
-
-template<class T, class U, class V, class W>
-struct common_type
-{
-  typedef typename common_type<typename common_type<T, U, V>::type, W>::type type;
-};
-
-#endif
-
-// 20.4.5 Unary Type Traits [meta.unary]
+// 20.5.4 Unary Type Traits [meta.unary]
 
 #define NTL__STLX_DEF_TRAIT(X)\
   template <class T> struct X : public integral_constant<bool, __##X(T)> {};
 #define NTL__STLX_DEF_TRAIT2(X,Y)\
   template <class T> struct X : public integral_constant<bool, __##Y(T)> {};
 
-// 20.4.4.1 Primary Type Categories [meta.unary.cat]
+// 20.5.4.1 Primary Type Categories [meta.unary.cat]
 
 template <class T> struct is_void                      : public false_type {};
 template <>        struct is_void<void>                : public true_type {};
@@ -484,7 +430,7 @@ template <class T> struct decay
 };
 
 
-// 20.4.4.2 Composite type traits [meta.unary.comp]
+// 20.5.4.2 Composite type traits [meta.unary.comp]
 
 template <class T> struct is_reference
 : public integral_constant<
@@ -534,7 +480,7 @@ template <class T> struct is_compound
        || is_member_pointer<T>::value
        > {};
 
-// 20.4.4.3 Type properties [meta.unary.prop]
+// 20.5.4.3 Type properties [meta.unary.prop]
 
 template <class T> struct is_const          : public false_type {};
 template <class T> struct is_const<const T> : public true_type {};
@@ -636,6 +582,88 @@ _CHECK_TRAIT((extent<int, 1>::value) == 0);
 _CHECK_TRAIT((extent<int[2], 1>::value) == 0);
 _CHECK_TRAIT((extent<int[2][4], 1>::value) == 4);
 _CHECK_TRAIT((extent<int[][4], 1>::value) == 4);
+
+
+// 20.5.7.2 Other transformations [meta.trans.other]
+#ifdef NTL__CXX
+
+template <class ...T> struct common_type;
+
+template <class T>
+struct common_type<T> { typedef T type; };
+
+template <class T, class U>
+struct common_type<T, U> 
+{
+private:
+  static T&& __t();
+  static U&& __u();
+public:
+  typedef decltype(true ? __t() : __u()) type;
+};
+
+template <class T, class U, class... V>
+struct common_type<T, U, V...> 
+{
+  typedef typename common_type<typename common_type<T, U>::type, V...>::type type;
+};
+
+#else // NTL__CXX
+
+template<class T, class U = void, class V = void, class W = void>
+struct common_type;
+
+template <class T> 
+struct common_type<T, void, void, void>
+{
+  static_assert(sizeof(T) > 0, "T shall be complete");
+  typedef T type;
+};
+
+template<class T, class U>
+struct common_type<T, U, void, void>
+{
+  static_assert(sizeof(T) > 0, "T shall be complete");
+  static_assert(sizeof(T) > 0, "U shall be complete");
+
+#if 0
+  // TODO: replace this with promote algorithm
+  typedef typename <typename remove_cv<typename conditional<(sizeof(T) < sizeof(U)), T, U>::type>::type>::type type;
+
+#else
+private:
+  typedef typename remove_cv<typename remove_reference<T>::type>::type rawT;
+  typedef typename remove_cv<typename remove_reference<U>::type>::type rawU;
+
+public:
+  /**
+   *	@brief правила продвижения
+   *  1) если типы равны (без квалификаторов), то выбирается один из них (также без квалификатора [см. show()])
+   *  2) если один тип конвертируется в другой, то выбираем тот, в который можно сконвертировать
+   *  3) иначе результат - void
+   **/
+  typedef 
+    typename conditional<is_same<rawT, rawU>::value, rawT,
+      typename conditional<is_arithmetic<rawT>::value && is_arithmetic<rawU>::value, typename conditional<(sizeof(T) < sizeof(U)), rawU, rawT>::type,
+        typename conditional<is_convertible<rawT,rawU>::value, rawU,
+          typename conditional<is_convertible<rawU,rawT>::value, rawT, void>::type
+                            >::type>::type>::type type;
+#endif
+};
+
+template<class T, class U, class V>
+struct common_type<T, U, V, void>
+{
+  typedef typename common_type<typename common_type<T, U>::type, V>::type type;
+};
+
+template<class T, class U, class V, class W>
+struct common_type
+{
+  typedef typename common_type<typename common_type<T, U, V>::type, W>::type type;
+};
+
+#endif
 
 }//namespace std
 
