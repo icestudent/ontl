@@ -215,6 +215,40 @@ struct common_type<T, U, V...>
   typedef typename common_type<typename common_type<T, U>::type, V...>::type type;
 };
 
+#else // NTL__CXX
+
+template<class T, class U = void, class V = void, class W = void>
+struct common_type;
+
+template <class T> 
+struct common_type<T, void, void, void>
+{
+  static_assert(sizeof(remove_cv<T>::type) > 0, "T shall be complete");
+  typedef typename remove_reference<typename remove_cv<T>::type>::type type;
+};
+
+template<class T, class U>
+struct common_type<T, U, void, void>
+{
+  static_assert(sizeof(remove_cv<T>::type) > 0, "T shall be complete");
+  static_assert(sizeof(remove_cv<T>::type) > 0, "U shall be complete");
+
+  // TODO: replace this with promote algorithm
+  typedef typename remove_reference<typename remove_cv<typename conditional<(sizeof(T) < sizeof(U)), T, U>::type>::type>::type type;
+};
+
+template<class T, class U, class V>
+struct common_type<T, U, V, void>
+{
+  typedef typename common_type<typename common_type<T, U>::type, V>::type type;
+};
+
+template<class T, class U, class V, class W>
+struct common_type
+{
+  typedef typename common_type<typename common_type<T, U, V>::type, W>::type type;
+};
+
 #endif
 
 // 20.4.5 Unary Type Traits [meta.unary]

@@ -9,6 +9,7 @@
 #define NTL__NT_TIME
 
 #include "../stdint.h"
+#include "basedef.hxx"
 #include "shared_data.hxx"
 
 namespace ntl {

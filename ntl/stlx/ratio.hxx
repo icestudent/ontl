@@ -9,9 +9,17 @@
 #define NTL__STLX_RATIO
 
 #include "type_traits.hxx"
+#include "climits.hxx" // for RATIO_MAX, RATIO_MIN
 
 namespace std 
 {
+/**\defgroup  lib_utilities *** 20 General utilities library [utilities] *****
+ *
+ *    Components used by other elements of the Standard C + + library.
+ *@{
+ **/
+
+// for test purposes
 //#define SMALL_RATIO
 
 #ifndef SMALL_RATIO
@@ -20,26 +28,11 @@ namespace std
   typedef intmax_t      ratio_t;
   typedef uintmax_t     uratio_t;
 #else
-#define RATIO_MAX       INT_MAX
+  #define RATIO_MAX       INT_MAX
   #define RATIO_MIN     (-2147483647 - 1)
   typedef int           ratio_t;
   typedef unsigned int  uratio_t;
 #endif
-
-
-  template<ratio_t N, ratio_t D>
-  struct xprint_ratio
-  {
-    char _[0];
-  };
-
-  template<ratio_t V>
-  struct xprint_value
-  {
-    char _[0];
-  };
-
-
 
   template <ratio_t N, ratio_t D = 1> class ratio;
 
@@ -84,7 +77,6 @@ namespace std
   //typedef ratio<1000000000000000000000000, 1> yotta; // see 20.3.4
 
 
-  /// Class template ratio [20.3.1 ratio.ratio]
   namespace detail { namespace static_evaluation {
 
     // sign functions
@@ -119,19 +111,36 @@ namespace std
 
   }}
 
+  /**
+   *	@brief Class template ratio [20.3.1 ratio.ratio]
+   *
+   *  \code typedef std::ratio<-2,6> one_third; one_third::num == -1, one_third::den == 3 \endcode
+   *
+   *  @tparam N numenator of the ratio
+   *  @tparam D denominator of the ratio, which are always positive and default to 1
+   *  @note Negative ratios represented as negative numenator and \e positive denominator: 
+   *  ratio is always normalized such that it is expressed in lowest terms, and the denominator is always positive.
+   **/
   template <ratio_t N, ratio_t D>
   class ratio 
   {
     static const ratio_t gcd_value = detail::static_evaluation::gcd<N, D>::value;
   public:
     static_assert(D != 0, "template argument D shall not be zero");
-    static_assert(N >= RATIO_MIN && N <= RATIO_MAX && D >= RATIO_MIN && D <= RATIO_MAX, "out of range");
+    static_assert((N >= RATIO_MIN && N <= RATIO_MAX) && (D >= RATIO_MIN && D <= RATIO_MAX), "out of range");
 
-    /** \c num shall have the value sign(N)*sign(D)*abs(N)/gcd; sign(N)*abs(N) == N */
+    /**
+     *	@brief Numerator of the ratio
+     *  \c num shall have the value \f$ sign(N)*sign(D)*abs(N)/gcd \f$, 
+     *  but \f$ sign(N)*abs(N) == N \f$.
+     **/
     static const ratio_t num = N * detail::static_evaluation::sign<D>::value / gcd_value;
 
-    /** \c den shall have the value sign(N)*sign(D)*abs(D)/gcd; sign(D)*abs(D) == D */
-    //static const ratio_t den = D * detail::static_evaluation::sign<N>::value / gcd_value;
+    /**
+     *	@brief Denominator of the ratio
+     *  \c den shall have the value \f$ sign(N)*sign(D)*abs(D)/gcd \f$, after simplification it would be
+     *  \f$ D * sign(N) / gcd \f$, but we use \f$ abs(D) / gcd \f$ (see N2661).
+     **/
     static const ratio_t den = detail::static_evaluation::abs<D>::value / gcd_value;
   };
 
@@ -243,6 +252,7 @@ namespace std
 
   }
 
+  /** static addition with overflow detection */
   template <ratio_t a, ratio_t b>
   struct ratio_checked_add
   {
@@ -251,14 +261,16 @@ namespace std
     static const ratio_t value = a + b;
   };
 
+  /** static substraction with underflow detection */
   template <ratio_t a, ratio_t b>
   struct ratio_checked_sub
   {
-    static_assert((detail::check_sub_flows<a, b>::value), "sub overflow");
+    static_assert((detail::check_sub_flows<a, b>::value), "sub underflow");
 
     static const ratio_t value = a - b;
   };
 
+  /** static multiplication with overflow detection */
   template <ratio_t a, ratio_t b>
   struct ratio_checked_multiply
   {
@@ -282,6 +294,10 @@ namespace std
 
   };
 
+  /**
+   *	static addition with overflow detection and simplification
+   *  @internal To prevent a potential but unnecessary overflow a simplification algorithm used here
+   **/
   template <class R1, class R2>
   struct ratio_add 
   {
@@ -297,15 +313,15 @@ namespace std
                  > type;
   };
 
+  /** static substraction with overflow detection and simplification */
   template <class R1, class R2>
   struct ratio_subtract 
   {
-    typedef typename ratio_add<
-      R1,
-      ratio<-R2::num, R2::den>
-                              >::type type;
+    typedef typename 
+      ratio_add<R1, ratio<-R2::num, R2::den> >::type type;
   };
 
+  /** static multiplication with overflow detection and simplification */
   template <class R1, class R2>
   struct ratio_multiply
   {
@@ -319,6 +335,7 @@ namespace std
                  > type;
   };
 
+  /** static division with overflow detection and simplification */
   template <class R1, class R2>
   struct ratio_divide
   {
@@ -330,11 +347,14 @@ namespace std
 
 
   /// 20.3.3 Comparison of ratio types [ratio.comparison]
+
+  /** Check is two ratios are equal */
   template <class R1, class R2> 
   struct ratio_equal: 
     integral_constant<bool, R1::num == R2::num && R1::den == R2::den>
   { };
 
+  /** Check is two ratios are not equal */
   template <class R1, class R2> 
   struct ratio_not_equal:
     integral_constant<bool, !ratio_equal<R1, R2>::value> 
@@ -347,29 +367,35 @@ namespace std
     {};
   }
 
+  /** Check is first ratio are less than second */
   template <class R1, class R2> 
   struct ratio_less: 
     conditional<
-      detail::static_evaluation::abs<R1::den>::value == detail::static_evaluation::abs<R2::den>::value,
+      R1::den == R2::den,
       integral_constant<bool, ((R1::num) < (R2::num)) >,
       detail::ratio_less_common<R1, R2>
                >::type
   { };
 
+  /** Check is first ratio are less or equal to second */
   template <class R1, class R2> 
   struct ratio_less_equal:
     integral_constant<bool, !ratio_less<R2, R1>::value> 
   { };
 
+  /** Check is first ratio are greater than second */
   template <class R1, class R2> 
   struct ratio_greater:
     integral_constant<bool, ratio_less<R2, R1>::value> 
   { };
 
+  /** Check is first ratio are greater or equal than second */
   template <class R1, class R2> 
   struct ratio_greater_equal:
     integral_constant<bool, !ratio_less<R1, R2>::value> 
   { };
 
+  /**@} lib_utilities */
 } // namespace std
+
 #endif // NTL__STLX_RATIO
