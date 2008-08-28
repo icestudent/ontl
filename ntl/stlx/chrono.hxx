@@ -571,12 +571,8 @@ namespace std
         static const system_clock::duration diff(epochdiff_t::num);
 
         typedef chrono::time_point<system_clock, chrono::seconds> seconds_time_point;
-        seconds_time_point from_tp/*(chrono::seconds(t))*/; // BUG: vc can't recognize this
-        from_tp += chrono::seconds(t);
-
-        // seconds_time_point* xtp2 = new seconds_time_point(seconds_time_point::duration(t)); // this is ok
-        //xtp2->time_since_epoch();
-
+        // NOTE: c++ recognize `seconds_time_point from_tp(chrono::seconds(t))` as function declaration, so we need an alternate way:
+        const seconds_time_point from_tp(static_cast<chrono::seconds>(t)); 
         return time_point(duration_cast<duration>(from_tp.time_since_epoch()) + diff);
       }
     };
