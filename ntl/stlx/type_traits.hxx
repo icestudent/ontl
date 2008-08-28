@@ -637,10 +637,10 @@ private:
 
 public:
   /**
-   *	@brief правила продвижения
-   *  1) если типы равны (без квалификаторов), то выбирается один из них (также без квалификатора [см. show()])
-   *  2) если один тип конвертируется в другой, то выбираем тот, в который можно сконвертировать
-   *  3) иначе результат - void
+   *	@brief rules of selecting the "common" type
+   *  1) if raw types (without qualificators) are equal, then select one of them, also raw (don't sure here)
+   *  2) if one of types is convertible to other, select other type
+   *  3) else place the void
    **/
   typedef 
     typename conditional<is_same<rawT, rawU>::value, rawT,
