@@ -572,7 +572,8 @@ namespace std
 
         typedef chrono::time_point<system_clock, chrono::seconds> seconds_time_point;
         // NOTE: c++ recognize `seconds_time_point from_tp(chrono::seconds(t))` as function declaration, so we need an alternate way:
-        const seconds_time_point from_tp(static_cast<chrono::seconds>(t)); 
+        //  const seconds_time_point from_tp((chrono::seconds(t))) OR
+        const seconds_time_point from_tp(static_cast<chrono::seconds>(t));
         return time_point(duration_cast<duration>(from_tp.time_since_epoch()) + diff);
       }
     };
