@@ -243,8 +243,8 @@ class basic_string
     /// - size() == Size;
     /// - capacity() is at least as large as size().
     template<size_t Size>
-    basic_string(const charT (&s)[Size])
-    : str(&s[0], &s[Size]-1/*!s[Size]*/) {}
+    basic_string(const charT (&s)[Size], const Allocator& a = Allocator())
+    : str(&s[0], &s[Size]-1, a) {}
 
     /// 12 Requires: n < npos
     /// 13 Effects: Constructs an object of class basic_string and determines
