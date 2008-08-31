@@ -228,7 +228,7 @@ struct process_basic_information: aux::read_only
 };
 
 ///\name   ProcessTimes == 4
-struct kernel_user_times: aux::is_read_only<true>
+struct kernel_user_times: aux::read_only
 {
   static const process_information_class info_class_type = ProcessTimes;
 
