@@ -22,42 +22,67 @@ namespace ntl { namespace nt {
   /// Process Information Class
   enum process_information_class
   {
+    // RO
     ProcessBasicInformation,
     ProcessQuotaLimits,
+    // RO
     ProcessIoCounters,
+    // RO
     ProcessVmCounters,
+    // RO
     ProcessTimes,
+    // WO
     ProcessBasePriority,
+    // WO
     ProcessRaisePriority,
     ProcessDebugPort,
+    // WO
     ProcessExceptionPort,
+    // WO
     ProcessAccessToken,
     ProcessLdtInformation,
+    // WO
     ProcessLdtSize,
     ProcessDefaultHardErrorMode,
+    // WO
     ProcessIoPortHandlers,
+    // RO
     ProcessPooledUsageAndLimits,
     ProcessWorkingSetWatch,
+    // WO
     ProcessUserModeIOPL,
+    // WO
     ProcessEnableAlignmentFaultFixup,
+    // WO
     ProcessPriorityClass,
+    // RO
     ProcessWx86Information,
+    // RO
     ProcessHandleCount,
+    // WO
     ProcessAffinityMask,
     ProcessPriorityBoost,
     ProcessDeviceMap,
     ProcessSessionInformation,
+    // WO
     ProcessForegroundInformation,
+    // RO
     ProcessWow64Information,
+    // RO
     ProcessImageFileName,
+    // RO
     ProcessLUIDDeviceMapsEnabled,
     ProcessBreakOnTermination,
+    // RO
     ProcessDebugObjectHandle,
     ProcessDebugFlags,
     ProcessHandleTracing,
+    // nt 6.0+
     ProcessIoPriority,
     ProcessExecuteFlags,
+    // not used or vista+
     ProcessResourceManagement,
+    // RO
     ProcessCookie,
     ProcessImageInformation,
     MaxProcessInfoClass
@@ -94,11 +119,58 @@ namespace aux
     std::integral_constant<bool, value>
   {};
 
-  typedef is_read_only<true> read_only;
+  template<bool value = false>
+  struct is_write_only: 
+    std::integral_constant<bool, value>
+  {};
+
+  typedef is_read_only<true>  read_only;
+  typedef is_write_only<true> write_only;
+
+
+  /// default query policy
+  template<class                        InformationClass,
+          query_process_information_t   QueryInformation,
+          bool                          write_only>
+  struct query_process_information_policy
+  {
+    static __forceinline
+      ntstatus
+      _query(
+      legacy_handle   process_handle,
+      void *          info,
+      uint32_t        info_length
+      )
+    {
+      return QueryInformation(process_handle, InformationClass::info_class_type, info, info_length, std::nullptr);
+    }
+  protected:
+    InformationClass info;
+  };
+
+  /// write-only policy
+  template<class                        InformationClass,
+          query_process_information_t   QueryInformation>
+  struct query_process_information_policy<InformationClass, QueryInformation, true>
+  {
+    static __forceinline
+      ntstatus
+      _query(
+      legacy_handle,
+      void *,
+      uint32_t
+      )
+    {
+      return status::invalid_info_class;
+    }
+  protected:
+    int info; // dummy
+  };
 
   template <class                       InformationClass,
-            set_process_information_t   SetInformation>
-  struct default_set_process_information_policy
+            set_process_information_t   SetInformation,
+            bool                        read_only>
+  struct set_process_information_policy
   {
     static const bool is_read_only = false;
 
@@ -115,17 +187,17 @@ namespace aux
   };
 
   template <class                       InformationClass,
-  set_process_information_t             SetInformation>
-  struct ro_set_process_information_policy
+            set_process_information_t   SetInformation>
+  struct set_process_information_policy<InformationClass, SetInformation, true>
   {
     static const bool is_read_only = true;
 
     static __forceinline
       ntstatus
       _set(
-      legacy_handle   process_handle,
-      const void *    info,
-      uint32_t        info_length
+      legacy_handle,
+      const void *,
+      uint32_t
       )
     {
       return status::invalid_info_class;
@@ -138,15 +210,16 @@ template <class                       InformationClass,
           query_process_information_t QueryInformation,
           set_process_information_t   SetInformation>
 struct process_information_base:
-  std::conditional< std::is_base_of<aux::read_only, InformationClass>::value,
-    aux::ro_set_process_information_policy<InformationClass, SetInformation>,
-    aux::default_set_process_information_policy<InformationClass, SetInformation> >::type
+  aux::query_process_information_policy<InformationClass, QueryInformation, std::is_base_of<aux::write_only, InformationClass>::value>,
+  aux::set_process_information_policy<InformationClass, SetInformation, std::is_base_of<aux::read_only, InformationClass>::value>
 {
     typedef InformationClass info_class;
 
     process_information_base(legacy_handle process_handle) __ntl_nothrow
-    : status_(_query(process_handle, &info, sizeof(info)))
-    {/**/}
+    {
+      static_assert((std::is_base_of<aux::write_only, InformationClass>::value == false), "Cannot query a write-only information class");
+      status_ = _query(process_handle, &info, sizeof(info));
+    }
 
     process_information_base(
       legacy_handle       process_handle,
@@ -166,25 +239,12 @@ struct process_information_base:
 
     operator ntstatus() const { return status_; }
 
-    static __forceinline
-    ntstatus
-      _query(
-        legacy_handle   process_handle,
-        void *          info,
-        uint32_t        info_length
-        )
-    {
-      uint32_t return_length;
-      return QueryInformation(process_handle, info_class::info_class_type, info, info_length, &return_length);
-    }
 
 
   ///////////////////////////////////////////////////////////////////////////
   private:
 
     ntstatus    status_;
-    info_class  info;
-
 }; //class process_information_base
 
 
@@ -214,7 +274,7 @@ struct process_information
 # pragma pack(push, 8)
 #endif
 
-///\name   ProcessBasicInformation == 0
+///\name  ProcessBasicInformation == 0
 struct process_basic_information: aux::read_only
 {
   static const process_information_class info_class_type = ProcessBasicInformation;
@@ -227,7 +287,7 @@ struct process_basic_information: aux::read_only
   legacy_handle InheritedFromUniqueProcessId;
 };
 
-///\name   ProcessTimes == 4
+///\name  ProcessTimes == 4
 struct kernel_user_times: aux::read_only
 {
   static const process_information_class info_class_type = ProcessTimes;
@@ -238,7 +298,19 @@ struct kernel_user_times: aux::read_only
   int64_t UserTime;
 };
 
-///\name ProcessSessionInformation = 24
+///\name  ProcessBasePriority == 5
+struct process_base_priority_information: aux::write_only
+{
+  static const process_information_class info_class_type = ProcessBasePriority;
+
+  km::kpriority BasePriority;
+
+  process_base_priority_information(uint32_t priority)
+    :BasePriority(priority)
+  {}
+};
+
+///\name  ProcessSessionInformation = 24
 struct process_session_information
 {
   static const process_information_class info_class_type = ProcessSessionInformation;

@@ -61,7 +61,6 @@ inline clock_t clock(void)
   // unfortunately the best solution for the current function's specification does not works:
   // we can't retrieve the current process times except for create time field.
   const ntl::nt::process_information<ntl::nt::kernel_user_times> process_times;
-  ntl::nt::process_information<ntl::nt::process_session_information> session(ntl::nt::current_process(), 0);
   return process_times ? (ntl::nt::query_system_time() - process_times->CreateTime) : clock_t(-1);
 }
 
