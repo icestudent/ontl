@@ -20,7 +20,7 @@ namespace std {
  *@{*/
 
   // 100ns (10^-7)
-#define CLOCKS_PER_SEC 10000000
+#define CLOCKS_PER_SEC system_time_resolution
 
 typedef ntl::nt::systime_t clock_t;
 typedef ntl::nt::systime_t time_t;
