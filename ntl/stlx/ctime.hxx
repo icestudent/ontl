@@ -34,15 +34,15 @@ struct tm
   int tm_min;
   /** hours since midnight [0, 23] */
   int tm_hour;
-  /** day of the month — [1, 31] */
+  /** day of the month [1, 31] */
   int tm_mday;
-  /** months since January — [0, 11] */
+  /** months since January [0, 11] */
   int tm_mon; 
   /** years since 1900 */
   int tm_year; 
-  /** days since Sunday — [0, 6] */
+  /** days since Sunday [0, 6] */
   int tm_wday; 
-  /** days since January 1 — [0, 365] */
+  /** days since January 1 [0, 365] */
   int tm_yday; 
   /** Daylight Saving Time flag */
   int tm_isdst; 
