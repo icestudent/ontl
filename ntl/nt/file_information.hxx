@@ -159,7 +159,7 @@ struct file_information_base
     ntstatus    status_;
     info_class  info;
 
-};//class file_information
+};//class file_information_base
 
 
 template<class InformationClass>
@@ -168,7 +168,7 @@ struct file_information
                                 NtQueryInformationFile,
                                 NtSetInformationFile>
 {
-  file_information(legacy_handle file_handle) __ntl_nothrow
+  explicit file_information(legacy_handle file_handle) __ntl_nothrow
   : file_information_base<InformationClass, NtQueryInformationFile, NtSetInformationFile>(file_handle)
   {/**/}
 

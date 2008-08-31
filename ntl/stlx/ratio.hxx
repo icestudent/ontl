@@ -54,24 +54,24 @@ namespace std
   //typedef ratio<1, 1000000000000000000000000> yocto; // see 20.3.4
   //typedef ratio<1,    1000000000000000000000> zepto; // see 20.3.4
 #ifndef SMALL_RATIO
-  typedef ratio<1,       1000000000000000000> atto;
-  typedef ratio<1,          1000000000000000> femto;
-  typedef ratio<1,             1000000000000> pico;
+  typedef ratio<1,       1000000000000000000> atto;   // 10^-18
+  typedef ratio<1,          1000000000000000> femto;  // 10^-15
+  typedef ratio<1,             1000000000000> pico;   // 10^-12
 #endif
-  typedef ratio<1,                1000000000> nano;
-  typedef ratio<1,                   1000000> micro;
-  typedef ratio<1,                      1000> milli;
-  typedef ratio<1,                       100> centi;
-  typedef ratio<1,                        10> deci;
-  typedef ratio<                       10, 1> deca;
-  typedef ratio<                      100, 1> hecto;
-  typedef ratio<                     1000, 1> kilo;
-  typedef ratio<                  1000000, 1> mega;
-  typedef ratio<               1000000000, 1> giga;
+  typedef ratio<1,                1000000000> nano;   // 10^-9
+  typedef ratio<1,                   1000000> micro;  // 10^-6
+  typedef ratio<1,                      1000> milli;  // 10^-3
+  typedef ratio<1,                       100> centi;  // 10^-2
+  typedef ratio<1,                        10> deci;   // 10^-1
+  typedef ratio<                       10, 1> deca;   // 10^1
+  typedef ratio<                      100, 1> hecto;  // 10^2
+  typedef ratio<                     1000, 1> kilo;   // 10^3
+  typedef ratio<                  1000000, 1> mega;   // 10^6
+  typedef ratio<               1000000000, 1> giga;   // 10^9
 #ifndef SMALL_RATIO
-  typedef ratio<            1000000000000, 1> tera;
-  typedef ratio<         1000000000000000, 1> peta;
-  typedef ratio<      1000000000000000000, 1> exa;
+  typedef ratio<            1000000000000, 1> tera;   // 10^12
+  typedef ratio<         1000000000000000, 1> peta;   // 10^15
+  typedef ratio<      1000000000000000000, 1> exa;    // 10^18
 #endif
   //typedef ratio<   1000000000000000000000, 1> zetta; // see 20.3.4
   //typedef ratio<1000000000000000000000000, 1> yotta; // see 20.3.4

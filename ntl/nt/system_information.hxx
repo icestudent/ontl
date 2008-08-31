@@ -21,9 +21,6 @@
 
 namespace ntl {
 
-  namespace km {
-    typedef long kpriority;
-  }
 
 namespace nt {
 
@@ -125,11 +122,20 @@ ntstatus __stdcall
   query_system_information_t(
     system_information_class  SystemInformationClass,
     void *                    SystemInformation,
-    unsigned long             SystemInformationLength,
-    unsigned long *           ReturnLength
+    uint32_t                  SystemInformationLength,
+    uint32_t *                ReturnLength
+    );
+
+typedef
+ntstatus __stdcall
+  set_system_information_t(
+    system_information_class  SystemInformationClass,
+    const void *              SystemInformation,
+    uint32_t                  SystemInformationLength
     );
 
 NTL__EXTERNAPI query_system_information_t NtQuerySystemInformation;
+NTL__EXTERNAPI set_system_information_t NtSetSystemInformation;
 
 
 ///\note  most of SystemInformationClasses have either big or variable size,

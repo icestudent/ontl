@@ -37,20 +37,9 @@ systime_t inline query_system_time()
   return user_shared_data::instance().SystemTime.get();
 }
 
-
-
-#ifdef NTL__SUPPRESS_IMPORTS
-__forceinline
-ntstatus NtQuerySystemTime(systime_t* SystemTime)
-{
-  *SystemTime = query_system_time();
-  return status::success;
-}
-#else
 NTL__EXTERNAPI 
 ntstatus __stdcall 
   NtQuerySystemTime(systime_t* SystemTime);
-#endif
 
 NTL__EXTERNAPI
 void __stdcall

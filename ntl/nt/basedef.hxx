@@ -16,6 +16,7 @@ namespace ntl {
 
   namespace km {
     typedef uintptr_t kaffinity_t;
+    typedef long kpriority;
   }
 
   namespace pe {

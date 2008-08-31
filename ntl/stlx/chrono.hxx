@@ -95,9 +95,21 @@ namespace std
     template <class Rep, class Period>
     class duration 
     {
+      template<class NotRatio>
+      struct is_ratio: false_type
+      {};
+      template <ratio_t Num, ratio_t Den>
+      struct is_ratio<ratio<Num, Den> >: true_type
+      {};
+    public:
+      static_assert(is_arithmetic<Rep>::value, "Rep shall be an arithmetic type or a class emulating an arithmetic type");
+      static_assert(is_ratio<Period>::value,   "Period shall be a specialization of ratio");
+      static_assert(Period::num >= 0,          "Period::num shall be positive");
+
     public:
       typedef Rep rep;
       typedef Period period;
+
     public:
       // 20.8.3.1 construct/copy/destroy
       duration()
@@ -393,6 +405,15 @@ namespace std
     template <class Clock, class Duration>
     class time_point
     {
+      template<class NotDuration>
+      struct is_duration: false_type
+      {};
+      template <class Rep, class Period>
+      struct is_duration<duration<Rep, Period> >: true_type
+      {};
+    public:
+      static_assert(is_duration<Duration>::value, "Duration shall be an instance of duration");
+
     public:
       typedef Clock clock;
       typedef Duration duration;
@@ -525,15 +546,18 @@ namespace std
     class system_clock
     {
     public:
-      typedef ntl::nt::systime_t rep;
+      typedef int64_t rep;
 
-      // period is 100 nanoseconds
-      typedef ratio_multiply<ratio<100>, nano>::type  period;
+      // The system clock time stored as 100 nanoseconds units.
+      // it customizable from 0,001 to 0,015625 sec (1 - 15,6 ms), 
+      // usualy 976,5us (microseconds), so an approximate value (10ms) was choosen.
+      typedef ratio_multiply<ratio<10>, milli>::type  period;
+
       typedef chrono::duration<rep, period>           duration;
       typedef chrono::time_point<system_clock>        time_point;
 
-      // NOTE: not sure about monotony
-      static const bool is_monotonic = true;
+      // NOTE: see the Table 54 (20.8.1), system time can be adjusted back.
+      static const bool is_monotonic = false;
     public:
 #ifdef NTL__CXX
       static_assert(duration::min() < duration::zero(), "20.8.5.1.2");
@@ -544,60 +568,98 @@ namespace std
       /** \c return the time_point representing a current date and time */
       static time_point now()
       {
+        typedef ratio_multiply<ratio<100>, nano>::type systime_unit;
+        typedef chrono::duration<ntl::nt::systime_t, systime_unit> systime_duration;
+        STATIC_ASSERT(systime_unit::den == 10000000); // 100ns is a 10^-7 of second
+        STATIC_ASSERT(period::den == 100); // 10ms is a 10^-2 (1/100) of second
+        STATIC_ASSERT(( ratio_divide<period, systime_unit>::type::num == 100000 )); // 10ms is in 100 000 times greater than 100ns
+
         const ntl::nt::systime_t ntime = ntl::nt::query_system_time();
-        return time_point(duration(ntime));
+        //const systime_duration sd(ntime);
+        //const duration d = duration_cast<duration>(sd);
+        //const time_point tp(d);
+        //return tp;
+        return time_point( duration_cast<duration>(systime_duration(ntime)) );
       }
 
-      // Map to C API
-      /** \return A \c time_t object that represents the same point in time as t when both values are truncated to the coarser
-        of the precisions of \c time_t and time_point */
+      /**
+       *  A \c time_t object that represents the same point in time as \c t when both values are truncated to the coarser
+       *  of the precisions of \c time_t and time_point.
+       *  @note Precision of \c time_t less than precision of time_point.
+       **/
       static time_t to_time_t (const time_point& t)
       {
-        // Number of 100 nanosecond units from 1/1/1601 to 1/1/1970
-        typedef ratio_divide<ratio<116444736>, nano>::type epochdiff_t;
-        STATIC_ASSERT(epochdiff_t::num == 116444736000000000i64);
+        // Number of seconds from 1/1/1601 to 1/1/1970 in 10ms units (see system_clock::period) (10ms = 1 centisecond)
+        typedef ratio_divide<ratio_multiply<ratio<116444736>, hecto>::type, centi>::type epochdiff_t;
+        STATIC_ASSERT(epochdiff_t::num == 1164447360000i64);
 
         static const system_clock::duration diff(epochdiff_t::num);
         return duration_cast<chrono::seconds>(t.time_since_epoch() - diff).count();
       }
 
-      /** \return A \c time_point object that represents the same point in time as t when both values are truncated to the coarser 
-        of the precisions of \c time_t and time_point */
+      /**
+       *  A \c time_point object that represents the same point in time as \c t when both values are truncated to the coarser 
+       *  of the precisions of \c time_t and time_point.
+       *  @note Precision of \c time_t less than precision of time_point.
+       **/
       static time_point from_time_t(time_t t)
       {
-        typedef ratio_divide<ratio<116444736>, nano>::type epochdiff_t;
-        STATIC_ASSERT(epochdiff_t::num == 116444736000000000i64);
-
+        // Number of seconds from 1/1/1601 to 1/1/1970 in 10ms units (see system_clock::period) (10ms = 1 centisecond)
+        typedef ratio_divide<ratio_multiply<ratio<116444736>, hecto>::type, centi>::type epochdiff_t;
+        STATIC_ASSERT(epochdiff_t::num == 1164447360000i64);
+        typedef chrono::time_point<system_clock, chrono::seconds> seconds_time_point;
         static const system_clock::duration diff(epochdiff_t::num);
 
-        typedef chrono::time_point<system_clock, chrono::seconds> seconds_time_point;
-        // NOTE: c++ recognize `seconds_time_point from_tp(chrono::seconds(t))` as function declaration, so we need an alternate way:
+        // NOTE: c++ recognizes `seconds_time_point from_tp(chrono::seconds(t))` as function declaration, so we need an alternate way:
         //  const seconds_time_point from_tp((chrono::seconds(t))) OR
         const seconds_time_point from_tp(static_cast<chrono::seconds>(t));
         return time_point(duration_cast<duration>(from_tp.time_since_epoch()) + diff);
       }
     };
 
-#if 0
+
+
     /**
      *	@brief Class monotonic_clock [20.8.5.2 time.clock.monotonic]
      *  Objects of class monotonic_clock represent clocks for which values of time_point never decrease as physical time
-     *  advances. monotonic_clock may be a synonym for system_clock.
+     *  advances.
+     *
+     *  @note It is monotonic non-decreasing clock (see the http://www.rtsj.org/specjavadoc/timers_overview-summary.html for information)
      **/
     class monotonic_clock 
     {
     public:
-      typedef unspecified rep;
-      typedef ratio<unspecified, unspecified> period;
-      typedef chrono::duration<rep, period> duration;
-      typedef chrono::time_point<unspecified, duration> time_point;
+      typedef int64_t rep;
+
+      // period is 10 ms
+      typedef ratio_multiply<ratio<10>, milli>::type  period;
+      typedef chrono::duration<rep, period>           duration;
+
+      typedef chrono::time_point<monotonic_clock>     time_point;
+
       static const bool is_monotonic = true;
     public:
-      /** \c return the time_point representing a current date and time */
-      static time_point now();
+#ifdef NTL__CXX
+      static_assert(duration::min() < duration::zero(), "20.8.5.1.2");
+#else
+      static_assert(numeric_limits<duration::rep>::is_signed, "20.8.5.1.2");
+#endif
+
+      /** \c return the time_point representing a current monotonic time */
+      static time_point now()
+      {
+        typedef ratio_multiply<ratio<100>, nano>::type systime_unit;
+        typedef chrono::duration<ntl::nt::systime_t, systime_unit> systime_duration;
+        STATIC_ASSERT(systime_unit::den == 10000000); // 100ns is a 10^-7 of second
+        STATIC_ASSERT(period::den == 100); // 10ms is a 10^-2 (1/100) of second
+        STATIC_ASSERT(( ratio_divide<period, systime_unit>::type::num == 100000 )); // 10ms is in 100 000 times greater than 100ns
+
+        const ntl::nt::systime_t ntime = ntl::user_shared_data::instance().InterruptTime.get();
+        return time_point( duration_cast<duration>(systime_duration(ntime)) );
+      }
     };
 
-
+#if 0
     /**
      *	@brief Class high_resolution_clock [20.8.5.3 time.clock.hires]
      *  Objects of class high_resolution_clock represent clocks with the shortest tick period.
@@ -605,11 +667,13 @@ namespace std
     class high_resolution_clock
     {
     public:
-      typedef unspecified rep;
+      typedef uint64_t rep;
+
       typedef ratio<unspecified, unspecified> period;
       typedef chrono::duration<rep, period> duration;
       typedef chrono::time_point<unspecified, duration> time_point;
-      static const bool is_monotonic;
+
+      static const bool is_monotonic = true;
     public:
       /** \c return the time_point representing a current date and time */
       static time_point now();

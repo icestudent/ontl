@@ -103,7 +103,8 @@ NTL__EXTERNAPI
 control_thread_t NtSuspendThread;
 
 
-enum thread_info_class {
+enum thread_info_class 
+{
   ThreadBasicInformation,
   ThreadTimes,
   ThreadPriority,

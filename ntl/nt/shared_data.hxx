@@ -127,11 +127,14 @@ public:
             uint32_t      SystemCall;
             uint32_t      SystemCallReturn;
             uint64_t      SystemCallPad[3];
+
+            // xpsp2+
   union {
     volatile system_time  TickCount;
     volatile uint64_t     TickCountQuad;
   };
             uint32_t      Cookie;
+
 };
 STATIC_ASSERT(sizeof(shared_data_32) == 0x338 );
 

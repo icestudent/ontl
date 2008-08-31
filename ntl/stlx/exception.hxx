@@ -20,7 +20,7 @@ namespace std {
 /**\addtogroup  lib_language_support *** Language support library [18] ******
  *@{*/
 
-/**\defgroup  lib_support_exception **** Exception handling [18.6] **********
+/**\defgroup  lib_support_exception **** Exception handling [18.7] **********
  *@{*/
 
 /// 18.7.1 Class exception [exception]
@@ -34,7 +34,7 @@ class exception
     virtual const char* what() const __ntl_nothrow { return "exception"; }
 };
 
-/// Class bad_exception [18.6.2.1 lib.bad.exception]
+/// Class bad_exception [18.7.2.1 lib.bad.exception]
 class bad_exception : public exception
 {
   public:
@@ -45,28 +45,74 @@ class bad_exception : public exception
     virtual const char* what() const __ntl_nothrow { return "bad_exception"; }
 };
 
-/// Type unexpected_handler [18.6.2.2 lib.unexpected.handler]
-/// @note an unexpected_handler shall not return.
-typedef void (*unexpected_handler)();
+  /// Type unexpected_handler [18.7.2.2 unexpected.handler]
+  /// @note an unexpected_handler shall not return.
+  typedef void (*unexpected_handler)();
 
-/// set_unexpected [18.6.2.3 lib.set.unexpected]
-unexpected_handler set_unexpected(unexpected_handler f) __ntl_nothrow;
+  /// set_unexpected [18.7.2.3 set.unexpected]
+  unexpected_handler set_unexpected(unexpected_handler f) __ntl_nothrow;
 
-/// unexpected [18.6.2.4 lib.unexpected]
-void unexpected();
+  /// unexpected [18.7.2.4 unexpected]
+  void unexpected();
 
-/// Type terminate_handler [18.6.3.1 lib.terminate.handler]
-typedef void (*terminate_handler)();
 
-/// set_terminate [18.6.3.2 lib.set.terminate]
-terminate_handler set_terminate(terminate_handler f) __ntl_nothrow;
+  /// Type terminate_handler [18.7.3.1 terminate.handler]
+  typedef void (*terminate_handler)();
 
-/// terminate [18.6.3.3 lib.terminate]
-__declspec(noreturn)
-void terminate();
+  /// set_terminate [18.7.3.2 set.terminate]
+  terminate_handler set_terminate(terminate_handler f) __ntl_nothrow;
 
-/// uncaught_exception [18.6.4 lib.uncaught]
-bool uncaught_exception() __ntl_nothrow;
+  /// terminate [18.7.3.3 terminate]
+  __declspec(noreturn)
+  void terminate();
+
+
+  /// uncaught_exception [18.7.4 uncaught]
+  bool uncaught_exception() __ntl_nothrow;
+
+
+  /// Exception Propagation [18.7.5 propagation]
+  /// 
+  typedef struct __exception_ptr { } exception_ptr;
+
+  exception_ptr current_exception();
+
+  void rethrow_exception(exception_ptr e);
+
+  template<class E>
+  exception_ptr copy_exception(E e);
+
+  /// nested_exception [18.7.6 except.nested]
+  class nested_exception
+  {
+  public:
+    nested_exception() throw()
+      :e(current_exception())
+    {}
+
+  #ifdef NTL__CXX
+    nested_exception(const nested_exception&) throw() = default;
+    nested_exception& operator=(const nested_exception&) throw() = default;
+    virtual ~nested_exception() = default;
+  #else
+    // default generated
+  #endif
+
+    // access functions
+    void rethrow_nested() const; // [[noreturn]]
+    exception_ptr nested_ptr() const { return e; }
+
+  private:
+    exception_ptr e;
+  };
+
+#ifdef NTL__CXX
+  template<class T> void throw_with_nested(T&& t); // [[noreturn]]
+#else
+  template<class T> void throw_with_nested(T& t); // [[noreturn]]
+#endif
+
+  template <class E> void rethrow_if_nested(const E& e);
 
 /**@} lib_support_exception */
 /**@} lib_language_support */
