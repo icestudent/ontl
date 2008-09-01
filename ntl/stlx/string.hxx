@@ -416,8 +416,8 @@ class basic_string
 
     ///\name  basic_string::operator+= [21.3.6.1 lib.string::op+=]
     basic_string& operator+=(const basic_string& str) { return append(str); }
-    template<typename charPtr>
-    basic_string& operator+=(const charPtr& s)        { return append(s, traits_type::length(s)); }
+    template<typename charT>
+    basic_string& operator+=(const charT* const& s)   { return append(s, traits_type::length(s)); }
     template<size_t Size>
     basic_string& operator+=(const charT(&s)[Size])   { return append(s, Size-1); }
     basic_string& operator+=(charT c) { push_back(c); return *this; }
@@ -426,8 +426,8 @@ class basic_string
 
     template<size_t Size>
     basic_string& operator+=(charT(&s)[Size])         { return append(s, Size-1); }
-    template<typename charPtr>
-    basic_string& operator+=(charPtr& s)              { return append(s, traits_type::length(s));     }
+    template<typename charT>
+    basic_string& operator+=(const charT* const& s)   { return append(s, traits_type::length(s));     }
 
   template<class String>
     basic_string& operator+=(const String& str)
