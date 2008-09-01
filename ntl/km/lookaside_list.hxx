@@ -92,7 +92,7 @@ struct npaged_lookaside_list : public general_lookaside
 
     typedef CellType  value_type;
 
-  explicit 
+  explicit
   npaged_lookaside_list(
     allocate_function_t *   Allocate    = 0,
     free_function_t *       Free        = 0,

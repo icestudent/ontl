@@ -114,7 +114,7 @@ struct csr_setpriority_class_msg {
   uint32_t PriorityClass;
 };
 
-struct csr_callback_info 
+struct csr_callback_info
 {
     uint32_t ApiNumberBase;
     uint32_t MaxApiNumber;
@@ -153,7 +153,7 @@ struct csr_api_msg {
 // fields if prior to accepting the connection.
 //
 
-struct basesrv_api_connectinfo 
+struct basesrv_api_connectinfo
 {
   uint32_t ExpectedVersion;
   legacy_handle DefaultObjectDirectory;

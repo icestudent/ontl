@@ -44,9 +44,9 @@ class basic_istream : virtual public basic_ios<charT, traits>
     {
       basic_ios::init(sb);
     }
-    
+
     //basic_istream(basic_istream&& rhs);
-    
+
     virtual ~basic_istream() {/**/}
 
     // 27.6.1.1.2 Class basic_istream assign and swap [istream.assign]
@@ -85,7 +85,7 @@ class basic_istream : virtual public basic_ios<charT, traits>
 
         //basic_istream<charT, traits>& is;
         bool ok_;
-        
+
         sentry(const sentry&); // not defined
         sentry& operator=(const sentry&); // not defined
 
@@ -120,7 +120,7 @@ class basic_istream : virtual public basic_ios<charT, traits>
     {
       return pf(*this);
     }
- 
+
     basic_istream<charT, traits>&
       operator>>(ios_base& (*pf)(ios_base&))
     {
@@ -133,7 +133,7 @@ class basic_istream : virtual public basic_ios<charT, traits>
     ///\todo non-member operator>>
 
     ///\name 27.6.1.3 Unformatted input functions [istream.unformatted]
-    
+
     streamsize gcount() const { return ccount; }
 
     int_type get()
@@ -158,7 +158,7 @@ class basic_istream : virtual public basic_ios<charT, traits>
       this->setstate(state);
       return c;
     }
-    
+
     basic_istream<charT,traits>& get(char_type& c)
     {
       const int_type ic = get();
@@ -166,12 +166,12 @@ class basic_istream : virtual public basic_ios<charT, traits>
         c = traits_type::to_char_type(ic);
       return *this;
     }
-    
+
     basic_istream<charT,traits>& get(char_type* s, streamsize n)
     {
       return get(s, n, this_base::widen('\n'));
     }
-    
+
     basic_istream<charT,traits>& get(char_type* s, streamsize n, char_type delim)
     {
       ccount = 0;
@@ -203,7 +203,7 @@ class basic_istream : virtual public basic_ios<charT, traits>
       this->setstate(state | ccount ? state : ios_base::failbit);
       return *this;
     }
-    
+
     basic_istream<charT,traits>& get(basic_streambuf<char_type,traits>& sb)
     {
       return get(sb, this_base::widen('\n'));
@@ -238,7 +238,7 @@ class basic_istream : virtual public basic_ios<charT, traits>
       this->setstate(state | ccount ? state : ios_base::failbit);
       return *this;
     }
-    
+
     basic_istream<charT,traits>& getline(char_type* s, streamsize n)
     {
       return getline(s, this_base::widen('\n'));
@@ -246,9 +246,9 @@ class basic_istream : virtual public basic_ios<charT, traits>
 
     basic_istream<charT,traits>& getline(char_type* s, streamsize n, char_type delim)
     ;
-    
+
     basic_istream<charT,traits>& ignore(streamsize n = 1, int_type delim = traits::eof());
-    
+
     int_type peek()
     {
       ccount = 0;
@@ -269,7 +269,7 @@ class basic_istream : virtual public basic_ios<charT, traits>
       this->setstate(state);
       return c;
     }
-    
+
     basic_istream<charT,traits>& read(char_type* s, streamsize n);
     streamsize readsome(char_type* s, streamsize n);
     basic_istream<charT,traits>& putback(char_type c);
@@ -314,7 +314,7 @@ class basic_iostream
 : public basic_istream<charT, traits>, public basic_ostream<charT, traits>
 {
   public:
-  
+
     ///\name Types
 
     typedef charT char_type;

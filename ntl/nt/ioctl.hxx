@@ -155,7 +155,7 @@ struct ioctl
 
 } // ioctl
 
-typedef 
+typedef
 ntstatus __stdcall
   control_file_t(
     legacy_handle FileHandle,

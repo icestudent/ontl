@@ -74,7 +74,7 @@ typedef uint32_t char32_t;
  *@{*/
 
 ///\name  Limits of exact-width integer types 7.18.2.1
-#define INT8_MIN          SCHAR_MIN 
+#define INT8_MIN          SCHAR_MIN
 #define INT8_MAX          SCHAR_MAX
 #define UINT8_MAX         UCHAR_MAX
 

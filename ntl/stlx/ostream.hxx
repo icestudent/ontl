@@ -46,7 +46,7 @@ class basic_ostream
 
     ///\name  27.6.2.2 basic_ostream constructors [ostream.cons]
     /// 1 Effects: Constructs an object of class basic_ostream, assigning
-    ///   initial values to the base class by calling 
+    ///   initial values to the base class by calling
     ///   basic_ios<charT,traits>::init(sb) (27.4.4.1).
     /// 2 Postcondition: rdbuf() == sb.
     explicit basic_ostream(basic_streambuf<char_type, traits>* sb)
@@ -112,7 +112,7 @@ class basic_ostream
 
         basic_ostream<charT, traits>& os;
         bool ok;
-        
+
 
         sentry(const sentry&); // not defined
         sentry& operator=(const sentry&); // not defined
@@ -123,7 +123,7 @@ class basic_ostream
     /// 1 Returns: if fail() != false, returns pos_type(-1) to indicate failure.
     ///   Otherwise, returns rdbuf()->pubseekoff(0, cur, out).
     pos_type tellp()
-    { 
+    {
       return this->fail() ? pos_type(-1) : this->rdbuf()->pubseekoff(0, cur, out);
     }
 
@@ -162,7 +162,7 @@ class basic_ostream
     ///   the result of the formattted output function is *this.
     /// 2 The descriptions of the individual formatted output operations describe
     ///   how they perform output and do not mention the sentry object.
-    
+
     ///\name  27.6.2.6.2 Arithmetic Inserters [ostream.inserters.arithmetic]
     /// 1 Effects: The classes num_get<> and num_put<> handle locale-dependent
     ///   numeric formatting and parsing. These inserter functions use the imbued
@@ -218,7 +218,7 @@ class basic_ostream
       return pf(*this);
     }
 
-    basic_ostream<charT, traits>& 
+    basic_ostream<charT, traits>&
       operator<<(basic_ios<charT, traits>& (*pf)(basic_ios<charT, traits>&))
     {
       pf(*this);
@@ -284,7 +284,7 @@ class basic_ostream
     ///   Otherwise, if the sentry object returns false, does nothing.
     /// 8 Returns: *this.
     basic_ostream<charT, traits>& flush()
-    { 
+    {
       if ( this->rdbuf() )
       {
         ///\note no sentry as it'll result in recursive call
@@ -374,7 +374,7 @@ basic_ostream<charT, traits>&
   ends(basic_ostream<charT, traits>& os)
 {
   os.put(charT());
-  return os;  
+  return os;
 }
 
 template <class charT, class traits>

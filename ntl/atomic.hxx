@@ -35,29 +35,29 @@ namespace atomic {
 
 static inline
 unsigned long
-  increment(volatile unsigned long & val) 
-{ 
+  increment(volatile unsigned long & val)
+{
   return intrinsic::_InterlockedIncrement(&val);
 }
 
 static inline
 unsigned long
-  decrement(volatile unsigned long & val) 
-{ 
+  decrement(volatile unsigned long & val)
+{
   return intrinsic::_InterlockedDecrement(&val);
 }
 
 static inline
 unsigned long
-  exchange(volatile unsigned long & target, unsigned long val) 
-{ 
+  exchange(volatile unsigned long & target, unsigned long val)
+{
   return intrinsic::_InterlockedExchange(&target, val);
 }
 
 static inline
 unsigned long
-  exchange_add(volatile unsigned long & target, unsigned long val) 
-{ 
+  exchange_add(volatile unsigned long & target, unsigned long val)
+{
   return intrinsic::_InterlockedExchangeAdd(&target, val);
 }
 
@@ -65,7 +65,7 @@ static inline
 unsigned long
   compare_exchange(volatile unsigned long & dest, unsigned long exchange,
                    unsigned long comperand)
-{ 
+{
   return intrinsic::_InterlockedCompareExchange(&dest, exchange, comperand);
 }
 
@@ -85,11 +85,11 @@ struct atomic_t
     unsigned long operator--() { return atomic::decrement(value); }
     void operator+=(unsigned long val) { exchange_add(val); }
     void operator-=(unsigned long val) { exchange_add(0 - val); }
-    unsigned long exchange(unsigned long val) 
+    unsigned long exchange(unsigned long val)
       { return atomic::exchange(value, val); }
-    unsigned long exchange_add(unsigned long val) 
+    unsigned long exchange_add(unsigned long val)
       { return atomic::exchange_add(value, val); }
-    unsigned long exchange_if_equal(unsigned long val, unsigned long comperand) 
+    unsigned long exchange_if_equal(unsigned long val, unsigned long comperand)
       { return atomic::compare_exchange(value, val, comperand); }
 
   private: unsigned long volatile value;
@@ -127,8 +127,8 @@ class atomic_exec
 
     Lock & lock;
     T      r;
-}; 
-  
+};
+
 
 template <class Lock>
 class atomic_exec<Lock, void>
@@ -142,7 +142,7 @@ class atomic_exec<Lock, void>
     explicit
     atomic_exec(Lock & lock)
     : lock(lock)
-    { 
+    {
       lock.acquire();
     }
 
@@ -150,14 +150,14 @@ class atomic_exec<Lock, void>
     explicit
     atomic_exec(AnyLock & lock)
     : lock(*static_cast<Lock*>(&lock))
-    { 
+    {
       this->lock.acquire();
     }
 
     explicit
     atomic_exec(Lock * lock)
     : lock(*lock)
-    { 
+    {
       lock.acquire();
     }
 
@@ -165,7 +165,7 @@ class atomic_exec<Lock, void>
     explicit
     atomic_exec(AnyLock * lock)
     : lock(*static_cast<Lock*>(lock))
-    { 
+    {
       this->lock.acquire();
     }
 
@@ -178,8 +178,8 @@ class atomic_exec<Lock, void>
 
     Lock & lock;
 
-}; 
-  
+};
+
 
 
 }//namespace ntl

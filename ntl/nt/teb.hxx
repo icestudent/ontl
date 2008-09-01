@@ -101,7 +101,7 @@ struct teb: public tib
       ntl::intrinsic::__readgsbyte
 #endif
       ((uint32_t)offsetof(teb,*member));
-  }  
+  }
   template<typename type>
   static inline type get(type teb::* member, Int2Type<sizeof(uint16_t)>)
   {
@@ -112,7 +112,7 @@ struct teb: public tib
       ntl::intrinsic::__readgsword
 #endif
       ((uint32_t)offsetof(teb,*member));
-  }  
+  }
   template<typename type>
   static inline type get(type teb::* member, Int2Type<sizeof(uint32_t)>)
   {
@@ -123,7 +123,7 @@ struct teb: public tib
       ntl::intrinsic::__readgsdword
 #endif
       ((uint32_t)offsetof(teb,*member));
-  }  
+  }
   template<typename type>
   static inline type get(type teb::* member, Int2Type<sizeof(uint64_t)>)
   {
@@ -146,9 +146,9 @@ struct teb: public tib
 #elif defined(_M_X64)
       v = ntl::intrinsic::__readgsqword((uint32_t)offsetof(teb,*member));
 #endif
-      
+
     return t;
-  }  
+  }
   template<typename type>
   static inline type get(type teb::* member)
   {
@@ -204,7 +204,7 @@ struct teb: public tib
 
   template<typename type, typename type2>
   static inline
-  void set(type teb::* member, type2 value) 
+  void set(type teb::* member, type2 value)
   {
     set(member, value, Int2Type<sizeof(type)>());
   }

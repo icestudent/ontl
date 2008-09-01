@@ -11,7 +11,7 @@
 #include "type_traits.hxx"
 #include "climits.hxx" // for RATIO_MAX, RATIO_MIN
 
-namespace std 
+namespace std
 {
 /**\defgroup  lib_utilities *** 20 General utilities library [utilities] *****
  *
@@ -118,11 +118,11 @@ namespace std
    *
    *  @tparam N numenator of the ratio
    *  @tparam D denominator of the ratio, which are always positive and default to 1
-   *  @note Negative ratios represented as negative numenator and \e positive denominator: 
+   *  @note Negative ratios represented as negative numenator and \e positive denominator:
    *  ratio is always normalized such that it is expressed in lowest terms, and the denominator is always positive.
    **/
   template <ratio_t N, ratio_t D>
-  class ratio 
+  class ratio
   {
     static const ratio_t gcd_value = detail::static_evaluation::gcd<N, D>::value;
   public:
@@ -131,7 +131,7 @@ namespace std
 
     /**
      *	@brief Numerator of the ratio
-     *  \c num shall have the value \f$ sign(N)*sign(D)*abs(N)/gcd \f$, 
+     *  \c num shall have the value \f$ sign(N)*sign(D)*abs(N)/gcd \f$,
      *  but \f$ sign(N)*abs(N) == N \f$.
      **/
     static const ratio_t num = N * detail::static_evaluation::sign<D>::value / gcd_value;
@@ -206,7 +206,7 @@ namespace std
       conditional< static_evaluation::is_negative<a>::value || static_evaluation::is_negative<b>::value,
         typename conditional< static_evaluation::is_negative<a>::value && static_evaluation::is_negative<b>::value,
           check_add_overflow_impl<a, b, true>,
-          check_sub_underflow<a, b> 
+          check_sub_underflow<a, b>
                    >::type,
         check_add_overflow_impl<a, b, false>
                  >::type
@@ -288,7 +288,7 @@ namespace std
     static_assert(a1 * b2 + b1 * a2 < (c >> 1), "mul overflow");
     static_assert(a1 * b1 <= RATIO_MAX, "mul overflow");
     static_assert((a1 * b2 + b1 * a2) * c <= RATIO_MAX - a1 * b1, "mul overflow");
-  
+
   public:
     static const ratio_t value = a * b;
 
@@ -299,7 +299,7 @@ namespace std
    *  @internal To prevent a potential but unnecessary overflow a simplification algorithm used here
    **/
   template <class R1, class R2>
-  struct ratio_add 
+  struct ratio_add
   {
   private:
     static const intmax_t dens_gcd = detail::static_evaluation::gcd<R1::den, R2::den>::value;
@@ -315,9 +315,9 @@ namespace std
 
   /** static substraction with overflow detection and simplification */
   template <class R1, class R2>
-  struct ratio_subtract 
+  struct ratio_subtract
   {
-    typedef typename 
+    typedef typename
       ratio_add<R1, ratio<-R2::num, R2::den> >::type type;
   };
 
@@ -330,7 +330,7 @@ namespace std
       gcd2 = detail::static_evaluation::gcd<R2::num, R1::den>::value;
   public:
     typedef ratio<
-      ratio_checked_multiply<R1::num / gcd1, R2::num / gcd2>::value, 
+      ratio_checked_multiply<R1::num / gcd1, R2::num / gcd2>::value,
       ratio_checked_multiply<R1::den / gcd2, R2::den / gcd1>::value
                  > type;
   };
@@ -349,15 +349,15 @@ namespace std
   /// 20.3.3 Comparison of ratio types [ratio.comparison]
 
   /** Check is two ratios are equal */
-  template <class R1, class R2> 
-  struct ratio_equal: 
+  template <class R1, class R2>
+  struct ratio_equal:
     integral_constant<bool, R1::num == R2::num && R1::den == R2::den>
   { };
 
   /** Check is two ratios are not equal */
-  template <class R1, class R2> 
+  template <class R1, class R2>
   struct ratio_not_equal:
-    integral_constant<bool, !ratio_equal<R1, R2>::value> 
+    integral_constant<bool, !ratio_equal<R1, R2>::value>
   { };
 
   namespace detail {
@@ -368,8 +368,8 @@ namespace std
   }
 
   /** Check is first ratio are less than second */
-  template <class R1, class R2> 
-  struct ratio_less: 
+  template <class R1, class R2>
+  struct ratio_less:
     conditional<
       R1::den == R2::den,
       integral_constant<bool, ((R1::num) < (R2::num)) >,
@@ -378,21 +378,21 @@ namespace std
   { };
 
   /** Check is first ratio are less or equal to second */
-  template <class R1, class R2> 
+  template <class R1, class R2>
   struct ratio_less_equal:
-    integral_constant<bool, !ratio_less<R2, R1>::value> 
+    integral_constant<bool, !ratio_less<R2, R1>::value>
   { };
 
   /** Check is first ratio are greater than second */
-  template <class R1, class R2> 
+  template <class R1, class R2>
   struct ratio_greater:
-    integral_constant<bool, ratio_less<R2, R1>::value> 
+    integral_constant<bool, ratio_less<R2, R1>::value>
   { };
 
   /** Check is first ratio are greater or equal than second */
-  template <class R1, class R2> 
+  template <class R1, class R2>
   struct ratio_greater_equal:
-    integral_constant<bool, !ratio_less<R1, R2>::value> 
+    integral_constant<bool, !ratio_less<R1, R2>::value>
   { };
 
   /**@} lib_utilities */

@@ -159,7 +159,7 @@ template <> struct aligner<sizeof(max_align_t)> { __declspec(align(8192)) class 
 
 template <std::size_t Len, std::size_t Align>
 struct aligned_storage
-{ 
+{
   union type
   {
     private: unsigned char __data[Len];
@@ -193,8 +193,8 @@ template <bool, class T = void> struct enable_if {};
 template <class T> struct enable_if<true, T> { typedef T type; };
 
 template <bool, class IfTrueType, class IfFalseType> struct conditional;
-template <class T, class F> struct conditional<true, T, F>  { typedef T type; }; 
-template <class T, class F> struct conditional<false, T, F> { typedef F type; }; 
+template <class T, class F> struct conditional<true, T, F>  { typedef T type; };
+template <class T, class F> struct conditional<false, T, F> { typedef F type; };
 
 
 // 20.5.4 Unary Type Traits [meta.unary]
@@ -321,7 +321,7 @@ struct is_member_function_pointer : public false_type {};
 #include "tt_ismemptr.inl"
 
 #undef NTL_TT_PCV
-#undef NTL_TT_TCV 
+#undef NTL_TT_TCV
 
 namespace test__impl {
 struct has_members
@@ -337,7 +337,7 @@ struct has_members
 }//namespace test__impl
 
 NTL__STLX_DEF_TRAIT(is_enum)
-  
+
 NTL__STLX_DEF_TRAIT(is_union)
 
 NTL__STLX_DEF_TRAIT(is_class)
@@ -454,7 +454,7 @@ template <class T> struct is_object
        && !is_function<T>::value
        > {};
 
-template <class T> struct is_member_pointer 
+template <class T> struct is_member_pointer
 : public integral_constant<
     bool, is_member_object_pointer<T>::value
        || is_member_function_pointer<T>::value
@@ -512,7 +512,7 @@ template <class T> struct is_pod
 _CHECK_TRAIT(is_pod<int>::value);
 
 NTL__STLX_DEF_TRAIT(is_empty)
-  
+
 NTL__STLX_DEF_TRAIT(is_polymorphic)
 
 NTL__STLX_DEF_TRAIT(is_abstract)
@@ -593,7 +593,7 @@ template <class T>
 struct common_type<T> { typedef T type; };
 
 template <class T, class U>
-struct common_type<T, U> 
+struct common_type<T, U>
 {
 private:
   static T&& __t();
@@ -603,7 +603,7 @@ public:
 };
 
 template <class T, class U, class... V>
-struct common_type<T, U, V...> 
+struct common_type<T, U, V...>
 {
   typedef typename common_type<typename common_type<T, U>::type, V...>::type type;
 };
@@ -613,7 +613,7 @@ struct common_type<T, U, V...>
 template<class T, class U = void, class V = void, class W = void>
 struct common_type;
 
-template <class T> 
+template <class T>
 struct common_type<T, void, void, void>
 {
   static_assert(sizeof(T) > 0, "T shall be complete");
@@ -642,7 +642,7 @@ public:
    *  2) if one of types is convertible to other, select other type
    *  3) else place the void
    **/
-  typedef 
+  typedef
     typename conditional<is_same<rawT, rawU>::value, rawT,
       typename conditional<is_arithmetic<rawT>::value && is_arithmetic<rawU>::value, typename conditional<(sizeof(T) < sizeof(U)), rawU, rawT>::type,
         typename conditional<is_convertible<rawT,rawU>::value, rawU,

@@ -55,7 +55,7 @@ struct binary_function
 #pragma region lib_refwrap
 /**\defgroup  lib_refwrap ***************** reference_wrapper [20.5.5] *******
  *
- *    reference_wrapper<T> is a CopyConstructible and Assignable wrapper 
+ *    reference_wrapper<T> is a CopyConstructible and Assignable wrapper
  *    around a reference to an object of type T.
  *@{
  */
@@ -246,7 +246,7 @@ struct logical_not : unary_function<T, bool>
  *@{
  **/
 
-template <class T> struct bit_and : binary_function<T,T,T> 
+template <class T> struct bit_and : binary_function<T,T,T>
 {
   T operator()(const T& x, const T& y) const
   {
@@ -262,7 +262,7 @@ template <class T> struct bit_or : binary_function<T,T,T>
   }
 };
 
-template <class T> struct bit_xor : binary_function<T,T,T> 
+template <class T> struct bit_xor : binary_function<T,T,T>
 {
   T operator()(const T& x, const T& y) const
   {
@@ -288,7 +288,7 @@ class unary_negate
     explicit unary_negate(const Predicate& pred) : pred(pred) {}
 
     bool operator()(const typename Predicate::argument_type& x) const
-    { 
+    {
       return ! pred(x);
     }
 };
@@ -378,7 +378,7 @@ class binder1st
               const typename Operation::first_argument_type& y)
     : op(x), value(y) {}
 
-    ///\note extended with remove_reference 
+    ///\note extended with remove_reference
     typename Operation::result_type
       operator()(const typename remove_reference<typename Operation::second_argument_type>::type& x) const
     {
@@ -409,7 +409,7 @@ class binder2nd
     binder2nd(const Operation& x,
               const typename Operation::second_argument_type& y)
     : op(x), value(y) {}
-    
+
     typename Operation::result_type
       operator()(const typename Operation::first_argument_type& x) const
     {

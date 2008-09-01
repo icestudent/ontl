@@ -279,7 +279,7 @@ struct file_information<file_rename_information>
   private:
 
     ntstatus    status_;
-    
+
 };
 
 

@@ -34,7 +34,7 @@ namespace std {
 #pragma intrinsic(memcmp, memcpy, memset, strcmp, strcpy, strlen, strcat)
 #endif
 
-__forceinline 
+__forceinline
 const void *
 NTL__CRTCALL
   memchr(const void * const mem, const int c, size_t n)
@@ -47,7 +47,7 @@ NTL__CRTCALL
   return 0;
 }
 
-__forceinline 
+__forceinline
 void *
 NTL__CRTCALL
   memchr(void * const mem, const int c, size_t n)
@@ -61,7 +61,7 @@ NTL__CRTCALL
 }
 
 #ifndef _MSC_VER
-__forceinline 
+__forceinline
 int
 NTL__CRTCALL
   memcmp(const void * s1, const void * s2, size_t n)
@@ -72,13 +72,13 @@ NTL__CRTCALL
   const unsigned char * p2 = reinterpret_cast<const unsigned char*>(s2);
   for ( const unsigned char * const end = p + n; p != end; ++p, ++p2 )
     if ( *p != *p2 ) return *p - *p2;
-  return 0;  
+  return 0;
 }
 #endif
 
 #ifndef _MSC_VER
 namespace x {
-__forceinline 
+__forceinline
 void *
   memcpy(void * const dst, const void * const src, size_t n)
 {
@@ -90,7 +90,7 @@ void *
   return d;
 } }
 
-__forceinline 
+__forceinline
 void *
 NTL__CRTCALL
   memcpy(void * const dst, const void * const src, size_t n)
@@ -103,7 +103,7 @@ NTL__CRTCALL
 #endif
 
 namespace x {
-__forceinline 
+__forceinline
 void *
   memcpybw(void * const dst, const void * const src, size_t n)
 {
@@ -115,7 +115,7 @@ void *
   return dst;
 } }
 
-__forceinline 
+__forceinline
 void *
 NTL__CRTCALL
   memmove(void * const dst, const void * const src, size_t n)
@@ -129,7 +129,7 @@ NTL__CRTCALL
 
 #ifndef _MSC_VER
 namespace x {
-__forceinline 
+__forceinline
 void *
   memset(void * const s, int c, size_t n)
 {
@@ -140,7 +140,7 @@ void *
   return p;
 } }
 
-__forceinline 
+__forceinline
 void *
 NTL__CRTCALL
   memset(void * const s, int c, size_t n)
@@ -156,7 +156,7 @@ NTL__CRTCALL
 
 #ifndef _MSC_VER
 namespace x {
-__forceinline 
+__forceinline
 char *
   strcat(char * dst, const char * src)
 {
@@ -167,7 +167,7 @@ char *
   return dst;
 } }
 
-__forceinline 
+__forceinline
 char *
 NTL__CRTCALL
   strcat(char * const dst, const char * const src)
@@ -180,20 +180,20 @@ NTL__CRTCALL
 #endif
 
 
-__forceinline 
+__forceinline
 const char *
 NTL__CRTCALL
   strchr(const char * const s, int c)
 {
   _Assert(s);
   while ( *s )
-    if ( static_cast<unsigned char>(c) 
+    if ( static_cast<unsigned char>(c)
         == *reinterpret_cast<const unsigned char*>(s) )
       return s;
   return 0;
 }
 
-__forceinline 
+__forceinline
 char *
 NTL__CRTCALL
   strchr(char * const s, int c)
@@ -207,7 +207,7 @@ NTL__CRTCALL
 
 
 #ifndef _MSC_VER
-__forceinline 
+__forceinline
 int
 NTL__CRTCALL
   strcmp(const char * s1, const char * s2)
@@ -221,7 +221,7 @@ NTL__CRTCALL
 }
 #endif
 
-__forceinline 
+__forceinline
 int
 NTL__CRTCALL
   strncmp(const char * s1, const char * s2, size_t n)
@@ -232,13 +232,13 @@ NTL__CRTCALL
     if ( !*s1 || *s1 != *s2 )
       return  *reinterpret_cast<const unsigned char*>(s1)
             - *reinterpret_cast<const unsigned char*>(s2);
-  return static_cast<int>(n); // n == 0  
+  return static_cast<int>(n); // n == 0
 }
 
 
 #ifndef _MSC_VER
 namespace x {
-__forceinline 
+__forceinline
 char *
   strcpy(char * dst, const char * src)
 {
@@ -248,7 +248,7 @@ char *
   return dst;
 } }
 
-__forceinline 
+__forceinline
 char *
 NTL__CRTCALL
   strcpy(char * const dst, const char * const src)
@@ -259,7 +259,7 @@ NTL__CRTCALL
   return dst;
 }
 
-__forceinline 
+__forceinline
 size_t
 NTL__CRTCALL
   strlen(const char * const s)
@@ -271,7 +271,7 @@ NTL__CRTCALL
 }
 #endif
 
-__forceinline 
+__forceinline
 char *
 NTL__CRTCALL
 strdup(const char * const src)
@@ -298,14 +298,14 @@ NTL__EXTERNAPI
 int __cdecl
   _stricmp(
     const char * s1,
-    const char * s2 
+    const char * s2
     );
 
 NTL__EXTERNAPI
 int __cdecl
   _wcsicmp(
     const wchar_t * s1,
-    const wchar_t * s2 
+    const wchar_t * s2
     );
 
 NTL__EXTERNAPI
@@ -313,7 +313,7 @@ int __cdecl
   _strnicmp(
     const char *  s1,
     const char *  s2,
-    size_t        n 
+    size_t        n
     );
 
 NTL__EXTERNAPI
@@ -321,7 +321,7 @@ int __cdecl
   _wcsnicmp(
     const wchar_t * s1,
     const wchar_t * s2,
-    size_t          n 
+    size_t          n
     );
 
 #endif // #ifndef _INC_STDLIB

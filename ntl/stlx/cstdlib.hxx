@@ -44,7 +44,7 @@ NTL__CRTCALL
   strtod(const char * __restrict nptr, char ** __restrict endptr);
 
 /// 7.20.1.4 The strtol function
-long int 
+long int
 NTL__CRTCALL
   strtol(const char * __restrict nptr, char ** __restrict endptr, int base);
 
@@ -102,7 +102,7 @@ NTL__CRTCALL
 
 ///\name  7.20.4 Communication with the environment
 
-/// 7.20.4.1 The abort function + 18.3/3 
+/// 7.20.4.1 The abort function + 18.3/3
 void
 NTL__CRTCALL
   abort();
@@ -140,7 +140,7 @@ NTL__CRTCALL
 /// 7.20.5.2 The qsort function
 void
 NTL__CRTCALL
-  qsort(void *base, size_t nmemb, size_t size, 
+  qsort(void *base, size_t nmemb, size_t size,
            int (*compar)(const void *, const void *));
 
 
@@ -236,7 +236,7 @@ NTL__CRTCALL
 //////////////////////////////////////////////////////////////////////////
 /* c++ initializers */
 extern vfv_t* __xc_a[];
-extern vfv_t* __xc_z[];    
+extern vfv_t* __xc_z[];
 
 }; // extern "C"
 ///@}

@@ -17,7 +17,7 @@ namespace ntl {
   namespace nt {
 #ifdef _M_X64
     NTL__EXTERNAPI
-      void *__stdcall 
+      void *__stdcall
         RtlPcToFileHeader(const void *PcValue, void **pBaseOfImage);
 #endif
   }
@@ -167,7 +167,7 @@ namespace ntl {
       struct optional_header32
       {
         static const uint16_t signature = 0x010B;
-        struct characteristics 
+        struct characteristics
         {
           enum values {
             /**  DLL can move (ASLR) */
@@ -252,7 +252,7 @@ namespace ntl {
       struct optional_header64
       {
         static const uint16_t signature = 0x020B;
-        struct characteristics 
+        struct characteristics
         {
           enum values {
             /**  DLL can move (ASLR) */
@@ -340,7 +340,7 @@ namespace ntl {
 
         uint32_t            Signature;
         file_header         FileHeader;
-        union 
+        union
         {
           optional_header32 OptionalHeader32;
           optional_header64 OptionalHeader64;
@@ -391,7 +391,7 @@ namespace ntl {
         return nth->is_valid() ? nth->data_directory(entry) : 0;
       }
 
-      const image::data_directory * 
+      const image::data_directory *
         get_data_directory(data_directory::entry entry) const
       {
         const nt_headers * const nth = get_nt_headers();
@@ -400,7 +400,7 @@ namespace ntl {
 
       uintptr_t base() const
       {
-        return reinterpret_cast<uintptr_t>(this); 
+        return reinterpret_cast<uintptr_t>(this);
       }
 
       /// converts RVA to VA
@@ -422,23 +422,23 @@ namespace ntl {
       }
 
       dos_header * get_dos_header()
-      { 
-        return va<dos_header*>(0); 
+      {
+        return va<dos_header*>(0);
       }
 
       const dos_header * get_dos_header() const
-      { 
-        return va<const dos_header*>(0); 
+      {
+        return va<const dos_header*>(0);
       }
 
-      nt_headers * get_nt_headers() 
-      { 
-        return va<nt_headers*>(static_cast<uintptr_t>(get_dos_header()->e_lfanew)); 
+      nt_headers * get_nt_headers()
+      {
+        return va<nt_headers*>(static_cast<uintptr_t>(get_dos_header()->e_lfanew));
       }
 
       const nt_headers * get_nt_headers() const
-      { 
-        return va<const nt_headers*>(static_cast<uintptr_t>(get_dos_header()->e_lfanew)); 
+      {
+        return va<const nt_headers*>(static_cast<uintptr_t>(get_dos_header()->e_lfanew));
       }
 
       uint32_t checksum() const
@@ -470,7 +470,7 @@ namespace ntl {
       }
 
 
-      struct section_header  
+      struct section_header
       {
         struct characteristics
         {
@@ -548,7 +548,7 @@ namespace ntl {
         static const size_t sizeof_short_name = 8;
         char        Name[sizeof_short_name];
         union
-        { 
+        {
           uint32_t  PhysicalAddress;
           uint32_t  VirtualSize;
         };
@@ -628,7 +628,7 @@ namespace ntl {
 
       ///\name  Export support
 
-      struct export_directory 
+      struct export_directory
       {
         uint32_t  Characteristics;
         uint32_t  TimeDateStamp;
@@ -644,7 +644,7 @@ namespace ntl {
 
         ///\note  binary search is not for speed here -
         ///       sequential one could give different results on tricky PEs
-        ///       and probably is exposed for some exploitation 
+        ///       and probably is exposed for some exploitation
         __forceinline
           uint32_t ordinal(const image * pe, const char name[]) const
         {
@@ -666,7 +666,7 @@ namespace ntl {
           return ordinal - Base;
         }
 
-        void * function(const image * pe, uint32_t ordinal) const 
+        void * function(const image * pe, uint32_t ordinal) const
         {
           return ordinal < NumberOfFunctions
             ? pe->va<void*>(pe->va<uint32_t*>(AddressOfFunctions)[ordinal]) : 0;
@@ -691,7 +691,7 @@ namespace ntl {
       template<typename ExportType>
       void * find_export(ExportType exp) const
       {
-        const data_directory * const export_table = 
+        const data_directory * const export_table =
           get_data_directory(data_directory::export_table);
         if ( ! export_table || ! export_table->VirtualAddress ) return 0;
         export_directory * exports = va<export_directory*>(export_table->VirtualAddress);
@@ -703,7 +703,7 @@ namespace ntl {
       template<class Functor>
       void* find_export_f(Functor finder) const
       {
-        const data_directory * const export_table = 
+        const data_directory * const export_table =
           get_data_directory(data_directory::export_table);
         if (!export_table || !export_table->VirtualAddress)
           return 0;
@@ -717,11 +717,11 @@ namespace ntl {
       template<typename DllFinder>
       void * find_export(const char * exp, DllFinder find_dll) const
       {
-        const data_directory * const export_table = 
+        const data_directory * const export_table =
           get_data_directory(data_directory::export_table);
         if ( ! export_table || ! export_table->VirtualAddress ) return 0;
         export_directory * exports = va<export_directory*>(export_table->VirtualAddress);
-        const uint32_t ordinal = uintptr_t(exp) <= 0xFFFF 
+        const uint32_t ordinal = uintptr_t(exp) <= 0xFFFF
           ? exports->ordinal(this, reinterpret_cast<uint16_t>(exp))
           : exports->ordinal(this, exp);
         void * const f = exports->function(this, ordinal);
@@ -783,14 +783,14 @@ namespace ntl {
           /** The RVA of the import lookup table. This table contains a name or ordinal for each import. */
           uint32_t  OriginalFirstThunk;
         };
-        /** The stamp that is set to zero until the image is bound. 
+        /** The stamp that is set to zero until the image is bound.
           After the image is bound, this field is set to the time/data stamp of the DLL. */
         uint32_t  TimeDateStamp;
         /** The index of the first forwarder reference. */
         uint32_t  ForwarderChain;
         /** RVA. The address of an ASCII string that contains the name of the DLL. */
         uint32_t  Name;
-        /** The RVA of the import address table. The contents of this table are identical 
+        /** The RVA of the import address table. The contents of this table are identical
           to the contents of the import lookup table until the image is bound. */
         uint32_t  FirstThunk;
 
@@ -876,10 +876,10 @@ namespace ntl {
       /** Hint/Name import table */
       struct import_name_table
       {
-        /** An index into the export name pointer table. A match is attempted first with this value. 
+        /** An index into the export name pointer table. A match is attempted first with this value.
           If it fails, a binary search is performed on the DLL’s export name pointer table. */
         uint16_t Hint;
-        /** An ASCII string that contains the name to import. This is the string that must be matched 
+        /** An ASCII string that contains the name to import. This is the string that must be matched
           to the public name in the DLL. This string is case sensitive and terminated by a null byte. */
         char     Name;
       };
@@ -893,9 +893,9 @@ namespace ntl {
       import_descriptor *
         get_first_import_entry() const
       {
-        const data_directory * const import_table = 
+        const data_directory * const import_table =
           get_data_directory(data_directory::import_table);
-        return import_table && import_table->VirtualAddress 
+        return import_table && import_table->VirtualAddress
           ? va<import_descriptor*>(import_table->VirtualAddress)
           : 0;
       }
@@ -943,8 +943,8 @@ next_entry:;
           import_entry && !import_entry->is_terminating();
           ++import_entry)
         {
-          if (module){ 
-            if (!import_entry->Name) 
+          if (module){
+            if (!import_entry->Name)
               goto next_entry;
 
             // compare names case-insensitive (simpified)
@@ -988,7 +988,7 @@ next_entry:;
 
       ///\name  Relocations
 
-      struct base_relocation 
+      struct base_relocation
       {
         uint32_t  VirtualAddress;
         uint32_t  SizeOfBlock;
@@ -1074,7 +1074,7 @@ next_entry:;
 
       bool relocate(ptrdiff_t delta)
       {
-        const data_directory * const reloc_dir = 
+        const data_directory * const reloc_dir =
           get_data_directory(data_directory::basereloc_table);
         if ( ! reloc_dir || ! reloc_dir->VirtualAddress ) return false;
         const base_relocation * fixups = va<base_relocation*>(reloc_dir->VirtualAddress);
@@ -1101,9 +1101,9 @@ next_entry:;
 
       ///\name Resources
 
-      struct resource_directory_entry 
+      struct resource_directory_entry
       {
-        union 
+        union
         {
           struct
           {
@@ -1146,7 +1146,7 @@ next_entry:;
         if(!(n < rsrc->NumberOfIdEntries))
           return 0;
         resource_directory_entry* ride = reinterpret_cast<resource_directory_entry*>(
-          uintptr_t(rsrc) + sizeof(resource_directory) + 
+          uintptr_t(rsrc) + sizeof(resource_directory) +
           sizeof(resource_directory_entry)*rsrc->NumberOfNamedEntries);
         return &ride[n];
         //return & reinterpret_cast<resource_directory_entry*>
@@ -1160,7 +1160,7 @@ next_entry:;
         wchar_t   NameString[1];
       };
 
-      struct resource_data_entry 
+      struct resource_data_entry
       {
         uint32_t  OffsetToData;
         uint32_t  Size;
@@ -1175,7 +1175,7 @@ next_entry:;
         uint32_t  Size;
       };
 
-      struct security_table_entry 
+      struct security_table_entry
       {
         uint32_t  dwLength;
         // 0x100 - 1.0, 0x200 - 2.0

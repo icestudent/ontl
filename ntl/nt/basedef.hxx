@@ -199,7 +199,7 @@ namespace ntl {
       PowerDeviceMaximum
     };
 
-    enum DllMainReason 
+    enum DllMainReason
     {
       DllProcessDetach,
       DllProcessAttach,

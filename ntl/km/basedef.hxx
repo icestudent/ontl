@@ -126,7 +126,7 @@ DbgBreakPointWithStatus(
 
 /** Interrupt request level RAII wrapper */
 struct kirql
-{ 
+{
   /// level definitions
   enum level {
 		passive_level = 0,             // passive release level
@@ -235,7 +235,7 @@ typedef uint8_t kirql;
 #endif
 
 struct kspin_lock
-{ 
+{
     kspin_lock() : _() {} // no need for KeInitializeSpinLock call
 
     __forceinline kirql acquire();
@@ -246,7 +246,7 @@ struct kspin_lock
 };
 
 typedef uint64_t kspin_lock_queue_number_t;
-enum kspin_lock_queue_number 
+enum kspin_lock_queue_number
 {
   LockQueueDispatcherLock,
   LockQueueExpansionLock,
@@ -546,7 +546,7 @@ struct kdpc
 
 #else
 
-struct kdpc_data 
+struct kdpc_data
 {
   list_entry DpcListHead;
   kspin_lock DpcLock;
@@ -558,7 +558,7 @@ struct kdpc_data
   uint32_t DpcCount;
 };
 
-struct kdpc 
+struct kdpc
 {
   enum DpcType {
     Normal,
@@ -582,9 +582,9 @@ struct kdpc
   list_entry DpcListEntry;
 
   void (__stdcall *DeferredRoutine)(
-    const kdpc* Dpc, 
-    const void* DeferredContext, 
-    const void* SystemArgument1, 
+    const kdpc* Dpc,
+    const void* DeferredContext,
+    const void* SystemArgument1,
     const void* SystemArgument2);
 
   void* DeferredContext;
@@ -610,7 +610,7 @@ struct ksemaphore
 };
 
 
-struct work_queue_item 
+struct work_queue_item
 {
   list_entry  List;
   void     (* WorkerRoutine)(void*);

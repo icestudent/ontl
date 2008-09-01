@@ -36,8 +36,8 @@ struct object_attributes
       valid_attributes    = 0x000007F2L,
     };
 
-    friend attributes operator | (attributes m, attributes m2) 
-    { 
+    friend attributes operator | (attributes m, attributes m2)
+    {
       return bitwise_or(m, m2);
     }
 

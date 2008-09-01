@@ -50,7 +50,7 @@ enum system_information_class
   SystemObjectInformation,
   SystemPageFileInformation,
   SystemVdmInstemulInformation,
-  SystemVdmBopInformation, 
+  SystemVdmBopInformation,
   SystemFileCacheInformation,
   SystemPoolTagInformation,
   SystemInterruptInformation,
@@ -153,7 +153,7 @@ class system_information_base
 
     typedef InformationClass info_class;
 
-    system_information_base() __ntl_nothrow : ptr(0) 
+    system_information_base() __ntl_nothrow : ptr(0)
     {
       unsigned long length = 0;
       for ( unsigned long i = sizeof(info_class);
@@ -270,10 +270,10 @@ struct system_process_information
 
 #if 0
   const_iterator begin() const
-  { 
+  {
     return end() - NumberOfThreads;
   }
-  
+
   const_iterator end() const
   {
     return reinterpret_cast<system_thread_information*>(
@@ -282,7 +282,7 @@ struct system_process_information
   }
 #else
   const_iterator begin() const
-  { 
+  {
     return reinterpret_cast<system_thread_information*>(uintptr_t(this) + sizeof(system_process_information));
   }
 
@@ -321,13 +321,13 @@ struct system_processes: public system_process_information
 
     friend
       bool operator==(const const_iterator & x, const const_iterator & y)
-      { 
+      {
         return x.p == y.p;
       }
 
     friend
       bool operator!=(const const_iterator & x, const const_iterator & y)
-      { 
+      {
         return !(x == y);
       }
 
@@ -347,7 +347,7 @@ struct system_processes: public system_process_information
   const_iterator cbegin() const {  return this; }
   const_iterator cend() const { return 0; }
 
-  const system_process_information * 
+  const system_process_information *
   find_process(const const_unicode_string & image_name) const
   {
     for ( const_iterator it = cbegin(); it != cend(); ++it )
@@ -376,12 +376,12 @@ struct rtl_process_module_information// RTL_PROCESS_MODULE_INFORMATION
   char        FullPathName[full_path_name_len];
 
   pe::image * image() const
-  { 
+  {
     return pe::image::bind(ImageBase);
   }
 
   const char * file_name() const
-  { 
+  {
     return &FullPathName[OffsetToFileName];
   }
 
@@ -396,7 +396,7 @@ struct system_modules_information //RTL_PROCESS_MODULES
 
   size_t size() const { return NumberOfModules; }
 
-  typedef rtl_process_module_information *        iterator;      
+  typedef rtl_process_module_information *        iterator;
   typedef const rtl_process_module_information *  const_iterator;
   typedef std::reverse_iterator<iterator>         reverse_iterator;
   typedef std::reverse_iterator<const_iterator>   const_reverse_iterator;
@@ -416,7 +416,7 @@ struct system_modules_information //RTL_PROCESS_MODULES
 
   /// @note returns Modules[0] when file_name == nullptr
   __forceinline
-  const rtl_process_module_information * 
+  const rtl_process_module_information *
     find_module(const char file_name[]) const
   {
     for ( uint32_t i = 0; i != NumberOfModules; ++i )
@@ -427,7 +427,7 @@ struct system_modules_information //RTL_PROCESS_MODULES
   }
 
   __forceinline
-  const rtl_process_module_information * 
+  const rtl_process_module_information *
     find_module(const std::string & file_name) const
   {
     for ( uint32_t i = 0; i != NumberOfModules; ++i )

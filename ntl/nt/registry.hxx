@@ -24,7 +24,7 @@ namespace nt {
 
 ///\note  Because ntoskernel does not export Nt* variants,
 ///       Zw* exports are used here, and this header is to be used from KM;
-///       howecer, DO remember nt::object_attributes have 
+///       howecer, DO remember nt::object_attributes have
 ///       no default kernel_handle flag set
 
 ///\name  Legacy API
@@ -105,7 +105,7 @@ enum key_information_class
 {
   KeyBasicInformation,
   KeyNodeInformation,
-  KeyFullInformation 
+  KeyFullInformation
 };
 
 NTL__EXTERNAPI
@@ -154,18 +154,18 @@ struct device_traits<nt::key> : public device_traits<>
   };
   static const access_mask access_mask_default = access_mask(read);
 
-  friend access_mask operator | (access_mask m, access_mask m2) 
-  { 
+  friend access_mask operator | (access_mask m, access_mask m2)
+  {
     return bitwise_or(m, m2);
   }
 
   friend access_mask operator | (access_mask m, nt::access_mask m2)
-  { 
+  {
     return m | static_cast<access_mask>(m2);
   }
 
   friend access_mask operator | (nt::access_mask m, access_mask m2)
-  { 
+  {
     return m2 | m;
   }
 
@@ -181,8 +181,8 @@ struct device_traits<nt::key> : public device_traits<>
   };
   static const creation_options creation_options_default = creation_options(0x00000000);
 
-  friend creation_options operator | (creation_options m, creation_options m2) 
-  { 
+  friend creation_options operator | (creation_options m, creation_options m2)
+  {
     return bitwise_or(m, m2);
   }
 
@@ -214,7 +214,7 @@ class key : public handle, public device_traits<key>
     bool
     __forceinline
       create(
-        const object_attributes &     oa, 
+        const object_attributes &     oa,
         const access_mask             desired_access,
         const creation_options        co          = creation_options_default,
         disposition *                 cd          = 0,
@@ -230,7 +230,7 @@ class key : public handle, public device_traits<key>
     bool
     __forceinline
       open(
-        const object_attributes & oa, 
+        const object_attributes & oa,
         const access_mask         desired_access  = access_mask_default
         ) __ntl_nothrow
     {
@@ -240,7 +240,7 @@ class key : public handle, public device_traits<key>
 
     __forceinline
     explicit key(
-        const object_attributes & oa, 
+        const object_attributes & oa,
         const access_mask         desired_access  = access_mask_default
         )
     {
@@ -250,7 +250,7 @@ class key : public handle, public device_traits<key>
 
     __forceinline
     explicit key(
-        const const_unicode_string &  name, 
+        const const_unicode_string &  name,
         const access_mask             desired_access  = access_mask_default
         )
     {
@@ -261,7 +261,7 @@ class key : public handle, public device_traits<key>
     __forceinline
     explicit key(
         const handle &        root,
-        const std::wstring &  name, 
+        const std::wstring &  name,
         const access_mask     desired_access  = access_mask_default
         )
     {
@@ -281,7 +281,7 @@ class key : public handle, public device_traits<key>
       return *this;
     }
 
-    operator const void*() { return get(); } 
+    operator const void*() { return get(); }
 
     bool erase()
     {
@@ -477,7 +477,7 @@ class key : public handle, public device_traits<key>
     }
 
 
-    struct basic_information 
+    struct basic_information
     {
       int64_t   LastWriteTime;
       uint32_t  TitleIndex;
@@ -494,7 +494,7 @@ class key : public handle, public device_traits<key>
       uint32_t  NameLength;
       wchar_t   Name[1];  //  Variable-length string
     };
-    
+
     static
     ntstatus
       enumerate_key(
@@ -533,7 +533,7 @@ class key : public handle, public device_traits<key>
 
         __forceinline
         subkey_iterator & operator++()
-        { 
+        {
           ///\note does not handle ++subkey_end()
           ++index;
           read();
@@ -606,13 +606,13 @@ class key : public handle, public device_traits<key>
 
     __forceinline
     subkey_iterator subkey_begin() const
-    { 
+    {
       return subkey_iterator(get() , subkey_iterator::begin_index);
     }
 
     __forceinline // God bless RVO
     const subkey_iterator & subkey_end() const
-    { 
+    {
       return subkey_end_;
     }
 

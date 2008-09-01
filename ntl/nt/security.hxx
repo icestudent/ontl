@@ -19,9 +19,9 @@ namespace nt {
 #pragma warning(disable:4201)
   struct access_mask_t
   {
-    union 
+    union
     {
-      struct 
+      struct
       {
         uint16_t  SpecificRights;
         uint8_t   StandardRights;

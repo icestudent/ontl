@@ -84,13 +84,13 @@ struct service
     start                 = 0x0010,   stop                  = 0x0020,
     pause_continue        = 0x0040,   interrogate           = 0x0080,
     user_defined_control  = 0x0100,
-    all_acess = standard_rights_required | qeury_config | change_config 
+    all_acess = standard_rights_required | qeury_config | change_config
               | qeury_status | enumerate_dependents | start | stop | interrogate
               | user_defined_control
   };
 
-  friend access_mask operator | (access_mask m, access_mask m2) 
-  { 
+  friend access_mask operator | (access_mask m, access_mask m2)
+  {
     return bitwise_or(m, m2);
   }
 
@@ -99,8 +99,8 @@ struct service
   {
     boot_start    = 0,  ///< Device driver started by the system loader.
     system_start  = 1,  ///< Device driver started by the IoInitSystem function.
-    auto_start    = 2,  ///< Service started automatically during system startup. 
-    demand_start  = 3,  ///< Service started by the service control manager. 
+    auto_start    = 2,  ///< Service started automatically during system startup.
+    demand_start  = 3,  ///< Service started by the service control manager.
     disabled      = 4   ///< Service cannot be started.
   };
 
@@ -165,7 +165,7 @@ struct service
     uint32_t  dwProcessId;
     uint32_t  dwServiceFlags;
   };
-  
+
 
 
 };

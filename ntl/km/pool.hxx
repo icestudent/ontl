@@ -49,7 +49,7 @@ void * __stdcall
 NTL__EXTERNAPI
 __declspec(noalias)
 void __stdcall
-  ExFreePoolWithTag(void * p, unsigned long tag); 
+  ExFreePoolWithTag(void * p, unsigned long tag);
 
 
 template<pool_type PoolType = PagedPool>
@@ -61,14 +61,14 @@ class pool
     __declspec(restrict) __declspec(noalias)
     static __forceinline
     void * alloc(size_t size, unsigned long tag = NTL__POOL_TAG)
-    { 
+    {
       return ExAllocatePoolWithTag(PoolType, size, tag);
     }
 
     __declspec(noalias)
     static __forceinline
     void free(void * const p, unsigned long tag = NTL__POOL_TAG)
-    { 
+    {
       ExFreePoolWithTag(p, tag);
     }
 

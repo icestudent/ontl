@@ -53,7 +53,7 @@ class sha1
       friend static
         bool operator ==(const digest & d, const digest & d2)
           { return binary_equal(d, d2); }
-        
+
       friend static
         bool operator !=(const digest & d, const digest & d2)
           { return ! (d == d2); }
@@ -129,8 +129,8 @@ class sha1
       pad[j++] = 0x80;
       while ( (j % block_bytes) != block_bytes - sizeof(uint64_t) )
         pad[j++] = 0x00;
-      // add 64 bit size and do hash 
-      *reinterpret_cast<uint64_t*>(&pad[j]) = 
+      // add 64 bit size and do hash
+      *reinterpret_cast<uint64_t*>(&pad[j]) =
                                   big_endian(static_cast<uint64_t>(bytes) * 8);
       operator()(_b[0]);
       if ( j > block_bytes )  operator()(_b[1]);
@@ -153,7 +153,7 @@ class sha1
     }
 
 #ifdef NTL_TEST
-    /// @return 0 - Ok; 
+    /// @return 0 - Ok;
     static inline
     const char * test__implementation()
     {
@@ -171,7 +171,7 @@ class sha1
       {
         static char msg[] = "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq";
         STATIC_ASSERT(448 / 8 == sizeof(msg) - 1);
-        digest etalon( 0x84, 0x98, 0x3e, 0x44,  0x1c, 0x3b, 0xd2, 0x6e, 
+        digest etalon( 0x84, 0x98, 0x3e, 0x44,  0x1c, 0x3b, 0xd2, 0x6e,
                        0xba, 0xae, 0x4a, 0xa1,  0xf9, 0x51, 0x29, 0xe5,
                        0xe5, 0x46, 0x70, 0xf1 );
         sha1 hash;
@@ -217,7 +217,7 @@ class sha1
             : t < 40 ?  b ^ c ^ d
             : t < 60 ?  (c | d) & b | c & d  //b & c | b & d | c & d
             :/* < 80 */ b ^ c ^ d;
-    }    
+    }
 
 };// class sha1
 

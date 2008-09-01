@@ -9,7 +9,7 @@
 /* c++ initializers */
 #define sec(x) __declspec(allocate(x))
 sec(".CRT$XCA") vfv_t* __xc_a[]= {0};
-sec(".CRT$XCZ") vfv_t* __xc_z[]= {0};    
+sec(".CRT$XCZ") vfv_t* __xc_z[]= {0};
 #undef sec
 
 #pragma endregion

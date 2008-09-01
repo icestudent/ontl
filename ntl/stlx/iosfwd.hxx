@@ -28,8 +28,8 @@ template<>            struct char_traits<wchar_t>;
 
 template<class T>     class allocator;
 
-/// 2 The class template specialization basic_ios<charT,traits> serves as 
-///   a virtual base class for the class templates 
+/// 2 The class template specialization basic_ios<charT,traits> serves as
+///   a virtual base class for the class templates
 ///   basic_istream, basic_ostream, and class templates derived from them.
 ///   basic_iostream is a class template derived from both
 ///   basic_istream<charT,traits> and basic_ostream<charT,traits>.

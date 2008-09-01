@@ -10,7 +10,7 @@ LEAF_ENTRY _CallSettingFrame, _TEXT
 	mov		[csp+8*1],rcx	; action
 	mov		[csp+8*2],rdx	; frame
 	mov		[csp+8*3],r8d	; param
-	
+
 	mov		rdx,[rdx]		; states
 	mov		rax,rcx			; action
 	call	_NLG_Notify
@@ -22,10 +22,10 @@ LEAF_ENTRY _CallSettingFrame, _TEXT
 	mov		r8d,2
 	call	_NLG_Notify
 	mov		[csp-8],rax
-	
+
 	add		rsp,8*3
 	ret
-	
+
 LEAF_END _CallSettingFrame, _TEXT
 
 LEAF_ENTRY _NLG_Notify, _TEXT

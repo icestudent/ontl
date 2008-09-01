@@ -45,7 +45,7 @@ namespace ntl {
 
       __declspec(noalias)
         __forceinline
-        void deallocate(pointer p, size_type /* n */) 
+        void deallocate(pointer p, size_type /* n */)
       {
         ::operator delete(p);//(address(*p));
       }

@@ -51,7 +51,7 @@ namespace std {
       const Allocator& a = Allocator())
       :tree_type(comp, a)
     {}
-      
+
     template <class InputIterator>
     set(InputIterator first, InputIterator last,
       const Compare& comp = Compare(), const Allocator& a = Allocator())
@@ -63,7 +63,7 @@ namespace std {
 #ifdef NTL__CXX
     set(set<Key,Compare,Allocator>&& x);
 #endif
-    
+
     set(const Allocator&);
     set(const set& x, const Allocator& a)
     {}
@@ -106,7 +106,7 @@ namespace std {
 
     pair<iterator,iterator> equal_range(const key_type& x)
     {
-      // find a node with value which are equal or nearest to the x 
+      // find a node with value which are equal or nearest to the x
       node* p = root_;
       while(p){
         if(elem_less(x, p->elem)){

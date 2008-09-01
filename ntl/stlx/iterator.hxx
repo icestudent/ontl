@@ -16,8 +16,8 @@ namespace std {
 
 /**\addtogroup  lib_iterators ********** Iterators library [24] *************
  *
- *    Components that C++ programs may use to perform iterations over 
- *    \link lib_containers containers\endlink, 
+ *    Components that C++ programs may use to perform iterations over
+ *    \link lib_containers containers\endlink,
  *    \link lib_streams streams\endlink,
  *    and \link lib_stream_buffers stream buffers\endlink.
  *@{
@@ -83,7 +83,7 @@ template<class InputIterator, class Distance>
 static inline
 void
   advance(InputIterator& i, Distance n, const input_iterator_tag &)
-{ 
+{
   advance(i, n, forward_iterator_tag());
 }
 
@@ -91,7 +91,7 @@ template<class ForwardIterator, class Distance>
 static inline
 void
   advance(ForwardIterator& i, Distance n, const forward_iterator_tag &)
-{ 
+{
   for ( ; 0 < n ; --n ) ++i;
 }
 
@@ -109,7 +109,7 @@ template<class RandomIterator, class Distance>
 static inline
 void
   advance(RandomIterator& i, Distance n, const random_access_iterator_tag &)
-{ 
+{
   i += n;
 }
 
@@ -118,7 +118,7 @@ static inline
 typename iterator_traits<InputIterator>::difference_type
   distance(const InputIterator& first, const InputIterator& last,
              const input_iterator_tag &)
-{ 
+{
   return distance(first, last, forward_iterator_tag());
 }
 
@@ -130,7 +130,7 @@ typename iterator_traits<ForwardIterator>::difference_type
 {
   typename iterator_traits<ForwardIterator>::difference_type d = 0;
   for ( ; first != last; ++first ) ++d;
-  return d;  
+  return d;
 }
 
 template <class BidirectionalIterator>
@@ -139,7 +139,7 @@ typename iterator_traits<BidirectionalIterator>::difference_type
   distance(const BidirectionalIterator& first,
            const BidirectionalIterator& last,
            const bidirectional_iterator_tag &)
-{ 
+{
   return distance(first, last, forward_iterator_tag());
 }
 
@@ -148,7 +148,7 @@ static inline
 typename iterator_traits<RandomIterator>::difference_type
   distance(const RandomIterator& first, const RandomIterator& last,
            const random_access_iterator_tag &)
-{ 
+{
   return last - first;
 }
 
@@ -158,9 +158,9 @@ typename iterator_traits<RandomIterator>::difference_type
 
 template<class AnyIterator, class Distance>
 inline
-void 
+void
   advance(AnyIterator& i, Distance n)
-{ 
+{
   __impl::advance(i, n, iterator_traits<AnyIterator>::iterator_category());
 }
 
@@ -168,7 +168,7 @@ template <class AnyIterator>
 inline
 typename iterator_traits<AnyIterator>::difference_type
   distance(AnyIterator first, AnyIterator last)
-{ 
+{
   return __impl::distance(first, last,
                           iterator_traits<AnyIterator>::iterator_category());
 }
@@ -213,7 +213,7 @@ class reverse_iterator
 
     reverse_iterator() {}
     explicit reverse_iterator(Iterator x) : current(x) {}
-    template <class U> 
+    template <class U>
     reverse_iterator(const reverse_iterator<U>& u) : current(u.base()) {}
 
     Iterator  base()        const { return current; }
@@ -228,29 +228,29 @@ class reverse_iterator
       { reverse_iterator tmp = *this; ++current; return tmp; }
 
     reverse_iterator operator+ (difference_type n) const
-    { 
+    {
       return reverse_iterator( current - n );
     }
 
     reverse_iterator operator+=(difference_type n)
-    { 
+    {
       current -= n;
       return *this;
     }
 
     reverse_iterator operator- (difference_type n) const
-    { 
+    {
       return reverse_iterator( current + n );
     }
 
     reverse_iterator operator-=(difference_type n)
-    { 
+    {
       current += n;
       return *this;
     }
 
     reference operator[](difference_type n) const
-    { 
+    {
       return current[-n-1];
     }
 
@@ -268,25 +268,25 @@ class reverse_iterator
 
   template<typename Iterator2>
   friend
-    bool operator< (const reverse_iterator<Iterator>& x, 
+    bool operator< (const reverse_iterator<Iterator>& x,
                     const reverse_iterator<Iterator2>& y)
       { return x.current > y.current; }
 
   template<typename Iterator2>
   friend
-    bool operator> (const reverse_iterator<Iterator>& x, 
+    bool operator> (const reverse_iterator<Iterator>& x,
                     const reverse_iterator<Iterator2>& y)
       { return x.current < y.current; }
 
   template<typename Iterator2>
   friend
-    bool operator>=(const reverse_iterator<Iterator>& x, 
+    bool operator>=(const reverse_iterator<Iterator>& x,
                     const reverse_iterator<Iterator2>& y)
       { return x.current <= y.current; }
 
   template<typename Iterator2>
   friend
-    bool operator<=(const reverse_iterator<Iterator>& x, 
+    bool operator<=(const reverse_iterator<Iterator>& x,
                     const reverse_iterator<Iterator2>& y)
       { return x.current >= y.current; }
 
@@ -301,10 +301,10 @@ class reverse_iterator
     reverse_iterator<Iterator>
       operator+(typename reverse_iterator<Iterator>::difference_type n,
                 const reverse_iterator<Iterator>& x)
-      { 
+      {
         return reverse_iterator(x.current - n);
       }
-  
+
   protected:
     Iterator current;
 };//class reverse_iterator
@@ -312,7 +312,7 @@ class reverse_iterator
 
 /// 24.4.2.1 Class template back_insert_iterator [lib.back.insert.iterator]
 template <class Container>
-class back_insert_iterator 
+class back_insert_iterator
 : public iterator<output_iterator_tag, void, void, void, void>
 {
   public:
@@ -371,7 +371,7 @@ template <class Container>
 inline
 front_insert_iterator<Container>
   front_inserter(Container& x)
-{ 
+{
   return front_insert_iterator<Container>( x );
 }
 
@@ -409,7 +409,7 @@ template <class Container, class Iterator>
 inline
 insert_iterator<Container>
   inserter(Container& x, Iterator i)
-{ 
+{
   return insert_iterator<Container>( x, typename Container::iterator( i ) );
 }
 
@@ -478,12 +478,12 @@ class ostream_iterator
     ostream_iterator(ostream_type& s) : out_stream(s), delim(0) {}
     ostream_iterator(ostream_type& s, const charT* delimiter)
     : out_stream(s), delim(delimiter) {}
-    ostream_iterator(const this_type& x) 
+    ostream_iterator(const this_type& x)
     : out_stream(x.out_stream), delim(x.delim) {}
     ~ostream_iterator() {}
 
     ostream_iterator<T,charT,traits>& operator=(const T& value)
-    { 
+    {
       *out_stream << value;
       if ( delim ) *out_stream << delim;
       return *this;
@@ -523,7 +523,7 @@ class istreambuf_iterator
     struct proxy
     {
         charT             operator*() { return c; }
-        streambuf_type *  sbuf()      { return sbuf_; }        
+        streambuf_type *  sbuf()      { return sbuf_; }
 
     private:
         streambuf_type *  sbuf_;
@@ -536,8 +536,8 @@ class istreambuf_iterator
     istreambuf_iterator(streambuf_type* s)  __ntl_nothrow : sbuf_(s) {}
     istreambuf_iterator(const proxy& p)     __ntl_nothrow : sbuf_(p.sbuf()) {}
 
-    charT operator*() const 
-    { 
+    charT operator*() const
+    {
       // The result of operator*() on an end of stream is undefined.
       int_type c = sbuf_->sgetc();
       if ( ! traits::not_eof(c) ) sbuf_ = 0;
@@ -561,7 +561,7 @@ class istreambuf_iterator
   friend
     bool operator!=(const this_type& a, const this_type& b)
       { return ! a.equal(b); }
-  
+
   private:
     mutable streambuf_type * sbuf_;
 };

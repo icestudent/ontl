@@ -72,7 +72,7 @@ class bad_exception : public exception
 
 
   /// Exception Propagation [18.7.5 propagation]
-  /// 
+  ///
   typedef struct __exception_ptr { } exception_ptr;
 
   exception_ptr current_exception();

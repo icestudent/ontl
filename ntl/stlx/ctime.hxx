@@ -27,7 +27,7 @@ typedef ntl::nt::systime_t time_t;
 
 /** Holds the components of a calendar time, called the broken-down time. */
 struct tm
-{ 
+{
   /** seconds after the minute [0, 60] */
   int tm_sec;
   /** minutes after the hour [0, 59] */
@@ -37,15 +37,15 @@ struct tm
   /** day of the month [1, 31] */
   int tm_mday;
   /** months since January [0, 11] */
-  int tm_mon; 
+  int tm_mon;
   /** years since 1900 */
-  int tm_year; 
+  int tm_year;
   /** days since Sunday [0, 6] */
-  int tm_wday; 
+  int tm_wday;
   /** days since January 1 [0, 365] */
-  int tm_yday; 
+  int tm_yday;
   /** Daylight Saving Time flag */
-  int tm_isdst; 
+  int tm_isdst;
 };
 
 // Time manipulation functions
@@ -56,7 +56,7 @@ struct tm
  *  @note Processor time can not be retrieved for the current process, therefore
  *  function returns amount of time elapsed from the program's start time.
  **/
-inline clock_t clock(void) 
+inline clock_t clock(void)
 {
   // unfortunately the best solution for the current function's specification does not works:
   // we can't retrieve the current process times except for create time field.
@@ -136,7 +136,7 @@ tm *gmtime(const time_t* timer);
 tm *localtime(const time_t* timer);
 
 /**
- *	The strftime function places characters into the array pointed to by s as controlled by the string pointed to by format. 
+ *	The strftime function places characters into the array pointed to by s as controlled by the string pointed to by format.
  **/
 size_t strftime(char* s,
                 size_t maxsize,

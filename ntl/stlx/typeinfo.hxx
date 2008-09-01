@@ -72,7 +72,7 @@ class type_info
     const char* name() const
 #if !STLX__USE_RTTI
     {
-      return mname; 
+      return mname;
     }
 #else
     ;
@@ -89,7 +89,7 @@ class type_info
 namespace std {
 
 #if STLX__USE_RTTI
-  
+
 /// 18.6.1 Class type_info [type.info]
 using ::type_info;
 
@@ -123,7 +123,7 @@ public:
   bad_typeid& operator=(const bad_typeid&) __ntl_nothrow
   {}
 
-  virtual const char* what() const __ntl_nothrow 
+  virtual const char* what() const __ntl_nothrow
   {
     return "bad_typeid";
   }

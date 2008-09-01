@@ -27,7 +27,7 @@
 #define exception_info()            reinterpret_cast<struct ntl::nt::exception::pointers*>(::_exception_info())
 #define abnormal_termination        (::_abnormal_termination() != 0)
 
-extern "C" 
+extern "C"
 {
   unsigned long __cdecl _exception_code(void);
   void *        __cdecl _exception_info(void);
@@ -107,8 +107,8 @@ class exception
 #ifdef _M_X64
     /**
      *	@brief Function table entry
-     *  Table-based exception handling requires a function table entry for all functions that allocate stack space 
-     *  or call another function (that is, nonleaf functions). 
+     *  Table-based exception handling requires a function table entry for all functions that allocate stack space
+     *  or call another function (that is, nonleaf functions).
      *  @note All addresses are image relative (that is, they are 32-bit offsets from the starting address of the image that contains the function table entry).
      **/
     struct __declspec(align(4)) runtime_function
@@ -156,7 +156,7 @@ class exception
       };
 
       struct {
-        /** offset from the beginning of the prolog to the end of the instruction that performs this operation, 
+        /** offset from the beginning of the prolog to the end of the instruction that performs this operation,
             plus 1 (that is, the offset of the start of the next instruction) */
         uint8_t CodeOffset;
         /** unwind operation, see \c opcodes */
@@ -169,9 +169,9 @@ class exception
     };
 
     /**
-     *	@brief Unwind data information structure 
-     *  The unwind data information structure is used to record the effects that a function has on the stack pointer 
-     *  and where the nonvolatile registers are saved on the stack. 
+     *	@brief Unwind data information structure
+     *  The unwind data information structure is used to record the effects that a function has on the stack pointer
+     *  and where the nonvolatile registers are saved on the stack.
      **/
     struct unwind_info
     {
@@ -182,13 +182,13 @@ class exception
         ehandler    = 0x01,
         /** function has a termination handler that should be called when unwinding an exception */
         uhandler    = 0x02,
-        /** this \c unwind_info structure is not the primary one for the procedure. Instead, the chained-unwind-info entry 
-            (\c FunctionEntry member) is the contents of a previous runtime_function entry. 
+        /** this \c unwind_info structure is not the primary one for the procedure. Instead, the chained-unwind-info entry
+            (\c FunctionEntry member) is the contents of a previous runtime_function entry.
             If this flag is set, then the \c ehandler and \c uhandler flags must be cleared.
             Also, the frame register and fixed-stack allocation fields must have the same values as in the primary unwind information. */
         chaininfo   = 0x04
       };
-      
+
       /** version number of the unwind data, currently 1 */
       uint8_t Version:3;
       /** flags for unwind data */
@@ -200,8 +200,8 @@ class exception
       /** number of the nonvolatile register used as the frame pointer, if nonzero; specifies that the function does not use a frame pointer otherwise */
       uint8_t FrameRegister:4;
       /** the scaled offset from RSP that is applied to the FP register when it is established, if the FrameRegister member is nonzero;
-        The actual FP register is set to RSP plus 16 times this number, allowing offsets from 0 to 240. 
-        This permits pointing the FP register into the middle of the local stack allocation for dynamic stack frames, 
+        The actual FP register is set to RSP plus 16 times this number, allowing offsets from 0 to 240.
+        This permits pointing the FP register into the middle of the local stack allocation for dynamic stack frames,
         allowing better code density through shorter instructions (more instructions can use the 8-bit signed offset form). */
       uint8_t FrameOffset:4;
       /** array of items that explains the effect of the prolog on the nonvolatile registers and RSP; for alignment purposes, this array always has an even number of entries. */
@@ -209,10 +209,10 @@ class exception
 
       /** @note following fields are optional */
       union {
-        /** image-relative pointer to the function's language-specific exception/termination handler 
+        /** image-relative pointer to the function's language-specific exception/termination handler
           (if flag \c chaininfo is clear and one of the flags \c ehandler or \c uhandler is set) */
         rva_t ExceptionHandler;
-        /** contents of the chained unwind information (if flag chaininfo is set). In this case, the \c unwind_info structure ends with three dwords, 
+        /** contents of the chained unwind information (if flag chaininfo is set). In this case, the \c unwind_info structure ends with three dwords,
             which represent the \c runtime_function information for the function of the chained unwind.  */
         rva_t FunctionEntry;
       };
@@ -260,7 +260,7 @@ class exception
 
     union frame_pointers
     {
-      struct 
+      struct
       {
         rva_t MemoryStackFp;
         rva_t MemoryStoreFp;
@@ -268,7 +268,7 @@ class exception
       uintptr_t FramePointers;
     };
 
-    
+
     /**
      *	@brief Exception dispatch context
      **/
@@ -314,7 +314,7 @@ class exception
     };
 #endif // _M_X64
 
-    struct record 
+    struct record
     {
       static const int maximum_parameters = 15;
 
@@ -335,7 +335,7 @@ class exception
 
       inline void raise() const;
     };
-    
+
 #ifdef _M_IX86
     /// SEH record
     struct registration
@@ -344,7 +344,7 @@ class exception
       handler_t *     handler;
 
       static registration * end_of_chain()
-      { 
+      {
         return reinterpret_cast<registration*>(-1);
       }
 
@@ -390,7 +390,7 @@ class exception
 #ifdef _M_X64
 
 NTL__EXTERNAPI
-void *__stdcall 
+void *__stdcall
   RtlPcToFileHeader(const void *PcValue, void **pBaseOfImage);
 
 #endif
@@ -421,7 +421,7 @@ typedef nt::exception::pointers           exception_pointers;
 //typedef nt::exception::registration exception_registration; see nt::tib::ExceptionList
 struct exception_registration
 #ifdef _M_IX86
-  : public nt::exception::registration 
+  : public nt::exception::registration
 #endif
   {};
 
@@ -431,7 +431,7 @@ NTL__EXTERNAPI
 void __stdcall
 RtlUnwind(
     const exception_registration *  TargetFrame,    __optional
-    const void *                    TargetIp,       __optional ///< not used on x86 
+    const void *                    TargetIp,       __optional ///< not used on x86
     const exception_record *        ExceptionRecord,__optional
     const void *                    ReturnValue
     );
@@ -470,7 +470,7 @@ static const exception_flags
   exception_target_unwind   = nt::exception::target_unwind,
   exception_collied_unwind  = nt::exception::collied_unwind,
   exception_unwind  = nt::exception::unwind;
-  
+
 /// Exception filter return values
 static const exception_filter
   exception_continue_execution  = nt::exception::continue_execution,
@@ -509,7 +509,7 @@ RaiseException(
     const uintptr_t * Arguments)
 {
   exception_record er =
-  { 
+  {
     ExceptionCode, ExceptionFlags, 0, _ReturnAddress(),
     !Arguments ? 0 :
       NumberOfArguments > exception_record::maximum_parameters ?
@@ -523,7 +523,7 @@ RaiseException(
 
 /// Constructs the exception_record object and sends this to exception_handler
 /// through the OS's exception dispatcher
-///\todo use std::tuple 
+///\todo use std::tuple
 template <typename T, size_t N>
 __declspec(noreturn)
 void inline
@@ -562,7 +562,7 @@ namespace cxxruntime {
   static const uint32_t ehmagic1300 = 0x19930521;
   static const uint32_t ehmagic1200 = 0x19930520;
 
-  static const uint32_t CxxNumberOfParameters = 
+  static const uint32_t CxxNumberOfParameters =
 #ifdef _M_IX86
     3;
 #else
@@ -588,7 +588,7 @@ namespace cxxruntime {
     mdiff_t vdisp_offset;   // offset to the displacement value inside the vbtable
 
     template<typename T>
-    T * operator()(T * const thisptr) const 
+    T * operator()(T * const thisptr) const
     {
       uintptr_t tp = reinterpret_cast<uintptr_t>(thisptr);
       uintptr_t ptr = tp + member_offset;
@@ -619,7 +619,7 @@ namespace cxxruntime {
   STATIC_ASSERT(sizeof(eobject::dtor_ptr) == sizeof(void*));
 
   ///\note the calling convention should not matter since this has no arguments
-  typedef void generic_function_t(); 
+  typedef void generic_function_t();
 
   struct catchabletype
   {
@@ -642,11 +642,11 @@ namespace cxxruntime {
     /** size of the simple type or offset into buffer of \c this pointer for catch object */
     uint32_t    object_size;
 
-    union 
+    union
     {
 #ifndef _M_X64
-      eobject::ctor_ptr copyctor; 
-      eobject::ctor_ptr2 copyctor2; 
+      eobject::ctor_ptr copyctor;
+      eobject::ctor_ptr2 copyctor2;
 #else
       rva_t           copyctor;
       rva_t           copyctor2;
@@ -658,7 +658,7 @@ namespace cxxruntime {
 #pragma pack(push, 4)
   struct catchabletypearray
   {
-    uint32_t        size; 
+    uint32_t        size;
 #ifndef _M_X64
     catchabletype * type[1];
 #else
@@ -673,7 +673,7 @@ namespace cxxruntime {
   {
     /* 0x00 */  uint32_t  econst    : 1;
     /* 0x00 */  uint32_t  evolatile : 1;
-    /* 0x04 */  eobject::dtor_ptr exception_dtor; 
+    /* 0x04 */  eobject::dtor_ptr exception_dtor;
     /* 0x08 */  exception_disposition (__cdecl * forwardcompathandler)(...);///\todo safe proto
     /* 0x0C */  ntl::cxxruntime::catchabletypearray *  catchabletypearray; ///< types able to catch the exception.
   };
@@ -690,7 +690,7 @@ namespace cxxruntime {
     /* 0x00 */  uint32_t  evolatile : 1;
     /* 0x00 */  uint32_t            : 1;
     /* 0x00 */  uint32_t  e8        : 1;
-    /* 0x04 */  rva_t     exception_dtor; 
+    /* 0x04 */  rva_t     exception_dtor;
     /* 0x08 */  rva_t     forwardcompathandler;
     /* 0x0C */  rva_t     catchabletypearray; ///< types able to catch the exception.
   };
@@ -784,7 +784,7 @@ uint32_t              :27;
   {
     ehstate_t            state;
 #ifndef _M_X64
-    generic_function_t * unwindfunclet; 
+    generic_function_t * unwindfunclet;
 #else
     rva_t                unwindfunclet;
 #endif
@@ -1002,7 +1002,7 @@ uint32_t              :27;
 
 #ifdef _M_IX86
     uintptr_t stackbaseptr() const
-    { 
+    {
       //STATIC_ASSERT(sizeof(cxxregistration) == 0xC || sizeof(cxxregistration) == 20);
       return reinterpret_cast<uintptr_t>(this + 1);
     }
@@ -1155,7 +1155,7 @@ uint32_t              :27;
     ///         destructors are invoked for all automatic objects constructed
     ///         since the try block was entered. The automatic objects are destroyed
     ///         in the reverse order of the completion of their construction.
-    void// __forceinline 
+    void// __forceinline
       unwind(const dispatcher_context * const dispatch, const ehfuncinfo * const ehfi, ehstate_t to_state = -1) ///< defaults to empty state
     {
 #ifdef _M_IX86
@@ -1171,7 +1171,7 @@ uint32_t              :27;
           }
         }
         __except(unwindfilter(_exception_status()/*_exception_info()*/))
-        { 
+        {
         }
       }
 #endif // _M_IX86
@@ -1211,7 +1211,7 @@ uint32_t              :27;
 
   };//struct cxxregistration
 
-  exception_disposition 
+  exception_disposition
     inline
     cxxframehandler(
     exception_record *        const er,
@@ -1229,17 +1229,17 @@ uint32_t              :27;
   {
 
     uint32_t get_ehmagic() const
-    { 
+    {
       /* 0x14 */  return (uint32_t)ExceptionInformation[0];
     }
 
     eobject * get_object() const
-    { 
+    {
       /* 0x18 */  return reinterpret_cast<eobject*>(ExceptionInformation[1]);
     }
 
     const throwinfo * get_throwinfo() const
-    { 
+    {
       /* 0x1C */  return reinterpret_cast<const throwinfo*>(ExceptionInformation[2]);
     }
 
@@ -1316,7 +1316,7 @@ uint32_t              :27;
 
     static
       exception_disposition __cdecl
-      catchguardhandler( 
+      catchguardhandler(
       exception_record  *           er,
       nt::exception::registration * establisher_frame,
       nt::context *                 ctx,
@@ -1334,7 +1334,7 @@ uint32_t              :27;
       const ehfuncinfo *    const funcinfo,
       generic_function_t *  const handler,
       int                   const catchdepth,
-      unsigned              const nlg_code = 0x100) 
+      unsigned              const nlg_code = 0x100)
     {
       // assume callcatchblockhelper throws
       generic_function_t * continuation = 0;
@@ -1387,7 +1387,7 @@ uint32_t              :27;
       }
     }
 
-    generic_function_t * 
+    generic_function_t *
       callcatchblockhelper(
       cxxregistration *     const cxxreg,
       const ehfuncinfo *    const funcinfo,
@@ -1448,7 +1448,7 @@ uint32_t              :27;
 
         const typeinfo_t* ti = catchblock->typeinfo ? dispatch->va<typeinfo_t*>(catchblock->typeinfo) : NULL;
         if(ti && *ti->name && (ti->spare || catchblock->ishz)){
-          eobject** objplace = catchblock->ishz 
+          eobject** objplace = catchblock->ishz
             ? reinterpret_cast<eobject**>(cxxreg)
             : reinterpret_cast<eobject**>(catchblock->eobject_bpoffset + cxxreg->fp.FramePointers);
           if(catchblock->isreference){
@@ -1470,8 +1470,8 @@ uint32_t              :27;
         }
         // end of build helper
         if(cinfo != cidefault){
-          eobject* objthis = catchblock->ishz 
-            ? reinterpret_cast<eobject*>(cxxreg) 
+          eobject* objthis = catchblock->ishz
+            ? reinterpret_cast<eobject*>(cxxreg)
             : reinterpret_cast<eobject*>(catchblock->eobject_bpoffset + cxxreg->fp.FramePointers);
           void* copyctor = thrown_va(convertable->copyctor);
           eobject* copyarg = adjust_pointer(get_object(), convertable);
@@ -1605,7 +1605,7 @@ uint32_t              :27;
     }
 #endif
 
-    /// 15.1/2  When an exception is thrown, control is transferred 
+    /// 15.1/2  When an exception is thrown, control is transferred
     ///         to the nearest handler with a matching type (15.3)
     ///\return  does not return on handled exceptions.
     void
@@ -1804,7 +1804,7 @@ next_try: ;
 
 #ifdef _M_IX86
 
-  exception_disposition 
+  exception_disposition
     __declspec(noinline)
     cxxframehandler(
     exception_record *        const er,       ///< thrown NT exception

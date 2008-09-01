@@ -68,7 +68,7 @@ ntstatus __stdcall
   registry_callback_t(
     void *            CallbackContext,
     reg_notify_class  Argument1,
-    void *            Argument2 
+    void *            Argument2
     );
 
 typedef
@@ -76,7 +76,7 @@ ntstatus __stdcall
   cm_register_callback_t(
     registry_callback_t * Function,
     void *                Context,
-    int64_t *             Cookie 
+    int64_t *             Cookie
     );
 
 NTL__EXTERNAPI
@@ -85,7 +85,7 @@ cm_register_callback_t CmRegisterCallback;
 typedef
 ntstatus __stdcall
   cm_unregister_callback_t(
-    int64_t *             Cookie 
+    int64_t *             Cookie
     );
 
 NTL__EXTERNAPI
@@ -123,7 +123,7 @@ struct cm_key_hash
 
 struct cm_key_control_block;
 
-struct cached_child_list 
+struct cached_child_list
 {
   /* 0x00 */ uint32_t               Count;
   union {

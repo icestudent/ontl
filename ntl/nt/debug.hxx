@@ -142,82 +142,82 @@ namespace ntl {
       }
 
       void operator()(const char msg[]) const
-      { 
+      {
         printf(msg);
       }
 
       void operator()(const wchar_t msg[]) const
-      { 
+      {
         printf("%ws", msg);
       }
 
       void operator()(const char msg[], int i) const
-      { 
+      {
         printf("%s%i", msg, i);
       }
 
       void operator()(const char msg[], unsigned u) const
-      { 
+      {
         printf("%s%u", msg, u);
       }
 
       void operator()(const char msg[], long i) const
-      { 
+      {
         printf("%s%i", msg, i);
       }
 
       void operator()(const char msg[], int64_t i) const
-      { 
+      {
         printf("%s%I64i", msg, i);
       }
 
       void operator()(const char msg[], uint64_t i) const
-      { 
+      {
         printf("%s%I64u", msg, i);
       }
 
       void operator()(const char msg[], unsigned long u) const
-      { 
+      {
         printf("%s%u", msg, u);
       }
 
       void operator()(const char msg[], const void* p) const
-      { 
+      {
         printf("%s%p", msg, p);
       }
 
       void operator()(const char msg[], char c) const
-      { 
+      {
         printf("%s`%c'", msg, c);
       }
 
       void operator()(char c) const
-      { 
+      {
         printf("%c", c);
       }
 
       void operator()(const char msg[], wchar_t c) const
-      { 
+      {
         printf("%s`%C'", msg, c);
       }
 
       void operator()(const char msg[], const char msg2[]) const
-      { 
+      {
         printf("%s`%s'", msg, msg2);
       }
 
       void operator()(const char msg[], const wchar_t msg2[]) const
-      { 
+      {
         printf("%s`%S'", msg, msg2);
       }
 
       void operator()(const char msg[], const const_unicode_string & msg2) const
-      { 
+      {
         printf("%s`%wZ'", msg, &msg2);
       }
 
       void operator()(const char msg[], const unicode_string & msg2) const
-      { 
+      {
         printf("%s`%wZ'", msg, &msg2);
       }
     };
@@ -258,7 +258,7 @@ namespace ntl {
 #endif
       }
 
-    }//namespace dbg 
+    }//namespace dbg
 
 
   }//namespace nt

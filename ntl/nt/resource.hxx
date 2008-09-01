@@ -70,8 +70,8 @@ namespace ntl {
       };
 
       typedef uint32_t __stdcall run_once_init_t(
-          rtl::run_once* RunOnce, 
-          void* Parameter, 
+          rtl::run_once* RunOnce,
+          void* Parameter,
           void** Context
           );
 
@@ -84,7 +84,7 @@ namespace ntl {
       critical_section_control_t
         RtlInitializeCriticalSection,
         RtlDeleteCriticalSection,
-        RtlEnterCriticalSection, 
+        RtlEnterCriticalSection,
         RtlLeaveCriticalSection;
 
     NTL__EXTERNAPI
@@ -116,12 +116,12 @@ namespace ntl {
 
     NTL__EXTERNAPI
       void __stdcall RtlpWaitForCriticalSection(rtl::critical_section* CriticalSection);
-    
-    NTL__EXTERNAPI
-      void __stdcall RtlpUnWaitCriticalSection(rtl::critical_section* CriticalSection);      
 
     NTL__EXTERNAPI
-      void __stdcall RtlpNotOwnerCriticalSection(rtl::critical_section* CriticalSection);      
+      void __stdcall RtlpUnWaitCriticalSection(rtl::critical_section* CriticalSection);
+
+    NTL__EXTERNAPI
+      void __stdcall RtlpNotOwnerCriticalSection(rtl::critical_section* CriticalSection);
 
     // run once
     NTL__EXTERNAPI

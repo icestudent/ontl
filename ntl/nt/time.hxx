@@ -37,8 +37,8 @@ systime_t inline query_system_time()
   return user_shared_data::instance().SystemTime.get();
 }
 
-NTL__EXTERNAPI 
-ntstatus __stdcall 
+NTL__EXTERNAPI
+ntstatus __stdcall
   NtQuerySystemTime(systime_t* SystemTime);
 
 NTL__EXTERNAPI

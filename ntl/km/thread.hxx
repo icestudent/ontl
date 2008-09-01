@@ -67,7 +67,7 @@ void dereference_object(kthread * thread)
 typedef
 nt::tib * __stdcall
   get_thread_teb_t(const kthread * Thread);
-  
+
 NTL__EXTERNAPI
 get_thread_teb_t PsGetThreadTeb;
 
@@ -142,7 +142,7 @@ struct kpcr
 #define MAXIMUM_PROCESSORS 64
 
 
-struct kdescriptor 
+struct kdescriptor
 {
   uint16_t Pad[3];
   uint16_t Limit;
@@ -386,7 +386,7 @@ struct kprcb
   // The initiating processor waits (at elevated IRQL - generally SYNCH level)
   // for the last finishing processor to clear packet barrier which will cause
   // the packet barrier cache line to transfer to the last finishing processor
-  // then back to respective processor. 
+  // then back to respective processor.
   //
   // N.B. This results in minimal sharing of the cache line (no more than would
   // have occurred if the packet barrier was in a cache line all by itself)) and
@@ -587,7 +587,7 @@ struct kprcb
   processor_power_state PowerState;
 
   //
-  // Logical Processor Cache Information  
+  // Logical Processor Cache Information
   //
 
   cache_descriptor Cache[5];
@@ -606,7 +606,7 @@ struct kpcr
       ntl::intrinsic::__readgsbyte
 #endif
       ((uint32_t)offsetof(kpcr,*member));
-  }  
+  }
   template<typename type>
   static inline type get(type kpcr::* member, Int2Type<sizeof(uint16_t)>)
   {
@@ -617,7 +617,7 @@ struct kpcr
       ntl::intrinsic::__readgsword
 #endif
       ((uint32_t)offsetof(kpcr,*member));
-  }  
+  }
   template<typename type>
   static inline type get(type kpcr::* member, Int2Type<sizeof(uint32_t)>)
   {
@@ -628,7 +628,7 @@ struct kpcr
       ntl::intrinsic::__readgsdword
 #endif
       ((uint32_t)offsetof(kpcr,*member));
-  }  
+  }
   template<typename type>
   static inline type get(type kpcr::* member, Int2Type<sizeof(uint64_t)>)
   {
@@ -639,7 +639,7 @@ struct kpcr
       ntl::intrinsic::__readgsqword
 #endif
       ((uint32_t)offsetof(kpcr,*member));
-  }  
+  }
   template<typename type>
   static inline type get(type kpcr::* member)
   {
@@ -727,13 +727,13 @@ struct kthread32
   /* 0x34 */  kapc_state        ApcState;
   /* 0x4c */  uint32_t          ContextSwitches;
 
-  static 
+  static
   kthread * get_current()
   {
 #ifndef NTL_SUPPRESS_IMPORT
     return KeGetCurrentThread();
 #else
-    return *reinterpret_cast<kthread**>(/*__readfsdword(0x124)*/0xFFDFF124);    
+    return *reinterpret_cast<kthread**>(/*__readfsdword(0x124)*/0xFFDFF124);
 #endif
   }
 
@@ -1065,7 +1065,7 @@ struct device_traits<km::system_tread> : private device_traits<>
     query_limited_information = 0x0800,
   #if 0//(NTDDI_VERSION >= NTDDI_LONGHORN)
     all_access                = standard_rights_required | synchronize | 0xFFFF,
-  #else                                   
+  #else
     all_access                = standard_rights_required | synchronize | 0x3FF,
   #endif
   };
@@ -1112,7 +1112,7 @@ class system_tread : public handle, public device_traits<system_tread>
       create(this, start_routine, start_context, oa, desired_access,
               process_handle, client);
     }
-      
+
     static
     ntstatus
       create(

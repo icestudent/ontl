@@ -19,10 +19,10 @@
 
 #if defined(_MSC_VER) && _MSC_VER >= 1400
 //#define __thiscall __thiscall
-//#define __restrict __restrict 
+//#define __restrict __restrict
 #else
 #define __restrict
-#define __thiscall 
+#define __thiscall
 #endif
 
 #define _PasteToken(x,y) x##y
@@ -115,7 +115,7 @@ typedef alignas(8192) struct {} max_align_t;
  *@{*/
 
 //based on SC22/WG21/N1601 J16/04-0041
-typedef struct 
+typedef struct
 {
     template<typename any> operator any * () const { return 0; }
     template<class any, typename T> operator T any:: * () const { return 0; }

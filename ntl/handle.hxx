@@ -16,7 +16,7 @@
 namespace ntl {
 
 
-namespace aux { 
+namespace aux {
 template<typename T> __forceinline bool is_valid(T t) { return t != 0; }
 }
 
@@ -50,19 +50,19 @@ class basic_handle
     X release()   __ntl_nothrow { X tmp = get(); set(0); return tmp; }
 
     basic_handle duplicate() const __ntl_nothrow
-    { 
+    {
       return basic_handle( Duplicate(get()) );
     }
 
     void reset(X h = 0) __ntl_nothrow
-    { 
+    {
       if ( get() && get() != h ) Delete(get());
       set(h);
     }
 
   ///////////////////////////////////////////////////////////////////////////
   private:
-  
+
     X h;
     void set(X h) { this->h = h; }
 };

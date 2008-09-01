@@ -35,10 +35,10 @@ class basic_file : public traits
     template<typename objectT>
     explicit __forceinline
       basic_file(
-        const objectT &             object, 
+        const objectT &             object,
         const creation_disposition  cd              = traits::creation_disposition_default,
         const access_mask           desired_access  = traits::access_mask_default,
-        const share_mode            share_access    = traits::share_mode_default, 
+        const share_mode            share_access    = traits::share_mode_default,
         const creation_options      co              = traits::creation_options_default,
         const attributes            attr            = traits::attribute_default
         ) __ntl_nothrow
@@ -49,10 +49,10 @@ class basic_file : public traits
     template<typename objectT>
     bool
       create(
-        const objectT &             object, 
+        const objectT &             object,
         const creation_disposition  cd              = traits::creation_disposition_default,
         const access_mask           desired_access  = traits::access_mask_default,
-        const share_mode            share_access    = traits::share_mode_default, 
+        const share_mode            share_access    = traits::share_mode_default,
         const creation_options      co              = traits::creation_options_default,
         const attributes            attr            = traits::attribute_default
         ) __ntl_nothrow
@@ -117,7 +117,7 @@ class basic_file : public traits
     }
 
     const FileDevice & handler() const
-    { 
+    {
       return f;
     }
 

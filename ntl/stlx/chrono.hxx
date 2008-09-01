@@ -13,7 +13,7 @@
 #include "limits.hxx"
 #include "ratio.hxx"
 
-namespace std 
+namespace std
 {
 /**\defgroup  lib_utilities *** 20 General utilities library [utilities] *****
  *
@@ -21,7 +21,7 @@ namespace std
  *@{
  **/
 
-  namespace chrono 
+  namespace chrono
   {
     template <class Rep, class Period = ratio<1>> class duration;
     template <class Clock, class Duration = typename Clock::duration> class time_point;
@@ -45,8 +45,8 @@ namespace std
   {
     typedef chrono::duration<
       typename common_type<Rep1, Rep2>::type,
-      ratio< 
-        detail::static_evaluation::gcd<Period1::num, Period2::num>::value, 
+      ratio<
+        detail::static_evaluation::gcd<Period1::num, Period2::num>::value,
         (Period1::den / detail::static_evaluation::gcd<Period1::den, Period2::den>::value) * Period2::den
            >
                             > type;
@@ -59,17 +59,17 @@ namespace std
   };
 
 
-  namespace chrono 
+  namespace chrono
   {
     // customization traits
     /// is_floating_point [20.8.2.1 time.traits.is_fp]
-    template <class Rep> 
+    template <class Rep>
     struct treat_as_floating_point:
       is_floating_point<Rep>
     {};
 
     /// duration_values [20.8.2.2 time.traits.duration_values]
-    template <class Rep> 
+    template <class Rep>
     struct duration_values
     {
       static constexpr Rep zero() { return Rep(0); }
@@ -85,7 +85,7 @@ namespace std
      *  holds a count of ticks and a tick period. The tick period is the amount of time which occurs from one tick to the next, in
      *  units of seconds. It is expressed as a rational constant using the template \ñ ratio.
      *
-     *  @note \e Requires: \c Rep shall be an arithmetic type or a class emulating an arithmetic type. 
+     *  @note \e Requires: \c Rep shall be an arithmetic type or a class emulating an arithmetic type.
      *  If a program instantiates duration with a duration type for the template argument Rep a diagnostic is required.
      *  \par \e Requires: Period shall be a specialization of ratio, diagnostic required.
      *  \par \e Requires: Period::num shall be positive, diagnostic required.
@@ -93,7 +93,7 @@ namespace std
      *  on their representations.
      **/
     template <class Rep, class Period>
-    class duration 
+    class duration
     {
       template<class NotRatio>
       struct is_ratio: false_type
@@ -290,7 +290,7 @@ namespace std
       return CD(lhs).count() / CD(rhs).count();
     }
 
-    
+
     /// duration comparisons
     template <class Rep1, class Period1, class Rep2, class Period2>
     bool operator==(const duration<Rep1, Period1>& lhs, const duration<Rep2, Period2>& rhs)
@@ -372,13 +372,13 @@ namespace std
         }
       };
     }
-    
+
     /**
      *	@brief duration_cast [20.8.3.7 time.duration.cast]
      *
      *  @note \e Requires: ToDuration shall be an instantiation of duration. Diagnostic required.
      *
-     *  @remarks  This function shall not rely on any implicit conversions. All conversions shall be accomplished through static_cast. 
+     *  @remarks  This function shall not rely on any implicit conversions. All conversions shall be accomplished through static_cast.
      *  The implementation shall avoid all multiplications or divisions when it is known at compile time
      *  that they can be avoided because one or more arguments are 1. All intermediate computations shall be carried out
      *  in the widest possible representation and only converted to the destination representation at the final step.
@@ -388,7 +388,7 @@ namespace std
     {
       typedef typename ratio_divide<Period, typename ToDuration::period>::type    CF;
       typedef typename common_type<typename ToDuration::rep, Rep, intmax_t>::type CR;
-      
+
       return detail::duration_cast_impl<CF::num == 1, CF::den == 1>::cast<ToDuration, CF, CR>(d);
     }
 
@@ -396,7 +396,7 @@ namespace std
 
     /**
      *	@brief Class template time_point [20.8.4 time.point]
-     *  A time_point represents a point in time, as opposed to a duration of time. 
+     *  A time_point represents a point in time, as opposed to a duration of time.
      *  Another way of saying the same thing, is that a time_point represents an epoch plus or minus a duration.
 
      *  @tparam Clock shall meet the Clock requirements
@@ -549,7 +549,7 @@ namespace std
       typedef int64_t rep;
 
       // The system clock time stored as 100 nanoseconds units.
-      // it customizable from 0,001 to 0,015625 sec (1 - 15,6 ms), 
+      // it customizable from 0,001 to 0,015625 sec (1 - 15,6 ms),
       // usualy 976,5us (microseconds), so an approximate value (10ms) was choosen.
       typedef ratio_multiply<ratio<10>, milli>::type  period;
 
@@ -598,7 +598,7 @@ namespace std
       }
 
       /**
-       *  A \c time_point object that represents the same point in time as \c t when both values are truncated to the coarser 
+       *  A \c time_point object that represents the same point in time as \c t when both values are truncated to the coarser
        *  of the precisions of \c time_t and time_point.
        *  @note Precision of \c time_t less than precision of time_point.
        **/
@@ -626,7 +626,7 @@ namespace std
      *
      *  @note It is monotonic non-decreasing clock (see the http://www.rtsj.org/specjavadoc/timers_overview-summary.html for information)
      **/
-    class monotonic_clock 
+    class monotonic_clock
     {
     public:
       typedef int64_t rep;

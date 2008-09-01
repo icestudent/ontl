@@ -27,9 +27,9 @@ namespace tree
       struct node
       {
         enum color_type { black, red };
-        union 
+        union
         {
-          struct 
+          struct
           {
             node *left, *right;
           } s;
@@ -41,11 +41,11 @@ namespace tree
         int8_t color;
 
         explicit node(const T& elem, node* parent, node* left = NULL, node* right = NULL)
-          :elem(elem), parent(parent), left(left), right(right), 
+          :elem(elem), parent(parent), left(left), right(right),
           color(black)
         {}
         node(const T& elem)
-          :elem(elem), 
+          :elem(elem),
           parent(NULL),// left(NULL), right(NULL),
           color(red)
         {
@@ -90,7 +90,7 @@ namespace tree
 
         friend struct const_iterator_impl;
         friend class rb_tree<T,Compare, Allocator>;
-        
+
         iterator_impl(node_type* /*const*/ p, rb_tree<T, Compare, Allocator>* tree)
           :p(p), tree_(tree)
         {}
@@ -150,7 +150,7 @@ namespace tree
       {}
 
       template<class InputIterator>
-      rb_tree(InputIterator first, InputIterator last, 
+      rb_tree(InputIterator first, InputIterator last,
         const Compare& comp = Compare(), const Allocator& a = Allocator())
         :comparator_(comp), node_allocator(a),
         root_(), first_(), last_(), count_()
@@ -159,11 +159,11 @@ namespace tree
       }
 
       rb_tree(const Allocator& a);
-      
+
       rb_tree(const rb_tree<T, Compare, Allocator>& x)
         :root_(x.root_), first_(x.first_), last_(x.last_), count_(x.count_), node_allocator(x.node_allocator), comparator_(x.comparator_)
       {}
-      
+
       rb_tree(const rb_tree& x, const Allocator& a)
         :root_(x.root_), first_(x.first_), last_(x.last_), count_(x.count_), node_allocator(a), comparator_(x.comparator_)
       {}
@@ -487,7 +487,7 @@ namespace tree
         if(!w)
           return x->parent;
         if(
-          (!w->u.link[left] || w->u.link[left] ->color == node::black) && 
+          (!w->u.link[left] || w->u.link[left] ->color == node::black) &&
           (!w->u.link[right]|| w->u.link[right]->color == node::black))
         {
           w->color = node::red;

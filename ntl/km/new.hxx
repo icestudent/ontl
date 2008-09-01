@@ -16,7 +16,7 @@ namespace ntl {
   }
 }
 
-#ifndef NTL_NO_NEW 
+#ifndef NTL_NO_NEW
 
 #include "pool.hxx"
 #include "../stlx/new.hxx"
@@ -82,6 +82,6 @@ void __cdecl
   if ( ptr ) ntl::km::pool<ntl::km::NonPagedPool>::free(ptr);
 }
 
-#endif//#ifndef NTL_NO_NEW 
+#endif//#ifndef NTL_NO_NEW
 
 #endif//#ifndef NTL__KM_NEW

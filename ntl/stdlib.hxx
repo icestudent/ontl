@@ -50,56 +50,56 @@ extern "C" uint64_t _byteswap_uint64(uint64_t value);
 
 ///\name  Rotations
 
-static inline 
+static inline
 uint8_t
   rotl(uint8_t value, uint8_t shift)
 {
   return intrinsic::_rotl8(value, shift);
 }
 
-static inline 
+static inline
 uint16_t
   rotl(uint16_t value, uint8_t shift)
 {
   return intrinsic::_rotl16(value, shift);
 }
 
-static inline 
+static inline
 uint32_t
   rotl(uint32_t value, uint8_t shift)
 {
   return intrinsic::_lrotl(value, shift);
 }
 
-static inline 
+static inline
 uint64_t
   rotl(uint64_t value, uint8_t shift)
 {
   return intrinsic::_rotl64(value, shift);
 }
 
-static inline 
+static inline
 uint8_t
   rotr(uint8_t value, uint8_t shift)
 {
   return intrinsic::_rotr8(value, shift);
 }
 
-static inline 
+static inline
 uint16_t
   rotr(uint16_t value, uint8_t shift)
 {
   return intrinsic::_rotr16(value, shift);
 }
 
-static inline 
+static inline
 uint32_t
   rotr(uint32_t value, uint8_t shift)
 {
   return intrinsic::_lrotr(value, shift);
 }
 
-static inline 
+static inline
 uint64_t
   rotr(uint64_t value, uint8_t shift)
 {
@@ -109,21 +109,21 @@ uint64_t
 
 ///\name  Bytes swap
 
-static inline 
+static inline
 uint16_t
-  bswap(uint16_t value) 
+  bswap(uint16_t value)
 {
   return intrinsic::_byteswap_ushort(value);
 }
 
-static inline 
+static inline
 uint32_t
   bswap(uint32_t value)
 {
   return intrinsic::_byteswap_ulong(value);
 }
 
-static inline 
+static inline
 uint64_t
   bswap(uint64_t value)
 {
@@ -135,19 +135,19 @@ uint64_t
 
 /// host <-> big-endian
 template<typename type>
-static inline 
+static inline
 type
   big_endian(const type value)
-{ 
+{
   return bswap(value);
 }
 
 /// host <-> little-endian
 template<typename type>
-static inline 
+static inline
 type
   little_endian(const type value)
-{ 
+{
   return value;
 }
 
@@ -162,7 +162,7 @@ template<typename type>
 static inline
 type
   bitwise_or(const type m, const type m2)
-{ 
+{
   return static_cast<type>(static_cast<unsigned>(m)
                          | static_cast<unsigned>(m2));
 }
@@ -171,7 +171,7 @@ template<typename type>
 static inline
 type
   bitwise_and(const type m, const type m2)
-{ 
+{
   return static_cast<type>(static_cast<unsigned>(m)
                          & static_cast<unsigned>(m2));
 }
@@ -180,7 +180,7 @@ template<typename type>
 static inline
 type
   bitwise_xor(const type m, const type m2)
-{ 
+{
   return static_cast<type>(static_cast<unsigned>(m)
                          ^ static_cast<unsigned>(m2));
 }
@@ -190,7 +190,7 @@ type
 
 /// zeroes object's memory
 template<typename type>
-static inline 
+static inline
 void zero_mem(type & object)
 {
   char * const p = reinterpret_cast<char*>(&object);
@@ -200,7 +200,7 @@ void zero_mem(type & object)
 
 /// compares object's memory
 template<typename type>
-static inline 
+static inline
 bool binary_equal(const type & o, const type & o2)
 {
   const char * p  = reinterpret_cast<const char*>(&o);

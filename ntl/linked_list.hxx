@@ -36,7 +36,7 @@ struct linked<1>
 
   // PopEntryList(ListHead); however may pop more than one entry
   void unlink(this_type * prev)
-  { 
+  {
     prev->next = this->next;
   }
 };
@@ -64,17 +64,17 @@ struct linked<2>
   }
 
   void static unlink(this_type * prev, this_type * next)
-  { 
+  {
     prev->next = next; next->prev = prev;
   }
 
   void unlink(this_type * prev)
-  { 
+  {
     unlink(prev, this->next);
   }
 
   void unlink()
-  { 
+  {
     unlink(this->prev, this->next);
   }
 
@@ -184,6 +184,6 @@ struct containing_adaptor
     const member_type * m;
 };
 
-}//namespace ntl  
+}//namespace ntl
 
 #endif//#ifndef NTL__LINKED_LIST

@@ -33,7 +33,7 @@ kprocess * __stdcall
 
 struct kprocess
 {
-  static 
+  static
   kprocess * get_current()
   {
 #ifndef NTL_SUPPRESS_IMPORT
@@ -58,7 +58,7 @@ struct kgdtentry
 {
 	/*<thisrel this+0x0>*/ /*|0x2|*/ uint16_t LimitLow;
 	/*<thisrel this+0x2>*/ /*|0x2|*/ uint16_t BaseLow;
-	/*<thisrel this+0x4>*/ /*|0x4|*/ 
+	/*<thisrel this+0x4>*/ /*|0x4|*/
 	union {
 		struct {
 			uint8_t   BaseMid;
@@ -302,7 +302,7 @@ struct kprocess50
   uint8_t PowerState;
   bool DisableQuantum;
   uint8_t Spare[2];
-}; // <size 0x6c> 
+}; // <size 0x6c>
 
 struct kprocess51
 {
@@ -1011,7 +1011,7 @@ struct kprocess52 {
   /*<thisrel this+0xa8>*/ /*|0x10|*/ list_entry ProcessListEntry;
 }; // <size 0xb8>
 
-struct kprocess60 
+struct kprocess60
 {
   /*<thisrel this+0x0>*/ /*|0x18|*/ dispatcher_header Header;
   /*<thisrel this+0x18>*/ /*|0x10|*/ list_entry ProfileListHead;
@@ -1362,14 +1362,14 @@ get_process_peb_t PsGetProcessPeb;
 
 
 
-typedef	void 
+typedef	void
 (__stdcall* PCreateProcessNotifyRoutine)(
   legacy_handle ParentId,
   legacy_handle ProcessId,
   bool Create
   );
 
-typedef void 
+typedef void
 (__stdcall* PCreateThreadNotifyRoutine)(
                                         legacy_handle ProcessId,
                                         legacy_handle ThreadId,

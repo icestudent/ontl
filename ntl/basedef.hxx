@@ -40,7 +40,7 @@ using std::uintptr_t;
 
 using std::ptrdiff_t;
 
-///\name  
+///\name
 
 typedef std::vector<uint8_t, std::allocator<uint8_t> > raw_data;
 
@@ -50,7 +50,7 @@ enum times
   microseconds  = 10   * nanoseconds,
   milliseconds  = 1000 * microseconds,
   seconds       = 1000 * milliseconds,
-  minutes       = 60   * seconds, 
+  minutes       = 60   * seconds,
 //  hours         = int64_t(60)   * minutes,
 //  days          = int64_t(24)   * hours,
 };

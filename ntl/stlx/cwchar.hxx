@@ -53,10 +53,10 @@ NTL__CRTCALL
   _Assert(s1);
   _Assert(s2);
   for ( ; n; --n, ++s1, ++s2 ) if ( *s1 != *s2 || !*s1 ) return *s1 - *s2;
-  return static_cast<int>(n); // n == 0  
+  return static_cast<int>(n); // n == 0
 }
 
-__forceinline 
+__forceinline
 wchar_t *
   wcscpy(wchar_t * dst, const wchar_t * src)
 {
@@ -67,7 +67,7 @@ wchar_t *
 }
 
 
-__forceinline 
+__forceinline
 size_t
 NTL__CRTCALL
   wcslen(const wchar_t * const s)

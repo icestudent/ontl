@@ -70,7 +70,7 @@ int __stdcall
 
 static __forceinline
 int close(legacy_handle handle)
-{ 
+{
   return CloseHandle(handle);
 }
 
@@ -79,13 +79,13 @@ namespace aux {
 
 __forceinline
 void close(legacy_handle handle)
-{ 
+{
   nt::close(handle);
 }
 
 __forceinline
 legacy_handle duplicate(legacy_handle handle)
-{ 
+{
   return nt::duplicate(handle);
 }
 

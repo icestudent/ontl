@@ -63,7 +63,7 @@ class vector
       while ( n-- ) array_allocator.construct(i++, value);
       end_ = i;
     }
-    
+
     template <class InputIterator>
     __forceinline
     void construct(InputIterator first, size_type n)
@@ -135,7 +135,7 @@ class vector
 
     __forceinline
     ~vector() __ntl_nothrow
-    { 
+    {
       clear();
       if ( begin_ ) array_allocator.deallocate(begin_, capacity_);
     }
@@ -206,7 +206,7 @@ class vector
     const_reverse_iterator  rbegin() const
       { return const_reverse_iterator(end_); }
     reverse_iterator        rend()       { return reverse_iterator(begin_); }
-    const_reverse_iterator  rend() const 
+    const_reverse_iterator  rend() const
       { return const_reverse_iterator(begin_); }
 
     const_iterator          cbegin() const { return begin(); }
@@ -229,7 +229,7 @@ class vector
     }
 
     void reserve(size_type n) __ntl_throws(bad_alloc) //throw(length_error)
-    { 
+    {
       if ( capacity() < n ) realloc(n);
     }
 
@@ -243,7 +243,7 @@ class vector
       check_bounds(n);
       return operator[](n);
     }
-    
+
     reference at(size_type n)
     {
       check_bounds(n);
@@ -283,11 +283,11 @@ class vector
       iterator r_src = end();
       iterator r_dest = end_ = new_end;
       while ( tail_size-- )
-        move(--r_dest, --r_src);      
+        move(--r_dest, --r_src);
       if ( old_mem ) array_allocator.deallocate(old_mem, old_capacity);
       return r_dest;
     }
-    
+
     iterator insert__impl(iterator position, size_type n, const T& x)
     {
       iterator r_dest = insert__blank_space(position, n);
@@ -357,7 +357,7 @@ class vector
 
     __forceinline
     iterator erase(iterator position) __ntl_nothrow
-    { 
+    {
       // return erase(position, position + 1);
       array_allocator.destroy(position);
       --end_;
@@ -392,7 +392,7 @@ class vector
     }
 
     ///@}
-    
+
   ///////////////////////////////////////////////////////////////////////////
   private:
 
@@ -456,7 +456,7 @@ class vector
     //    capacity_ may be 0;
     //    for smal capacity_ values reallocation will be more efficient
     //      2,  4,  8,  16,  32,  64, 128, 256, 512
-    //      8, 24, 56, 120, 248, 504, 
+    //      8, 24, 56, 120, 248, 504,
     size_type capacity_factor() const { return (capacity_ + 4) * 2; }
 
 };//class vector

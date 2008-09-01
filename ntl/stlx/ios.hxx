@@ -114,7 +114,7 @@ class ios_base
     static const openmode in      = 1 << 3;
     static const openmode out     = 1 << 4;
     static const openmode binary  = 1 << 5;
- 
+
     /// 27.4.2.1.5 Type ios_base::seekdir [ios::seekdir]
     enum seekdir { beg, end, cur };
 
@@ -124,7 +124,7 @@ class ios_base
       public:
 
         Init()
-        { 
+        {
           if ( ! init_cnt )
           {
             init_cnt = 1;
@@ -151,7 +151,7 @@ class ios_base
     {
       return fmtfl;
     }
-    
+
     fmtflags flags(fmtflags fmtfl)
     {
       const fmtflags old = this->fmtfl;
@@ -165,7 +165,7 @@ class ios_base
       this->fmtfl |= fmtfl;
       return old;
     }
-    
+
     fmtflags setf(fmtflags fmtfl, fmtflags mask)
     {
       const fmtflags old = this->fmtfl;
@@ -177,24 +177,24 @@ class ios_base
     {
       fmtfl &= ~mask;
     }
-    
+
     streamsize precision() const
     {
       return prec;
     }
-    
+
     streamsize precision(streamsize prec)
     {
       const streamsize old = this->prec;
       this->prec = prec;
       return old;
     }
-    
+
     streamsize width() const
     {
       return wide;
     }
-      
+
     streamsize width(streamsize wide)
     {
       const streamsize old = this->wide;
@@ -248,7 +248,7 @@ class ios_base
   private:
 
     // members are sorted by size
-    
+
     streamsize  prec;
     streamsize  wide;
 
@@ -293,7 +293,7 @@ class fpos
     operator streamoff() const { return offset; }
 
   private:
-    //file_t    filepos;    
+    //file_t    filepos;
     streamoff offset;
     stateT    state_;
 };
@@ -342,14 +342,14 @@ class basic_ios : public ios_base
     {
       return tiestr;
     }
-    
+
     basic_ostream<charT, traits>* tie(basic_ostream<charT, traits>* tiestr)
     {
       basic_ostream<charT, traits>* const old = this->tiestr;
       this->tiestr = tiestr;
       return old;
     }
-    
+
     basic_streambuf<charT, traits>* rdbuf() const
     {
       return sb;
@@ -361,19 +361,19 @@ class basic_ios : public ios_base
       this->sb = sb;
       return old;
     }
-    
+
     locale imbue(const locale& loc)
     {
       const locale old = ios_base::imbue(loc);
       if ( rdbuf() ) rdbuf()->pubimbue(loc);
       return old;
     }
-    
+
     char narrow(char_type c, char dfault) const
     {
       return use_facet<ctype<char_type> >(getloc()).narrow(c, dfault);
     }
-    
+
     char_type widen(char c) const
     {
       return use_facet<ctype<char_type> >(getloc()).widen(c);
@@ -383,7 +383,7 @@ class basic_ios : public ios_base
     {
       return fillc;
     }
-    
+
     char_type fill(char_type ch)
     {
       const char_type old = fillc;
@@ -394,7 +394,7 @@ class basic_ios : public ios_base
     basic_ios& copyfmt(const basic_ios& rhs);
 
     ///\name 27.4.4.3 basic_ios flags functions [iostate.flags]
-    
+
     operator void*() const { return fail() ? 0 : this; }
     bool operator!() const { return fail(); }
 
@@ -486,7 +486,7 @@ ios_base&
   str.setf(ios_base::showpoint);
   return str;
 }
-  
+
 inline
 ios_base&
   noshowpoint(ios_base& str)

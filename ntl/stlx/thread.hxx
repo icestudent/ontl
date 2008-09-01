@@ -51,7 +51,7 @@ class thread
 
       private: native_handle_type _;
       friend thread;
-      
+
     };
 
     ///\name construct/copy/destroy:
@@ -128,7 +128,7 @@ thread::thread(F& f, const Arg1& arg1)
     thread_thunk(thread & thr, F& f, const Arg1& arg1)
     : thr(thr), f(f), arg1(arg1) {}
 
-    static void __stdcall 
+    static void __stdcall
     thread_start_routine(void* param)
     {
       thread_thunk & p = *reinterpret_cast<thread_thunk*>(param);
@@ -150,13 +150,13 @@ thread::thread(F& f, const Arg1& arg1)
   // wait till class instance is initialized by thread_start_routine
   while ( this->tid._ == reinterpret_cast<thread::native_handle_type>(-1) )
     this_thread::yield();
-  
+
 }
 
 void thread::join()
-{ 
+{
   _Assert(joinable());
-  while ( this->tid._ ) this_thread::yield();//sleep(1); 
+  while ( this->tid._ ) this_thread::yield();//sleep(1);
 }
 
   /** @} thread */

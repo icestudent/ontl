@@ -83,7 +83,7 @@ namespace std {
       {
         return !bitset_.test(pos_);
       }
-      
+
       operator bool() const
       {
         return bitset_.test(pos_);
@@ -128,7 +128,7 @@ namespace std {
       ) __ntl_throws(out_of_range, invalid_argument)
     {
       typedef basic_string<charT,traits,Allocator> string_type;
-      
+
       // 23.3.5.1.4
       if(pos > str.size())
         __ntl_throw(out_of_range);
@@ -339,7 +339,7 @@ namespace std {
 
     bool none() const { return !any(); }
     bool all() const { return count() == size(); }
-    bool any() const 
+    bool any() const
     {
       for(uint32_t i = 0; i < elements_count_; i++)
         if(storage_[i])
@@ -407,8 +407,8 @@ namespace std {
     static const size_t elements_count_ = N / element_size_ + ((N & (element_size_-1)) ? 1 : 0);
     static const storage_type set_bits_ = static_cast<storage_type>(-1);
 
-    template<size_t size, bool large> struct tidy 
-    { 
+    template<size_t size, bool large> struct tidy
+    {
       static const uint64_t make_tidy()
       {
         return (1 << size) - 1;
@@ -434,4 +434,3 @@ namespace std {
 } // namespace std
 
 #endif // NTL__STLX_BITSET
-

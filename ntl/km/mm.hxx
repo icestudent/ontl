@@ -1,6 +1,6 @@
 /**\file*********************************************************************
 *                                                                     \brief
-*  NT Memory 
+*  NT Memory
 *
 ****************************************************************************
 */
@@ -705,7 +705,7 @@ namespace ntl {
 
 #endif
 
-    struct mmaddress_node 
+    struct mmaddress_node
     {
       union {
         intptr_t Balance : 2;
@@ -857,7 +857,7 @@ namespace ntl {
     };
 
     // Page File structures.
- 
+
     struct mmmod_writer_listhead {
       list_entry ListHead;
       kevent Event;

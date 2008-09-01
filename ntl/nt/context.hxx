@@ -78,7 +78,7 @@ struct __declspec(align(16)) m128_t
 // Format of data for 32-bit fxsave/fxrstor instructions.
 //
 
-struct xmm_save_area32 
+struct xmm_save_area32
 {
   uint16_t ControlWord;
   uint16_t StatusWord;

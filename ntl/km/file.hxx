@@ -108,10 +108,10 @@ class file_handler : public handle, public device_traits<file_handler>
     __forceinline
     ntstatus
       create(
-        const object_attributes &   oa, 
+        const object_attributes &   oa,
         const creation_disposition  cd              = creation_disposition_default,
         const access_mask           desired_access  = access_mask_default,
-        const share_mode            share           = share_mode_default, 
+        const share_mode            share           = share_mode_default,
         const creation_options      co              = creation_options_default,
         const attributes            attr            = attribute_default,
         const uint64_t *            allocation_size = 0,
@@ -127,10 +127,10 @@ class file_handler : public handle, public device_traits<file_handler>
     __forceinline
     ntstatus
       create(
-        const std::wstring &        file_name, 
+        const std::wstring &        file_name,
         const creation_disposition  cd              = creation_disposition_default,
         const access_mask           desired_access  = access_mask_default,
-        const share_mode            share           = share_mode_default, 
+        const share_mode            share           = share_mode_default,
         const creation_options      co              = creation_options_default,
         const attributes            attr            = attribute_default,
         const uint64_t *            allocation_size = 0,
@@ -148,7 +148,7 @@ class file_handler : public handle, public device_traits<file_handler>
     __forceinline
     ntstatus
       open(
-        const object_attributes &   oa, 
+        const object_attributes &   oa,
         const access_mask           desired_access,
         const share_mode            share,
         const creation_options      co
@@ -158,7 +158,7 @@ class file_handler : public handle, public device_traits<file_handler>
       return ZwOpenFile(this, desired_access, &oa, &iosb, share, co);
     }
 
-    operator const void*() { return get(); } 
+    operator const void*() { return get(); }
 
     void close() { reset(); }
 
@@ -201,16 +201,16 @@ class file_handler : public handle, public device_traits<file_handler>
     }
 
 
-    int64_t 
+    int64_t
       size() const
     {
       file_information<file_standard_information> file_info(get());
       return file_info ? file_info.data()->size() : 0;
     }
-  
+
     ntstatus size(const size_type & new_size)
     {
-      const file_end_of_file_information & fi = 
+      const file_end_of_file_information & fi =
         *reinterpret_cast<const file_end_of_file_information*>(&new_size);
       file_information<file_end_of_file_information> file_info(get(), fi);
       return file_info;
@@ -220,7 +220,7 @@ class file_handler : public handle, public device_traits<file_handler>
       const const_unicode_string &  new_name,
       bool                          replace_if_exists)
     {
-      file_rename_information::file_rename_information_ptr fi = 
+      file_rename_information::file_rename_information_ptr fi =
         file_rename_information::alloc(new_name, replace_if_exists);
       if ( !fi ) return status::insufficient_resources;
       file_information<file_rename_information> file_info(get(), *fi);

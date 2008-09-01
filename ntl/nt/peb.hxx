@@ -160,7 +160,7 @@ struct peb
   {
     return *teb::get(&teb::ProcessEnvironmentBlock);
   }
-  
+
   struct ldr_data
   {
     /* 0x00 */  uint32_t      Length;
@@ -186,7 +186,7 @@ struct peb
     }
   };
 
-  typedef void __stdcall lock_routine_t(rtl_critical_section * PebLock);  
+  typedef void __stdcall lock_routine_t(rtl_critical_section * PebLock);
   typedef void __stdcall kernel_callback_t(void *);
 
   struct free_block
@@ -284,7 +284,7 @@ struct peb51: peb
   /* 0x204 */ void *                  SystemAssemblyStorageMap;
   /* 0x208 */ uint32_t                MinimumStackCommit;
 };
-// <size 0x210 
+// <size 0x210
 
 struct peb52: peb
 {
@@ -350,7 +350,7 @@ struct peb52: peb
   /* 0x21c */ /*|0x10|*/ uint32_t FlsBitmapBits[4];
   /* 0x22c */ /*|0x4|*/ uint32_t FlsHighIndex;
 };
-// <size 0x230 
+// <size 0x230
 
 
 #elif defined(_M_X64)
@@ -416,7 +416,7 @@ struct peb52: peb
   /*<thisrel this+0x328>*/ /*|0x10|*/ list_entry FlsListHead;
   /*<thisrel this+0x338>*/ /*|0x8|*/ void* FlsBitmap;
   /*<thisrel this+0x340>*/ /*|0x10|*/ uint32_t FlsBitmapBits[4];
-  /*<thisrel this+0x350>*/ /*|0x4|*/ uint32_t FlsHighIndex; 
+  /*<thisrel this+0x350>*/ /*|0x4|*/ uint32_t FlsHighIndex;
 };
 // <size 0x358>
 

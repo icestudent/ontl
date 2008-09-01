@@ -75,7 +75,7 @@ class native_string
 
     native_string(charT* s, size_t n)
     : length_(size_type(n) * sizeof(value_type)),
-      maximum_length_(size_type(n) * sizeof(value_type)), 
+      maximum_length_(size_type(n) * sizeof(value_type)),
       buffer_(s)
     {/**/}
 
@@ -108,7 +108,7 @@ class native_string
       return std::basic_string<value_type>(begin(), size());
     }
 
-    operator 
+    operator
       const native_string<typename std::add_const<charT>::type,
                           traits,
                           Allocator>&() const
@@ -162,7 +162,7 @@ class native_string
       check_bounds(n);
       return operator[](n);
     }
-    
+
     reference at(size_type n)
     {
       check_bounds(n);
@@ -191,15 +191,15 @@ class native_string
     ///\name  compare
     int compare(const native_string& str) const;
 
-    ///\name  operator== 
+    ///\name  operator==
     friend
       bool operator==(const native_string& lhs, const native_string& rhs)
       {
-        return lhs.length_== rhs.length_ 
+        return lhs.length_== rhs.length_
             && std::equal(lhs.buffer_, &lhs.buffer_[lhs.length_/sizeof(charT)], rhs.buffer_);
       }
 
-    ///\name  operator!= 
+    ///\name  operator!=
     friend
       bool operator!=(const native_string& lhs, const native_string& rhs)
       {

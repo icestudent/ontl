@@ -15,7 +15,6 @@
 #include "algorithm.hxx"
 #include "iterator.hxx"
 #include "memory.hxx"
-//#include "stdexcept.hxx"
 #include "vector.hxx"
 
 #ifndef EOF // should be moved to "stdio.hxx" ?
@@ -161,12 +160,14 @@ class basic_string
     typedef std::reverse_iterator<iterator>       reverse_iterator;
     typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
 
+    typedef charT CT;
+
     static const size_type npos = static_cast<size_type>(-1);
 
     ///\name 21.3.2 basic_string constructors and assigment operators [string.cons]
 
     /// 1 Effects: Constructs an object of class basic_string.
-    /// Postconditions: 
+    /// Postconditions:
     /// - data() a non-null pointer that is copyable and can have 0 added to it;
     /// - size() == 0;
     /// - capacity() an unspecified value.
@@ -174,8 +175,8 @@ class basic_string
     {/**/}
 
     /// 2 Effects: Constructs an object of class basic_string as indicated below.
-    ///   The stored Allocator value is copied from str.get_allocator(). 
-    /// Postconditions: 
+    ///   The stored Allocator value is copied from str.get_allocator().
+    /// Postconditions:
     /// - data() points at the first element of an allocated copy of the
     ///   array whose first element is pointed at by str.data();
     /// - size() == str.size();
@@ -189,7 +190,7 @@ class basic_string
     /// 6 Effects: Constructs an object of class basic_string and determines
     ///   the effective length rlen of the initial string value as the smaller
     ///   of n and str.size() - pos.
-    /// Postconditions: 
+    /// Postconditions:
     /// - data() points at the first element of an allocated copy of rlen
     ///   consecutive elements of the string controlled by str beginning
     ///   at position pos;
@@ -199,14 +200,14 @@ class basic_string
                  size_type            pos,
                  size_type            n     = npos,
                  const Allocator &    a     = Allocator())//throw(out_of_range)
-    : str(&str[pos], str.max__it(pos, n), a) 
+    : str(&str[pos], str.max__it(pos, n), a)
     {/**/}
 
     /// 7 Requires: s shall not be a null pointer and n < npos.
     /// 8 Effects: Constructs an object of class basic_string and determines
     ///   its initial string value from the array of charT of length n whose
     ///   first element is designated by s.
-    /// Postconditions: 
+    /// Postconditions:
     /// - data() points at the first element of an allocated copy of the
     ///   array whose first element is pointed at by s;
     /// - size() == n;
@@ -219,16 +220,16 @@ class basic_string
     /// 10 Effects: Constructs an object of class basic_string and determines
     ///   its initial string value from the array of charT of length traits::length(s)
     ///   whose first element is designated by s.
-    /// Postconditions: 
+    /// Postconditions:
     /// - data() points at the first element of an allocated copy of the
     ///   array whose first element is pointed at by s;
     /// - size() == traits::length(s);
     /// - capacity() is at least as large as size().
-    template<typename charT>
-    basic_string(const charT* const& s, const Allocator& a = Allocator())
+    template<typename CT>
+    basic_string(const CT* const& s, const Allocator& a = Allocator())
     : str(a)
     {
-      static_assert((is_same<charT, value_type>::value), "charT must to be value_type");
+      static_assert((is_same<CT, value_type>::value), "CT must to be value_type");
       assert_ptr(s);
       // small hack: copy terminating 0 to avoid case when n == 0
       size_type n = traits_type::length(s) + 1; // include '\0'
@@ -243,7 +244,7 @@ class basic_string
     /// Effects: Constructs an object of class basic_string and determines
     ///   its initial string value from the array of charT of length Size
     ///   whose elements are designated by s.
-    /// Postconditions: 
+    /// Postconditions:
     /// - data() points at the first element of an allocated copy of the array s;
     /// - size() == Size;
     /// - capacity() is at least as large as size().
@@ -255,7 +256,7 @@ class basic_string
     /// 13 Effects: Constructs an object of class basic_string and determines
     ///   its initial string value by repeating the charlikeobject c for all
     ///   n elements.
-    /// Postconditions: 
+    /// Postconditions:
     /// - data() points at the first element of an allocated array of
     ///   n elements, each storing the initial value c;
     /// - size() = n;
@@ -266,7 +267,7 @@ class basic_string
     /// 14 Effects: If InputIterator is an integral type, equivalent to
     ///   basic_string(static_cast<size_type>(begin), static_cast<value_type>(end), a)
     /// 15 Otherwise constructs a string from the values in the range [begin, end)
-    ///   with Postconditions: 
+    ///   with Postconditions:
     /// - data() points at the first element of an allocated copy of
     ///   the sequence [begin, end);
     /// - size() == distance(begin, end);
@@ -299,11 +300,11 @@ class basic_string
 
     /// 25 Returns: *this = basic_string<charT,traits,Allocator>(s).
     /// 26 Remarks: Uses traits::length().
-    template<typename charT>
-    basic_string& operator=(const charT* const& s)
+    template<typename CT>
+    basic_string& operator=(const CT* const& s)
     {
-      static_assert((is_same<charT, value_type>::value), "charT must to be value_type"); 
-      return assign(s);     
+      static_assert((is_same<CT, value_type>::value), "charT must to be value_type");
+      return assign(s);
     }
 
     template<size_t Size>
@@ -408,7 +409,7 @@ class basic_string
     /// 5 Requires: !empty()
     /// 6 Effects: Equivalent to operator[](0).
     const charT& front() const { _Assert(!empty()); return operator[](0); }
-    charT& front()             { _Assert(!empty()); return operator[](0); }       
+    charT& front()             { _Assert(!empty()); return operator[](0); }
 
     /// 7 Requires: !empty()
     /// 8 Effects: Equivalent to operator[](size() - 1).
@@ -420,13 +421,13 @@ class basic_string
     ///\name  basic_string::operator+= [21.3.6.1 lib.string::op+=]
     basic_string& operator+=(const basic_string& str) { return append(str); }
 
-    template<typename charT>
-    basic_string& operator+=(const charT* const& s)   
-    { 
-      static_assert((is_same<charT, value_type>::value), "charT must to be value_type"); 
+    template<typename CT>
+    basic_string& operator+=(const CT* const& s)
+    {
+      static_assert((is_same<CT, value_type>::value), "charT must to be value_type");
       return append(s, traits_type::length(s));
     }
-    
+
     template<size_t Size>
     basic_string& operator+=(const charT(&s)[Size])   { return append(s, Size-1); }
     basic_string& operator+=(charT c) { push_back(c); return *this; }
@@ -436,16 +437,16 @@ class basic_string
     template<size_t Size>
     basic_string& operator+=(charT(&s)[Size])         { return append(s, Size-1); }
 
-    template<typename charT>
-    basic_string& operator+=(const charT* const& s)   
-    { 
-      static_assert((is_same<charT, value_type>::value), "charT must to be value_type");
-      return append(s, traits_type::length(s));     
+    template<typename CT>
+    basic_string& operator+=(const CT* const& s)
+    {
+      static_assert((is_same<CT, value_type>::value), "charT must to be value_type");
+      return append(s, traits_type::length(s));
     }
 
   template<class String>
     basic_string& operator+=(const String& str)
-    { 
+    {
       return append(str.data(), str.size());
     }
 
@@ -471,10 +472,10 @@ class basic_string
       return *this;
     }
 
-    template<typename charT>
-    basic_string& append(const charT* const& s)
+    template<typename CT>
+    basic_string& append(const CT* const& s)
     {
-      static_assert((is_same<charT, value_type>::value), "charT must to be value_type");
+      static_assert((is_same<CT, value_type>::value), "charT must to be value_type");
       // trade off the traits_type::length(s) call for possible reallocs
       const_pointer ls = s;
       while ( !traits_type::eq(*ls, charT()) ) push_back(*ls++);
@@ -484,7 +485,7 @@ class basic_string
     template<size_t Size>
     basic_string& append(const charT (&s)[Size])
     {
-      append(s, Size-1); 
+      append(s, Size-1);
       return *this;
     }
 
@@ -523,10 +524,10 @@ class basic_string
       return insert(0, s, n);
     }
 
-    template<typename charT>
-    basic_string& assign(const charT* const& s)
+    template<typename CT>
+    basic_string& assign(const CT* const& s)
     {
-      static_assert((is_same<charT, value_type>::value), "charT must to be value_type");
+      static_assert((is_same<CT, value_type>::value), "charT must to be value_type");
       clear();
       return insert(0, s, traits_type::length(s));
     }
@@ -574,10 +575,10 @@ class basic_string
       return *this;
     }
 
-    template<typename charT>
-    basic_string& insert(size_type pos, const charT* const& s)
+    template<typename CT>
+    basic_string& insert(size_type pos, const CT* const& s)
     {
-      static_assert((is_same<charT, value_type>::value), "charT must to be value_type");
+      static_assert((is_same<CT, value_type>::value), "charT must to be value_type");
       const size_t n = traits_type::length(s);
       insert(&str[pos], s, &s[n]);
       return *this;
@@ -616,7 +617,7 @@ class basic_string
     iterator erase(iterator position) { return str.erase(position); }
 
     iterator erase(iterator first, iterator last)
-    { 
+    {
       return str.erase(first, last);
     }
 
@@ -637,8 +638,8 @@ class basic_string
                           size_type     n2)
     ;
 
-    template<typename charT>
-    basic_string& replace(size_type pos, size_type n1, const charT* const& s);
+    template<typename CT>
+    basic_string& replace(size_type pos, size_type n1, const CT* const& s);
 
     template<size_t Size>
     basic_string& replace(size_type pos, size_type n1, const charT(&s)[Size])
@@ -647,11 +648,11 @@ class basic_string
     }
 
     basic_string& replace(size_type pos, size_type n1, size_type n2, charT c);
-    
+
     basic_string& replace(iterator i1, iterator i2, const basic_string& str);
     basic_string& replace(iterator i1, iterator i2, const_pointer s, size_type n);
-    template<typename charT>
-    basic_string& replace(iterator i1, iterator i2, const charT* const& s);
+    template<typename CT>
+    basic_string& replace(iterator i1, iterator i2, const CT* const& s);
     template<size_t Size>
     basic_string& replace(iterator i1, iterator i2, const charT(&s)[Size])
     {
@@ -694,7 +695,7 @@ class basic_string
       static const charT empty;
       return /*size()*/ capacity() ? begin() : &empty;
     }
-    
+
     allocator_type get_allocator() const { return str.get_allocator(); }
 
     ///\name   21.3.7.2 basic_string::find [string::find]
@@ -711,7 +712,7 @@ class basic_string
     {
       return find(str.begin(), pos, str.size());
     }
-    
+
     /// 4 Returns: find(basic_string<charT,traits,Allocator>(s,n),pos).
     size_type find(const_pointer s, size_type pos, size_type n) const
     {
@@ -728,10 +729,10 @@ class basic_string
 
     /// 5 Returns: find(basic_string<charT,traits,Allocator>(s),pos).
     /// 6 Remarks: Uses traits::length().
-    template<typename charT>
-    size_type find(const charT* const& s, size_type pos = 0) const
+    template<typename CT>
+    size_type find(const CT* const& s, size_type pos = 0) const
     {
-      static_assert((is_same<charT, value_type>::value), "charT must to be value_type");
+      static_assert((is_same<CT, value_type>::value), "charT must to be value_type");
       return find(s, pos, traits_type::length(s));
     }
 
@@ -771,7 +772,7 @@ class basic_string
       size_type & xpos = pos;
       if ( xpos > size() || xpos + n > size() )
         xpos = size() - n;
-      while ( xpos + n > 0 ) 
+      while ( xpos + n > 0 )
       {
         for ( size_type i = 0; i != n; ++i )
           if ( !traits_type::eq(*(begin() + xpos + i), *(s + i)) )
@@ -782,13 +783,13 @@ class basic_string
       }
       return npos;
     }
-  
+
     /// 5 Returns: rfind(basic_string<charT,traits,Allocator>(s),pos).
     /// 6 Remarks: Uses traits::length().
-    template<typename charT>
-    size_type rfind(const charT* const& s, size_type pos = npos) const
+    template<typename CT>
+    size_type rfind(const CT* const& s, size_type pos = npos) const
     {
-      static_assert((is_same<charT, value_type>::value), "charT must to be value_type");
+      static_assert((is_same<CT, value_type>::value), "charT must to be value_type");
       return rfind(s, pos, traits_type::length(s));
     }
 
@@ -846,10 +847,10 @@ class basic_string
 
     /// 5 Returns: find_first_of(basic_string<charT,traits,Allocator>(s),pos).
     /// 6 Remarks: Uses traits::length().
-    template<typename charT>
-    size_type find_first_of(const charT* const& s, size_type pos = 0) const
+    template<typename CT>
+    size_type find_first_of(const CT* const& s, size_type pos = 0) const
     {
-      static_assert((is_same<charT, value_type>::value), "charT must to be value_type");
+      static_assert((is_same<CT, value_type>::value), "charT must to be value_type");
       return find_first_of(s, pos, traits_type::length(s));
     }
 
@@ -900,10 +901,10 @@ class basic_string
 
     /// 5 Returns: find_last_of(basic_string<charT,traits,Allocator>(s),pos).
     /// 6 Remarks: Uses traits::length().
-    template<typename charT>
-    size_type find_last_of(const charT* const& s, size_type pos = npos) const
+    template<typename CT>
+    size_type find_last_of(const CT* const& s, size_type pos = npos) const
     {
-      static_assert((is_same<charT, value_type>::value), "charT must to be value_type");
+      static_assert((is_same<CT, value_type>::value), "charT must to be value_type");
       return find_last_of(s, pos, traits_type::length(s));
     }
 
@@ -950,10 +951,10 @@ class basic_string
 
     /// 5 Returns: find_first_not_of(basic_string<charT,traits,Allocator>(s),pos).
     /// 6 Remarks: Uses traits::length().
-    template<typename charT>
-    size_type find_first_not_of(const charT* const& s, size_type pos = 0) const
+    template<typename CT>
+    size_type find_first_not_of(const CT* const& s, size_type pos = 0) const
     {
-      static_assert((is_same<charT, value_type>::value), "charT must to be value_type");
+      static_assert((is_same<CT, value_type>::value), "charT must to be value_type");
       return find_first_not_of(s, pos, traits_type::length(s));
     }
 
@@ -1004,10 +1005,10 @@ class basic_string
 
     /// 5 Returns: find_last_not_of(basic_string<charT,traits,Allocator>(s),pos).
     /// 6 Remarks: Uses traits::length().
-    template<typename charT>
-    size_type find_last_not_of(const charT* const& s, size_type pos = npos) const
+    template<typename CT>
+    size_type find_last_not_of(const CT* const& s, size_type pos = npos) const
     {
-      static_assert((is_same<charT, value_type>::value), "charT must to be value_type");
+      static_assert((is_same<CT, value_type>::value), "charT must to be value_type");
       return find_last_not_of(s, pos, traits_type::length(s));
     }
 
@@ -1049,10 +1050,10 @@ class basic_string
     int compare(size_type pos1, size_type n1, const basic_string& str) const;
     int compare(size_type pos1, size_type n1, const basic_string& str, size_type pos2, size_type n2) const;
 
-    template<typename charT>
-    int compare(const charT* const& s) const
+    template<typename CT>
+    int compare(const CT* const& s) const
     {
-      static_assert((is_same<charT, value_type>::value), "charT must to be value_type");
+      static_assert((is_same<CT, value_type>::value), "charT must to be value_type");
       const int r = traits_type::compare(begin(), s, size());
       // s may be longer than *this
       return r != 0 ? r : traits_type::eq(s[size()], charT()) ? r : r - 1; // r == 0 here
@@ -1070,8 +1071,8 @@ class basic_string
     {
       return compare(pos1, n1, s, Size-1);
     }
-    template<typename charT>
-    int compare(size_type pos1, size_type n1, const charT* const& s) const;
+    template<typename CT>
+    int compare(size_type pos1, size_type n1, const CT* const& s) const;
     int compare(size_type pos1, size_type n1, const_pointer s, size_type n2) const;
 
     ///\name  operator+ [21.3.7.1 lib.string::op+]
@@ -1087,8 +1088,9 @@ class basic_string
       return sum;
     }
 
+  template<typename CT>
   friend
-    basic_string operator+(const_pointer& lhs, const basic_string& rhs)
+    basic_string operator+(const CT* const& lhs, const basic_string& rhs)
     {
       basic_string<charT, traits, Allocator> sum;
       sum.alloc__new(traits_type::length(lhs) + rhs.size());
@@ -1118,8 +1120,9 @@ class basic_string
       return sum;
     }
 
+  template<typename CT>
   friend
-    basic_string operator+(const basic_string& lhs, const_pointer& rhs)
+    basic_string operator+(const basic_string& lhs, const CT* const& rhs)
     {
       basic_string<charT, traits, Allocator> sum;
       sum.alloc__new(lhs.size() + traits_type::length(rhs));
@@ -1221,7 +1224,7 @@ class basic_string
     basic_string append_to__reserved(const basic_string & str)
     {
       iterator to = this->str.end_;
-      for ( const_iterator from = str.begin(); from != str.end(); ) 
+      for ( const_iterator from = str.begin(); from != str.end(); )
         traits_type::assign(*to++, *from++);
       this->str.end_ = to;
       return *this;
@@ -1419,7 +1422,7 @@ void
 
 template<class charT, class traits, class Allocator>
 basic_istream<charT,traits>&
-  operator>>(basic_istream<charT,traits>& is, 
+  operator>>(basic_istream<charT,traits>& is,
              basic_string<charT,traits,Allocator>& str);
 
 template<class charT, class traits, class Allocator>
@@ -1434,7 +1437,7 @@ basic_istream<charT,traits>&
 
 template<class charT, class traits, class Allocator>
 basic_istream<charT,traits>&
-  getline(basic_istream<charT,traits>& is, 
+  getline(basic_istream<charT,traits>& is,
           basic_string<charT,traits,Allocator>& str);
 
 typedef basic_string<char>    string;

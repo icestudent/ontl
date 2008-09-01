@@ -80,12 +80,12 @@ namespace ntl {
 struct initial_tib;
 
 typedef
-uint32_t __stdcall 
+uint32_t __stdcall
 thread_start_routine_t(
    void* Parameter
    );
 
-typedef 
+typedef
 ntstatus __stdcall
   control_thread_t(
     legacy_handle       ThreadHandle,
@@ -103,7 +103,7 @@ NTL__EXTERNAPI
 control_thread_t NtSuspendThread;
 
 
-enum thread_info_class 
+enum thread_info_class
 {
   ThreadBasicInformation,
   ThreadTimes,
@@ -163,23 +163,23 @@ class user_thread;
       query_limited_information = 0x0800,
 #if 0//(NTDDI_VERSION >= NTDDI_LONGHORN)
       all_access                = standard_rights_required | synchronize | 0xFFFF,
-#else                                   
+#else
       all_access                = standard_rights_required | synchronize | 0x3FF,
 #endif
     };
 
-    friend access_mask operator | (access_mask m, access_mask m2) 
-    { 
+    friend access_mask operator | (access_mask m, access_mask m2)
+    {
       return bitwise_or(m, m2);
     }
 
     friend access_mask operator | (access_mask m, nt::access_mask m2)
-    { 
+    {
       return m | static_cast<access_mask>(m2);
     }
 
     friend access_mask operator | (nt::access_mask m, access_mask m2)
-    { 
+    {
       return m2 | m;
     }
   };
@@ -318,7 +318,7 @@ void __stdcall
 /* user_thread                                                          */
 /************************************************************************/
 class user_thread:
-  public handle, 
+  public handle,
   public device_traits<user_thread>
 {
   ////////////////////////////////////////////////////////////////////////////
@@ -334,7 +334,7 @@ public:
     size_t              commited_stack_size = 0,
     bool                create_suspended = false,
     client_id *         client          = 0,
-    security_descriptor* thread_security = 0) 
+    security_descriptor* thread_security = 0)
   {
     create(this, current_process(), start_routine, start_context, maximum_stack_size, commited_stack_size,
       create_suspended, client, thread_security);
@@ -360,7 +360,7 @@ public:
       client_id *         client          = 0,
       security_descriptor* thread_security = 0)
   {
-    return RtlCreateUserThread(process_handle, thread_security, create_suspended, 0, 
+    return RtlCreateUserThread(process_handle, thread_security, create_suspended, 0,
       maximum_stack_size, commited_stack_size, start_routine, start_context, thread_handle, client);
   }
 
@@ -375,7 +375,7 @@ public:
     return NtOpenThread(ThreadHandle, DesiredAccess, &oa, ClientId);
   }
 
-  ntstatus control(bool suspend) 
+  ntstatus control(bool suspend)
   {
     return (suspend ? NtSuspendThread : NtResumeThread)(get(), NULL);
   }

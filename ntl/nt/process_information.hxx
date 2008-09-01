@@ -112,15 +112,15 @@ NTL__EXTERNAPI query_process_information_t NtQueryInformationProcess;
 NTL__EXTERNAPI set_process_information_t   NtSetInformationProcess;
 
 //////////////////////////////////////////////////////////////////////////
-namespace aux 
+namespace aux
 {
   template<bool value = true>
-  struct is_read_only: 
+  struct is_read_only:
     std::integral_constant<bool, value>
   {};
 
   template<bool value = false>
-  struct is_write_only: 
+  struct is_write_only:
     std::integral_constant<bool, value>
   {};
 

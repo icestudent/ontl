@@ -138,7 +138,7 @@ namespace ntl { namespace cxxruntime
     }
   };
 
-  typedef void generic_function_t(); 
+  typedef void generic_function_t();
 
   #pragma pack(push, _TypeDescriptor, 8)
   struct typeinfo
@@ -234,7 +234,7 @@ namespace ntl { namespace cxxruntime
       intptr_t complete = ptr::padd<intptr_t>(object, -offset);
       if(cdoffset)
 #ifndef _M_X64
-        complete += 
+        complete +=
 #else
         complete -=
 #endif
@@ -244,7 +244,7 @@ namespace ntl { namespace cxxruntime
 
     const base_class2* find_instance(const void* complete, ptrdiff_t ptrdelta, const typeinfo& srctype, const typeinfo& desttype, const pe::image* imagebase = NULL) const
     {
-      const class_hierarchy* hierarchy = 
+      const class_hierarchy* hierarchy =
 #ifndef _M_X64
         this->hierarchy;
 #else
@@ -267,8 +267,8 @@ namespace ntl { namespace cxxruntime
       for(unsigned i = 0; i < hierarchy->bases; i++, ptr++){
         base = *ptr;
         if(base->type.rawtype == desttype){
-          // assume that no more than one base classes are exists, 
-          // i.e. only one base object exists, which type equals to the target type, and it [base object] can be private, 
+          // assume that no more than one base classes are exists,
+          // i.e. only one base object exists, which type equals to the target type, and it [base object] can be private,
           // so we can't give access to it.
           if(!base->notvisible)
             return base;
@@ -319,7 +319,7 @@ namespace ntl { namespace cxxruntime
     void validate() const
     {
       int reader = 0;
-      for(const char* p = reinterpret_cast<const char*>(this); 
+      for(const char* p = reinterpret_cast<const char*>(this);
         p < reinterpret_cast<const char*>(this) + sizeof(*this);
         p++)
       {
@@ -342,10 +342,10 @@ namespace {
   {
     using namespace ntl::cxxruntime;
     __try {
-      const pe::image* imagebase = 
+      const pe::image* imagebase =
 #ifdef _M_X64
         pe::image::base_from(object);
-#else 
+#else
         NULL;
 #endif
       const object_locator2& locator = object_locator2::instance(object);
@@ -356,7 +356,7 @@ namespace {
       // adjust object ptr by vptr diplacement
       object = ptr::padd(object, -vfdelta);
       const base_class2* base = locator.find_instance(complete, (const char*)object - (const char*)complete, srctype, desttype, imagebase);
-      
+
       const void* result;
       if(base)
         result = base->thiscast(complete);

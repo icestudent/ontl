@@ -58,7 +58,7 @@ ntstatus __stdcall
 
 static __forceinline
 ntstatus close(legacy_handle handle)
-{ 
+{
   return ZwClose(handle);
 }
 
@@ -67,13 +67,13 @@ namespace aux {
 
 __forceinline
 void close(legacy_handle handle)
-{ 
+{
   km::close(handle);
 }
 
 __forceinline
 legacy_handle duplicate(legacy_handle handle)
-{ 
+{
   return km::duplicate(handle);
 }
 

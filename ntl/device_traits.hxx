@@ -44,13 +44,13 @@ struct device_traits<void>
     generic_all               = 0x10000000L
   };
 
-  friend access_mask operator|(access_mask m, access_mask m2) 
-  { 
+  friend access_mask operator|(access_mask m, access_mask m2)
+  {
     return bitwise_or(m, m2);
   }
 
-  friend access_mask operator&(access_mask m, access_mask m2) 
-  { 
+  friend access_mask operator&(access_mask m, access_mask m2)
+  {
     return bitwise_and(m, m2);
   }
 
@@ -75,7 +75,7 @@ struct access_mask_t
     bool      access_aystem_acl,
     uint8_t   standard_rights,
     uint16_t  specific_rights = 0
-    ) : generic_read(static_cast<uint8_t>(generic_read)), 
+    ) : generic_read(static_cast<uint8_t>(generic_read)),
         generic_write(static_cast<uint8_t>(generic_write)),
         generic_execute(static_cast<uint8_t>(generic_execute)),
         generic_all(static_cast<uint8_t>(generic_all)),

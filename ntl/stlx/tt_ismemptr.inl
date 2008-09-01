@@ -6,7 +6,7 @@
 template <class T, class RT>
 struct is_member_object_pointer<RT T::* NTL_TT_PCV> : public true_type {};
 
-#else 
+#else
 #define NTL_TT_TCV_ NTL_TT_TCV
 #endif
 

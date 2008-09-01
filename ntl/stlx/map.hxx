@@ -26,7 +26,7 @@ namespace std {
 
 /// [23.3.1 lib.map]
 /// supports unique keys (contains at most one of each key value)
-  template 
+  template
     <
     class Key,
     class T,
@@ -42,7 +42,7 @@ namespace std {
               class Compare,
               class Allocator
               >
-    class value_compare: 
+    class value_compare:
       public binary_function<pair<const Key, T>, pair<const Key, T>, bool>
     {
     public:
@@ -216,7 +216,7 @@ class map:
       iterator val = find(x);
       return val == end() ? 0 : (erase(val), 1);
     }
-    
+
 #ifdef NTL__CXX
     void swap(map<Key,T,Compare,Allocator>&&);
 #else
@@ -263,7 +263,7 @@ class map:
 
     pair<iterator,iterator> equal_range(const key_type& x)
     {
-      // find a node with value which are equal or nearest to the x 
+      // find a node with value which are equal or nearest to the x
       node* p = root_;
       while(p){
         if(val_comp_(x, p->elem)){
@@ -343,7 +343,7 @@ void swap(map<Key,T,Compare,Allocator& x, map<Key,T,Compare,Allocator>&& y);
 
 template <class Key, class T, class Compare, class Alloc>
 struct constructible_with_allocator_suffix< map<Key, T, Compare, Alloc> >
-  :true_type 
+  :true_type
 {};
 
 /// [23.3.2 lib.multimap]

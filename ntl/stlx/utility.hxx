@@ -35,13 +35,13 @@ namespace rel_ops {
 template<class T> inline
 bool operator!=(const T & x, const T & y) { return !(x == y); }
 
-template<class T> inline 
+template<class T> inline
 bool operator> (const T & x, const T & y) { return y < x; }
 
-template<class T> inline 
+template<class T> inline
 bool operator<=(const T & x, const T & y) { return !(y < x); }
 
-template<class T> inline 
+template<class T> inline
 bool operator>=(const T & x, const T & y) { return !(x < y); }
 
 }//namespace rel_ops
@@ -86,7 +86,7 @@ struct pair
     // allocator-extended constructors
     template <class Alloc> pair(allocator_arg_t, const Alloc& a);
     template <class Alloc> pair(allocator_arg_t, const Alloc& a, const T1& x, const T2& y);
-    
+
     template <class U, class V, class Alloc>
     pair(allocator_arg_t, const Alloc& a, U&& x, V&& y);
 
@@ -126,28 +126,28 @@ struct constructible_with_allocator_prefix<pair<T1, T2> >: true_type {};
 ///\name  Comparisons
 ///@{
 
-template<class T1, class T2> 
+template<class T1, class T2>
 inline
 bool
   operator==(const pair<T1, T2> & x, const pair<T1, T2> & y)
-{ 
+{
   return x.first == y.first && x.second == y.second;
 }
 
-template<class T1, class T2> 
+template<class T1, class T2>
 inline
 bool
   operator<(const pair<T1, T2> & x, const pair<T1, T2> & y)
-{ 
+{
   const bool less = x.first < y.first;
   return less || (!less && x.second < y.second);
 }
 
-template<class T1, class T2> 
+template<class T1, class T2>
 inline
 bool
   operator!=(const pair<T1, T2> & x, const pair<T1, T2> & y)
-{ 
+{
   return !(x == y);
 }
 
@@ -155,7 +155,7 @@ template<class T1, class T2>
 inline
 bool
   operator> (const pair<T1, T2> & x, const pair<T1, T2> & y)
-{ 
+{
   return y < x;
 }
 
@@ -163,7 +163,7 @@ template<class T1, class T2>
 inline
 bool
   operator>=(const pair<T1, T2> & x, const pair<T1, T2> & y)
-{ 
+{
   return !(y < x);
 }
 
@@ -171,7 +171,7 @@ template<class T1, class T2>
 inline
 bool
   operator<=(const pair<T1, T2> & x, const pair<T1, T2> & y)
-{ 
+{
   return !(x < y);
 }
 
@@ -181,7 +181,7 @@ template<class T1, class T2>
 inline
 pair<T1, T2>
   make_pair(T1 x, T2 y)
-{ 
+{
   return pair<T1, T2>( x, y );
 }
 #pragma endregion

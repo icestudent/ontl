@@ -5,7 +5,7 @@
  ****************************************************************************
  */
 
-#ifdef STLX__CONFORMING_LOCALE 
+#ifdef STLX__CONFORMING_LOCALE
   #if STLX__CONFORMING_LOCALE
   #error no conforming locales support yet
   #endif
@@ -91,7 +91,7 @@ class locale
 
     bool operator==(const locale& other) const;
     bool operator!=(const locale& other) const;
-    
+
     template <class charT, class Traits, class Allocator>
     bool operator()(const basic_string<charT, Traits, Allocator>& s1,
                     const basic_string<charT, Traits, Allocator>& s2) const
@@ -353,7 +353,7 @@ template <> class ctype<char>
   public:
 
     template <class Facet> friend const Facet& use_facet(const locale&);
-    
+
     typedef char char_type;
 
     explicit ctype(const mask* tab = 0, bool del = false, size_t refs = 0)
@@ -375,20 +375,20 @@ template <> class ctype<char>
     {
       while ( low != high && !(table()[static_cast<unsigned char>(*low)] & m) )
           ++low;
-      return low; 
+      return low;
     }
 
     const char* scan_not(mask m, const char* low, const char* high) const
     {
       while ( low != high && (table()[static_cast<unsigned char>(*low)] & m) )
           ++low;
-      return low; 
+      return low;
     }
 
     char toupper(char c) const { return do_toupper(c); }
 
     const char* toupper(char* low, const char* high) const { return do_toupper(low, high); }
-    
+
     char tolower(char c) const { return do_tolower(c); }
 
     const char* tolower(char* low, const char* high) const {return do_tolower(low, high); }
@@ -412,7 +412,7 @@ template <> class ctype<char>
   protected:
 
     ~ctype()
-    { 
+    {
       // tab pointer is allways initialyzed by the constructor
       if ( /*tab &&*/ del )
         delete[] tab;
@@ -428,7 +428,7 @@ template <> class ctype<char>
     ///\name 22.2.1.3.4 ctype<char> virtual functions [facet.ctype.char.virtuals]
 
     _NTL_LOC_VIRTUAL char do_toupper(char c) const
-    { 
+    {
       return is(c, lower) ? c + 'A'-'a' : c;
     }
 
@@ -440,7 +440,7 @@ template <> class ctype<char>
     }
 
     _NTL_LOC_VIRTUAL char do_tolower(char c) const
-    { 
+    {
       return is(c, upper) ? c + 'A'-'a' : c;
     }
 
@@ -646,7 +646,7 @@ class numpunct : public locale::facet
 
     typedef charT char_type;
     typedef basic_string<charT> string_type;
-    
+
     explicit numpunct(size_t refs = 0);
 
     ///\name 22.2.3.1.1 numpunct members [facet.numpunct.members]

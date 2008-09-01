@@ -77,7 +77,7 @@ ntstatus __stdcall
     );
 
 
-enum duplicate_options 
+enum duplicate_options
 {
   duplicate_close_source    = 1,
   duplicate_same_access     = 2,
@@ -85,8 +85,8 @@ enum duplicate_options
 };
 
 static __forceinline
-  duplicate_options operator|(duplicate_options m, duplicate_options m2) 
-{ 
+  duplicate_options operator|(duplicate_options m, duplicate_options m2)
+{
   return bitwise_or(m, m2);
 }
 
@@ -99,8 +99,8 @@ enum handle_attributes
 };
 
 static __forceinline
-  handle_attributes operator|(handle_attributes m, handle_attributes m2) 
-{ 
+  handle_attributes operator|(handle_attributes m, handle_attributes m2)
+{
   return bitwise_or(m, m2);
 }
 
@@ -130,7 +130,7 @@ ntstatus __stdcall
 
 static __forceinline
 ntstatus close(legacy_handle handle)
-{ 
+{
   return NtClose(handle);
 }
 
@@ -139,13 +139,13 @@ namespace aux {
 
 __forceinline
 void close(legacy_handle handle)
-{ 
+{
   nt::close(handle);
 }
 
 __forceinline
 legacy_handle duplicate(legacy_handle handle)
-{ 
+{
   return nt::duplicate(handle);
 }
 

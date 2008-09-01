@@ -392,7 +392,7 @@ namespace ntl {
       irp * Irp
       );
 
-    irp * 
+    irp *
       irp::allocate(uint8_t StackSize, bool ChargeQuota)
     {
       return IoAllocateIrp(StackSize, ChargeQuota);

@@ -39,14 +39,14 @@ struct system_time
     int32_t   high, high2;
 };
 
-enum product_type 
+enum product_type
 {
   NtProductWinNt = 1,
   NtProductLanManNt,
   NtProductServer
 };
 
-enum alternative_architecture_type 
+enum alternative_architecture_type
 {
   StandardDesign,
   NEC98x86,
@@ -153,7 +153,7 @@ struct shared_data_64 : public shared_data_32
   }
 #endif
 
-  enum wow64_shared_information 
+  enum wow64_shared_information
   {
     SharedNtdll32LdrInitializeThunk,
     SharedNtdll32KiUserExceptionDispatcher,

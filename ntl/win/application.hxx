@@ -1,6 +1,6 @@
 /**\file*********************************************************************
  *                                                                     \brief
- *  Win32 Application support 
+ *  Win32 Application support
  *
  ****************************************************************************
  */
@@ -67,7 +67,7 @@ class application
     }
 
     struct startupinfo
-    {  
+    {
       uint32_t        cb;
       char_type *     lpReserved;
       char_type *     lpDesktop;
@@ -100,7 +100,7 @@ class application
       legacy_handle   hStdError;
 
       void inline get();
-    }; 
+    };
 
 
     struct command_line

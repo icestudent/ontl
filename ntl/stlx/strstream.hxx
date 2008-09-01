@@ -33,12 +33,12 @@ class strstreambuf : public basic_streambuf<char>
   public:
 
     ///\name D.7.1.1 strstreambuf constructors [depr.strstreambuf.cons]
- 
+
     explicit strstreambuf(streamsize alsize_arg = 0)
     : basic_streambuf(),
       strmode(dynamic), alsize(alsize_arg), palloc(0), pfree(0)
     {/**/}
-    
+
     strstreambuf(void* (*palloc_arg)(size_t), void (*pfree_arg)(void*))
     : basic_streambuf(),/*alsize(alsize_arg), an unspecified value*/
       strmode(dynamic), palloc(palloc_arg), pfree(pfree_arg)
@@ -50,7 +50,7 @@ class strstreambuf : public basic_streambuf<char>
     {
       _construct(gnext_arg, n, pbeg_arg);
     }
-    
+
     strstreambuf(const char* gnext_arg, streamsize n)
     : basic_streambuf(),/*alsize(alsize_arg), an unspecified value*/
       strmode(constant), palloc(0), pfree(0)
@@ -64,7 +64,7 @@ class strstreambuf : public basic_streambuf<char>
     {
       _construct(reinterpret_cast<char*>(gnext_arg), n, reinterpret_cast<char*>(pbeg_arg));
     }
-    
+
     strstreambuf(const signed char* gnext_arg, streamsize n)
     : basic_streambuf(),/*alsize(alsize_arg), an unspecified value*/
       strmode(constant), palloc(0), pfree(0)
@@ -268,7 +268,7 @@ class strstreambuf : public basic_streambuf<char>
       char_type * const sl  = seeklow();
       if ( which & ios::in )
       {
-        const off_type newoff = off + way == ios::beg ? 0 
+        const off_type newoff = off + way == ios::beg ? 0
                                     : way == ios::cur ? gnext - gbeg
                                     : /*way == ios::end ?*/ sh - gbeg;
         if ( newoff < (sl - gbeg) || (sh - gbeg) < newoff )
@@ -280,7 +280,7 @@ class strstreambuf : public basic_streambuf<char>
       // ( which & ios::out )
       if ( !pnext )
         return failed;
-      const off_type newoff = off + way == ios::beg ? 0 
+      const off_type newoff = off + way == ios::beg ? 0
                                   : way == ios::cur ? pnext - pbeg
                                   : /*way == ios::end ?*/ sh - pbeg;
       if ( newoff < (sl - pbeg) || (sh - pbeg) < newoff )
@@ -334,7 +334,7 @@ class strstreambuf : public basic_streambuf<char>
     //virtual streambuf* setbuf(char* s , streamsize n);
 
     ///}
-    
+
   ///////////////////////////////////////////////////////////////////////////
   private:
 
@@ -346,7 +346,7 @@ class strstreambuf : public basic_streambuf<char>
     char_type * seeklow() const { return gnext ? gbeg : gnext/* 0 */; }
 
     enum strstate
-    { 
+    {
       /// set when a dynamic array object has been allocated, and
       /// hence should be freed by the destructor for the strstreambuf object;
       allocated = 1 << 0,
@@ -467,7 +467,7 @@ class ostrstream : public ostream//basic_ostream<char>
     ///   constructors:
     /// — If (mode & app) == 0, then s shall designate the first element of
     ///   an array of n elements. The constructor is strstreambuf(s, n, s).
-    /// — If (mode & app) != 0, then s shall designate the first element of 
+    /// — If (mode & app) != 0, then s shall designate the first element of
     ///   an array of n elements that contains an NTBS whose first element is
     ///   designated by s. The constructor is strstreambuf(s, n, s + std::strlen(s)).
     ostrstream(char* s, int n, ios_base::openmode mode = ios_base::out)
@@ -505,7 +505,7 @@ class ostrstream : public ostream//basic_ostream<char>
 class strstream : public iostream//basic_iostream<char>
 {
   public:
-  
+
     ///\name Types
     typedef char char_type;
     typedef char_traits<char>::int_type int_type;

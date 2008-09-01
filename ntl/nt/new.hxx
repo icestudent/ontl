@@ -8,7 +8,7 @@
 #ifndef NTL__NT_NEW
 #define NTL__NT_NEW
 
-#ifndef NTL_NO_NEW 
+#ifndef NTL_NO_NEW
 
 #include "heap.hxx"
 #include "../stlx/new.hxx"
@@ -74,6 +74,6 @@ void __cdecl
   ntl::nt::heap::free(ntl::nt::process_heap(), ptr);
 }
 
-#endif//#ifndef NTL_NO_NEW 
+#endif//#ifndef NTL_NO_NEW
 
 #endif//#ifndef NTL__NT_NEW

@@ -16,19 +16,19 @@ namespace ntl {
   namespace nt {
 
     /// event
-    enum event_type { 
+    enum event_type {
       /** manual-reset */
-      NotificationEvent, 
+      NotificationEvent,
       /** auto-reset */
-      SynchronizationEvent 
+      SynchronizationEvent
     };
 
-    enum event_information_class 
+    enum event_information_class
     {
       EventBasicInformation
     };
 
-    struct event_basic_information 
+    struct event_basic_information
     {
       event_type EventType;
       int32_t    EventState;
@@ -72,18 +72,18 @@ namespace ntl {
       all_access    = standard_rights_required | synchronize | 0x3
     };
 
-    friend access_mask operator | (access_mask m, access_mask m2) 
-    { 
+    friend access_mask operator | (access_mask m, access_mask m2)
+    {
       return bitwise_or(m, m2);
     }
 
     friend access_mask operator | (access_mask m, nt::access_mask m2)
-    { 
+    {
       return m | static_cast<access_mask>(m2);
     }
 
     friend access_mask operator | (nt::access_mask m, access_mask m2)
-    { 
+    {
       return m2 | m;
     }
   };

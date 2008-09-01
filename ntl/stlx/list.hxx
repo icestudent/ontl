@@ -84,7 +84,7 @@ class list
         iterator__impl() /*: p(0)*/ {}
         iterator__impl(const iterator__impl& i) : p(i.p) {}
 
-        reference operator* () const 
+        reference operator* () const
           { return static_cast<node_type*>(this->p)->elem; }
         pointer   operator->() const { return &operator*(); }
         iterator__impl & operator++() { p = p->next; return *this; }
@@ -116,14 +116,14 @@ class list
         const_iterator__impl(const typename list::iterator__impl& i) : p(i.p) {} //`typename list::' works around MSVC's /Ze
         const_iterator__impl(const const_iterator__impl& i) : p(i.p) {}
 
-        const_reference operator* () const 
+        const_reference operator* () const
           { return static_cast<const node_type*>(this->p)->elem; }
         const_pointer   operator->() const { return &operator*(); }
         const_iterator__impl & operator++() { p = p->next; return *this; }
         const_iterator__impl & operator--() { p = p->prev; return *this; }
         const_iterator__impl operator++(int)
           { const_iterator__impl tmp( *this ); ++*this; return tmp; }
-        const_iterator__impl operator--(int) 
+        const_iterator__impl operator--(int)
           { const_iterator__impl tmp( *this ); --*this; return tmp; }
 
       friend bool
@@ -151,8 +151,8 @@ class list
     ///\name construct/copy/destroy [23.2.4.1]
 
     explicit list(const Allocator& a = Allocator())
-    : node_allocator(a), size_(0) 
-    { 
+    : node_allocator(a), size_(0)
+    {
       init_head();
     }
 
@@ -161,7 +161,7 @@ class list
                   const T&          value = T(),
                   const Allocator&  a     = Allocator())
     : node_allocator(a), size_(0)
-    { 
+    {
       init_head();
       insert(begin(), n, value);
     }
@@ -279,7 +279,7 @@ class list
 
     __forceinline
     void push_front(const T& x) { insert(begin(), x); }
-    
+
     __forceinline
     void pop_front()            { erase(begin()); }
 
@@ -301,7 +301,7 @@ class list
 
     __forceinline
     void insert(iterator position, size_type n, const T& x)
-    { 
+    {
       while ( n-- ) insert(position, x);
     }
 
@@ -325,7 +325,7 @@ class list
 
     __forceinline
     iterator erase(iterator position, iterator last)
-    { 
+    {
       while ( position != last ) position = erase(position);
       return last;
     }
@@ -434,7 +434,7 @@ class list
       node_allocator.destroy(static_cast<node_type*>(position.p));
       node_allocator.construct(static_cast<node_type*>(position.p), x);
     }
-    
+
 };//class list
 
 ///\name  List comparisons
@@ -479,7 +479,7 @@ bool operator<=(const list<T,Allocator>& x, const list<T,Allocator>& y) __ntl_no
 
 template <class T, class Allocator>
 void swap(list<T, Allocator>& x, list<T, Allocator>& y) __ntl_nothrow
-{ 
+{
   x.swap(y);
 }
 
@@ -501,7 +501,7 @@ const char * list<int>::test__implementation()
 
   l.clear();
   if ( l.size() != 0 )  return "list<int>::clear()";
-  
+
   l.push_back(3);
   l.push_back(4);
   l.push_back(5);
@@ -511,7 +511,7 @@ const char * list<int>::test__implementation()
 
   list<int>::const_iterator i0 = l.begin();
   //list<int>::iterator i1 = i0;//shall not compile
-  
+
   int j = 5;
   for ( list<int>::const_reverse_iterator i = l.rbegin();
         i != static_cast<const_reverse_iterator>(l.rend()); )

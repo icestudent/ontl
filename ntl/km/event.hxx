@@ -170,7 +170,7 @@ namespace ntl {
       bool Wait
       );
 
-    struct kmutant 
+    struct kmutant
     {
       dispatcher_header   Header;
       list_entry          MutantListEntry;
@@ -197,7 +197,7 @@ namespace ntl {
 
     // guarded mutex
 
-    struct kguarded_mutex 
+    struct kguarded_mutex
     {
       enum lock
       {

@@ -194,7 +194,7 @@ struct io_timer
 };
 
 
-enum io_allocation_action 
+enum io_allocation_action
 {
   KeepObject                    = 0x1,
   DeallocateObject              = 0x2,

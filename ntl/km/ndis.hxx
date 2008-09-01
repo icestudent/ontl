@@ -256,7 +256,7 @@ class ndis
         {
           if ( !Private.ValidCounts )
           {
-            Private.TotalLength = Private.PhysicalCount = Private.Count = 0; 
+            Private.TotalLength = Private.PhysicalCount = Private.Count = 0;
             for ( buffer * tmp = Private.Head; tmp; tmp = tmp->next() )
             {
               Private.TotalLength += tmp->byte_count();
@@ -329,7 +329,7 @@ class ndis
     };
 
     typedef uint32_t  oid;
-  
+
     struct request
     {
       enum type
@@ -476,11 +476,11 @@ class ndis
               ndis::status::type      Status,
               unsigned                BytesTransferred
               );
-        
+
           typedef
           void __stdcall
             wan_transfer_data_complete_handler_t();
-        
+
           union
           {
             transfer_data_complete_handler_t *      TransferDataCompleteHandler;
@@ -748,7 +748,7 @@ class ndis
 
     typedef ndis::protocol::characteristics::transfer_data_complete_handler_t
       transfer_data_complete_handler_t;
-        
+
     typedef ndis::protocol::characteristics::wan_transfer_data_complete_handler_t
       wan_transfer_data_complete_handler_t;
 
@@ -885,16 +885,16 @@ class ndis
       receive_complete_handler_t *        ReceiveCompleteHandler;
       wan_receive_handler_t *             WanReceiveHandler;
       request_complete_handler_t *        RequestCompleteHandler;
-  
+
       receive_packet_handler_t *          ReceivePacketHandler;
       send_packets_handler_t *            SendPacketsHandler;
-  
+
       reset_handler_t *                   ResetHandler;
       request_handler_t *                 RequestHandler;
       reset_complete_handler_t *          ResetCompleteHandler;
       status_handler_t *                  StatusHandler;
       status_complete_handler_t *         StatusCompleteHandler;
-  
+
       uint32_t            Flags;
       int32_t             References;
       kspin_lock          SpinLock;
@@ -964,7 +964,7 @@ class ndis
         const ndis::packet *  PacketArray[],
         uint32_t              NumberOfPackets
         );
-    
+
     struct x_filter;
     typedef x_filter eth_filter;
 

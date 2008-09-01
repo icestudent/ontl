@@ -56,7 +56,7 @@ struct array
     const_reverse_iterator  rbegin() const
       { return const_reverse_iterator(end()); }
     reverse_iterator        rend()        { return reverse_iterator(begin()); }
-    const_reverse_iterator  rend() const 
+    const_reverse_iterator  rend() const
       { return const_reverse_iterator(begin()); }
 
     const_iterator cbegin() const { return begin(); }
@@ -99,7 +99,7 @@ struct array
 
   // Types with private or protected data members are not aggregate
   //private:
-    
+
     /* vs2k5 debugger bug: it doesn't recognize `static const type`, we must use enum instead */
     //static const size_t __actual_size = N ? N : 1;
     enum { __actual_size = N ? N : 1 };
@@ -135,12 +135,12 @@ template <class T, size_t N> struct tuple_size<array<T, N> >;
 template <int I, class T, size_t N> struct tuple_element<I, array<T, N> >;
 
 template <int I, class T, size_t N>
-T& 
+T&
   get(array<T, N>& a)
 {
   return a[I];
 }
-  
+
 template <int I, class T, size_t N>
 const T&
   get(const array<T, N>& a)

@@ -39,7 +39,7 @@ class basic_streambuf
     typedef traits                    traits_type;
 
   protected:
-    
+
     /// 27.5.2.1 basic_streambuf constructors [streambuf.cons]
     __forceinline
     basic_streambuf()
@@ -63,7 +63,7 @@ class basic_streambuf
     locale pubimbue(const locale& loc);
 
     locale getloc() const
-    { 
+    {
 #if !STLX__CONFORMING_LOCALE
       locale  l;
 #endif
@@ -91,7 +91,7 @@ class basic_streambuf
     }
 
     int pubsync()
-    { 
+    {
       return sync();
     }
 
@@ -106,7 +106,7 @@ class basic_streambuf
       const streamsize ravail = gend - gnext;
       return 0 < ravail ? ravail : showmanyc();
     }
-    
+
     int_type snextc()
     {
       const int_type c = sbumpc();
@@ -139,7 +139,7 @@ class basic_streambuf
       return !(0 < pbavail) || !traits_type::eq(c ,gnext[-1])
         ? pbackfail(traits_type::to_int_type(c)) : traits_type::to_int_type(*--gnext);
     }
-    
+
     int_type sungetc()
     {
       const streamsize pbavail = gnext - gbeg;
@@ -154,7 +154,7 @@ class basic_streambuf
       const streamsize wavail = pend - pnext;
       return !(0 < wavail) ? overflow(ic) : *pnext++ = traits_type::to_char_type(ic), ic;
     }
-    
+
     streamsize sputn(const char_type* s, streamsize n)
     {
       return xsputn(s, n);
@@ -203,7 +203,7 @@ class basic_streambuf
 
     virtual basic_streambuf<char_type,traits>*
       setbuf(char_type*, streamsize)
-    { 
+    {
       // Default behavior: Does nothing.
       return this;
     }
@@ -226,14 +226,14 @@ class basic_streambuf
     }
 
     virtual int sync()
-    { 
+    {
       return 0;
     }
 
     ///\name  27.5.2.4.3 Get area [streambuf.virt.get]
 
     virtual streamsize showmanyc()
-    { 
+    {
       return 0;
     }
 
@@ -260,7 +260,7 @@ class basic_streambuf
     }
 
     virtual int_type underflow()
-    { 
+    {
       ///\note The public members of basic_streambuf call this virtual function
       ///      only if gptr() is null or gptr() >= egptr()
       _Assert(!gptr() || gptr() >= egptr());
@@ -280,7 +280,7 @@ class basic_streambuf
 
     ///\name  27.5.2.4.4 Putback [streambuf.virt.pback]
     virtual int_type pbackfail(int_type c = traits_type::eof())
-    { 
+    {
       ///\note The public functions of basic_streambuf call this virtual function
       ///      only when gptr() is null, gptr() == eback(),
       ///      or traits::eq(traits::to_char_type(c ),gptr()[-1]) returns false.
@@ -317,7 +317,7 @@ class basic_streambuf
     }
 
     virtual int_type overflow(int_type = traits_type::eof())
-    { 
+    {
       //  Default behavior: Returns traits::eof().
       return traits_type::eof();
     }

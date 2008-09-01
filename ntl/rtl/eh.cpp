@@ -65,7 +65,7 @@ uint32_t get_eax()
 #ifdef _M_X64
 
 
-exception_disposition 
+exception_disposition
 ntl::cxxruntime::cxxframehandler(
                 exception_record *        const er,       ///< thrown NT exception
                 cxxregistration *         const eframe,
@@ -77,8 +77,8 @@ ntl::cxxruntime::cxxframehandler(
                 bool                            const destruct      /* recursive */)
 {
   if(!
-    (er->iscxx() 
-    || (er->isconsolidate() && er->NumberParameters == exception_record::maximum_parameters && er->ExceptionInformation[8] == ehmagic1200) 
+    (er->iscxx()
+    || (er->isconsolidate() && er->NumberParameters == exception_record::maximum_parameters && er->ExceptionInformation[8] == ehmagic1200)
     || er->islongjump() || ehfi->magic < _EH_MAGIC || !ehfi->synchronous)
     )
   {

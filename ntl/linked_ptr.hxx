@@ -1,13 +1,13 @@
 /**\file*********************************************************************
  *                                                                     \brief
- *  Linked pointer  
+ *  Linked pointer
  *
  ****************************************************************************
  */
 
 #ifndef NTL__LINKED_PTR
 #define NTL__LINKED_PTR
- 
+
 #include "stlx/algorithm.hxx"
 #include "linked_list.hxx"
 
@@ -42,7 +42,7 @@ struct linked_ptr
 
     /// unlink
     ~linked_ptr()
-    { 
+    {
       /// unless this is not the last one
       //if ( links.prev != links.next )
         links.unlink(links.prev, links.next);
@@ -54,7 +54,7 @@ struct linked_ptr
       long c = 0;
       const_double_linked_iterator i = &links;
       do if ( containing_adaptor<this_type, double_linked, &this_type::links>(i)->ptr )
-          ++c; 
+          ++c;
       while ( --i != &links );
       return c;
     }
@@ -66,7 +66,7 @@ struct linked_ptr
     }
 
     operator unspecified_bool_type() const
-    { 
+    {
       // ptr != 0 forces a few bloat instructions
       return brute_cast<unspecified_bool_type>(ptr);
     }

@@ -37,7 +37,7 @@ void __stdcall
     );
 
 
-typedef 
+typedef
 ntstatus __stdcall
   set_remove_load_image_notify_routine_t(
     load_image_notify_routine_t *  NotifyRoutine

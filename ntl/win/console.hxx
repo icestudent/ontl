@@ -1,6 +1,6 @@
 /**\file*********************************************************************
  *                                                                     \brief
- *  Console support 
+ *  Console support
  *
  ****************************************************************************
  */
@@ -64,11 +64,11 @@ class console
       return 0 != AllocConsole();
     }
 
-    ///\note attaches to parent process' console by default 
+    ///\note attaches to parent process' console by default
     static __forceinline
     bool attach(uint32_t process_id = uint32_t(-1))
     {
-      return 0 != AttachConsole(process_id);      
+      return 0 != AttachConsole(process_id);
     }
 
     static __forceinline
@@ -106,14 +106,14 @@ class console
     uint32_t write(const charT msg[])
     {
       return write<charT>(msg, static_cast<uint32_t>(std::char_traits<charT>::length(msg)));
-    }    
+    }
 
     template<typename charT>
     static
     uint32_t write(const charT c)
     {
       return write<charT>(&c, 1);
-    }    
+    }
 
     template<typename charT>
     static

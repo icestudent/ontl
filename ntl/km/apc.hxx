@@ -125,7 +125,7 @@ struct apc : kapc
     return KeInsertQueueApc(this, system_argument1, system_argument2, increment);
   }
 
-  static 
+  static
   void __stdcall
     default_kernel_routine(const kapc * Apc, knormal_routine_t *, void *, void *, void *)
   {

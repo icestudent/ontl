@@ -132,12 +132,12 @@ ntstatus __stdcall
 struct rtl_relative_name
 {
   unicode_string    RelativeName;
-  union 
+  union
   {
     legacy_handle   ContainingDirectory;
     uint64_t        wow64Handle;
   };
-  
+
   rtl_relative_name()
     :wow64Handle()
   {}
@@ -170,7 +170,7 @@ template<>
 struct device_traits<nt::file_handler> : public device_traits<>
 {
   bool success(ntstatus s) { return nt::success(s); }
-  
+
   typedef int64_t size_type;
 
   enum access_mask
@@ -197,21 +197,21 @@ struct device_traits<nt::file_handler> : public device_traits<>
       generic_execute       = standard_rights_execute | execute | read_attributes | synchronize,
       generic_all           = all_access
   };
-  static const access_mask access_mask_default = 
+  static const access_mask access_mask_default =
                         access_mask(read_attributes | read_data | synchronize);
 
-  friend access_mask operator | (access_mask m, access_mask m2) 
-  { 
+  friend access_mask operator | (access_mask m, access_mask m2)
+  {
     return bitwise_or(m, m2);
   }
 
   friend access_mask operator | (access_mask m, nt::access_mask m2)
-  { 
+  {
     return m | static_cast<access_mask>(m2);
   }
 
   friend access_mask operator | (nt::access_mask m, access_mask m2)
-  { 
+  {
     return m2 | m;
   }
 
@@ -238,8 +238,8 @@ struct device_traits<nt::file_handler> : public device_traits<>
     does_not_exists
   };
 
-  friend creation_disposition operator | (creation_disposition m, creation_disposition m2) 
-  { 
+  friend creation_disposition operator | (creation_disposition m, creation_disposition m2)
+  {
     return bitwise_or(m, m2);
   }
 
@@ -253,8 +253,8 @@ struct device_traits<nt::file_handler> : public device_traits<>
   };
   static const share_mode share_mode_default = share_read;
 
-  friend share_mode operator | (share_mode m, share_mode m2) 
-  { 
+  friend share_mode operator | (share_mode m, share_mode m2)
+  {
     return bitwise_or(m, m2);
   }
 
@@ -272,7 +272,7 @@ struct device_traits<nt::file_handler> : public device_traits<>
 
     complete_if_oplocked      = 0x00000100,
     no_ae_knowledge           = 0x00000200,
-    open_remote_instance      = 0x00000400,    
+    open_remote_instance      = 0x00000400,
     random_access             = 0x00000800,
 
     delete_on_close           = 0x00001000,
@@ -285,11 +285,11 @@ struct device_traits<nt::file_handler> : public device_traits<>
     open_no_recall            = 0x00400000,
     open_for_free_space_query = 0x00800000,
   };
-  static const creation_options creation_options_default = 
+  static const creation_options creation_options_default =
                  creation_options(non_directory_file | synchronous_io_nonalert);
 
-  friend creation_options operator | (creation_options m, creation_options m2) 
-  { 
+  friend creation_options operator | (creation_options m, creation_options m2)
+  {
     return bitwise_or(m, m2);
   }
 
@@ -308,8 +308,8 @@ struct device_traits<nt::file_handler> : public device_traits<>
   };
   static const attributes attribute_default = static_cast<attributes>(0);
 
-  friend attributes operator | (attributes m, attributes m2) 
-  { 
+  friend attributes operator | (attributes m, attributes m2)
+  {
     return bitwise_or(m, m2);
   }
 
@@ -331,18 +331,18 @@ struct device_traits<nt::section>:
 
   static const access_mask access_mask_default = map_read;
 
-  friend access_mask operator | (access_mask m, access_mask m2) 
-  { 
+  friend access_mask operator | (access_mask m, access_mask m2)
+  {
     return bitwise_or(m, m2);
   }
 
   friend access_mask operator | (access_mask m, nt::access_mask m2)
-  { 
+  {
     return m | static_cast<access_mask>(m2);
   }
 
   friend access_mask operator | (nt::access_mask m, access_mask m2)
-  { 
+  {
     return m2 | m;
   }
 
@@ -360,10 +360,10 @@ class file_handler : public handle, public device_traits<file_handler>
     __forceinline
     ntstatus
       create(
-        const object_attributes &   oa, 
+        const object_attributes &   oa,
         const creation_disposition  cd              = creation_disposition_default,
         const access_mask           desired_access  = access_mask_default,
-        const share_mode            share           = share_mode_default, 
+        const share_mode            share           = share_mode_default,
         const creation_options      co              = creation_options_default,
         const attributes            attr            = attribute_default,
         const uint64_t *            allocation_size = 0,
@@ -379,10 +379,10 @@ class file_handler : public handle, public device_traits<file_handler>
     __forceinline
     ntstatus
       create(
-        const std::wstring &        file_name, 
+        const std::wstring &        file_name,
         const creation_disposition  cd              = creation_disposition_default,
         const access_mask           desired_access  = access_mask_default,
-        const share_mode            share           = share_mode_default, 
+        const share_mode            share           = share_mode_default,
         const creation_options      co              = creation_options_default,
         const attributes            attr            = attribute_default,
         const uint64_t *            allocation_size = 0,
@@ -399,7 +399,7 @@ class file_handler : public handle, public device_traits<file_handler>
 
     ntstatus
       open(
-        const object_attributes &   oa, 
+        const object_attributes &   oa,
         const access_mask           desired_access,
         const share_mode            share,
         const creation_options      co
@@ -409,7 +409,7 @@ class file_handler : public handle, public device_traits<file_handler>
       return NtOpenFile(this, desired_access, &oa, &iosb, share, co);
     }
 
-    operator const void*() { return get(); } 
+    operator const void*() { return get(); }
 
     void close() { reset(); }
 
@@ -459,7 +459,7 @@ class file_handler : public handle, public device_traits<file_handler>
 
     ntstatus size(const size_type & new_size)
     {
-      const file_end_of_file_information & fi = 
+      const file_end_of_file_information & fi =
         *reinterpret_cast<const file_end_of_file_information*>(&new_size);
       file_information<file_end_of_file_information> file_info(get(), fi);
       return file_info;
@@ -496,7 +496,7 @@ class file_handler : public handle, public device_traits<file_handler>
       const const_unicode_string &  new_name,
       bool                          replace_if_exists)
     {
-      file_rename_information::file_rename_information_ptr fi = 
+      file_rename_information::file_rename_information_ptr fi =
                     file_rename_information::alloc(new_name, replace_if_exists);
       if ( !fi ) return status::insufficient_resources;
       file_information<file_rename_information> file_info(get(), *fi);
@@ -504,7 +504,7 @@ class file_handler : public handle, public device_traits<file_handler>
     }
 
     const io_status_block & get_io_status_block() { return iosb; }
-  
+
   ////////////////////////////////////////////////////////////////////////////
   private:
 
@@ -644,7 +644,7 @@ public:
 
   // static helpers
   __forceinline
-    static ntstatus 
+    static ntstatus
       create(
         handle*             SectionHandle,
         access_mask         DesiredAccess,

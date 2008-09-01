@@ -8,7 +8,8 @@
 #define NTL__STLX_SYSTEM_ERROR
 
 #include "type_traits.hxx"
-#include "stdexcept.hxx"
+//#include "stdexcept.hxx"
+#include "string.hxx"
 
 namespace std {
 
@@ -47,7 +48,8 @@ namespace std {
   };
 
   /// 19.4.2 syserr.errcode
-  class error_code {
+  class error_code
+  {
   public:
     // 19.4.2.2 constructors:
     error_code();
@@ -76,7 +78,8 @@ private:
 
 
   /// 19.4.3 syserr.errcondition
-  class error_condition {
+  class error_condition
+  {
   public:
     // 19.4.3.2 constructors:
     error_condition();
@@ -106,7 +109,8 @@ private:
 
 
   /// 19.4.5.1 syserr.syserr
-  class system_error : public runtime_error {
+  class system_error : public runtime_error
+  {
   public:
     system_error(error_code ec, const string& what_arg);
     system_error(error_code ec);
@@ -133,5 +137,4 @@ private:
 
   /** @} syserr */
 } // std
-
 #endif // NTL__STLX_SYSTEM_ERROR
