@@ -228,8 +228,7 @@ class basic_string
     basic_string(const charT* const& s, const Allocator& a = Allocator())
     : str(a)
     {
-      static_assert((is_same<charT, value_type>::value), "cannot use types other than value_type");
-      
+      static_assert((is_same<charT, value_type>::value), "charT must to be value_type");
       assert_ptr(s);
       // small hack: copy terminating 0 to avoid case when n == 0
       size_type n = traits_type::length(s) + 1; // include '\0'
@@ -301,7 +300,11 @@ class basic_string
     /// 25 Returns: *this = basic_string<charT,traits,Allocator>(s).
     /// 26 Remarks: Uses traits::length().
     template<typename charT>
-    basic_string& operator=(const charT* const& s){ return assign(s);     }
+    basic_string& operator=(const charT* const& s)
+    {
+      static_assert((is_same<charT, value_type>::value), "charT must to be value_type"); 
+      return assign(s);     
+    }
 
     template<size_t Size>
     basic_string& operator=(const charT(&s)[Size]) { return assign(s, Size-1);     }
@@ -416,8 +419,14 @@ class basic_string
 
     ///\name  basic_string::operator+= [21.3.6.1 lib.string::op+=]
     basic_string& operator+=(const basic_string& str) { return append(str); }
+
     template<typename charT>
-    basic_string& operator+=(const charT* const& s)   { return append(s, traits_type::length(s)); }
+    basic_string& operator+=(const charT* const& s)   
+    { 
+      static_assert((is_same<charT, value_type>::value), "charT must to be value_type"); 
+      return append(s, traits_type::length(s));
+    }
+    
     template<size_t Size>
     basic_string& operator+=(const charT(&s)[Size])   { return append(s, Size-1); }
     basic_string& operator+=(charT c) { push_back(c); return *this; }
@@ -426,8 +435,13 @@ class basic_string
 
     template<size_t Size>
     basic_string& operator+=(charT(&s)[Size])         { return append(s, Size-1); }
+
     template<typename charT>
-    basic_string& operator+=(const charT* const& s)   { return append(s, traits_type::length(s));     }
+    basic_string& operator+=(const charT* const& s)   
+    { 
+      static_assert((is_same<charT, value_type>::value), "charT must to be value_type");
+      return append(s, traits_type::length(s));     
+    }
 
   template<class String>
     basic_string& operator+=(const String& str)
@@ -460,6 +474,7 @@ class basic_string
     template<typename charT>
     basic_string& append(const charT* const& s)
     {
+      static_assert((is_same<charT, value_type>::value), "charT must to be value_type");
       // trade off the traits_type::length(s) call for possible reallocs
       const_pointer ls = s;
       while ( !traits_type::eq(*ls, charT()) ) push_back(*ls++);
@@ -511,8 +526,9 @@ class basic_string
     template<typename charT>
     basic_string& assign(const charT* const& s)
     {
+      static_assert((is_same<charT, value_type>::value), "charT must to be value_type");
       clear();
-      return insert(0, s);
+      return insert(0, s, traits_type::length(s));
     }
 
     template<size_t Size>
@@ -561,6 +577,7 @@ class basic_string
     template<typename charT>
     basic_string& insert(size_type pos, const charT* const& s)
     {
+      static_assert((is_same<charT, value_type>::value), "charT must to be value_type");
       const size_t n = traits_type::length(s);
       insert(&str[pos], s, &s[n]);
       return *this;
@@ -714,6 +731,7 @@ class basic_string
     template<typename charT>
     size_type find(const charT* const& s, size_type pos = 0) const
     {
+      static_assert((is_same<charT, value_type>::value), "charT must to be value_type");
       return find(s, pos, traits_type::length(s));
     }
 
@@ -770,6 +788,7 @@ class basic_string
     template<typename charT>
     size_type rfind(const charT* const& s, size_type pos = npos) const
     {
+      static_assert((is_same<charT, value_type>::value), "charT must to be value_type");
       return rfind(s, pos, traits_type::length(s));
     }
 
@@ -830,6 +849,7 @@ class basic_string
     template<typename charT>
     size_type find_first_of(const charT* const& s, size_type pos = 0) const
     {
+      static_assert((is_same<charT, value_type>::value), "charT must to be value_type");
       return find_first_of(s, pos, traits_type::length(s));
     }
 
@@ -883,6 +903,7 @@ class basic_string
     template<typename charT>
     size_type find_last_of(const charT* const& s, size_type pos = npos) const
     {
+      static_assert((is_same<charT, value_type>::value), "charT must to be value_type");
       return find_last_of(s, pos, traits_type::length(s));
     }
 
@@ -932,6 +953,7 @@ class basic_string
     template<typename charT>
     size_type find_first_not_of(const charT* const& s, size_type pos = 0) const
     {
+      static_assert((is_same<charT, value_type>::value), "charT must to be value_type");
       return find_first_not_of(s, pos, traits_type::length(s));
     }
 
@@ -985,6 +1007,7 @@ class basic_string
     template<typename charT>
     size_type find_last_not_of(const charT* const& s, size_type pos = npos) const
     {
+      static_assert((is_same<charT, value_type>::value), "charT must to be value_type");
       return find_last_not_of(s, pos, traits_type::length(s));
     }
 
@@ -1029,6 +1052,7 @@ class basic_string
     template<typename charT>
     int compare(const charT* const& s) const
     {
+      static_assert((is_same<charT, value_type>::value), "charT must to be value_type");
       const int r = traits_type::compare(begin(), s, size());
       // s may be longer than *this
       return r != 0 ? r : traits_type::eq(s[size()], charT()) ? r : r - 1; // r == 0 here
