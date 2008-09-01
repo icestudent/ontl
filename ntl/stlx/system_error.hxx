@@ -8,7 +8,7 @@
 #define NTL__STLX_SYSTEM_ERROR
 
 #include "type_traits.hxx"
-//#include "stdexcept.hxx"
+#include "stdexcept.hxx"
 #include "string.hxx"
 
 namespace std {
@@ -35,13 +35,21 @@ namespace std {
   {
   public:
     virtual ~error_category();
-    //error_category(const error_category&) = delete;
-    //error_category& operator=(const error_category&) = delete;
+#ifdef NTL__CXX
+    error_category(const error_category&) = delete;
+    error_category& operator=(const error_category&) = delete;
+#else
+  private:
+    error_category(const error_category&);
+    error_category& operator=(const error_category&);
+  public:
+#endif
     virtual const char* name() const = 0;
     virtual error_condition default_error_condition(int ev) const;
     virtual bool equivalent(int code, const error_condition& condition) const;
     virtual bool equivalent(const error_code& code, int condition) const;
     virtual string message(int ev) const = 0;
+
     bool operator==(const error_category& rhs) const;
     bool operator!=(const error_category& rhs) const;
     bool operator<(const error_category& rhs) const;
