@@ -170,8 +170,8 @@ class basic_string
     /// - data() a non-null pointer that is copyable and can have 0 added to it;
     /// - size() == 0;
     /// - capacity() an unspecified value.
-    explicit basic_string(const Allocator& a = Allocator()) : str(a) {/**/TRACE();}
-
+    explicit basic_string(const Allocator& a = Allocator()) : str(a)
+    {/**/}
 
     /// 2 Effects: Constructs an object of class basic_string as indicated below.
     ///   The stored Allocator value is copied from str.get_allocator(). 
@@ -181,7 +181,8 @@ class basic_string
     /// - size() == str.size();
     /// - capacity() is at least as large as size().
     __forceinline
-    basic_string(const basic_string& str) : str(str.str) {/**/TRACE();}
+    basic_string(const basic_string& str) : str(str.str)
+    {/**/}
 
     /// 4 Requires: pos <= str.size()
     /// 5 \todo Throws: out_of_range if pos > str.size().
@@ -198,7 +199,8 @@ class basic_string
                  size_type            pos,
                  size_type            n     = npos,
                  const Allocator &    a     = Allocator())//throw(out_of_range)
-    : str(&str[pos], str.max__it(pos, n), a) {/**/TRACE();}
+    : str(&str[pos], str.max__it(pos, n), a) 
+    {/**/}
 
     /// 7 Requires: s shall not be a null pointer and n < npos.
     /// 8 Effects: Constructs an object of class basic_string and determines
@@ -210,7 +212,8 @@ class basic_string
     /// - size() == n;
     /// - capacity() is at least as large as size().
     basic_string(const_pointer s, size_type n, const Allocator& a = Allocator())
-    : str(assert_ptr(s), &s[n], a) {TRACE();}
+    : str(assert_ptr(s), &s[n], a)
+    {/**/}
 
     /// 9 Requires: s shall not be a null pointer.
     /// 10 Effects: Constructs an object of class basic_string and determines
@@ -224,7 +227,7 @@ class basic_string
     template<typename charT>
     basic_string(const charT* const& s, const Allocator& a = Allocator())
     : str(a)
-    {TRACE();
+    {
       static_assert((is_same<charT, value_type>::value), "cannot use types other than value_type");
       
       assert_ptr(s);
@@ -247,7 +250,7 @@ class basic_string
     /// - capacity() is at least as large as size().
     template<size_t Size>
     basic_string(const charT (&s)[Size], const Allocator& a = Allocator())
-    : str(&s[0], &s[Size]-1, a) {TRACE();}
+    : str(&s[0], &s[Size]-1, a) {}
 
     /// 12 Requires: n < npos
     /// 13 Effects: Constructs an object of class basic_string and determines
@@ -259,7 +262,7 @@ class basic_string
     /// - size() = n;
     /// - capacity() is at least as large as size().
     basic_string(size_type n, charT c, const Allocator& a = Allocator())
-    : str(n, c, a) {TRACE();}
+    : str(n, c, a) {}
 
     /// 14 Effects: If InputIterator is an integral type, equivalent to
     ///   basic_string(static_cast<size_type>(begin), static_cast<value_type>(end), a)
@@ -273,7 +276,7 @@ class basic_string
     basic_string(InputIterator    begin,
                  InputIterator    end,
                  const Allocator& a     = Allocator())
-    : str(begin, end, a) {TRACE();}
+    : str(begin, end, a) {}
 
 //    basic_string(initializer_list<charT> il, const Allocator& a = Allocator());
     basic_string(const basic_string& str, const Allocator& alloc);
