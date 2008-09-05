@@ -275,9 +275,10 @@ namespace tree
       iterator insert(iterator /*position*/, const value_type& x)
       {
         // TODO: implement fast insert function based on position
-        return insert(x)->first;
+        return insert(x).first;
       }
 
+#if 0
       template<class InputIterator>
       void insert(InputIterator first, InputIterator last)
       {
@@ -286,6 +287,8 @@ namespace tree
           ++first;
         }
       }
+#endif
+
       iterator erase(iterator position)
       {
         node *y, *z = position.p;

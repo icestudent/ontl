@@ -86,6 +86,10 @@ NTL__EXTERNAPI
 size_t __cdecl
   _vsnwprintf(wchar_t *buffer, size_t count, const wchar_t *format, va_list argptr);
 
+NTL__EXTERNAPI
+int __cdecl
+  _wtoi(const wchar_t* str);
+
 /**@} lib_c_strings */
 /**@} lib_strings */
 

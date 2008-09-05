@@ -226,7 +226,7 @@ namespace ntl {
       extern "C" void __cdecl __debugbreak();
 #pragma intrinsic(__debugbreak)
 
-      static inline
+      static __forceinline
         void debugbreak()
       {
         intrinsic::__debugbreak();
@@ -250,7 +250,7 @@ namespace ntl {
       const dbgprint<dpfltr::error>   info;
 #endif
 
-      static inline
+      static __forceinline
         void bp()
       {
 #if defined(_DEBUG) || defined(DBG)

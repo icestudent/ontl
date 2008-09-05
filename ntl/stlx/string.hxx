@@ -292,25 +292,25 @@ class basic_string
 
     /// 1 Returns: an iterator referring to the first character in the string.
     iterator                begin()         { return str.begin();   }
-    const_iterator          begin()  const  { return str.cbegin();   }
+    const_iterator          begin()  const  { return str.cbegin();  }
 
     /// 2 Returns: an iterator which is the past-the-end value.
     iterator                end()           { return str.end();     }
-    const_iterator          end()    const  { return str.cend();     }
+    const_iterator          end()    const  { return str.cend();    }
 
     /// 3 Returns: an iterator which is semantically equivalent to reverse_iterator(end()).
     reverse_iterator        rbegin()        { return str.rbegin();  }
-    const_reverse_iterator  rbegin() const  { return str.crbegin();  }
+    const_reverse_iterator  rbegin() const  { return str.crbegin(); }
 
     /// 4 Returns: an iterator which is semantically equivalent to reverse_iterator(begin()).
     reverse_iterator        rend()          { return str.rend();    }
-    const_reverse_iterator  rend()   const  { return str.crend();    }
+    const_reverse_iterator  rend()   const  { return str.crend();   }
 
     /// Returns: const iterators.
-    const_iterator          cbegin()  const  { return begin();   }
-    const_iterator          cend()    const  { return end();     }
-    const_reverse_iterator  crbegin() const  { return rbegin();  }
-    const_reverse_iterator  crend()   const  { return rend();    }
+    const_iterator          cbegin()  const { return str.cbegin();  }
+    const_iterator          cend()    const { return str.cend();    }
+    const_reverse_iterator  crbegin() const { return str.crbegin(); }
+    const_reverse_iterator  crend()   const { return str.crend();   }
 
     ///\name  21.3.4 basic_string capacity [string.capacity]
 
@@ -398,16 +398,6 @@ class basic_string
     basic_string& operator+=(const basic_string& str) { return append(str);   }
     basic_string& operator+=(const charT* s)          { return append(s);     }
     basic_string& operator+=(charT c) { push_back(c); return *this; }
-
-#ifndef NTL__STRICT_STRING
-
-  template<class String>
-    basic_string& operator+=(const String& str)
-    {
-      return append(str.data(), str.size());
-    }
-
-#endif
 
     ///\name  basic_string::append [21.3.6.2 lib.string::append]
 

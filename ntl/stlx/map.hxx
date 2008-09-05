@@ -64,7 +64,8 @@ namespace std {
       Compare comp;
       value_compare(Compare c) : comp(c) {}
       value_compare();
-      value_compare& operator=(const value_compare&);
+      friend void std::swap<value_compare>(value_compare&, value_compare&);
+      value_compare& operator=(const value_compare& c) { comp = c.comp; return *this; }
     };
   } // detail
 
@@ -127,8 +128,15 @@ class map:
 #ifdef NTL__CXX
     map(map<Key,T,Compare,Allocator>&& x);
 #endif
-    map(const Allocator&);
-    map(const map&, const Allocator&);
+
+    map(const Allocator& a)
+      :val_comp_(Compare()), tree_type(val_comp_, a)
+    {}
+
+    map(const map& x, const Allocator& a)
+      :val_comp_(x.val_comp_), tree_type(val_comp_, a)
+    {}
+
 #ifdef NTL__CXX
     map(map&&, const Allocator&);
 #endif
@@ -141,6 +149,7 @@ class map:
         val_comp_ = x.val_comp_;
       return *this;
     }
+
 #ifdef NTL__CXX
     map<Key,T,Compare,Allocator>& operator=(map<Key,T,Compare,Allocator>&& x);
 #endif
@@ -223,7 +232,7 @@ class map:
     void swap(map<Key,T,Compare,Allocator>& x)
     {
       tree_type::swap(x);
-      swap(val_comp_, x.val_comp_);
+      std::swap(val_comp_, x.val_comp_);
     }
 #endif
 
@@ -256,35 +265,35 @@ class map:
       return find(x) != end() ? 1 : 0;
     }
 
-    iterator        lower_bound(const key_type& x)        { return equal_range(x)->second; }
-    const_iterator  lower_bound(const key_type& x) const  { return equal_range(x)->second; }
-    iterator        upper_bound(const key_type& x)        { return equal_range(x)->first;  }
-    const_iterator  upper_bound(const key_type& x) const  { return equal_range(x)->first;  }
+    iterator        lower_bound(const key_type& x)        { return equal_range(x).second; }
+    const_iterator  lower_bound(const key_type& x) const  { return equal_range(x).second; }
+    iterator        upper_bound(const key_type& x)        { return equal_range(x).first;  }
+    const_iterator  upper_bound(const key_type& x) const  { return equal_range(x).first;  }
 
     pair<iterator,iterator> equal_range(const key_type& x)
     {
       // find a node with value which are equal or nearest to the x
       node* p = root_;
       while(p){
-        if(val_comp_(x, p->elem)){
-          if(p->left){
-            p = p->left;
+        if(val_comp_(value_type(x, mapped_type()), p->elem)){
+          if(p->u.s.left){
+            p = p->u.s.left;
           }else{
-            iterator re(p, this);
+            iterator re(make_iterator(p));
             return make_pair(re, re); // is a closest nodes
           }
-        }else if(val_comp_(p->elem, x)) // greater
-          p = p->right;
+        }else if(val_comp_(p->elem, value_type(x, mapped_type()))) // greater
+          p = p->u.s.right;
         else
-          return make_pair(iterator(p, this), iterator(next(p), this));
+          return make_pair(make_iterator(p), make_iterator(next(p, right)));
       }
-      iterator re(NULL, this);
+      iterator re(make_iterator(NULL));
       return make_pair(re, re);
     }
 
     pair<const_iterator,const_iterator> equal_range(const key_type& x) const
     {
-      return equal_range(x);
+      return const_cast<map*>(this)->equal_range(x);
     }
 
     friend bool operator==(const map<Key,T,Compare,Allocator>& x,
