@@ -12,6 +12,8 @@
 #include "../device_traits.hxx"
 #include "object.hxx"
 
+#include "../stlx/chrono.hxx"
+
 namespace ntl {
   namespace nt {
 
