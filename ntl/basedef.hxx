@@ -49,9 +49,9 @@ template<typename def>
 struct right_enum : def
 {
   typedef typename def::type type;
-  type v;
-  right_enum(type v) : v(v) {}
-  operator type () const {return v;}
+  type value;
+  right_enum(type v) : value(v) {}
+  operator type () const {return value;}
 };
 
 struct times_def
