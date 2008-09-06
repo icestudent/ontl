@@ -23,8 +23,9 @@
 namespace ntl {
   namespace nt {
 
-    typedef std::ratio_multiply<std::ratio<100>, std::nano>::type  systime_unit;
-    typedef std::chrono::duration<systime_t, systime_unit>    system_duration;
+    // TODO: should be moved up to share with other headers
+    typedef std::ratio_multiply<std::ratio<100>, std::nano>::type systime_unit;
+    typedef std::chrono::duration<systime_t, systime_unit>        system_duration;
 
     namespace kwait_reason {
       enum type {
