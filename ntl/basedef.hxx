@@ -44,16 +44,31 @@ using std::ptrdiff_t;
 
 typedef std::vector<uint8_t, std::allocator<uint8_t> > raw_data;
 
-enum times
+// right_enum by remark
+template<typename def>
+struct right_enum : def
 {
-  nanoseconds   = 1,
-  microseconds  = 10   * nanoseconds,
-  milliseconds  = 1000 * microseconds,
-  seconds       = 1000 * milliseconds,
-  minutes       = 60   * seconds,
-//  hours         = int64_t(60)   * minutes,
-//  days          = int64_t(24)   * hours,
+  typedef typename def::type type;
+  type v;
+  right_enum(type v) : v(v) {}
+  operator type () const {return v;}
 };
+
+struct times_def
+{
+  enum type
+  {
+    nanoseconds   = 1,
+    microseconds  = 10   * nanoseconds,
+    milliseconds  = 1000 * microseconds,
+    seconds       = 1000 * milliseconds,
+    minutes       = 60   * seconds,
+    //  hours         = int64_t(60)   * minutes,
+    //  days          = int64_t(24)   * hours,
+  };
+};
+
+typedef right_enum<times_def> times;
 
 ///@}
 

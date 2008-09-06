@@ -72,9 +72,9 @@ namespace std
     template <class Rep>
     struct duration_values
     {
-      static constexpr Rep zero() { return Rep(0); }
-      static constexpr Rep min()  { return numeric_limits<Rep>::lowest(); }
-      static constexpr Rep max()  { return numeric_limits<Rep>::max(); }
+      static const Rep zero() { return Rep(0); }
+      static const Rep min()  { return numeric_limits<Rep>::lowest(); }
+      static const Rep max()  { return numeric_limits<Rep>::max(); }
     };
 
 
@@ -91,6 +91,7 @@ namespace std
      *  \par \e Requires: Period::num shall be positive, diagnostic required.
      *  \par \e Requires: Members of duration shall not throw exceptions other than those thrown by the indicated operations
      *  on their representations.
+     *  @todo constexpr
      **/
     template <class Rep, class Period>
     class duration
@@ -124,7 +125,7 @@ namespace std
       explicit duration(const Rep2& r)
         :rep_(static_cast<rep>(r))
       {
-        static_assert((is_convertible<Rep2, rep>::value && (treat_as_floating_point<rep>::value || !treat_as_floating_point<Rep2>::value)), "20.8.3.1.1");
+        static_assert((is_convertible<Rep2, rep>::value && (treat_as_floating_point<rep>::value || !treat_as_floating_point<Rep2>::value)), "20.8.3.1/6");
       }
 
       template <class Rep2, class Period2>
@@ -146,7 +147,7 @@ namespace std
 
       duration& operator=(const duration& d)
       {
-        rep_ = d.rep_;
+        rep_ = d.rep_; return *this;
       }
 
       // 20.8.3.2 observer
@@ -172,7 +173,7 @@ namespace std
 
       duration operator++(int)
       {
-        return duration(++rep_);
+        return duration(rep_++);
       }
 
       duration& operator--()
@@ -183,7 +184,7 @@ namespace std
 
       duration operator--(int)
       {
-        return duration(--rep_);
+        return duration(rep_--);
       }
 
       duration& operator+=(const duration& d)
@@ -208,19 +209,19 @@ namespace std
 
 
       // 20.8.3.4 special values
-      static constexpr duration zero()
+      static const duration zero()
       {
         return duration(duration_values<rep>::zero());
       }
 
-      static constexpr duration min()
+      static const duration min()
       {
         return duration(duration_values<rep>::min());
       }
 
-      static constexpr duration max()
+      static const duration max()
       {
-        duration(duration_values<rep>::max());
+        return duration(duration_values<rep>::max());
       }
     private:
       rep rep_;

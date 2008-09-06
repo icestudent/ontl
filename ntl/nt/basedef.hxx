@@ -215,8 +215,7 @@ ntstatus __stdcall
     const int64_t * DelayInterval
     );
 
-
-template<times TimeResolution>
+template<times::type TimeResolution>
 static inline
 ntstatus sleep(
   uint32_t        time_resolution,
@@ -232,7 +231,7 @@ ntstatus sleep(
   uint32_t        ms,
   bool            alertable = false)
 {
-  const int64_t interval = int64_t(-1) * milliseconds * ms;
+  const int64_t interval = int64_t(-1) * times::milliseconds * ms;
   return NtDelayExecution(alertable, &interval);
 }
 

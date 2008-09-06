@@ -17,6 +17,7 @@
 #include "utility.hxx"
 #include "new.hxx"
 #include "stdlib.hxx"
+#include "../basedef.hxx"
 #include "../linked_ptr.hxx"
 
 namespace std {
@@ -31,28 +32,104 @@ struct allocator_arg_t {/**/};
 const allocator_arg_t allocator_arg;// = allocator_arg_t();
 
 ///\name 20.7.2 Allocator-related traits [allocator.traits]
+/**
+ *	Automatically detects whether \c T has a nested \c allocator_type that is convertible from \c Alloc.
+ **/
 template<class T, class Alloc> struct uses_allocator
 : public integral_constant<
     bool, is_convertible<Alloc, typename T::allocator_type>::value
     > {};
+
+/**
+ *	If a specialization \c is_scoped_allocator<Alloc> is derived from \c true_type, it indicates that
+ *  \c Alloc is a \c scoped allocator. A scoped allocator specifies the memory resource to be used by a container
+ *  (as all allocators do) and also specifies an inner allocator resource to be used by every element of the container.
+ *
+ *  @note \e Requires: If a specialization \c is_scoped_allocator<Alloc> is derived from \c true_type, 
+ *  \c Alloc shall have a nested type \c inner_allocator_type and a member function \c inner_allocator() which is
+ *  callable with no arguments and which returns an object of a type that is convertible to \c inner_allocator_type.
+ **/
 template<class Alloc> struct is_scoped_allocator : false_type {};
+
+/**
+ *	If a specialization \c constructible_with_allocator_suffix<T> is derived from \c true_type, it
+ *  indicates that \c T can be constructed with an allocator as its last constructor argument. Ideally, all
+ *  constructors of \c T (including copy and move constructors) should have a variant that accepts a final
+ *  argument of \c allocator_type.
+ *
+ *  @note \e Requires: If a specialization \c constructible_with_allocator_suffix<T> is derived from \c true_type,
+ *  \c T shall have a nested type \c allocator_type and at least one constructor for which \c allocator_type is
+ *  the last parameter. If not all constructors of \c T can be called with a final \c allocator_type argument
+ *  and \c T is used in a context where a container must call such a constructor, the program is ill-formed.
+ **/
 template<class T> struct constructible_with_allocator_suffix : false_type {};
+
+/**
+ *	If a specialization \c constructible_with_allocator_prefix<T> is derived from \c true_type,
+ *  it indicates that \c T can be constructed with allocator_arg and \c T::allocator_type as its first two
+ *  constructor arguments. Ideally, all constructors of \c T (including copy and move constructors) should
+ *  have a variant that accepts these two initial arguments.
+ *
+ *  @note \e Requires: If a specialization \c constructible_with_allocator_suffix<T> is derived from \c true_type,
+ *  \c T shall have a nested type \c allocator_type and at least one constructor for which \c allocator_arg_t
+ *  is the first parameter and \c allocator_type is the second parameter. If not all constructors of \c T can
+ *  be called with these initial arguments and \c T is used in a context where a container must call such a
+ *  constructor, the program is ill-formed.
+ **/
 template<class T> struct constructible_with_allocator_prefix : false_type {};
 ///}
 
 
 ///\name 20.7.3 Allocator propagation traits [allocator.propagation]
+/**
+ *	If specialized to derive from \c true_type for a specific allocator type, indicates that a container
+ *  using the specified \c Alloc should not copy or move the allocator when the container is copy-constructed,
+ *  move-constructed, copy-assigned, moved-assigned, or swapped.
+ *  @note \e Requires: Alloc shall be an Allocator (20.1.2).
+ **/
 template<class Alloc> struct allocator_propagate_never
 : false_type {};
-template<class Alloc> struct allocator_propagate_on_copy_construction
-: false_type {};
+
+/**
+ *	If specialized to derive from \c true_type for specific allocator type, indicates that a container
+ *  using the specified \c Alloc should copy or move the allocator when the container is copy constructed,
+ *  move constructed, move assigned, or swapped but not when the container is copy assigned.
+ *  @note \e Requires: Alloc shall be an Allocator (20.1.2).
+ **/
 template<class Alloc> struct allocator_propagate_on_move_assignment
 : false_type {};
+
+/**
+ *	If specialized to derive from \c true_type for a specific allocator type, indicates that a container
+ *  using the specified \c Alloc should copy or move the allocator when the container is copy constructed,
+ *  move constructed, move assigned, swapped or copy assigned.
+ *  @note \e Requires: Alloc shall be an Allocator (20.1.2).
+ **/
 template<class Alloc> struct allocator_propagate_on_copy_assignment
 : false_type {};
+
+/**
+ *	If specialized to derive from \c true_type for specific allocator type, indicates that a container
+ *  using the specified \c Alloc should copy or move the allocator when the container is copy constructed or
+ *  move constructed, but not when the container is copy assigned, moved assigned, or swapped.
+ *  @note \e Requires: Alloc shall be an Allocator (20.1.2).
+ **/
+template<class Alloc> struct allocator_propagate_on_copy_construction
+: integral_constant<bool, !
+   (allocator_propagate_never<Alloc>::value ||
+    allocator_propagate_on_move_assignment<Alloc>::value ||
+    allocator_propagate_on_copy_assignment<Alloc>::value)>
+  {};
+
 ///}
 
 /// 20.7.3 20.7.4 Allocator propogation map [allocator.propagation.map]
+/**
+ *	The \c allocator_propagation_map provides functions to be used by containers for manipulating
+ *  allocators during construction, assignment, and swap operations. The implementations of the functions
+ *  above are dependent on the allocator propagation traits of the specific \c Alloc.
+ *  @note \e Requires: Exactly one propagation trait shall derive from \c true_type for \c Alloc.
+ **/
 template<class Alloc> struct allocator_propagation_map
 {
   static Alloc select_for_copy_construction(const Alloc& x)
@@ -74,11 +151,15 @@ template<class Alloc> struct allocator_propagation_map
   }
   static void swap(Alloc& a, Alloc& b)
   {
-//    anywhy UB
-//    if ( allocator_propagate_on_move_assignment<Alloc>::value
-//      || allocator_propagate_on_copy_assignment<Alloc>::value )
-    if ( !(a == b ) )
-      swap(a, b);
+    // anywhy UB
+    if ( allocator_propagate_on_move_assignment<Alloc>::value
+      || allocator_propagate_on_copy_assignment<Alloc>::value )
+    {
+      if ( !(a == b ) )
+        swap(a, b);
+    }else{
+      // UB
+    }
   }
 };
 
@@ -201,7 +282,136 @@ template <class OuterA, class InnerA = void>
 class scoped_allocator_adaptor;
 
 template <class Alloc>
-class scoped_allocator_adaptor<Alloc, void>;
+class scoped_allocator_adaptor<Alloc, void>:
+  public Alloc
+{
+public:
+  // outer and inner allocator types are the same:
+  typedef Alloc outer_allocator_type;
+  typedef Alloc inner_allocator_type;
+
+  typedef typename outer_allocator_type::size_type size_type;
+  typedef typename outer_allocator_type::difference_type difference_type;
+  typedef typename outer_allocator_type::pointer pointer;
+  typedef typename outer_allocator_type::const_pointer const_pointer;
+  typedef typename outer_allocator_type::reference reference;
+  typedef typename outer_allocator_type::const_reference const_reference;
+  typedef typename outer_allocator_type::value_type value_type;
+
+  template <typename _Tp>
+  struct rebind 
+  {
+    typedef scoped_allocator_adaptor<
+      typename Alloc::template rebind<_Tp>::other, void> other;
+  };
+
+  scoped_allocator_adaptor();
+  #ifdef NTL__CXX
+  scoped_allocator_adaptor(scoped_allocator_adaptor&&);
+  #endif
+  scoped_allocator_adaptor(const scoped_allocator_adaptor&);
+  #ifdef NTL__CXX
+  scoped_allocator_adaptor(Alloc&& outerAlloc);
+  #endif
+  scoped_allocator_adaptor(const Alloc& outerAlloc);
+  #ifdef NTL__CXX
+  template <typename OuterA2>
+  scoped_allocator_adaptor(scoped_allocator_adaptor<OuterA2, void>&&);
+  #endif
+  template <typename OuterA2>
+  scoped_allocator_adaptor(const scoped_allocator_adaptor<OuterA2, void>&);
+  ~scoped_allocator_adaptor();
+
+  pointer address(reference x) const;
+  const_pointer address(const_reference x) const;
+
+  pointer allocate(size_type n);
+  template <typename _HintP>
+  pointer allocate(size_type n, _HintP u);
+  void deallocate(pointer p, size_type n);
+
+  size_type max_size() const;
+  
+  #ifdef NTL__CXX
+  template <class... Args>
+  void construct(pointer p, Args&&... args);
+  #else
+  void construct(pointer p, const value_type& val);
+  #endif
+  
+  void destroy(pointer p);
+
+  const outer_allocator_type& outer_allocator();
+  const inner_allocator_type& inner_allocator();
+};
+
+
+template<typename OuterA, typename InnerA>
+class scoped_allocator_adaptor : public OuterA 
+{
+public:
+  typedef OuterA outer_allocator_type;
+  typedef InnerA inner_allocator_type;
+  typedef typename outer_allocator_type::size_type size_type;
+  typedef typename outer_allocator_type::difference_type difference_type;
+  typedef typename outer_allocator_type::pointer pointer;
+  typedef typename outer_allocator_type::const_pointer const_pointer;
+  typedef typename outer_allocator_type::reference reference;
+  typedef typename outer_allocator_type::const_reference const_reference;
+  typedef typename outer_allocator_type::value_type value_type;
+
+  template <typename _Tp>
+  struct rebind 
+  {
+    typedef scoped_allocator_adaptor<
+      typename OuterA::template rebind<_Tp>::other,
+      InnerA> other;
+  };
+
+  scoped_allocator_adaptor();
+  #ifdef NTL__CXX
+  scoped_allocator_adaptor(outer_allocator_type&& outerAlloc,
+    inner_allocator_type&& innerAlloc);
+  #endif
+  scoped_allocator_adaptor(const outer_allocator_type& outerAlloc,
+    const inner_allocator_type& innerAlloc);
+  #ifdef NTL__CXX
+  scoped_allocator_adaptor(scoped_allocator_adaptor&& other);
+  #endif
+  scoped_allocator_adaptor(const scoped_allocator_adaptor& other);
+  #ifdef NTL__CXX
+  template <typename OuterAlloc2>
+  scoped_allocator_adaptor(
+    scoped_allocator_adaptor<OuterAlloc2&,InnerA>&&);
+  #endif
+  template <typename OuterAlloc2>
+  scoped_allocator_adaptor(
+    const scoped_allocator_adaptor<OuterAlloc2&,InnerA>&);
+  ~scoped_allocator_adaptor();
+
+  pointer address(reference x) const;
+  const_pointer address(const_reference x) const;
+
+  pointer allocate(size_type n);
+  template <typename _HintP>
+  pointer allocate(size_type n, _HintP u);
+  void deallocate(pointer p, size_type n);
+  
+  size_type max_size() const;
+  
+  
+  #ifdef NTL__CXX
+  template <class... Args>
+  void construct(pointer p, Args&&... args);
+  #else
+  void construct(pointer p, const value_type& val);
+  #endif
+  
+  void destroy(pointer p);
+
+  const outer_allocator_type& outer_allocator() const;
+  const inner_allocator_type& inner_allocator() const;
+};
 
 template <class OuterA, class InnerA>
 struct is_scoped_allocator<scoped_allocator_adaptor<OuterA, InnerA> >
@@ -211,12 +421,20 @@ template <class OuterA, class InnerA>
 struct allocator_propagate_never<scoped_allocator_adaptor<OuterA, InnerA> >
   : true_type { };
 
-#if 0
-template <class OuterA1, class OuterA2, class InnerA1>
-bool operator==(const scoped_allocator_adaptor<OuterA1, InnerA1>& a, const scoped_allocator_adaptor<OuterA2, InnerA>& b);
-template <class OuterA1, class OuterA2, class InnerA>
-bool operator!=(const scoped_allocator_adaptor<OuterA1, InnerA1>& a, const scoped_allocator_adaptor<OuterA2, InnerA>& b);
-#endif
+template<typename OuterA1, typename OuterA2, typename InnerA>
+bool operator==(const scoped_allocator_adaptor<OuterA1,InnerA>& a, const scoped_allocator_adaptor<OuterA2,InnerA>& b)
+{
+  return a.outer_allocator() == b.outer_allocator() && a.inner_allocator() == b.inner_allocator();
+}
+
+template<typename OuterA1, typename OuterA2, typename InnerA>
+bool operator!=(const scoped_allocator_adaptor<OuterA1,InnerA>& a, const scoped_allocator_adaptor<OuterA2,InnerA>& b)
+{
+  return !(a == b);
+}
+
+
+
 
 /// 20.7.7 Raw storage iterator [storage.iterator]
 template<class OutputIterator, class T>
@@ -617,6 +835,7 @@ template <class T, class D> void swap(unique_ptr<T, D>& x, unique_ptr<T, D>& y)
 {
   x.swap(y);
 }
+
 #ifdef NTL__CXX
 template <class T, class D> void swap(unique_ptr<T, D>&& x, unique_ptr<T, D>& y)
 {
@@ -666,6 +885,9 @@ bool operator>=(const unique_ptr<T1, D1>& x, const unique_ptr<T2, D2>& y)
 
 ///\}
 
+
+
+
 ///\name  20.7.12 Smart pointers [util.smartptr]
 
 template<class X> class auto_ptr;
@@ -712,7 +934,7 @@ class shared_ptr : ntl::linked_ptr<T>
 
     /// Well, should not D & A be moved to the class template? ...
     template<class Y, class D> shared_ptr(Y* p, D d);
-    /// this needs no allolcator at all
+    /// this needs no allocator at all
     template<class Y, class D, class A> shared_ptr(Y* p, D d, A a);
 
     /// 14 Effects: Constructs a shared_ptr instance that stores p and shares
@@ -754,11 +976,14 @@ class shared_ptr : ntl::linked_ptr<T>
     /// 29 Postconditions: use_count() == r.use_count().
     /// 30 Throws: bad_weak_ptr when r.expired().
     /// 31 Exception safety: If an exception is thrown, the constructor has no effect.
-    template<class Y> explicit shared_ptr(const weak_ptr<Y>& r) : base_type(r)
+    template<class Y> explicit shared_ptr(const weak_ptr<Y>& r);
+#if 0
+    : base_type(r)
     {
       if ( r.get() ) set(r.get());
       else throw bad_alloc();
     }
+#endif
 
 #ifdef NTL__CXX
     /// 32 Requires: r.release() shall be convertible to T*. Y shall be a complete
@@ -771,7 +996,7 @@ class shared_ptr : ntl::linked_ptr<T>
     /// 36 Exception safety: If an exception is thrown, the constructor has no effect.
     template<class Y> explicit shared_ptr(auto_ptr<Y>&& r);
 #else
-    template<class Y> explicit shared_ptr(const auto_ptr<Y>& r)
+    template<class Y> explicit shared_ptr(auto_ptr<Y>& r)
     : base_type(r.release()) {/**/}
 #endif
 
@@ -815,8 +1040,32 @@ class shared_ptr : ntl::linked_ptr<T>
     template <class Y, class D> shared_ptr& operator=(const unique_ptr<Y, D>& r) = delete;
     template <class Y, class D> shared_ptr& operator=(unique_ptr<Y, D>&& r);
 #else
-    shared_ptr& operator=(const shared_ptr& r) { r.swap(this); }
-    template<class Y> shared_ptr& operator=(const shared_ptr<Y>& r) { r.swap(this); }
+    shared_ptr& operator=(shared_ptr& r)
+    {
+      r.swap(*this); 
+      return *this; 
+    }
+
+    template<class Y>
+    shared_ptr& operator=(shared_ptr<Y>& r)
+    { 
+      shared_ptr<T>(r).swap(*this);
+      return *this;
+    }
+
+    template<class Y>
+    shared_ptr& operator=(auto_ptr<Y>& r)
+    {
+      set(r.release());
+      return *this;
+    }
+
+    template <class Y, class D>
+    shared_ptr& operator=(unique_ptr<Y, D>& r)
+    {
+      set(r.release());
+      return *this;
+    }
 #endif
 
     ///\name  20.7.12.2.4 shared_ptr modifiers [util.smartptr.shared.mod]
@@ -899,7 +1148,7 @@ inline
 bool
   operator!=(shared_ptr<T> const& a, shared_ptr<U> const& b)
 {
-  return a.get() != b.get().
+  return a.get() != b.get();
 }
 
 /// 5 Returns: an unspecified value such that
@@ -937,6 +1186,11 @@ void
   a.swap(b);
 }
 
+#ifdef NTL__CXX
+  template<class T> void swap(shared_ptr<T>&& a, shared_ptr<T>& b);
+  template<class T> void swap(shared_ptr<T>& a, shared_ptr<T>&& b);
+#endif
+
 ///\name  20.7.12.2.10 shared_ptr casts [util.smartptr.shared.cast]
 
 template<class T, class U>
@@ -960,7 +1214,7 @@ shared_ptr<T>
 template<class D, class T> D* get_deleter(shared_ptr<T> const& p);
 
 
-/// 20.7.6.3 Class template weak_ptr [util.smartptr.weak]
+/// 20.7.12.3 Class template weak_ptr [util.smartptr.weak]
 template<class T>
 class weak_ptr
 {
@@ -969,28 +1223,28 @@ class weak_ptr
 
     typedef T element_type;
 
-    ///\name  20.7.6.3.1 weak_ptr constructors [util.smartptr.weak.const]
+    ///\name  20.7.12.3.1 weak_ptr constructors [util.smartptr.weak.const]
 
     weak_ptr();
     template<class Y> weak_ptr(shared_ptr<Y> const& r);
     weak_ptr(weak_ptr const& r);
     template<class Y> weak_ptr(weak_ptr<Y> const& r);
 
-    ///\name  20.7.6.3.2 weak_ptr destructor [util.smartptr.weak.dest]
+    ///\name  20.7.12.3.2 weak_ptr destructor [util.smartptr.weak.dest]
     ~weak_ptr();
 
-    ///\name  20.7.6.3.3 weak_ptr assignment [util.smartptr.weak.assign]
+    ///\name  20.7.12.3.3 weak_ptr assignment [util.smartptr.weak.assign]
 
     weak_ptr& operator=(weak_ptr const& r);
     template<class Y> weak_ptr& operator=(weak_ptr<Y> const& r);
     template<class Y> weak_ptr& operator=(shared_ptr<Y> const& r);
 
-    ///\name  20.7.6.3.4 weak_ptr modifiers [util.smartptr.weak.mod]
+    ///\name  20.7.12.3.4 weak_ptr modifiers [util.smartptr.weak.mod]
 
     void swap(weak_ptr& r);
     void reset();
 
-    ///\name  20.7.6.3.5 weak_ptr observers [util.smartptr.weak.obs]
+    ///\name  20.7.12.3.5 weak_ptr observers [util.smartptr.weak.obs]
 
     long use_count() const;
     bool expired() const;
@@ -1003,12 +1257,12 @@ class weak_ptr
 
 };
 
-///\name  20.7.6.3.6 weak_ptr comparison [util.smartptr.weak.cmp]
+///\name  20.7.12.3.6 weak_ptr comparison [util.smartptr.weak.cmp]
 template<class T, class U>
 bool
   operator<(weak_ptr<T> const& a, weak_ptr<U> const& b);
 
-///\name  20.7.6.3.7 weak_ptr specialized algorithms [util.smartptr.weak.spec]
+///\name  20.7.12.3.7 weak_ptr specialized algorithms [util.smartptr.weak.spec]
 template<class T>
 void
   swap(weak_ptr<T>& a, weak_ptr<T>& b)
@@ -1018,8 +1272,49 @@ void
 
 ///@}
 
-/// 20.7.6.4 Class template enable_shared_from_this [util.smartptr.enab]
-template<class T> class enable_shared_from_this;
+/// 20.7.12.4 Class template enable_shared_from_this [util.smartptr.enab]
+template<class T> 
+class enable_shared_from_this
+{
+protected:
+  enable_shared_from_this();
+  enable_shared_from_this(const enable_shared_from_this&);
+  enable_shared_from_this& operator=(const enable_shared_from_this&);
+  ~enable_shared_from_this();
+public:
+  shared_ptr<T> shared_from_this();
+  shared_ptr<T const> shared_from_this() const;
+};
+
+/// 20.7.12.6 Pointer safety [util.dynamic.safety]
+#ifdef NTL__CXX
+  enum class pointer_safety { relaxed, preferred, strict };
+#else
+/**
+ *	An enumeration value indicating the implementation’s treatment of pointers that are not safely derived.
+ **/
+struct pointer_safety_class
+{ 
+  enum type 
+  { 
+    /** pointers that are not safely derived will be treated the same as pointers that are safely derived for the duration of the program */
+    relaxed, 
+    /** pointers that are not safely derived will be treated the same as pointers that are safely derived for the duration of the program 
+        but allows the implementation to hint that it could be desirable to avoid dereferencing pointers that are not safely derived as described. */
+    preferred, 
+    /** pointers that are not safely derived might be treated differently than pointers that are safely derived. */
+    strict 
+  };
+};
+typedef ntl::right_enum<pointer_safety_class> pointer_safety;
+#endif
+
+void declare_reachable(void *p);
+template <class T> T *undeclare_reachable(T *p);
+void declare_no_pointers(char *p, size_t n);
+void undeclare_no_pointers(char *p, size_t n);
+pointer_safety get_pointer_safety();
+
 
 /// 20.7.13 Align [ptr.align]
 inline void * align(size_t alignment, size_t size, void* &ptr, size_t& space)
@@ -1033,6 +1328,9 @@ inline void * align(size_t alignment, size_t size, void* &ptr, size_t& space)
   }
   return 0;
 }
+
+
+
 
 ///\name  D.9 auto_ptr [depr.auto.ptr]
 
@@ -1112,7 +1410,7 @@ class auto_ptr
 template<class Y>
 struct auto_ptr_ref
 {
-    auto_ptr_ref(auto_ptr<Y> & a) __ntl_nothrow : ptr(a) {}
+    explicit auto_ptr_ref(auto_ptr<Y> & a) __ntl_nothrow : ptr(a) {}
     auto_ptr<Y> & ptr;
   private:
     auto_ptr_ref<Y> & operator=(const auto_ptr_ref<Y> &);
