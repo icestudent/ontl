@@ -52,28 +52,28 @@ enum wait_type { WaitAll, WaitAny };
 NTL__EXTERNAPI
 ntstatus __stdcall
   NtWaitForSingleObject(
-    legacy_handle Handle,
-    bool          Alertable,
-    const int64_t*Timeout
+    legacy_handle   Handle,
+    bool            Alertable,
+    const int64_t&  Timeout
     );
 
 NTL__EXTERNAPI
 ntstatus __stdcall
   NtSignalAndWaitForSingleObject(
-    legacy_handle SignalHandle,
-    legacy_handle Handle,
-    bool          Alertable,
-    const int64_t*Timeout
+    legacy_handle   SignalHandle,
+    legacy_handle   Handle,
+    bool            Alertable,
+    const int64_t&  Timeout
     );
 
 NTL__EXTERNAPI
 ntstatus __stdcall
   NtWaitForMultipleObjects(
-    uint32_t      Count,
-    legacy_handle Handles[],
-    wait_type     WaitType,
-    bool          Alertable,
-    const int64_t*Timeout
+    uint32_t            Count,
+    const legacy_handle Handles[],
+    wait_type           WaitType,
+    bool                Alertable,
+    const int64_t&      Timeout
     );
 
 

@@ -203,22 +203,47 @@ namespace ntl {
         return success(NtPulseEvent(get(), 0));
       }
 
+      // old-style wait, deprecated
+      __declspec(deprecated("use 'wait_for' function"))
       ntstatus wait(uint32_t timeout = -1, bool alertable = true) const
       {
-        const int64_t interval = int64_t(-1) * milliseconds * timeout;
-        return NtWaitForSingleObject(get(), alertable, &interval);
+        const int64_t interval = int64_t(-1) * times::milliseconds * timeout;
+        return NtWaitForSingleObject(get(), alertable, interval);
       }
 
-      template<ntl::times TimeResolution>
+      // old-style wait, deprecated
+      template<ntl::times::type TimeResolution>
+      __declspec(deprecated("use 'wait_for' function"))
       ntstatus wait(uint32_t timeout_time_resolution, bool alertable = true) const
       {
         const int64_t interval = int64_t(-1) * TimeResolution * timeout_time_resolution;
-        return NtWaitForSingleObject(get(), alertable, &interval);
+        return NtWaitForSingleObject(get(), alertable, interval);
       }
 
-      bool ready() const
+      template <class Clock, class Duration>
+      ntstatus wait_until(const std::chrono::time_point<Clock, Duration>& abs_time, bool alertable = true) const
       {
-        return success(wait(0, false));
+        typedef ratio_multiply<ratio<100>, nano>::type systime_unit;
+        typedef chrono::duration<systime_t, systime_unit> system_duration;
+
+        return NtWaitForSingleObject(get(), alertable, std::chrono::duration_cast<system_duration>(abs_time.time_since_epoch()).count());
+      }
+
+      template <class Rep, class Period>
+      ntstatus wait_for(const std::chrono::duration<Rep, Period>& rel_time, bool alertable = true) const
+      {
+        typedef ratio_multiply<ratio<100>, nano>::type systime_unit;
+        typedef chrono::duration<systime_t, systime_unit> system_duration;
+
+        return NtWaitForSingleObject(get(), alertable, -1i64 * std::chrono::duration_cast<system_duration>(rel_time).count());
+      }
+
+      bool is_ready() const
+      {
+        typedef std::ratio_multiply<std::ratio<100>, std::nano>::type systime_unit;
+        typedef std::chrono::duration<systime_t, systime_unit> system_duration;
+
+        return success(wait_for(system_duration(0), false));
       }
     };
 

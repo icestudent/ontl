@@ -18,8 +18,13 @@
 
 #include "../pe/image.hxx"
 
+#include "../stlx/chrono.hxx"
+
 namespace ntl {
   namespace nt {
+
+    typedef std::ratio_multiply<std::ratio<100>, std::nano>::type  systime_unit;
+    typedef std::chrono::duration<systime_t, systime_unit>    system_duration;
 
     namespace kwait_reason {
       enum type {
@@ -390,17 +395,33 @@ public:
     return (alert ? NtAlertResumeThread : NtResumeThread)(get(), PreviousSuspendCount);
   }
 
-  ntstatus wait(bool alertable = true, uint32_t timeout = -1)
+  // old-style wait, deprecated
+  __declspec(deprecated("use 'wait_for' function"))
+  ntstatus wait(bool alertable = true, uint32_t timeout = -1) const
   {
-    const int64_t interval = int64_t(-1) * milliseconds * timeout;
-    return NtWaitForSingleObject(get(), alertable, &interval);
+    const int64_t interval = int64_t(-1) * ntl::times::milliseconds * timeout;
+    return NtWaitForSingleObject(get(), alertable, interval);
   }
 
-  template<ntl::times TimeResolution>
-  ntstatus wait(uint32_t timeout_time_resolution, bool alertable = true)
+  // old-style wait, deprecated
+  template<ntl::times::type TimeResolution>
+  __declspec(deprecated("use 'wait_for' function"))
+  ntstatus wait(uint32_t timeout_time_resolution, bool alertable = true) const
   {
     const int64_t interval = int64_t(-1) * TimeResolution * timeout_time_resolution;
-    return NtWaitForSingleObject(get(), alertable, &interval);
+    return NtWaitForSingleObject(get(), alertable, interval);
+  }
+
+  template <class Clock, class Duration>
+  ntstatus wait_until(const std::chrono::time_point<Clock, Duration>& abs_time, bool alertable = true) const
+  {
+    return NtWaitForSingleObject(get(), alertable, std::chrono::duration_cast<system_duration>(abs_time.time_since_epoch()).count());
+  }
+
+  template <class Rep, class Period>
+  ntstatus wait_for(const std::chrono::duration<Rep, Period>& rel_time, bool alertable = true) const
+  {
+    return NtWaitForSingleObject(get(), alertable, -1i64 * std::chrono::duration_cast<system_duration>(rel_time).count());
   }
 
   static legacy_handle get_current() { return current_thread(); }
@@ -445,6 +466,18 @@ public:
     }
   }
 };
+
+  template <class Clock, class Duration>
+  void sleep_until(const std::chrono::time_point<Clock, Duration>& abs_time, bool alertable = false)
+  {
+    NtDelayExecution(alertable, std::chrono::duration_cast<system_duration>(abs_time.time_since_epoch()).count());
+  }
+
+  template <class Rep, class Period>
+  void sleep_for(const std::chrono::duration<Rep, Period>& rel_time, bool alertable = false)
+  {
+    NtDelayExecution(alertable, -1i64 * std::chrono::duration_cast<system_duration>(rel_time).count());
+  }
 
   }
 }

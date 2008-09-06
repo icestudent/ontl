@@ -212,7 +212,7 @@ NTL__EXTERNAPI
 ntstatus __stdcall
   NtDelayExecution(
     bool            Alertable,
-    const int64_t * DelayInterval
+    const int64_t&  DelayInterval
     );
 
 template<times::type TimeResolution>
@@ -222,7 +222,7 @@ ntstatus sleep(
   bool            alertable = false)
 {
   const int64_t interval = int64_t(-1) * TimeResolution * time_resolution;
-  return NtDelayExecution(alertable, &interval);
+  return NtDelayExecution(alertable, interval);
 }
 
 /// default milliseconds
@@ -232,7 +232,7 @@ ntstatus sleep(
   bool            alertable = false)
 {
   const int64_t interval = int64_t(-1) * times::milliseconds * ms;
-  return NtDelayExecution(alertable, &interval);
+  return NtDelayExecution(alertable, interval);
 }
 
 /// rtl compression
