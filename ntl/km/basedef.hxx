@@ -59,6 +59,7 @@ using nt::unicode_string;
 using nt::const_unicode_string;
 using nt::const_ansi_string;
 
+using nt::systime_t;
 
 
 struct kthread;
@@ -357,9 +358,9 @@ ntstatus yield_execution()
 NTL__EXTERNAPI
 ntstatus __stdcall
   KeDelayExecutionThread(
-    kprocessor_mode WaitMode,
-    bool            Alertable,
-    const int64_t&  Interval
+    kprocessor_mode   WaitMode,
+    bool              Alertable,
+    const systime_t&  Interval
     );
 
 
@@ -370,7 +371,7 @@ ntstatus sleep(
   bool            alertable = false,
   kprocessor_mode wait_mode = KernelMode)
 {
-  const int64_t interval = int64_t(-1) * TimeResolution * time_resolution;
+  const systime_t interval = int64_t(-1) * TimeResolution * time_resolution;
   return KeDelayExecutionThread(wait_mode, alertable, interval);
 }
 
@@ -381,7 +382,7 @@ ntstatus sleep(
   bool            alertable = false,
   kprocessor_mode wait_mode = KernelMode)
 {
-  const int64_t interval = int64_t(-1) * times::milliseconds * ms;
+  const systime_t interval = int64_t(-1) * times::milliseconds * ms;
   return KeDelayExecutionThread(wait_mode, alertable, interval);
 }
 
@@ -451,101 +452,6 @@ struct dispatcher_header
 
 struct kgate { dispatcher_header Header; };
 
-
-enum kwait_reason
-{
-  Executive,
-  FreePage,
-  PageIn,
-  PoolAllocation,
-  DelayExecution,
-  Suspended,
-  UserRequest,
-  WrExecutive,
-  WrFreePage,
-  WrPageIn,
-  WrPoolAllocation,
-  WrDelayExecution,
-  WrSuspended,
-  WrUserRequest,
-  WrEventPair,
-  WrQueue,
-  WrLpcReceive,
-  WrLpcReply,
-  WrVirtualMemory,
-  WrPageOut,
-  WrRendezvous,
-  Spare2,
-  Spare3,
-  Spare4,
-  Spare5,
-  Spare6,
-  WrKernel,
-  WrResource,
-  WrPushLock,
-  WrMutex,
-  WrQuantumEnd,
-  WrDispatchInt,
-  WrPreempted,
-  WrYieldExecution,
-  WrFastMutex,
-  WrGuardedMutex,
-  WrRundown,
-  MaximumWaitReason
-}; // enum kwait_reason
-
-NTL__EXTERNAPI
-ntstatus __stdcall
-  KeWaitForSingleObject(
-    void *          Object,
-    kwait_reason    WaitReason,
-    kprocessor_mode WaitMode,
-    bool            Alertable,
-    int64_t *       Timeout  __optional
-    );
-
-static inline
-ntstatus
-  wait_for_single_object(
-    void *          Object,
-    kwait_reason    WaitReason  = Executive,
-    kprocessor_mode WaitMode    = KernelMode,
-    bool            Alertable   = false,
-    int64_t *       Timeout     = 0
-    )
-{
-  return KeWaitForSingleObject(Object, WaitReason, WaitMode, Alertable, Timeout);
-}
-
-#if 0
-
-struct kdpc;
-
-typedef
-void __stdcall
-  kdeferred_routine_t(
-    const kdpc *  Dpc,
-    const void *  DeferredContext,
-    const void *  SystemArgument1,
-    const void *  SystemArgument2
-    );
-
-struct kdpc
-{
-  uint8_t               Type;
-  uint8_t               Importance;
-  uint8_t               Number;
-  uint8_t               Expedite;
-  list_entry            DpcListEntry;
-  kdeferred_routine_t * DeferredRoutine;
-  void *                DeferredContext;
-  void *                SystemArgument1;
-  void *                SystemArgument2;
-  void *                DpcData;
-};
-
-#else
-
 struct kdpc_data
 {
   list_entry DpcListHead;
@@ -560,10 +466,12 @@ struct kdpc_data
 
 struct kdpc
 {
-  enum DpcType {
+  enum type
+  {
     Normal,
     Threaded
   };
+
   enum DpcImportance {
     LowImportance,
     MediumImportance,
@@ -598,8 +506,6 @@ struct kdpc
 STATIC_ASSERT(sizeof(kdpc) == 0x20);
 #elif  _M_X64
 STATIC_ASSERT(sizeof(kdpc) == 0x40);
-#endif
-
 #endif
 
 

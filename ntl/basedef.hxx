@@ -44,13 +44,13 @@ using std::ptrdiff_t;
 
 typedef std::vector<uint8_t, std::allocator<uint8_t> > raw_data;
 
-// right_enum by remark
+// class_enum by remark
 template<typename def>
-struct right_enum : def
+struct class_enum : def
 {
   typedef typename def::type type;
   type value;
-  right_enum(type v) : value(v) {}
+  class_enum(type v) : value(v) {}
   operator type () const {return value;}
 };
 
@@ -68,7 +68,7 @@ struct times_def
   };
 };
 
-typedef right_enum<times_def> times;
+typedef class_enum<times_def> times;
 
 ///@}
 

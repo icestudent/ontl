@@ -19,6 +19,7 @@
 #include "../pe/image.hxx"
 
 #include "../stlx/chrono.hxx"
+#include "time.hxx"
 
 namespace ntl {
   namespace nt {
@@ -27,50 +28,8 @@ namespace ntl {
     typedef std::ratio_multiply<std::ratio<100>, std::nano>::type systime_unit;
     typedef std::chrono::duration<systime_t, systime_unit>        system_duration;
 
-    namespace kwait_reason {
-      enum type {
-        Executive,
-        FreePage,
-        PageIn,
-        PoolAllocation,
-        DelayExecution,
-        Suspended,
-        UserRequest,
-        WrExecutive,
-        WrFreePage,
-        WrPageIn,
-        WrPoolAllocation,
-        WrDelayExecution,
-        WrSuspended,
-        WrUserRequest,
-        WrEventPair,
-        WrQueue,
-        WrLpcReceive,
-        WrLpcReply,
-        WrVirtualMemory,
-        WrPageOut,
-        WrRendezvous,
-        Spare2,
-        Spare3,
-        Spare4,
-        Spare5,
-        Spare6,
-        WrKernel,
-        WrResource,
-        WrPushLock,
-        WrMutex,
-        WrQuantumEnd,
-        WrDispatchInt,
-        WrPreempted,
-        WrYieldExecution,
-        WrFastMutex,
-        WrGuardedMutex,
-        WrRundown,
-        MaximumWaitReason
-      };
-    }
-
-    namespace thread_state {
+    struct thread_state_def
+    {
       enum type {
         Initialized,
         Ready,
@@ -81,7 +40,8 @@ namespace ntl {
         Transition,
         Unknown
       };
-    }
+    };
+    typedef ntl::class_enum<thread_state_def> thread_state;
 
 struct initial_tib;
 
@@ -396,23 +356,6 @@ public:
     return (alert ? NtAlertResumeThread : NtResumeThread)(get(), PreviousSuspendCount);
   }
 
-  // old-style wait, deprecated
-  __declspec(deprecated("use 'wait_for' function"))
-  ntstatus wait(bool alertable = true, uint32_t timeout = -1) const
-  {
-    const int64_t interval = int64_t(-1) * ntl::times::milliseconds * timeout;
-    return NtWaitForSingleObject(get(), alertable, interval);
-  }
-
-  // old-style wait, deprecated
-  template<ntl::times::type TimeResolution>
-  __declspec(deprecated("use 'wait_for' function"))
-  ntstatus wait(uint32_t timeout_time_resolution, bool alertable = true) const
-  {
-    const int64_t interval = int64_t(-1) * TimeResolution * timeout_time_resolution;
-    return NtWaitForSingleObject(get(), alertable, interval);
-  }
-
   template <class Clock, class Duration>
   ntstatus wait_until(const std::chrono::time_point<Clock, Duration>& abs_time, bool alertable = true) const
   {
@@ -423,6 +366,11 @@ public:
   ntstatus wait_for(const std::chrono::duration<Rep, Period>& rel_time, bool alertable = true) const
   {
     return NtWaitForSingleObject(get(), alertable, -1i64 * std::chrono::duration_cast<system_duration>(rel_time).count());
+  }
+
+  ntstatus wait(bool alertable = true) const
+  {
+    return NtWaitForSingleObject(get(), alertable, system_time::infinite());
   }
 
   static legacy_handle get_current() { return current_thread(); }

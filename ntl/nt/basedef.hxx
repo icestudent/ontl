@@ -16,7 +16,7 @@ namespace ntl {
 
   namespace km {
     typedef uintptr_t kaffinity_t;
-    typedef long kpriority;
+    typedef long      kpriority;
   }
 
   namespace pe {
@@ -207,12 +207,14 @@ namespace ntl {
       DllThreadDetach
     };
 
+// system_time::type
+typedef int64_t systime_t;
 
 NTL__EXTERNAPI
 ntstatus __stdcall
   NtDelayExecution(
-    bool            Alertable,
-    const int64_t&  DelayInterval
+    bool              Alertable,
+    const systime_t&  DelayInterval
     );
 
 template<times::type TimeResolution>
@@ -221,7 +223,7 @@ ntstatus sleep(
   uint32_t        time_resolution,
   bool            alertable = false)
 {
-  const int64_t interval = int64_t(-1) * TimeResolution * time_resolution;
+  const systime_t interval = int64_t(-1) * TimeResolution * time_resolution;
   return NtDelayExecution(alertable, interval);
 }
 
@@ -231,7 +233,7 @@ ntstatus sleep(
   uint32_t        ms,
   bool            alertable = false)
 {
-  const int64_t interval = int64_t(-1) * times::milliseconds * ms;
+  const systime_t interval = int64_t(-1) * times::milliseconds * ms;
   return NtDelayExecution(alertable, interval);
 }
 

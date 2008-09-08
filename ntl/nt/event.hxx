@@ -13,6 +13,7 @@
 #include "object.hxx"
 
 #include "../stlx/chrono.hxx"
+#include "time.hxx"
 
 namespace ntl {
   namespace nt {
@@ -53,12 +54,12 @@ namespace ntl {
     NTL__EXTERNAPI
       ntstatus __stdcall
       NtQueryEvent(
-      legacy_handle       EventHandle,
-      event_information_class EventInformationClass,
-      void*               EventInformation,
-      uint32_t            EventInformationLength,
-      uint32_t*           ReturnLength
-      );
+        legacy_handle       EventHandle,
+        event_information_class EventInformationClass,
+        void*               EventInformation,
+        uint32_t            EventInformationLength,
+        uint32_t*           ReturnLength
+        );
 
     class user_event;
   } // namespace nt
@@ -110,13 +111,29 @@ namespace ntl {
         const object_attributes*  ObjectAttributes
         );
 
-    /// user_event
+    /**
+     *	Notifies one or more waiting threads that an event has occurred.
+     **/
     class user_event:
       public handle,
       public device_traits<user_event>
     {
     public:
-      // create
+      /** Manual-reset event: an event object whose state remains signaled until it is explicitly reset to nonsignaled by the reset() function. */
+      static const event_type NotificationEvent    = NotificationEvent;
+      /** Auto-reset event: an event object whose state remains signaled until a single waiting thread is released, 
+          at which time the system automatically sets the state to nonsignaled.  */
+      static const event_type SynchronizationEvent = SynchronizationEvent;
+    public:
+      
+      /**
+       *	@brief Creates a named event object
+       *
+       *	@param[in] event_name     name of the event object
+       *	@param[in] EventType      type of the event object, can be NotificationEvent or SynchronizationEvent
+       *	@param[in] InitialState   initial state of event, signaled or nonsignaled
+       *	@param[in] DesiredAccess  desired types of access for the event object
+       **/
       explicit user_event(
         const const_unicode_string& event_name,
         event_type          EventType,
@@ -128,6 +145,15 @@ namespace ntl {
         create(this, DesiredAccess, &oa, EventType, InitialState);
       }
 
+      /**
+       *	@brief Creates a named event object
+       *
+       *	@param[in] event_name     name of the event object
+       *	@param[in] EventType      type of the event object, can be NotificationEvent or SynchronizationEvent
+       *  @param[out] IsOpened      if the named event object already existed before, IsOpened will be setted to true
+       *	@param[in] InitialState   initial state of event, signaled or nonsignaled
+       *	@param[in] DesiredAccess  desired types of access for the event object
+       **/
       explicit user_event(
         const const_unicode_string& event_name,
         event_type          EventType,
@@ -140,6 +166,13 @@ namespace ntl {
         IsOpened = create(this, DesiredAccess, &oa, EventType, InitialState) == status::object_name_exists;
       }
 
+      /**
+       *	@brief Creates an unnamed event object
+       *
+       *	@param[in] EventType      type of the event object, can be NotificationEvent or SynchronizationEvent
+       *	@param[in] InitialState   initial state of event, signaled or nonsignaled
+       *	@param[in] DesiredAccess  desired types of access for the event object
+       **/
       explicit user_event(
         event_type          EventType,
         bool                InitialState = false,
@@ -150,29 +183,51 @@ namespace ntl {
       }
 
 
-      // open
-      user_event(
+      /**
+       *	@brief Opens a named event object
+       *
+       *	@param[in] event_name     name of the event object
+       *	@param[in] DesiredAccess  desired types of access for the event object
+       **/
+      explicit user_event(
         const const_unicode_string& event_name,
-        access_mask         DesiredAccess = modify_state
+        access_mask                 DesiredAccess = modify_state
         )
       {
         const object_attributes oa(event_name);
         open(this, &oa, DesiredAccess);
       }
 
-
-      user_event(
+      /**
+       *	@brief Opens a named event object
+       *
+       *	@param[in] ObjectAttributes provides a name in the object attributes
+       *	@param[in] DesiredAccess    desired types of access for the event object
+       **/
+      explicit user_event(
         const object_attributes&  ObjectAttributes,
-        access_mask         DesiredAccess = modify_state
+        access_mask               DesiredAccess = modify_state
         )
       {
         open(this, &ObjectAttributes, DesiredAccess);
       }
+
+
+      /**
+       *	@brief Creates an event object
+       *
+       *	@param[out] EventHandle   pointer to handle that will receive event object handle
+       *	@param[in] DesiredAccess  desired types of access for the event object
+       *	@param[in] ObjectAttributes provides a name in the object attributes, optional
+       *	@param[in] EventType      type of the event object, can be NotificationEvent or SynchronizationEvent
+       *	@param[in] InitialState   initial state of event, signaled or nonsignaled
+       *  @return result of operation
+       **/
       static ntstatus
         create(
           handle*           EventHandle,
           access_mask       DesiredAccess,
-          const object_attributes*  ObjectAttributes,
+          const object_attributes*  ObjectAttributes __optional,
           event_type        EventType,
           bool              InitialState
           )
@@ -180,6 +235,14 @@ namespace ntl {
         return NtCreateEvent(EventHandle, DesiredAccess, ObjectAttributes, EventType, InitialState);
       }
 
+      /**
+       *	@brief Opens a named event object
+       *
+       *	@param[out] EventHandle   pointer to handle that will receive event object handle
+       *	@param[in] ObjectAttributes provides a name in the object attributes
+       *	@param[in] DesiredAccess  desired types of access for the event object
+       *  @return result of operation
+       **/
       static ntstatus
         open(
           handle*           EventHandle,
@@ -190,38 +253,48 @@ namespace ntl {
         return NtOpenEvent(EventHandle, DesiredAccess, ObjectAttributes);
       }
 
+      /** Sets the state of an event object to signaled. */
       bool set()
       {
         return success(NtSetEvent(get(), 0));
       }
 
+      /** Sets the state of an event object to nonsignaled. */
       bool reset()
       {
         return success(NtClearEvent(get()));
       }
 
+      /** Sets the event object to the signaled state and then resets it to the nonsignaled state after releasing the appropriate number of waiting threads */
       bool pulse()
       {
         return success(NtPulseEvent(get(), 0));
       }
 
-      // old-style wait, deprecated
-      __declspec(deprecated("use 'wait_for' function"))
-      ntstatus wait(uint32_t timeout = -1, bool alertable = true) const
+      /** Returns the current event object's state */
+      bool is_ready() const
       {
-        const int64_t interval = int64_t(-1) * times::milliseconds * timeout;
-        return NtWaitForSingleObject(get(), alertable, interval);
+        typedef std::ratio_multiply<std::ratio<100>, std::nano>::type systime_unit;
+        typedef std::chrono::duration<systime_t, systime_unit> system_duration;
+
+        return success(wait_for(system_duration(0), false));
       }
 
-      // old-style wait, deprecated
-      template<ntl::times::type TimeResolution>
-      __declspec(deprecated("use 'wait_for' function"))
-      ntstatus wait(uint32_t timeout_time_resolution, bool alertable = true) const
+      /** Returns event object's type */
+      event_type type() const
       {
-        const int64_t interval = int64_t(-1) * TimeResolution * timeout_time_resolution;
-        return NtWaitForSingleObject(get(), alertable, interval);
+        event_basic_information info;
+        NtQueryEvent(get(), EventBasicInformation, &info, sizeof(info), NULL);
+        return info.EventType;
       }
 
+      /**
+       *	@brief Waites when the event object is in the signaled state or the specified time was riched
+       *
+       *	@param[in] abs_time specifies the absolute time at which the wait is to be completed
+       *	@param[in] alertable specifies if the wait is alertable 
+       *	@return Status of operation
+       **/
       template <class Clock, class Duration>
       ntstatus wait_until(const std::chrono::time_point<Clock, Duration>& abs_time, bool alertable = true) const
       {
@@ -231,6 +304,13 @@ namespace ntl {
         return NtWaitForSingleObject(get(), alertable, std::chrono::duration_cast<system_duration>(abs_time.time_since_epoch()).count());
       }
 
+      /**
+       *	@brief Waites when the event object is in the signaled state or the specified time-out interval elapses
+       *
+       *	@param[in] rel_time specifies the time-out interval at which the wait is to be completed
+       *	@param[in] alertable specifies if the wait is alertable 
+       *	@return Status of operation
+       **/
       template <class Rep, class Period>
       ntstatus wait_for(const std::chrono::duration<Rep, Period>& rel_time, bool alertable = true) const
       {
@@ -240,12 +320,14 @@ namespace ntl {
         return NtWaitForSingleObject(get(), alertable, -1i64 * std::chrono::duration_cast<system_duration>(rel_time).count());
       }
 
-      bool is_ready() const
+      /**
+       *	@brief Waites when the event object is in the signaled state
+       *	@param[in] alertable specifies if the wait is alertable 
+       *	@return Status of operation
+       **/
+      ntstatus wait(bool alertable = true) const
       {
-        typedef std::ratio_multiply<std::ratio<100>, std::nano>::type systime_unit;
-        typedef std::chrono::duration<systime_t, systime_unit> system_duration;
-
-        return success(wait_for(system_duration(0), false));
+        return NtWaitForSingleObject(get(), alertable, system_time::infinite());
       }
     };
 

@@ -1306,7 +1306,7 @@ struct pointer_safety_class
     strict 
   };
 };
-typedef ntl::right_enum<pointer_safety_class> pointer_safety;
+typedef ntl::class_enum<pointer_safety_class> pointer_safety;
 #endif
 
 void declare_reachable(void *p);

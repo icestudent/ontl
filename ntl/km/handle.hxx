@@ -9,8 +9,9 @@
 #ifndef NTL__KM_HANDLE
 #define NTL__KM_HANDLE
 
-#include "../nt/handle.hxx"
 #include "basedef.hxx"
+#include "../nt/handle.hxx"
+#include "../stlx/chrono.hxx"
 
 namespace ntl {
 namespace km {
@@ -18,6 +19,42 @@ namespace km {
 using nt::legacy_handle;
 using nt::duplicate_options;
 using nt::handle_attributes;
+using nt::kwait_reason;
+
+NTL__EXTERNAPI
+ntstatus __stdcall
+  KeWaitForSingleObject(
+    void *          Object,
+    kwait_reason::type WaitReason,
+    kprocessor_mode WaitMode,
+    bool            Alertable,
+    const systime_t* Timeout  __optional
+    );
+
+static inline
+ntstatus
+  wait_for_single_object(
+    void *            Object,
+    kwait_reason      WaitReason  = kwait_reason::Executive,
+    kprocessor_mode   WaitMode    = KernelMode,
+    bool              Alertable   = false
+    )
+{
+  return KeWaitForSingleObject(Object, WaitReason, WaitMode, Alertable, NULL);
+}
+
+static inline
+ntstatus
+  wait_for_single_object(
+    void *            Object,
+    const systime_t&  Timeout,
+    kwait_reason      WaitReason  = kwait_reason::Executive,
+    kprocessor_mode   WaitMode    = KernelMode,
+    bool              Alertable   = false
+    )
+{
+  return KeWaitForSingleObject(Object, WaitReason, WaitMode, Alertable, &Timeout);
+}
 
 
 NTL__EXTERNAPI

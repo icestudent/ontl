@@ -18,6 +18,12 @@ struct system_time
 {
     typedef int64_t type;
     static const type resolution = (1000 * 1000 * 1000) / 100; // 100ns
+    
+    static const type& infinite()
+    {
+      static const type* const null = 0;
+      return *null;
+    }
 
     __forceinline type get() volatile const
     {

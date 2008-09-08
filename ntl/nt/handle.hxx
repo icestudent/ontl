@@ -47,23 +47,74 @@ NtDuplicateObject(
     );
 
 // wait functions
-enum wait_type { WaitAll, WaitAny };
+struct wait_type_def
+{
+  enum type { WaitAll, WaitAny };
+};
+typedef class_enum<wait_type_def> wait_type;
+
+struct kwait_reason_def
+{
+  enum type
+  {
+    Executive,
+    FreePage,
+    PageIn,
+    PoolAllocation,
+    DelayExecution,
+    Suspended,
+    UserRequest,
+    WrExecutive,
+    WrFreePage,
+    WrPageIn,
+    WrPoolAllocation,
+    WrDelayExecution,
+    WrSuspended,
+    WrUserRequest,
+    WrEventPair,
+    WrQueue,
+    WrLpcReceive,
+    WrLpcReply,
+    WrVirtualMemory,
+    WrPageOut,
+    WrRendezvous,
+    Spare2,
+    Spare3,
+    Spare4,
+    Spare5,
+    Spare6,
+    WrKernel,
+    WrResource,
+    WrPushLock,
+    WrMutex,
+    WrQuantumEnd,
+    WrDispatchInt,
+    WrPreempted,
+    WrYieldExecution,
+    WrFastMutex,
+    WrGuardedMutex,
+    WrRundown,
+    MaximumWaitReason
+  };
+};
+typedef ntl::class_enum<kwait_reason_def> kwait_reason;
+
 
 NTL__EXTERNAPI
 ntstatus __stdcall
   NtWaitForSingleObject(
-    legacy_handle   Handle,
-    bool            Alertable,
-    const int64_t&  Timeout
+    legacy_handle     Handle,
+    bool              Alertable,
+    const systime_t&  Timeout
     );
 
 NTL__EXTERNAPI
 ntstatus __stdcall
   NtSignalAndWaitForSingleObject(
-    legacy_handle   SignalHandle,
-    legacy_handle   Handle,
-    bool            Alertable,
-    const int64_t&  Timeout
+    legacy_handle     SignalHandle,
+    legacy_handle     Handle,
+    bool              Alertable,
+    const systime_t&  Timeout
     );
 
 NTL__EXTERNAPI
@@ -71,9 +122,9 @@ ntstatus __stdcall
   NtWaitForMultipleObjects(
     uint32_t            Count,
     const legacy_handle Handles[],
-    wait_type           WaitType,
+    wait_type::type     WaitType,
     bool                Alertable,
-    const int64_t&      Timeout
+    const systime_t&    Timeout
     );
 
 
