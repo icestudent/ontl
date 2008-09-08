@@ -594,7 +594,7 @@ namespace std
         typedef ratio_divide<ratio_multiply<ratio<116444736>, hecto>::type, centi>::type epochdiff_t;
         STATIC_ASSERT(epochdiff_t::num == 1164447360000i64);
 
-        static const system_clock::duration diff(epochdiff_t::num);
+        const system_clock::duration diff(epochdiff_t::num);
         return duration_cast<chrono::seconds>(t.time_since_epoch() - diff).count();
       }
 
@@ -609,7 +609,7 @@ namespace std
         typedef ratio_divide<ratio_multiply<ratio<116444736>, hecto>::type, centi>::type epochdiff_t;
         STATIC_ASSERT(epochdiff_t::num == 1164447360000i64);
         typedef chrono::time_point<system_clock, chrono::seconds> seconds_time_point;
-        static const system_clock::duration diff(epochdiff_t::num);
+        const system_clock::duration diff(epochdiff_t::num);
 
         // NOTE: c++ recognizes `seconds_time_point from_tp(chrono::seconds(t))` as function declaration, so we need an alternate way:
         //  const seconds_time_point from_tp((chrono::seconds(t))) OR

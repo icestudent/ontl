@@ -17,6 +17,7 @@ namespace ntl {
 
     using nt::time_fields;
     using nt::system_time;
+    using nt::systime_t;
     using nt::RtlTimeToTimeFields;
 
     struct ktimer
@@ -29,7 +30,7 @@ namespace ntl {
     };
 
     __forceinline
-      void KeQuerySystemTime(int64_t* CurrentTime)
+      void KeQuerySystemTime(systime_t* CurrentTime)
     {
       *CurrentTime = user_shared_data::instance().SystemTime.get();
     }
@@ -42,7 +43,7 @@ namespace ntl {
 
     NTL__EXTERNAPI
       void __stdcall
-      ExSystemTimeToLocalTime(int64_t* SystemTime, int64_t* LocalTime);
+      ExSystemTimeToLocalTime(systime_t* SystemTime, systime_t* LocalTime);
 
 
   }//namespace km

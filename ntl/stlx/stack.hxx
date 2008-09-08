@@ -39,6 +39,22 @@ class stack
     typedef          Container              container_type;
 
     explicit stack(const Container& c = Container()) : c(c) {}
+    
+    #ifdef NTL__CXX
+    explicit stack(Container&& = Container());
+    #endif
+
+    template <class Alloc>
+    explicit stack(const Alloc&);
+    template <class Alloc>
+    stack(const Container&, const Alloc&);
+    
+    #ifdef NTL__CXX
+    template <class Alloc>
+    stack(Container&&, const Alloc&);
+    template <class Alloc>
+    stack(stack&&, const Alloc&);
+    #endif
 
     bool              empty() const             { return c.empty(); }
     size_type         size()  const             { return c.size(); }
@@ -46,6 +62,19 @@ class stack
     const value_type& top()   const             { return c.back(); }
     void              push(const value_type& x) { c.push_back(x); }
     void              pop()                     { c.pop_back(); }
+
+    #ifdef NTL__CXX
+    void push(value_type&& x);
+    template <class... Args>
+    void emplace(Args&&... args);
+    #endif
+
+    #ifdef NTL__CXX
+    void swap(stack&& s) { c.swap(s.c); }
+    #else
+    void swap(stack&  s) { c.swap(s.c); }
+    #endif
+
 
   ///////////////////////////////////////////////////////////////////////////
   protected:
@@ -84,6 +113,33 @@ class stack
   ///@}
 
 };//class stack
+
+// misprint?
+template <class T, class Allocator>
+void swap(stack<T,Allocator>& x, stack<T,Allocator>& y);
+
+template <class T, class Container>
+void swap(stack<T, Container>& x, stack<T, Container>& y)
+{
+  x.swap(y);
+}
+
+#ifdef NTL__CXX
+template <class T, class Allocator>
+void swap(stack<T,Allocator>&& x, stack<T,Allocator>& y);
+template <class T, class Allocator>
+void swap(stack<T,Allocator>& x, stack<T,Allocator>&& y);
+#endif
+
+
+template <class T, class Container, class Alloc>
+struct uses_allocator<stack<T, Container>, Alloc>
+  : uses_allocator<Container, Alloc>::type { };
+
+template <class T, class Container>
+struct constructible_with_allocator_suffix<stack<T, Container> >
+  : true_type { };
+
 
 /**@} lib_container_adaptors */
 

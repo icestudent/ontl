@@ -15,13 +15,17 @@ namespace tree
     public:
       typedef           T                           value_type;
       typedef           Compare                     value_compare;
-      typedef           Allocator                   allocator_type;
-      typedef typename  Allocator::pointer          pointer;
-      typedef typename  Allocator::const_pointer    const_pointer;
-      typedef typename  Allocator::reference        reference;
-      typedef typename  Allocator::const_reference  const_reference;
-      typedef typename  Allocator::size_type        size_type;
-      typedef typename  Allocator::difference_type  difference_type;
+
+      typedef Allocator                             allocator_type;
+      typedef typename  
+        Allocator::template rebind<T>::other        allocator;
+      
+      typedef typename  allocator::pointer          pointer;
+      typedef typename  allocator::const_pointer    const_pointer;
+      typedef typename  allocator::reference        reference;
+      typedef typename  allocator::const_reference  const_reference;
+      typedef typename  allocator::size_type        size_type;
+      typedef typename  allocator::difference_type  difference_type;
 
     protected:
       struct node
@@ -41,9 +45,12 @@ namespace tree
         int8_t color;
 
         explicit node(const T& elem, node* parent, node* left = NULL, node* right = NULL)
-          :elem(elem), parent(parent), left(left), right(right),
+          :elem(elem), parent(parent),
           color(black)
-        {}
+        {
+          u.s.left = left;
+          u.s.right= right;
+        }
         node(const T& elem)
           :elem(elem),
           parent(NULL),// left(NULL), right(NULL),
@@ -174,7 +181,7 @@ namespace tree
           return *this;
 
         clear();
-        insert(x.cbegin(), x.cend());
+        insert_range(x.cbegin(), x.cend());
         return *this;
       }
 
@@ -183,7 +190,7 @@ namespace tree
         clear();
       }
 
-      allocator_type get_allocator() const { return node_allocator; }
+      allocator_type get_allocator() const { return static_cast<allocator_type>(node_allocator); }
 
     public:
       // capacity
@@ -278,16 +285,6 @@ namespace tree
         return insert(x).first;
       }
 
-#if 0
-      template<class InputIterator>
-      void insert(InputIterator first, InputIterator last)
-      {
-        while(first != last){
-          insert(*first);
-          ++first;
-        }
-      }
-#endif
 
       iterator erase(iterator position)
       {
@@ -534,7 +531,7 @@ namespace tree
       }
       bool elem_equal(const T& x, const T& y) const
       {
-        return !node_less(x, y) && !node_greater(x, y);
+        return !elem_less(x, y) && !elem_greater(x, y);
       }
       bool elem_greater(const T& x, const T& y) const
       {
@@ -549,6 +546,15 @@ namespace tree
       const_iterator make_iterator(const node* p) const
       {
         return const_iterator(p, this);
+      }
+
+      template<class InputIterator>
+      void insert_range(InputIterator first, InputIterator last)
+      {
+        while(first != last){
+          insert(*first);
+          ++first;
+        }
       }
 
     protected:

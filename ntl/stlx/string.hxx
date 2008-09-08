@@ -160,6 +160,7 @@ class basic_string
     typedef std::reverse_iterator<iterator>       reverse_iterator;
     typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
 
+public:
     static const size_type npos = static_cast<size_type>(-1);
 
     ///\name 21.3.2 basic_string constructors and assigment operators [string.cons]
@@ -791,7 +792,7 @@ class basic_string
     /// 7 Returns: find_last_of(basic_string<charT,traits,Allocator>(1,c),pos).
     size_type find_last_of(charT c, size_type pos = npos) const
     {
-      return rfind(c);
+      return rfind(c, pos);
     }
 
     ///\name  21.3.7.6 basic_string::find_first_not_of [string::find.first.not.of]

@@ -1,6 +1,6 @@
 /**\file*********************************************************************
  *                                                                     \brief
- *  Class template list [23.2.4 lib.list]
+ *  Class template list [23.2.4 list]
  *
  ****************************************************************************
  */
@@ -65,15 +65,16 @@ class list
   public:
 
     // types:
-
     typedef           T                           value_type;
-    typedef           Allocator                   allocator_type;
-    typedef typename  Allocator::pointer          pointer;
-    typedef typename  Allocator::const_pointer    const_pointer;
-    typedef typename  Allocator::reference        reference;
-    typedef typename  Allocator::const_reference  const_reference;
-    typedef typename  Allocator::size_type        size_type;
-    typedef typename  Allocator::difference_type  difference_type;
+    typedef Allocator                             allocator_type;
+    typedef typename  
+      Allocator::template rebind<T>::other        allocator;
+    typedef typename  allocator::pointer          pointer;
+    typedef typename  allocator::const_pointer    const_pointer;
+    typedef typename  allocator::reference        reference;
+    typedef typename  allocator::const_reference  const_reference;
+    typedef typename  allocator::size_type        size_type;
+    typedef typename  allocator::difference_type  difference_type;
 
   private:
 
@@ -183,6 +184,19 @@ class list
       insert(begin(), x.begin(), x.end());
     }
 
+    list(const list& x, const Allocator& a)
+      : node_allocator(a)
+    {
+      init_head();
+      insert(begin(), x.begin(), x.end());
+    }
+    
+    #ifdef NTL__CXX
+    list(list&& x);
+    list(list&&, const Allocator&);
+    list(initializer_list<T>, Allocator& = Allocator());
+    #endif
+
     __forceinline
     ~list() { clear(); }
 
@@ -192,6 +206,10 @@ class list
       assign(x.begin(), x.end());
       return *this;
     }
+    #ifdef NTL__CXX
+    list<T,Allocator>& operator=(list<T,Allocator>&& x);
+    list& operator=(initializer_list<T>);
+    #endif
 
     template <class InputIterator>
     void assign(InputIterator first, InputIterator last)
@@ -208,8 +226,12 @@ class list
       for ( size_type i = size(); i; --i, ++it ) replace(it, t);
       if ( n > size() ) insert(it, n - size(), t);
     }
+    
+    #ifdef NTL__CXX
+    void assign(initializer_list<T>);
+    #endif
 
-    allocator_type get_allocator() const { return node_allocator; }
+    allocator_type get_allocator() const { return static_cast<allocator_type>(node_allocator); }
 
     ///@}
 
@@ -277,6 +299,14 @@ class list
 
     ///\name modifiers [23.2.4.3]
 
+    #ifdef NTL__CXX
+    template <class... Args> void emplace_front(Args&&... args);
+    template <class... Args> void emplace_back(Args&&... args);
+    void push_front(T&& x);
+    void push_back(T&& x);
+    template <class... Args> iterator emplace(const_iterator position, Args&&... args);
+    #endif
+
     __forceinline
     void push_front(const T& x) { insert(begin(), x); }
 
@@ -289,6 +319,10 @@ class list
     __forceinline
     void pop_back()             { erase(--end()); }
 
+    #ifdef NTL__CXX
+    iterator insert(const_iterator position, T&& x);
+    void insert(const_iterator position, initializer_list<T> il);
+    #endif
     __forceinline
     iterator insert(iterator position, const T& x)
     {
@@ -330,7 +364,11 @@ class list
       return last;
     }
 
+    #ifdef NTL__CXX
+    void swap(list<T,Allocator>&&);
+    #else
     void swap(list<T, Allocator>&);
+    #endif
 
     __forceinline
     void clear() { erase(begin(), end()); }
@@ -357,12 +395,19 @@ class list
 
     ///\name list operations [23.2.4.4]
 
+    #ifdef NTL__CXX
+    void splice(const_iterator position, list<T,Allocator>&& x);
+    void splice(const_iterator position, list<T,Allocator>&& x, const_iterator i);
+    void splice(const_iterator position, list<T,Allocator>&& x,
+      const_iterator first, const_iterator last);
+    #else
     void splice(iterator position, list<T, Allocator>& x);
 
     void splice(iterator position, list<T, Allocator>& x, iterator i);
 
     void splice(iterator position, list<T, Allocator>& x,
                 iterator first, iterator last);
+    #endif
 
     void remove(const T& value)
     {
@@ -400,10 +445,15 @@ class list
       while ( i != begin() );
     }
 
+    #ifdef NTL__CXX
+    void merge(list<T,Allocator>&& x);
+    template <class Compare>
+    void merge(list<T,Allocator>&& x, Compare comp);
+    #else
     void merge(list<T, Allocator>& x);
-
     template <class Compare>
     void merge(list<T, Allocator>& x, Compare comp);
+    #endif
 
     void sort();
 
@@ -482,6 +532,17 @@ void swap(list<T, Allocator>& x, list<T, Allocator>& y) __ntl_nothrow
 {
   x.swap(y);
 }
+
+#ifdef NTL__CXX
+template <class T, class Allocator>
+void swap(list<T,Allocator>&& x, list<T,Allocator>& y);
+template <class T, class Allocator>
+void swap(list<T,Allocator>& x, list<T,Allocator>&& y);
+#endif
+
+template <class T, class Alloc>
+struct constructible_with_allocator_suffix<list<T, Alloc> >
+  : true_type { };
 
 ///@}
 /**@} lib_sequence */

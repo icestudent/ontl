@@ -30,22 +30,27 @@ namespace std {
     typedef tree::rb_tree::rb_tree<Key, Compare, Allocator> tree_type;
   public:
     // types:
-    typedef Key key_type;
-    typedef Key value_type;
-    typedef Compare key_compare;
-    typedef Compare value_compare;
-    typedef Allocator allocator_type;
-    typedef typename Allocator::reference reference;
-    typedef typename Allocator::const_reference const_reference;
-    typedef tree_type::iterator iterator;
-    typedef tree_type::const_iterator const_iterator;
-    typedef typename Allocator::size_type size_type;
-    typedef typename Allocator::difference_type difference_type;
-    typedef typename Allocator::pointer pointer;
-    typedef typename Allocator::const_pointer const_pointer;
-    typedef std::reverse_iterator<iterator> reverse_iterator;
+    typedef Key                                   key_type;
+    typedef Key                                   value_type;
+    typedef Compare                               key_compare;
+    typedef Compare                               value_compare;
+
+    typedef Allocator                             allocator_type;
+    typedef typename  
+      Allocator::template rebind<T>::other        allocator;
+    typedef typename  allocator::pointer          pointer;
+    typedef typename  allocator::const_pointer    const_pointer;
+    typedef typename  allocator::reference        reference;
+    typedef typename  allocator::const_reference  const_reference;
+    typedef typename  allocator::size_type        size_type;
+    typedef typename  allocator::difference_type  difference_type;
+
+    typedef tree_type::iterator                   iterator;
+    typedef tree_type::const_iterator             const_iterator;
+    typedef std::reverse_iterator<iterator>       reverse_iterator;
     typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
 
+  public:
     // 23.3.3.1 construct/copy/destroy:
     explicit set(const Compare& comp = Compare(),
       const Allocator& a = Allocator())

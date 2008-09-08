@@ -810,7 +810,7 @@ class unique_ptr<T[N], default_delete<T[N]> >
     __forceinline
     void reset(T* p = 0) const __ntl_nothrow
     {
-      if ( get() && get() != p ) get_deleter()(get());
+      if ( get() && get() != p ) get_deleter()(get(), N);
       set(p);
     }
 
@@ -1334,7 +1334,16 @@ inline void * align(size_t alignment, size_t size, void* &ptr, size_t& space)
 
 ///\name  D.9 auto_ptr [depr.auto.ptr]
 
-template<class Y> struct auto_ptr_ref;
+template<class X> class auto_ptr;
+
+template<class Y>
+struct auto_ptr_ref
+{
+  explicit auto_ptr_ref(auto_ptr<Y> & a) __ntl_nothrow : ptr(a) {}
+  auto_ptr<Y> & ptr;
+private:
+  auto_ptr_ref<Y> & operator=(const auto_ptr_ref<Y> &);
+};
 
 /// D.9.1 Class template auto_ptr [auto.ptr]
 template<class X>
@@ -1393,7 +1402,7 @@ class auto_ptr
     auto_ptr & operator=(auto_ptr_ref<X> r) __ntl_nothrow { return *this = r.ptr; }
 
     template<class Y>
-    operator auto_ptr_ref<Y>()  __ntl_nothrow { return auto_ptr_ref<Y>(*this); }
+    operator auto_ptr_ref<Y>()  __ntl_nothrow { return auto_ptr_ref<Y>(*reinterpret_cast<auto_ptr<Y>*>(this)); }
 
     template<class Y>
     operator auto_ptr<Y>()      __ntl_nothrow { return auto_ptr<Y>(release()); }
@@ -1406,16 +1415,6 @@ class auto_ptr
     X * ptr;
     void set(X * p) { ptr = p; }
 };
-
-template<class Y>
-struct auto_ptr_ref
-{
-    explicit auto_ptr_ref(auto_ptr<Y> & a) __ntl_nothrow : ptr(a) {}
-    auto_ptr<Y> & ptr;
-  private:
-    auto_ptr_ref<Y> & operator=(const auto_ptr_ref<Y> &);
-};
-
 
 /**@} lib_memory */
 /**@} lib_utilities */

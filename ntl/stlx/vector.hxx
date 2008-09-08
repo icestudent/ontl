@@ -42,19 +42,22 @@ class vector
   public:
 
     typedef           T                           value_type;
-    typedef           Allocator                   allocator_type;
-    typedef typename  Allocator::pointer          pointer;
-    typedef typename  Allocator::const_pointer    const_pointer;
-    typedef typename  Allocator::reference        reference;
-    typedef typename  Allocator::const_reference  const_reference;
-    typedef typename  Allocator::size_type        size_type;
-    typedef typename  Allocator::difference_type  difference_type;
+    typedef Allocator                             allocator_type;
+    typedef typename  
+      Allocator::template rebind<T>::other        allocator;
+    typedef typename  allocator::pointer          pointer;
+    typedef typename  allocator::const_pointer    const_pointer;
+    typedef typename  allocator::reference        reference;
+    typedef typename  allocator::const_reference  const_reference;
+    typedef typename  allocator::size_type        size_type;
+    typedef typename  allocator::difference_type  difference_type;
 
     typedef pointer                               iterator;
     typedef const_pointer                         const_iterator;
     typedef std::reverse_iterator<iterator>       reverse_iterator;
     typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
 
+    static_assert((is_same<value_type, typename allocator::value_type>::value), "allocator::value_type must be the same as X::value_type");
   private:
 
     void construct(size_type n, const T& value)
@@ -134,6 +137,26 @@ class vector
     }
 
     __forceinline
+    vector(const vector& x, const Allocator& a)
+      :array_allocator(a)
+    {
+      capacity_ = x.size();
+      if ( !capacity_ )
+        begin_ = end_ = 0;
+      else
+      {
+        begin_ = array_allocator.allocate(capacity_);
+        construct(x.begin(), capacity_);
+      }
+    }
+
+    #ifdef NTL__CXX
+    vector(vector&&);
+    vector(vector&&, const Allocator&);
+    vector(initializer_list<T>, const Allocator& = Allocator());
+    #endif
+
+    __forceinline
     ~vector() __ntl_nothrow
     {
       clear();
@@ -142,10 +165,18 @@ class vector
 
     vector<T, Allocator>& operator=(const vector<T, Allocator>& x)
     {
-    //?  array_allocator = x.array_allocator;
-      assign(x.begin(), x.end());
+      if(this != &x){
+        // Table 92 (page 677 of N2733) does not require this?
+        array_allocator = x.array_allocator;
+        assign(x.begin(), x.end());
+      }
       return *this;
     }
+
+    #ifdef NTL__CXX
+    vector<T,Allocator>& operator=(vector<T,Allocator>&& x);
+    vector& operator=(initializer_list<T>);
+    #endif
 
     template <class InputIterator>
     void assign(InputIterator first, InputIterator last)
@@ -164,8 +195,12 @@ class vector
       }
       construct(n, u);
     }
+    
+    #ifdef NTL__CXX
+    void assign(initializer_list<T>);
+    #endif
 
-    allocator_type get_allocator() const  { return array_allocator; }
+    allocator_type get_allocator() const  { return static_cast<allocator_type>(array_allocator); }
 
     ///@}
 
@@ -232,6 +267,8 @@ class vector
     {
       if ( capacity() < n ) realloc(n);
     }
+    /** A non-binding request to reduce capacity() to size(). */
+    void shrink_to_fit();
 
     ///\name  element access
 
@@ -330,6 +367,10 @@ class vector
 
     ///\name  modifiers [23.2.6.3]
 
+    #ifdef NTL__CXX
+    template <class... Args> void emplace_back(Args&&... args);
+    void push_back(T&& x);
+    #endif
     __forceinline
     void push_back(const T& x)
     {
@@ -339,6 +380,11 @@ class vector
 
     void pop_back() __ntl_nothrow { array_allocator.destroy(--end_); }
 
+    #ifdef NTL__CXX
+    template <class... Args> iterator emplace(const_iterator position, Args&&... args);
+    iterator insert(const_iterator position, T&& x);
+    void insert(const_iterator position, initializer_list<T> il);
+    #endif
     iterator insert(iterator position, const T& x)
     {
       return insert__impl(position, 1, x);
@@ -375,6 +421,10 @@ class vector
       end_ = first;
       return tail;
     }
+    
+    #ifdef NTL__CXX
+    void swap(vector<T,Allocator>&&);
+    #endif
 
     void swap(vector<T, Allocator>& x) __ntl_nothrow
     {
@@ -418,11 +468,11 @@ class vector
   //end extension
   #endif
 
-    pointer         begin_;
-    pointer         end_;
-    size_type       capacity_;
+    pointer   begin_;
+    pointer   end_;
+    size_type capacity_;
 
-    mutable allocator_type  array_allocator;
+    mutable allocator array_allocator;
 
     // "stdexcept.hxx" includes this header
     // hack: MSVC doesn't look inside function body
@@ -518,6 +568,18 @@ void swap(vector<T, Allocator>& x, vector<T, Allocator>& y) __ntl_nothrow
 {
   x.swap(y);
 }
+
+#ifdef NTL__CXX
+  template <class T, class Allocator>
+  void swap(vector<T,Allocator>&& x, vector<T,Allocator>& y);
+  template <class T, class Allocator>
+  void swap(vector<T,Allocator>& x, vector<T,Allocator>&& y);
+#endif
+
+template <class T, class Allocator>
+struct constructible_with_allocator_suffix<vector<T, Allocator> >
+  : true_type { };
+
 
 ///@}
 /**@} lib_sequence */

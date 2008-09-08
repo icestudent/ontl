@@ -1,6 +1,6 @@
 /**\file*********************************************************************
  *                                                                     \brief
- *  Class template map [lib.map]
+ *  Class template map [map]
  *
  ****************************************************************************
  */
@@ -24,7 +24,7 @@ namespace std {
   *@{ *    Provide an ability for fast retrieval of data based on keys.
   **/
 
-/// [23.3.1 lib.map]
+/// [23.3.1 map]
 /// supports unique keys (contains at most one of each key value)
   template
     <
@@ -82,30 +82,29 @@ class map:
   public:
 
     ///\name  types
-    typedef Key                                   key_type;
-    typedef T                                     mapped_type;
-    typedef pair<const Key, T>                    value_type;
-    typedef Compare                               key_compare;
+    typedef Key                                       key_type;
+    typedef T                                         mapped_type;
+    typedef pair<const Key, T>                        value_type;
+    typedef Compare                                   key_compare;
 
-    typedef detail::value_compare
-      <Key, T, Compare, Allocator>                value_compare;
+    typedef Allocator                                 allocator_type;
+    typedef typename  
+      Allocator::template rebind<value_type>::other   allocator;
 
-    typedef Allocator                             allocator_type;
-    typedef typename  Allocator::reference        reference;
-    typedef typename  Allocator::const_reference  const_reference;
+    typedef typename  allocator::pointer              pointer;
+    typedef typename  allocator::const_pointer        const_pointer;
+    typedef typename  allocator::reference            reference;
+    typedef typename  allocator::const_reference      const_reference;
+    typedef typename  allocator::size_type            size_type;
+    typedef typename  allocator::difference_type      difference_type;
 
-    typedef typename tree_type::iterator          iterator;
-    typedef typename tree_type::const_iterator    const_iterator;
+    typedef typename tree_type::iterator              iterator;
+    typedef typename tree_type::const_iterator        const_iterator;
 
-    typedef typename tree_type::reverse_iterator        reverse_iterator;
-    typedef typename tree_type::const_reverse_iterator  const_reverse_iterator;
+    typedef typename tree_type::reverse_iterator       reverse_iterator;
+    typedef typename tree_type::const_reverse_iterator const_reverse_iterator;
 
-    typedef typename  Allocator::size_type        size_type;
-    typedef typename  Allocator::difference_type  difference_type;
-    typedef typename  Allocator::pointer          pointer;
-    typedef typename  Allocator::const_pointer    const_pointer;
-
-
+public:
     ///\name 23.3.1.1 construct/copy/destroy:
     explicit map(const Compare& comp = Compare(), const Allocator& a = Allocator())
       :val_comp_(comp), tree_type(val_comp_, a)
@@ -210,12 +209,10 @@ class map:
     iterator insert(const_iterator position, P&&);
 #endif
     template <class InputIterator>
+    __forceinline
     void insert(InputIterator first, InputIterator last)
     {
-      while(first != last){
-        insert(*first);
-        ++first;
-      }
+      insert_range(first, last);
     }
 
     size_type erase(const key_type& x)
@@ -346,16 +343,16 @@ template <class Key, class T, class Compare, class Allocator>
 void swap(map<Key,T,Compare,Allocator&& x, map<Key,T,Compare,Allocator>& y);
 
 template <class Key, class T, class Compare, class Allocator>
-void swap(map<Key,T,Compare,Allocator& x, map<Key,T,Compare,Allocator>&& y);
+void swap(map<Key,T, Compare, Allocator& x, map<Key,T, Compare, Allocator>&& y);
 
 #endif
 
-template <class Key, class T, class Compare, class Alloc>
-struct constructible_with_allocator_suffix< map<Key, T, Compare, Alloc> >
+template <class Key, class T, class Compare, class Allocator>
+struct constructible_with_allocator_suffix< map<Key, T, Compare, Allocator> >
   :true_type
 {};
 
-/// [23.3.2 lib.multimap]
+/// [23.3.2 multimap]
 #if 0
 template <class Key, class T, class Compare = less<Key>, class Allocator = allocator<pair<const Key, T> > >
 class multimap;
@@ -387,6 +384,18 @@ bool operator<=(const multimap<Key,T,Compare,Allocator>& x,
 template <class Key, class T, class Compare, class Allocator>
 void swap(multimap<Key,T,Compare,Allocator>& x,
           multimap<Key,T,Compare,Allocator>& y);
+template <class Key, class T, class Compare, class Allocator>
+void swap(multimap<Key,T,Compare,Allocator&& x,
+          multimap<Key,T,Compare,Allocator>& y);
+template <class Key, class T, class Compare, class Allocator>
+void swap(multimap<Key,T,Compare,Allocator& x,
+          multimap<Key,T,Compare,Allocator>&& y);
+
+template <class Key, class T, class Compare, class Allocator>
+struct constructible_with_allocator_suffix<
+  multimap<Key, T, Compare, Allocator> >
+  : true_type { };
+
 #endif
 ///@}
 /**@} lib_associative */
