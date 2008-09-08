@@ -226,7 +226,7 @@ struct process_information_base:
       const info_class &  new_info
       ) __ntl_nothrow
     {
-      //static_assert(is_read_only == false, "Cannot set a read-only information class");
+      static_assert(is_read_only == false, "Cannot set a read-only information class");
       status_ = _set(process_handle, &new_info, sizeof(info_class));
     }
 
