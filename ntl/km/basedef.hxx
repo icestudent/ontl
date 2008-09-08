@@ -359,11 +359,11 @@ ntstatus __stdcall
   KeDelayExecutionThread(
     kprocessor_mode WaitMode,
     bool            Alertable,
-    const int64_t * Interval
+    const int64_t&  Interval
     );
 
 
-template<times TimeResolution>
+template<times::type TimeResolution>
 static inline
 ntstatus sleep(
   uint32_t        time_resolution,
@@ -371,7 +371,7 @@ ntstatus sleep(
   kprocessor_mode wait_mode = KernelMode)
 {
   const int64_t interval = int64_t(-1) * TimeResolution * time_resolution;
-  return KeDelayExecutionThread(wait_mode, alertable, &interval);
+  return KeDelayExecutionThread(wait_mode, alertable, interval);
 }
 
 /// default milliseconds
@@ -381,8 +381,8 @@ ntstatus sleep(
   bool            alertable = false,
   kprocessor_mode wait_mode = KernelMode)
 {
-  const int64_t interval = int64_t(-1) * milliseconds * ms;
-  return KeDelayExecutionThread(wait_mode, alertable, &interval);
+  const int64_t interval = int64_t(-1) * times::milliseconds * ms;
+  return KeDelayExecutionThread(wait_mode, alertable, interval);
 }
 
 

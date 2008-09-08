@@ -225,8 +225,8 @@ namespace ntl {
       template <class Clock, class Duration>
       ntstatus wait_until(const std::chrono::time_point<Clock, Duration>& abs_time, bool alertable = true) const
       {
-        typedef ratio_multiply<ratio<100>, nano>::type systime_unit;
-        typedef chrono::duration<systime_t, systime_unit> system_duration;
+        typedef std::ratio_multiply<std::ratio<100>, std::nano>::type systime_unit;
+        typedef std::chrono::duration<systime_t, systime_unit> system_duration;
 
         return NtWaitForSingleObject(get(), alertable, std::chrono::duration_cast<system_duration>(abs_time.time_since_epoch()).count());
       }
@@ -234,8 +234,8 @@ namespace ntl {
       template <class Rep, class Period>
       ntstatus wait_for(const std::chrono::duration<Rep, Period>& rel_time, bool alertable = true) const
       {
-        typedef ratio_multiply<ratio<100>, nano>::type systime_unit;
-        typedef chrono::duration<systime_t, systime_unit> system_duration;
+        typedef std::ratio_multiply<std::ratio<100>, std::nano>::type systime_unit;
+        typedef std::chrono::duration<systime_t, systime_unit> system_duration;
 
         return NtWaitForSingleObject(get(), alertable, -1i64 * std::chrono::duration_cast<system_duration>(rel_time).count());
       }

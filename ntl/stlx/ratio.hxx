@@ -77,7 +77,7 @@ namespace std
   //typedef ratio<1000000000000000000000000, 1> yotta; // see 20.3.4
 
 
-  namespace detail { namespace static_evaluation {
+  namespace __ { namespace static_evaluation {
 
     // sign functions
     template<ratio_t a>
@@ -124,7 +124,7 @@ namespace std
   template <ratio_t N, ratio_t D>
   class ratio
   {
-    static const ratio_t gcd_value = detail::static_evaluation::gcd<N, D>::value;
+    static const ratio_t gcd_value = __::static_evaluation::gcd<N, D>::value;
   public:
     static_assert(D != 0, "template argument D shall not be zero");
     static_assert((N >= RATIO_MIN && N <= RATIO_MAX) && (D >= RATIO_MIN && D <= RATIO_MAX), "out of range");
@@ -134,20 +134,20 @@ namespace std
      *  \c num shall have the value \f$ sign(N)*sign(D)*abs(N)/gcd \f$,
      *  but \f$ sign(N)*abs(N) == N \f$.
      **/
-    static const ratio_t num = N * detail::static_evaluation::sign<D>::value / gcd_value;
+    static const ratio_t num = N * __::static_evaluation::sign<D>::value / gcd_value;
 
     /**
      *	@brief Denominator of the ratio
      *  \c den shall have the value \f$ sign(N)*sign(D)*abs(D)/gcd \f$, after simplification it would be
      *  \f$ D * sign(N) / gcd \f$, but we use \f$ abs(D) / gcd \f$ (see N2661).
      **/
-    static const ratio_t den = detail::static_evaluation::abs<D>::value / gcd_value;
+    static const ratio_t den = __::static_evaluation::abs<D>::value / gcd_value;
   };
 
 
 
   /// 20.3.2 Arithmetic on ratio types [ratio.arithmetic]
-  namespace detail {
+  namespace __ {
 
     /*
        there are 4 ways of addition:
@@ -256,7 +256,7 @@ namespace std
   template <ratio_t a, ratio_t b>
   struct ratio_checked_add
   {
-    static_assert((detail::check_add_flows<a, b>::value), "add overflow");
+    static_assert((__::check_add_flows<a, b>::value), "add overflow");
 
     static const ratio_t value = a + b;
   };
@@ -265,7 +265,7 @@ namespace std
   template <ratio_t a, ratio_t b>
   struct ratio_checked_sub
   {
-    static_assert((detail::check_sub_flows<a, b>::value), "sub underflow");
+    static_assert((__::check_sub_flows<a, b>::value), "sub underflow");
 
     static const ratio_t value = a - b;
   };
@@ -275,8 +275,8 @@ namespace std
   struct ratio_checked_multiply
   {
   private:
-    static const uratio_t absa = detail::static_evaluation::abs<a>::value;
-    static const uratio_t absb = detail::static_evaluation::abs<b>::value;
+    static const uratio_t absa = __::static_evaluation::abs<a>::value;
+    static const uratio_t absb = __::static_evaluation::abs<b>::value;
     static const uratio_t c = 1UI64 << (sizeof(uratio_t)*4);
 
     static const uratio_t a1 = absa % c;
@@ -302,7 +302,7 @@ namespace std
   struct ratio_add
   {
   private:
-    static const intmax_t dens_gcd = detail::static_evaluation::gcd<R1::den, R2::den>::value;
+    static const intmax_t dens_gcd = __::static_evaluation::gcd<R1::den, R2::den>::value;
   public:
     typedef ratio<
       ratio_checked_add<
@@ -326,8 +326,8 @@ namespace std
   struct ratio_multiply
   {
   private:
-    static const intmax_t gcd1 = detail::static_evaluation::gcd<R1::num, R2::den>::value,
-      gcd2 = detail::static_evaluation::gcd<R2::num, R1::den>::value;
+    static const intmax_t gcd1 = __::static_evaluation::gcd<R1::num, R2::den>::value,
+      gcd2 = __::static_evaluation::gcd<R2::num, R1::den>::value;
   public:
     typedef ratio<
       ratio_checked_multiply<R1::num / gcd1, R2::num / gcd2>::value,
@@ -360,7 +360,7 @@ namespace std
     integral_constant<bool, !ratio_equal<R1, R2>::value>
   { };
 
-  namespace detail {
+  namespace __ {
     template<class R1, class R2>
     struct ratio_less_common:
       integral_constant<bool, ((ratio_checked_multiply<R1::num, R2::den>::value) < (ratio_checked_multiply<R2::num, R1::den>::value)) >
@@ -373,7 +373,7 @@ namespace std
     conditional<
       R1::den == R2::den,
       integral_constant<bool, ((R1::num) < (R2::num)) >,
-      detail::ratio_less_common<R1, R2>
+      __::ratio_less_common<R1, R2>
                >::type
   { };
 

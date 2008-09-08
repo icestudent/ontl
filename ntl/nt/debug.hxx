@@ -224,7 +224,7 @@ namespace ntl {
 
     namespace intrinsic {
       extern "C" void __cdecl __debugbreak();
-#pragma intrinsic(__debugbreak)
+      #pragma intrinsic(__debugbreak)
 
       static __forceinline
         void debugbreak()

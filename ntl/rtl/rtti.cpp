@@ -26,7 +26,7 @@ namespace x
 }
 #endif
 
-namespace detail
+namespace __
 {
 #ifndef CRT_UNDNAME
   typedef size_t __stdcall undname_t(const char* signame, char* name, size_t length, uint32_t flags);
@@ -56,25 +56,25 @@ namespace detail
 #endif
     return undname != NULL;
   }
-} // namespace detail
+} // namespace __
 
 namespace {
   const char* undname(const char* signame)
   {
-    if(!detail::undname)
-      if(!detail::init_undname())
+    if(!__::undname)
+      if(!__::init_undname())
         return signame;
 
     static const uint16_t flags = 0x2000; /* no_arguments */
 
 #ifndef CRT_UNDNAME
     char buf[4096];
-    size_t len = detail::undname(signame+1, buf, sizeof(buf), flags);
+    size_t len = __::undname(signame+1, buf, sizeof(buf), flags);
     if(!len)
       return signame;
     return std::strdup(buf);
 #else
-    return detail::undname(0, signame+1, 0, x::malloc, x::free, flags);
+    return __::undname(0, signame+1, 0, x::malloc, x::free, flags);
 #endif
   }
 } // namespace

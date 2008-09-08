@@ -15,12 +15,14 @@ namespace cpu {
 #ifdef _MSC_VER
   #ifdef _M_IX86
 
-    static inline void pause() { __asm { rep nop } }
+    static inline void pause() { __asm { pause } }
 
   #else // ! _M_IX86
-    //#error unsupported CPU type
-    static inline void pause() { }
-    #pragma deprecated(pause)
+    namespace intrinsic {
+      extern "C" void __cdecl _mm_pause();
+      #pragma intrinsic(_mm_pause)
+    }
+    static inline void pause() { intrinsic::_mm_pause(); }
   #endif
 #else // ! _MSC_VER
 #error unsupported compiler

@@ -16,6 +16,7 @@
 #include "../device_traits.hxx"
 #include "../nt/context.hxx"
 #include "time.hxx"
+#include "../stlx/chrono.hxx"
 
 namespace ntl {
 namespace km {
@@ -1135,6 +1136,19 @@ class system_tread : public handle, public device_traits<system_tread>
     }
 
 };//
+
+
+template <class Clock, class Duration>
+void sleep_until(const std::chrono::time_point<Clock, Duration>& abs_time, bool alertable = false)
+{
+  KeDelayExecutionThread(KernelMode, alertable, std::chrono::duration_cast<system_duration>(abs_time.time_since_epoch()).count());
+}
+
+template <class Rep, class Period>
+void sleep_for(const std::chrono::duration<Rep, Period>& rel_time, bool alertable = false)
+{
+  KeDelayExecutionThread(KernelMode, alertable, -1i64 * std::chrono::duration_cast<system_duration>(rel_time).count());
+}
 
 
 }//namspace km

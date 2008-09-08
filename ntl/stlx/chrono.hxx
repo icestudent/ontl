@@ -46,8 +46,8 @@ namespace std
     typedef chrono::duration<
       typename common_type<Rep1, Rep2>::type,
       ratio<
-        detail::static_evaluation::gcd<Period1::num, Period2::num>::value,
-        (Period1::den / detail::static_evaluation::gcd<Period1::den, Period2::den>::value) * Period2::den
+        __::static_evaluation::gcd<Period1::num, Period2::num>::value,
+        (Period1::den / __::static_evaluation::gcd<Period1::den, Period2::den>::value) * Period2::den
            >
                             > type;
   };
@@ -331,7 +331,7 @@ namespace std
       return !(lhs < rhs);
     }
 
-    namespace detail {
+    namespace __ {
 
       template<bool num_is_one, bool den_is_one>
       struct duration_cast_impl
@@ -390,7 +390,7 @@ namespace std
       typedef typename ratio_divide<Period, typename ToDuration::period>::type    CF;
       typedef typename common_type<typename ToDuration::rep, Rep, intmax_t>::type CR;
 
-      return detail::duration_cast_impl<CF::num == 1, CF::den == 1>::cast<ToDuration, CF, CR>(d);
+      return __::duration_cast_impl<CF::num == 1, CF::den == 1>::cast<ToDuration, CF, CR>(d);
     }
 
 

@@ -35,7 +35,7 @@ namespace std {
     >
   class map;
 
-  namespace detail
+  namespace __
   {
     template <class Key,
               class T,
@@ -67,17 +67,17 @@ namespace std {
       friend void std::swap<value_compare>(value_compare&, value_compare&);
       value_compare& operator=(const value_compare& c) { comp = c.comp; return *this; }
     };
-  } // detail
+  } // __
 
 template <class Key,
           class T,
           class Compare = less<Key>,
           class Allocator = allocator<pair<const Key, T> > >
 class map:
-  protected tree::rb_tree::rb_tree<pair<const Key, T>, detail::value_compare<Key, T, Compare, Allocator>, Allocator>
+  protected tree::rb_tree::rb_tree<pair<const Key, T>, __::value_compare<Key, T, Compare, Allocator>, Allocator>
 {
   ///////////////////////////////////////////////////////////////////////////
-  typedef tree::rb_tree::rb_tree<pair<const Key, T>, detail::value_compare<Key, T, Compare, Allocator>, Allocator> tree_type;
+  typedef tree::rb_tree::rb_tree<pair<const Key, T>, __::value_compare<Key, T, Compare, Allocator>, Allocator> tree_type;
   typedef tree_type::node node;
   public:
 
