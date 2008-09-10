@@ -49,26 +49,29 @@ template<typename def>
 struct class_enum : def
 {
   typedef typename def::type type;
-  type value;
+
+  __forceinline
   class_enum(type v) : value(v) {}
+
+  __forceinline
   operator type () const {return value;}
+
+  type value;
 };
 
-struct times_def
+
+#define __class_enum(name) struct name ## _def; typedef class_enum<name ## _def> name; struct name ## _def { enum type
+
+__class_enum(times) 
 {
-  enum type
-  {
-    nanoseconds   = 1,
-    microseconds  = 10   * nanoseconds,
-    milliseconds  = 1000 * microseconds,
-    seconds       = 1000 * milliseconds,
-    minutes       = 60   * seconds,
-    //  hours         = int64_t(60)   * minutes,
-    //  days          = int64_t(24)   * hours,
-  };
-};
-
-typedef class_enum<times_def> times;
+  nanoseconds   = 1,
+  microseconds  = 10   * nanoseconds,
+  milliseconds  = 1000 * microseconds,
+  seconds       = 1000 * milliseconds,
+  minutes       = 60   * seconds,
+  //  hours         = int64_t(60)   * minutes,
+  //  days          = int64_t(24)   * hours,
+};};
 
 ///@}
 

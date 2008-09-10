@@ -158,10 +158,10 @@ static const nullptr_t nullptr = {};
 #endif
 
 #define __ntl_bitmask_type(bitmask, _friend)\
-  _friend bitmask operator&(bitmask x, bitmask y) { return static_cast<bitmask>(static_cast<int>(x)&static_cast<int>(y)); }\
-  _friend bitmask operator|(bitmask x, bitmask y) { return static_cast<bitmask>(static_cast<int>(x)|static_cast<int>(y)); }\
-  _friend bitmask operator^(bitmask x, bitmask y) { return static_cast<bitmask>(static_cast<int>(x)^static_cast<int>(y)); }\
-  _friend bitmask operator~(bitmask x) { return static_cast<bitmask>(~static_cast<int>(x)); }\
+  _friend bitmask operator&(bitmask x, bitmask y) { return bitwise_and(x, y); }\
+  _friend bitmask operator|(bitmask x, bitmask y) { return bitwise_or (x, y); }\
+  _friend bitmask operator^(bitmask x, bitmask y) { return bitwise_xor(x, y); }\
+  _friend bitmask operator~(bitmask x) { return static_cast<bitmask>(~static_cast<unsigned>(x)); }\
   _friend bitmask& operator&=(bitmask& x, bitmask y) { x = x&y ; return x ; }\
   _friend bitmask& operator|=(bitmask& x, bitmask y) { x = x|y ; return x ; }\
   _friend bitmask& operator^=(bitmask& x, bitmask y) { x = x^y ; return x ; }

@@ -87,36 +87,36 @@ ntstatus __stdcall
 NTL__EXTERNAPI
 ntstatus __stdcall
   NtCreateSection(
-    handle*           SectionHandle,
-    uint32_t          DesiredAccess,
-    const object_attributes* ObjectAttributes __optional,
-    const int64_t*    MaximumSize   __optional,
-    uint32_t          SectionPageProtection,
-    uint32_t          AllocationAttributes,
-    legacy_handle     FileHandle    __optional
+    handle*                     SectionHandle,
+    uint32_t                    DesiredAccess,
+    const object_attributes*    ObjectAttributes __optional,
+    const int64_t*              MaximumSize   __optional,
+    page_protection::type       SectionPageProtection,
+    allocation_attributes::type AllocationAttributes,
+    legacy_handle               FileHandle    __optional
     );
 
 NTL__EXTERNAPI
 ntstatus __stdcall
   NtOpenSection(
-    handle*           SectionHandle,
-    uint32_t          DesiredAccess,
-    const object_attributes* ObjectAttributes
+    handle*                   SectionHandle,
+    uint32_t                  DesiredAccess,
+    const object_attributes*  ObjectAttributes
     );
 
 NTL__EXTERNAPI
 ntstatus __stdcall
   NtMapViewOfSection(
-    legacy_handle   SectionHandle,
-    legacy_handle   ProcessHandle,
-    void**          BaseAddress,
-    uintptr_t       ZeroBits,
-    size_t          CommitSize,
-    int64_t*        SectionOffset,
-    size_t*         ViewSize,
-    section_inherit InheritDisposition,
-    uint32_t        AllocationType,
-    uint32_t        Win32Protect
+    legacy_handle               SectionHandle,
+    legacy_handle               ProcessHandle,
+    void**                      BaseAddress,
+    uintptr_t                   ZeroBits,
+    size_t                      CommitSize,
+    int64_t*                    SectionOffset,
+    size_t*                     ViewSize,
+    section_inherit::type       InheritDisposition,
+    allocation_attributes::type AllocationType,
+    page_protection::type       Win32Protect
     );
 
 NTL__EXTERNAPI
@@ -127,8 +127,7 @@ ntstatus __stdcall
     );
 
 
-
-
+//////////////////////////////////////////////////////////////////////////
 struct rtl_relative_name
 {
   unicode_string    RelativeName;
@@ -522,19 +521,19 @@ class section:
 public:
   // create
   explicit section(
-    access_mask DesiredAccess,
-    uint32_t    SectionPageProtection,
-    uint32_t    AllocationAttributes = mem_commit
+    access_mask           DesiredAccess,
+    page_protection       SectionPageProtection,
+    allocation_attributes AllocationAttributes = allocation_attributes::mem_commit
     ):base_()
   {
     create(this, DesiredAccess, NULL, NULL, SectionPageProtection, AllocationAttributes, NULL);
   }
 
   explicit section(
-    access_mask   DesiredAccess,
-    uint32_t      SectionPageProtection,
-    int64_t&      MaximumSize,
-    uint32_t      AllocationAttributes = mem_commit
+    access_mask           DesiredAccess,
+    page_protection       SectionPageProtection,
+    int64_t&              MaximumSize,
+    allocation_attributes AllocationAttributes = allocation_attributes::mem_commit
     ):base_()
   {
     create(this, DesiredAccess, NULL, &MaximumSize, SectionPageProtection, AllocationAttributes, NULL);
@@ -543,8 +542,8 @@ public:
   explicit section(
     legacy_handle FileHandle,
     access_mask   DesiredAccess,
-    uint32_t      SectionPageProtection,
-    uint32_t      AllocationAttributes = mem_commit
+    page_protection       SectionPageProtection,
+    allocation_attributes AllocationAttributes = allocation_attributes::mem_commit
     ):base_()
   {
     create(this, DesiredAccess, NULL, NULL, SectionPageProtection, AllocationAttributes, FileHandle);
@@ -553,8 +552,8 @@ public:
   explicit section(
     const const_unicode_string& SectionName,
     access_mask           DesiredAccess,
-    uint32_t              SectionPageProtection,
-    uint32_t              AllocationAttributes = mem_commit
+    page_protection       SectionPageProtection,
+    allocation_attributes AllocationAttributes = allocation_attributes::mem_commit
     ):base_()
   {
     const object_attributes oa(SectionName);
@@ -564,9 +563,9 @@ public:
   explicit section(
     const const_unicode_string& SectionName,
     access_mask           DesiredAccess,
-    uint32_t              SectionPageProtection,
+    page_protection       SectionPageProtection,
     int64_t&              MaximumSize,
-    uint32_t              AllocationAttributes = mem_commit
+    allocation_attributes AllocationAttributes = allocation_attributes::mem_commit
     ):base_()
   {
     const object_attributes oa(SectionName);
@@ -574,14 +573,14 @@ public:
   }
 
   // open
-  section(
+  explicit section(
     access_mask  DesiredAccess
     ):base_()
   {
     open(this, DesiredAccess, NULL);
   }
 
-  section(
+  explicit section(
     const const_unicode_string& SectionName,
     access_mask           DesiredAccess
     ):base_()
@@ -598,22 +597,22 @@ public:
   // map
   void* mmap(
     size_t    ViewSize,
-    uint32_t  RegionProtection,
-    uint32_t  AllocationType = 0
+    page_protection       RegionProtection,
+    allocation_attributes AllocationType = allocation_attributes::mem_commit
     )
   {
-    NtMapViewOfSection(get(), current_process(), &base_, 0, 0, NULL, &ViewSize, ViewUnmap, AllocationType, RegionProtection);
+    NtMapViewOfSection(get(), current_process(), &base_, 0, 0, NULL, &ViewSize, section_inherit::ViewUnmap, AllocationType, RegionProtection);
     return base_;
   }
 
   void* mmap(
     int64_t&  SectionOffset,
     size_t    ViewSize,
-    uint32_t  RegionProtection,
-    uint32_t  AllocationType = 0
+    page_protection       RegionProtection,
+    allocation_attributes AllocationType = allocation_attributes::mem_commit
     )
   {
-    NtMapViewOfSection(get(), current_process(), &base_, 0, 0, &SectionOffset, &ViewSize, ViewUnmap, AllocationType, RegionProtection);
+    NtMapViewOfSection(get(), current_process(), &base_, 0, 0, &SectionOffset, &ViewSize, section_inherit::ViewUnmap, AllocationType, RegionProtection);
     return base_;
   }
 
@@ -650,8 +649,8 @@ public:
         access_mask         DesiredAccess,
         const object_attributes*  ObjectAttributes,
         int64_t*            MaximumSize,
-        uint32_t            SectionPageProtection,
-        uint32_t            AllocationAttributes,
+        page_protection     SectionPageProtection,
+        allocation_attributes AllocationAttributes,
         legacy_handle       FileHandle
         )
     {

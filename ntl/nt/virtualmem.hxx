@@ -14,14 +14,13 @@
 namespace ntl {
   namespace nt {
 
-
-    enum section_inherit
+    __class_enum (section_inherit)
     {
       ViewShare = 1,
       ViewUnmap = 2
-    };
+    };};
 
-    enum allocation_attributes
+    __class_enum (allocation_attributes)
     {
       mem_commit            = 0x1000,
       mem_reserve           = 0x2000,
@@ -38,8 +37,9 @@ namespace ntl {
       mem_4mb_pages     = 0x80000000,
       sec_large_pages   = 0x80000000
     };
+    __ntl_bitmask_type(type, friend)};
 
-    enum page_protection
+    __class_enum (page_protection)
     {
       page_noaccess           = 0x01,
       page_readonly           = 0x02,
@@ -53,12 +53,13 @@ namespace ntl {
       page_nocache           = 0x200,
       page_writecombine      = 0x400
     };
+    __ntl_bitmask_type(type, friend)};
 
-    enum map_type
+    __class_enum  (map_type)
     {
       map_process = 1,
       map_system  = 2
-    };
+    };};
 
     enum memory_information_class
     {
