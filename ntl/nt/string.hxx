@@ -67,11 +67,13 @@ class native_string
 
  friend class native_string;
 
+#if 0
     native_string(const native_string<value_type>& str)
     : length_(str.length_),
       maximum_length_(str.maximum_length_),
       buffer_(str.buffer_)
     {/**/}
+#endif
 
     native_string(charT* s, size_t n)
     : length_(size_type(n) * sizeof(value_type)),
@@ -109,13 +111,9 @@ class native_string
     }
 
     operator
-      const native_string<typename std::add_const<charT>::type,
-                          traits,
-                          Allocator>&() const
+      const native_string<typename std::add_const<charT>::type, traits>&() const
     {
-      return *reinterpret_cast<const native_string<std::add_const<charT>::type,
-                               traits,
-                               Allocator>*>(this);
+      return *reinterpret_cast<const native_string<std::add_const<charT>::type, traits>*>(this);
     }
 
     ///\name  native_string iterator support
