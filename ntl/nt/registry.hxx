@@ -49,6 +49,25 @@ ntstatus __stdcall
     const object_attributes * ObjectAttributes
     );
 
+NTL__EXTERNAPI
+ntstatus __stdcall
+  ZwDeleteKey(
+    legacy_handle KeyHandle
+    );
+
+NTL__EXTERNAPI
+ntstatus __stdcall
+  ZwFlushKey(
+    legacy_handle KeyHandle
+    );
+
+enum key_information_class
+{
+  KeyBasicInformation,
+  KeyNodeInformation,
+  KeyFullInformation
+};
+
 enum key_value_information_class
 {
   KeyValueBasicInformation,
@@ -69,17 +88,6 @@ ntstatus __stdcall
 
 NTL__EXTERNAPI
 ntstatus __stdcall
-  ZwEnumerateValueKey(
-    legacy_handle                 KeyHandle,
-    uint32_t                      Index,
-    key_value_information_class   KeyValueInformationClass,
-    void *                        KeyValueInformation,
-    uint32_t                      Length,
-    uint32_t *                    ResultLength
-    );
-
-NTL__EXTERNAPI
-ntstatus __stdcall
   ZwSetValueKey(
     legacy_handle                 KeyHandle,
     const const_unicode_string *  ValueName,
@@ -91,22 +99,10 @@ ntstatus __stdcall
 
 NTL__EXTERNAPI
 ntstatus __stdcall
-  ZwDeleteKey(
-    legacy_handle KeyHandle
+  ZwDeleteValueKey(
+    legacy_handle                 KeyHandle,
+    const const_unicode_string*   ValueName
     );
-
-NTL__EXTERNAPI
-ntstatus __stdcall
-  ZwFlushKey(
-    legacy_handle KeyHandle
-    );
-
-enum key_information_class
-{
-  KeyBasicInformation,
-  KeyNodeInformation,
-  KeyFullInformation
-};
 
 NTL__EXTERNAPI
 ntstatus __stdcall
@@ -117,6 +113,17 @@ ntstatus __stdcall
     void *                KeyInformation,
     uint32_t              Length,
     uint32_t *            ResultLength
+    );
+
+NTL__EXTERNAPI
+ntstatus __stdcall
+  ZwEnumerateValueKey(
+    legacy_handle                 KeyHandle,
+    uint32_t                      Index,
+    key_value_information_class   KeyValueInformationClass,
+    void *                        KeyValueInformation,
+    uint32_t                      Length,
+    uint32_t *                    ResultLength
     );
 
 ///@}
@@ -288,6 +295,11 @@ class key : public handle, public device_traits<key>
       const ntstatus res = ZwDeleteKey(this->get());
       this->handle::release();
       return nt::success(res);
+    }
+
+    bool erase(const const_unicode_string& value_name) __ntl_nothrow
+    {
+      return nt::success(ZwDeleteValueKey(this->get(), &value_name));
     }
 
     bool flush()

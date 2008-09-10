@@ -51,8 +51,10 @@ namespace std
   template <class R1, class R2> struct ratio_greater_equal;
 
   // convenience SI typedefs
-  //typedef ratio<1, 1000000000000000000000000> yocto; // see 20.3.4
-  //typedef ratio<1,    1000000000000000000000> zepto; // see 20.3.4
+#if _INTEGRAL_MAX_BITS >= 128
+  typedef ratio<1, 1000000000000000000000000> yocto; // see 20.3.4
+  typedef ratio<1,    1000000000000000000000> zepto; // see 20.3.4
+#endif
 #ifndef SMALL_RATIO
   typedef ratio<1,       1000000000000000000> atto;   // 10^-18
   typedef ratio<1,          1000000000000000> femto;  // 10^-15
@@ -73,9 +75,10 @@ namespace std
   typedef ratio<         1000000000000000, 1> peta;   // 10^15
   typedef ratio<      1000000000000000000, 1> exa;    // 10^18
 #endif
-  //typedef ratio<   1000000000000000000000, 1> zetta; // see 20.3.4
-  //typedef ratio<1000000000000000000000000, 1> yotta; // see 20.3.4
-
+#if _INTEGRAL_MAX_BITS >= 128
+  typedef ratio<   1000000000000000000000, 1> zetta; // see 20.3.4
+  typedef ratio<1000000000000000000000000, 1> yotta; // see 20.3.4
+#endif
 
   namespace __ { namespace static_evaluation {
 
