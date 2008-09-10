@@ -128,6 +128,12 @@ ntstatus __stdcall
 
 
 //////////////////////////////////////////////////////////////////////////
+struct rtl_curdir_ref
+{
+  volatile uint32_t RefCount;
+  legacy_handle     Handle;
+};
+
 struct rtl_relative_name
 {
   unicode_string    RelativeName;
@@ -137,8 +143,11 @@ struct rtl_relative_name
     uint64_t        wow64Handle;
   };
 
+  // 2k3sp1+
+  rtl_curdir_ref* CurDirRef;
+
   rtl_relative_name()
-    :wow64Handle()
+    :wow64Handle(), CurDirRef()
   {}
 };
 
@@ -147,8 +156,36 @@ bool __stdcall RtlDosPathNameToNtPathName_U(
     const wchar_t*  DosFileName,
     unicode_string* NtFileName,
     wchar_t**       FilePart,
+    rtl_relative_name* RelativeName // reserved at 2k3sp1
+    );
+
+// 2k3sp1+
+NTL__EXTERNAPI
+ntstatus __stdcall RtlDosPathNameToNtPathName_U_WithStatus(
+    const wchar_t*  DosFileName,
+    unicode_string* NtFileName,
+    wchar_t**       FilePart,
+    rtl_relative_name* // reserved
+    );
+
+NTL__EXTERNAPI
+bool __stdcall RtlDosPathNameToRelativeNtPathName_U(
+    const wchar_t*  DosFileName,
+    unicode_string* NtFileName,
+    wchar_t**       FilePart,
     rtl_relative_name* RelativeName
     );
+
+NTL__EXTERNAPI
+ntstatus __stdcall RtlDosPathNameToRelativeNtPathName_U_WithStatus(
+    const wchar_t*  DosFileName,
+    unicode_string* NtFileName,
+    wchar_t**       FilePart,
+    rtl_relative_name* RelativeName
+    );
+
+NTL__EXTERNAPI
+void __stdcall RtlReleaseRelativeName(rtl_relative_name*);
 
 namespace rtl
 {
@@ -168,6 +205,17 @@ namespace rtl
     }
     ~relative_name()
     {
+      #ifdef _M_X64
+      RtlReleaseRelativeName(this);
+      #else
+      if(CurDirRef){
+        if(!--CurDirRef->RefCount){
+          close(CurDirRef->Handle);
+          delete CurDirRef; // heap::free(process_heap(),0,CurDirRef)
+        }
+      }
+      #endif
+
       if(!path.empty())
         RtlFreeUnicodeString(&path);
     }
