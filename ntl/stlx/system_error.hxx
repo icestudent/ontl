@@ -80,8 +80,8 @@ namespace std {
     /*explicit */operator bool() const;
 
 private:
-    int val_; // exposition only
-    const error_category& cat_; // exposition only
+    //int val_; // exposition only
+    //const error_category& cat_; // exposition only
   };
 
 
@@ -108,8 +108,8 @@ private:
     /*explicit */operator bool() const;
 
   private:
-    int val_; // exposition only
-    const error_category& cat_; // exposition only
+    //int val_; // exposition only
+    //const error_category& cat_; // exposition only
   };
 
   // 19.4.3.5 non-member functions:

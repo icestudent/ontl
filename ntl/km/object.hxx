@@ -43,8 +43,23 @@ struct object_attributes:
   {/**/}
 
   object_attributes(
+    const unicode_string &        name,
+    const attributes              attr      = case_insensitive | kernel_handle,
+    const security_descriptor *   security  = 0)
+    : nt::object_attributes(name, attr, security)
+  {/**/}
+
+  object_attributes(
     const legacy_handle           root,
     const const_unicode_string &  name,
+    const attributes              attr      = case_insensitive | kernel_handle,
+    const security_descriptor *   security  = 0)
+    : nt::object_attributes(root, name, attr, security)
+  {/**/}
+
+  object_attributes(
+    const legacy_handle           root,
+    const unicode_string &        name,
     const attributes              attr      = case_insensitive | kernel_handle,
     const security_descriptor *   security  = 0)
     : nt::object_attributes(root, name, attr, security)

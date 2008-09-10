@@ -68,13 +68,13 @@ namespace ntl {
 
     struct memory_basic_information
     {
-      void*                 BaseAddress;
-      void*                 AllocationBase;
-      page_protection       AllocationProtect;
-      size_t                RegionSize;
-      allocation_attributes State;
-      page_protection       Protect;
-      allocation_attributes Type;
+      void*                       BaseAddress;
+      void*                       AllocationBase;
+      page_protection::type       AllocationProtect;
+      size_t                      RegionSize;
+      allocation_attributes::type State;
+      page_protection::type       Protect;
+      allocation_attributes::type Type;
     };
 
 

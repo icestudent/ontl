@@ -150,7 +150,40 @@ bool __stdcall RtlDosPathNameToNtPathName_U(
     rtl_relative_name* RelativeName
     );
 
+namespace rtl
+{
+  struct relative_name: rtl_relative_name
+  {
+    unicode_string  path;
+    wchar_t*        file;
 
+
+    relative_name(const wchar_t* dospath)
+    {
+      convert(dospath);
+    }
+    relative_name(const std::wstring& dospath)
+    {
+      convert(dospath.c_str());
+    }
+    ~relative_name()
+    {
+      if(!path.empty())
+        RtlFreeUnicodeString(&path);
+    }
+
+    operator const object_attributes() const
+    {
+      return object_attributes(/*ContainingDirectory, ContainingDirectory ? RelativeName : */path);
+    }
+
+  protected:
+    void convert(const wchar_t* dospath)
+    {
+      RtlDosPathNameToNtPathName_U(dospath, &path, &file, this);
+    }
+  };
+}
 
 //#pragma warning(pop)
 

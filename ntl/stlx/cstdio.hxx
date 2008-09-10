@@ -21,7 +21,7 @@ NTL__EXTERNAPI size_t __cdecl
 NTL__EXTERNAPI size_t __cdecl
   _vsnprintf(char *buffer, size_t count, const char *format, va_list argptr);
 
-NTL__EXTERNAPI wchar_t* _cdecl _wcslwr(wchar_t * str);
+NTL__EXTERNAPI wchar_t* __cdecl _wcslwr(wchar_t * str);
 
 //NTL__EXTERNAPI size_t _cdecl
 //  _snwprintf(wchar_t *buffer, size_t count, const wchar_t *format, ...);
