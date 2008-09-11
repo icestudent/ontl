@@ -258,44 +258,44 @@ class reverse_iterator
   friend
     bool operator==(const reverse_iterator<Iterator>& x,
                     const reverse_iterator<Iterator2>& y)
-      { return x.current == y.current; }
+      { return x.base() == y.base(); }
 
   template<typename Iterator2>
   friend
     bool operator!=(const reverse_iterator<Iterator>& x,
                     const reverse_iterator<Iterator2>& y)
-      { return x.current != y.current; }
+      { return x.base() != y.base(); }
 
   template<typename Iterator2>
   friend
     bool operator< (const reverse_iterator<Iterator>& x,
                     const reverse_iterator<Iterator2>& y)
-      { return x.current > y.current; }
+      { return x.base() > y.base(); }
 
   template<typename Iterator2>
   friend
     bool operator> (const reverse_iterator<Iterator>& x,
                     const reverse_iterator<Iterator2>& y)
-      { return x.current < y.current; }
+      { return x.base() < y.base(); }
 
   template<typename Iterator2>
   friend
     bool operator>=(const reverse_iterator<Iterator>& x,
                     const reverse_iterator<Iterator2>& y)
-      { return x.current <= y.current; }
+      { return x.base() <= y.base(); }
 
   template<typename Iterator2>
   friend
     bool operator<=(const reverse_iterator<Iterator>& x,
                     const reverse_iterator<Iterator2>& y)
-      { return x.current >= y.current; }
+      { return x.base() >= y.base(); }
 
   template<typename Iterator2>
   friend
     typename reverse_iterator<Iterator>::difference_type
       operator-(const reverse_iterator<Iterator>& x,
                 const reverse_iterator<Iterator2>& y)
-      { return y.current - x.current; }
+      { return y.base() - x.base(); }
 
   friend inline
     reverse_iterator<Iterator>
