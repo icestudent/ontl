@@ -120,7 +120,7 @@ namespace std {
 
         storage_type xval = storage_[i/element_size_];
         const unsigned mod = i & element_mod_;
-        xval &= ~(1ui64 << mod);
+        xval &= ~(native_one_ << mod);
       #ifndef _M_X64
         xval |= ((c == '1') << mod);
       #else
@@ -194,7 +194,7 @@ namespace std {
       storage_type xval = 0, yval = 0;
       for(int i = elements_count_-1; i >= 0; --i){
         // save shifted bits
-        yval = storage_[i] & ((1ui64 << pos) - 1);
+        yval = storage_[i] & ((native_one_ << pos) - 1);
         // shift
         storage_[i] >>= pos;
         // restore previous bits
@@ -256,7 +256,7 @@ namespace std {
       check_bounds(pos);
       storage_type val = storage_[pos / element_size_];
       const size_t mod = pos & element_mod_;
-      val ^= (1ui64 << mod);
+      val ^= (native_one_ << mod);
       storage_[pos / element_size_] = val;
       return *this;
     }
@@ -383,7 +383,7 @@ namespace std {
         const storage_type xval = storage_[word];
         const size_t count = min((size_t)rpos+1, celement_size_);
         for(unsigned bit = 0; bit < count; ++bit){
-          str[rpos-bit] = static_cast<charT>('0' + ((xval & (1ui64 << bit)) != 0));
+          str[rpos-bit] = static_cast<charT>('0' + ((xval & (native_one_ << bit)) != 0));
         }
       }
       return str;
@@ -443,9 +443,10 @@ namespace std {
     enum { digits = N };
     enum { element_size_ = sizeof(storage_type) * 8 }; // bits count
 
+    static const size_t native_one_ = 1;
     static const storage_type set_bits_ = static_cast<storage_type>(-1);
     static const size_t element_mod_ = element_size_ - 1;
-    static const size_t digits_mod_val_ = static_cast<size_t>(1ui64 << (N % element_size_)) - 1;//static_cast<size_t>(1 << (N & (element_size_-1))) - 1;
+    static const size_t digits_mod_val_ = static_cast<size_t>(native_one_ << (N % element_size_)) - 1;//static_cast<size_t>(1 << (N & (element_size_-1))) - 1;
     static const size_t digits_mod_ = digits_mod_val_ ? digits_mod_val_ : set_bits_;
     static const size_t elements_count_ = N / element_size_ + ((N & (element_size_-1)) ? 1 : 0);
     static const size_t celement_size_ = sizeof(storage_type) * 8;
