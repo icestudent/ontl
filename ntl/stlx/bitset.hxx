@@ -85,8 +85,8 @@ namespace std {
         reset();
 
       // split val to i elements
-      const unsigned count = min(elements_count_, sizeof(unsigned long long) / sizeof(storage_type));
-      for(unsigned x = 0; x < count; ++x)
+      const size_t count = min(elements_count_, sizeof(unsigned long long) / sizeof(storage_type));
+      for(size_t x = 0; x < count; ++x)
         storage_[x] = static_cast<storage_type>((val >> x * element_size_) & set_bits_);
     }
 
@@ -105,14 +105,14 @@ namespace std {
         __ntl_throw(out_of_range);
 
       // 23.3.5.1.5
-      const unsigned rlen = min(n, str.size()-pos);
+      const unsigned rlen = static_cast<unsigned>(min(n, str.size()-pos));
 
       // 23.3.5.1.7
       if(rlen < elements_count_*element_size_)
         reset();
 
-      const unsigned count = min(rlen, N);
-      for(unsigned i = 0, rpos = pos + count - 1; i < count; ++i, --rpos){
+      const unsigned count = min(rlen, static_cast<unsigned>(N));
+      for(unsigned i = 0, rpos = static_cast<unsigned>(pos) + count - 1; i < count; ++i, --rpos){
         const traits::char_type c = str[rpos];
         // 23.3.5.1.5.2
         if(!(c == '0' || c == '1'))
@@ -120,8 +120,13 @@ namespace std {
 
         storage_type xval = storage_[i/element_size_];
         const unsigned mod = i & element_mod_;
-        xval &= ~(1 << mod);
+        xval &= ~(1ui64 << mod);
+      #ifndef _M_X64
         xval |= ((c == '1') << mod);
+      #else
+        if(c == '1')
+          xval |= 1ui64 << mod;
+      #endif
         storage_[i/element_size_] = xval;
       }
     }
@@ -189,7 +194,7 @@ namespace std {
       storage_type xval = 0, yval = 0;
       for(int i = elements_count_-1; i >= 0; --i){
         // save shifted bits
-        yval = storage_[i] & ((1 << pos) - 1);
+        yval = storage_[i] & ((1ui64 << pos) - 1);
         // shift
         storage_[i] >>= pos;
         // restore previous bits
@@ -251,7 +256,7 @@ namespace std {
       check_bounds(pos);
       storage_type val = storage_[pos / element_size_];
       const size_t mod = pos & element_mod_;
-      val ^= (1 << mod);
+      val ^= (1ui64 << mod);
       storage_[pos / element_size_] = val;
       return *this;
     }
@@ -300,7 +305,7 @@ namespace std {
       unsigned count_ = 0;
       for(storage_type j = storage_[elements_count_-1] & digits_mod_; j; j >>= 4)
         count_ += table[j & 0xF];
-      for(int i = elements_count_-2; i >= 0; --i)
+      for(ssize_t i = elements_count_-2; i >= 0; --i)
         for(storage_type j = storage_[i]; j; j >>= 4)
           count_ += table[j & 0xF];
       return count_;
@@ -376,9 +381,9 @@ namespace std {
       for(unsigned word = 0; word < elements_count_; ++word){
         const unsigned rpos = N - word*element_size_ - 1;
         const storage_type xval = storage_[word];
-        const size_t count = min(rpos+1, (size_t)element_size_);
+        const size_t count = min((size_t)rpos+1, celement_size_);
         for(unsigned bit = 0; bit < count; ++bit){
-          str[rpos-bit] = static_cast<charT>('0' + ((xval & (1 << bit)) != 0));
+          str[rpos-bit] = static_cast<charT>('0' + ((xval & (1ui64 << bit)) != 0));
         }
       }
       return str;
@@ -387,7 +392,7 @@ namespace std {
     void large_shift_left(size_t pos)
     {
       const size_t shift = pos % element_size_;
-      const unsigned lookup = pos / element_size_;
+      const unsigned lookup = static_cast<unsigned>(pos / element_size_);
       if(shift == 0){
         // shift by words, fastest pass
         for(unsigned i = elements_count_-1; i >= lookup; --i)
@@ -412,7 +417,7 @@ namespace std {
     void large_shift_right(size_t pos)
     {
       const size_t shift = pos % element_size_;
-      const unsigned lookup = pos / element_size_;
+      const unsigned lookup = static_cast<unsigned>(pos / element_size_);
       if(shift == 0){
         // shift by words, fastest pass
         for(unsigned i = 0; i < elements_count_-lookup; ++i)
@@ -440,9 +445,10 @@ namespace std {
 
     static const storage_type set_bits_ = static_cast<storage_type>(-1);
     static const size_t element_mod_ = element_size_ - 1;
-    static const size_t digits_mod_val_ = static_cast<size_t>(1 << (N & (element_size_-1))) - 1;
+    static const size_t digits_mod_val_ = static_cast<size_t>(1ui64 << (N % element_size_)) - 1;//static_cast<size_t>(1 << (N & (element_size_-1))) - 1;
     static const size_t digits_mod_ = digits_mod_val_ ? digits_mod_val_ : set_bits_;
     static const size_t elements_count_ = N / element_size_ + ((N & (element_size_-1)) ? 1 : 0);
+    static const size_t celement_size_ = sizeof(storage_type) * 8;
 
     template<size_t size, bool large> struct tidy
     {

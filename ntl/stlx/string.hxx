@@ -903,7 +903,7 @@ public:
     {
       const int r = traits_type::compare(begin(), str.begin(),
                                             std::min(size(), str.size()));
-      return r != 0 ? r : size() - str.size();
+      return r != 0 ? r : static_cast<int>(size() - str.size());
     }
 
     int compare(size_type pos1, size_type n1, const basic_string& str) const;
