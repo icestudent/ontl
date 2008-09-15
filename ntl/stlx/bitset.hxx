@@ -21,35 +21,6 @@ namespace std {
   /**\addtogroup  lib_associative *********** Associative [23.3] *******************
   *@{*/
 
-  template <size_t N> class bitset;
-
-  // 23.3.5.3 bitset operators:
-  template <size_t N>
-  bitset<N> operator&(const bitset<N>& lhs, const bitset<N>& rhs)
-  {
-    return lhs &= rhs;
-  }
-
-  template <size_t N>
-  bitset<N> operator|(const bitset<N>& lhs, const bitset<N>& rhs)
-  {
-    return lhs |= rhs;
-  }
-
-  template <size_t N>
-  bitset<N> operator^(const bitset<N>& lhs, const bitset<N>& rhs)
-  {
-    return lhs ^= rhs;
-  }
-
-  template <class charT, class traits, size_t N>
-  basic_istream<charT, traits>&
-    operator>>(basic_istream<charT, traits>& is, bitset<N>& x);
-
-  template <class charT, class traits, size_t N>
-  basic_ostream<charT, traits>&
-    operator<<(basic_ostream<charT, traits>& os, const bitset<N>& x);
-
   /// Class template bitset [23.3.5 template.bitset]
   template<size_t N>
   class bitset
@@ -114,8 +85,8 @@ namespace std {
         reset();
 
       // split val to i elements
-      const size_t count = min(elements_count_, sizeof(unsigned long long) / sizeof(storage_type));
-      for(size_t x = 0; x < count; ++x)
+      const unsigned count = min(elements_count_, sizeof(unsigned long long) / sizeof(storage_type));
+      for(unsigned x = 0; x < count; ++x)
         storage_[x] = static_cast<storage_type>((val >> x * element_size_) & set_bits_);
     }
 
@@ -134,21 +105,21 @@ namespace std {
         __ntl_throw(out_of_range);
 
       // 23.3.5.1.5
-      const size_t rlen = min(n, str.size()-pos);
+      const unsigned rlen = min(n, str.size()-pos);
 
       // 23.3.5.1.7
-      if((n-pos*8) < N)
+      if(rlen < elements_count_*element_size_)
         reset();
 
-      const size_t count = min(rlen, N);
-      for(size_t i = 0, rpos = pos + count - 1; i < count; ++i, --rpos){
+      const unsigned count = min(rlen, N);
+      for(unsigned i = 0, rpos = pos + count - 1; i < count; ++i, --rpos){
         const traits::char_type c = str[rpos];
         // 23.3.5.1.5.2
         if(!(c == '0' || c == '1'))
           __ntl_throw(invalid_argument);
 
         storage_type xval = storage_[i/element_size_];
-        const size_t mod = i & element_mod_;
+        const unsigned mod = i & element_mod_;
         xval &= ~(1 << mod);
         xval |= ((c == '1') << mod);
         storage_[i/element_size_] = xval;
@@ -158,40 +129,49 @@ namespace std {
     /// @name bitset operations [23.3.5.2]
     bitset<N>& operator&=(const bitset<N>& rhs)
     {
-      for(size_t i = 0; i < elements_count_; ++i)
+      for(unsigned i = 0; i < elements_count_; ++i)
         storage_[i] &= ~rhs.storage_[i];
       return *this;
     }
 
     bitset<N>& operator|=(const bitset<N>& rhs)
     {
-      for(size_t i = 0; i < elements_count_; ++i)
+      for(unsigned i = 0; i < elements_count_; ++i)
         storage_[i] |= rhs.storage_[i];
       return *this;
     }
 
     bitset<N>& operator^=(const bitset<N>& rhs)
     {
-      for(size_t i = 0; i < elements_count_; ++i)
+      for(unsigned i = 0; i < elements_count_; ++i)
         storage_[i] ^= rhs.storage_[i];
       return *this;
     }
 
     bitset<N>& operator<<=(size_t pos)
     {
-      if(pos > N)
+      if(pos >= N)
         return reset();
+      else if(pos == 0)
+        return *this; // nothing to do
+      else if(pos >= element_size_){
+        large_shift_left(pos);
+        return *this;
+      }
 
-      storage_type xval = 0, yval = 0;
-      for(size_t i = 0; i < elements_count_; ++i){
+      storage_type preval = 0, curval = 0;
+      for(unsigned i = 0; i < elements_count_; ++i){
         // save shifted bits
-        yval = storage_[i] >> (element_size_ - pos);
+        curval = storage_[i] >> (element_size_ - pos);
         // shift
         storage_[i] <<= pos;
         // restore previous bits
-        storage_[i] |= xval;
-        xval = yval;
+        storage_[i] |= preval;
+        preval = curval;
       }
+
+      // cut garbage bits
+      storage_[elements_count_-1] &= digits_mod_;
       return *this;
     }
 
@@ -199,6 +179,12 @@ namespace std {
     {
       if(pos > N)
         return reset();
+      else if(pos == 0)
+        return *this; // nothing to do
+      else if(pos >= element_size_){
+        large_shift_right(pos);
+        return *this;
+      }
 
       storage_type xval = 0, yval = 0;
       for(int i = elements_count_-1; i >= 0; --i){
@@ -215,7 +201,7 @@ namespace std {
 
     bitset<N>& set()
     {
-      for(size_t i = 0; i < elements_count_; ++i)
+      for(unsigned i = 0; i < elements_count_; ++i)
         storage_[i] = set_bits_;
       return *this;
     }
@@ -233,7 +219,7 @@ namespace std {
 
     bitset<N>& reset()
     {
-      for(size_t i = 0; i < elements_count_; ++i)
+      for(unsigned i = 0; i < elements_count_; ++i)
         storage_[i] = 0;
       return *this;
     }
@@ -255,7 +241,7 @@ namespace std {
 
     bitset<N>& flip()
     {
-      for(size_t i = 0; i < elements_count_; ++i)
+      for(unsigned i = 0; i < elements_count_; ++i)
         storage_[i] = ~storage_[i];
       return *this;
     }
@@ -311,9 +297,11 @@ namespace std {
     size_t count() const
     {
       static const char table[] = "\0\1\1\2\1\2\2\3\1\2\2\3\2\3\3\4";
-      size_t count_ = 0;
-      for(int i = elements_count_-1; i >= 0; --i)
-        for(storage_type j = storage_[i] & digitd_mod_; j; j >>= 4)
+      unsigned count_ = 0;
+      for(storage_type j = storage_[elements_count_-1] & digits_mod_; j; j >>= 4)
+        count_ += table[j & 0xF];
+      for(int i = elements_count_-2; i >= 0; --i)
+        for(storage_type j = storage_[i]; j; j >>= 4)
           count_ += table[j & 0xF];
       return count_;
     }
@@ -338,8 +326,8 @@ namespace std {
     }
 
     bool none() const { return !any(); }
-    bool all() const { return count() == size(); }
-    bool any() const
+    bool all()  const { return count() == size(); }
+    bool any()  const
     {
       for(uint32_t i = 0; i < elements_count_; i++)
         if(storage_[i])
@@ -369,13 +357,13 @@ namespace std {
     {
       if(sizeof(T)*8 < N){
         // check that all upper bits are zero
-        for(size_t pos = elements_count_-1; pos >= sizeof(T) / sizeof(storage_type); --pos){
+        for(unsigned pos = elements_count_-1; pos >= sizeof(T) / sizeof(storage_type); --pos){
           if(storage_[pos] != 0)
             __ntl_throw(overflow_error);
         }
       }
       T val = 0;
-      for(size_t pos = 0; pos < min(sizeof(T) / sizeof(storage_type), elements_count_); ++pos)
+      for(unsigned pos = 0; pos < min(sizeof(T) / sizeof(storage_type), elements_count_); ++pos)
         val |= (T)storage_[pos] << (pos*element_size_);
       return val;
     }
@@ -385,15 +373,63 @@ namespace std {
     {
       basic_string<charT, traits, Allocator> str;
       str.resize(N);
-      for(size_t word = 0; word < elements_count_; ++word){
-        const size_t rpos = N - word*element_size_ - 1;
+      for(unsigned word = 0; word < elements_count_; ++word){
+        const unsigned rpos = N - word*element_size_ - 1;
         const storage_type xval = storage_[word];
         const size_t count = min(rpos+1, (size_t)element_size_);
-        for(size_t bit = 0; bit < count; ++bit){
+        for(unsigned bit = 0; bit < count; ++bit){
           str[rpos-bit] = static_cast<charT>('0' + ((xval & (1 << bit)) != 0));
         }
       }
       return str;
+    }
+
+    void large_shift_left(size_t pos)
+    {
+      const size_t shift = pos % element_size_;
+      const unsigned lookup = pos / element_size_;
+      if(shift == 0){
+        // shift by words, fastest pass
+        for(unsigned i = elements_count_-1; i >= lookup; --i)
+          storage_[i] = storage_[i-lookup];
+        for(int i = lookup-1; i >= 0; --i)
+          storage_[i] = 0;
+      }else{
+        // shift by bits
+        for(unsigned i = elements_count_-1; i > lookup; --i){
+          storage_[i]  = storage_[i-lookup] << shift;
+          storage_[i] |= storage_[i-lookup-1] >> (element_size_-shift);
+        }
+        storage_[lookup] = storage_[0] << shift;
+        // clear remaining bits
+        for(int i = lookup-1; i >= 0; --i)
+          storage_[i] = 0;
+      }
+      // cut garbage bits
+      storage_[elements_count_-1] &= digits_mod_;
+    }
+
+    void large_shift_right(size_t pos)
+    {
+      const size_t shift = pos % element_size_;
+      const unsigned lookup = pos / element_size_;
+      if(shift == 0){
+        // shift by words, fastest pass
+        for(unsigned i = 0; i < elements_count_-lookup; ++i)
+          storage_[i] = storage_[i+lookup];
+        for(unsigned i = elements_count_-lookup; i < elements_count_; ++i)
+          storage_[i] = 0;
+      }else{
+        // shift by bits
+        for(unsigned i = 0; i < elements_count_-lookup-1; ++i){
+          storage_[i]  = storage_[i+lookup] >> shift;
+          storage_[i] |= storage_[i+lookup+1] << (element_size_-shift);
+        }
+        storage_[elements_count_-lookup-1] = storage_[elements_count_-1] >> shift;
+        // clear remaining bits
+        for(unsigned i = elements_count_-lookup; i < elements_count_; ++i)
+          storage_[i] = 0;
+      }
     }
 
   private:
@@ -402,10 +438,11 @@ namespace std {
     enum { digits = N };
     enum { element_size_ = sizeof(storage_type) * 8 }; // bits count
 
-    static const size_t element_mod_ = element_size_ - 1;
-    static const size_t digitd_mod_ = (1 << (N & (element_size_-1))) - 1;
-    static const size_t elements_count_ = N / element_size_ + ((N & (element_size_-1)) ? 1 : 0);
     static const storage_type set_bits_ = static_cast<storage_type>(-1);
+    static const size_t element_mod_ = element_size_ - 1;
+    static const size_t digits_mod_val_ = static_cast<size_t>(1 << (N & (element_size_-1))) - 1;
+    static const size_t digits_mod_ = digits_mod_val_ ? digits_mod_val_ : set_bits_;
+    static const size_t elements_count_ = N / element_size_ + ((N & (element_size_-1)) ? 1 : 0);
 
     template<size_t size, bool large> struct tidy
     {
@@ -426,6 +463,34 @@ namespace std {
 
     storage_type storage_[elements_count_];
   };
+
+
+  // 23.3.5.3 bitset operators:
+  template <size_t N>
+  bitset<N> operator&(const bitset<N>& lhs, const bitset<N>& rhs)
+  {
+    return lhs &= rhs;
+  }
+
+  template <size_t N>
+  bitset<N> operator|(const bitset<N>& lhs, const bitset<N>& rhs)
+  {
+    return lhs |= rhs;
+  }
+
+  template <size_t N>
+  bitset<N> operator^(const bitset<N>& lhs, const bitset<N>& rhs)
+  {
+    return lhs ^= rhs;
+  }
+
+  template <class charT, class traits, size_t N>
+  basic_istream<charT, traits>&
+    operator>>(basic_istream<charT, traits>& is, bitset<N>& x);
+
+  template <class charT, class traits, size_t N>
+  basic_ostream<charT, traits>&
+    operator<<(basic_ostream<charT, traits>& os, const bitset<N>& x);
 
   ///@}
   /**@} lib_associative */
