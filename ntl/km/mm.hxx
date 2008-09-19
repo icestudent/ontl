@@ -428,8 +428,6 @@ namespace ntl {
     };
 
     struct hardware_pte_x86pae {
-      union {
-        struct {
           uint64_t Valid : 1;
           uint64_t Write : 1;
           uint64_t Owner : 1;
@@ -445,12 +443,6 @@ namespace ntl {
           uint64_t PageFrameNumber : 24;
           uint64_t reserved1 : 28;  // software field
         };
-        struct {
-          uint32_t LowPart;
-          uint32_t HighPart;
-        };
-      };
-    };
 
     struct hardware_pte_x64 {
       uint64_t Valid : 1;
@@ -1000,7 +992,7 @@ namespace ntl {
       size_t CommittedStackSize;
       uint32_t SubSystemType;
       union {
-        struct {
+        struct subsystem_version {
           uint16_t SubSystemMinorVersion;
           uint16_t SubSystemMajorVersion;
         };

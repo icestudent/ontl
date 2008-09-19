@@ -907,6 +907,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\win\library.hxx"
+					>
+				</File>
+				<File
 					RelativePath=".\win\scm.hxx"
 					>
 				</File>
@@ -936,6 +940,10 @@
 				</File>
 				<File
 					RelativePath=".\device_traits.hxx"
+					>
+				</File>
+				<File
+					RelativePath=".\dllapp.hxx"
 					>
 				</File>
 				<File

@@ -133,8 +133,8 @@ struct device_object
       const const_unicode_string & object_name,
       const access_mask            desired_access)
   {
-    device_object * pdo = std::nullptr;
-    file_object *   pfo = std::nullptr;
+    device_object * pdo = nullptr;
+    file_object *   pfo = nullptr;
     IoGetDeviceObjectPointer(&object_name, desired_access, &pfo, &pdo);
     ObfDereferenceObject(pfo);
     return pdo;

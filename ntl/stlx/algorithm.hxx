@@ -311,6 +311,30 @@ OutputIterator
   return result;
 }
 
+template<class InputIterator, class Size, class OutputIterator>
+OutputIterator
+  copy_n(InputIterator first, Size n, OutputIterator result)
+{
+  for(; n; --n, ++first, ++result)
+  {
+    *result = *first;
+  }
+  return result;
+}
+
+template<class InputIterator, class OutputIterator, class Predicate>
+OutputIterator
+  copy_if(InputIterator first, InputIterator last,
+          OutputIterator result, Predicate pred)
+{
+  for(; first != last; ++first, ++result)
+  {
+    if(pred(*first) == true)
+      *result = *first;
+  }
+}
+
+
 template<class BidirectionalIterator1, class BidirectionalIterator2>
 __forceinline
 BidirectionalIterator2

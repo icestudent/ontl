@@ -199,13 +199,13 @@ namespace ntl {
       PowerDeviceMaximum
     };
 
-    enum DllMainReason
+    __class_enum(DllMainReason)
     {
       DllProcessDetach,
       DllProcessAttach,
       DllThreadAttach,
       DllThreadDetach
-    };
+    };};
 
 // system_time::type
 typedef int64_t systime_t;

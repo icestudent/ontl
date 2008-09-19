@@ -206,7 +206,9 @@ namespace nt {
 
 class key : public handle, public device_traits<key>
 {
-    static const uint32_t query_buf_default_size = 64; // 32 seems to be smallest pool block size
+    // 32 seems to be smallest pool block size and header takes 8 or 16.
+    ///\todo inherit this constant from some heap related class
+    static const uint32_t query_buf_default_size = 64 - 2*sizeof(void*);
 
     const key & operator=(const key &);
 

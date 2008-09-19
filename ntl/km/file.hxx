@@ -149,16 +149,19 @@ class file_handler : public handle, public device_traits<file_handler>
     ntstatus
       open(
         const object_attributes &   oa,
-        const access_mask           desired_access,
-        const share_mode            share,
-        const creation_options      co
+        const access_mask           desired_access  = access_mask_default,
+        const share_mode            share           = share_mode_default,
+        const creation_options      co              = creation_options_default
         ) __ntl_nothrow
     {
       reset();
       return ZwOpenFile(this, desired_access, &oa, &iosb, share, co);
     }
 
-    operator const void*() { return get(); }
+    operator unspecified_bool_type() const
+    { 
+      return ntl::brute_cast<unspecified_bool_type>(get());
+    } 
 
     void close() { reset(); }
 

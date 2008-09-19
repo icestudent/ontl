@@ -16,7 +16,6 @@
 namespace ntl {
 namespace win {
 
-//#pragma comment(linker, "/subsystem:windows")
 #pragma comment(lib,    "kernel32.lib")
 
 

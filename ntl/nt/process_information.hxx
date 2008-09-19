@@ -142,7 +142,7 @@ namespace aux
       uint32_t        info_length
       )
     {
-      return QueryInformation(process_handle, InformationClass::info_class_type, info, info_length, std::nullptr);
+      return QueryInformation(process_handle, InformationClass::info_class_type, info, info_length, nullptr);
     }
   protected:
     InformationClass info;
