@@ -166,7 +166,7 @@ class system_information_base
         delete[] ptr;
         if ( s == status::info_length_mismatch )
           continue;
-        ptr = std::nullptr;
+        ptr = nullptr;
         break;
       }
     }
@@ -189,7 +189,7 @@ class system_information_base
       query(
         void *          system_nformation,
         unsigned long   system_information_length,
-        unsigned long * return_length = std::nullptr
+        unsigned long * return_length = nullptr
         )
     {
       return QueryInformation(info_class::info_class_type,
