@@ -142,7 +142,7 @@ namespace ntl {
         )
       {
         const object_attributes oa(event_name);
-        create(this, DesiredAccess, &oa, EventType, InitialState);
+        last_status_ = create(this, DesiredAccess, &oa, EventType, InitialState);
       }
 
       /**
@@ -163,7 +163,8 @@ namespace ntl {
         )
       {
         const object_attributes oa(event_name, object_attributes::case_insensitive | object_attributes::openif);
-        IsOpened = create(this, DesiredAccess, &oa, EventType, InitialState) == status::object_name_exists;
+        last_status_ = create(this, DesiredAccess, &oa, EventType, InitialState);
+        IsOpened = last_status_ == status::object_name_exists;
       }
 
       /**
@@ -179,7 +180,7 @@ namespace ntl {
         access_mask         DesiredAccess = all_access
         )
       {
-        create(this, DesiredAccess, NULL, EventType, InitialState);
+        last_status_ = create(this, DesiredAccess, NULL, EventType, InitialState);
       }
 
 
@@ -195,7 +196,7 @@ namespace ntl {
         )
       {
         const object_attributes oa(event_name);
-        open(this, &oa, DesiredAccess);
+        last_status_ = open(this, &oa, DesiredAccess);
       }
 
       /**
@@ -209,7 +210,7 @@ namespace ntl {
         access_mask               DesiredAccess = modify_state
         )
       {
-        open(this, &ObjectAttributes, DesiredAccess);
+        last_status_ = open(this, &ObjectAttributes, DesiredAccess);
       }
 
 
@@ -256,19 +257,19 @@ namespace ntl {
       /** Sets the state of an event object to signaled. */
       bool set()
       {
-        return success(NtSetEvent(get(), 0));
+        return success(last_status_ = NtSetEvent(get(), 0));
       }
 
       /** Sets the state of an event object to nonsignaled. */
       bool reset()
       {
-        return success(NtClearEvent(get()));
+        return success(last_status_ = NtClearEvent(get()));
       }
 
       /** Sets the event object to the signaled state and then resets it to the nonsignaled state after releasing the appropriate number of waiting threads */
       bool pulse()
       {
-        return success(NtPulseEvent(get(), 0));
+        return success(last_status_ = NtPulseEvent(get(), 0));
       }
 
       /** Returns the current event object's state */
@@ -277,14 +278,14 @@ namespace ntl {
         typedef std::ratio_multiply<std::ratio<100>, std::nano>::type systime_unit;
         typedef std::chrono::duration<systime_t, systime_unit> system_duration;
 
-        return success(wait_for(system_duration(0), false));
+        return success(last_status_ = wait_for(system_duration(0), false));
       }
 
       /** Returns event object's type */
       event_type type() const
       {
         event_basic_information info;
-        NtQueryEvent(get(), EventBasicInformation, &info, sizeof(info), NULL);
+        last_status_ = NtQueryEvent(get(), EventBasicInformation, &info, sizeof(info), NULL);
         return info.EventType;
       }
 
@@ -301,7 +302,7 @@ namespace ntl {
         typedef std::ratio_multiply<std::ratio<100>, std::nano>::type systime_unit;
         typedef std::chrono::duration<systime_t, systime_unit> system_duration;
 
-        return NtWaitForSingleObject(get(), alertable, std::chrono::duration_cast<system_duration>(abs_time.time_since_epoch()).count());
+        return last_status_ = NtWaitForSingleObject(get(), alertable, std::chrono::duration_cast<system_duration>(abs_time.time_since_epoch()).count());
       }
 
       /**
@@ -317,7 +318,7 @@ namespace ntl {
         typedef std::ratio_multiply<std::ratio<100>, std::nano>::type systime_unit;
         typedef std::chrono::duration<systime_t, systime_unit> system_duration;
 
-        return NtWaitForSingleObject(get(), alertable, -1i64 * std::chrono::duration_cast<system_duration>(rel_time).count());
+        return last_status_ = NtWaitForSingleObject(get(), alertable, -1i64 * std::chrono::duration_cast<system_duration>(rel_time).count());
       }
 
       /**
@@ -327,8 +328,13 @@ namespace ntl {
        **/
       ntstatus wait(bool alertable = true) const
       {
-        return NtWaitForSingleObject(get(), alertable, system_time::infinite());
+        return last_status_ = NtWaitForSingleObject(get(), alertable, system_time::infinite());
       }
+
+      ntstatus last_status() const { return last_status_; }
+    private:
+      mutable ntstatus last_status_;
+
     };
 
   }// namespace nt

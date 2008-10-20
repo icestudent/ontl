@@ -22,6 +22,8 @@ namespace ntl {
 
     __class_enum (allocation_attributes)
     {
+      none,
+
       mem_commit            = 0x1000,
       mem_reserve           = 0x2000,
       mem_decommit          = 0x4000,
@@ -31,10 +33,20 @@ namespace ntl {
       mem_mapped           = 0x40000,
       mem_reset            = 0x80000,
       mem_top_down        = 0x100000,
+      mem_write_watch     = 0x200000,
+      mem_physical        = 0x400000,
       mem_image          = 0x1000000,
-      sec_reserve        = 0x4000000,
       mem_large_pages   = 0x20000000,
       mem_4mb_pages     = 0x80000000,
+
+      sec_based           = 0x200000,
+      sec_no_change       = 0x400000,
+      sec_file            = 0x800000,
+      sec_image          = 0x1000000,
+      sec_reserve        = 0x4000000,
+      sec_commit         = 0x8000000,
+      sec_nocache       = 0x10000000,
+      sec_global        = 0x20000000,
       sec_large_pages   = 0x80000000
     };
     __ntl_bitmask_type(type, friend)};

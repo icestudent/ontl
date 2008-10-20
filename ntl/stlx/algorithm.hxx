@@ -509,9 +509,9 @@ OutputIterator
                  OutputIterator result, Predicate pred)
 {
   for ( ; first != last; ++first )
-    if ( !(pred(*first) != false) )
+    if ( !pred(*first) )
     {
-      *result == *first;
+      *result = *first;
       ++result;
     }
   return result;

@@ -600,74 +600,78 @@ class section:
   public device_traits<section>
 {
 public:
-  // create
+  // create unnamed section
   explicit section(
-    access_mask           DesiredAccess,
-    page_protection       SectionPageProtection,
-    allocation_attributes AllocationAttributes = allocation_attributes::mem_commit
+    int64_t               MaximumSize,
+    page_protection       SectionPageProtection = page_protection::page_readwrite,
+    allocation_attributes AllocationAttributes = allocation_attributes::sec_commit,
+    access_mask           DesiredAccess = all_access
     ):base_()
   {
-    create(this, DesiredAccess, NULL, NULL, SectionPageProtection, AllocationAttributes, NULL);
+    last_status_ = create(this, DesiredAccess, NULL, &MaximumSize, SectionPageProtection, AllocationAttributes, NULL);
   }
 
   explicit section(
-    access_mask           DesiredAccess,
-    page_protection       SectionPageProtection,
-    int64_t&              MaximumSize,
-    allocation_attributes AllocationAttributes = allocation_attributes::mem_commit
+    int64_t*              MaximumSize,
+    page_protection       SectionPageProtection = page_protection::page_readwrite,
+    allocation_attributes AllocationAttributes = allocation_attributes::sec_commit,
+    access_mask           DesiredAccess = all_access
     ):base_()
   {
-    create(this, DesiredAccess, NULL, &MaximumSize, SectionPageProtection, AllocationAttributes, NULL);
+    last_status_ = create(this, DesiredAccess, NULL, MaximumSize, SectionPageProtection, AllocationAttributes, NULL);
   }
 
   explicit section(
     legacy_handle FileHandle,
-    access_mask   DesiredAccess,
-    page_protection       SectionPageProtection,
-    allocation_attributes AllocationAttributes = allocation_attributes::mem_commit
+    page_protection       SectionPageProtection = page_protection::page_readwrite,
+    allocation_attributes AllocationAttributes = allocation_attributes::sec_commit,
+    access_mask           DesiredAccess = all_access
     ):base_()
   {
-    create(this, DesiredAccess, NULL, NULL, SectionPageProtection, AllocationAttributes, FileHandle);
+    last_status_ = create(this, DesiredAccess, NULL, NULL, SectionPageProtection, AllocationAttributes, FileHandle);
+  }
+
+  // create named section
+  explicit section(
+    const const_unicode_string& SectionName,
+    int64_t               MaximumSize,
+    page_protection       SectionPageProtection = page_protection::page_readwrite,
+    allocation_attributes AllocationAttributes = allocation_attributes::sec_commit,
+    access_mask           DesiredAccess = all_access
+    ):base_()
+  {
+    const object_attributes oa(SectionName);
+    last_status_ = create(this, DesiredAccess, &oa, &MaximumSize, SectionPageProtection, AllocationAttributes, NULL);
   }
 
   explicit section(
     const const_unicode_string& SectionName,
-    access_mask           DesiredAccess,
-    page_protection       SectionPageProtection,
-    allocation_attributes AllocationAttributes = allocation_attributes::mem_commit
+    int64_t*              MaximumSize,
+    page_protection       SectionPageProtection = page_protection::page_readwrite,
+    allocation_attributes AllocationAttributes = allocation_attributes::sec_commit,
+    access_mask           DesiredAccess = all_access
     ):base_()
   {
     const object_attributes oa(SectionName);
-    create(this, DesiredAccess, &oa, NULL, SectionPageProtection, AllocationAttributes, NULL);
-  }
-
-  explicit section(
-    const const_unicode_string& SectionName,
-    access_mask           DesiredAccess,
-    page_protection       SectionPageProtection,
-    int64_t&              MaximumSize,
-    allocation_attributes AllocationAttributes = allocation_attributes::mem_commit
-    ):base_()
-  {
-    const object_attributes oa(SectionName);
-    create(this, DesiredAccess, &oa, &MaximumSize, SectionPageProtection, AllocationAttributes, NULL);
+    last_status_ = create(this, DesiredAccess, &oa, MaximumSize, SectionPageProtection, AllocationAttributes, NULL);
   }
 
   // open
-  explicit section(
-    access_mask  DesiredAccess
-    ):base_()
-  {
-    open(this, DesiredAccess, NULL);
-  }
-
   explicit section(
     const const_unicode_string& SectionName,
     access_mask           DesiredAccess
     ):base_()
   {
     const object_attributes oa(SectionName);
-    open(this, DesiredAccess, &oa);
+    last_status_ = open(this, DesiredAccess, &oa);
+  }
+
+  explicit section(
+    const object_attributes& ObjectAtributes,
+    access_mask  DesiredAccess
+    ):base_()
+  {
+    last_status_ = open(this, DesiredAccess, &ObjectAtributes);
   }
 
   ~section()
@@ -677,31 +681,31 @@ public:
 
   // map
   void* mmap(
-    size_t    ViewSize,
-    page_protection       RegionProtection,
-    allocation_attributes AllocationType = allocation_attributes::mem_commit
+    size_t          ViewSize,
+    page_protection RegionProtection = page_protection::page_readwrite
     )
   {
-    NtMapViewOfSection(get(), current_process(), &base_, 0, 0, NULL, &ViewSize, section_inherit::ViewUnmap, AllocationType, RegionProtection);
+    last_status_ = NtMapViewOfSection(get(), current_process(), &base_, 0, 0, NULL, &ViewSize, section_inherit::ViewUnmap, allocation_attributes::none, RegionProtection);
     return base_;
   }
 
   void* mmap(
     int64_t&  SectionOffset,
+    size_t    CommitSize,
     size_t    ViewSize,
-    page_protection       RegionProtection,
-    allocation_attributes AllocationType = allocation_attributes::mem_commit
+    page_protection       RegionProtection = page_protection::page_readwrite,
+    allocation_attributes AllocationType = allocation_attributes::none
     )
   {
-    NtMapViewOfSection(get(), current_process(), &base_, 0, 0, &SectionOffset, &ViewSize, section_inherit::ViewUnmap, AllocationType, RegionProtection);
+    last_status_ = NtMapViewOfSection(get(), current_process(), &base_, 0, CommitSize, &SectionOffset, &ViewSize, section_inherit::ViewUnmap, AllocationType, RegionProtection);
     return base_;
   }
 
   bool munmap()
   {
-    ntstatus st = NtUnmapViewOfSection(current_process(), base_);
+    last_status_ = NtUnmapViewOfSection(current_process(), base_);
     base_ = NULL;
-    return success(st);
+    return success(last_status_);
   }
 
   bool flush()
@@ -709,16 +713,16 @@ public:
     void* base = base_;
     io_status_block iosb;
     size_t size = 0;
-    ntstatus st = NtFlushVirtualMemory(current_process(), &base, &size, &iosb);
-    return success(st);
+    last_status_ = NtFlushVirtualMemory(current_process(), &base, &size, &iosb);
+    return success(last_status_);
   }
 
   bool flush(size_t size)
   {
     void* base = base_;
     io_status_block iosb;
-    ntstatus st = NtFlushVirtualMemory(current_process(), &base, &size, &iosb);
-    return success(st);
+    last_status_ = NtFlushVirtualMemory(current_process(), &base, &size, &iosb);
+    return success(last_status_);
   }
 
 
@@ -749,8 +753,11 @@ public:
     return NtOpenSection(SectionHandle, DesiredAccess, ObjectAttributes);
   }
 
+  ntstatus last_status() const { return last_status_; }
+
 private:
   void* base_;
+  ntstatus last_status_;
 };
 
 }//namespace nt
