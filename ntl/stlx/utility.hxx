@@ -115,10 +115,6 @@ struct pair
     pair(pair<U, V>&& p)
       :first(move(p.first)), second(move(p.second))
     {}
-#else
-    template<class U, class V>
-    pair(const pair<U, V> & p) : first(p.first), second(p.second)
-    {}
 #endif
 
 #ifdef NTL__CXX_VT

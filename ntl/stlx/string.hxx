@@ -17,6 +17,8 @@
 #include "memory.hxx"
 #include "vector.hxx"
 
+#include "new.hxx"
+
 #ifndef EOF // should be moved to "stdio.hxx" ?
 # define EOF -1
 #endif

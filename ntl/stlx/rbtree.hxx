@@ -261,6 +261,7 @@ namespace tree
         }
       }
 
+      #ifdef NTL__CXX_RV
       void assign(rb_tree&& x)
       {
         if(this != x){
@@ -268,6 +269,7 @@ namespace tree
           swap(x);
         }
       }
+      #endif
 
     protected:
       node_type* construct_node(const value_type& x)
@@ -277,12 +279,14 @@ namespace tree
         return np;
       }
 
+      #ifdef NTL__CXX_RV
       node_type* construct_node(value_type&& x)
       {
         node_type* const np = node_allocator.allocate(1);
         node_allocator.construct(np, forward<value_type>(x));
         return np;
       }
+      #endif
 
       std::pair<iterator, bool> insert_impl(node* const np)
       {
@@ -334,10 +338,12 @@ namespace tree
         return insert_impl(construct_node(x));
       }
 
+      #ifdef NTL__CXX_RV
       std::pair<iterator, bool> insert(value_type&& x)
       {
         return insert_impl(construct_node(x));
       }
+      #endif
 
       iterator insert(iterator /*position*/, const value_type& x)
       {
