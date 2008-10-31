@@ -51,7 +51,7 @@ namespace std {
     deque(const deque<T,Allocator>& x);
     deque(const deque& x, const Allocator& a);
     
-    #ifdef NTL__CXX
+    #ifdef NTL__CXX_RV
     deque(deque&&);
     deque(deque&&, const Allocator&);
     deque(initializer_list<T>, const Allocator& = Allocator());
@@ -61,7 +61,7 @@ namespace std {
     
     deque<T,Allocator>& operator=(const deque<T,Allocator>& x);
     
-    #ifdef NTL__CXX
+    #ifdef NTL__CXX_RV
     deque<T,Allocator>& operator=(deque<T,Allocator>&& x);
     deque& operator=(initializer_list<T>);
     void assign(initializer_list<T>);
@@ -109,10 +109,12 @@ namespace std {
     const_reference back() const;
     
     // 23.2.2.3 modifiers:
-    #ifdef NTL__CXX
+    #ifdef NTL__CXX_VT
     template <class... Args> void emplace_front(Args&&... args);
     template <class... Args> void emplace_back(Args&&... args);
     template <class... Args> iterator emplace(const_iterator position, Args&&... args);
+    #endif
+    #ifdef NTL__CXX_RV
     void push_front(T&& x);
     void push_back(T&& x);
     #endif
@@ -122,7 +124,7 @@ namespace std {
     void pop_front();
     void pop_back();
 
-    #ifdef NTL__CXX
+    #ifdef NTL__CXX_RV
     iterator insert(const_iterator position, T&& x);
     void insert(const_iterator position, initializer_list<T>);
     #endif
@@ -136,7 +138,7 @@ namespace std {
     iterator erase(const_iterator position);
     iterator erase(const_iterator first, const_iterator last);
 
-    #ifdef NTL__CXX
+    #ifdef NTL__CXX_RV
     void swap(deque<T,Allocator>&&);
     #else
     void swap(deque<T,Allocator>& x);
@@ -164,7 +166,7 @@ namespace std {
   template <class T, class Allocator>
   void swap(deque<T,Allocator>& x, deque<T,Allocator>& y);
   
-  #ifdef NTL__CXX
+  #ifdef NTL__CXX_RV
   template <class T, class Allocator>
   void swap(deque<T,Allocator>&& x, deque<T,Allocator>& y);
   template <class T, class Allocator>

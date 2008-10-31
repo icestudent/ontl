@@ -37,7 +37,7 @@ namespace std {
 
     typedef Allocator                             allocator_type;
     typedef typename  
-      Allocator::template rebind<T>::other        allocator;
+      Allocator::template rebind<value_type>::other allocator;
     typedef typename  allocator::pointer          pointer;
     typedef typename  allocator::const_pointer    const_pointer;
     typedef typename  allocator::reference        reference;
@@ -64,35 +64,65 @@ namespace std {
     {}
 
     set(const set<Key,Compare,Allocator>& x)
+      :tree_type(x)
     {}
-#ifdef NTL__CXX
-    set(set<Key,Compare,Allocator>&& x);
-#endif
+    #ifdef NTL__CXX_RV
+    set(set<Key,Compare,Allocator>&& x)
+      :tree_type(x)
+    {}
+    #endif
 
-    set(const Allocator&);
+    explicit set(const Allocator& a)
+      :tree_type(a)
+    {}
     set(const set& x, const Allocator& a)
+      :tree_type(x, a)
     {}
 
-#ifdef NTL__CXX
-    set(set&&, const Allocator&);
-#endif
+    #ifdef NTL__CXX_RV
+    set(set&& x, const Allocator& a)
+      :tree_type(x, a)
+    {}
+    #endif
+
+    set(initializer_list<value_type> il, const Compare& comp = Compare(), const Allocator& a = Allocator())
+      :tree_type(il.begin(), il.end(), comp, a)
+    {}
+
     ~set()
     {}
 
     set<Key,Compare,Allocator>& operator= (const set<Key,Compare,Allocator>& x)
-    {}
+    {
+      assign(x);
+      return *this;
+    }
 
-#ifdef NTL__CXX
-    set<Key,Compare,Allocator>& operator= (set<Key,Compare,Allocator>&& x);
-#endif
+    #ifdef NTL__CXX_RV
+    set<Key,Compare,Allocator>& operator= (set<Key,Compare,Allocator>&& x)
+    {
+      assign(x);
+      return *this;
+    }
+    #endif
 
     // modifiers:
-#ifdef NTL__CXX
+    #ifdef NTL__CXX_VT
     template <class... Args> pair<iterator, bool> emplace(Args&&... args);
     template <class... Args> iterator emplace(const_iterator position, Args&&... args);
-    pair<iterator,bool> insert(value_type&& x);
-    iterator insert(const_iterator position, value_type&& x);
-#endif
+    #endif
+
+    #ifdef NTL__CXX_RV
+    pair<iterator,bool> insert(value_type&& x)
+    {
+      return tree_type::insert(x);
+    }
+
+    iterator insert(const_iterator position, value_type&& x)
+    {
+      return tree_type::insert(position, x);
+    }
+    #endif
 
     // observers:
     key_compare key_comp() const { return tree_type::value_comp(); }
@@ -138,16 +168,13 @@ namespace std {
 
   // specialized algorithms:
   template <class Key, class Compare, class Allocator>
-  void swap(set<Key,Compare,Allocator>& x, set<Key,Compare,Allocator>& y)
-  {
-    x.swap(y);
-  }
+  void swap(set<Key,Compare,Allocator>& x, set<Key,Compare,Allocator>& y) { x.swap(y); }
 
-#ifdef NTL__CXX
+#ifdef NTL__CXX_RV
   template <class Key, class Compare, class Allocator>
-  void swap(set<Key,Compare,Allocator&& x, set<Key,Compare,Allocator>& y);
+  void swap(set<Key,Compare,Allocator>&& x, set<Key,Compare,Allocator>& y) { x.swap(y); }
   template <class Key, class Compare, class Allocator>
-  void swap(set<Key,Compare,Allocator& x, set<Key,Compare,Allocator>&& y);
+  void swap(set<Key,Compare,Allocator>& x, set<Key,Compare,Allocator>&& y) { x.swap(y); }
 #endif
 
   template <class Key, class Compare, class Alloc>

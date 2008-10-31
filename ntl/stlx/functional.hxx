@@ -75,6 +75,9 @@ class reference_wrapper
     // construct/copy/destroy
     explicit reference_wrapper(T&) __ntl_nothrow;
     reference_wrapper(const reference_wrapper<T>& x) __ntl_nothrow;
+#if defined(NTL__CXX_RV) && defined(NTL__CXX_EF)
+    explicit reference_wrapper(T&&) = delete; // do not bind to temporary objects
+#endif
 
     // assignment
     reference_wrapper& operator=(const reference_wrapper<T>& x) __ntl_nothrow;
@@ -83,7 +86,7 @@ class reference_wrapper
     operator T& () const __ntl_nothrow;
     T& get() const __ntl_nothrow;
 
-#if 0
+#if NTL__CXX_VT
     // invocation
     template <class T1, class T2, ..., class TN>
     typename result_of<T(T1, T2, ..., TN)>::type
@@ -335,7 +338,7 @@ binary_negate<Predicate> not2(const Predicate& pred)
  *   The template function bind returns an object that binds a function object passed as an argument to additional arguments.
  *@{
  */
-#ifdef NTL__CXX
+#ifdef NTL__CXX_VT
 
 template<class T> struct is_bind_expression;
 template<class T> struct is_placeholder;
@@ -352,7 +355,7 @@ namespace placeholders {
   extern unspecified _M;
 }
 
-#endif // NTL__CXX
+#endif // NTL__CXX_VT
 
 /**@} lib_bind
   **/

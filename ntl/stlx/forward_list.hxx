@@ -47,14 +47,14 @@ namespace std {
     template <class InputIterator>
     forward_list(InputIterator first, InputIterator last, const Allocator& = Allocator());
     forward_list(const forward_list<T,Allocator>& x);
-    #ifdef NTL__CXX
+    #ifdef NTL__CXX_RV
     forward_list(forward_list<T,Allocator>&& x);
     forward_list(initializer_list<T>, const Allocator& = Allocator());
     #endif
     ~forward_list();
 
     forward_list<T,Allocator>& operator=(const forward_list<T,Allocator>& x);
-    #ifdef NTL__CXX
+    #ifdef NTL__CXX_RV
     forward_list<T,Allocator>& operator=(forward_list<T,Allocator>&& x);
     forward_list& operator=(initializer_list<T>);
     #endif
@@ -62,9 +62,7 @@ namespace std {
     template <class InputIterator>
     void assign(InputIterator first, InputIterator last);
     void assign(size_type n, const T& t);
-    #ifdef NTL__CXX
     void assign(initializer_list<T>);
-    #endif
     
     allocator_type get_allocator() const;
     
@@ -89,7 +87,7 @@ namespace std {
     
     // 23.2.3.4 modifiers:
     
-    #ifdef NTL__CXX
+    #ifdef NTL__CXX_VT
     template <class... Args> void emplace_front(Args&&... args);
     void push_front(T&& x);
     #endif
@@ -97,7 +95,7 @@ namespace std {
     void pop_front();
     
     
-    #ifdef NTL__CXX
+    #ifdef NTL__CXX_VT
     template <class... Args> iterator emplace_after(const_iterator position, Args&&... args);
     iterator insert_after(const_iterator position, T&& x);
     #endif
@@ -105,14 +103,12 @@ namespace std {
     void insert_after(const_iterator position, size_type n, const T& x);
     template <class InputIterator>
     void insert_after(const_iterator position, InputIterator first, InputIterator last);
-    #ifdef NTL__CXX
     void insert_after(const_iterator position, initializer_list<T> il);
-    #endif
     iterator erase_after(const_iterator position);
     iterator erase_after(const_iterator position, iterator last);
     
     
-    #ifdef NTL__CXX
+    #ifdef NTL__CXX_RV
     void swap(forward_list<T,Allocator>&&);
     #else
     void swap(forward_list<T,Allocator>& x);
@@ -125,7 +121,7 @@ namespace std {
     
     // 23.2.3.5 forward_list operations:
     
-    #ifdef NTL__CXX
+    #ifdef NTL__CXX_RV
     void splice_after(const_iterator position, forward_list<T,Allocator>&& x);
     void splice_after(const_iterator position, forward_list<T,Allocator>&& x,
       const_iterator i);
@@ -145,7 +141,7 @@ namespace std {
     template <class BinaryPredicate>
     void unique(BinaryPredicate binary_pred);
     
-    #ifdef NTL__CXX
+    #ifdef NTL__CXX_RV
     void merge(forward_list<T,Allocator>&& x);
     template <class Compare> 
     void merge(forward_list<T,Allocator>&& x, Compare comp);
@@ -182,7 +178,7 @@ namespace std {
   template <class T, class Allocator>
   void swap(forward_list<T,Allocator>& x, forward_list<T,Allocator>& y);
   
-  #ifdef NTL__CXX
+  #ifdef NTL__CXX_RV
   template <class T, class Allocator>
   void swap(forward_list<T,Allocator>&& x, forward_list<T,Allocator>& y);
   template <class T, class Allocator>

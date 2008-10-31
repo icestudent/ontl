@@ -302,6 +302,10 @@
 					Name=".ext"
 					>
 					<File
+						RelativePath=".\stlx\fib.hxx"
+						>
+					</File>
+					<File
 						RelativePath=".\stlx\rbtree.hxx"
 						>
 					</File>

@@ -9,6 +9,7 @@
 #define NTL__STLX_UTILITY
 
 #include "type_traits.hxx"
+#include "functional.hxx"
 
 /// Standard Template Library
 namespace std {
@@ -49,10 +50,28 @@ bool operator>=(const T & x, const T & y) { return !(x < y); }
 
 #pragma region forward
 /// 20.2.2 forward/move helpers [forward]
-#ifdef NTL__CXX
-template <class T> struct identity;
-template <class T> T&& forward(typename identity<T>::type&&);
-template <class T> typename remove_reference<T>::type&& move(T&&);
+#ifdef NTL__CXX_RV
+template <class T>
+struct identity
+{
+  typedef T type;
+
+  const T& operator()(const T& x) const { return x; }
+};
+
+template <class T>
+inline
+T&& forward(typename identity<T>::type&& t)
+{
+  return t;
+}
+
+template <class T> 
+inline
+typename remove_reference<T>::type&& move(T&& t)
+{
+  return t;
+}
 #endif
 #pragma endregion
 
@@ -70,42 +89,96 @@ struct pair
     T1  first;
     T2  second;
 
-    pair() : first(T1()), second(T2()) {}
-    pair(const T1 & x, const T2 & y) : first(x), second(y) {}
+
+    pair() : first(T1()), second(T2()) 
+    {}
+
+    pair(const T1 & x, const T2 & y) : first(x), second(y) 
+    {}
 
     template<class U, class V>
-    pair(const pair<U, V> & p) : first(p.first), second(p.second) {}
+    pair(const pair<U, V>& p)
+      :first(p.first), second(p.second)
+    {}
 
-#ifdef NTL__CXX
-    pair(pair&& p);
-    pair(const T1& x, const T2& y);
-    template<class U, class V> pair(U&& x, V&& y);
-    template<class U, class V> pair(pair<U, V>&& p);
-    template<class U, class... Args> pair(U&& x, Args&&... args);
+#ifdef NTL__CXX_RV
+    template<class U, class V> 
+    pair(U&& x, V&& y)
+      :first(forward<U>(x)), second(forward<V>(y))
+    {}
+
+    pair(pair&& p)
+      :first(move(p.first)), second(move(p.second))
+    {}
+
+    template<class U, class V>
+    pair(pair<U, V>&& p)
+      :first(move(p.first)), second(move(p.second))
+    {}
+#else
+    template<class U, class V>
+    pair(const pair<U, V> & p) : first(p.first), second(p.second)
+    {}
+#endif
+
+#ifdef NTL__CXX_VT
+    template<class U, class... Args>
+    pair(U&& x, Args&&... args)
+      :first(forward<U>(x), second(forward<Args>(args))
+    {}
+#endif
 
     // allocator-extended constructors
     template <class Alloc> pair(allocator_arg_t, const Alloc& a);
     template <class Alloc> pair(allocator_arg_t, const Alloc& a, const T1& x, const T2& y);
 
+#ifdef NTL__CXX_RV
     template <class U, class V, class Alloc>
     pair(allocator_arg_t, const Alloc& a, U&& x, V&& y);
 
     template <class Alloc> pair(allocator_arg_t, const Alloc&, pair&& p);
+#endif
 
     template <class U, class V, class Alloc>
     pair(allocator_arg_t, const Alloc& a, const pair<U, V>& p);
 
+#ifdef NTL__CXX_RV
     template <class U, class V, class Alloc>
     pair(allocator_arg_t, const Alloc& a, pair<U, V>&& p);
+#endif
 
+#ifdef NTL__CXX_VT
     template <class U, class... Args, class Alloc>
     pair(allocator_arg_t, const Alloc& a, U&& x, Args&&... args);
+#endif
 
-    pair& operator=(pair&& p);
+#ifdef NTL__CXX_RV
+    pair& operator=(pair&& p)
+    {
+      first = move(p.first);
+      second = move(p.second);
+      return *this;
+    }
 
-    template<class U, class V> pair& operator=(pair<U, V>&& p);
+    template<class U, class V>
+    pair& operator=(pair<U, V>&& p)
+    {
+      first = move(p.first);
+      second = move(p.second);
+      return *this;
+    }
 
-    void swap(pair&& p);
+    void swap(pair&& p)
+    {
+      std::swap(first, p.first);
+      std::swap(second, p.second);
+    }
+#else
+    void swap(pair& p)
+    {
+      std::swap(first, p.first);
+      std::swap(second, p.second);
+    }
 #endif
 };
 #pragma warning(pop)
@@ -175,8 +248,53 @@ bool
   return !(x < y);
 }
 
+template<class T1, class T2> void swap(pair<T1, T2>& x, pair<T1, T2>& y)
+{
+  x.swap(y);
+}
+#ifdef NTL__CXX_RV
+template<class T1, class T2> void swap(pair<T1, T2>&& x, pair<T1, T2>& y)
+{
+  x.swap(y);
+}
+template<class T1, class T2> void swap(pair<T1, T2>& x, pair<T1, T2>&& y)
+{
+  x.swap(y);
+}
+
+#endif
 ///@}
 
+#ifdef NTL__CXX_RV
+namespace __
+{
+  template<class T>
+  struct pair_type
+  {
+    typedef typename decay<T>::type U;
+    
+    typedef typename conditional<is_same<U, reference_wrapper<T> >::value, 
+                                 T&, 
+                                 U
+                                >::type type;
+  };
+  template<class T1, class T2>
+  struct pair_result
+  {
+    typedef typename pair_type<T1>::type V1;
+    typedef typename pair_type<T2>::type V2;
+    typedef typename pair<V1, V2> type;
+  };
+}
+
+template<class T1, class T2>
+inline
+typename __::pair_result<T1, T2>::type
+make_pair(T1&& x, T2&& y)
+{
+  return __::pair_result<T1, T2>::type( forward<T1>(x), forward<T2>(y) );
+}
+#else
 template<class T1, class T2>
 inline
 pair<T1, T2>
@@ -184,6 +302,7 @@ pair<T1, T2>
 {
   return pair<T1, T2>( x, y );
 }
+#endif
 #pragma endregion
 
 /**@} lib_utility */

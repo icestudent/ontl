@@ -72,7 +72,8 @@ namespace ntl {
       query_state   = 1,
       modify_state  = 2,
       synchronize   = device_traits<>::synchronize,
-      all_access    = standard_rights_required | synchronize | 0x3
+      query         = synchronize | query_state,
+      all_access    = standard_rights_required | synchronize | query_state | modify_state
     };
 
     friend access_mask operator | (access_mask m, access_mask m2)

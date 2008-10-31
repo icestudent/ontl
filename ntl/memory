@@ -1,1 +1,2 @@
 #include "stlx/memory.hxx"
+#include "stlx/smart_ptr.hxx"

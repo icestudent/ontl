@@ -191,11 +191,22 @@ class list
       insert(begin(), x.begin(), x.end());
     }
     
-    #ifdef NTL__CXX
-    list(list&& x);
+    #ifdef NTL__CXX_RV
+    list(list&& x)
+    {
+      // NOTE: should we initialize head? or null it?
+      swap(x);
+    }
+
     list(list&&, const Allocator&);
-    list(initializer_list<T>, Allocator& = Allocator());
     #endif
+    
+    list(initializer_list<T> il, Allocator& a = Allocator())
+      :node_allocator(a)
+    {
+      init_head();
+      insert(begin(), il);
+    }
 
     __forceinline
     ~list() { clear(); }
@@ -206,10 +217,22 @@ class list
       assign(x.begin(), x.end());
       return *this;
     }
-    #ifdef NTL__CXX
-    list<T,Allocator>& operator=(list<T,Allocator>&& x);
-    list& operator=(initializer_list<T>);
+    #ifdef NTL__CXX_RV
+    list<T,Allocator>& operator=(list<T,Allocator>&& x)
+    {
+      if(this != &x){
+        clear();
+        swap(x);
+      }
+      return *this;
+    }
     #endif
+    
+    list& operator=(initializer_list<T> il)
+    {
+      assign(il.begin(), il.end());
+      return *this;
+    }
 
     template <class InputIterator>
     void assign(InputIterator first, InputIterator last)
@@ -227,9 +250,10 @@ class list
       if ( n > size() ) insert(it, n - size(), t);
     }
     
-    #ifdef NTL__CXX
-    void assign(initializer_list<T>);
-    #endif
+    void assign(initializer_list<T> il)
+    {
+      assign(il.begin(), il.end());
+    }
 
     allocator_type get_allocator() const { return static_cast<allocator_type>(node_allocator); }
 
@@ -299,12 +323,17 @@ class list
 
     ///\name modifiers [23.2.4.3]
 
-    #ifdef NTL__CXX
+    #ifdef NTL__CXX_VT
     template <class... Args> void emplace_front(Args&&... args);
     template <class... Args> void emplace_back(Args&&... args);
-    void push_front(T&& x);
-    void push_back(T&& x);
     template <class... Args> iterator emplace(const_iterator position, Args&&... args);
+    #endif
+
+    #ifdef NTL__CXX_RV
+    __forceinline
+    void push_front(T&& x) { insert(begin(), x); }
+    __forceinline
+    void push_back(T&& x)  { insert(end(), x);   }
     #endif
 
     __forceinline
@@ -319,56 +348,78 @@ class list
     __forceinline
     void pop_back()             { erase(--end()); }
 
-    #ifdef NTL__CXX
-    iterator insert(const_iterator position, T&& x);
-    void insert(const_iterator position, initializer_list<T> il);
-    #endif
     __forceinline
-    iterator insert(iterator position, const T& x)
+    iterator insert(const_iterator position, const T& x)
     {
       ++size_;
       node_type * const p = node_allocator.allocate(1);
       node_allocator.construct(p, x);
-      p->link(position.p->prev, position.p);
+      double_linked* const np = const_cast<double_linked*>(position.p);
+      p->link(np->prev, np);
       return p;
     }
 
+    #ifdef NTL__CXX_RV
     __forceinline
-    void insert(iterator position, size_type n, const T& x)
+    iterator insert(const_iterator position, T&& x)
+    {
+      ++size_;
+      node_type * const p = node_allocator.allocate(1);
+      node_allocator.construct(p, forward<value_type>(x));
+      double_linked* const np = const_cast<double_linked*>(position.p);
+      p->link(np->prev, np);
+      return p;
+    }
+    #endif
+    
+    __forceinline
+    void insert(const_iterator position, size_type n, const T& x)
     {
       while ( n-- ) insert(position, x);
     }
 
     template <class InputIterator>
     __forceinline
-    void insert(iterator position, InputIterator first, InputIterator last)
+    void insert(const_iterator position, InputIterator first, InputIterator last)
     {
       insert__disp(position, first, last, is_integral<InputIterator>::type());
     }
 
+    void insert(const_iterator position, initializer_list<T> il)
+    {
+      insert(position, il.begin(), il.end());
+    }
+    
     __forceinline
-    iterator erase(iterator position)
+    iterator erase(const_iterator position)
     {
       iterator res( position.p->next );
-      position.p->unlink();
+      node_type* const np = const_cast<node_type*>(static_cast<const node_type*>(position.p));
+      np->unlink();
       --size_;
-      node_allocator.destroy(static_cast<node_type*>(position.p));
-      node_allocator.deallocate(static_cast<node_type*>(position.p), 1);
+      node_allocator.destroy(np);
+      node_allocator.deallocate(np, 1);
       return res;
     }
 
     __forceinline
-    iterator erase(iterator position, iterator last)
+    iterator erase(const_iterator position, const_iterator last)
     {
       while ( position != last ) position = erase(position);
-      return last;
+      return const_cast<double_linked*>(last.p);
     }
 
-    #ifdef NTL__CXX
-    void swap(list<T,Allocator>&&);
+    #ifdef NTL__CXX_RV
+    void swap(list<T,Allocator>&& x)
     #else
-    void swap(list<T, Allocator>&);
-    #endif
+    void swap(list<T, Allocator>& x)
+#endif
+    {
+      std::swap(size_, x.size_);
+      std::swap(head.next, x.head.next);
+      std::swap(head.prev, x.head.prev);
+      std::swap(node_allocator, x.node_allocator);
+    }
 
     __forceinline
     void clear() { erase(begin(), end()); }
@@ -378,14 +429,14 @@ class list
   private:
 
     template <class InputIterator>
-    void insert__disp(iterator position, InputIterator first, InputIterator last,
+    void insert__disp(const_iterator position, InputIterator first, InputIterator last,
                       const false_type&)
     {
       while ( first != last ) position = insert(position, *--last);
     }
 
     template <class IntegralType>
-    void insert__disp(iterator position, IntegralType n, IntegralType x,
+    void insert__disp(const_iterator position, IntegralType n, IntegralType x,
                       const true_type&)
     {
       insert(position, static_cast<size_type>(n), static_cast<value_type>(x));
@@ -395,7 +446,7 @@ class list
 
     ///\name list operations [23.2.4.4]
 
-    #ifdef NTL__CXX
+    #ifdef NTL__CXX_RV
     void splice(const_iterator position, list<T,Allocator>&& x);
     void splice(const_iterator position, list<T,Allocator>&& x, const_iterator i);
     void splice(const_iterator position, list<T,Allocator>&& x,
@@ -445,7 +496,7 @@ class list
       while ( i != begin() );
     }
 
-    #ifdef NTL__CXX
+    #ifdef NTL__CXX_RV
     void merge(list<T,Allocator>&& x);
     template <class Compare>
     void merge(list<T,Allocator>&& x, Compare comp);
@@ -533,11 +584,11 @@ void swap(list<T, Allocator>& x, list<T, Allocator>& y) __ntl_nothrow
   x.swap(y);
 }
 
-#ifdef NTL__CXX
+#ifdef NTL__CXX_RV
 template <class T, class Allocator>
-void swap(list<T,Allocator>&& x, list<T,Allocator>& y);
+void swap(list<T,Allocator>&& x, list<T,Allocator>& y) { x.swap(y); }
 template <class T, class Allocator>
-void swap(list<T,Allocator>& x, list<T,Allocator>&& y);
+void swap(list<T,Allocator>& x, list<T,Allocator>&& y) { x.swap(y); }
 #endif
 
 template <class T, class Alloc>

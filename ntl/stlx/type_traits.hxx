@@ -84,7 +84,7 @@ _CHECK_TRAIT((is_same<add_cv<int>::type, volatile const int>::value));
 
 template <class T> struct remove_reference     { typedef T type; };
 template <class T> struct remove_reference<T&> { typedef T type; };
-#ifdef NTL__CXX
+#ifdef NTL__CXX_RV
 template <class T> struct remove_reference<T&&> { typedef T type; };
 _CHECK_TRAIT((is_same<remove_reference<int&>::type, int&>::value) == 0);
 _CHECK_TRAIT((is_same<remove_reference<int&>::type, int>::value));
@@ -246,7 +246,7 @@ template <class T> struct is_lvalue_reference<T&> : public true_type {};
 _CHECK_TRAIT(is_lvalue_reference<volatile int&>::value);
 
 template <class T> struct is_rvalue_reference     : public false_type {};
-#ifdef NTL__CXX
+#ifdef NTL__CXX_RV
 template <class T> struct is_rvalue_reference<T&&>: public true_type {};
 _CHECK_TRAIT(is_rvalue_reference<volatile int&&>::value);
 #endif
@@ -425,7 +425,7 @@ template <class T> struct decay
                           typename conditional<is_function<U>::value,
                                                 typename add_pointer<U>::type,
                                                 typename remove_cv<U>::type
-                                              >
+                                              >::type
                         >::type   type;
 };
 
@@ -585,7 +585,7 @@ _CHECK_TRAIT((extent<int[][4], 1>::value) == 4);
 
 
 // 20.5.7.2 Other transformations [meta.trans.other]
-#ifdef NTL__CXX
+#if defined(NTL__CXX_VT) && defined(NTL__CXX_TYPEOF)
 
 template <class ...T> struct common_type;
 

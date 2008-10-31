@@ -40,7 +40,7 @@ class stack
 
     explicit stack(const Container& c = Container()) : c(c) {}
     
-    #ifdef NTL__CXX
+    #ifdef NTL__CXX_RV
     explicit stack(Container&& = Container());
     #endif
 
@@ -49,7 +49,7 @@ class stack
     template <class Alloc>
     stack(const Container&, const Alloc&);
     
-    #ifdef NTL__CXX
+    #ifdef NTL__CXX_RV
     template <class Alloc>
     stack(Container&&, const Alloc&);
     template <class Alloc>
@@ -63,13 +63,15 @@ class stack
     void              push(const value_type& x) { c.push_back(x); }
     void              pop()                     { c.pop_back(); }
 
-    #ifdef NTL__CXX
+    #ifdef NTL__CXX_RV
     void push(value_type&& x);
+    #endif
+    #ifdef NTL__CXX_VT
     template <class... Args>
     void emplace(Args&&... args);
     #endif
 
-    #ifdef NTL__CXX
+    #ifdef NTL__CXX_RV
     void swap(stack&& s) { c.swap(s.c); }
     #else
     void swap(stack&  s) { c.swap(s.c); }
@@ -124,7 +126,7 @@ void swap(stack<T, Container>& x, stack<T, Container>& y)
   x.swap(y);
 }
 
-#ifdef NTL__CXX
+#ifdef NTL__CXX_RV
 template <class T, class Allocator>
 void swap(stack<T,Allocator>&& x, stack<T,Allocator>& y);
 template <class T, class Allocator>

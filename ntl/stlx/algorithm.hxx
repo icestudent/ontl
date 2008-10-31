@@ -15,7 +15,7 @@ namespace std {
 
 // 25.1, non-modifying sequence operations:
 
-/// 25.1.1 For each [lib.alg.foreach]
+/// 25.1.1 For each [alg.foreach]
 template<class InputIterator, class Function>
 __forceinline
 Function
@@ -25,7 +25,7 @@ Function
   return f;
 };
 
-/// 25.1.2 Find [lib.alg.find]
+/// 25.1.2 Find [alg.find]
 template<class InputIterator, class T>
 __forceinline
 InputIterator
@@ -35,7 +35,7 @@ InputIterator
   return first;
 }
 
-/// 25.1.2 Find [lib.alg.find]
+/// 25.1.2 Find [alg.find]
 template<class InputIterator, class Predicate>
 __forceinline
 InputIterator
@@ -45,14 +45,14 @@ InputIterator
   return first;
 }
 
-/// 25.1.3 Find End [lib.alg.find.end]
+/// 25.1.3 Find End [alg.find.end]
 template<class ForwardIterator1, class ForwardIterator2>
 __forceinline
 ForwardIterator1
   find_end(ForwardIterator1 first1, ForwardIterator1 last1,
            ForwardIterator2 first2, ForwardIterator2 last2);
 
-/// 25.1.3 Find End [lib.alg.find.end]
+/// 25.1.3 Find End [alg.find.end]
 template<class ForwardIterator1, class ForwardIterator2, class BinaryPredicate>
 __forceinline
 ForwardIterator1
@@ -60,7 +60,7 @@ ForwardIterator1
            ForwardIterator2 first2, ForwardIterator2 last2,
            BinaryPredicate pred);
 
-/// 25.1.4 Find First [lib.alg.find.first.of]
+/// 25.1.4 Find First [alg.find.first.of]
 template<class ForwardIterator1, class ForwardIterator2>
 __forceinline
 ForwardIterator1
@@ -73,7 +73,7 @@ ForwardIterator1
   return first1;  // here first1 == last1
 }
 
-/// 25.1.4 Find First [lib.alg.find.first.of]
+/// 25.1.4 Find First [alg.find.first.of]
 template<class ForwardIterator1, class ForwardIterator2, class BinaryPredicate>
 __forceinline
 ForwardIterator1
@@ -87,7 +87,7 @@ ForwardIterator1
   return first1;  // here first1 == last1
 }
 
-/// 25.1.5 Adjacent find [lib.alg.adjacent.find]
+/// 25.1.5 Adjacent find [alg.adjacent.find]
 template<class ForwardIterator>
 __forceinline
 ForwardIterator
@@ -104,7 +104,7 @@ ForwardIterator
   }
 }
 
-/// 25.1.5 Adjacent find [lib.alg.adjacent.find]
+/// 25.1.5 Adjacent find [alg.adjacent.find]
 template<class ForwardIterator, class BinaryPredicate>
 __forceinline
 ForwardIterator
@@ -121,7 +121,7 @@ ForwardIterator
   }
 }
 
-/// 25.1.6 Count [lib.alg.count]
+/// 25.1.6 Count [alg.count]
 template<class InputIterator, class T>
 __forceinline
 typename iterator_traits<InputIterator>::difference_type
@@ -133,7 +133,7 @@ typename iterator_traits<InputIterator>::difference_type
   return count;
 }
 
-/// 25.1.6 Count [lib.alg.count]
+/// 25.1.6 Count [alg.count]
 template<class InputIterator, class Predicate>
 __forceinline
 typename iterator_traits<InputIterator>::difference_type
@@ -145,7 +145,7 @@ typename iterator_traits<InputIterator>::difference_type
   return count;
 }
 
-/// 25.1.7 Mismatch [lib.mismatch]
+/// 25.1.7 Mismatch [mismatch]
 template<class InputIterator1, class InputIterator2>
 __forceinline
 pair<InputIterator1, InputIterator2>
@@ -159,7 +159,7 @@ pair<InputIterator1, InputIterator2>
   return pair<InputIterator1, InputIterator2>(first1, first2);
 }
 
-/// 25.1.7 Mismatch [lib.mismatch]
+/// 25.1.7 Mismatch [mismatch]
 template
 <class InputIterator1, class InputIterator2, class BinaryPredicate>
 __forceinline
@@ -175,7 +175,7 @@ pair<InputIterator1, InputIterator2>
   return pair<InputIterator1, InputIterator2>(first1, first2);
 }
 
-/// 25.1.8 Equal [lib.alg.equal]
+/// 25.1.8 Equal [alg.equal]
 template<class InputIterator1, class InputIterator2>
 __forceinline
 bool
@@ -186,7 +186,7 @@ bool
   return true;
 }
 
-/// 25.1.8 Equal [lib.alg.equal]
+/// 25.1.8 Equal [alg.equal]
 template
 <class InputIterator1, class InputIterator2, class BinaryPredicate>
 __forceinline
@@ -199,7 +199,7 @@ bool
   return true;
 }
 
-/// 25.1.9 Search [lib.alg.search]
+/// 25.1.9 Search [alg.search]
 template<class ForwardIterator1, class ForwardIterator2>
 __forceinline
 ForwardIterator1
@@ -224,7 +224,7 @@ ForwardIterator1
   }
 }
 
-/// 25.1.9 Search [lib.alg.search]
+/// 25.1.9 Search [alg.search]
 template<class ForwardIterator1, class ForwardIterator2, class BinaryPredicate>
 __forceinline
 ForwardIterator1
@@ -248,7 +248,7 @@ ForwardIterator1
   }
 }
 
-/// 25.1.9 Search [lib.alg.search]
+/// 25.1.9 Search [alg.search]
 template<class ForwardIterator, class Size, class T>
 __forceinline
 ForwardIterator
@@ -271,7 +271,7 @@ ForwardIterator
   }
 }
 
-/// 25.1.9 Search [lib.alg.search]
+/// 25.1.9 Search [alg.search]
 template<class ForwardIterator, class Size, class T, class BinaryPredicate>
 __forceinline
 ForwardIterator
@@ -296,7 +296,7 @@ ForwardIterator
 
 // 25.2, modifying sequence operations:
 
-/// 25.2.1 Copy [lib.alg.copy]
+/// 25.2.1 Copy [alg.copy]
 template<class InputIterator, class OutputIterator>
 __forceinline
 OutputIterator
@@ -341,22 +341,50 @@ BidirectionalIterator2
   copy_backward(BidirectionalIterator1 first, BidirectionalIterator1 last,
                 BidirectionalIterator2 result)
 {
-  while ( first != last ) *--result == *--first;
+  while ( first != last ) *--result = *--first;
   return result;
 }
 
-/// 25.2.2 Swap [lib.alg.swap]
+/// 25.2.1 Copy [alg.move]
+template<class InputIterator, class OutputIterator>
+OutputIterator move(InputIterator first, InputIterator last, OutputIterator result)
+{
+  while ( first != last )
+  {
+    *result = move(*first);
+    ++result;
+    ++first;
+  }
+  return result;
+}
+
+template<class BidirectionalIterator1, class BidirectionalIterator2>
+BidirectionalIterator2
+  move_backward(BidirectionalIterator1 first, BidirectionalIterator1 last,
+                BidirectionalIterator2 result)
+{
+  while ( first != last ) *--result = move(*--first);
+  return result;
+}
+
+/// 25.2.2 Swap [alg.swap]
 template<class T>
-__forceinline
+//__forceinline
 void
   swap(T& a, T& b)
 {
+#ifndef NTL__CXX_RV
   T temp( a );
   a = b;
   b = temp;
+#else
+  T temp(move(a));
+  a = move(b);
+  b = move(temp);
+#endif
 }
 
-/// 25.2.2 Swap [lib.alg.swap]
+/// 25.2.2 Swap [alg.swap]
 template<class ForwardIterator1, class ForwardIterator2>
 __forceinline
 ForwardIterator2
@@ -368,7 +396,7 @@ ForwardIterator2
   return first2;
 }
 
-/// 25.2.2 Swap [lib.alg.swap]
+/// 25.2.2 Swap [alg.swap]
 template<class ForwardIterator1, class ForwardIterator2>
 __forceinline
 void
@@ -379,7 +407,7 @@ void
   *b = temp;
 }
 
-/// 25.2.3 Transform [lib.alg.transform]
+/// 25.2.3 Transform [alg.transform]
 template<class InputIterator, class OutputIterator, class UnaryOperation>
 __forceinline
 OutputIterator
@@ -391,7 +419,7 @@ OutputIterator
   return result;
 }
 
-/// 25.2.3 Transform [lib.alg.transform]
+/// 25.2.3 Transform [alg.transform]
 template<class InputIterator1, class InputIterator2, class OutputIterator,
          class BinaryOperation>
 __forceinline
@@ -405,7 +433,7 @@ OutputIterator
   return result;
 }
 
-/// 25.2.4 Replace [lib.alg.replace]
+/// 25.2.4 Replace [alg.replace]
 template<class ForwardIterator, class T>
 __forceinline
 void
@@ -416,7 +444,7 @@ void
     if ( *first == old_value ) *first = new_value;
 }
 
-/// 25.2.4 Replace [lib.alg.replace]
+/// 25.2.4 Replace [alg.replace]
 template<class ForwardIterator, class Predicate, class T>
 __forceinline
 void
@@ -427,7 +455,7 @@ void
     if ( pred(*first) != false ) *first = new_value;
 }
 
-/// 25.2.4 Replace [lib.alg.replace]
+/// 25.2.4 Replace [alg.replace]
 template<class InputIterator, class OutputIterator, class T>
 __forceinline
 OutputIterator
@@ -438,7 +466,7 @@ OutputIterator
     if ( *result == old_value ) *result = new_value;
 }
 
-/// 25.2.4 Replace [lib.alg.replace]
+/// 25.2.4 Replace [alg.replace]
 template<class Iterator, class OutputIterator, class Predicate, class T>
 __forceinline
 OutputIterator
@@ -449,7 +477,7 @@ OutputIterator
     if ( pred(*result) != false ) *result = new_value;
 }
 
-/// 25.2.5 Fill [lib.alg.fill]
+/// 25.2.5 Fill [alg.fill]
 template<class ForwardIterator, class T>
 __forceinline
 void
@@ -458,7 +486,7 @@ void
   for ( ; first != last; ++first ) *first = value;
 }
 
-/// 25.2.5 Fill [lib.alg.fill]
+/// 25.2.5 Fill [alg.fill]
 template<class OutputIterator, class Size, class T>
 __forceinline
 void
@@ -467,7 +495,7 @@ void
   for ( ; n--; ++first ) *first = value;
 }
 
-/// 25.2.6 Generate [lib.alg.generate]
+/// 25.2.6 Generate [alg.generate]
 template<class ForwardIterator, class Generator>
 __forceinline
 void
@@ -476,7 +504,7 @@ void
   for ( ; first != last; ++first ) *first = gen();
 }
 
-/// 25.2.6 Generate [lib.alg.generate]
+/// 25.2.6 Generate [alg.generate]
 template<class OutputIterator, class Size, class Generator>
 __forceinline
 void
@@ -485,7 +513,7 @@ void
   for ( ; n--; ++first ) *first = gen();
 }
 
-/// 25.2.7 Remove [lib.alg.remove]
+/// 25.2.7 Remove [alg.remove]
 template<class InputIterator, class OutputIterator, class T>
 __forceinline
 OutputIterator
@@ -501,7 +529,7 @@ OutputIterator
   return result;
 }
 
-/// 25.2.7 Remove [lib.alg.remove]
+/// 25.2.7 Remove [alg.remove]
 template<class InputIterator, class OutputIterator, class Predicate>
 __forceinline
 OutputIterator
@@ -517,7 +545,7 @@ OutputIterator
   return result;
 }
 
-/// 25.2.7 Remove [lib.alg.remove]
+/// 25.2.7 Remove [alg.remove]
 template<class ForwardIterator, class T>
 __forceinline
 ForwardIterator
@@ -529,7 +557,7 @@ ForwardIterator
   return i;
 }
 
-/// 25.2.7 Remove [lib.alg.remove]
+/// 25.2.7 Remove [alg.remove]
 template<class ForwardIterator, class Predicate>
 __forceinline
 ForwardIterator
@@ -541,7 +569,7 @@ ForwardIterator
   return i;
 }
 
-/// 25.2.8 Unique [lib.alg.unique]
+/// 25.2.8 Unique [alg.unique]
 template<class InputIterator, class OutputIterator>
 __forceinline
 OutputIterator
@@ -556,7 +584,7 @@ OutputIterator
   return result;
 }
 
-/// 25.2.8 Unique [lib.alg.unique]
+/// 25.2.8 Unique [alg.unique]
 template<class InputIterator, class OutputIterator, class BinaryPredicate>
 __forceinline
 OutputIterator
@@ -572,7 +600,7 @@ OutputIterator
   return result;
 }
 
-/// 25.2.8 Unique [lib.alg.unique]
+/// 25.2.8 Unique [alg.unique]
 template<class ForwardIterator>
 __forceinline
 ForwardIterator
@@ -582,7 +610,7 @@ ForwardIterator
   return unique_copy(first, last, first);
 }
 
-/// 25.2.8 Unique [lib.alg.unique]
+/// 25.2.8 Unique [alg.unique]
 template<class ForwardIterator, class BinaryPredicate>
 __forceinline
 ForwardIterator
@@ -592,7 +620,7 @@ ForwardIterator
   return unique_copy(first, last, first, pred);
 }
 
-/// 25.2.9 Reverse [lib.alg.reverse]
+/// 25.2.9 Reverse [alg.reverse]
 template<class BidirectionalIterator>
 __forceinline
 void
@@ -603,7 +631,7 @@ void
       iter_swap(first, last);
 }
 
-/// 25.2.9 Reverse [lib.alg.reverse]
+/// 25.2.9 Reverse [alg.reverse]
 template<class BidirectionalIterator, class OutputIterator>
 __forceinline
 OutputIterator
@@ -615,7 +643,7 @@ OutputIterator
   return result;
 }
 
-/// 25.2.10 Rotate [lib.alg.rotate]
+/// 25.2.10 Rotate [alg.rotate]
 template<class ForwardIterator>
 inline
 void
@@ -701,7 +729,7 @@ RandomAccessIterator
                     RandomAccessIterator result_last,
                     Compare comp);
 
-/// 25.3.2 Nth element [lib.alg.nth.element]
+/// 25.3.2 Nth element [alg.nth.element]
 template<class RandomAccessIterator>
 inline
 void
@@ -963,7 +991,7 @@ inline
 ForwardIterator
   max_element(ForwardIterator first, ForwardIterator last, Compare comp);
 
-/// 25.3.8 Lexicographical comparison [lib.alg.lex.comparison]
+/// 25.3.8 Lexicographical comparison [alg.lex.comparison]
 template<class InputIterator1, class InputIterator2>
 __forceinline
 bool
@@ -979,7 +1007,7 @@ bool
   return first2 != last2;
 }
 
-/// 25.3.8 Lexicographical comparison [lib.alg.lex.comparison]
+/// 25.3.8 Lexicographical comparison [alg.lex.comparison]
 template<class InputIterator1, class InputIterator2, class Compare>
 __forceinline
 bool

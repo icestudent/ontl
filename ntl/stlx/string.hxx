@@ -1,6 +1,6 @@
 /**\file*********************************************************************
  *                                                                     \brief
- *  String classes [21.2 lib.string.classes]
+ *  String classes [21.2 string.classes]
  *
  ****************************************************************************
  */
@@ -259,12 +259,24 @@ public:
                  const Allocator& a     = Allocator())
     : str(begin, end, a) {}
 
-    basic_string(const basic_string& str, const Allocator& alloc);
+    basic_string(const basic_string& str, const Allocator& a)
+      :str(str.str, a)
+    {}
 
-#ifdef NTL__CXX
-    basic_string(initializer_list<charT> il, const Allocator& a = Allocator());
-    basic_string(basic_string&& str, const Allocator& alloc);
-#endif
+    
+    basic_string(initializer_list<charT> il, const Allocator& a = Allocator())
+      :str(il, a)
+    {}
+    
+
+    #ifdef NTL__CXX_RV
+    basic_string(basic_string&& str)
+      :str(str.str)
+    {}
+    basic_string(basic_string&& str, const Allocator& a)
+      :str(str.str, a)
+    {}
+    #endif
 
     /// Effects: destructs string object.
     __forceinline
@@ -281,6 +293,22 @@ public:
     {
       return this == &str ? *this : assign(str);
     }
+
+    #ifdef NTL__CXX_RV
+    basic_string& operator=(basic_string&& str)
+    {
+      if(this != &str)
+        swap(str);
+      return *this;
+    }
+    #endif
+
+    
+    basic_string& operator=(initializer_list<charT> il)
+    {
+      return *this = basic_string(il);
+    }
+    
 
     /// 25 Returns: *this = basic_string<charT,traits,Allocator>(s).
     /// 26 Remarks: Uses traits::length().
@@ -362,7 +390,7 @@ public:
     /// 15 Returns: size() == 0.
     bool empty()          const { return str.empty();     }
 
-    ///\name  basic_string element access [21.3.5 lib.string.access]
+    ///\name  basic_string element access [21.3.5 string.access]
 
     /// 1 Returns: If pos < size(), returns *(begin() + pos). Otherwise,
     ///   if pos == size(), returns charT().
@@ -394,13 +422,16 @@ public:
 
     /// 21.3.6 basic_string modifiers [string.modifiers]
 
-    ///\name  basic_string::operator+= [21.3.6.1 lib.string::op+=]
+    ///\name  basic_string::operator+= [21.3.6.1 string::op+=]
 
     basic_string& operator+=(const basic_string& str) { return append(str);   }
     basic_string& operator+=(const charT* s)          { return append(s);     }
     basic_string& operator+=(charT c) { push_back(c); return *this; }
+    
+    basic_string& operator+=(initializer_list<charT> il) { return append(il); }
+    
 
-    ///\name  basic_string::append [21.3.6.2 lib.string::append]
+    ///\name  basic_string::append [21.3.6.2 string::append]
 
     basic_string& append(const basic_string& str)
     {
@@ -440,15 +471,30 @@ public:
       return *this;
     }
 
+    
+    basic_string& apend(initializer_list<charT> il)
+    {
+      return append(il.begin(), il.end());
+    }
+    
+
     void push_back(charT c) { str.push_back(c); }
 
-    ///\name  basic_string::assign [21.3.6.3 lib.string::assign]
+    ///\name  basic_string::assign [21.3.6.3 string::assign]
 
     basic_string& assign(const basic_string& str)
     {
       this->str.assign(str.begin(), str.end());
       return *this;
     }
+
+    #ifdef NTL__CXX_RV
+    basic_string& assign(basic_string&& str)
+    {
+      swap(str);
+      return *this;
+    }
+    #endif
 
     basic_string& assign(const basic_string& str, size_type pos, size_type n)
     {
@@ -481,7 +527,14 @@ public:
       return *this;
     }
 
-    ///\name  basic_string::insert [21.3.6.4 lib.string::insert]
+    
+    basic_string& assign(initializer_list<charT> il)
+    {
+      return assign(basic_string(il));
+    }
+    
+
+    ///\name  basic_string::insert [21.3.6.4 string::insert]
 
     basic_string& insert(size_type pos1, const basic_string& str)
     {
@@ -527,7 +580,12 @@ public:
       str.insert(p, first, last);
     }
 
-    ///\name  basic_string::erase [21.3.6.5 lib.string::erase]
+    iterator insert(iterator p, initializer_list<charT> il)
+    {
+      return str.insert(p, il.begin(), il.end());
+    }
+
+    ///\name  basic_string::erase [21.3.6.5 string::erase]
 
     basic_string& erase(size_type pos = 0, size_type n = npos)
     {
@@ -574,7 +632,7 @@ public:
                           InputIterator j2)
                           ;
 
-    ///\name  basic_string::copy [21.3.6.7 lib.string::copy]
+    ///\name  basic_string::copy [21.3.6.7 string::copy]
     size_type copy(charT* s, size_type n, size_type pos = 0) const
     {
       const size_type tail = size() - pos;
@@ -584,10 +642,14 @@ public:
       return rlen;
     }
 
-    ///\name  basic_string::swap [21.3.6.8 lib.string::swap]
+    ///\name  basic_string::swap [21.3.6.8 string::swap]
+    #ifdef NTL__CXX_RV
+    void swap(basic_string&&str2) { str.swap(str2.str); }
+    #else
     void swap(basic_string& str2) { str.swap(str2.str); }
+    #endif
 
-    ///\name  basic_string string operations [21.3.6 lib.string.ops]
+    ///\name  basic_string string operations [21.3.6 string.ops]
 
     const charT* c_str() const // explicit
     {
@@ -650,7 +712,7 @@ public:
       return npos;
     }
 
-    ///\name   basic_string::rfind [21.3.6.2 lib.string::rfind]
+    ///\name   basic_string::rfind [21.3.6.2 string::rfind]
 
     /// 1 Effects: Determines the highest position xpos, if possible, such that
     ///   both of the following conditions obtain:
@@ -897,7 +959,7 @@ public:
       return basic_string(*this, pos, n);
     }
 
-    ///\name  basic_string::compare [21.3.6.8 lib.string::compare]
+    ///\name  basic_string::compare [21.3.7.9 string::compare]
 
     int compare(const basic_string& str) const
     {
@@ -919,7 +981,7 @@ public:
     int compare(size_type pos1, size_type n1, const charT* s) const;
     int compare(size_type pos1, size_type n1, const charT* s, size_type n2) const;
 
-    ///\name  operator+ [21.3.7.1 lib.string::op+]
+    ///\name  operator+ [21.3.8.1 string::op+]
     /// @note frends, not just non-member functions
 
   friend
@@ -1051,7 +1113,7 @@ public:
 
 // 21.3.7 basic_string non-member functions [lib.string.nonmembers]
 
-///\name  operator== [21.3.7.2 lib.string::operator==]
+///\name  operator== [21.3.8.2 string::operator==]
 
 template<class charT, class traits, class Allocator>
 inline
@@ -1080,7 +1142,7 @@ bool
   return lhs.compare(rhs) == 0;
 }
 
-///\name  operator!= [21.3.7.3 lib.string::op!=]
+///\name  operator!= [21.3.8.3 string::op!=]
 
 template<class charT, class traits, class Allocator>
 inline
@@ -1107,7 +1169,7 @@ bool
   return ! (lhs == rhs);
 }
 
-///\name  operator< [21.3.7.4 lib.string::op<]
+///\name  operator< [21.3.8.4 string::op<]
 
 template<class charT, class traits, class Allocator>
 inline
@@ -1134,7 +1196,7 @@ bool
   return 0 < rhs.compare(lhs);
 }
 
-///\name  operator> [21.3.7.5 lib.string::op>]
+///\name  operator> [21.3.8.5 string::op>]
 
 template<class charT, class traits, class Allocator>
 inline
@@ -1161,7 +1223,7 @@ bool
   return lhs.compare(rhs) > 0;
 }
 
-///\name  operator<= [21.3.7.6 lib.string::op<=]
+///\name  operator<= [21.3.8.6 string::op<=]
 
 template<class charT, class traits, class Allocator>
 inline
@@ -1188,7 +1250,7 @@ bool
   return 0 <= rhs.compare(lhs);
 }
 
-///\name  operator>= [21.3.7.7 lib.string::op>=]
+///\name  operator>= [21.3.8.7 string::op>=]
 
 template<class charT, class traits, class Allocator>
 inline
@@ -1215,7 +1277,8 @@ bool
   return 0 >= rhs.compare(lhs);
 }
 
-///\name  swap [21.3.7.8 lib.string.special]
+
+///\name  swap [21.3.8.8 string.special]
 template<class charT, class traits, class Allocator>
 inline
 void
@@ -1225,7 +1288,32 @@ void
   lhs.swap(rhs);
 }
 
-///\name  Inserters and extractors [21.3.7.9 lib.string.io]
+#ifdef NTL__CXX_RV
+template<class charT, class traits, class Allocator>
+inline
+void
+swap(basic_string<charT,traits,Allocator>&& lhs,
+     basic_string<charT,traits,Allocator>& rhs)
+{
+  lhs.swap(rhs);
+}
+
+template<class charT, class traits, class Allocator>
+inline
+void
+swap(basic_string<charT,traits,Allocator>& lhs,
+     basic_string<charT,traits,Allocator>&& rhs)
+{
+  lhs.swap(rhs);
+}
+#endif
+
+template <class charT, class traits, class Allocator>
+struct constructible_with_allocator_suffix<
+  basic_string<charT, traits, Allocator> > : true_type { };
+
+
+///\name  Inserters and extractors [21.3.7.9 string.io]
 
 template<class charT, class traits, class Allocator>
 basic_istream<charT,traits>&

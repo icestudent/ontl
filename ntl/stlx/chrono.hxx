@@ -133,7 +133,7 @@ namespace std
         :rep_(duration_cast<duration>(d).count())
       {}
 
-#ifdef NTL__CXX
+#ifdef NTL__CXX_EF
       ~duration() = default;
 #else
       // using the default destructor
@@ -560,7 +560,7 @@ namespace std
       // NOTE: see the Table 54 (20.8.1), system time can be adjusted back.
       static const bool is_monotonic = false;
     public:
-#ifdef NTL__CXX
+#ifdef NTL__CXX_CONSTEXPR
       static_assert(duration::min() < duration::zero(), "20.8.5.1.2");
 #else
       static_assert(numeric_limits<duration::rep>::is_signed, "20.8.5.1.2");
@@ -640,7 +640,7 @@ namespace std
 
       static const bool is_monotonic = true;
     public:
-#ifdef NTL__CXX
+#ifdef NTL__CXX_CONSTEXPR
       static_assert(duration::min() < duration::zero(), "20.8.5.1.2");
 #else
       static_assert(numeric_limits<duration::rep>::is_signed, "20.8.5.1.2");

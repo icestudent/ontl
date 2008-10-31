@@ -35,7 +35,7 @@ namespace std {
   {
   public:
     virtual ~error_category();
-#ifdef NTL__CXX
+#ifdef NTL__CXX_EF
     error_category(const error_category&) = delete;
     error_category& operator=(const error_category&) = delete;
 #else

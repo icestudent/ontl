@@ -11,7 +11,6 @@
 #include "algorithm.hxx"
 #include "iterator.hxx"
 #include "memory.hxx"
-//#include "stdexcept.hxx"
 #include "type_traits.hxx"
 
 #ifdef _MSC_VER
@@ -150,12 +149,29 @@ class vector
       }
     }
 
-    #ifdef NTL__CXX
-    vector(vector&&);
-    vector(vector&&, const Allocator&);
-    vector(initializer_list<T>, const Allocator& = Allocator());
+    #ifdef NTL__CXX_RV
+    vector(vector&& x)
+      :begin_(x.begin_), end_(x.end_), capacity_(x.capacity_), array_allocator(std::move(x.array_allocator))
+    {
+      x.begin_ = x.end_ = nullptr;
+      x.capacity_ = 0;
+    }
+
+    vector(vector&& x, const Allocator& a)
+      :begin_(x.begin_), end_(x.end_), capacity_(x.capacity_), 
+      array_allocator(a)
+    {
+      x.begin_ = x.end_ = nullptr;
+      x.capacity_ = 0;
+    }
     #endif
 
+    vector(initializer_list<T> il, const Allocator& a = Allocator())
+      :array_allocator(a)
+    {
+      vector__disp(il.begin(), il.end(), false_type());
+    }
+    
     __forceinline
     ~vector() __ntl_nothrow
     {
@@ -166,18 +182,30 @@ class vector
     vector<T, Allocator>& operator=(const vector<T, Allocator>& x)
     {
       if(this != &x){
-        // Table 92 (page 677 of N2733) does not require this?
+        // NOTE: Table 92 (page 677 of N2733) does not require this?
         array_allocator = x.array_allocator;
         assign(x.begin(), x.end());
       }
       return *this;
     }
 
-    #ifdef NTL__CXX
-    vector<T,Allocator>& operator=(vector<T,Allocator>&& x);
-    vector& operator=(initializer_list<T>);
+    #ifdef NTL__CXX_RV
+    vector<T,Allocator>& operator=(vector<T,Allocator>&& x)
+    {
+      if(this != &x){
+        clear();
+        swap(x);
+      }
+      return *this;
+    }
     #endif
 
+    vector& operator=(initializer_list<T> il)
+    {
+      assign(il);
+      return *this;
+    }
+    
     template <class InputIterator>
     void assign(InputIterator first, InputIterator last)
     {
@@ -196,9 +224,10 @@ class vector
       construct(n, u);
     }
     
-    #ifdef NTL__CXX
-    void assign(initializer_list<T>);
-    #endif
+    void assign(initializer_list<T> il)
+    {
+      assign__disp(il.begin(), il.end(), false_type());
+    }
 
     allocator_type get_allocator() const  { return static_cast<allocator_type>(array_allocator); }
 
@@ -296,7 +325,7 @@ class vector
 
   private:
 
-    iterator insert__blank_space(const iterator position, const size_type n)
+    iterator insert__blank_space(const_iterator position, const size_type n)
     {
       const size_type old_capacity = capacity_;
       iterator old_mem = 0;
@@ -313,8 +342,15 @@ class vector
         //new_end += difference_type(new_mem - old_mem);        // dangerous alignment
         iterator dest = begin_ = new_mem;
         // this is safe for begin_ == 0 && end_ == 0, but keep vector() intact
+        #ifndef NTL__CXX_RV
         for ( iterator src = old_mem; src != position; ++src, ++dest )
           move(dest, src);
+        #else
+        for ( iterator src = old_mem; src != position; ++src, ++dest ){
+          *dest = std::move(*src);
+          array_allocator.destroy(src);
+        }
+        #endif
       }
       // move the tail. iterators are reverse - may be no realloc
       iterator r_src = end();
@@ -325,41 +361,51 @@ class vector
       return r_dest;
     }
 
-    iterator insert__impl(iterator position, size_type n, const T& x)
+    iterator insert__impl(const_iterator position, size_type n, const T& x)
     {
       iterator r_dest = insert__blank_space(position, n);
       while ( n-- ) array_allocator.construct(--r_dest, x);
       return r_dest;
     }
 
+    #ifdef NTL__CXX_RV
+    iterator insert__impl(const_iterator position, size_type n, T&& x)
+    {
+      iterator r_dest = insert__blank_space(position, n);
+      while ( n-- ) array_allocator.construct(--r_dest, std::move(x));
+      return r_dest;
+    }
+    #endif
+
     template <class InputIterator>
-    void insert__disp_it(iterator position, InputIterator first,
+    iterator insert__disp_it(iterator position, InputIterator first,
                          InputIterator last, const input_iterator_tag&)
     {
       while ( first != last ) position = insert__impl(position, 1, *first++) + 1;
     }
 
     template <class InputIterator>
-   void insert__disp_it(iterator position, InputIterator first,
+   iterator insert__disp_it(iterator position, InputIterator first,
                          InputIterator last, const random_access_iterator_tag &)
     {
-      position = insert__blank_space(position, static_cast<size_type>(last - first));
+      iterator i = position = insert__blank_space(position, static_cast<size_type>(last - first));
       while ( first != last ) array_allocator.construct(--position, *--last);
+      return i;
     }
 
     template <class InputIterator>
-    void insert__disp(iterator position, InputIterator first, InputIterator last,
+    iterator insert__disp(iterator position, InputIterator first, InputIterator last,
                       const false_type&)
     {
-      insert__disp_it(position, first, last,
+      return insert__disp_it(position, first, last,
                       iterator_traits<InputIterator>::iterator_category());
     }
 
     template <class IntegralType>
-    void insert__disp(iterator position, IntegralType n, IntegralType x,
+    iterator insert__disp(iterator position, IntegralType n, IntegralType x,
                       const true_type&)
     {
-      insert__impl(position, static_cast<size_type>(n),
+      return insert__impl(position, static_cast<size_type>(n),
                   static_cast<value_type>(x));
     }
 
@@ -367,10 +413,19 @@ class vector
 
     ///\name  modifiers [23.2.6.3]
 
-    #ifdef NTL__CXX
+    #ifdef NTL__CXX_VT
     template <class... Args> void emplace_back(Args&&... args);
-    void push_back(T&& x);
     #endif
+
+    #ifdef NTL__CXX_RV
+    void push_back(T&& x)
+    {
+      if ( size() == capacity() ) realloc(capacity_factor());
+      //*end_++ = move(x);
+      array_allocator.construct(end_++, forward<value_type>(x));
+    }
+    #endif
+
     __forceinline
     void push_back(const T& x)
     {
@@ -380,53 +435,91 @@ class vector
 
     void pop_back() __ntl_nothrow { array_allocator.destroy(--end_); }
 
-    #ifdef NTL__CXX
+    #ifdef NTL__CXX_VT
     template <class... Args> iterator emplace(const_iterator position, Args&&... args);
-    iterator insert(const_iterator position, T&& x);
-    void insert(const_iterator position, initializer_list<T> il);
     #endif
-    iterator insert(iterator position, const T& x)
+
+    iterator insert(const_iterator position, const T& x)
     {
       return insert__impl(position, 1, x);
     }
 
-    void insert(iterator position, size_type n, const T& x)
+    #ifdef NTL__CXX_RV
+    iterator insert(const_iterator position, T&& x)
+    {
+      return insert__impl(position, 1, x);
+    }
+    #endif
+    
+    void insert(const_iterator position, size_type n, const T& x)
     {
       insert__impl(position, n, x);
     }
 
     template <class InputIterator>
-    void insert(iterator position, InputIterator first, InputIterator last)
+    void insert(const_iterator position, InputIterator first, InputIterator last)
     {
-      insert__disp(position, first, last, is_integral<InputIterator>::type());
+      insert__disp(&const_cast<value_type&>(*position), first, last, is_integral<InputIterator>::type());
+    }
+
+    void insert(const_iterator position, initializer_list<T> il)
+    {
+      insert__disp(&const_cast<value_type&>(*position), il.begin(), il.end(), false_type());
     }
 
     __forceinline
-    iterator erase(iterator position) __ntl_nothrow
+    iterator erase(const_iterator position) __ntl_nothrow
     {
       // return erase(position, position + 1);
-      array_allocator.destroy(position);
+      iterator i = &const_cast<value_type&>(*position);
+#if 0
+      array_allocator.destroy(i);
       --end_;
-      iterator i = position;
       do move(i, i + 1); while ( ++i != end_ );
-      return position;
+#else
+      if(position + 1 != end()){
+        #ifdef NTL__CXX_RV
+          std::move
+        #else
+          std::copy
+        #endif
+        (position+1, cend(), i);
+      }
+      array_allocator.destroy(--end_);
+#endif
+      return &const_cast<value_type&>(*position);
     }
 
     __forceinline
-    iterator erase(iterator first, iterator last) __ntl_nothrow
+    iterator erase(const_iterator first, const_iterator last) __ntl_nothrow
     {
+#if 0
       for ( iterator i = last; i != first;  ) array_allocator.destroy(--i);
       iterator const tail = first;
       for ( ; last != end_; ++first, ++last ) move(first, last);
       end_ = first;
       return tail;
+#else
+      iterator i = &const_cast<value_type&>(*first);
+      if(first != last){
+        #ifdef NTL__CXX_RV
+          std::move
+        #else
+          std::copy
+        #endif
+        (last, cend(), i);
+        while(end_-- != last)
+          array_allocator.destroy(end_);
+      }
+      return i;
+#endif
     }
     
-    #ifdef NTL__CXX
-    void swap(vector<T,Allocator>&&);
-    #endif
-
+    #ifdef NTL__CXX_RV
+    void swap(vector<T,Allocator>&& x) __ntl_nothrow
+    #else
     void swap(vector<T, Allocator>& x) __ntl_nothrow
+    #endif
     {
       std::swap(begin_, x.begin_);
       std::swap(end_, x.end_);
@@ -483,10 +576,13 @@ class vector
 
     void move(const iterator to, const iterator from) const
     {
+      #ifndef NTL__CXX_RV
       array_allocator.construct(to, *from);
+      #else
+      array_allocator.construct(to, forward<value_type>(*from));
+      #endif
       array_allocator.destroy(from);
     }
-
 
     void realloc(size_type n) __ntl_throws(bad_alloc)
     {
@@ -569,7 +665,7 @@ void swap(vector<T, Allocator>& x, vector<T, Allocator>& y) __ntl_nothrow
   x.swap(y);
 }
 
-#ifdef NTL__CXX
+#ifdef NTL__CXX_RV
   template <class T, class Allocator>
   void swap(vector<T,Allocator>&& x, vector<T,Allocator>& y);
   template <class T, class Allocator>

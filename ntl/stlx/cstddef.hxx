@@ -53,51 +53,102 @@
 #endif
 
 #if __cplusplus > 199711L
-/// new C++ Standard
-#define NTL__CXX
+  /// new C++ Standard
+  #define NTL__CXX
 #endif
 
 #if __cplusplus <= 199711L
 
-  #ifndef static_assert
+#ifdef _MSC_VER
+
+#if _MSC_VER >= 1600
+ 
+/** partial C++0x support */
+
+// keywords:
+// align (N2798+)
+//#define NTL__CXX_ALIGN
+// alignas( <= N2723)
+//#define NTL__CXX_ALIGNAS
+// alignof
+//#define NTL__CXX_ALIGNOF
+// auto
+#define NTL__CXX_AUTO
+// char16_t, char32_t
+//#define NTL__CXX_CHART
+// concepts, concept_map, requires
+//#define NTL__CXX_CONCEPT
+// constexpr
+//#define NTL__CXX_CONSTEXPR
+// decltype (typeof)
+//#define NTL__CXX_TYPEOF
+// class enum
+//#define NTL__CXX_ENUM
+// nullptr
+//#define NTL__CXX_NULLPTR
+// static assert
+#define NTL__CXX_ASSERT
+// thread_local
+//#define NTL__CXX_THREADL
+
+// syntax:
+// explicit delete/default function definition
+//#define NTL__CXX_EF
+// explicit conversion operators
+//#define NTL__CXX_EXPLICITOP
+// initializer lists
+//#define NTL__CXX_IL
+// lambda
+#define NTL__CXX_LAMBDA
+// rvalues
+#define NTL__CXX_RV
+// template typedef
+//#define NTL__CXX_TT
+// variadic templates (implies rvalue references support)
+//#define NTL__CXX_VT
+
+#endif // _MSC_VER >= 1600
+
+  #ifndef NTL__CXX_ASSERT
     #define static_assert(e, Msg) STATIC_ASSERT(e)
   #endif
 
-#ifndef alignas
-  #ifdef _MSC_VER
-    #define alignas(X) __declspec(align(X))
-  #else
-    #error unsupported compiler
-  #endif
-#endif
-
-#ifndef alignof
-  #ifdef _MSC_VER
-  #if _MSC_VER <= 1500
-    #define alignof(X) __alignof(X)
-  #endif
-  #else
-    #error unsupported compiler
-  #endif
-#endif
-static_assert(alignof(int)==alignof(unsigned int), "wierd platform");
-
-  //static const char __func__[];
-  #ifndef __func__
+  #ifndef NTL__CXX_ALIGNAS
     #ifdef _MSC_VER
-      //#define __func__ __FUNCDNAME__
-      #define __func__ __FUNCSIG__
-      //#define __func__ __FUNCTION__
+      #define alignas(X) __declspec(align(X))
     #else
       #error unsupported compiler
     #endif
   #endif
 
-#ifndef __align
-  #define __align(X) __declspec(align(X))
-#endif
+  #ifndef NTL__CXX_ALIGNOF
+    #if _MSC_VER <= 1600
+      #define alignof(X) __alignof(X)
+    #endif
+  #endif
+  static_assert(alignof(int)==alignof(unsigned int), "wierd platform");
 
-#define constexpr
+    //static const char __func__[];
+    #ifndef __func__
+      #ifdef _MSC_VER
+        //#define __func__ __FUNCDNAME__
+        #define __func__ __FUNCSIG__
+        //#define __func__ __FUNCTION__
+      #else
+        #error unsupported compiler
+      #endif
+    #endif
+
+  #ifndef __align
+    #define __align(X) __declspec(align(X))
+  #endif
+
+  #ifndef NTL_CXX_CONSTEXPR
+    #define constexpr
+  #endif
+#else
+  #error unsupported compiler
+#endif // _MSC_VER
 
 #endif//__cplusplus <= 199711L
 
@@ -179,6 +230,18 @@ STATIC_ASSERT(sizeof(nullptr)==sizeof(void*));
 
 /**@} lib_support_types */
 /**@} lib_language_support */
+
+
+  /**\addtogroup  lib_utilities ********** [20] General utilities library *****
+  *@{*/
+  /**\addtogroup  lib_memory *************** [20.7] Memory **********************
+  *@{*/
+
+  /// 20.7.1 Allocator argument tag [allocator.tag]
+  struct allocator_arg_t {/**/};
+  const allocator_arg_t allocator_arg;// = allocator_arg_t();
+  /**@} lib_memory */
+  /**@} lib_utilities */
 
 
 } //namespace std

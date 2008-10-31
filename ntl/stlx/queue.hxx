@@ -34,7 +34,7 @@ namespace std {
   public:
     explicit queue(const Container&);
     
-    #ifdef NTL__CXX
+    #ifdef NTL__CXX_RV
     explicit queue(Container&& = Container());
     queue(queue&& q) : c(std::move(q.c)) {}
     #endif
@@ -44,7 +44,7 @@ namespace std {
     template <class Alloc>
     queue(const Container&, const Alloc&);
     
-    #ifdef NTL__CXX
+    #ifdef NTL__CXX_RV
     template <class Alloc>
     queue(Container&&, const Alloc&);
     template <class Alloc>
@@ -52,7 +52,7 @@ namespace std {
     #endif
 
     
-    #ifdef NTL__CXX
+    #ifdef NTL__CXX_RV
     queue& operator=(queue&& q) { c = std::move(q.c); return *this; }
     #else
     queue& operator=(const queue& q);
@@ -67,8 +67,10 @@ namespace std {
     const_reference back() const { return c.back(); }
 
     
-    #ifdef NTL__CXX
+    #ifdef NTL__CXX_RV
     void push(value_type&& x) { c.push_back(std::move(x)); }
+    #endif
+    #ifdef NTL__CXX_VT
     template <class... Args>
     void emplace(Args&&... args);
     #endif
@@ -76,7 +78,7 @@ namespace std {
     void push(const value_type& x) { c.push_back(x); }
     void pop() { c.pop_front(); }
     
-    #ifdef NTL__CXX
+    #ifdef NTL__CXX_RV
     void swap(queue&& q) { c.swap(q.c); }
     #else
     void swap(queue& q)  { c.swap(q.c); }
@@ -102,7 +104,7 @@ namespace std {
   template <class T, class Container>
   void swap(queue<T, Container>& x, queue<T, Container>& y);
   
-  #ifdef NTL__CXX
+  #ifdef NTL__CXX_RV
   template <class T, class Container>
   void swap(queue<T, Container>&& x, queue<T, Container>& y);
   template <class T, class Container>

@@ -90,7 +90,7 @@ class bad_exception : public exception
       :e(current_exception())
     {}
 
-  #ifdef NTL__CXX
+  #ifdef NTL__CXX_EF
     nested_exception(const nested_exception&) throw() = default;
     nested_exception& operator=(const nested_exception&) throw() = default;
     virtual ~nested_exception() = default;
@@ -106,7 +106,7 @@ class bad_exception : public exception
     exception_ptr e;
   };
 
-#ifdef NTL__CXX
+#ifdef NTL__CXX_RV
   template<class T> void throw_with_nested(T&& t); // [[noreturn]]
 #else
   template<class T> void throw_with_nested(T& t); // [[noreturn]]

@@ -51,6 +51,14 @@ namespace std {
       value_compare(const value_compare& x)
         :comp(x.comp)
       {}
+      
+      #ifdef NTL__CXX_RV
+      value_compare(value_compare&& x)
+        :comp(move(x.comp))
+      {
+        // TODO: support real move semantics for Compare
+      }
+      #endif
 
       __forceinline
       bool operator()(const value_type& x, const value_type& y) const
@@ -124,8 +132,12 @@ public:
       :val_comp_(x.val_comp_), tree_type(val_comp_, x.get_allocator())
     {}
 
-#ifdef NTL__CXX
-    map(map<Key,T,Compare,Allocator>&& x);
+#ifdef NTL__CXX_RV
+    map(map<Key,T,Compare,Allocator>&& x)
+      :val_comp_(forward<value_compare>(x.val_comp_)), tree_type(val_comp_, x.get_allocator())
+    {
+      swap(x);
+    };
 #endif
 
     map(const Allocator& a)
@@ -136,7 +148,7 @@ public:
       :val_comp_(x.val_comp_), tree_type(val_comp_, a)
     {}
 
-#ifdef NTL__CXX
+#ifdef NTL__CXX_RV
     map(map&&, const Allocator&);
 #endif
 
@@ -151,8 +163,12 @@ public:
       return *this;
     }
 
-#ifdef NTL__CXX
-    map<Key,T,Compare,Allocator>& operator=(map<Key,T,Compare,Allocator>&& x);
+#ifdef NTL__CXX_RV
+    map<Key,T,Compare,Allocator>& operator=(map<Key,T,Compare,Allocator>&& x)
+    {
+      assign(x);
+      return *this;
+    }
 #endif
 
     using tree_type::get_allocator;
@@ -182,8 +198,14 @@ public:
       return iter->second;
     }
 
-#ifdef NTL__CXX
-    T& operator[](key_type&& x);
+#ifdef NTL__CXX_RV
+    T& operator[](key_type&& x)
+    {
+      iterator iter = find(x);
+      if(iter == end())
+        iter = insert(value_type(x, mapped_type())).first;
+      return iter->second;
+    }
 #endif
 
     T& at(const key_type& x) __ntl_throws(out_of_range)
@@ -203,13 +225,25 @@ public:
     }
 
     // modifiers:
-#ifdef NTL__CXX
+#ifdef NTL__CXX_VT
     template <class... Args> pair<iterator, bool> emplace(Args&&... args);
     template <class... Args> iterator emplace(const_iterator position, Args&&... args);
-    template <class P> pair<iterator, bool> insert(P&& x);
-    template <class P>
-    iterator insert(const_iterator position, P&&);
 #endif
+
+#ifdef NTL__CXX_RV
+    template <class P>
+    pair<iterator, bool> insert(P&& x)
+    {
+      return tree_type::insert(x);
+    }
+
+    template <class P>
+    iterator insert(const_iterator position, P&& x)
+    {
+      return tree_type::insert(position, x).first;
+    }
+#endif
+
     template <class InputIterator>
     __forceinline
     void insert(InputIterator first, InputIterator last)
@@ -225,15 +259,15 @@ public:
       return val == end() ? 0 : (erase(val), 1);
     }
 
-#ifdef NTL__CXX
-    void swap(map<Key,T,Compare,Allocator>&&);
+#ifdef NTL__CXX_RV
+    void swap(map<Key,T,Compare,Allocator>&&x)
 #else
     void swap(map<Key,T,Compare,Allocator>& x)
+#endif
     {
       tree_type::swap(x);
       std::swap(val_comp_, x.val_comp_);
     }
-#endif
 
     // observers:
     key_compare key_comp() const { return val_comp_.comp; }
@@ -340,12 +374,12 @@ void swap(map<Key,T,Compare,Allocator>& x,
   x.swap(y);
 }
 
-#ifdef NTL__CXX
+#ifdef NTL__CXX_RV
 template <class Key, class T, class Compare, class Allocator>
-void swap(map<Key,T,Compare,Allocator&& x, map<Key,T,Compare,Allocator>& y);
+void swap(map<Key,T,Compare,Allocator>&& x, map<Key,T,Compare,Allocator>& y) { x.swap(y); }
 
 template <class Key, class T, class Compare, class Allocator>
-void swap(map<Key,T, Compare, Allocator& x, map<Key,T, Compare, Allocator>&& y);
+void swap(map<Key,T, Compare, Allocator>& x, map<Key,T, Compare, Allocator>&& y) { x.swap(y); }
 
 #endif
 

@@ -165,25 +165,45 @@ namespace tree
         insert(first, last);
       }
 
-      rb_tree(const Allocator& a);
+      explicit rb_tree(const Allocator& a);
 
-      rb_tree(const rb_tree<T, Compare, Allocator>& x)
-        :root_(x.root_), first_(x.first_), last_(x.last_), count_(x.count_), node_allocator(x.node_allocator), comparator_(x.comparator_)
-      {}
+      rb_tree(const rb_tree& x)
+        :node_allocator(x.node_allocator), comparator_(x.comparator_),
+        root_(), first_(), last_(), count_()
+      {
+        insert(x.begin(), x.end());
+      }
+
+      #ifdef NTL__CXX_RV
+      rb_tree(rb_tree&& x)
+        :root_(), first_(), last_(), count_(), node_allocator(), comparator_()
+      {
+        swap(x);
+      }
+      rb_tree(rb_tree&& x, const Allocator& a);
+      #endif
 
       rb_tree(const rb_tree& x, const Allocator& a)
-        :root_(x.root_), first_(x.first_), last_(x.last_), count_(x.count_), node_allocator(a), comparator_(x.comparator_)
-      {}
-
-      rb_tree& operator=(const rb_tree<T, Compare, Allocator>& x)
+        :node_allocator(a),
+        comparator_(x.comparator_),
+        root_(), first_(), last_(), count_()
       {
-        if(this == &x)
-          return *this;
+        insert(x.begin(), x.end());
+      }
 
-        clear();
-        insert_range(x.cbegin(), x.cend());
+      rb_tree& operator=(const rb_tree& x)
+      {
+        assign(x);
         return *this;
       }
+
+      #ifdef NTL__CXX_RV
+      rb_tree& operator=(rb_tree&& x)
+      {
+        assign(x);
+        return *this;
+      }
+      #endif
 
       ~rb_tree() __ntl_nothrow
       {
@@ -232,7 +252,39 @@ namespace tree
       const_iterator find(const value_type& x) const { return find(x); }
 
       // modifiers
-      std::pair<iterator, bool> insert(const value_type& x)
+    protected:
+      void assign(const rb_tree& x)
+      {
+        if(this != &x){
+          clear();
+          insert_range(x.cbegin(), x.cend());
+        }
+      }
+
+      void assign(rb_tree&& x)
+      {
+        if(this != x){
+          clear();
+          swap(x);
+        }
+      }
+
+    protected:
+      node_type* construct_node(const value_type& x)
+      {
+        node_type* const np = node_allocator.allocate(1);
+        node_allocator.construct(np, x);
+        return np;
+      }
+
+      node_type* construct_node(value_type&& x)
+      {
+        node_type* const np = node_allocator.allocate(1);
+        node_allocator.construct(np, forward<value_type>(x));
+        return np;
+      }
+
+      std::pair<iterator, bool> insert_impl(node* const np)
       {
         // I guess this is not necessary:
         // Node_allocator.allocate shall throw bad_alloc in this case.
@@ -243,8 +295,7 @@ namespace tree
 
         if(empty()){
           // insert x as the root node
-          root_ = node_allocator.allocate(1);
-          node_allocator.construct(root_, x);
+          root_ = np;
           root_->color = node::black;
           first_ = last_ = root_;
           ++count_;
@@ -254,15 +305,13 @@ namespace tree
         bool greater = false;
         node *q = NULL;
         for(node* p = root_; p != NULL; q = p, p = p->u.link[ greater ]){
-          greater = comparator_(p->elem, x);
-          if(!greater && !elem_less(x, p->elem))
+          greater = comparator_(p->elem, np->elem);
+          if(!greater && !elem_less(np->elem, p->elem))
             // equal
             return std::make_pair(iterator(p, this), false);
         }
 
         // create node
-        node_type* const np = node_allocator.allocate(1);
-        node_allocator.construct(np, x);
         np->parent = q;
 
         // u.link
@@ -277,6 +326,17 @@ namespace tree
         // balance tree
         fixup_insert(np);
         return std::make_pair(iterator(np, this), true);
+      }
+
+    public:
+      std::pair<iterator, bool> insert(const value_type& x)
+      {
+        return insert_impl(construct_node(x));
+      }
+
+      std::pair<iterator, bool> insert(value_type&& x)
+      {
+        return insert_impl(construct_node(x));
       }
 
       iterator insert(iterator /*position*/, const value_type& x)
@@ -362,7 +422,11 @@ namespace tree
         return pos == end() ? 0 : (erase(pos), 1);
       }
 
+      #ifdef NTL__CXX_RV
+      void swap(rb_tree<T, Compare, Allocator>&& tree)
+      #else
       void swap(rb_tree<T, Compare, Allocator>& tree)
+      #endif
       {
         if(this != &tree){
           //if(node_allocator == tree.node_allocator){
