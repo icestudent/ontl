@@ -51,27 +51,40 @@ bool operator>=(const T & x, const T & y) { return !(x < y); }
 #pragma region forward
 /// 20.2.2 forward/move helpers [forward]
 #ifdef NTL__CXX_RV
-template <class T>
-struct identity
-{
-  typedef T type;
+  template <class T>
+  struct identity
+  {
+    typedef T type;
 
-  const T& operator()(const T& x) const { return x; }
-};
+    const T& operator()(const T& x) const { return x; }
+  };
 
-template <class T>
-inline
-T&& forward(typename identity<T>::type&& t)
-{
-  return t;
-}
+  template <class T>
+  inline
+  T&& forward(typename identity<T>::type&& t)
+  {
+    return t;
+  }
 
-template <class T> 
-inline
-typename remove_reference<T>::type&& move(T&& t)
-{
-  return t;
-}
+  template <class T> 
+  inline
+  typename remove_reference<T>::type&& move(T&& t)
+  {
+    return t;
+  }
+
+#else
+  template <class T> struct identity { typedef T type; };
+
+  template <class T>
+  T& inline forward(typename identity<T>::type& t) { return t; }
+
+  template <class T>
+  T& inline move(T& t) { return t; }
+
+  template <class T>
+  const T& inline move(const T& t) { return t; }
+
 #endif
 #pragma endregion
 

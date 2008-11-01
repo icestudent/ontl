@@ -38,7 +38,7 @@ namespace std {
 #endif
 
 #ifndef CHAR_MIN
-#ifdef  _MSC_VER
+#if defined(_MSC_VER) || defined(__BCPLUSPLUS__)
   #ifndef _CHAR_UNSIGNED
     #define CHAR_MIN    SCHAR_MIN
     #define CHAR_MAX    SCHAR_MAX

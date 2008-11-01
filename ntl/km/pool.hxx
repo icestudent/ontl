@@ -42,12 +42,12 @@ enum pool_type
 
 
 NTL__EXTERNAPI
-__declspec(restrict) __declspec(noalias)
+__restrict __noalias
 void * __stdcall
   ExAllocatePoolWithTag(pool_type, size_t, unsigned long tag);
 
 NTL__EXTERNAPI
-__declspec(noalias)
+__noalias
 void __stdcall
   ExFreePoolWithTag(void * p, unsigned long tag);
 
@@ -58,14 +58,14 @@ class pool
   ///////////////////////////////////////////////////////////////////////////
   public:
 
-    __declspec(restrict) __declspec(noalias)
+    __restrict __noalias
     static __forceinline
     void * alloc(size_t size, unsigned long tag = NTL__POOL_TAG)
     {
       return ExAllocatePoolWithTag(PoolType, size, tag);
     }
 
-    __declspec(noalias)
+    __noalias
     static __forceinline
     void free(void * const p, unsigned long tag = NTL__POOL_TAG)
     {

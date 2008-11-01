@@ -1,6 +1,6 @@
 /**\file*********************************************************************
  *                                                                     \brief
- *  21.4 Null-terminated sequence utilities [lib.c.strings]
+ *  21.5 Null-terminated sequence utilities [strings]
  *
  ****************************************************************************
  */

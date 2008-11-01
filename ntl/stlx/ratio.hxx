@@ -21,6 +21,9 @@ namespace std
 
 // for test purposes
 //#define SMALL_RATIO
+#ifdef __BCPLUSPLUS__
+# define SMALL_RATIO
+#endif
 
 #ifndef SMALL_RATIO
   #define RATIO_MAX     LLONG_MAX

@@ -49,7 +49,7 @@ namespace std {
 
 ///\name  long double type
 #ifndef LDBL_DIG
-#ifdef  _MSC_VER
+#if defined(_MSC_VER) || defined(__BCPLUSPLUS__)
 #define LDBL_DIG        DBL_DIG
 #define LDBL_EPSILON    DBL_EPSILON
 #define LDBL_MANT_DIG   DBL_MANT_DIG
@@ -62,7 +62,7 @@ namespace std {
 #define LDBL_RADIX      DBL_RADIX
 #define LDBL_ROUNDS     DBL_ROUNDS
 #else
-error long double limits undefined
+// long double limits can be defined through extern variables
 #endif//#ifdef  _MSC_VER
 #endif
 

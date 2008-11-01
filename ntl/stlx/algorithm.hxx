@@ -402,9 +402,7 @@ __forceinline
 void
   iter_swap(ForwardIterator1 a, ForwardIterator2 b)
 {
-  T temp( *a );
-  *a = *b;
-  *b = temp;
+  swap(*a, *b);
 }
 
 /// 25.2.3 Transform [alg.transform]
@@ -660,11 +658,26 @@ inline
 void
   random_shuffle(RandomAccessIterator first, RandomAccessIterator last);
 
+#ifdef NTL__CXX_RV
+template<class RandomAccessIterator, class RandomNumberGenerator>
+inline
+void
+  random_shuffle(RandomAccessIterator first, RandomAccessIterator last,
+                 RandomNumberGenerator&& rand);
+#else
 template<class RandomAccessIterator, class RandomNumberGenerator>
 inline
 void
   random_shuffle(RandomAccessIterator first, RandomAccessIterator last,
                  RandomNumberGenerator& rand);
+#endif
+
+template<class RandomAccessIterator, class UniformRandomNumberGenerator>
+inline
+void 
+  random_shuffle(RandomAccessIterator first,
+                 RandomAccessIterator last,
+                 UniformRandomNumberGenerator& g);
 
 // 25.2.12, partitions:
 template<class BidirectionalIterator, class Predicate>

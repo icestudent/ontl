@@ -326,6 +326,14 @@ class back_insert_iterator
       container->push_back(value);
       return *this;
     }
+    #ifdef NTL__CXX_RV
+    back_insert_iterator<Container>&
+      operator=(typename Container::value_type&& value)
+    {
+      container->push_back(value);
+      return *this;
+    }
+    #endif
 
     back_insert_iterator<Container>& operator*()     { return *this; }
     back_insert_iterator<Container>& operator++()    { return *this; }
@@ -357,6 +365,14 @@ class front_insert_iterator
       container->push_front(value);
       return *this;
     }
+    #ifdef NTL__CXX_RV
+    front_insert_iterator<Container>&
+      operator=(typename Container::value_type&& value)
+    {
+      container->push_front(value);
+      return *this;
+    }
+    #endif
 
     front_insert_iterator<Container>& operator*()     { return *this; }
     front_insert_iterator<Container>& operator++()    { return *this; }
@@ -394,6 +410,15 @@ class insert_iterator
       ++iter;
       return *this;
     }
+    #ifdef NTL__CXX_RV
+    insert_iterator<Container>&
+      operator=(typename Container::value_type&& value)
+    {
+      iter = container->insert(iter, value);
+      ++iter;
+      return *this;
+    }
+    #endif
 
     insert_iterator<Container>& operator*()     { return *this; }
     insert_iterator<Container>& operator++()    { return *this; }

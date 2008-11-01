@@ -8,11 +8,25 @@
 #ifndef NTL__STLX_CSTDDEF
 #define NTL__STLX_CSTDDEF
 
-#ifdef _MSC_VER
-#pragma warning(disable:4514)// unreferenced inline function has been removed
-//#define __forceinline __forceinline
+// supported compilers
+#if defined(_MSC_VER)
+// MS VC++
+  #if _MSC_VER < 1400
+  # pragma error upgrade your compiler at least to VC8 (14.00)
+  #endif
+#elif defined(__BCPLUSPLUS__)
+// borland C++
+  #if __BCPLUSPLUS__ < 0x600
+  # pragma error upgrade your compiler at leat to BCB 2009 (12.00)
+  #endif
 #else
-#define __forceinline inline
+# pragma message("Unknown compiler, it is unsupported probably. Sorry, mate")
+#endif
+
+#ifdef _MSC_VER
+# pragma warning(disable:4514)// unreferenced inline function has been removed
+#else
+# define __forceinline inline
 #endif
 
 #define __optional
@@ -25,30 +39,42 @@
 #define __thiscall
 #endif
 
+#if defined(_MSC_VER)
+// add __declspec(restrict) ?
+# define __noalias __declspec(noalias)
+#elif defined(__BCPLUSPLUS__)
+# define __noalias
+#endif
+
 #define _PasteToken(x,y) x##y
 #define _Join(x,y) _PasteToken(x,y)
 #ifndef STATIC_ASSERT
 #define STATIC_ASSERT(e) typedef char _Join(_STATIC_ASSERT_, __COUNTER__) [(e)?1:-1]
 #endif
 
+#ifdef __BCPLUSPLUS__
+# define __w64
+#endif
+
 #ifndef NTL__CRTCALL
-  #ifdef NTL__STLX_FORCE_CDECL
+# ifdef NTL__STLX_FORCE_CDECL
   #ifdef _MSC_VER
     #define NTL__CRTCALL __cdecl
-  #else
-    #error unsupported compiler
+  #elif defined(__BCPLUSPLUS__)
+    #define NTL__CRTCALL __cdecl
   #endif
-#else
+# else
   #define NTL__CRTCALL
-#endif
+# endif
 #endif
 
 #ifndef NTL__EXTERNAPI
   #ifdef  _MSC_VER
     #define NTL__EXTERNAPI extern "C" __declspec(dllimport) __declspec(nothrow)
     #define NTL__EXTERNVAR extern "C" __declspec(dllimport)
-  #else
-    #error usupported compiler
+  #elif defined(__BCPLUSPLUS__)
+    #define NTL__EXTERNAPI extern "C" __declspec(dllimport) __declspec(nothrow)
+    #define NTL__EXTERNVAR extern "C" __declspec(dllimport)
   #endif
 #endif
 
@@ -63,7 +89,7 @@
 
 #if _MSC_VER >= 1600
  
-/** partial C++0x support */
+/** VC10's partial C++0x support */
 
 // keywords:
 // align (N2798+)
@@ -75,7 +101,7 @@
 // auto
 #define NTL__CXX_AUTO
 // char16_t, char32_t
-//#define NTL__CXX_CHART
+//#define NTL__CXX_CHARS
 // concepts, concept_map, requires
 //#define NTL__CXX_CONCEPT
 // constexpr
@@ -108,6 +134,55 @@
 //#define NTL__CXX_VT
 
 #endif // _MSC_VER >= 1600
+#elif defined(__BCPLUSPLUS__)
+
+/** BCB's partial C++0x support */
+
+// keywords:
+// align (N2798+)
+//#define NTL__CXX_ALIGN
+// alignas( <= N2723)
+//#define NTL__CXX_ALIGNAS
+// alignof
+#define NTL__CXX_ALIGNOF
+// auto
+//#define NTL__CXX_AUTO
+// char16_t, char32_t
+#define NTL__CXX_CHARS
+// concepts, concept_map, requires
+//#define NTL__CXX_CONCEPT
+// constexpr
+//#define NTL__CXX_CONSTEXPR
+// decltype (typeof)
+#define NTL__CXX_TYPEOF
+// class enum
+#define NTL__CXX_ENUM
+// nullptr
+//#define NTL__CXX_NULLPTR
+// static assert
+#define NTL__CXX_ASSERT
+// thread_local
+//#define NTL__CXX_THREADL
+
+// syntax:
+// explicit delete/default function definition
+//#define NTL__CXX_EF
+// explicit conversion operators
+//#define NTL__CXX_EXPLICITOP
+// extern templates
+#define NTL__CXX_EXTPL
+// initializer lists
+//#define NTL__CXX_IL
+// lambda
+//#define NTL__CXX_LAMBDA
+// rvalues
+#define NTL__CXX_RV
+// template typedef
+//#define NTL__CXX_TT
+// variadic templates (implies rvalue references support)
+//#define NTL__CXX_VT
+
+#endif // _MSC_VER
 
   #ifndef NTL__CXX_ASSERT
     #define static_assert(e, Msg) STATIC_ASSERT(e)
@@ -117,13 +192,13 @@
     #ifdef _MSC_VER
       #define alignas(X) __declspec(align(X))
     #else
-      #error unsupported compiler
+      #define alignas(X)
     #endif
   #endif
 
   #ifndef NTL__CXX_ALIGNOF
     #if _MSC_VER <= 1600
-      #define alignof(X) __alignof(X)
+      #define alignof(X) alignof(X)
     #endif
   #endif
   static_assert(alignof(int)==alignof(unsigned int), "wierd platform");
@@ -131,41 +206,46 @@
     //static const char __func__[];
     #ifndef __func__
       #ifdef _MSC_VER
-        //#define __func__ __FUNCDNAME__
         #define __func__ __FUNCSIG__
-        //#define __func__ __FUNCTION__
       #else
-        #error unsupported compiler
+        #define __func__ __FUNC__
       #endif
     #endif
 
   #ifndef __align
-    #define __align(X) __declspec(align(X))
+    #ifdef _MSC_VER
+    # define __align(X) __declspec(align(X))
+    #else
+    # define __align(X)
+    #endif
   #endif
 
   #ifndef NTL_CXX_CONSTEXPR
     #define constexpr
   #endif
-#else
-  #error unsupported compiler
-#endif // _MSC_VER
 
 #endif//__cplusplus <= 199711L
+
+
 
 namespace std {
 
 /**\defgroup  lib_language_support ***** Language support library [18] ******
  *@{*/
 
-#pragma warning(push)
-#pragma warning(disable:4324)
-typedef alignas(8192) struct {} max_align_t;
-#pragma warning(pop)
+#ifdef _MSC_VER
+  #pragma warning(push)
+  #pragma warning(disable:4324)
+  typedef alignas(8192) struct {} max_align_t;
+  #pragma warning(pop)
+#else
+  struct {} max_align_t;
+#endif
 
 /**\defgroup  lib_support_types ******** Types [18.1] ***********************
  *@{*/
 
-#ifdef NTL__CXX
+#ifdef NTL__CXX_NULLPTR
   typedef decltype(nullptr) nullptr_t;
 #else
 
@@ -174,8 +254,13 @@ struct nullptr_t
 {
     template<typename any> operator any * () const { return 0; }
     template<class any, typename T> operator T any:: * () const { return 0; }
+
+    #ifdef _MSC_VER
     struct pad {};
     pad __[sizeof(void*)/sizeof(pad)];
+    #else
+    char __[sizeof(void*)];
+    #endif
   private:
   //  nullptr_t();// {}
   //  nullptr_t(const nullptr_t&);
@@ -191,32 +276,33 @@ static const nullptr_t __nullptr = {};
     #define nullptr std::__nullptr
   #endif
 #endif // NTL__CXX
-STATIC_ASSERT(sizeof(nullptr)==sizeof(void*));
+static_assert(sizeof(nullptr)==sizeof(void*), "3.9.1.10: sizeof(std::nullptr_t) shall be equal to sizeof(void*)");
 
 #ifndef NULL
 #define NULL 0
 #endif
 
 #ifdef _M_X64
-  typedef          long long  ptrdiff_t;
-#ifdef _MSC_VER
-  using ::size_t;
+    typedef          long long  ptrdiff_t;
+# ifdef _MSC_VER
+    using ::size_t;
+# else
+    typedef unsigned long long  size_t;
+# endif
+    typedef          long long  ssize_t;
 #else
-  typedef unsigned long long  size_t;
-#endif
-  typedef          long long  ssize_t;
-#else
-  typedef __w64    int  ptrdiff_t;
-#ifdef _MSC_VER
-  using ::size_t;
-#else
-  typedef unsigned int  size_t;
-#endif
-  typedef __w64    int  ssize_t;
+    typedef __w64    int  ptrdiff_t;
+# ifdef _MSC_VER
+    using ::size_t;
+# else
+    typedef unsigned int  size_t;
+# endif
+    typedef __w64    int  ssize_t;
 #endif
 
 #ifndef offsetof
   #define offsetof(s,m) (size_t)&reinterpret_cast<const volatile char&>((((s *)0)->m))
+  // from bcb #define offsetof( s_name, m_name )  (size_t)&(((s_name*)0)->m_name)
 #endif
 
 #define __ntl_bitmask_type(bitmask, _friend)\
@@ -239,11 +325,20 @@ STATIC_ASSERT(sizeof(nullptr)==sizeof(void*));
 
   /// 20.7.1 Allocator argument tag [allocator.tag]
   struct allocator_arg_t {/**/};
+#ifdef _MSC_VER
   const allocator_arg_t allocator_arg;// = allocator_arg_t();
+#else
+  const allocator_arg_t allocator_arg = allocator_arg_t();
+#endif
   /**@} lib_memory */
   /**@} lib_utilities */
 
 
 } //namespace std
+
+#ifdef __BCPLUSPLUS__
+  using std::ptrdiff_t;
+  using std::size_t;
+#endif
 
 #endif //#ifndef NTL__STLX_CSTDDEF

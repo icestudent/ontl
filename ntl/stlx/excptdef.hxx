@@ -10,7 +10,7 @@
 
 
 #ifndef STLX__USE_EXCEPTIONS
-  #ifdef _MSC_VER
+  #if defined(_MSC_VER) || defined(__BCPLUSPLUS__)
     #ifdef _CPPUNWIND
       #define STLX__USE_EXCEPTIONS 1
     #else

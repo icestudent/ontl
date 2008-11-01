@@ -26,11 +26,19 @@ namespace std {
 /**
  *	Automatically detects whether \c T has a nested \c allocator_type that is convertible from \c Alloc.
  **/
+#ifndef __BCPLUSPLUS__
 template<class T, class Alloc> struct uses_allocator
 : public integral_constant<
     bool, is_convertible<Alloc, typename T::allocator_type>::value
     > {};
-
+#else
+template<class T, class Alloc> struct uses_allocator
+{
+  typedef bool value_type;
+  static const value_type value = is_convertible<Alloc, typename T::allocator_type>::value;
+  typedef integral_constant<value_type, value> type;
+};
+#endif
 /**
  *	If a specialization \c is_scoped_allocator<Alloc> is derived from \c true_type, it indicates that
  *  \c Alloc is a \c scoped allocator. A scoped allocator specifies the memory resource to be used by a container
@@ -205,7 +213,7 @@ class allocator
     }
 #endif
 
-    __declspec(noalias) __declspec(restrict)
+    __noalias __restrict
     __forceinline
     pointer allocate(size_type n, allocator<void>::const_pointer hint = 0)
       __ntl_throws(bad_alloc)
@@ -216,7 +224,7 @@ class allocator
       return p;
     }
 
-    __declspec(noalias)
+    __noalias
     __forceinline
     void deallocate(pointer p, size_type /* n */)
     {
@@ -232,14 +240,14 @@ class allocator
       __assume(p);
       ::new((void*)p) T(forward<Args>(args)...);
     }
-#elif defined(NTL__CXX_RV) && 0
+#elif defined(NTL__CXX_RV) //&& 0
     __forceinline
       void construct(pointer p, T&& val)
     {
       __assume(p);
       ::new((void *)p) T(std::forward<T>(val));
     }
-#endif
+#else
     __forceinline
     void construct(pointer p, const T & val)
     {
@@ -247,6 +255,7 @@ class allocator
       ///\todo ::new((void *)p ) T(std::forward<U>(val))
       ::new((void *)p) T(val);
     }
+#endif
 
 //    __forceinline
     void destroy(const pointer p)
@@ -491,8 +500,51 @@ void
 
 /// 20.7.9 construct_element [construct.element]
 #ifdef NTL__CXX_VT
+namespace __
+{
+  template<bool prefix, bool suffix>
+  struct construct_element_policy
+  {
+    template <class Alloc, class T, class... Args>
+    static void construct_element(Alloc& alloc, T& r, Args&&... args)
+    {
+      alloc.construct(alloc.address(r), args...);
+    }
+  };
+
+  template<bool suffix>
+  struct construct_element_policy<true, suffix>
+  {
+    template <class Alloc, class T, class... Args>
+    static void construct_element(Alloc& alloc, T& r, Args&&... args)
+    {
+      alloc.construct(alloc.address(r), allocator_arg_t, alloc.inner_allocator(), args...);
+    }
+  };
+
+  template<bool prefix>
+  struct construct_element_policy<prefix, true>
+  {
+    template <class Alloc, class T, class... Args>
+    static void construct_element(Alloc& alloc, T& r, Args&&... args)
+    {
+      alloc.construct(alloc.address(r), args..., alloc.inner_allocator());
+    }
+  };
+}
+
+
 template <class Alloc, class T, class... Args>
-void construct_element(Alloc& alloc, T& r, Args&&... args);
+void construct_element(Alloc& alloc, T& r, Args&&... args)
+{
+  typedef typename 
+    __select_or<is_scoped_allocator<Alloc>::value == false, uses_allocator<T, Alloc::inner_allocator_type>::value == false,
+      __::construct_element_policy<false, false>,
+      __::construct_element_policy<
+          constructible_with_allocator_prefix<T, Alloc::inner_allocator_type, Args...>::value,
+          constructible_with_allocator_suffix<T, Alloc::inner_allocator_type, Args...>::value> policy;
+  policy::construct_element(alloc, r, args...);
+}
 #endif
 
 ///\name  20.7.10 Specialized algorithms [specialized.algorithms]

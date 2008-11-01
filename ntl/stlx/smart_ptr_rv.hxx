@@ -1,6 +1,6 @@
 /**\file*********************************************************************
  *                                                                     \brief
- *  N2588 20.7 Memory [memory]
+ *  N2723 20.7 Memory [memory]
  *
  ****************************************************************************
  */
@@ -72,13 +72,14 @@ namespace std
     unique_ptr() __ntl_nothrow : ptr(0) {}
     explicit unique_ptr(T* p) __ntl_nothrow : ptr(p) {}
     unique_ptr(T* p, const deleter_type &) __ntl_nothrow : ptr(p) {}
-    unique_ptr(const unique_ptr& u) __ntl_nothrow : ptr(u.get())
+
+    unique_ptr(unique_ptr&& u) __ntl_nothrow : ptr(u.get())
     {
       u.release(); // it's here to help MSVC optimizing container operations
     }
 
     template <class U/*, class E*/>
-    unique_ptr(const unique_ptr<U, deleter_type>& u) __ntl_nothrow : ptr(u.get())
+    unique_ptr(unique_ptr<U, deleter_type>&& u) __ntl_nothrow : ptr(u.get())
     {
       u.release();
     }
@@ -86,9 +87,17 @@ namespace std
     ///\name 20.7.11.2.2 unique_ptr destructor [unique.ptr.single.dtor]
     ~unique_ptr() __ntl_nothrow { if ( get() ) get_deleter()(get()); }
 
+    #ifdef NTL__CXX_EF
+    // disable copy from lvalue
+    unique_ptr(const unique_ptr&) = delete;
+    template <class U, class E> unique_ptr(const unique_ptr<U, E>&) = delete;
+    unique_ptr& operator=(const unique_ptr&) = delete;
+    template <class U, class E> unique_ptr& operator=(const unique_ptr<U, E>&) = delete;
+    #endif
+
     ///\name 20.7.11.2.3 unique_ptr assignment [unique.ptr.single.asgn]
     __forceinline
-      const unique_ptr& operator=(const unique_ptr& u) __ntl_nothrow
+    unique_ptr& operator=(unique_ptr&& u) __ntl_nothrow
     {
       reset(u.release());
       return *this;
@@ -96,20 +105,20 @@ namespace std
 
     template <class U/*, class E*/>
     __forceinline
-      const unique_ptr& operator=(const unique_ptr<U, deleter_type>& u) __ntl_nothrow
+    unique_ptr& operator=(unique_ptr<U, deleter_type>&& u) __ntl_nothrow
     {
       reset(u.release());
       return *this;
     }
 
-    const unique_ptr& operator=(unspecified_pointer_type *)
+    unique_ptr& operator=(unspecified_pointer_type *)
     {
       reset();
       return *this;
     }
 
     ///\name 20.7.11.2.4 unique_ptr observers [unique.ptr.single.observers]
-    T& operator*() const __ntl_nothrow { return *get(); }
+    typename add_lvalue_reference<T>::type operator*() const __ntl_nothrow { return *get(); }
     T* operator->() const __ntl_nothrow { return get(); }
     T* get() const __ntl_nothrow { return ptr; }
 
@@ -120,26 +129,42 @@ namespace std
     operator unspecified_bool_type() const __ntl_nothrow { return ptr; }
 
     ///\name 20.7.11.2.5 unique_ptr modifiers [unique.ptr.single.modifiers]
-    T* release() const { T * const tmp = get(); set(0); return tmp; }
+    T* release()
+    {
+      T* tmp = nullptr;
+      std::swap(ptr, tmp);
+      return tmp; 
+    }
 
     __forceinline
-      void reset(T* p = 0) const __ntl_nothrow
+    void reset(T* p = 0) __ntl_nothrow
     {
       if ( get() && get() != p ) get_deleter()(get());
       set(p);
     }
 
-    void swap(const unique_ptr& u) const __ntl_nothrow { std::swap(ptr, u.ptr); }
+    void swap(unique_ptr&& u) __ntl_nothrow 
+    {
+      std::swap(ptr, u.ptr); 
+    }
 
     ///\}
 
     ///////////////////////////////////////////////////////////////////////////
   private:
+    element_type*  ptr;
+    void set(T * p) { ptr = p; }
 
-    mutable element_type *  ptr;
-    void set(T * p) const { ptr = p; }
+    #ifndef NTL__CXX_EF
+    // disable copy from lvalue
+    unique_ptr(const unique_ptr&);
+    template <class U, class E> unique_ptr(const unique_ptr<U, E>&);
+    unique_ptr& operator=(const unique_ptr&);
+    template <class U, class E> unique_ptr& operator=(const unique_ptr<U, E>&);
+    #endif
 
   };//template class unique_ptr
+
 
   /// 20.7.11.3 unique_ptr for array objects with a runtime length [unique.ptr.runtime]
   template <class T>
@@ -158,7 +183,8 @@ namespace std
     unique_ptr() __ntl_nothrow : ptr(0) {}
     explicit unique_ptr(T* p) __ntl_nothrow : ptr(p) {}
     unique_ptr(T* p, const deleter_type &) __ntl_nothrow : ptr(p) {}
-    unique_ptr(const unique_ptr& u) __ntl_nothrow : ptr(u.get())
+
+    unique_ptr(unique_ptr&& u) __ntl_nothrow : ptr(u.get())
     {
       u.release();
     }
@@ -166,15 +192,21 @@ namespace std
     ///\name 20.7.11.2.2 unique_ptr destructor [unique.ptr.single.dtor]
     ~unique_ptr() __ntl_nothrow { if ( get() ) get_deleter()(get()); }
 
+    #ifdef NTL__CXX_EF
+    // disable copy from lvalue
+    unique_ptr(const unique_ptr&) = delete;
+    unique_ptr& operator=(const unique_ptr&) = delete;
+    #endif
+
     ///\name 20.7.11.2.3 unique_ptr assignment [unique.ptr.single.asgn]
     __forceinline
-      const unique_ptr& operator=(const unique_ptr& u) __ntl_nothrow
+    unique_ptr& operator=(unique_ptr&& u) __ntl_nothrow
     {
       reset(u.release());
       return *this;
     }
 
-    const unique_ptr& operator=(unspecified_pointer_type *)
+    unique_ptr& operator=(unspecified_pointer_type *)
     {
       reset();
       return *this;
@@ -199,31 +231,44 @@ namespace std
     operator unspecified_bool_type() const __ntl_nothrow { return ptr; }
 
     ///\name 20.7.11.2.5 unique_ptr modifiers [unique.ptr.single.modifiers]
-    T* release() const { T * const tmp = get(); set(0); return tmp; }
+    T* release()
+    {
+      T* tmp = nullptr;
+      std::swap(tmp, ptr);
+      return tmp;
+    }
 
     __forceinline
-      void reset(T* p = 0) const __ntl_nothrow
+    void reset(T* p = 0) __ntl_nothrow
     {
       if ( get() && get() != p ) get_deleter()(get());
       set(p);
     }
 
-    void swap(const unique_ptr& u) const __ntl_nothrow { std::swap(ptr, u.ptr); }
+    void swap(unique_ptr&& u) __ntl_nothrow { std::swap(ptr, u.ptr); }
 
     ///\}
 
     ///////////////////////////////////////////////////////////////////////////
   private:
 
-    mutable element_type *  ptr;
+    element_type*  ptr;
     void set(T * p) const { ptr = p; }
+
+    #ifndef NTL__CXX_EF
+    // disable copy from lvalue
+    unique_ptr(const unique_ptr&);
+    unique_ptr& operator=(const unique_ptr&);
+    #endif
 
     template<class Other> unique_ptr(Other*);
     template<class Other> void reset(Other*) const;
 
   };//template class unique_ptr
 
-  /// 20.7.11.4 unique_ptr for array objects with a compile time length [unique.ptr.compiletime]
+
+
+  /// unique_ptr for array objects with a compile time length (removed from N2723)
   template <class T, size_t N>
   class unique_ptr<T[N], default_delete<T[N]> >
   {
@@ -242,7 +287,7 @@ namespace std
     unique_ptr() __ntl_nothrow : ptr(0) {}
     explicit unique_ptr(T* p) __ntl_nothrow : ptr(p) {}
     unique_ptr(T* p, const deleter_type &) __ntl_nothrow : ptr(p) {}
-    unique_ptr(const unique_ptr& u) __ntl_nothrow : ptr(u.get())
+    unique_ptr(unique_ptr&& u) __ntl_nothrow : ptr(u.get())
     {
       u.release();
     }
@@ -250,15 +295,21 @@ namespace std
     ///\name 20.7.11.4.1 unique_ptr destructor [unique.ptr.compiletime.dtor]
     ~unique_ptr() __ntl_nothrow { if ( get() ) get_deleter()(get(), N); }
 
+    #ifdef NTL__CXX_EF
+    // disable copy from lvalue
+    unique_ptr(const unique_ptr&) = delete;
+    unique_ptr& operator=(const unique_ptr&) = delete;
+    #endif
+
     ///\name 20.7.11.2.3 unique_ptr assignment [unique.ptr.single.asgn]
     __forceinline
-      const unique_ptr& operator=(const unique_ptr& u) __ntl_nothrow
+    unique_ptr& operator=(unique_ptr&& u) __ntl_nothrow
     {
       reset(u.release());
       return *this;
     }
 
-    const unique_ptr& operator=(unspecified_pointer_type *)
+    unique_ptr& operator=(unspecified_pointer_type *)
     {
       reset();
       return *this;
@@ -283,16 +334,23 @@ namespace std
     operator unspecified_bool_type() const __ntl_nothrow { return ptr; }
 
     ///\name 20.7.11.2.5 unique_ptr modifiers [unique.ptr.single.modifiers]
-    T* release() const { T * const tmp = get(); set(0); return tmp; }
+    T* release() {
+      T* tmp = nullptr;
+      std::swap(ptr, tmp);
+      return tmp; 
+    }
 
     __forceinline
-      void reset(T* p = 0) const __ntl_nothrow
+    void reset(T* p = 0) const __ntl_nothrow
     {
       if ( get() && get() != p ) get_deleter()(get(), N);
       set(p);
     }
 
-    void swap(const unique_ptr& u) const __ntl_nothrow { std::swap(ptr, u.ptr); }
+    void swap(unique_ptr&& u) const __ntl_nothrow 
+    { 
+      std::swap(ptr, u.ptr); 
+    }
 
     ///\}
 
@@ -300,21 +358,26 @@ namespace std
   private:
     enum { __actual_size = N };
 
-    mutable element_type *  ptr;
+    element_type *  ptr;
     void set(T * p) const { ptr = p; }
+
+    #ifndef NTL__CXX_EF
+    // disable copy from lvalue
+    unique_ptr(const unique_ptr&);
+    unique_ptr& operator=(const unique_ptr&);
+    #endif
 
     template<class Other> unique_ptr(Other*);
     template<class Other> void reset(Other*) const;
 
   };//template class unique_ptr<T[N], default_delete<T[N]> >
 
-  ///\name 20.7.11.5 unique_ptr specialized algorithms [unique.ptr.special]
+  ///\name 20.7.11.4 unique_ptr specialized algorithms [unique.ptr.special]
   template <class T, class D> void swap(unique_ptr<T, D>& x, unique_ptr<T, D>& y)
   {
     x.swap(y);
   }
 
-#ifdef NTL__CXX_RV
   template <class T, class D> void swap(unique_ptr<T, D>&& x, unique_ptr<T, D>& y)
   {
     x.swap(y);
@@ -323,7 +386,6 @@ namespace std
   {
     x.swap(y);
   }
-#endif
 
   template <class T1, class D1, class T2, class D2>
   bool operator==(const unique_ptr<T1, D1>& x, const unique_ptr<T2, D2>& y)
@@ -360,6 +422,9 @@ namespace std
   {
     return x.get() >= y.get();
   }
+
+
+
 
   ///\name  20.7.12 Smart pointers [util.smartptr]
 
@@ -434,14 +499,12 @@ namespace std
       set(r.get());
     }
 
-#ifdef NTL__CXX_RV
     /// 23 Requires: For the second constructor Y* shall be convertible to T*.
     /// 24 Effects: Move-constructs a shared_ptr instance from r.
     /// 25 Postconditions: *this shall contain the old value of r. r shall be empty.
     /// 26 Throws: nothing.
     shared_ptr(shared_ptr&& r);
     template<class Y> shared_ptr(shared_ptr<Y>&& r);
-#endif
 
     /// 27 Requires: Y* shall be convertible to T*.
     /// 28 Effects: Constructs a shared_ptr object that shares ownership with r
@@ -458,7 +521,6 @@ namespace std
     }
 #endif
 
-#ifdef NTL__CXX_RV
     /// 32 Requires: r.release() shall be convertible to T*. Y shall be a complete
     ///    type. The expression delete r.release() shall be well-formed,
     ///    shall have well defined behavior, and shall not throw exceptions.
@@ -468,10 +530,6 @@ namespace std
     ///    a resource other than memory could not be obtained.
     /// 36 Exception safety: If an exception is thrown, the constructor has no effect.
     template<class Y> explicit shared_ptr(auto_ptr<Y>&& r);
-#else
-    template<class Y> explicit shared_ptr(auto_ptr<Y>& r)
-      : base_type(r.release()) {/**/}
-#endif
 
 #ifdef NTL__CXX_EF
     /// 37 Effects: Equivalent to shared_ptr(r.release(), r.get_deleter())
@@ -480,13 +538,8 @@ namespace std
     /// 38 Exception safety: If an exception is thrown, the constructor has no effect.
     template <class Y, class D> explicit shared_ptr(const unique_ptr<Y, D>& r) = delete;
 #endif
-#ifdef NTL__CXX_RV
     template <class Y, class D> explicit shared_ptr(unique_ptr<Y, D>&& r)
     : base_type(r.release()) {/**/}
-#else
-    template <class Y, class D> explicit shared_ptr(const unique_ptr<Y, D>& r)
-      : base_type(r.release()) {/**/}
-#endif
 
     ///\name  20.7.12.2.2 shared_ptr destructor [util.smartptr.shared.dest]
     ///
@@ -509,39 +562,33 @@ namespace std
 
     ///\name  20.7.12.2.3 shared_ptr assignment [util.smartptr.shared.assign]
 
-#ifdef NTL__CXX_RV
-    shared_ptr& operator=(shared_ptr&& r);
-    template<class Y> shared_ptr& operator=(shared_ptr<Y>&& r);
-    template<class Y> shared_ptr& operator=(auto_ptr<Y>&& r);
-    template <class Y, class D> shared_ptr& operator=(unique_ptr<Y, D>&& r);
-#else
-    shared_ptr& operator=(shared_ptr& r)
+    shared_ptr& operator=(shared_ptr&& r)
     {
       r.swap(*this); 
       return *this; 
     }
 
     template<class Y>
-    shared_ptr& operator=(shared_ptr<Y>& r)
+    shared_ptr& operator=(shared_ptr<Y>&& r)
     { 
       shared_ptr<T>(r).swap(*this);
       return *this;
     }
 
     template<class Y>
-    shared_ptr& operator=(auto_ptr<Y>& r)
+    shared_ptr& operator=(auto_ptr<Y>&& r)
     {
       set(r.release());
       return *this;
     }
 
     template <class Y, class D>
-    shared_ptr& operator=(unique_ptr<Y, D>& r)
+    shared_ptr& operator=(unique_ptr<Y, D>&& r)
     {
       set(r.release());
       return *this;
     }
-#endif
+
 #ifdef NTL__CXX_EF
     template <class Y, class D> shared_ptr& operator=(const unique_ptr<Y, D>& r) = delete;
 #endif
@@ -549,7 +596,7 @@ namespace std
 
     /// 1 Effects: Exchanges the contents of *this and r.
     /// 2 Throws: nothing.
-    void swap(shared_ptr& r)
+    void swap(shared_ptr&& r)
     {
       base_type::swap(r);
     }
@@ -572,11 +619,15 @@ namespace std
     //bool unique()    const __ntl_nothrow { return base_type::unique(); }
     using base_type::unique;
 
+    #ifndef NTL__CXX_EXPLICITOP
     //operator base_type::unspecified_bool_type() const __ntl_nothrow
     //{
     //  return base_type::operator base_type::unspecified_bool_type();
     //}
     using base_type::operator base_type::unspecified_bool_type;
+    #else
+    explicit operator bool() const;
+    #endif
 
     ///@}
 
@@ -662,11 +713,14 @@ namespace std
   {
     a.swap(b);
   }
-
-#ifdef NTL__CXX_RV
-  template<class T> void swap(shared_ptr<T>&& a, shared_ptr<T>& b);
-  template<class T> void swap(shared_ptr<T>& a, shared_ptr<T>&& b);
-#endif
+  template<class T> void swap(shared_ptr<T>&& a, shared_ptr<T>& b)
+  {
+    a.swap(b);
+  }
+  template<class T> void swap(shared_ptr<T>& a, shared_ptr<T>&& b)
+  {
+    a.swap(b);
+  }
 
   ///\name  20.7.12.2.10 shared_ptr casts [util.smartptr.shared.cast]
 

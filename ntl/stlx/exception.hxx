@@ -29,7 +29,7 @@ class exception
   public:
     exception() __ntl_nothrow {}
     exception(const exception&) __ntl_nothrow {}
-    exception& operator=(const exception&) __ntl_nothrow {}
+    exception& operator=(const exception&) __ntl_nothrow { return *this; }
     virtual ~exception() __ntl_nothrow {}
     virtual const char* what() const __ntl_nothrow { return "exception"; }
 };
@@ -40,7 +40,7 @@ class bad_exception : public exception
   public:
     bad_exception() __ntl_nothrow {}
     bad_exception(const bad_exception&) __ntl_nothrow {}
-    bad_exception& operator=(const bad_exception&) __ntl_nothrow {}
+    bad_exception& operator=(const bad_exception&) __ntl_nothrow { return *this; }
     virtual ~bad_exception() __ntl_nothrow {}
     virtual const char* what() const __ntl_nothrow { return "bad_exception"; }
 };

@@ -4,7 +4,6 @@
  *
  ****************************************************************************
  */
-
 // sorry, MSVC 2005+ only
 
 #include "cstddef.hxx"
@@ -14,10 +13,14 @@
 #define NTL__STLX_TYPE_TRAITS
 
 #if 1
-#define _CHECK_TRAIT(X) STATIC_ASSERT(X)
+#define _CHECK_TRAIT(X) static_assert(X, "Traits check failed on '" #X "'")
 #else
 #define _CHECK_TRAIT(X)
 #endif
+
+#ifdef __BCPLUSPLUS__
+#include "type_traits_bcb.hxx"
+#else
 
 namespace std {
 
@@ -183,9 +186,13 @@ struct aligned_storage
 
 #pragma warning(pop)
 
-_CHECK_TRAIT(__alignof(aligned_storage<5, 8000>::type) == 8192);
+_CHECK_TRAIT(alignof(aligned_storage<5, 8000>::type) == 8192);
 _CHECK_TRAIT(sizeof(aligned_storage<2, 4>::type) == 4);
 //_CHECK_TRAIT(sizeof(aligned_storage<2, 4>::type) == 2);
+
+#ifdef NTL__CXX_VT
+template <std::size_t Len, class... Types> struct aligned_union;
+#endif
 
 template <class T> struct decay;
 
@@ -196,6 +203,39 @@ template <bool, class IfTrueType, class IfFalseType> struct conditional;
 template <class T, class F> struct conditional<true, T, F>  { typedef T type; };
 template <class T, class F> struct conditional<false, T, F> { typedef F type; };
 
+namespace __
+{
+  // static logical operators: OR and AND
+  // usage:
+  // select_or<condition1, condition2, TrueType, FalseType>::type is equal to "if(condition1 || condition2) TrueType; else FalseType;
+  // select_and works same, but with the "&&" operation.
+
+  template<bool cond1, bool cond2, 
+  class IfTrueType, class IfFalseType> 
+  struct select_or
+  { typedef IfFalseType type; };
+
+  template<bool cond2, class T, class F>                                
+  struct select_or<true, cond2, T, F>
+  { typedef T type; };
+
+  template<bool cond1, class T, class F>                                
+  struct select_or<cond1, true, T, F>
+  { typedef T type; };
+
+  template<class T, class F>                                            
+  struct select_or<true, true, T, F>
+  { typedef T type; };
+
+  template<bool cond1, bool cond2, 
+  class IfTrueType, class IfFalseType> 
+  struct select_and
+  { typedef IfFalseType type; };
+
+  template<class T, class F>                                            
+  struct select_and<true, true, T, F>
+  { typedef T type; };
+}
 
 // 20.5.4 Unary Type Traits [meta.unary]
 
@@ -545,7 +585,7 @@ _CHECK_TRAIT(is_unsigned<unsigned>::value);
 _CHECK_TRAIT(is_unsigned<float>::value == 0);
 
 template <class T> struct alignment_of
-: public integral_constant<size_t, __alignof(T)> {};
+: public integral_constant<size_t, alignof(T)> {};
 template <>        struct alignment_of<void>
 : public integral_constant<size_t, 0> {};
 template <>        struct alignment_of<const void>
@@ -666,6 +706,7 @@ struct common_type
 #endif
 
 }//namespace std
+#endif // __BCPLUSPLUS__
 
 #undef _CHECK_TRAIT
 

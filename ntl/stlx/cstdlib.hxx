@@ -76,25 +76,25 @@ NTL__CRTCALL
 ///\name  7.20.3 Memory management functions
 
 /// 7.20.3.1 The calloc function
-__declspec(restrict) __declspec(noalias)
+__restrict __noalias
 void *
 NTL__CRTCALL
   calloc(size_t nmemb, size_t size);
 
 /// 7.20.3.2 The free function
-__declspec(noalias)
+__noalias
 void
 NTL__CRTCALL
   free(void *ptr);
 
 /// 7.20.3.3 The malloc function
-__declspec(restrict) __declspec(noalias)
+__restrict __noalias
 void *
 NTL__CRTCALL
   malloc(size_t size);
 
 /// 7.20.3.4 The realloc function
-__declspec(restrict) __declspec(noalias)
+__restrict __noalias
 void *
 NTL__CRTCALL
   realloc(void *ptr, size_t size);

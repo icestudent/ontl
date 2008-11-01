@@ -16,10 +16,15 @@
 
 
 #if defined NTL__DEBUG || !defined NDEBUG
+#ifdef _MSC_VER
 #define __ntl_assert(__msg, __line)\
   { const char * volatile __assertion_failure; __assertion_failure = (__msg);\
     unsigned volatile __assertion_failure_at_line; __assertion_failure_at_line = (__line);\
     __debugbreak(); }
+#else
+NTL__EXTERNAPI void __stdcall DbgBreakPoint();
+#define __ntl_assert(__msg, __line) { DbgBreakPoint(); }
+#endif // _MSC_VER
 #endif
 
 
