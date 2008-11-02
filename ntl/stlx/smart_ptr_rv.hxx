@@ -81,7 +81,7 @@ namespace std
     }
 
     template <class U/*, class E*/>
-    unique_ptr(unique_ptr<U, deleter_type>&& u) __ntl_nothrow : ptr(u.get())
+    unique_ptr(unique_ptr<U, default_delete<U>>&& u) __ntl_nothrow : ptr(u.get())
     {
       u.release();
     }
@@ -107,7 +107,7 @@ namespace std
 
     template <class U/*, class E*/>
     __forceinline
-    unique_ptr& operator=(unique_ptr<U, deleter_type>&& u) __ntl_nothrow
+    unique_ptr& operator=(unique_ptr<U, default_delete<U>>&& u) __ntl_nothrow
     {
       reset(u.release());
       return *this;
@@ -159,10 +159,10 @@ namespace std
 
     #ifndef NTL__CXX_EF
     // disable copy from lvalue
-    unique_ptr(const unique_ptr&);
-    template <class U, class E> unique_ptr(const unique_ptr<U, E>&);
-    unique_ptr& operator=(const unique_ptr&);
-    template <class U, class E> unique_ptr& operator=(const unique_ptr<U, E>&);
+    //unique_ptr(const unique_ptr&);
+    //template <class U, class E> unique_ptr(const unique_ptr<U, E>&);
+    //unique_ptr& operator=(const unique_ptr&);
+    //template <class U, class E> unique_ptr& operator=(const unique_ptr<U, E>&);
     #endif
 
   };//template class unique_ptr
@@ -510,8 +510,18 @@ namespace std
     /// 24 Effects: Move-constructs a shared_ptr instance from r.
     /// 25 Postconditions: *this shall contain the old value of r. r shall be empty.
     /// 26 Throws: nothing.
-    shared_ptr(shared_ptr&& r);
-    template<class Y> shared_ptr(shared_ptr<Y>&& r);
+    shared_ptr(shared_ptr&& r)
+      :base_type(r)
+    {
+      set(r.get());
+      r.set(nullptr);
+    }
+    template<class Y> shared_ptr(shared_ptr<Y>&& r)
+      :base_type(r)
+    {
+      set(r.get());
+      r.set(nullptr);
+    }
 
     /// 27 Requires: Y* shall be convertible to T*.
     /// 28 Effects: Constructs a shared_ptr object that shares ownership with r
@@ -536,7 +546,11 @@ namespace std
     /// 35 Throws: bad_alloc, or an implementation-defined exception when
     ///    a resource other than memory could not be obtained.
     /// 36 Exception safety: If an exception is thrown, the constructor has no effect.
-    template<class Y> explicit shared_ptr(auto_ptr<Y>&& r);
+    template<class Y> explicit shared_ptr(auto_ptr<Y>&& r)
+      :base_type(r.get())
+    {
+      set(r.release());
+    }
 
 #ifdef NTL__CXX_EF
     /// 37 Effects: Equivalent to shared_ptr(r.release(), r.get_deleter())
@@ -545,6 +559,7 @@ namespace std
     /// 38 Exception safety: If an exception is thrown, the constructor has no effect.
     template <class Y, class D> explicit shared_ptr(const unique_ptr<Y, D>& r) = delete;
 #endif
+
     template <class Y, class D> explicit shared_ptr(unique_ptr<Y, D>&& r)
     : base_type(r.release()) {/**/}
 
@@ -610,7 +625,7 @@ namespace std
 
     /// 3 Effects: Equivalent to shared_ptr().swap(*this).
     __forceinline
-      void reset() { shared_ptr().swap(*this); }
+    void reset() { shared_ptr().swap(*this); }
     template<class Y> void reset(Y* p) { shared_ptr(p).swap(*this); }
     template<class Y, class D> void reset(Y* p, D d);
 
