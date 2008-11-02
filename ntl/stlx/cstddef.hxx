@@ -40,7 +40,6 @@
 #endif
 
 #if defined(_MSC_VER)
-// add __declspec(restrict) ?
 # define __noalias __declspec(noalias)
 #elif defined(__BCPLUSPLUS__)
 # define __noalias
@@ -198,7 +197,7 @@
 
   #ifndef NTL__CXX_ALIGNOF
     #if _MSC_VER <= 1600
-      #define alignof(X) alignof(X)
+      #define alignof(X) __alignof(X)
     #endif
   #endif
   static_assert(alignof(int)==alignof(unsigned int), "wierd platform");

@@ -186,7 +186,7 @@ struct aligned_storage
 
 #pragma warning(pop)
 
-_CHECK_TRAIT(alignof(aligned_storage<5, 8000>::type) == 8192);
+_CHECK_TRAIT(__alignof(aligned_storage<5, 8000>::type) == 8192);
 _CHECK_TRAIT(sizeof(aligned_storage<2, 4>::type) == 4);
 //_CHECK_TRAIT(sizeof(aligned_storage<2, 4>::type) == 2);
 
@@ -532,24 +532,27 @@ template <class T> struct is_volatile<volatile T> : public true_type {};
 _CHECK_TRAIT(is_volatile<const int>::value == false);
 _CHECK_TRAIT(is_volatile<volatile int>::value);
 
-template<class T>struct is_trivial;
-template<class T>struct is_standard_layout;
+namespace __ { 
+  template<class T> struct is_unknown_array: false_type {};
+  template<class T> struct is_unknown_array<T[]>: true_type {};
+  template<class T, size_t Size> struct is_unknown_array<T[Size]>: false_type {};
+}
 
+template<class T> struct is_trivial;
+template<class T> struct is_standard_layout;
 
 ///\warning what about std::pair<int, int> ?
 template <class T> struct is_pod
 : public integral_constant<
-    bool, __is_pod(typename remove_extent<T>::type) // __is_pod will return false on fundamental types
-      || is_scalar<typename remove_extent<T>::type>::value
+bool, is_void<T>::value || 
+      is_scalar<typename remove_extent<T>::type>::value || 
+      __::is_unknown_array<T>::value ||
+      __is_pod(typename remove_extent<T>::type) // __is_pod will return false on fundamental types
     >
-{
-  static const bool __v = integral_constant::value;
-  STATIC_ASSERT(__v == is_pod<typename remove_extent<T>::type>::__v
-             && __v == is_pod<T const volatile>::__v
-             && __v >= (is_scalar<T>::value || is_void<T>::value)
-             );
-};
+{};
 _CHECK_TRAIT(is_pod<int>::value);
+_CHECK_TRAIT(is_pod<void>::value || is_pod<const void>::value);
+_CHECK_TRAIT(is_pod<int[]>::value);
 
 NTL__STLX_DEF_TRAIT(is_empty)
 
@@ -622,6 +625,17 @@ _CHECK_TRAIT((extent<int, 1>::value) == 0);
 _CHECK_TRAIT((extent<int[2], 1>::value) == 0);
 _CHECK_TRAIT((extent<int[2][4], 1>::value) == 4);
 _CHECK_TRAIT((extent<int[][4], 1>::value) == 4);
+
+template<class T> struct is_trivial
+: public integral_constant<
+bool, is_void<T>::value ||
+      __::is_unknown_array<T>::value ||
+     ( has_trivial_default_constructor<T>::value &&
+       has_trivial_copy_constructor<T>::value &&
+       has_trivial_assign<T>::value &&
+       has_trivial_destructor<T>::value
+     )                    > 
+{};
 
 
 // 20.5.7.2 Other transformations [meta.trans.other]

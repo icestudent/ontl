@@ -213,9 +213,9 @@ class allocator
     }
 #endif
 
-    __noalias __restrict
+    __noalias
     __forceinline
-    pointer allocate(size_type n, allocator<void>::const_pointer hint = 0)
+    T* __restrict allocate(size_type n, allocator<void>::const_pointer hint = 0)
       __ntl_throws(bad_alloc)
     {
       (hint);
