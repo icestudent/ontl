@@ -51,7 +51,11 @@ class list
     struct node : public double_linked
     {
         T elem;
-        node(const T & elem) : elem(elem)   {}
+        node(const T& elem) : elem(elem)   {}
+        #ifdef NTL__CXX_RV
+        node(T&& elem) : elem(move(elem))  {}
+        node(node&& x);
+        #endif
      // protected:
         // It's Ok not to copy the base (double_linked) while
         // copy constructor is called by list::insert() & list::replace() only.
@@ -158,8 +162,16 @@ class list
     }
 
     __forceinline
+    explicit list(size_type n)
+    : size_(0)
+    {
+      init_head();
+      //insert(begin(), n, value);
+    }
+
+    __forceinline
     explicit list(      size_type   n,
-                  const T&          value = T(),
+                  const T&          value,
                   const Allocator&  a     = Allocator())
     : node_allocator(a), size_(0)
     {
@@ -308,7 +320,14 @@ class list
     size_type max_size()  const { return node_allocator.max_size(); }
 
     __forceinline
-    void resize(size_type sz, T c = T())
+    void resize(size_type sz)
+    {
+      //while ( sz < size() ) pop_back();
+      //if    ( sz > size() ) insert(end(), sz - size(), c);
+    }
+
+    __forceinline
+    void resize(size_type sz, const T& c)
     {
       while ( sz < size() ) pop_back();
       if    ( sz > size() ) insert(end(), sz - size(), c);
@@ -365,7 +384,7 @@ class list
     {
       ++size_;
       node_type * const p = node_allocator.allocate(1);
-      node_allocator.construct(p, forward<value_type>(x));
+      node_allocator.construct(p, forward<T>(x));
       double_linked* const np = const_cast<double_linked*>(position.p);
       p->link(np->prev, np);
       return p;

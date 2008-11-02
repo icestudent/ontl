@@ -61,19 +61,20 @@ class vector
 
     void construct(size_type n, const T& value)
     {
-      iterator i = begin_;
-      while ( n-- ) array_allocator.construct(i++, value);
-      end_ = i;
+      uninitialized_fill_n(begin_, n, value);
+      end_ = begin_ + n;
     }
 
     template <class InputIterator>
     __forceinline
     void construct(InputIterator first, size_type n)
     {
-      iterator i = begin_;
-      for ( ; n--; ++first, ++i )
-        array_allocator.construct(i, *first);
-      end_ = i;
+      copy_n(first, n, begin_);
+      end_ = begin_ + n;
+      //iterator i = begin_;
+      //for ( ; n--; ++first, ++i )
+        //array_allocator.construct(i, *first);
+      //end_ = i;
     }
 
     template <class ForwardIterator>
@@ -102,8 +103,16 @@ class vector
     explicit vector(const Allocator& a = Allocator())
     : array_allocator(a), begin_(0), end_(0), capacity_(0) {}
 
-    explicit vector(      size_type n,
-                    const T& value      = T(),
+    explicit vector(size_type n)
+      :capacity_(n)
+    {
+      end_ = begin_ = array_allocator.allocate(n);
+      while(n--)
+        array_allocator.construct(end_++, forward<value_type>(T()));
+    }
+
+    explicit vector(size_type n,
+                    const T& value,
                     const Allocator& a  = Allocator())
     : array_allocator(a)
     {
@@ -285,7 +294,14 @@ class vector
     size_type capacity()  const { return capacity_; }
     bool      empty()     const { return begin_ == end_; }
 
-    void resize(size_type sz, const T& c = T())
+    void resize(size_type sz)
+    {
+      iterator new_end = begin_ + sz;
+      while ( new_end < end_ ) pop_back();
+      if    ( new_end > end_ ) insert__impl(end_, new_end - end_, forward<value_type>(T()));
+    }
+
+    void resize(size_type sz, const T& c)
     {
       iterator new_end = begin_ + sz;
       while ( new_end < end_ ) pop_back();
@@ -364,7 +380,9 @@ class vector
     iterator insert__impl(const_iterator position, size_type n, const T& x)
     {
       iterator r_dest = insert__blank_space(position, n);
-      while ( n-- ) array_allocator.construct(--r_dest, x);
+      //while ( n-- ) array_allocator.construct(--r_dest, x);
+      r_dest -= n;
+      uninitialized_fill_n(r_dest, n, x);
       return r_dest;
     }
 
@@ -447,7 +465,7 @@ class vector
     #ifdef NTL__CXX_RV
     iterator insert(const_iterator position, T&& x)
     {
-      return insert__impl(position, 1, x);
+      return insert__impl(position, 1, forward<value_type>((x)));
     }
     #endif
     
@@ -483,11 +501,11 @@ class vector
         #else
           std::copy
         #endif
-        (position+1, cend(), i);
+        (i+1, end(), i);
       }
       array_allocator.destroy(--end_);
 #endif
-      return &const_cast<value_type&>(*position);
+      return i;
     }
 
     __forceinline
