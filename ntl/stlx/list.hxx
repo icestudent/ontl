@@ -55,7 +55,8 @@ class list
         node(const T& elem) : elem(elem)   {}
         #else
         node(T&& elem) : elem(forward<T>(elem))  {}
-        node(node&& x);
+        node(node&& x): elem(move(x.elem))
+        {}
         #endif
      // protected:
         // It's Ok not to copy the base (double_linked) while
@@ -167,7 +168,8 @@ class list
     : size_(0)
     {
       init_head();
-      //insert(begin(), n, value);
+      while(n--)
+        insert(end(), forward<value_type>(T()));
     }
 
     __forceinline
@@ -324,7 +326,15 @@ class list
     void resize(size_type sz)
     {
       //while ( sz < size() ) pop_back();
-      //if    ( sz > size() ) insert(end(), sz - size(), c);
+      if(sz < size()){
+        const_iterator from = cbegin();
+        for(size_type i = 0; i < sz; ++i, ++from);
+        erase(from, cend());
+      }else if(sz > size()) {
+        size_type n = sz - size();
+        while(n--)
+          insert(end(), forward<value_type>(T()));
+      }
     }
 
     __forceinline
