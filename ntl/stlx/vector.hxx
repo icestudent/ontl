@@ -453,7 +453,7 @@ class vector
     void push_back(const T& x)
     {
       if ( size() == capacity() ) realloc(capacity_factor());
-      array_allocator.construct(end_++, x);
+      array_allocator.construct(end_++, (x));
     }
 
     void pop_back() __ntl_nothrow { array_allocator.destroy(--end_); }

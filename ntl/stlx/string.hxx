@@ -582,7 +582,7 @@ public:
       str.insert(p, first, last);
     }
 
-    iterator insert(iterator p, initializer_list<charT> il)
+    void insert(iterator p, initializer_list<charT> il)
     {
       return str.insert(p, il.begin(), il.end());
     }
