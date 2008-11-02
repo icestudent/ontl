@@ -322,7 +322,6 @@ class list
     size_type size()      const { return size_; }
     size_type max_size()  const { return node_allocator.max_size(); }
 
-    __forceinline
     void resize(size_type sz)
     {
       //while ( sz < size() ) pop_back();

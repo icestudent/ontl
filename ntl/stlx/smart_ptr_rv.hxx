@@ -70,7 +70,9 @@ namespace std
 
     ///\name 20.7.11.2.1 unique_ptr constructors [unique.ptr.single.ctor]
     unique_ptr() __ntl_nothrow : ptr(0) {}
+
     explicit unique_ptr(T* p) __ntl_nothrow : ptr(p) {}
+    
     unique_ptr(T* p, const deleter_type &) __ntl_nothrow : ptr(p) {}
 
     unique_ptr(unique_ptr&& u) __ntl_nothrow : ptr(u.get())
@@ -181,7 +183,9 @@ namespace std
 
     ///\name 20.7.11.3.1 unique_ptr constructors [unique.ptr.runtime.ctor]
     unique_ptr() __ntl_nothrow : ptr(0) {}
+
     explicit unique_ptr(T* p) __ntl_nothrow : ptr(p) {}
+
     unique_ptr(T* p, const deleter_type &) __ntl_nothrow : ptr(p) {}
 
     unique_ptr(unique_ptr&& u) __ntl_nothrow : ptr(u.get())
@@ -285,8 +289,11 @@ namespace std
 
     ///\name 20.7.11.3.1 unique_ptr constructors [unique.ptr.runtime.ctor]
     unique_ptr() __ntl_nothrow : ptr(0) {}
+
     explicit unique_ptr(T* p) __ntl_nothrow : ptr(p) {}
+
     unique_ptr(T* p, const deleter_type &) __ntl_nothrow : ptr(p) {}
+
     unique_ptr(unique_ptr&& u) __ntl_nothrow : ptr(u.get())
     {
       u.release();

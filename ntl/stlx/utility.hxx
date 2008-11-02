@@ -77,13 +77,13 @@ bool operator>=(const T & x, const T & y) { return !(x < y); }
   template <class T> struct identity { typedef T type; };
 
   template <class T>
-  T& inline forward(typename identity<T>::type& t) { return t; }
+  inline T& forward(typename identity<T>::type& t) { return t; }
 
   template <class T>
-  T& inline move(T& t) { return t; }
+  inline T& move(T& t) { return t; }
 
   template <class T>
-  const T& inline move(const T& t) { return t; }
+  inline const T& move(const T& t) { return t; }
 
 #endif
 #pragma endregion

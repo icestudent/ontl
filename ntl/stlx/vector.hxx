@@ -107,6 +107,7 @@ class vector
       :capacity_(n)
     {
       end_ = begin_ = array_allocator.allocate(n);
+      // TODO: detect move constructor existance and split this implementation in two other (common and move)
       while(n--)
         array_allocator.construct(end_++, forward<value_type>(T()));
     }
@@ -297,15 +298,19 @@ class vector
     void resize(size_type sz)
     {
       iterator new_end = begin_ + sz;
-      while ( new_end < end_ ) pop_back();
-      if    ( new_end > end_ ) insert__impl(end_, new_end - end_, forward<value_type>(T()));
+      if(new_end < end_)
+        erase(new_end, end_);
+      else if(new_end > end_)
+        insert__impl(end_, new_end - end_, forward<value_type>(T()));
     }
 
     void resize(size_type sz, const T& c)
     {
       iterator new_end = begin_ + sz;
-      while ( new_end < end_ ) pop_back();
-      if    ( new_end > end_ ) insert(end_, new_end - end_, c);
+      if(new_end < end_)
+        erase(new_end, end_);
+      else if(new_end > end_)
+        insert(end_, new_end - end_, c);
     }
 
     void reserve(size_type n) __ntl_throws(bad_alloc) //throw(length_error)
@@ -358,15 +363,15 @@ class vector
         //new_end += difference_type(new_mem - old_mem);        // dangerous alignment
         iterator dest = begin_ = new_mem;
         // this is safe for begin_ == 0 && end_ == 0, but keep vector() intact
-        #ifndef NTL__CXX_RV
+        //#ifndef NTL__CXX_RV
         for ( iterator src = old_mem; src != position; ++src, ++dest )
           move(dest, src);
-        #else
-        for ( iterator src = old_mem; src != position; ++src, ++dest ){
-          *dest = std::move(*src);
-          array_allocator.destroy(src);
-        }
-        #endif
+        //#else
+        //for ( iterator src = old_mem; src != position; ++src, ++dest ){
+        //  *dest = std::move(*src);
+        //  array_allocator.destroy(src);
+        //}
+        //#endif
       }
       // move the tail. iterators are reverse - may be no realloc
       iterator r_src = end();
@@ -518,18 +523,21 @@ class vector
       end_ = first;
       return tail;
 #else
-      iterator i = &const_cast<value_type&>(*first);
-      if(first != last){
+      // 1[000]
+      // 1[000]2
+      iterator first_ = &const_cast<value_type&>(*first), last_ = &const_cast<value_type&>(*last);
+      if(first_ != last_){
+        last_ = 
         #ifdef NTL__CXX_RV
           std::move
         #else
           std::copy
         #endif
-        (last, cend(), i);
-        while(end_-- != last)
-          array_allocator.destroy(end_);
+        (last_, end(), first_);
+        while(end_ != last_)
+          array_allocator.destroy(--end_);
       }
-      return i;
+      return first_;
 #endif
     }
     
