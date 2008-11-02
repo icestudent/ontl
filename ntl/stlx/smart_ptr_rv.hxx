@@ -257,7 +257,7 @@ namespace std
   private:
 
     element_type*  ptr;
-    void set(T * p) const { ptr = p; }
+    void set(T * p) { ptr = p; }
 
     #ifndef NTL__CXX_EF
     // disable copy from lvalue
