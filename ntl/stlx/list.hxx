@@ -51,9 +51,10 @@ class list
     struct node : public double_linked
     {
         T elem;
+        #ifndef NTL__CXX_RV
         node(const T& elem) : elem(elem)   {}
-        #ifdef NTL__CXX_RV
-        node(T&& elem) : elem(move(elem))  {}
+        #else
+        node(T&& elem) : elem(forward<T>(elem))  {}
         node(node&& x);
         #endif
      // protected:
@@ -350,9 +351,9 @@ class list
 
     #ifdef NTL__CXX_RV
     __forceinline
-    void push_front(T&& x) { insert(begin(), x); }
+    void push_front(T&& x) { insert(begin(), move(x)); }
     __forceinline
-    void push_back(T&& x)  { insert(end(), x);   }
+    void push_back(T&& x)  { insert(end(), move(x));   }
     #endif
 
     __forceinline
