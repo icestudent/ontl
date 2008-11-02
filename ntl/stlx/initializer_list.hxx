@@ -21,8 +21,8 @@ namespace std {
   public:
     initializer_list();
     size_t size() const;
-    const E* begin() const;
-    const E* end() const;
+    const E* begin() const { return nullptr; }
+    const E* end() const { return nullptr; }
   };
 }
 

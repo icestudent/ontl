@@ -51,9 +51,8 @@ class list
     struct node : public double_linked
     {
         T elem;
-        #ifndef NTL__CXX_RV
         node(const T& elem) : elem(elem)   {}
-        #else
+        #ifdef NTL__CXX_RV
         node(T&& elem) : elem(forward<T>(elem))  {}
         node(node&& x): elem(move(x.elem))
         {}
@@ -209,11 +208,24 @@ class list
     #ifdef NTL__CXX_RV
     list(list&& x)
     {
-      // NOTE: should we initialize head? or null it?
+      // NOTE: should we initialize head? or null it? null it.
+      init_head();
       swap(x);
     }
 
-    list(list&&, const Allocator&);
+    list(list&& x, const Allocator& a)
+      :node_allocator(a)
+    {
+      init_head();
+      if(x.get_allocator() == a){
+        swap(x);
+      }else{
+        // move elements using the node_allocator
+        resize(x.size());
+        std::move(x.begin(), x.end(), begin());
+        x.clear();
+      }
+    }
     #endif
     
     list(initializer_list<T> il, Allocator& a = Allocator())
@@ -382,6 +394,7 @@ class list
     {
       ++size_;
       node_type * const p = node_allocator.allocate(1);
+      //get_allocator().construct(&p->elem, x);
       node_allocator.construct(p, x);
       double_linked* const np = const_cast<double_linked*>(position.p);
       p->link(np->prev, np);

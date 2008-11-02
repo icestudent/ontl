@@ -56,7 +56,7 @@ namespace std {
       value_compare(value_compare&& x)
         :comp(move(x.comp))
       {
-        // TODO: support real move semantics for Compare
+        // TODO: support real move semantics for Compare?
       }
       #endif
 
@@ -65,7 +65,6 @@ namespace std {
       {
         return comp(x.first, y.first);
       }
-
 
     friend class std::map<Key, T, Compare, Allocator>;
     protected:
@@ -134,7 +133,8 @@ public:
 
 #ifdef NTL__CXX_RV
     map(map<Key,T,Compare,Allocator>&& x)
-      :val_comp_(forward<value_compare>(x.val_comp_)), tree_type(val_comp_, x.get_allocator())
+      // Compare must be a CopyConstructible
+      :val_comp_(x.val_comp_), tree_type(val_comp_, x.get_allocator())
     {
       swap(x);
     };
@@ -152,6 +152,12 @@ public:
     map(map&&, const Allocator&);
 #endif
 
+    map(initializer_list<value_type> il, const Compare comp = Compare(), const Allocator& a = Allocator())
+      :val_comp_(comp), tree_type(val_comp_, a)
+    {
+      insert_range(il.begin(), il.end());
+    }
+
     ~map(){}
 
     map<Key, T, Compare, Allocator>& operator=(const map<Key, T, Compare, Allocator> & x)
@@ -166,10 +172,18 @@ public:
 #ifdef NTL__CXX_RV
     map<Key,T,Compare,Allocator>& operator=(map<Key,T,Compare,Allocator>&& x)
     {
-      assign(x);
+      if(this != &x){
+        clear();
+        swap(x);
+      }
       return *this;
     }
 #endif
+
+    map& operator=(initializer_list<value_type> il)
+    {
+      return *this = map(il);
+    }
 
     using tree_type::get_allocator;
     using tree_type::begin;
@@ -234,14 +248,14 @@ public:
     template <class P>
     pair<iterator, bool> insert(P&& x)
     {
-      return tree_type::insert(x);
+      return tree_type::insert(std::forward<P>(x));
     }
 
-    template <class P>
-    iterator insert(const_iterator position, P&& x)
-    {
-      return tree_type::insert(position, x).first;
-    }
+    //template <class P>
+    //iterator insert(const_iterator position, P&& x);
+    //{
+    //  return tree_type::insert(position, std::forward<P>(x)).first;
+    //}
 #endif
 
     template <class InputIterator>
@@ -249,6 +263,12 @@ public:
     void insert(InputIterator first, InputIterator last)
     {
       insert_range(first, last);
+    }
+
+    __forceinline
+    void insert(initializer_list<value_type> il)
+    {
+      insert_range(il.begin(), il.end());
     }
 
     size_type erase(const key_type& x)
@@ -260,7 +280,7 @@ public:
     }
 
 #ifdef NTL__CXX_RV
-    void swap(map<Key,T,Compare,Allocator>&&x)
+    void swap(map<Key,T,Compare,Allocator>&& x)
 #else
     void swap(map<Key,T,Compare,Allocator>& x)
 #endif

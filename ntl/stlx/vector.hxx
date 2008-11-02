@@ -161,18 +161,23 @@ class vector
 
     #ifdef NTL__CXX_RV
     vector(vector&& x)
-      :begin_(x.begin_), end_(x.end_), capacity_(x.capacity_), array_allocator(std::move(x.array_allocator))
+      :begin_(), end_(), capacity_()
     {
-      x.begin_ = x.end_ = nullptr;
-      x.capacity_ = 0;
+      swap(x);
     }
 
     vector(vector&& x, const Allocator& a)
-      :begin_(x.begin_), end_(x.end_), capacity_(x.capacity_), 
-      array_allocator(a)
+      :array_allocator(a), 
+      begin_(), end_(), capacity_()
     {
-      x.begin_ = x.end_ = nullptr;
-      x.capacity_ = 0;
+      if(x.get_allocator() == a){
+        swap(x);
+      }else{
+        // move elements using the array_allocator
+        resize(x.size());
+        std::move(x.begin(), x.end(), begin_);
+        x.clear();
+      }
     }
     #endif
 

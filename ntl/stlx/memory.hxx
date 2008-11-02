@@ -241,17 +241,12 @@ class allocator
       ::new((void*)p) T(forward<Args>(args)...);
     }
 #elif defined(NTL__CXX_RV) //&& 0
+    template<class Arg>
     __forceinline
-    void construct(pointer p, T&& val)
+    void construct(pointer p, Arg&& val)
     {
       __assume(p);
-      ::new((void *)p) T(std::forward<T>(val));
-    }
-    __forceinline
-    void construct(pointer p, const T& val)
-    {
-      __assume(p);
-      ::new((void *)p) T(val);
+      ::new((void *)p) T(std::forward<Arg>(val));
     }
 #else
     __forceinline

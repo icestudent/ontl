@@ -261,22 +261,24 @@ public:
                  const Allocator& a     = Allocator())
     : str(begin, end, a) {}
 
+    __forceinline
     basic_string(const basic_string& str, const Allocator& a)
       :str(str.str, a)
     {}
 
-    
+    __forceinline
     basic_string(initializer_list<charT> il, const Allocator& a = Allocator())
       :str(il, a)
     {}
-    
 
     #ifdef NTL__CXX_RV
+    __forceinline
     basic_string(basic_string&& str)
-      :str(str.str)
+      :str(forward<stringbuf_t>(str.str))
     {}
+    __forceinline
     basic_string(basic_string&& str, const Allocator& a)
-      :str(str.str, a)
+      :str(forward<stringbuf_t>(str.str), a)
     {}
     #endif
 
@@ -291,21 +293,21 @@ public:
     /// - capacity() is at least as large as size().
     /// 19 If *this and str are the same object, the member has no effect.
     /// 20 Returns: *this
+    __forceinline
     basic_string& operator=(const basic_string& str)
     {
       return this == &str ? *this : assign(str);
     }
 
     #ifdef NTL__CXX_RV
+    __forceinline
     basic_string& operator=(basic_string&& str)
     {
-      if(this != &str)
-        swap(str);
-      return *this;
+      return this == &str ? *this : assign(move(str));
     }
     #endif
 
-    
+    __forceinline
     basic_string& operator=(initializer_list<charT> il)
     {
       return *this = basic_string(il);
@@ -493,6 +495,7 @@ public:
     #ifdef NTL__CXX_RV
     basic_string& assign(basic_string&& str)
     {
+      clear();
       swap(str);
       return *this;
     }

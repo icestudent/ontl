@@ -53,15 +53,31 @@ namespace tree
         }
         node(const T& elem)
           :elem(elem),
-          parent(NULL),// left(NULL), right(NULL),
+          parent(),
           color(red)
         {
           u.s.left = NULL;
           u.s.right= NULL;
         }
+        #ifdef NTL__CXX_RV
+        node(T&& elem)
+          :elem(std::forward<T>(elem)),
+          parent(),
+          color(red)
+        {
+          u.s.left = NULL;
+          u.s.right= NULL;
+        }
+        node(node&& n)
+          :elem(std::move(n.elem)),
+          parent(n.parent), color(n.color)
+        {
+          u.s.left = n.u.s.left;
+          u.s.right= n.u.s.right;
+        }
+        #endif
         node(const node& n)
-          :elem(n.elem),
-          parent(n.parent), /*left(n.left), right(n.right),*/ color(n.color)
+          :elem(n.elem), parent(n.parent), color(n.color)
         {
           u.s.left = n.u.s.left;
           u.s.right= n.u.s.right;
@@ -165,8 +181,6 @@ namespace tree
         insert(first, last);
       }
 
-      explicit rb_tree(const Allocator& a);
-
       rb_tree(const rb_tree& x)
         :node_allocator(x.node_allocator), comparator_(x.comparator_),
         root_(), first_(), last_(), count_()
@@ -180,6 +194,7 @@ namespace tree
       {
         swap(x);
       }
+
       rb_tree(rb_tree&& x, const Allocator& a);
       #endif
 
@@ -200,7 +215,10 @@ namespace tree
       #ifdef NTL__CXX_RV
       rb_tree& operator=(rb_tree&& x)
       {
-        assign(x);
+        if(this != &x){
+          clear();
+          swap(x);
+        }
         return *this;
       }
       #endif
@@ -283,8 +301,13 @@ namespace tree
       node_type* construct_node(value_type&& x)
       {
         node_type* const np = node_allocator.allocate(1);
-        node_allocator.construct(np, forward<value_type>(x));
+        node_allocator.construct(np, std::forward<value_type>(x));
         return np;
+      }
+
+      std::pair<iterator, bool> insert_reference(value_type&& x)
+      {
+        return insert_impl(construct_node(std::forward<value_type>(x)));
       }
       #endif
 
@@ -338,19 +361,11 @@ namespace tree
         return insert_impl(construct_node(x));
       }
 
-      #ifdef NTL__CXX_RV
-      std::pair<iterator, bool> insert(value_type&& x)
-      {
-        return insert_impl(construct_node(x));
-      }
-      #endif
-
       iterator insert(iterator /*position*/, const value_type& x)
       {
         // TODO: implement fast insert function based on position
         return insert(x).first;
       }
-
 
       iterator erase(iterator position)
       {
