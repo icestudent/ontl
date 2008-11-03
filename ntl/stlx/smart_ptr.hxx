@@ -59,9 +59,13 @@ namespace std
   template <class T>
   class unique_ptr<T, default_delete<T> >
   {
+    #ifndef __ICL
     typedef typename const unique_ptr::T** unspecified_pointer_type;
     typedef typename const unique_ptr::T*  unspecified_bool_type;
-
+    #else
+    typedef const T** unspecified_pointer_type;
+    typedef const T*  unspecified_bool_type;
+    #endif
     ///////////////////////////////////////////////////////////////////////////
   public:
 
@@ -145,8 +149,13 @@ namespace std
   template <class T>
   class unique_ptr<T[], default_delete<T[]> >
   {
+    #ifndef __ICL
     typedef typename const unique_ptr::T** unspecified_pointer_type;
     typedef typename const unique_ptr::T*  unspecified_bool_type;
+    #else
+    typedef const T** unspecified_pointer_type;
+    typedef const T*  unspecified_bool_type;
+    #endif
 
     ///////////////////////////////////////////////////////////////////////////
   public:
@@ -227,8 +236,13 @@ namespace std
   template <class T, size_t N>
   class unique_ptr<T[N], default_delete<T[N]> >
   {
+    #ifndef __ICL
     typedef typename const unique_ptr::T** unspecified_pointer_type;
     typedef typename const unique_ptr::T*  unspecified_bool_type;
+    #else
+    typedef const T** unspecified_pointer_type;
+    typedef const T*  unspecified_bool_type;
+    #endif
 
     ///////////////////////////////////////////////////////////////////////////
   public:

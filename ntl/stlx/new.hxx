@@ -39,7 +39,7 @@ class bad_alloc : public exception
   public:
     bad_alloc() __ntl_nothrow {}
     bad_alloc(const bad_alloc&) __ntl_nothrow {}
-    bad_alloc& operator=(const bad_alloc&) __ntl_nothrow {}
+    bad_alloc& operator=(const bad_alloc&) __ntl_nothrow { return *this; }
     virtual ~bad_alloc() __ntl_nothrow {}
     virtual const char* what() const __ntl_nothrow { return "bad_alloc"; }
 };
@@ -47,7 +47,11 @@ class bad_alloc : public exception
 struct  nothrow_t {};
 __declspec(selectany)
 extern
+#ifndef __BCPLUSPLUS__
 const nothrow_t nothrow;
+#else
+const nothrow_t nothrow = {};
+#endif
 
 /// Type new_handler [18.4.2.2 lib.new.handler]
 typedef void (*new_handler)();
@@ -112,7 +116,11 @@ void  operator delete[] (void*, void*) __ntl_nothrow            {}
 ///\name Variable-size structures support
 struct varsize_tag {};
 __declspec(selectany)
+#ifndef __BCPLUSPLUS__
 extern const varsize_tag varsize;
+#else
+extern const varsize_tag varsize = {};
+#endif
 
 __forceinline
 void* operator new(std::size_t size, const varsize_tag&, std::size_t aux_size)

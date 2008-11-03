@@ -121,7 +121,11 @@ struct linked_iterator<Node, 1>
 };
 
 typedef linked_iterator<linked, 1>        single_linked_iterator;
+#ifndef __ICL
 typedef linked_iterator<const linked, 1>  const_single_linked_iterator;
+#else
+typedef linked_iterator<linked, 1>        const_single_linked_iterator;
+#endif
 
 template<template<size_t> class Node>
 struct linked_iterator<Node, 2>
@@ -148,8 +152,11 @@ struct linked_iterator<Node, 2>
 };
 
 typedef linked_iterator<linked, 2>        double_linked_iterator;
+#ifndef __ICL
 typedef linked_iterator<const linked, 2>  const_double_linked_iterator;
-
+#else
+typedef linked_iterator<linked, 2>        const_double_linked_iterator;
+#endif
 
 template< typename ContainingType,
           typename MemberType,

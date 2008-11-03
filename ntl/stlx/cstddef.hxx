@@ -9,7 +9,7 @@
 #define NTL__STLX_CSTDDEF
 
 // supported compilers
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) && !defined(__INTEL_COMPILER)
 // MS VC++
   #if _MSC_VER < 1400
   # pragma error upgrade your compiler at least to VC8 (14.00)
@@ -19,14 +19,20 @@
   #if __BCPLUSPLUS__ < 0x600
   # pragma error upgrade your compiler at leat to BCB 2009 (12.00)
   #endif
+#elif defined(__INTEL_COMPILER)
+  #ifndef __ICL
+  # define __ICL __INTEL_COMPILER
+  #endif
 #else
 # pragma message("Unknown compiler, it is unsupported probably. Sorry, mate")
 #endif
+
 
 #ifdef _MSC_VER
 # pragma warning(disable:4514)// unreferenced inline function has been removed
 #else
 # define __forceinline inline
+# define __assume(X)
 #endif
 
 #define __optional
@@ -84,7 +90,7 @@
 
 #if __cplusplus <= 199711L
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && !defined(__ICL)
 
 #if _MSC_VER >= 1600
  
@@ -180,6 +186,58 @@
 //#define NTL__CXX_TT
 // variadic templates (implies rvalue references support)
 //#define NTL__CXX_VT
+#elif defined(__ICL)
+
+# if __ICL > 1100
+
+// TODO: detect -std=C++0x presence
+
+/** ICL's (East Mill) partial C++0x support */
+
+// keywords:
+// align (N2798+)
+//#define NTL__CXX_ALIGN
+// alignas( <= N2723)
+//#define NTL__CXX_ALIGNAS
+// alignof
+//#define NTL__CXX_ALIGNOF
+// auto
+#define NTL__CXX_AUTO
+// char16_t, char32_t
+//#define NTL__CXX_CHARS
+// concepts, concept_map, requires
+//#define NTL__CXX_CONCEPT
+// constexpr
+//#define NTL__CXX_CONSTEXPR
+// decltype (typeof)
+#define NTL__CXX_TYPEOF
+// class enum
+//#define NTL__CXX_ENUM
+// nullptr
+//#define NTL__CXX_NULLPTR
+// static assert
+#define NTL__CXX_ASSERT
+// thread_local
+//#define NTL__CXX_THREADL
+
+// syntax:
+// explicit delete/default function definition
+//#define NTL__CXX_EF
+// explicit conversion operators
+//#define NTL__CXX_EXPLICITOP
+// extern templates
+#define NTL__CXX_EXTPL
+// initializer lists
+//#define NTL__CXX_IL
+// lambda
+#define NTL__CXX_LAMBDA
+// rvalues
+//#define NTL__CXX_RV
+// template typedef
+//#define NTL__CXX_TT
+// variadic templates (implies rvalue references support)
+//#define NTL__CXX_VT
+# endif // __ICL
 
 #endif // _MSC_VER
 
@@ -191,12 +249,14 @@
     #ifdef _MSC_VER
       #define alignas(X) __declspec(align(X))
     #else
-      #define alignas(X)
+      #define alignas(X) 
     #endif
   #endif
 
   #ifndef NTL__CXX_ALIGNOF
-    #if _MSC_VER <= 1600
+    #if defined(__ICL)
+      #define alignof(X) __ALIGNOF__(X)
+    #elif _MSC_VER <= 1600
       #define alignof(X) __alignof(X)
     #endif
   #endif
@@ -235,7 +295,11 @@ namespace std {
 #ifdef _MSC_VER
   #pragma warning(push)
   #pragma warning(disable:4324)
-  typedef alignas(8192) struct {} max_align_t;
+  #ifndef __ICL
+  typedef alignas(8192)  struct {} max_align_t;
+  #else
+  typedef alignas(8192)  struct {void*_;} max_align_t;
+  #endif
   #pragma warning(pop)
 #else
   struct {} max_align_t;

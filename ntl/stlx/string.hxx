@@ -1039,7 +1039,7 @@ public:
       return sum;
     }
 
-#ifndef NTL__STRICT_STRING
+#if !defined(NTL__STRICT_STRING) && !defined(__BCPLUSPLUS__)
 
   template<class String>
   friend __forceinline

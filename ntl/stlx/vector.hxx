@@ -56,7 +56,9 @@ class vector
     typedef std::reverse_iterator<iterator>       reverse_iterator;
     typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
 
+    #ifndef __BCPLUSPLUS__
     static_assert((is_same<value_type, typename allocator::value_type>::value), "allocator::value_type must be the same as X::value_type");
+    #endif
   private:
 
     void construct(size_type n, const T& value)

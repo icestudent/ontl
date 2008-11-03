@@ -581,9 +581,15 @@ template <class T> struct is_signed
 : public integral_constant<bool, (static_cast<T>(-1) < 0)> {};
 _CHECK_TRAIT(is_signed<int>::value);
 
-template <class T> struct is_unsigned
-//: public integral_constant<bool, (is_arithmetic<T>::value && T(-1) > T(0))> {};
-: public integral_constant<bool, (static_cast<T>(-1) > 0)> {};
+#ifndef __ICL
+  template <class T> struct is_unsigned
+  //: public integral_constant<bool, (is_arithmetic<T>::value && T(-1) > T(0))> {};
+  : public integral_constant<bool, (static_cast<T>(-1) > 0)> {};
+#else
+  template <class T> struct is_unsigned
+    : public integral_constant<bool, (is_arithmetic<T>::value && !numeric_limits<T>::is_signed)> {};
+  //: public integral_constant<bool, (static_cast<T>(-1) > 0)> {};
+#endif
 _CHECK_TRAIT(is_unsigned<unsigned>::value);
 _CHECK_TRAIT(is_unsigned<float>::value == 0);
 

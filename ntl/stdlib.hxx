@@ -152,7 +152,7 @@ type
 }
 
 #else
-#error unsuported compiler
+
 #endif  //_MSC_VER
 
 

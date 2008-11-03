@@ -73,7 +73,48 @@ unsigned long
 }//namespace atomic
 
 #else
-#error unsupported compiler
+
+namespace atomic {
+
+static inline
+unsigned long
+  increment(volatile unsigned long & val)
+{
+  return 0;
+}
+
+static inline
+unsigned long
+  decrement(volatile unsigned long & val)
+{
+  return 0;
+}
+
+static inline
+unsigned long
+  exchange(volatile unsigned long & target, unsigned long val)
+{
+  return 0;
+}
+
+static inline
+unsigned long
+  exchange_add(volatile unsigned long & target, unsigned long val)
+{
+  return 0;
+}
+
+static inline
+unsigned long
+  compare_exchange(volatile unsigned long & dest, unsigned long exchange,
+                   unsigned long comperand)
+{
+  return 0;
+}
+
+}//namespace atomic
+
+
 #endif
 
 

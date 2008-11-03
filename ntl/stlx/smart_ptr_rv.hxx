@@ -43,11 +43,13 @@ namespace std
     void operator()(T* ptr) const { ::delete[] ptr; }
   };
 
+  #if 0
   /// 20.7.11.1.3 default_delete<T[N]> [unique.ptr.dltr.dflt2]
   template <class T, size_t N> struct default_delete<T[N]>
   {
     void operator()(T* ptr, size_t) const { ::delete[] ptr; }
   };
+  #endif
 
   ///\}
 
@@ -59,8 +61,13 @@ namespace std
   template <class T>
   class unique_ptr<T, default_delete<T> >
   {
+    #ifndef __BCPLUSPLUS__
     typedef typename const unique_ptr::T** unspecified_pointer_type;
     typedef typename const unique_ptr::T*  unspecified_bool_type;
+    #else
+    typedef const T** unspecified_pointer_type;
+    typedef const T*  unspecified_bool_type;
+    #endif
 
     ///////////////////////////////////////////////////////////////////////////
   public:
@@ -81,7 +88,7 @@ namespace std
     }
 
     template <class U/*, class E*/>
-    unique_ptr(unique_ptr<U, default_delete<U>>&& u) __ntl_nothrow : ptr(u.get())
+    unique_ptr(unique_ptr<U, default_delete<U> >&& u) __ntl_nothrow : ptr(u.get())
     {
       u.release();
     }
@@ -107,7 +114,7 @@ namespace std
 
     template <class U/*, class E*/>
     __forceinline
-    unique_ptr& operator=(unique_ptr<U, default_delete<U>>&& u) __ntl_nothrow
+    unique_ptr& operator=(unique_ptr<U, default_delete<U> >&& u) __ntl_nothrow
     {
       reset(u.release());
       return *this;
@@ -172,8 +179,13 @@ namespace std
   template <class T>
   class unique_ptr<T[], default_delete<T[]> >
   {
+    #ifndef __BCPLUSPLUS__
     typedef typename const unique_ptr::T** unspecified_pointer_type;
     typedef typename const unique_ptr::T*  unspecified_bool_type;
+    #else
+    typedef const T** unspecified_pointer_type;
+    typedef const T*  unspecified_bool_type;
+    #endif
 
     ///////////////////////////////////////////////////////////////////////////
   public:
@@ -271,7 +283,7 @@ namespace std
   };//template class unique_ptr
 
 
-
+  #if 0
   /// unique_ptr for array objects with a compile time length (removed from N2723)
   template <class T, size_t N>
   class unique_ptr<T[N], default_delete<T[N]> >
@@ -378,6 +390,7 @@ namespace std
     template<class Other> void reset(Other*) const;
 
   };//template class unique_ptr<T[N], default_delete<T[N]> >
+  #endif
 
   ///\name 20.7.11.4 unique_ptr specialized algorithms [unique.ptr.special]
   template <class T, class D> void swap(unique_ptr<T, D>& x, unique_ptr<T, D>& y)
