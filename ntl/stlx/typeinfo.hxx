@@ -105,7 +105,7 @@ public:
   bad_cast(const bad_cast&) __ntl_nothrow
   {}
   bad_cast& operator=(const bad_cast&) __ntl_nothrow
-  {}
+  { return *this; }
 
   virtual const char* what() const __ntl_nothrow
   {
@@ -121,7 +121,7 @@ public:
   bad_typeid(const bad_typeid&) __ntl_nothrow
   {}
   bad_typeid& operator=(const bad_typeid&) __ntl_nothrow
-  {}
+  { return *this; }
 
   virtual const char* what() const __ntl_nothrow
   {

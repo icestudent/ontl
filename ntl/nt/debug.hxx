@@ -224,8 +224,9 @@ namespace ntl {
 
     namespace intrinsic {
       extern "C" void __cdecl __debugbreak();
+#ifdef _MSC_VER
       #pragma intrinsic(__debugbreak)
-
+#endif
       static __forceinline
         void debugbreak()
       {
@@ -244,10 +245,17 @@ namespace ntl {
       const dbgprint<dpfltr::trace>   trace;
       const dbgprint<dpfltr::info>    info;
 #else
+#ifndef __BCPLUSPLUS__
       const dbgprint<dpfltr::error>   error;
       const dbgprint<dpfltr::error>   warning;
       const dbgprint<dpfltr::error>   trace;
       const dbgprint<dpfltr::error>   info;
+#else
+      const dbgprint<dpfltr::error>   error = {};
+      const dbgprint<dpfltr::error>   warning = {};
+      const dbgprint<dpfltr::error>   trace = {};
+      const dbgprint<dpfltr::error>   info = {};
+#endif
 #endif
 
       static __forceinline

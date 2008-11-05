@@ -1,6 +1,6 @@
 /**\file*********************************************************************
  *                                                                     \brief
- *  N2723 20.7 Memory [memory]
+ *  /// 20.7.11 Class template unique_ptr [unique.ptr]
  *
  ****************************************************************************
  */
@@ -9,6 +9,7 @@
 
 #include "memory.hxx"
 #include "utility.hxx"
+#include "type_traits.hxx"
 
 #include "../basedef.hxx"
 #include "../linked_ptr.hxx"
@@ -43,7 +44,7 @@ namespace std
     void operator()(T* ptr) const { ::delete[] ptr; }
   };
 
-  #if 0
+  #ifdef SMARTPTR_WITH_N
   /// 20.7.11.1.3 default_delete<T[N]> [unique.ptr.dltr.dflt2]
   template <class T, size_t N> struct default_delete<T[N]>
   {
@@ -57,7 +58,152 @@ namespace std
   class unique_ptr;
 
   /// 20.7.11.2 unique_ptr for single objects [unique.ptr.single]
-  ///\warning not Standard as no && support yet
+  template <class T, class D>
+  class unique_ptr
+  {
+#ifndef __BCPLUSPLUS__
+    typedef typename const unique_ptr::T** unspecified_pointer_type;
+    typedef typename const unique_ptr::T*  unspecified_bool_type;
+#else
+    typedef const T** unspecified_pointer_type;
+    typedef const T*  unspecified_bool_type;
+#endif
+
+    ///////////////////////////////////////////////////////////////////////////
+  public:
+
+    typedef T* pointer;
+    typedef T  element_type;
+    typedef D  deleter_type;
+
+    ///\name 20.7.11.2.1 unique_ptr constructors [unique.ptr.single.ctor]
+    unique_ptr() __ntl_nothrow
+      : ptr(0), deleter()
+    {
+      static_assert(!(is_reference<D>::value || is_pointer<D>::value), "D shall not be a reference type or pointer type");
+    }
+
+    explicit unique_ptr(pointer p) __ntl_nothrow 
+      : ptr(p), deleter()
+    {
+      static_assert(!(is_reference<D>::value || is_pointer<D>::value), "D shall not be a reference type or pointer type");
+    }
+
+    unique_ptr(pointer p, typename conditional<is_reference<deleter_type>::value, deleter_type, const deleter_type&>::type d) __ntl_nothrow 
+      : ptr(p), deleter(d)
+    {}
+
+    unique_ptr(pointer p, typename remove_reference<deleter_type>::type&& d) __ntl_nothrow 
+      : ptr(p), deleter(move(d))
+    {
+      static_assert(!is_reference<D>::value, "rvalue deleter object combined with reference deleter type");
+    }
+
+    unique_ptr(unique_ptr&& u) __ntl_nothrow
+      : ptr(u.get()), deleter(forward<D>(u.deleter))
+    {
+      u.release();
+    }
+
+    template <class U, class E>
+    unique_ptr(unique_ptr<U, E>&& u) __ntl_nothrow
+      : ptr(u.get()), deleter(forward<D>(u.get_deleter()))
+    {
+      u.release();
+    }
+
+    ///\name 20.7.11.2.2 unique_ptr destructor [unique.ptr.single.dtor]
+    ~unique_ptr() __ntl_nothrow 
+    {
+      if ( get() )
+        get_deleter()(get()); 
+    }
+
+
+#ifdef NTL__CXX_EF
+    // disable copy from lvalue
+    unique_ptr(const unique_ptr&) = delete;
+    template <class U, class E> unique_ptr(const unique_ptr<U, E>&) = delete;
+    unique_ptr& operator=(const unique_ptr&) = delete;
+    template <class U, class E> unique_ptr& operator=(const unique_ptr<U, E>&) = delete;
+#endif
+
+    ///\name 20.7.11.2.3 unique_ptr assignment [unique.ptr.single.asgn]
+    __forceinline
+      unique_ptr& operator=(unique_ptr&& u) __ntl_nothrow
+    {
+      reset(u.release());
+      deleter = move(u.deleter);
+      return *this;
+    }
+
+    template <class U, class E>
+    __forceinline
+      unique_ptr& operator=(unique_ptr<U, E>&& u) __ntl_nothrow
+    {
+      reset(u.release());
+      deleter = move(u.get_deleter());
+      return *this;
+    }
+
+    unique_ptr& operator=(unspecified_pointer_type *)
+    {
+      reset();
+      return *this;
+    }
+
+    ///\name 20.7.11.2.4 unique_ptr observers [unique.ptr.single.observers]
+    typename add_lvalue_reference<T>::type operator*() const __ntl_nothrow { return *get(); }
+    pointer operator->() const __ntl_nothrow { return get(); }
+    pointer get() const __ntl_nothrow { return ptr; }
+
+    deleter_type& get_deleter() __ntl_nothrow { return deleter; }
+    const deleter_type& get_deleter() const __ntl_nothrow { return deleter; }
+
+    operator unspecified_bool_type() const __ntl_nothrow { return ptr; }
+
+    ///\name 20.7.11.2.5 unique_ptr modifiers [unique.ptr.single.modifiers]
+    pointer release()
+    {
+      pointer tmp = nullptr;
+      std::swap(ptr, tmp);
+      return tmp; 
+    }
+
+    __forceinline
+      void reset(pointer p = 0) __ntl_nothrow
+    {
+      if ( get() && get() != p ) get_deleter()(get());
+      set(p);
+    }
+
+    void swap(unique_ptr&& u) __ntl_nothrow 
+    {
+      std::swap(ptr, u.ptr);
+      std::swap(deleter, u.deleter);
+    }
+
+    ///\}
+
+    ///////////////////////////////////////////////////////////////////////////
+  private:
+    pointer ptr;
+    deleter_type  deleter;
+
+    void set(T * p) { ptr = p; }
+
+#ifndef NTL__CXX_EF
+    // disable copy from lvalue
+    unique_ptr(const unique_ptr&);
+    template <class U, class E> unique_ptr(const unique_ptr<U, E>&);
+    unique_ptr& operator=(const unique_ptr&);
+    template <class U, class E> unique_ptr& operator=(const unique_ptr<U, E>&);
+#endif
+
+  };//template class unique_ptr
+
+
+
   template <class T>
   class unique_ptr<T, default_delete<T> >
   {
@@ -72,15 +218,16 @@ namespace std
     ///////////////////////////////////////////////////////////////////////////
   public:
 
-    typedef T element_type;
+    typedef T* pointer;
+    typedef T  element_type;
     typedef default_delete<T> deleter_type;
 
     ///\name 20.7.11.2.1 unique_ptr constructors [unique.ptr.single.ctor]
     unique_ptr() __ntl_nothrow : ptr(0) {}
 
-    explicit unique_ptr(T* p) __ntl_nothrow : ptr(p) {}
+    explicit unique_ptr(pointer p) __ntl_nothrow : ptr(p) {}
     
-    unique_ptr(T* p, const deleter_type &) __ntl_nothrow : ptr(p) {}
+    unique_ptr(pointer p, const deleter_type &) __ntl_nothrow : ptr(p) {}
 
     unique_ptr(unique_ptr&& u) __ntl_nothrow : ptr(u.get())
     {
@@ -94,7 +241,12 @@ namespace std
     }
 
     ///\name 20.7.11.2.2 unique_ptr destructor [unique.ptr.single.dtor]
-    ~unique_ptr() __ntl_nothrow { if ( get() ) get_deleter()(get()); }
+    ~unique_ptr() __ntl_nothrow 
+    {
+      if ( get() )
+        get_deleter()(get()); 
+    }
+
 
     #ifdef NTL__CXX_EF
     // disable copy from lvalue
@@ -128,8 +280,8 @@ namespace std
 
     ///\name 20.7.11.2.4 unique_ptr observers [unique.ptr.single.observers]
     typename add_lvalue_reference<T>::type operator*() const __ntl_nothrow { return *get(); }
-    T* operator->() const __ntl_nothrow { return get(); }
-    T* get() const __ntl_nothrow { return ptr; }
+    pointer operator->() const __ntl_nothrow { return get(); }
+    pointer get() const __ntl_nothrow { return ptr; }
 
     // local statics produce code bloat, shoud we replace the UD with a global static?
     deleter_type& get_deleter() __ntl_nothrow { return *(deleter_type*)0; }
@@ -138,15 +290,15 @@ namespace std
     operator unspecified_bool_type() const __ntl_nothrow { return ptr; }
 
     ///\name 20.7.11.2.5 unique_ptr modifiers [unique.ptr.single.modifiers]
-    T* release()
+    pointer release()
     {
-      T* tmp = nullptr;
+      pointer tmp = nullptr;
       std::swap(ptr, tmp);
       return tmp; 
     }
 
     __forceinline
-    void reset(T* p = 0) __ntl_nothrow
+    void reset(pointer p = 0) __ntl_nothrow
     {
       if ( get() && get() != p ) get_deleter()(get());
       set(p);
@@ -156,26 +308,158 @@ namespace std
     {
       std::swap(ptr, u.ptr); 
     }
-
     ///\}
 
     ///////////////////////////////////////////////////////////////////////////
   private:
-    element_type*  ptr;
+    pointer ptr;
     void set(T * p) { ptr = p; }
 
     #ifndef NTL__CXX_EF
     // disable copy from lvalue
-    //unique_ptr(const unique_ptr&);
-    //template <class U, class E> unique_ptr(const unique_ptr<U, E>&);
-    //unique_ptr& operator=(const unique_ptr&);
-    //template <class U, class E> unique_ptr& operator=(const unique_ptr<U, E>&);
+    unique_ptr(const unique_ptr&);
+    template <class U, class E> unique_ptr(const unique_ptr<U, E>&);
+    unique_ptr& operator=(const unique_ptr&);
+    template <class U, class E> unique_ptr& operator=(const unique_ptr<U, E>&);
     #endif
 
   };//template class unique_ptr
 
 
   /// 20.7.11.3 unique_ptr for array objects with a runtime length [unique.ptr.runtime]
+  template <class T, class D>
+  class unique_ptr<T[], D>
+  {
+#ifndef __BCPLUSPLUS__
+    typedef typename const unique_ptr::T** unspecified_pointer_type;
+    typedef typename const unique_ptr::T*  unspecified_bool_type;
+#else
+    typedef const T** unspecified_pointer_type;
+    typedef const T*  unspecified_bool_type;
+#endif
+
+    ///////////////////////////////////////////////////////////////////////////
+  public:
+    typedef T* pointer;
+    typedef T  element_type;
+    typedef D  deleter_type;
+
+    ///\name 20.7.11.3.1 unique_ptr constructors [unique.ptr.runtime.ctor]
+    unique_ptr() __ntl_nothrow
+      : ptr(0), deleter()
+    {
+      static_assert(!(is_reference<D>::value || is_pointer<D>::value), "D shall not be a reference type or pointer type");
+    }
+
+    explicit unique_ptr(pointer p) __ntl_nothrow
+      : ptr(p), deleter()
+    {
+      static_assert(!(is_reference<D>::value || is_pointer<D>::value), "D shall not be a reference type or pointer type");
+    }
+
+    unique_ptr(pointer p, typename conditional<is_reference<deleter_type>::value, deleter_type, const deleter_type&>::type d) __ntl_nothrow 
+      : ptr(p), deleter(d)
+    {}
+
+    unique_ptr(pointer p, typename remove_reference<deleter_type>::type&& d) __ntl_nothrow 
+      : ptr(p), deleter(move(d))
+    {
+      static_assert(!is_reference<D>::value, "rvalue deleter object combined with reference deleter type");
+    }
+
+    unique_ptr(unique_ptr&& u) __ntl_nothrow
+      : ptr(u.get()), deleter(forward<D>(u.deleter))
+    {
+      u.release();
+    }
+
+    template <class U, class E>
+    unique_ptr(unique_ptr<U, E>&& u) __ntl_nothrow
+      : ptr(u.get()), deleter(forward<D>(u.get_deleter()))
+    {
+      u.release();
+    }
+
+    ///\name 20.7.11.2.2 unique_ptr destructor [unique.ptr.single.dtor]
+    ~unique_ptr() __ntl_nothrow 
+    {
+      if ( get() )
+        get_deleter()(get()); 
+    }
+
+
+#ifdef NTL__CXX_EF
+    // disable copy from lvalue
+    unique_ptr(const unique_ptr&) = delete;
+    unique_ptr& operator=(const unique_ptr&) = delete;
+#endif
+
+    ///\name 20.7.11.2.3 unique_ptr assignment [unique.ptr.single.asgn]
+    __forceinline
+      unique_ptr& operator=(unique_ptr&& u) __ntl_nothrow
+    {
+      reset(u.release());
+      deleter = move(u.deleter);
+      return *this;
+    }
+
+    unique_ptr& operator=(unspecified_pointer_type *)
+    {
+      reset();
+      return *this;
+    }
+
+    ///\name 20.7.11.3.2 unique_ptr observers [unique.ptr.runtime.observers]
+    T& operator[](size_t i) const __ntl_nothrow { return get()[i]; }
+    pointer get() const __ntl_nothrow { return ptr; }
+
+    deleter_type& get_deleter() __ntl_nothrow { return deleter; }
+    const deleter_type& get_deleter() const __ntl_nothrow { return deleter; }
+
+    operator unspecified_bool_type() const __ntl_nothrow { return ptr; }
+
+    ///\name 20.7.11.2.5 unique_ptr modifiers [unique.ptr.single.modifiers]
+    pointer release()
+    {
+      pointer tmp = nullptr;
+      std::swap(tmp, ptr);
+      return tmp;
+    }
+
+    __forceinline
+    void reset(pointer p = 0) __ntl_nothrow
+    {
+      if ( get() && get() != p ) get_deleter()(get());
+      set(p);
+    }
+
+    void swap(unique_ptr&& u) __ntl_nothrow
+    {
+      std::swap(ptr, u.ptr); 
+      std::swap(deleter, u.deleter);
+    }
+
+    ///\}
+
+    ///////////////////////////////////////////////////////////////////////////
+  private:
+    pointer ptr;
+    deleter_type deleter;
+
+    void set(T * p) { ptr = p; }
+
+#ifndef NTL__CXX_EF
+    // disable copy from lvalue
+    unique_ptr(const unique_ptr&);
+    unique_ptr& operator=(const unique_ptr&);
+#endif
+
+    template<class Other> unique_ptr(Other*);
+    template<class Other> void reset(Other*) const;
+
+  };//template class unique_ptr
+
+
   template <class T>
   class unique_ptr<T[], default_delete<T[]> >
   {
@@ -190,15 +474,16 @@ namespace std
     ///////////////////////////////////////////////////////////////////////////
   public:
 
-    typedef T element_type;
+    typedef T* pointer;
+    typedef T  element_type;
     typedef default_delete<T[]> deleter_type;
 
     ///\name 20.7.11.3.1 unique_ptr constructors [unique.ptr.runtime.ctor]
     unique_ptr() __ntl_nothrow : ptr(0) {}
 
-    explicit unique_ptr(T* p) __ntl_nothrow : ptr(p) {}
+    explicit unique_ptr(pointer p) __ntl_nothrow : ptr(p) {}
 
-    unique_ptr(T* p, const deleter_type &) __ntl_nothrow : ptr(p) {}
+    unique_ptr(pointer p, const deleter_type &) __ntl_nothrow : ptr(p) {}
 
     unique_ptr(unique_ptr&& u) __ntl_nothrow : ptr(u.get())
     {
@@ -206,7 +491,11 @@ namespace std
     }
 
     ///\name 20.7.11.2.2 unique_ptr destructor [unique.ptr.single.dtor]
-    ~unique_ptr() __ntl_nothrow { if ( get() ) get_deleter()(get()); }
+    ~unique_ptr() __ntl_nothrow 
+    {
+      if ( get() )
+        get_deleter()(get()); 
+    }
 
     #ifdef NTL__CXX_EF
     // disable copy from lvalue
@@ -230,7 +519,7 @@ namespace std
 
     ///\name 20.7.11.3.2 unique_ptr observers [unique.ptr.runtime.observers]
     T& operator[](size_t i) const __ntl_nothrow { return get()[i]; }
-    T* get() const __ntl_nothrow { return ptr; }
+    pointer get() const __ntl_nothrow { return ptr; }
 
     deleter_type& get_deleter() __ntl_nothrow
     {
@@ -247,28 +536,30 @@ namespace std
     operator unspecified_bool_type() const __ntl_nothrow { return ptr; }
 
     ///\name 20.7.11.2.5 unique_ptr modifiers [unique.ptr.single.modifiers]
-    T* release()
+    pointer release()
     {
-      T* tmp = nullptr;
+      pointer tmp = nullptr;
       std::swap(tmp, ptr);
       return tmp;
     }
 
     __forceinline
-    void reset(T* p = 0) __ntl_nothrow
+    void reset(pointer p = 0) __ntl_nothrow
     {
       if ( get() && get() != p ) get_deleter()(get());
       set(p);
     }
 
-    void swap(unique_ptr&& u) __ntl_nothrow { std::swap(ptr, u.ptr); }
-
+    void swap(unique_ptr&& u) __ntl_nothrow
+    {
+      std::swap(ptr, u.ptr); 
+    }
     ///\}
 
     ///////////////////////////////////////////////////////////////////////////
   private:
+    pointer ptr;
 
-    element_type*  ptr;
     void set(T * p) { ptr = p; }
 
     #ifndef NTL__CXX_EF
@@ -283,7 +574,7 @@ namespace std
   };//template class unique_ptr
 
 
-  #if 0
+  #ifdef SMARTPTR_WITH_N
   /// unique_ptr for array objects with a compile time length (removed from N2723)
   template <class T, size_t N>
   class unique_ptr<T[N], default_delete<T[N]> >
@@ -293,8 +584,8 @@ namespace std
 
     ///////////////////////////////////////////////////////////////////////////
   public:
-
-    typedef T element_type;
+    typedef T* pointer;
+    typedef T  element_type;
     typedef default_delete<T[N]> deleter_type;
 
     static const size_t size = N;
@@ -302,9 +593,9 @@ namespace std
     ///\name 20.7.11.3.1 unique_ptr constructors [unique.ptr.runtime.ctor]
     unique_ptr() __ntl_nothrow : ptr(0) {}
 
-    explicit unique_ptr(T* p) __ntl_nothrow : ptr(p) {}
+    explicit unique_ptr(pointer p) __ntl_nothrow : ptr(p) {}
 
-    unique_ptr(T* p, const deleter_type &) __ntl_nothrow : ptr(p) {}
+    unique_ptr(pointer p, const deleter_type &) __ntl_nothrow : ptr(p) {}
 
     unique_ptr(unique_ptr&& u) __ntl_nothrow : ptr(u.get())
     {
@@ -312,7 +603,11 @@ namespace std
     }
 
     ///\name 20.7.11.4.1 unique_ptr destructor [unique.ptr.compiletime.dtor]
-    ~unique_ptr() __ntl_nothrow { if ( get() ) get_deleter()(get(), N); }
+    ~unique_ptr() __ntl_nothrow 
+    {
+      if ( get() )
+        get_deleter()(get(), N); 
+    }
 
     #ifdef NTL__CXX_EF
     // disable copy from lvalue
@@ -336,7 +631,7 @@ namespace std
 
     ///\name 20.7.11.4.1 unique_ptr destructor [unique.ptr.compiletime.dtor]
     T& operator[](size_t i) const __ntl_nothrow { return get()[i]; }
-    T* get() const __ntl_nothrow { return ptr; }
+    pointer get() const __ntl_nothrow { return ptr; }
 
     deleter_type& get_deleter() __ntl_nothrow
     {
@@ -353,32 +648,32 @@ namespace std
     operator unspecified_bool_type() const __ntl_nothrow { return ptr; }
 
     ///\name 20.7.11.2.5 unique_ptr modifiers [unique.ptr.single.modifiers]
-    T* release() {
-      T* tmp = nullptr;
+    pointer release()
+    {
+      pointer tmp = nullptr;
       std::swap(ptr, tmp);
       return tmp; 
     }
 
     __forceinline
-    void reset(T* p = 0) const __ntl_nothrow
+    void reset(pointer p = 0) __ntl_nothrow
     {
       if ( get() && get() != p ) get_deleter()(get(), N);
       set(p);
     }
 
-    void swap(unique_ptr&& u) const __ntl_nothrow 
+    void swap(unique_ptr&& u) __ntl_nothrow 
     { 
       std::swap(ptr, u.ptr); 
     }
-
     ///\}
 
     ///////////////////////////////////////////////////////////////////////////
   private:
     enum { __actual_size = N };
 
-    element_type *  ptr;
-    void set(T * p) const { ptr = p; }
+    pointer ptr;
+    void set(T* p) { ptr = p; }
 
     #ifndef NTL__CXX_EF
     // disable copy from lvalue

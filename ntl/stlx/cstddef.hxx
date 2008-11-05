@@ -12,17 +12,23 @@
 #if defined(_MSC_VER) && !defined(__INTEL_COMPILER)
 // MS VC++
   #if _MSC_VER < 1400
-  # pragma error upgrade your compiler at least to VC8 (14.00)
+  # error upgrade your compiler at least to VC8 (14.00)
   #endif
 #elif defined(__BCPLUSPLUS__)
-// borland C++
+// Borland C++
   #if __BCPLUSPLUS__ < 0x600
-  # pragma error upgrade your compiler at leat to BCB 2009 (12.00)
+  # error upgrade your compiler at least to BCB 2009 (12.00)
   #endif
 #elif defined(__INTEL_COMPILER)
   #ifndef __ICL
   # define __ICL __INTEL_COMPILER
   #endif
+#elif defined(__GNUC__)
+// GCC 
+  #if !(__GNUC__ > 4 || __GNUC__ == 4 && __GNUC_MINOR__ >= 3)
+  # error upgrade GCC at least to the GCC 4.3
+  #endif
+  #error not supported yet.
 #else
 # pragma message("Unknown compiler, it is unsupported probably. Sorry, mate")
 #endif
@@ -237,7 +243,57 @@
 //#define NTL__CXX_TT
 // variadic templates (implies rvalue references support)
 //#define NTL__CXX_VT
+
+
 # endif // __ICL
+
+#elif defined(__GNUC__) && defined(__GXX_EXPERIMENTAL_CXX0X__)
+
+/** GCC's partial C++0x support */
+
+// keywords:
+// align (N2798+)
+//#define NTL__CXX_ALIGN
+// alignas( <= N2723)
+//#define NTL__CXX_ALIGNAS
+// alignof
+//#define NTL__CXX_ALIGNOF
+// auto
+//#define NTL__CXX_AUTO
+// char16_t, char32_t
+//#define NTL__CXX_CHARS
+// concepts, concept_map, requires
+//#define NTL__CXX_CONCEPT
+// constexpr
+//#define NTL__CXX_CONSTEXPR
+// decltype (typeof)
+#define NTL__CXX_TYPEOF
+// class enum
+#define NTL__CXX_ENUM
+// nullptr
+//#define NTL__CXX_NULLPTR
+// static assert
+#define NTL__CXX_ASSERT
+// thread_local
+//#define NTL__CXX_THREADL
+
+// syntax:
+// explicit delete/default function definition
+#define NTL__CXX_EF
+// explicit conversion operators
+//#define NTL__CXX_EXPLICITOP
+// extern templates
+#define NTL__CXX_EXTPL
+// initializer lists
+#define NTL__CXX_IL
+// lambda
+//#define NTL__CXX_LAMBDA
+// rvalues
+#define NTL__CXX_RV
+// template typedef
+//#define NTL__CXX_TT
+// variadic templates (implies rvalue references support)
+#define NTL__CXX_VT
 
 #endif // _MSC_VER
 

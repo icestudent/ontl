@@ -26,7 +26,7 @@ class logic_error : public exception
   private:
     const string msg;
   protected:
-    logic_error operator=(const logic_error&) {/* do not use */}
+    logic_error operator=(const logic_error&) {/* do not use */ return *this; }
 };
 
 /// 19.1.2 Class domain_error [domain.error]
@@ -72,7 +72,7 @@ class runtime_error : public exception
   private:
     const string msg;
   protected:
-    runtime_error operator=(const runtime_error&) {/* do not use */}
+    runtime_error operator=(const runtime_error&) {/* do not use */ return *this; }
 };
 
 /// 19.1.7 Class range_error [lib.range.error]

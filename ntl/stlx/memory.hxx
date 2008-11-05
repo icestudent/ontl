@@ -26,19 +26,10 @@ namespace std {
 /**
  *	Automatically detects whether \c T has a nested \c allocator_type that is convertible from \c Alloc.
  **/
-#ifndef __BCPLUSPLUS__
 template<class T, class Alloc> struct uses_allocator
 : public integral_constant<
-    bool, is_convertible<Alloc, typename T::allocator_type>::value
+    bool, is_convertible<Alloc, typename T::allocator_type>::value == true
     > {};
-#else
-template<class T, class Alloc> struct uses_allocator
-{
-  typedef bool value_type;
-  static const value_type value = is_convertible<Alloc, typename T::allocator_type>::value;
-  typedef integral_constant<value_type, value> type;
-};
-#endif
 /**
  *	If a specialization \c is_scoped_allocator<Alloc> is derived from \c true_type, it indicates that
  *  \c Alloc is a \c scoped allocator. A scoped allocator specifies the memory resource to be used by a container

@@ -1629,9 +1629,13 @@ struct status
     ipsec_integrity_check_failed                                   = (int)0xC0360006,
     ipsec_clear_text_drop                                          = (int)0xC0360007,
 
+#ifndef __BCPLUSPLUS__
     cxx_exception = (int)(0xE0000000|'msc'),
-    com_exception = (int)0xE0000000|'MOC'
-
+    com_exception = (int)(0xE0000000|'MOC')
+#else
+    cxx_exception = (int)0xE063736D,
+    com_exception = (int)0xE0434F4D
+#endif
   };
 };
 

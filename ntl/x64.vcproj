@@ -502,6 +502,18 @@
 						>
 					</File>
 					<File
+						RelativePath=".\stlx\regex.hxx"
+						>
+					</File>
+					<File
+						RelativePath=".\stlx\smart_ptr.hxx"
+						>
+					</File>
+					<File
+						RelativePath=".\stlx\smart_ptr_rv.hxx"
+						>
+					</File>
+					<File
 						RelativePath=".\stlx\tt_ismemptr.inl"
 						>
 					</File>
