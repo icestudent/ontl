@@ -109,6 +109,7 @@ namespace std
     unique_ptr(unique_ptr<U, E>&& u) __ntl_nothrow
       : ptr(u.get()), deleter(forward<D>(u.get_deleter()))
     {
+      static_assert(!is_reference<deleter_type>::value || is_same<deleter_type, E>::value, "If D is a reference type, then E shall be the same type as D");
       u.release();
     }
 
@@ -377,6 +378,7 @@ namespace std
     unique_ptr(unique_ptr<U, E>&& u) __ntl_nothrow
       : ptr(u.get()), deleter(forward<D>(u.get_deleter()))
     {
+      static_assert(!is_reference<deleter_type>::value || is_same<deleter_type, E>::value, "If D is a reference type, then E shall be the same type as D");
       u.release();
     }
 
