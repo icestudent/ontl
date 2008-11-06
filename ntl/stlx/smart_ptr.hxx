@@ -30,7 +30,11 @@ namespace std
   {
     default_delete() {}
     template <class U> default_delete(const default_delete<U>&) {}
-    void operator()(T* ptr) const { ::delete ptr; }
+    void operator()(T* ptr) const 
+    {
+      static_assert(sizeof(T) > 0, "incomplete type of T is not allowed");
+      ::delete ptr; 
+    }
   private:
     // forbid incompatible ::delete[]
     template <class U> default_delete(const default_delete<U[]>&);
@@ -40,7 +44,11 @@ namespace std
   /// 20.7.11.1.2 default_delete<T[]> [unique.ptr.dltr.dflt1]
   template <class T> struct default_delete<T[]>
   {
-    void operator()(T* ptr) const { ::delete[] ptr; }
+    void operator()(T* ptr) const 
+    {
+      static_assert(sizeof(T) > 0, "incomplete type of T is not allowed");
+      ::delete[] ptr; 
+    }
   };
 
 #ifdef SMARTPTR_WITH_N
@@ -107,6 +115,7 @@ namespace std
     unique_ptr(const unique_ptr<U, E>& u) __ntl_nothrow
       : ptr(u.get()), deleter(forward<D>(u.get_deleter()))
     {
+      static_assert(is_array<U>::value == false, "conversion among array and non-array forms are disallowed");
       static_assert(!is_reference<deleter_type>::value || is_same<deleter_type, E>::value, "If D is a reference type, then E shall be the same type as D");
       u.release();
     }
@@ -140,6 +149,7 @@ namespace std
     __forceinline
       unique_ptr& operator=(const unique_ptr<U, E>& u) __ntl_nothrow
     {
+      static_assert(is_array<U>::value == false, "conversion among array and non-array forms are disallowed");
       reset(u.release());
       deleter = move(u.get_deleter());
       return *this;
@@ -228,6 +238,7 @@ namespace std
     template <class U/*, class E*/>
     unique_ptr(const unique_ptr<U, default_delete<U> >& u) __ntl_nothrow : ptr(u.get())
     {
+      static_assert(is_array<U>::value == false, "conversion among array and non-array forms are disallowed");
       u.release();
     }
 
@@ -354,6 +365,7 @@ namespace std
     unique_ptr(const unique_ptr<U, E>& u) __ntl_nothrow
       : ptr(u.get()), deleter(forward<D>(u.get_deleter()))
     {
+      static_assert(is_array<U>::value == true, "conversion among array and non-array forms are disallowed");
       static_assert(!is_reference<deleter_type>::value || is_same<deleter_type, E>::value, "If D is a reference type, then E shall be the same type as D");
       u.release();
     }
@@ -459,6 +471,14 @@ namespace std
 
     unique_ptr(const unique_ptr& u) __ntl_nothrow : ptr(u.get())
     {
+      u.release();
+    }
+
+    template <class U/*, class E*/>
+    unique_ptr(const unique_ptr<U, default_delete<U[]> >& u) __ntl_nothrow
+      : ptr(u.get())
+    {
+      static_assert(is_array<U>::value == true, "conversion among array and non-array forms are disallowed");
       u.release();
     }
 
