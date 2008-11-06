@@ -52,7 +52,7 @@ namespace std
     }
   };
 
-  #ifdef SMARTPTR_WITH_N
+  #ifdef STLX__SMARTPTR_WITH_N
   /// 20.7.11.1.3 default_delete<T[N]> [unique.ptr.dltr.dflt2]
   template <class T, size_t N> struct default_delete<T[N]>
   {
@@ -597,7 +597,7 @@ namespace std
   };//template class unique_ptr
 
 
-  #ifdef SMARTPTR_WITH_N
+  #ifdef STLX__SMARTPTR_WITH_N
   /// unique_ptr for array objects with a compile time length (removed from N2723)
   template <class T, size_t N>
   class unique_ptr<T[N], default_delete<T[N]> >
