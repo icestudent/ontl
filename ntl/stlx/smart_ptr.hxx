@@ -96,11 +96,10 @@ namespace std
       static_assert(!(is_reference<D>::value || is_pointer<D>::value), "D shall not be a reference type or pointer type");
     }
 
-    /**
-      A = const A&
-      A&= A&
-      const A& = const A&
-     **/
+    unique_ptr(nullptr_t) __ntl_nothrow
+      :ptr(0), deleter()
+    {}
+
     unique_ptr(pointer p, typename conditional<is_reference<deleter_type>::value, deleter_type, typename add_lvalue_reference<const typename remove_reference<deleter_type>::type>::type>::type d) __ntl_nothrow 
       : ptr(p), deleter(d)
     {}
@@ -116,7 +115,7 @@ namespace std
       : ptr(u.get()), deleter(forward<D>(u.get_deleter()))
     {
       static_assert(is_array<U>::value == false, "conversion among array and non-array forms are disallowed");
-      static_assert(!is_reference<deleter_type>::value || is_same<deleter_type, E>::value, "If D is a reference type, then E shall be the same type as D");
+      static_assert((!is_reference<deleter_type>::value || is_same<deleter_type, E>::value), "If D is a reference type, then E shall be the same type as D");
       u.release();
     }
 
@@ -225,6 +224,10 @@ namespace std
 
     ///\name 20.7.11.2.1 unique_ptr constructors [unique.ptr.single.ctor]
     unique_ptr() __ntl_nothrow : ptr(0) {}
+
+    unique_ptr(nullptr_t) __ntl_nothrow
+      :ptr(0)
+    {}
 
     explicit unique_ptr(pointer p) __ntl_nothrow : ptr(p) {}
 
@@ -351,6 +354,10 @@ namespace std
       static_assert(!(is_reference<D>::value || is_pointer<D>::value), "D shall not be a reference type or pointer type");
     }
 
+    unique_ptr(nullptr_t) __ntl_nothrow
+      :ptr(0), deleter()
+    {}
+
     unique_ptr(pointer p, typename conditional<is_reference<deleter_type>::value, deleter_type, typename add_lvalue_reference<const typename remove_reference<deleter_type>::type>::type>::type d) __ntl_nothrow 
       : ptr(p), deleter(d)
     {}
@@ -366,7 +373,7 @@ namespace std
       : ptr(u.get()), deleter(forward<D>(u.get_deleter()))
     {
       static_assert(is_array<U>::value == true, "conversion among array and non-array forms are disallowed");
-      static_assert(!is_reference<deleter_type>::value || is_same<deleter_type, E>::value, "If D is a reference type, then E shall be the same type as D");
+      static_assert((!is_reference<deleter_type>::value || is_same<deleter_type, E>::value), "If D is a reference type, then E shall be the same type as D");
       u.release();
     }
 
@@ -466,6 +473,10 @@ namespace std
     unique_ptr() __ntl_nothrow : ptr(0) {}
 
     explicit unique_ptr(pointer p) __ntl_nothrow : ptr(p) {}
+
+    unique_ptr(nullptr_t) __ntl_nothrow
+      :ptr(0)
+    {}
 
     unique_ptr(pointer p, const deleter_type &) __ntl_nothrow : ptr(p) {}
 
@@ -580,6 +591,10 @@ namespace std
     unique_ptr() __ntl_nothrow : ptr(0) {}
 
     explicit unique_ptr(pointer p) __ntl_nothrow : ptr(p) {}
+
+    unique_ptr(nullptr_t) __ntl_nothrow
+      :ptr(0)
+    {}
 
     unique_ptr(pointer p, const deleter_type &) __ntl_nothrow : ptr(p) {}
 

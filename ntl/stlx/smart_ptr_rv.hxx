@@ -97,6 +97,10 @@ namespace std
       static_assert(!(is_reference<D>::value || is_pointer<D>::value), "D shall not be a reference type or pointer type");
     }
 
+    unique_ptr(nullptr_t) __ntl_nothrow
+      :ptr(0), deleter()
+    {}
+
     unique_ptr(pointer p, typename conditional<is_reference<deleter_type>::value, deleter_type, const deleter_type&>::type d) __ntl_nothrow 
       : ptr(p), deleter(d)
     {}
@@ -238,6 +242,10 @@ namespace std
 
     explicit unique_ptr(pointer p) __ntl_nothrow : ptr(p) {}
     
+    unique_ptr(nullptr_t) __ntl_nothrow
+      :ptr(0)
+    {}
+
     unique_ptr(pointer p, const deleter_type &) __ntl_nothrow : ptr(p) {}
 
     unique_ptr(unique_ptr&& u) __ntl_nothrow : ptr(u.get())
@@ -370,6 +378,10 @@ namespace std
       static_assert(!(is_reference<D>::value || is_pointer<D>::value), "D shall not be a reference type or pointer type");
     }
 
+    unique_ptr(nullptr_t) __ntl_nothrow
+      :ptr(0), deleter()
+    {}
+
     unique_ptr(pointer p, typename conditional<is_reference<deleter_type>::value, deleter_type, const deleter_type&>::type d) __ntl_nothrow 
       : ptr(p), deleter(d)
     {}
@@ -498,6 +510,10 @@ namespace std
 
     explicit unique_ptr(pointer p) __ntl_nothrow : ptr(p) {}
 
+    unique_ptr(nullptr_t) __ntl_nothrow
+      :ptr(0)
+    {}
+
     unique_ptr(pointer p, const deleter_type &) __ntl_nothrow : ptr(p) {}
 
     unique_ptr(unique_ptr&& u) __ntl_nothrow : ptr(u.get())
@@ -617,6 +633,10 @@ namespace std
     unique_ptr() __ntl_nothrow : ptr(0) {}
 
     explicit unique_ptr(pointer p) __ntl_nothrow : ptr(p) {}
+
+    unique_ptr(nullptr_t) __ntl_nothrow
+      :ptr(0)
+    {}
 
     unique_ptr(pointer p, const deleter_type &) __ntl_nothrow : ptr(p) {}
 
