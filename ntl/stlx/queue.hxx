@@ -93,22 +93,48 @@ namespace std {
   template <class T, class Container>
   bool operator< (const queue<T, Container>& x, const queue<T, Container>& y);
   template <class T, class Container>
-  bool operator!=(const queue<T, Container>& x, const queue<T, Container>& y);
-  template <class T, class Container>
-  bool operator> (const queue<T, Container>& x, const queue<T, Container>& y);
-  template <class T, class Container>
-  bool operator>=(const queue<T, Container>& x, const queue<T, Container>& y);
-  template <class T, class Container>
-  bool operator<=(const queue<T, Container>& x, const queue<T, Container>& y);
+  bool operator!=(const queue<T, Container>& x, const queue<T, Container>& y)
+  {
+    return rel_ops::operator !=(x, y);
+  }
 
   template <class T, class Container>
-  void swap(queue<T, Container>& x, queue<T, Container>& y);
+  bool operator> (const queue<T, Container>& x, const queue<T, Container>& y)
+  {
+    return rel_ops::operator >(x, y);
+  }
+
+  template <class T, class Container>
+  bool operator>=(const queue<T, Container>& x, const queue<T, Container>& y)
+  {
+    return rel_ops::operator >=(x, y);
+  }
+
+  template <class T, class Container>
+  bool operator<=(const queue<T, Container>& x, const queue<T, Container>& y)
+  {
+    return rel_ops::operator <=(x, y);
+  }
+
+  template <class T, class Container>
+  void swap(queue<T, Container>& x, queue<T, Container>& y)
+  {
+    x.swap(y);
+  }
   
   #ifdef NTL__CXX_RV
   template <class T, class Container>
-  void swap(queue<T, Container>&& x, queue<T, Container>& y);
+  void swap(queue<T, Container>&& x, queue<T, Container>& y)
+  {
+    x.swap(y);
+  }
+
   template <class T, class Container>
-  void swap(queue<T, Container>& x, queue<T, Container>&& y);
+  void swap(queue<T, Container>& x, queue<T, Container>&& y)
+  {
+    x.swap(y);
+  }
+
   #endif
   
   

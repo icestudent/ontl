@@ -95,13 +95,23 @@ namespace std {
 
   // no equality is provided
   template <class T, class Container, class Compare>
-  void swap(priority_queue<T, Container, Compare>& x, priority_queue<T, Container, Compare>& y);
+  void swap(priority_queue<T, Container, Compare>& x, priority_queue<T, Container, Compare>& y)
+  {
+    x.swap(y);
+  }
   
   #ifdef NTL__CXX_RV
   template <class T, class Container, class Compare>
-  void swap(priority_queue<T, Container, Compare>&& x, priority_queue<T, Container, Compare>& y);
+  void swap(priority_queue<T, Container, Compare>&& x, priority_queue<T, Container, Compare>& y)
+  {
+    x.swap(y);
+  }
+
   template <class T, class Container, class Compare>
-  void swap(priority_queue<T, Container, Compare>& x, priority_queue<T, Container, Compare>&& y);
+  void swap(priority_queue<T, Container, Compare>& x, priority_queue<T, Container, Compare>&& y)
+  {
+    x.swap(y);
+  }
   #endif
   
   template <class T, class Container, class Compare, class Alloc>

@@ -299,6 +299,9 @@
 
   #ifndef NTL__CXX_ASSERT
     #define static_assert(e, Msg) STATIC_ASSERT(e)
+  #else
+    #undef STATIC_ASSERT
+    #define STATIC_ASSERT(e) static_assert(e, #e)
   #endif
 
   #ifndef NTL__CXX_ALIGNAS

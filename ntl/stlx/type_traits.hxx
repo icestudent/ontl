@@ -544,14 +544,12 @@ template<class T> struct is_standard_layout;
 ///\warning what about std::pair<int, int> ?
 template <class T> struct is_pod
 : public integral_constant<
-bool, is_void<T>::value || 
-      is_scalar<typename remove_extent<T>::type>::value || 
-      __::is_unknown_array<T>::value ||
+bool, is_scalar<typename remove_extent<T>::type>::value || 
       __is_pod(typename remove_extent<T>::type) // __is_pod will return false on fundamental types
     >
 {};
 _CHECK_TRAIT(is_pod<int>::value);
-_CHECK_TRAIT(is_pod<void>::value || is_pod<const void>::value);
+_CHECK_TRAIT(!is_pod<void>::value && !is_pod<const void>::value);
 _CHECK_TRAIT(is_pod<int[]>::value);
 
 NTL__STLX_DEF_TRAIT(is_empty)
@@ -634,9 +632,7 @@ _CHECK_TRAIT((extent<int[][4], 1>::value) == 4);
 
 template<class T> struct is_trivial
 : public integral_constant<
-bool, is_void<T>::value ||
-      __::is_unknown_array<T>::value ||
-     ( has_trivial_default_constructor<T>::value &&
+bool,( has_trivial_default_constructor<T>::value &&
        has_trivial_copy_constructor<T>::value &&
        has_trivial_assign<T>::value &&
        has_trivial_destructor<T>::value

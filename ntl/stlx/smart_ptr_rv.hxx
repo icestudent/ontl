@@ -934,7 +934,6 @@ namespace std
     }
 
     ///\name  20.7.12.2.3 shared_ptr assignment [util.smartptr.shared.assign]
-
     shared_ptr& operator=(shared_ptr&& r)
     {
       r.swap(*this); 

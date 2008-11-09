@@ -663,7 +663,7 @@ namespace tree
     template<class T, class Compare, class Allocator>
     bool operator != (const rb_tree<T, Compare, Allocator>& x, const rb_tree<T, Compare, Allocator>& y)
     {
-      return !(x == y);
+      return rel_ops::operator !=(x, y);
     }
 
     template<class T, class Compare, class Allocator>
@@ -675,19 +675,19 @@ namespace tree
     template<class T, class Compare, class Allocator>
     bool operator > (const rb_tree<T, Compare, Allocator>& x, const rb_tree<T, Compare, Allocator>& y)
     {
-      return y < x;
+      return rel_ops::operator >(x, y);
     }
 
     template<class T, class Compare, class Allocator>
     bool operator <= (const rb_tree<T, Compare, Allocator>& x, const rb_tree<T, Compare, Allocator>& y)
     {
-      return !(y < x);
+      return rel_ops::operator <=(x, y);
     }
 
     template<class T, class Compare, class Allocator>
     bool operator >= (const rb_tree<T, Compare, Allocator>& x, const rb_tree<T, Compare, Allocator>& y)
     {
-      return !(x < y);
+      return rel_ops::operator >=(x, y);
     }
 
     // specialized algorithms

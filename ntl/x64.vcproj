@@ -522,6 +522,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\stlx\type_traits_bcb.hxx"
+						>
+					</File>
+					<File
 						RelativePath=".\stlx\typeinfo.hxx"
 						>
 					</File>

@@ -115,11 +115,26 @@ struct array
 
 ///\name  Array comparisons
 template <class T, size_t N> bool operator== (const array<T,N>& x, const array<T,N>& y);
-template <class T, size_t N> bool operator!= (const array<T,N>& x, const array<T,N>& y);
+template <class T, size_t N> bool operator!= (const array<T,N>& x, const array<T,N>& y)
+{
+  return rel_ops::operator !=(x, y);
+}
+
 template <class T, size_t N> bool operator< (const array<T,N>& x, const array<T,N>& y);
-template <class T, size_t N> bool operator> (const array<T,N>& x, const array<T,N>& y);
-template <class T, size_t N> bool operator<= (const array<T,N>& x, const array<T,N>& y);
-template <class T, size_t N> bool operator>= (const array<T,N>& x, const array<T,N>& y);
+template <class T, size_t N> bool operator> (const array<T,N>& x, const array<T,N>& y)
+{
+  return rel_ops::operator >(x, y);
+}
+
+template <class T, size_t N> bool operator<= (const array<T,N>& x, const array<T,N>& y)
+{
+  return rel_ops::operator <=(x, y);
+}
+
+template <class T, size_t N> bool operator>= (const array<T,N>& x, const array<T,N>& y)
+{
+  return rel_ops::operator >=(x, y);
+}
 
 ///\name  Array specialized algorithms [6.2.2.2]
 template <class T, size_t N > void swap(array<T,N>& x, array<T,N>& y)

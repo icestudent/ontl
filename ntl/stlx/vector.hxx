@@ -663,7 +663,7 @@ inline
 bool operator!=(const vector<T, Allocator>& x, const vector<T, Allocator>& y)
   __ntl_nothrow
 {
-  return ! (x == y);
+  return rel_ops::operator !=(x, y);
 }
 
 template <class T, class Allocator>
@@ -671,7 +671,7 @@ inline
 bool operator> (const vector<T, Allocator>& x, const vector<T, Allocator>& y)
   __ntl_nothrow
 {
-  return y < x;
+  return rel_ops::operator >(x, y);
 }
 
 template <class T, class Allocator>
@@ -679,7 +679,7 @@ inline
 bool operator>=(const vector<T, Allocator>& x, const vector<T, Allocator>& y)
   __ntl_nothrow
 {
-  return ! (x < y);
+  return rel_ops::operator >=(x, y);
 }
 
 template <class T, class Allocator>
@@ -687,7 +687,7 @@ inline
 bool operator<=(const vector<T, Allocator>& x, const vector<T, Allocator>& y)
   __ntl_nothrow
 {
-  return ! (y < x);
+  return rel_ops::operator <=(x, y);
 }
 
 ///\name  Vector specialized algorithms
@@ -700,9 +700,17 @@ void swap(vector<T, Allocator>& x, vector<T, Allocator>& y) __ntl_nothrow
 
 #ifdef NTL__CXX_RV
   template <class T, class Allocator>
-  void swap(vector<T,Allocator>&& x, vector<T,Allocator>& y);
+  void swap(vector<T,Allocator>&& x, vector<T,Allocator>& y)
+  {
+    x.swap(y);
+  }
+
   template <class T, class Allocator>
-  void swap(vector<T,Allocator>& x, vector<T,Allocator>&& y);
+  void swap(vector<T,Allocator>& x, vector<T,Allocator>&& y)
+  {
+    x.swap(y);
+  }
+
 #endif
 
 template <class T, class Allocator>

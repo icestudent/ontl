@@ -185,21 +185,21 @@ class list
     list(InputIterator    first,
          InputIterator    last,
          const Allocator& a     = Allocator())
-    : node_allocator(a)
+    : node_allocator(a), size_(0)
     {
       init_head();
       insert(begin(), first, last);
     }
 
     list(const list<T, Allocator>& x)
-    : node_allocator(x.node_allocator)
+    : node_allocator(x.node_allocator), size_(0)
     {
       init_head();
       insert(begin(), x.begin(), x.end());
     }
 
     list(const list& x, const Allocator& a)
-      : node_allocator(a)
+      : node_allocator(a), size_(0)
     {
       init_head();
       insert(begin(), x.begin(), x.end());
@@ -207,14 +207,14 @@ class list
     
     #ifdef NTL__CXX_RV
     list(list&& x)
+      :node_allocator(), size_(0)
     {
-      // NOTE: should we initialize head? or null it? null it.
       init_head();
       swap(x);
     }
 
     list(list&& x, const Allocator& a)
-      :node_allocator(a)
+      :node_allocator(a), size_(0)
     {
       init_head();
       if(x.get_allocator() == a){
@@ -229,7 +229,7 @@ class list
     #endif
     
     list(initializer_list<T> il, Allocator& a = Allocator())
-      :node_allocator(a)
+      :node_allocator(a), size_(0)
     {
       init_head();
       insert(begin(), il);
@@ -240,7 +240,6 @@ class list
 
     list<T, Allocator>& operator=(const list<T, Allocator>& x)
     {
-      //node_allocator = x.node_allocator;
       assign(x.begin(), x.end());
       return *this;
     }

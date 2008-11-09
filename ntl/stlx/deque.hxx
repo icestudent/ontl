@@ -153,24 +153,49 @@ namespace std {
   template <class T, class Allocator>
   bool operator< (const deque<T,Allocator>& x, const deque<T,Allocator>& y);
   template <class T, class Allocator>
-  bool operator!=(const deque<T,Allocator>& x, const deque<T,Allocator>& y);
+  bool operator!=(const deque<T,Allocator>& x, const deque<T,Allocator>& y)
+  {
+    return rel_ops::operator !=(x, y);
+  }
+
   template <class T, class Allocator>
-  bool operator> (const deque<T,Allocator>& x, const deque<T,Allocator>& y);
+  bool operator> (const deque<T,Allocator>& x, const deque<T,Allocator>& y)
+  {
+    return rel_ops::operator >(x, y);
+  }
+
   template <class T, class Allocator>
-  bool operator>=(const deque<T,Allocator>& x, const deque<T,Allocator>& y);
+  bool operator>=(const deque<T,Allocator>& x, const deque<T,Allocator>& y)
+  {
+    return rel_ops::operator >=(x, y);
+  }
+
   template <class T, class Allocator>
-  bool operator<=(const deque<T,Allocator>& x, const deque<T,Allocator>& y);
+  bool operator<=(const deque<T,Allocator>& x, const deque<T,Allocator>& y)
+  {
+    return rel_ops::operator <=(x, y);
+  }
   
   
   // specialized algorithms:
   template <class T, class Allocator>
-  void swap(deque<T,Allocator>& x, deque<T,Allocator>& y);
+  void swap(deque<T,Allocator>& x, deque<T,Allocator>& y)
+  {
+    x.swap(y);
+  }
   
   #ifdef NTL__CXX_RV
   template <class T, class Allocator>
-  void swap(deque<T,Allocator>&& x, deque<T,Allocator>& y);
+  void swap(deque<T,Allocator>&& x, deque<T,Allocator>& y)
+  {
+    x.swap(y);
+  }
+
   template <class T, class Allocator>
-  void swap(deque<T,Allocator>& x, deque<T,Allocator>&& y);
+  void swap(deque<T,Allocator>& x, deque<T,Allocator>&& y)
+  {
+    x.swap(y);
+  }
   #endif
   
   

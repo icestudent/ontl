@@ -804,15 +804,6 @@ namespace std
       set(r.get());
     }
 
-#ifdef NTL__CXX_RV
-    /// 23 Requires: For the second constructor Y* shall be convertible to T*.
-    /// 24 Effects: Move-constructs a shared_ptr instance from r.
-    /// 25 Postconditions: *this shall contain the old value of r. r shall be empty.
-    /// 26 Throws: nothing.
-    shared_ptr(shared_ptr&& r);
-    template<class Y> shared_ptr(shared_ptr<Y>&& r);
-#endif
-
     /// 27 Requires: Y* shall be convertible to T*.
     /// 28 Effects: Constructs a shared_ptr object that shares ownership with r
     ///    and stores a copy of the pointer stored in r.
@@ -828,7 +819,6 @@ namespace std
     }
 #endif
 
-#ifdef NTL__CXX_RV
     /// 32 Requires: r.release() shall be convertible to T*. Y shall be a complete
     ///    type. The expression delete r.release() shall be well-formed,
     ///    shall have well defined behavior, and shall not throw exceptions.
@@ -837,11 +827,8 @@ namespace std
     /// 35 Throws: bad_alloc, or an implementation-defined exception when
     ///    a resource other than memory could not be obtained.
     /// 36 Exception safety: If an exception is thrown, the constructor has no effect.
-    template<class Y> explicit shared_ptr(auto_ptr<Y>&& r);
-#else
     template<class Y> explicit shared_ptr(auto_ptr<Y>& r)
       : base_type(r.release()) {/**/}
-#endif
 
 #ifdef NTL__CXX_EF
     /// 37 Effects: Equivalent to shared_ptr(r.release(), r.get_deleter())
@@ -850,13 +837,8 @@ namespace std
     /// 38 Exception safety: If an exception is thrown, the constructor has no effect.
     template <class Y, class D> explicit shared_ptr(const unique_ptr<Y, D>& r) = delete;
 #endif
-#ifdef NTL__CXX_RV
-    template <class Y, class D> explicit shared_ptr(unique_ptr<Y, D>&& r)
-    : base_type(r.release()) {/**/}
-#else
     template <class Y, class D> explicit shared_ptr(const unique_ptr<Y, D>& r)
       : base_type(r.release()) {/**/}
-#endif
 
     ///\name  20.7.12.2.2 shared_ptr destructor [util.smartptr.shared.dest]
     ///
@@ -878,13 +860,6 @@ namespace std
     }
 
     ///\name  20.7.12.2.3 shared_ptr assignment [util.smartptr.shared.assign]
-
-#ifdef NTL__CXX_RV
-    shared_ptr& operator=(shared_ptr&& r);
-    template<class Y> shared_ptr& operator=(shared_ptr<Y>&& r);
-    template<class Y> shared_ptr& operator=(auto_ptr<Y>&& r);
-    template <class Y, class D> shared_ptr& operator=(unique_ptr<Y, D>&& r);
-#else
     shared_ptr& operator=(shared_ptr& r)
     {
       r.swap(*this); 
@@ -911,7 +886,6 @@ namespace std
       set(r.release());
       return *this;
     }
-#endif
 #ifdef NTL__CXX_EF
     template <class Y, class D> shared_ptr& operator=(const unique_ptr<Y, D>& r) = delete;
 #endif
@@ -1032,11 +1006,6 @@ namespace std
   {
     a.swap(b);
   }
-
-#ifdef NTL__CXX_RV
-  template<class T> void swap(shared_ptr<T>&& a, shared_ptr<T>& b);
-  template<class T> void swap(shared_ptr<T>& a, shared_ptr<T>&& b);
-#endif
 
   ///\name  20.7.12.2.10 shared_ptr casts [util.smartptr.shared.cast]
 
