@@ -128,8 +128,9 @@ typename iterator_traits<ForwardIterator>::difference_type
   distance(const ForwardIterator& first, const ForwardIterator& last,
            const forward_iterator_tag &)
 {
+  ForwardIterator from(first), to(last);
   typename iterator_traits<ForwardIterator>::difference_type d = 0;
-  for ( ; first != last; ++first ) ++d;
+  for ( ; from != to; ++from ) ++d;
   return d;
 }
 

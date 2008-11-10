@@ -239,6 +239,34 @@ class allocator
       __assume(p);
       ::new((void *)p) T(std::forward<Arg>(val));
     }
+    template<class Arg, class Arg2>
+    __forceinline
+    void construct(pointer p, Arg&& val, Arg2&& val2)
+    {
+      __assume(p);
+      ::new((void *)p) T(std::forward<Arg>(val), std::forward<Arg2>(val2));
+    }
+    template<class Arg, class Arg2, class Arg3>
+    __forceinline
+    void construct(pointer p, Arg&& val, Arg2&& val2, Arg3&& val3)
+    {
+      __assume(p);
+      ::new((void *)p) T(std::forward<Arg>(val), std::forward<Arg2>(val2), std::forward<Arg3>(val3));
+    }
+    template<class Arg, class Arg2, class Arg3, class Arg4>
+    __forceinline
+    void construct(pointer p, Arg&& val, Arg2&& val2, Arg3&& val3, Arg4&& val4)
+    {
+      __assume(p);
+      ::new((void *)p) T(std::forward<Arg>(val), std::forward<Arg2>(val2), std::forward<Arg3>(val3), std::forward<Arg4>(val4));
+    }
+    template<class Arg, class Arg2, class Arg3, class Arg4, class Arg5>
+    __forceinline
+    void construct(pointer p, Arg&& val, Arg2&& val2, Arg3&& val3, Arg4&& val4, Arg5&& val5)
+    {
+      __assume(p);
+      ::new((void *)p) T(std::forward<Arg>(val), std::forward<Arg2>(val2), std::forward<Arg3>(val3), std::forward<Arg4>(val4), std::forward<Arg5>(val5));
+    }
 #else
     __forceinline
     void construct(pointer p, const T & val)

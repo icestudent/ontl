@@ -23,12 +23,11 @@ namespace std {
  *@{*/
 
   /// Class template forward_list [23.2.3 forwardlist]
-  template <class T, class Allocator = allocator<T> >
+  template <class T, class Alloc = allocator<T> >
   class forward_list
   {
     typedef ntl::single_linked single_linked;
-    struct node: 
-      public single_linked
+    struct node: public single_linked
     {
       T elem;
 
@@ -39,17 +38,43 @@ namespace std {
       {}
       #endif
 
+      static void transfer_after(single_linked* p, single_linked* first)
+      {
+        single_linked* last = first;
+        while(last && last->next)
+          last = last->next;
+        transfer_after(p, first, last);
+      }
+
+      static void transfer_after(single_linked* p, single_linked* first, single_linked* last)
+      {
+        single_linked* tmp = first->next;
+        if(last){
+          first->next = last->next;
+          last->next = p->next;
+        }else{
+          first->next = nullptr;
+        }
+        p->next = tmp;
+      }
     };
 
-    typedef typename forward_list<T, Allocator>::node node_type;
+    typedef typename forward_list<T, Alloc>::node   node_type;
     typedef typename  
-      Allocator::template rebind<node_type>::other    node_allocator_type;
+      Alloc::template rebind<node_type>::other      node_allocator_type;
+
+#ifdef NTL__CXX_RV
+    typedef forward_list<T, Alloc>&& list_reference;
+#else
+    typedef forward_list<T, Alloc>&  list_reference;
+#endif
+
   public:
     // types:
     typedef T                                       value_type;
-    typedef Allocator                               allocator_type;
+    typedef Alloc                                   allocator_type;
     typedef typename  
-      Allocator::template rebind<T>::other          allocator;
+      Alloc::template rebind<T>::other              allocator;
     typedef typename  allocator::pointer            pointer;
     typedef typename  allocator::const_pointer      const_pointer;
     typedef typename  allocator::reference          reference;
@@ -124,7 +149,7 @@ namespace std {
 
   public:
     // 23.2.3.1 construct/copy/destroy:
-    explicit forward_list(const Allocator& a = Allocator())
+    explicit forward_list(const Alloc& a = Alloc())
       :node_allocator(a)
     {
       init_head();
@@ -135,61 +160,61 @@ namespace std {
     {
       init_head();
       while(n--)
-        insert_after(end(), forward<value_type>(T()));
+        insert_after(cbefore_begin(), forward<value_type>(T()));
     }
 
-    forward_list(size_type n, const T& value, const Allocator& a = Allocator())
+    forward_list(size_type n, const T& value, const Alloc& a = Alloc())
       : node_allocator(a)
     {
       init_head();
-      insert_after(begin(), n, value);
+      insert_after(cbefore_begin(), n, value);
     }
 
     template <class InputIterator>
-    forward_list(InputIterator first, InputIterator last, const Allocator& = Allocator())
+    forward_list(InputIterator first, InputIterator last, const Alloc& a = Alloc())
       : node_allocator(a)
     {
       init_head();
-      insert_after(begin(), first, last);
+      insert_after(cbefore_begin(), first, last);
     }
 
-    forward_list(const forward_list<T,Allocator>& x)
+    forward_list(const forward_list<T,Alloc>& x)
       : node_allocator(x.node_allocator)
     {
       init_head();
-      insert_after(begin(), x.begin(), x.end());
+      insert_after(cbefore_begin(), x.begin(), x.end());
     }
 
     #ifdef NTL__CXX_RV
-    forward_list(forward_list<T,Allocator>&& x)
+    forward_list(forward_list<T,Alloc>&& x)
       :node_allocator()
     {
       init_head();
       swap(x);
     }
+#endif
 
-    forward_list(initializer_list<T> il, const Allocator& a = Allocator())
+    forward_list(initializer_list<T> il, const Alloc& a = Alloc())
       :node_allocator(a)
     {
       init_head();
-      insert_after(begin(), il);
+      insert_after(cbefore_begin(), il);
     }
-
-    #endif
 
     ~forward_list()
     {
-      clear();
+      if(!empty())
+        clear();
     }
 
-    forward_list<T,Allocator>& operator=(const forward_list<T,Allocator>& x)
+    forward_list<T,Alloc>& operator=(const forward_list<T,Alloc>& x)
     {
       assign(x.begin(), x.end());
       return *this;
     }
 
-    #ifdef NTL__CXX_RV
-    forward_list<T,Allocator>& operator=(forward_list<T,Allocator>&& x)
+#ifdef NTL__CXX_RV
+    forward_list<T,Alloc>& operator=(forward_list<T,Alloc>&& x)
     {
       if(this != &x){
         clear();
@@ -197,12 +222,13 @@ namespace std {
       }
       return *this;
     }
+#endif
     forward_list& operator=(initializer_list<T> il)
     {
       assign(il);
       return *this;
     }
-    #endif
+
     
     template <class InputIterator>
     void assign(InputIterator first, InputIterator last)
@@ -213,7 +239,7 @@ namespace std {
     void assign(size_type n, const T& t)
     {
       clear();
-      insert_after(begin(), n, t);
+      insert_after(cbefore_begin(), n, t);
     }
 
     void assign(initializer_list<T> il)
@@ -228,7 +254,7 @@ namespace std {
     void assign__disp(InputIterator first, InputIterator last, const false_type&)
     {
       clear();
-      insert_after(begin(), first, last);
+      insert_after(cbefore_begin(), first, last);
     }
 
     template <class IntegralType>
@@ -239,10 +265,10 @@ namespace std {
 
   public:
     // 23.2.3.2 iterators:
-    iterator        before_begin()        { return &head_;     }
-    const_iterator  before_begin() const  { return &head_;     }
-    iterator        begin()               { return head_.next; }
-    const_iterator  begin()        const  { return head_.next; }
+    iterator        before_begin()        { return &head;     }
+    const_iterator  before_begin() const  { return &head;     }
+    iterator        begin()               { return head.next; }
+    const_iterator  begin()        const  { return head.next; }
     iterator        end()                 { return nullptr;   }
     const_iterator  end()          const  { return nullptr;   }
 
@@ -251,7 +277,7 @@ namespace std {
     const_iterator  cend()         const  { return end();     }
     
     // capacity:
-    bool empty() const { return head_.next == nullptr; }
+    bool empty() const { return head.next == nullptr; }
 
     size_type max_size() const { return node_allocator.max_size(); }
 
@@ -261,19 +287,31 @@ namespace std {
     
     // 23.2.3.4 modifiers:
     
-    #ifdef NTL__CXX_VT
-    template <class... Args> void emplace_front(Args&&... args)
+#ifdef NTL__CXX_VT
+    template <class... Args>
+    void emplace_front(Args&&... args)
     {
       insert_after(cbefore_begin(), forward<Args>(args)...);
     }
-    #endif
+#elif defined(NTL__CXX_RV)
 
-    #ifdef NTL__CXX_RV
+    template<class Arg1>
+    void emplace_front(Arg1&& arg1)
+    {
+      insert_after(cbefore_begin(), value_type(forward<Arg1>(arg1)));
+    }
+
+    template<class Arg1, class Arg2>
+    void emplace_front(Arg1&& arg1, Arg2&& arg2)
+    {
+      insert_after(cbefore_begin(), value_type(forward<Arg1>(arg1), forward<Arg2>(arg2)));
+    }
+
     void push_front(T&& x)
     {
       insert_after(cbefore_begin(), move(x));
     }
-    #endif
+#endif
 
     void push_front(const T& x)
     {
@@ -282,14 +320,23 @@ namespace std {
 
     void pop_front()
     {
-      erase_after(begin());
+      erase_after(cbefore_begin());
     }
     
-    #ifdef NTL__CXX_VT
+#ifdef NTL__CXX_VT
     template <class... Args> iterator emplace_after(const_iterator position, Args&&... args);
-    #endif
+#elif defined NTL__CXX_RV
+    template <class Arg1>
+    iterator emplace_after(const_iterator position, Arg1&& arg1)
+    {
+      return insert_after(position, value_type(forward<Arg1>(arg1)));
+    }
+    template <class Arg1, class Arg2>
+    iterator emplace_after(const_iterator position, Arg1&& arg1, Arg2&& arg2)
+    {
+      return insert_after(position, value_type(forward<Arg1>(arg1), forward<Arg2>(arg2)));
+    }
 
-    #ifdef NTL__CXX_RV
     iterator insert_after(const_iterator position, T&& x)
     {
       node* const p = node_allocator.allocate(1);
@@ -298,7 +345,7 @@ namespace std {
       p->link(pp);
       return p;
     }
-    #endif
+#endif
 
     iterator insert_after(const_iterator position, const T& x)
     {
@@ -327,35 +374,68 @@ namespace std {
 
     iterator erase_after(const_iterator position)
     {
+#if 0
       single_linked* node = const_cast<single_linked*>(position.p);
-      node_type* np = static_cast<node_type*>(node->next);
-      np->unlink(node); // node->next = np->next
-      node_allocator.destroy(np);
-      node_allocator.deallocate(np, 1);
-      return node->next;
+      if(node){
+        node_type* np = static_cast<node_type*>(node->next);
+        if(np){
+          //np->unlink(node); 
+          node->next = np->next;
+          node_allocator.destroy(np);
+          node_allocator.deallocate(np, 1);
+        }
+      }
+      return node ? node->next : node;
+#else
+      single_linked* pos = const_cast<single_linked*>(position.p);
+      if(pos){
+        // return erase(tmp)
+        node_type* cur = static_cast<node_type*>(pos->next);
+        if(cur){
+          single_linked* next = cur->next;
+          pos->next = next;
+          node_allocator.destroy(cur);
+          node_allocator.deallocate(cur, 1);
+        }
+        return pos;
+      }else{
+        return end();
+      }
+#endif
     }
 
     iterator erase_after(const_iterator position, iterator last)
     {
+#if 0
       while ( position != last ) position = erase_after(position);
       return const_cast<single_linked*>(last.p);
+#else
+      single_linked* pos = const_cast<single_linked*>(position.p);
+      single_linked* cur = pos->next;
+      while(cur){
+        node_type* tmp = static_cast<node_type*>(cur);
+        cur = cur->next;
+        node_allocator.destroy(tmp);
+        node_allocator.deallocate(tmp, 1);
+        pos->next = cur;
+        if(tmp == last.p)
+          break;
+      }
+      return pos;
+#endif
     };
     
-    #ifdef NTL__CXX_RV
-    void swap(forward_list<T,Allocator>&&)
-    #else
-    void swap(forward_list<T,Allocator>& x)
-    #endif
+    void swap(list_reference x)
     {
       std::swap(node_allocator, x.node_allocator);
-      std::swap(head_.next, x.head_.next);
+      std::swap(head.next, x.head.next);
     }
     
     void resize(size_type sz)
     {
-      size_type size_ = size();
+      size_type size_ = get_size();
       if(sz < size_){
-        const_iterator from = cbegin();
+        const_iterator from = cbefore_begin();
         for(size_type i = 0; i < sz; ++i, ++from);
         erase_after(from, end());
       }else if(sz > size_) {
@@ -367,9 +447,9 @@ namespace std {
 
     void resize(size_type sz, const value_type& c)
     {
-      size_type size_ = size();
+      size_type size_ = get_size();
       if(sz < size_){
-        const_iterator from = cbegin();
+        const_iterator from = cbefore_begin();
         for(size_type i = 0; i < sz; ++i, ++from);
         erase_after(from, end());
       }else if(sz > size_) {
@@ -381,7 +461,8 @@ namespace std {
     
     void clear()
     {
-      erase_after(begin(), end());
+      if(!empty())
+        erase_after(cbefore_begin(), end());
     }
 
   private:
@@ -400,35 +481,45 @@ namespace std {
   public:
     // 23.2.3.5 forward_list operations:
     
-    #ifdef NTL__CXX_RV
-    void splice_after(const_iterator position, forward_list<T,Allocator>&& x);
-    void splice_after(const_iterator position, forward_list<T,Allocator>&& x, const_iterator i)
+    void splice_after(const_iterator position, list_reference x)
+    {
+      if(!x.empty() && &x != this){
+        iterator first = x.before_begin();
+        node::transfer_after(const_cast<single_linked*>(position.p), first.p); 
+        x.clear();
+      }
+    }
+
+    void splice_after(const_iterator position, list_reference x, const_iterator i)
     {
       splice_after(position, x, i, i.p->next);
     }
-    void splice_after(const_iterator position, forward_list<T,Allocator>&& x, const_iterator first, const_iterator last);
-    #else
-    void splice_after(const_iterator position, forward_list<T,Allocator>& x);
-    void splice_after(const_iterator position, forward_list<T,Allocator>& x, const_iterator i);
-    void splice_after(const_iterator position, forward_list<T,Allocator>& x, const_iterator first, const_iterator last);
-    #endif
+
+    void splice_after(const_iterator position, list_reference x, const_iterator first, const_iterator last)
+    {
+      node::transfer_after(const_cast<single_linked*>(position.p), const_cast<single_linked*>(first.p), const_cast<single_linked*>(last.p)); 
+    }
 
     template <class Predicate> 
     void remove_if(Predicate pred)
     {
-      iterator i = begin();
-      while(i.p){
-        if(pred(*i))
-          i = erase_after(i);
+      single_linked* node = &head;
+      while(node->next){
+        if(pred(static_cast<node_type*>(node->next)->elem))
+          erase_after(node);
+        else
+          node = node->next;
       }
     }
 
     void remove(const T& value)
     {
-      iterator i = begin();
-      while(i.p){
-        if(*i == value)
-          i = erase_after(i);
+      single_linked* node = &head;
+      while(node->next){
+        if(static_cast<node_type*>(node->next)->elem == value)
+          erase_after(node);
+        else
+          node = node->next;
       }
     }
     
@@ -452,141 +543,129 @@ namespace std {
 
     }
     
-#ifdef NTL__CXX_RV
-    void merge(forward_list<T,Allocator>&& x)
-    {
-      merge(less<T>());
-    }
-
-    template <class Compare> 
-    void merge(forward_list<T,Allocator>&& x, Compare comp)
-#else
-    void merge(forward_list<T,Allocator>& x)
+    void merge(list_reference x)
     {
       merge(x, less<T>());
     }
 
     template <class Compare> 
-    void merge(forward_list<T,Allocator>& x, Compare comp)
-#endif
+    void merge(list_reference x, Compare comp)
     {
-      single_linked* node = &head_;
-      while(node->next && x.head_.next){
-        if(comp(static_cast<node_type*>(x.head_.next)->elem, static_cast<node_type*>(node->next)->elem)){
-          // node->transfer_after(&x.head_, x.head_.next)
-          single_linked* tmp = x.head_.next;
-          if(x.head_.next){
-            x.head_.next = x.head_.next->next;
-            x.head_.next->next = node->next;
-          }else{
-            x.head_.next = nullptr;
-          }
-          node->next = tmp;
-        }
+      single_linked* node = &head;
+      while(node->next && x.head.next){
+        if(comp(static_cast<node_type*>(x.head.next)->elem, static_cast<node_type*>(node->next)->elem))
+          node::transfer_after(node, &x.head, x.head.next);
         node = node->next;
       }
-      if(x.head_.next){
-        node->next = x.head_.next;
-        x.head_.next = nullptr;
+      if(x.head.next){
+        node->next = x.head.next;
+        x.head.next = nullptr;
       }
     }
     
     template <class Compare>
     void sort(Compare comp);
-
-    void sort()
-    {
-      sort(less<T>());
-    }
+    void sort();
     
     void reverse()
     {
-      single_linked *head = head_.next, *tail = nullptr;
+      single_linked *head = this->head.next, *tail = nullptr;
       while(head){
         single_linked* p = head;
         head = head->next;
         p->next = tail;
         tail = p;
       }
-      head_.next = tail;
+      this->head.next = tail;
     }
 
   protected:
     void init_head()
     {
-      head_.next = nullptr;
+      head.next = nullptr;
     }
 
-    size_type size() const
+    size_type get_size() const
     {
       size_type n = 0;
-      single_linked* p = head_.next;
+      single_linked* p = head.next;
       while(p)
         n++, p = p->next;
       return n;
     }
   private:
-    single_linked head_;
+    single_linked head;
 
     node_allocator_type node_allocator;
+
   };
 
 
   // Comparison operators
-  template <class T, class Allocator>
-  bool operator==(const forward_list<T,Allocator>& x, const forward_list<T,Allocator>& y);
+  template <class T, class Alloc>
+  bool operator==(const forward_list<T,Alloc>& x, const forward_list<T,Alloc>& y)
+  {
+    for(typename forward_list<T, Alloc>::const_iterator x1 = x.cbegin(), y1 = y.cbegin(), x2 = x.cend(), y2 = y.cend();
+        x1 != x2 && y1 != y2;
+        ++x1, ++y1)
+    {
+      if(*x1 != *y1)
+        return false;
+    }
+    return true;
+  }
 
-  template <class T, class Allocator>
-  bool operator< (const forward_list<T,Allocator>& x, const forward_list<T,Allocator>& y)
+  template <class T, class Alloc>
+  bool operator< (const forward_list<T,Alloc>& x, const forward_list<T,Alloc>& y)
   {
     return lexicographical_compare(x.cbegin(), x.cend(), y.cbegin(), y.cend());
   }
 
-  template <class T, class Allocator>
-  bool operator!=(const forward_list<T,Allocator>& x, const forward_list<T,Allocator>& y)
+  template <class T, class Alloc>
+  bool operator!=(const forward_list<T,Alloc>& x, const forward_list<T,Alloc>& y)
   {
     return rel_ops::operator !=(x, y);
   }
 
-  template <class T, class Allocator>
-  bool operator> (const forward_list<T,Allocator>& x, const forward_list<T,Allocator>& y)
+  template <class T, class Alloc>
+  bool operator> (const forward_list<T,Alloc>& x, const forward_list<T,Alloc>& y)
   {
     return rel_ops::operator >(x, y);
   }
 
-  template <class T, class Allocator>
-  bool operator>=(const forward_list<T,Allocator>& x, const forward_list<T,Allocator>& y)
+  template <class T, class Alloc>
+  bool operator>=(const forward_list<T,Alloc>& x, const forward_list<T,Alloc>& y)
   {
     return rel_ops::operator >=(x, y);
   }
 
-  template <class T, class Allocator>
-  bool operator<=(const forward_list<T,Allocator>& x, const forward_list<T,Allocator>& y)
+  template <class T, class Alloc>
+  bool operator<=(const forward_list<T,Alloc>& x, const forward_list<T,Alloc>& y)
   {
     return rel_ops::operator <=(x, y);
   }
 
 
   // 23.2.3.6 specialized algorithms:
-  template <class T, class Allocator>
-  void swap(forward_list<T,Allocator>& x, forward_list<T,Allocator>& y)
+  template <class T, class Alloc>
+  void swap(forward_list<T,Alloc>& x, forward_list<T,Alloc>& y)
   {
     x.swap(y);
   }
   
-  #ifdef NTL__CXX_RV
-  template <class T, class Allocator>
-  void swap(forward_list<T,Allocator>&& x, forward_list<T,Allocator>& y)
+#ifdef NTL__CXX_RV
+  template <class T, class Alloc>
+  void swap(forward_list<T,Alloc>&& x, forward_list<T,Alloc>& y)
   {
     x.swap(y);
   }
 
-  template <class T, class Allocator>
-  void swap(forward_list<T,Allocator>& x, forward_list<T,Allocator>&& y)
+  template <class T, class Alloc>
+  void swap(forward_list<T,Alloc>& x, forward_list<T,Alloc>&& y)
   {
     x.swap(y);
   }
-  #endif
+#endif
 
   /**@} lib_sequence */
   /**@} lib_containers */
