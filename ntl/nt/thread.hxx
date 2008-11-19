@@ -18,15 +18,11 @@
 
 #include "../pe/image.hxx"
 
-#include "../stlx/chrono.hxx"
+#include "resource.hxx"
 #include "time.hxx"
 
 namespace ntl {
   namespace nt {
-
-    // TODO: should be moved up to share with other headers
-    typedef std::ratio_multiply<std::ratio<100>, std::nano>::type systime_unit;
-    typedef std::chrono::duration<systime_t, systime_unit>        system_duration;
 
     struct thread_state_def
     {

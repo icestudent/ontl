@@ -1,9 +1,9 @@
 /**\file*********************************************************************
-*                                                                     \brief
-*  19.4 Thread support library [thread]
-*
-****************************************************************************
-*/
+ *                                                                     \brief
+ *  30.2 Thread support library [thread]
+ *
+ ****************************************************************************
+ */
 #ifndef NTL__STLX_THREAD
 #define NTL__STLX_THREAD
 
@@ -14,9 +14,9 @@
 namespace std {
 
   /**
-  *	@group thread Thread support library
-  *  @{
-  **/
+   *	@group thread Thread support library
+   *  @{
+   **/
 
 /// 30.2.1 thread.thread.class
 class thread

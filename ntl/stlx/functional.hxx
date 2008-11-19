@@ -1,6 +1,6 @@
 /**\file*********************************************************************
  *                                                                     \brief
- *  20.5 Function objects [lib.function.objects]
+ *  20.6 Function objects [function.objects]
  *
  ****************************************************************************
  */
@@ -20,14 +20,14 @@ namespace std {
 /**\addtogroup  lib_utilities ********* General utilities library [20] ******
  *@{*/
 
-/**\defgroup  lib_function_objects ***** Function objects [20.5] ************
+/**\defgroup  lib_function_objects ***** Function objects [20.6] ************
  *
  *    Function objects are objects with an operator() defined
  *@{
  */
 
 #pragma region lib_base
-/**\defgroup  lib_base ***************** Base [20.5.3] **********************
+/**\defgroup  lib_base ***************** Base [20.6.3] **********************
  *
  *    provided to simplify the typedefs of the argument and result types
  *@{
@@ -53,7 +53,7 @@ struct binary_function
 #pragma endregion
 
 #pragma region lib_refwrap
-/**\defgroup  lib_refwrap ***************** reference_wrapper [20.5.5] *******
+/**\defgroup  lib_refwrap ***************** reference_wrapper [20.6.5] *******
  *
  *    reference_wrapper<T> is a CopyConstructible and Assignable wrapper
  *    around a reference to an object of type T.
@@ -120,7 +120,7 @@ template <class T> reference_wrapper<const T> cref(reference_wrapper<T>) __ntl_n
 #pragma endregion
 
 #pragma region lib_arithmetic_operations
-/**\defgroup  lib_arithmetic_operations * Arithmetic operations [20.5.6] ****
+/**\defgroup  lib_arithmetic_operations * Arithmetic operations [20.6.6] ****
  *
  *    functors for all of the arithmetic operators
  *@{
@@ -167,7 +167,7 @@ struct negate : unary_function<T, T>
 #pragma endregion
 
 #pragma region lib_comparsions
-/**\defgroup  lib_comparisons ********** Comparisons [20.5.7] ***************
+/**\defgroup  lib_comparisons ********** Comparisons [20.6.7] ***************
  *
  *   functors for all of the comparison operators
  *@{
@@ -214,7 +214,7 @@ struct less_equal : binary_function<T, T, bool>
 #pragma endregion
 
 #pragma region lib_logical_operations
-/**\defgroup  lib_logical_operations *** Logical operations [20.5.8] ********
+/**\defgroup  lib_logical_operations *** Logical operations [20.6.8] ********
  *
  *   functors for all of the logical operators
  *@{
@@ -243,7 +243,7 @@ struct logical_not : unary_function<T, bool>
 #pragma endregion
 
 #pragma region lib_bitwise_operations
-/**\defgroup  lib_bitwise_operations *** Bitwise operations [20.5.9] *********
+/**\defgroup  lib_bitwise_operations *** Bitwise operations [20.6.9] *********
  *
  *   functors for all of the bitwise operators in the language
  *@{
@@ -275,7 +275,7 @@ template <class T> struct bit_xor : binary_function<T,T,T>
 #pragma endregion
 
 #pragma region lib_negators
-/**\defgroup  lib_negators ************* Negators [20.5.10] ******************
+/**\defgroup  lib_negators ************* Negators [20.6.10] ******************
  *
  *   negators take a predicate and return its complement
  *@{
@@ -333,7 +333,7 @@ binary_negate<Predicate> not2(const Predicate& pred)
 #pragma endregion
 
 #pragma region lib_bind
-/**\defgroup  lib_bind ***************** bind [20.5.11] *****************
+/**\defgroup  lib_bind ***************** bind [20.6.11] *****************
  *
  *   The template function bind returns an object that binds a function object passed as an argument to additional arguments.
  *@{
@@ -366,7 +366,7 @@ namespace placeholders {
  *@{
  */
 
-/// D8.1 Class template binder1st [lib.binder.1st]
+/// D8.1 Class template binder1st [binder.1st]
 template <class Operation>
 class binder1st
 : public unary_function<typename Operation::second_argument_type,
@@ -389,7 +389,7 @@ class binder1st
     }
 };
 
-/// D8.2 bind1st [lib.bind.1st]
+/// D8.2 bind1st [bind.1st]
 template <class Operation, class T>
 inline
 binder1st<Operation>
@@ -398,7 +398,7 @@ binder1st<Operation>
   return binder1st<Operation>(op, typename Operation::first_argument_type(x));
 }
 
-/// D8.3 Class template binder2nd [lib.binder.2nd]
+/// D8.3 Class template binder2nd [binder.2nd]
 template <class Operation>
 class binder2nd
 : public unary_function<typename Operation::first_argument_type,
@@ -427,7 +427,7 @@ class binder2nd
     }
 };
 
-/// D8.4 bind2nd [lib.bind.2nd]
+/// D8.4 bind2nd [bind.2nd]
 template <class Operation, class T>
 inline
 binder2nd<Operation>
@@ -441,7 +441,7 @@ binder2nd<Operation>
 #pragma endregion
 
 #pragma region lib_adaptors
-/**\defgroup  lib_function_pointer_adaptors Adaptors for pointers to functions [20.5.12]
+/**\defgroup  lib_function_pointer_adaptors Adaptors for pointers to functions [20.6.12]
  *@{
  */
 
@@ -483,7 +483,7 @@ pointer_to_binary_function<Arg1, Arg2, Result>
 #pragma endregion
 
 #pragma region lib_member_pointer_adaptors
-/**\defgroup  lib_member_pointer_adaptors Adaptors for pointers to members [20.5.13]
+/**\defgroup  lib_member_pointer_adaptors Adaptors for pointers to members [20.6.13]
  *@{
  */
 
@@ -622,20 +622,24 @@ const_mem_fun1_ref_t<Result, T, A>
   return const_mem_fun1_ref_t<Result, T, A>(f);
 }
 
+//template<class R, class T>
+//unspecified mem_fn(R T::* pm);
+
 /**@} lib_member_pointer_adaptors
  */
 #pragma endregion
 
+
 #pragma region unord.hash
-// 20.5.16 Class template hash [unord.hash]
-/**\defgroup  lib_hash Class template hash [20.5.16]
+// 20.6.16 Class template hash [unord.hash]
+/**\defgroup  lib_hash Class template hash [20.6.16]
  *
  * The unordered associative containers defied in clause 23.4 use specializations of hash as the default
  * hash function.
  *
  *@{
  */
-// 20.5.16, hash function base template:
+// 20.6.16, hash function base template:
 template <class T> struct hash;
 
 // Hash function specializations
@@ -668,9 +672,53 @@ template<class T> struct hash<T*>;
 template<class T>
 struct hash: unary_function<T, size_t>
 {
-  size_t operator()(T val) const;
+  size_t operator()(T val) const __ntl_nothrow;
 };
 
+#pragma endregion
+
+#pragma region func.reference_closure
+
+template<class> class reference_closure;
+
+#ifdef NTL__CXX_VT
+
+template<class R, class... ArgTypes >
+class reference_closure<R (ArgTypes...)> 
+{
+public:
+  typedef R result_type;
+  typedef T1 argument_type; // if sizeof...(ArgTypes) == 1 and ArgTypes contains T1
+  typedef T1 first_argument_type; // if sizeof...(ArgTypes) == 2 and ArgTypes contains T1, T2
+  typedef T2 second_argument_type; // if sizeof...(ArgTypes) == 2 and ArgTypes contains T1, T2
+
+  // 20.6.17.1, construct/copy/destroy:
+  reference_closure() = default;
+  reference_closure(const reference_closure&) = default;
+  constexpr reference_closure(nullptr_t);
+  reference_closure& operator=(const reference_closure&) = delete;
+  reference_closure& operator=(nullptr_t);
+  ~reference_closure() = default;
+  // 20.6.17.2, observer:
+  explicit operator bool() const;
+  // 20.6.17.3, invocation:
+  R operator()(ArgTypes...) const;
+};
+
+// 20.6.17.4, comparisons:
+template <class R, class... ArgTypes>
+bool operator==(const reference_closure<R (ArgTypes...)>&, nullptr_t);
+
+template <class R, class... ArgTypes>
+bool operator==(nullptr_t, const reference_closure<R (ArgTypes...)>&);
+
+template <class R, class... ArgTypes>
+bool operator!=(const reference_closure<R(ArgTypes...)>&, nullptr_t);
+
+template <class R, class... ArgTypes>
+bool operator!=(nullptr_t, const reference_closure<R (ArgTypes...)>&);
+
+#endif
 #pragma endregion
 
 /**@} lib_function_objects */

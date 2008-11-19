@@ -10,9 +10,13 @@
 
 #include "basedef.hxx"
 #include "handle.hxx"
+#include "../stlx/chrono.hxx"
 
 namespace ntl {
   namespace nt {
+
+    typedef std::ratio_multiply<std::ratio<100>, std::nano>::type systime_unit;
+    typedef std::chrono::duration<systime_t, systime_unit>        system_duration;
 
     namespace rtl
     {
@@ -24,7 +28,7 @@ namespace ntl {
         uint16_t    CreatorBackTraceIndex;
         struct critical_section* CriticalSection;
         list_entry  ProcessLocksList;
-        uint32_t    LockCount;
+        uint32_t    EntryCount;
         uint32_t    ContentionCount;
         uint32_t    Spare[2];
       };
@@ -148,6 +152,82 @@ namespace ntl {
         uint32_t              Flags,
         void**                Context
       );
+
+
+
+   class critical_section:
+     protected rtl::critical_section
+   {
+   public:
+     critical_section()
+     {
+       ntl::nt::RtlInitializeCriticalSection(this);
+     }
+
+     ~critical_section()
+     {
+       ntl::nt::RtlDeleteCriticalSection(this);
+     }
+
+     void acquire()
+     {
+       ntl::nt::RtlEnterCriticalSection(this);
+     }
+
+     void release()
+     {
+       ntl::nt::RtlLeaveCriticalSection(this);
+     }
+
+     bool try_acquire()
+     {
+       return ntl::nt::RtlTryEnterCriticalSection(this) != 0;
+     }
+
+     bool locked()
+     {
+       return ntl::nt::RtlIsCriticalSectionLocked(this) != 0;
+     }
+
+     bool thread_locked()
+     {
+       return ntl::nt::RtlIsCriticalSectionLockedByThread(this) != 0;
+     }
+
+     ntstatus wait(const systime_t& timeout, bool explicit_wait, bool alertable = true)
+     {
+       if(!LockSemaphore){
+         if(!try_acquire() && !explicit_wait)
+          return status::invalid_handle;
+         // wait
+         ntstatus st;
+
+         systime_t period = timeout;
+         systime_t const interval = std::chrono::duration_cast<system_duration>( std::chrono::milliseconds(50)).count();
+         do{
+           st = NtDelayExecution(alertable, interval);
+           period -= interval;
+         }while(st == status::timeout && period > 0);
+         return st;
+       }
+
+       DebugInfo->EntryCount++;
+       DebugInfo->ContentionCount++;
+       return NtWaitForSingleObject(LockSemaphore, alertable, timeout);
+     }
+
+     template <class Clock, class Duration>
+     ntstatus wait_until(const std::chrono::time_point<Clock, Duration>& abs_time, bool explicit_wait = true, bool alertable = true)
+     {
+       return wait(std::chrono::duration_cast<system_duration>(abs_time.time_since_epoch()).count(), explicit_wait, alertable);
+     }
+
+     template <class Rep, class Period>
+     ntstatus wait_for(const std::chrono::duration<Rep, Period>& rel_time, bool explicit_wait = true, bool alertable = true)
+     {
+       return wait(-1i64 * std::chrono::duration_cast<system_duration>(rel_time).count(), explicit_wait, alertable);
+     }
+   };
 
   } //namespace nt
 } //namespace ntl

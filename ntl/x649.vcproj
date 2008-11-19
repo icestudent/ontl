@@ -1,11 +1,12 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="9,00"
 	Name=".ntl"
 	ProjectGUID="{081E6E33-CC33-4BBF-81E8-2865B1D8FD67}"
 	RootNamespace="x64"
 	Keyword="Win32Proj"
+	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
 		<Platform
@@ -22,7 +23,7 @@
 	</ToolFiles>
 	<Configurations>
 		<Configuration
-			Name="Debug|x64"
+			Name="debug|x64"
 			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="4"
@@ -88,7 +89,7 @@
 			/>
 		</Configuration>
 		<Configuration
-			Name="Debug|Win32"
+			Name="debug|Win32"
 			OutputDirectory="$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="4"
@@ -153,7 +154,7 @@
 			/>
 		</Configuration>
 		<Configuration
-			Name="Release|x64"
+			Name="release|x64"
 			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="4"
@@ -216,7 +217,7 @@
 			/>
 		</Configuration>
 		<Configuration
-			Name="Release|Win32"
+			Name="release|Win32"
 			OutputDirectory="$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="4"
@@ -302,10 +303,6 @@
 					Name=".ext"
 					>
 					<File
-						RelativePath=".\stlx\fib.hxx"
-						>
-					</File>
-					<File
 						RelativePath=".\stlx\rbtree.hxx"
 						>
 					</File>
@@ -374,10 +371,6 @@
 						>
 					</File>
 					<File
-						RelativePath=".\stlx\chrono.hxx"
-						>
-					</File>
-					<File
 						RelativePath=".\stlx\climits.hxx"
 						>
 					</File>
@@ -410,6 +403,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\stlx\cuchar.hxx"
+						>
+					</File>
+					<File
 						RelativePath=".\stlx\cwchar.hxx"
 						>
 					</File>
@@ -417,6 +414,14 @@
 				<Filter
 					Name="runtime"
 					>
+					<File
+						RelativePath=".\stlx\chrono.hxx"
+						>
+					</File>
+					<File
+						RelativePath=".\stlx\condition_variable.hxx"
+						>
+					</File>
 					<File
 						RelativePath=".\stlx\cstdatomic.hxx"
 						>
@@ -502,11 +507,11 @@
 					Name="utility"
 					>
 					<File
-						RelativePath=".\stlx\memory.hxx"
+						RelativePath=".\stlx\initializer_list.hxx"
 						>
 					</File>
 					<File
-						RelativePath=".\stlx\regex.hxx"
+						RelativePath=".\stlx\memory.hxx"
 						>
 					</File>
 					<File
@@ -543,6 +548,14 @@
 					>
 					<File
 						RelativePath=".\stlx\algorithm.hxx"
+						>
+					</File>
+					<File
+						RelativePath=".\stlx\function.hxx"
+						>
+					</File>
+					<File
+						RelativePath=".\stlx\function_vt.hxx"
 						>
 					</File>
 					<File
@@ -818,7 +831,7 @@
 					RelativePath=".\rtl\crt.cpp"
 					>
 					<FileConfiguration
-						Name="Debug|x64"
+						Name="debug|x64"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -826,7 +839,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="Debug|Win32"
+						Name="debug|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -838,7 +851,7 @@
 					RelativePath=".\rtl\eh.cpp"
 					>
 					<FileConfiguration
-						Name="Debug|x64"
+						Name="debug|x64"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -846,7 +859,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="Debug|Win32"
+						Name="debug|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -858,7 +871,7 @@
 					RelativePath=".\rtl\ehsup.asm"
 					>
 					<FileConfiguration
-						Name="Debug|x64"
+						Name="debug|x64"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -866,7 +879,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="Debug|Win32"
+						Name="debug|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -878,7 +891,7 @@
 					RelativePath=".\rtl\rtti.cpp"
 					>
 					<FileConfiguration
-						Name="Debug|x64"
+						Name="debug|x64"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -886,7 +899,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="Debug|Win32"
+						Name="debug|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -898,7 +911,7 @@
 					RelativePath=".\rtl\safeseh.asm"
 					>
 					<FileConfiguration
-						Name="Debug|x64"
+						Name="debug|x64"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -906,7 +919,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="Debug|Win32"
+						Name="debug|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
