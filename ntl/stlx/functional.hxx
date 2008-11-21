@@ -17,17 +17,17 @@
 
 namespace std {
 
-/**\addtogroup  lib_utilities ********* General utilities library [20] ******
+/**\addtogroup  lib_utilities ********* 20 General utilities library [utilities] ******
  *@{*/
 
-/**\defgroup  lib_function_objects ***** Function objects [20.6] ************
+/**\defgroup  lib_function_objects ***** 20.6 Function objects [function.objects] ************
  *
  *    Function objects are objects with an operator() defined
  *@{
  */
 
 #pragma region lib_base
-/**\defgroup  lib_base ***************** Base [20.6.3] **********************
+/**\defgroup  lib_base ***************** 20.6.3 Base [base] **********************
  *
  *    provided to simplify the typedefs of the argument and result types
  *@{
@@ -52,8 +52,14 @@ struct binary_function
  */
 #pragma endregion
 
+#pragma region lib_ret
+
+template <class> class result_of; // undefined
+
+#pragma endregion
+
 #pragma region lib_refwrap
-/**\defgroup  lib_refwrap ***************** reference_wrapper [20.6.5] *******
+/**\defgroup  lib_refwrap ***************** 20.6.5 Class template reference_wrapper [refwrap] *******
  *
  *    reference_wrapper<T> is a CopyConstructible and Assignable wrapper
  *    around a reference to an object of type T.
@@ -66,8 +72,7 @@ class reference_wrapper
 //: public binary_function<T1, T2, R> // see below
 {
   ///////////////////////////////////////////////////////////////////////////
-  public :
-
+  public:
     // types
     typedef T type;
     //typedef -- result_type; // Not always defined
@@ -75,7 +80,7 @@ class reference_wrapper
     // construct/copy/destroy
     explicit reference_wrapper(T&) __ntl_nothrow;
     reference_wrapper(const reference_wrapper<T>& x) __ntl_nothrow;
-#if defined(NTL__CXX_RV) && defined(NTL__CXX_EF)
+#ifdef NTL__CXX_EF
     explicit reference_wrapper(T&&) = delete; // do not bind to temporary objects
 #endif
 
@@ -99,9 +104,11 @@ class reference_wrapper
 
   ///////////////////////////////////////////////////////////////////////////
   private:
-
     T* ptr;
 
+#if !defined(NTL__CXX_EF) && defined(NTL__CXX_RV)
+    explicit reference_wrapper(T&&); // do not bind to temporary objects
+#endif
 };
 
 
@@ -120,7 +127,8 @@ template <class T> reference_wrapper<const T> cref(reference_wrapper<T>) __ntl_n
 #pragma endregion
 
 #pragma region lib_arithmetic_operations
-/**\defgroup  lib_arithmetic_operations * Arithmetic operations [20.6.6] ****
+
+/**\defgroup  lib_arithmetic_operations * 20.6.6 Arithmetic operations [arithmetic.operations] ****
  *
  *    functors for all of the arithmetic operators
  *@{
@@ -167,7 +175,7 @@ struct negate : unary_function<T, T>
 #pragma endregion
 
 #pragma region lib_comparsions
-/**\defgroup  lib_comparisons ********** Comparisons [20.6.7] ***************
+/**\defgroup  lib_comparisons ********** 20.6.7 Comparisons [comparisons] ***************
  *
  *   functors for all of the comparison operators
  *@{
@@ -214,7 +222,7 @@ struct less_equal : binary_function<T, T, bool>
 #pragma endregion
 
 #pragma region lib_logical_operations
-/**\defgroup  lib_logical_operations *** Logical operations [20.6.8] ********
+/**\defgroup  lib_logical_operations *** 20.6.8 Logical operations [logical.operations] ********
  *
  *   functors for all of the logical operators
  *@{
@@ -243,7 +251,7 @@ struct logical_not : unary_function<T, bool>
 #pragma endregion
 
 #pragma region lib_bitwise_operations
-/**\defgroup  lib_bitwise_operations *** Bitwise operations [20.6.9] *********
+/**\defgroup  lib_bitwise_operations *** 20.6.9 Bitwise operations [bitwise.operations] *********
  *
  *   functors for all of the bitwise operators in the language
  *@{
@@ -275,7 +283,7 @@ template <class T> struct bit_xor : binary_function<T,T,T>
 #pragma endregion
 
 #pragma region lib_negators
-/**\defgroup  lib_negators ************* Negators [20.6.10] ******************
+/**\defgroup  lib_negators ************* 20.6.10 Negators [negators] ******************
  *
  *   negators take a predicate and return its complement
  *@{
@@ -333,7 +341,7 @@ binary_negate<Predicate> not2(const Predicate& pred)
 #pragma endregion
 
 #pragma region lib_bind
-/**\defgroup  lib_bind ***************** bind [20.6.11] *****************
+/**\defgroup  lib_bind ***************** 20.6.11 Function template bind [bind] *****************
  *
  *   The template function bind returns an object that binds a function object passed as an argument to additional arguments.
  *@{
@@ -362,11 +370,11 @@ namespace placeholders {
 #pragma endregion
 
 #pragma region lib_binders
-/**\defgroup  lib_binders ************** Binders [D8] ******************
+/**\defgroup  lib_binders ************** D.8 Binders [depr.lib.binders] ******************
  *@{
  */
 
-/// D8.1 Class template binder1st [binder.1st]
+/// D8.1 Class template binder1st [depr.lib.binder.1st]
 template <class Operation>
 class binder1st
 : public unary_function<typename Operation::second_argument_type,
@@ -389,7 +397,7 @@ class binder1st
     }
 };
 
-/// D8.2 bind1st [bind.1st]
+/// D8.2 bind1st [depr.lib.bind.1st]
 template <class Operation, class T>
 inline
 binder1st<Operation>
@@ -398,7 +406,7 @@ binder1st<Operation>
   return binder1st<Operation>(op, typename Operation::first_argument_type(x));
 }
 
-/// D8.3 Class template binder2nd [binder.2nd]
+/// D8.3 Class template binder2nd [depr.lib.binder.2nd]
 template <class Operation>
 class binder2nd
 : public unary_function<typename Operation::first_argument_type,
@@ -427,7 +435,7 @@ class binder2nd
     }
 };
 
-/// D8.4 bind2nd [bind.2nd]
+/// D8.4 bind2nd [depr.lib.bind.2nd]
 template <class Operation, class T>
 inline
 binder2nd<Operation>
@@ -441,7 +449,7 @@ binder2nd<Operation>
 #pragma endregion
 
 #pragma region lib_adaptors
-/**\defgroup  lib_function_pointer_adaptors Adaptors for pointers to functions [20.6.12]
+/**\defgroup  lib_function_pointer_adaptors 20.6.12 Adaptors for pointers to functions [function.pointer.adaptors]
  *@{
  */
 
@@ -483,7 +491,7 @@ pointer_to_binary_function<Arg1, Arg2, Result>
 #pragma endregion
 
 #pragma region lib_member_pointer_adaptors
-/**\defgroup  lib_member_pointer_adaptors Adaptors for pointers to members [20.6.13]
+/**\defgroup  lib_member_pointer_adaptors 20.6.13 Adaptors for pointers to members [member.pointer.adaptors]
  *@{
  */
 
@@ -632,7 +640,7 @@ const_mem_fun1_ref_t<Result, T, A>
 
 #pragma region unord.hash
 // 20.6.16 Class template hash [unord.hash]
-/**\defgroup  lib_hash Class template hash [20.6.16]
+/**\defgroup  lib_hash 20.6.16 Class template hash [unord.hash]
  *
  * The unordered associative containers defied in clause 23.4 use specializations of hash as the default
  * hash function.

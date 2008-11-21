@@ -17,9 +17,9 @@
 
 namespace std {
 
-/**\addtogroup  lib_utilities ********** [20] General utilities library *****
+/**\addtogroup  lib_utilities ********** 20 General utilities library [utilities] *****
  *@{*/
-/**\defgroup  lib_memory *************** [20.7] Memory **********************
+/**\defgroup  lib_memory *************** 20.7 Memory [memory] **********************
  *@{*/
 
 ///\name 20.7.2 Allocator-related traits [allocator.traits]

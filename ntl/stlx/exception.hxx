@@ -17,10 +17,10 @@
 
 namespace std {
 
-/**\addtogroup  lib_language_support *** Language support library [18] ******
+/**\addtogroup  lib_language_support *** 18 Language support library [language.support] ******
  *@{*/
 
-/**\defgroup  lib_support_exception **** Exception handling [18.7] **********
+/**\defgroup  lib_support_exception **** 18.7 Exception handling [support.exception] **********
  *@{*/
 
 /// 18.7.1 Class exception [exception]

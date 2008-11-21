@@ -34,7 +34,7 @@ NTL__EXTERNAPI wchar_t* __cdecl _wcslwr(wchar_t * str);
 
 namespace std {
 
-/**\addtogroup  lib_language_support *** Language support library [18] ******
+/**\addtogroup  lib_language_support *** 18 Language support library [language.support] ******
  *@{*/
 
 /**\addtogroup  lib_general_utilities ** C Library filees [c.files  ] *******

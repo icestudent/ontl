@@ -1,6 +1,6 @@
 /**\file*********************************************************************
  *                                                                     \brief
- *  Dynamic memory management [18.4 lib.support.dynamic]
+ *  Dynamic memory management [18.5 support.dynamic]
  *
  ****************************************************************************
  */
@@ -24,16 +24,16 @@ SizeType __ntl_grow_heap_block_size(const SizeType  size)
 
 namespace std {
 
-/**\addtogroup  lib_language_support *** Language support library [18] ******
+  /**\addtogroup  lib_language_support *** 18 Language support library [language.support] ******
  *@{*/
 
-/**\defgroup  lib_support_dynamic ****** Dynamic memory management [18.4] ***
+/**\defgroup  lib_support_dynamic ****** 18.5 Dynamic memory management [support.dynamic] ***
  *@{*/
 
-/**\defgroup  lib_alloc_errors ********* Storage allocation errors [18.4.2] *
+/**\defgroup  lib_alloc_errors ********* 18.5.2 Storage allocation errors [alloc.errors] *
  *@{*/
 
-/// Class bad_alloc [18.4.2.1 lib.bad.alloc]
+/// Class bad_alloc [18.5.2.1 lib.bad.alloc]
 class bad_alloc : public exception
 {
   public:
@@ -53,10 +53,10 @@ const nothrow_t nothrow;
 const nothrow_t nothrow = {};
 #endif
 
-/// Type new_handler [18.4.2.2 lib.new.handler]
+/// Type new_handler [18.5.2.2 lib.new.handler]
 typedef void (*new_handler)();
 
-/// set_new_handler [18.4.2.3 lib.set.new.handler]
+/// set_new_handler [18.5.2.3 lib.set.new.handler]
 new_handler set_new_handler(new_handler new_p) __ntl_nothrow;
 
 /**@} lib_alloc_errors */
@@ -77,9 +77,9 @@ new_handler set_new_handler(new_handler new_p) __ntl_nothrow;
 /**\addtogroup  lib_support_dynamic
  *@{*/
 
-// Storage allocation and deallocation [18.4.1 lib.new.delete]
+// Storage allocation and deallocation [18.5.1 lib.new.delete]
 
-///\name  Single-object forms [18.4.1.1 lib.new.delete.single]
+///\name  Single-object forms [18.5.1.1 lib.new.delete.single]
 
 void* operator new      (std::size_t size) __ntl_throws(std::bad_alloc);
 void  operator delete   (void* ptr) __ntl_nothrow;
@@ -87,7 +87,7 @@ void  operator delete   (void* ptr) __ntl_nothrow;
 void* operator new      (std::size_t size, const std::nothrow_t&) __ntl_nothrow;
 void  operator delete   (void* ptr, const std::nothrow_t&) __ntl_nothrow;
 
-///\name  Array forms [18.4.1.2 lib.new.delete.array]
+///\name  Array forms [18.5.1.2 lib.new.delete.array]
 
 void* operator new[]    (std::size_t size) __ntl_throws(std::bad_alloc);
 void  operator delete[] (void* ptr) __ntl_nothrow;
@@ -95,7 +95,7 @@ void  operator delete[] (void* ptr) __ntl_nothrow;
 void* operator new[]    (std::size_t size, const std::nothrow_t&) __ntl_nothrow;
 void  operator delete[] (void* ptr, const std::nothrow_t&) __ntl_nothrow;
 
-///\name  Placement forms [18.4.1.3 lib.new.delete.placement]
+///\name  Placement forms [18.5.1.3 lib.new.delete.placement]
 ///\note  Standard says nothing about inline nor static, but we're avoiding LNK2005
 
 __forceinline

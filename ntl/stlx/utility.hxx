@@ -20,7 +20,7 @@ namespace std {
  *@{
  */
 
-/**\defgroup  lib_utility ************** Utility components [20.2] **********
+/**\defgroup  lib_utility ************** 20.2 Utility components [utility] **********
  *
  *    basic function and class templates that are used throughout
  *    the rest of the library.

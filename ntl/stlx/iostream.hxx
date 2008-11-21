@@ -18,7 +18,7 @@
 
 namespace std {
 
-/**\addtogroup  lib_input_output ******* Input/output library [27] **********
+/**\addtogroup  lib_input_output ******* [27] Input/output library [input.output] **********
  *@{*/
 
 ///\name  Standard iostream objects [27.3 lib.iostream.objects]

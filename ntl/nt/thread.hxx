@@ -292,10 +292,10 @@ public:
     user_thread(
     start_routine_t *   start_routine,
     void *              start_context   = 0,
-    size_t              maximum_stack_size = 0,
-    size_t              commited_stack_size = 0,
     bool                create_suspended = false,
     client_id *         client          = 0,
+    size_t              maximum_stack_size = 0,
+    size_t              commited_stack_size = 0,
     security_descriptor* thread_security = 0)
   {
     create(this, current_process(), start_routine, start_context, maximum_stack_size, commited_stack_size,
@@ -337,34 +337,34 @@ public:
     return NtOpenThread(ThreadHandle, DesiredAccess, &oa, ClientId);
   }
 
-  ntstatus control(bool suspend)
+  ntstatus control(bool suspend) const volatile
   {
     return (suspend ? NtSuspendThread : NtResumeThread)(get(), NULL);
   }
 
-  ntstatus suspend(uint32_t* PreviousSuspendCount = 0) const
+  ntstatus suspend(uint32_t* PreviousSuspendCount = 0) const volatile
   {
     return NtSuspendThread(get(), PreviousSuspendCount);
   }
 
-  ntstatus resume(bool alert = false, uint32_t* PreviousSuspendCount = 0) const
+  ntstatus resume(bool alert = false, uint32_t* PreviousSuspendCount = 0) const volatile
   {
     return (alert ? NtAlertResumeThread : NtResumeThread)(get(), PreviousSuspendCount);
   }
 
   template <class Clock, class Duration>
-  ntstatus wait_until(const std::chrono::time_point<Clock, Duration>& abs_time, bool alertable = true) const
+  ntstatus wait_until(const std::chrono::time_point<Clock, Duration>& abs_time, bool alertable = true) const volatile
   {
     return NtWaitForSingleObject(get(), alertable, std::chrono::duration_cast<system_duration>(abs_time.time_since_epoch()).count());
   }
 
   template <class Rep, class Period>
-  ntstatus wait_for(const std::chrono::duration<Rep, Period>& rel_time, bool alertable = true) const
+  ntstatus wait_for(const std::chrono::duration<Rep, Period>& rel_time, bool alertable = true) const volatile
   {
     return NtWaitForSingleObject(get(), alertable, -1i64 * std::chrono::duration_cast<system_duration>(rel_time).count());
   }
 
-  ntstatus wait(bool alertable = true) const
+  ntstatus wait(bool alertable = true) const volatile
   {
     return NtWaitForSingleObject(get(), alertable, system_time::infinite());
   }
@@ -410,7 +410,49 @@ public:
       RtlReleasePebLock();
     }
   }
-};
+
+#ifdef NTL__CXX_RV
+  user_thread(user_thread&& rhs)
+  {
+    reset(rhs.release());
+  }
+
+  user_thread& operator=(user_thread&& rhs)
+  {
+    reset(rhs.release());
+    return *this;
+  }
+
+  void swap(user_thread& rhs)
+  {
+    __super::swap(rhs);
+  }
+#ifdef NTL__CXX_EF
+  user_thread(const user_thread&) = delete;
+  user_thread& operator=(const user_thread&) = delete;
+#else
+private:
+  user_thread(const user_thread&);
+  user_thread& operator=(const user_thread&);
+#endif
+#else
+  user_thread(user_thread& rhs)
+    :reset(rhs.release())
+  {}
+
+  user_thread& operator=(user_thread& rhs)
+  {
+    reset(rhs.release());
+    return *this;
+  }
+
+  void swap(user_thread& rhs)
+  {
+    handle::swap(rhs);
+  }
+#endif
+
+}; // class user_thread
 
   template <class Clock, class Duration>
   void sleep_until(const std::chrono::time_point<Clock, Duration>& abs_time, bool alertable = false)
@@ -424,6 +466,7 @@ public:
     NtDelayExecution(alertable, -1i64 * std::chrono::duration_cast<system_duration>(rel_time).count());
   }
 
-  }
+ } // namespace nt
+
 }
 #endif // NTL__NT_THREAD

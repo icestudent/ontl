@@ -241,11 +241,29 @@ extern vfv_t* __xc_z[];
 }; // extern "C"
 ///@}
 
+namespace ntl
+{
+  void _cdecl __init_crt(bool init);
+
+  struct crt_initializer
+  {
+    crt_initializer()
+    {
+      __init_crt(true);
+    }
+    ~crt_initializer()
+    {
+      __init_crt(false);
+    }
+  };
+}
+
+
 namespace std {
 
-/**\addtogroup  lib_language_support *** Language support library [18] ******
+/**\addtogroup  lib_language_support *** 18 Language support library [language.support] ******
  *@{*/
-/**\addtogroup  lib_support_start_term * Start and termination [18.3] *******
+/**\addtogroup  lib_support_start_term * 18.4 Start and termination [support.start.term] *******
  *@{*/
 
 
@@ -256,7 +274,7 @@ namespace std {
 /**@} lib_support_start_term
  */
 
-/**\addtogroup  lib_general_utilities ** Library General utilities [C 7.20] *******
+/**\addtogroup  lib_general_utilities ** C Library filees [c.files  ] *******
  *@{*/
 
 using ::atof;

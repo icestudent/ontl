@@ -14,18 +14,18 @@
 
 namespace std {
 
-/**\addtogroup  lib_iterators ********** Iterators library [24] *************
+/**\addtogroup  lib_iterators ********** 24 Iterators library [iterators] *************
  *
  *    Components that C++ programs may use to perform iterations over
  *    \link lib_containers containers\endlink,
- *    \link lib_streams streams\endlink,
+ *    \link lib_input_output streams\endlink,
  *    and \link lib_stream_buffers stream buffers\endlink.
  *@{
  */
 
 // primitives [24.3]
 
-/**\addtogroup  lib_std_iterator_tags ** Standard iterator tags [24.3.3] ****
+/**\addtogroup  lib_std_iterator_tags ** 24.3.3 Standard iterator tags [std.iterator.tags] ****
  *@{*/
 struct input_iterator_tag                                             {};
 struct output_iterator_tag                                            {};
@@ -34,7 +34,8 @@ struct bidirectional_iterator_tag : public forward_iterator_tag       {};
 struct random_access_iterator_tag : public bidirectional_iterator_tag {};
 /**@}*/
 
-/// Iterator traits [24.3.1 lib.iterator.traits]
+/**\addtogroup lib_std_iterator_traits ** 24.3.1 Iterator traits [iterator.traits] ****
+  *@{*/
 template<class Iterator>
 struct iterator_traits
 {
@@ -64,8 +65,10 @@ struct iterator_traits<const T*>
   typedef const T &                   reference;
   typedef random_access_iterator_tag  iterator_category;
 };
+/**@}*/
 
-/// Basic iterator [24.3.2 lib.iterator.basic]
+/**\addtogroup lib_std_iterator ** 24.3.2 Basic iterator [iterator.basic] ****
+ *@{*/
 template<class Category, class T, class Distance = ptrdiff_t,
          class Pointer = T*, class Reference = T&>
 struct iterator
@@ -76,7 +79,10 @@ struct iterator
   typedef Reference reference;
   typedef Category  iterator_category;
 };
+/**@}*/
 
+/**\addtogroup lib_std_iterator_operations ** 24.3.4 Iterator operations [iterator.operations] ****
+*@{*/
 namespace __impl {
 
 template<class InputIterator, class Distance>
@@ -155,7 +161,7 @@ typename iterator_traits<RandomIterator>::difference_type
 
 }//namespace __impl
 
-///\name  Iterator operations [24.3.4 lib.iterator.operations]
+///\name  24.3.4 Iterator operations [iterator.operations]
 
 template<class AnyIterator, class Distance>
 inline
@@ -194,7 +200,8 @@ InputIterator
 
 ///@}
 
-// 24.4, predefined iterators
+/**\addtogroup lib_std_predef_iterators ** 24.4 Predefined iterators [predef.iterators] ****
+*@{*/
 
 /// 24.4.1 Reverse iterators [lib.reverse.iterators]
 template <class Iterator>
@@ -627,6 +634,7 @@ class ostreambuf_iterator
     streambuf_type * sbuf_;
     bool             failed_;
 };
+/**@}*/
 
 /**@} lib_iterators */
 

@@ -15,10 +15,10 @@
 
 namespace std {
 
-  /**\addtogroup  lib_containers ********* Containers library [23] ************
+  /**\addtogroup  lib_containers ********* 23 Containers library [containers] ************
   *@{*/
 
-  /**\addtogroup  lib_associative *********** Associative [23.3] *******************
+  /**\addtogroup  lib_associative *********** 23.3 Associative containers [associative] *******************
   *@{*/
 
   /// Class template bitset [23.3.5 template.bitset]

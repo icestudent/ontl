@@ -16,10 +16,10 @@
 
 namespace std {
 
-/**\addtogroup  lib_containers ********* Containers library [23] ************
+/**\addtogroup  lib_containers ********* 23 Containers library [containers] ************
  *@{*/
 
-/**\addtogroup  lib_sequence *********** Assotiative [23.3] *******************
+/**\addtogroup  lib_associative *********** 23.3 Associative containers [associative] *******************
  *@{*/
 
   /// Class template set [23.3.3]

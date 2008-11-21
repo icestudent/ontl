@@ -1,6 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 ///
-///\file  C++ exception support runtime
+///\file
+///\brief C++ exception support runtime
 ///
 ///\note  The file contains compiler predefined library helpers
 ///       and must be compiled without /GL to avoid C2268.
@@ -48,6 +49,7 @@ void std::terminate()
 {
   __ntl_std_terminate_handler();
 }
+
 #pragma endregion
 
 

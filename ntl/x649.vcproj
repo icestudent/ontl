@@ -435,6 +435,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\stlx\future.hxx"
+						>
+					</File>
+					<File
 						RelativePath=".\stlx\locale.hxx"
 						>
 					</File>

@@ -10,9 +10,9 @@
 
 namespace std {
 
-/**\defgroup  lib_language_support ***** Language support library [18] ******
+/**\defgroup  lib_language_support ***** 18 Language support library [language.support] ******
  *@{*/
-/**\defgroup  lib_support_runtime ****** Types [18.7] ***********************
+/**\defgroup  lib_support_runtime ****** 18.9 Other runtime support [support.runtime] ***********************
  *@{*/
 
 #ifndef va_start

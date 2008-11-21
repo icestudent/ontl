@@ -8,6 +8,10 @@
 #ifndef NTL__KM_BASEDEF
 #define NTL__KM_BASEDEF
 
+#ifndef NTL__SUBSYSTEM_KM
+#define NTL__SUBSYSTEM_KM
+#endif
+
 #include "../nt/basedef.hxx"
 #include "../stdlib.hxx"
 #include "../nt/exception.hxx"

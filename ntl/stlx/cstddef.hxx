@@ -348,7 +348,7 @@
 
 namespace std {
 
-/**\defgroup  lib_language_support ***** Language support library [18] ******
+/**\defgroup  lib_language_support ***** 18 Language support library [language.support] ******
  *@{*/
 
 #ifdef _MSC_VER
@@ -364,7 +364,7 @@ namespace std {
   struct {} max_align_t;
 #endif
 
-/**\defgroup  lib_support_types ******** Types [18.1] ***********************
+/**\defgroup  lib_support_types ******** 18.1 Types [support.types] ***********************
  *@{*/
 
 #ifdef NTL__CXX_NULLPTR
@@ -440,9 +440,9 @@ static_assert(sizeof(nullptr)==sizeof(void*), "3.9.1.10: sizeof(std::nullptr_t) 
 /**@} lib_language_support */
 
 
-  /**\addtogroup  lib_utilities ********** [20] General utilities library *****
+  /**\addtogroup  lib_utilities ********** 20 General utilities library [utilities] *****
   *@{*/
-  /**\addtogroup  lib_memory *************** [20.7] Memory **********************
+  /**\addtogroup  lib_memory *************** 20.7 Memory [memory] **********************
   *@{*/
 
   /// 20.7.1 Allocator argument tag [allocator.tag]

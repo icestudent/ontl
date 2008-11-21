@@ -16,6 +16,12 @@ sec(".CRT$XCZ") vfv_t* __xc_z[]= {0};
 
 #include "../stlx/vector.hxx"
 
+#ifdef NTL__SUBSYSTEM_KM
+# include "../km/new.hxx"
+#else
+# include "../nt/new.hxx"
+#endif
+
 namespace
 {
   typedef std::vector<vfv_t*> exit_funcs_t;
@@ -48,7 +54,7 @@ namespace
 
 namespace ntl
 {
-  void _cdecl init_crt(bool init)
+  void _cdecl __init_crt(bool init)
   {
     if(init){
       exit_list = new exit_funcs_t();

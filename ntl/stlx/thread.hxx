@@ -14,7 +14,7 @@
 namespace std {
 
   /**
-   *	@group thread Thread support library
+   *	@defgroup thread Thread support library [thread]
    *  @{
    **/
 

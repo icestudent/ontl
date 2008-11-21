@@ -27,10 +27,10 @@ namespace std {
 
 typedef ptrdiff_t streamoff;
 
-/**\defgroup  lib_strings ************* Strings library [21] ****************
+/**\defgroup  lib_strings ************* 21 Strings library [strings] ****************
  *@{*/
 
-/**\defgroup  lib_char_traits ********* Character traits [21.1] *************
+/**\defgroup  lib_char_traits ********* 21.1 Character traits [char.traits] *************
  *@{*/
 
 /// 21.1 Character traits [char.traits]

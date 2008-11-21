@@ -47,6 +47,7 @@ class basic_handle
     bool is_valid() const { return Validate(get()); }
 
     X get() const __ntl_nothrow { return h; }
+    X get() const volatile __ntl_nothrow { return h; }
     X release()   __ntl_nothrow { X tmp = get(); set(0); return tmp; }
 
     basic_handle duplicate() const __ntl_nothrow
@@ -58,6 +59,17 @@ class basic_handle
     {
       if ( get() && get() != h ) Delete(get());
       set(h);
+    }
+
+#ifdef NTL__CXX_RV
+    void swap(basic_handle&& rhs)
+#else
+    void swap(basic_handle& rhs)
+#endif
+    {
+      X tmp = h;
+      h = rhs.h;
+      rhs.h = tmp;
     }
 
   ///////////////////////////////////////////////////////////////////////////

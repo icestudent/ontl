@@ -16,7 +16,7 @@
 
 namespace std {
 
-/**\defgroup  lib_input_output ********* Input/output library [27] **********
+/**\defgroup  lib_input_output ********* [27] Input/output library [input.output] **********
  *
  *    Components that C++ programs may use to perform input/output operations
  *@{

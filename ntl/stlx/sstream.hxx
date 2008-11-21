@@ -11,7 +11,7 @@
 
 namespace std {
 
-/**\addtogroup  lib_input_output ******* [27] Input/output library **********
+/**\addtogroup  lib_input_output ******* [27] Input/output library [input.output] **********
  *@{*/
 
 /**\addtogroup  lib_string_streams ***** [27.7] String-based streams ********

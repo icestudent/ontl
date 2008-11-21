@@ -18,7 +18,7 @@
 
 namespace std {
 
-/**\addtogroup  lib_input_output ******* [27] Input/output library **********
+/**\addtogroup  lib_input_output ******* [27] Input/output library [input.output] **********
  *@{*/
 
 ///\name  27.4.1 Types [stream.types]

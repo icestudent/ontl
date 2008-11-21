@@ -13,10 +13,10 @@
 
 namespace std {
 
-/**\addtogroup  lib_containers ********* Containers library [23] ************
+/**\addtogroup  lib_containers ********* 23 Containers library [containers] ************
  *@{*/
 
-/**\addtogroup  lib_sequence *********** Sequences [23.2] *******************
+/**\addtogroup  lib_sequence *********** 23.2 Sequence containers [sequences] *******************
  *@{*/
 
 /// Class template array [6.2.2 tr.array.array]

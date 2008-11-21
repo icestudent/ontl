@@ -18,13 +18,13 @@
 
 namespace std {
 
-/**\addtogroup  lib_containers ********* Containers library [23] ************
+/**\addtogroup  lib_containers ********* 23 Containers library [containers] ************
  *@{*/
 
-/**\addtogroup  lib_sequence *********** Sequences [23.2] *******************
+/**\addtogroup  lib_sequence *********** 23.2 Sequence containers [sequences] *******************
  *@{*/
 
-/**\defgroup  lib_container_adaptors *** Container adaptors [23.2.5]*********
+/**\defgroup  lib_container_adaptors *** 23.2.5 Container adaptors [container.adaptors] *********
  *@{*/
 
 /// Class template stack 23.2.5.3

@@ -41,7 +41,11 @@ NTL__EXTERNAPI void __stdcall DbgBreakPoint();
 ///             of NDEBUG each time that <assert.h> is included.
 #undef assert
 #ifdef NDEBUG
+# ifdef _MSC_VER
+  #define assert(expr) (__assume(expr))
+# else
   #define assert(expr) ((void)0)
+# endif
 #else
   #define assert(expr) \
     if ( !!(expr) ); else \

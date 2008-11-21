@@ -13,7 +13,7 @@
 
 namespace std {
 
-/**\addtogroup  lib_input_output ******* [27] Input/output library **********
+/**\addtogroup  lib_input_output ******* [27] Input/output library [input.output] **********
  *@{*/
 
 /**\addtogroup  lib_iostream_format **** [27.6] Formatting and manipulators *

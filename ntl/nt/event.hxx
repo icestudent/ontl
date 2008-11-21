@@ -229,7 +229,7 @@ namespace ntl {
         create(
           handle*           EventHandle,
           access_mask       DesiredAccess,
-          const object_attributes*  ObjectAttributes __optional,
+          const object_attributes*  ObjectAttributes,
           event_type        EventType,
           bool              InitialState
           )

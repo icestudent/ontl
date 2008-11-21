@@ -16,11 +16,11 @@
 
 namespace std {
 
-/**\defgroup  lib_containers *********** Containers library [23] ************
+/**\defgroup  lib_containers *********** 23 Containers library [containers] ************
   *@{ *    Components to organize collections of information
   **/
 
-/**\defgroup  lib_associative ********** Associative containers [23.3] ******
+/**\defgroup  lib_associative *********** 23.3 Associative containers [associative] ******
   *@{ *    Provide an ability for fast retrieval of data based on keys.
   **/
 

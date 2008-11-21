@@ -73,6 +73,9 @@ namespace ntl {
         void* Ptr;
       };
 
+      static const uint32_t RunOnceCheckOnly = 1U;
+      static const uint32_t RunOnceAsync     = 2U;
+
       typedef uint32_t __stdcall run_once_init_t(
           rtl::run_once* RunOnce,
           void* Parameter,
@@ -107,7 +110,7 @@ namespace ntl {
       uint32_t __stdcall RtlIsCriticalSectionLockedByThread(rtl::critical_section* CriticalSection);
 
     NTL__EXTERNAPI
-      uint32_t __stdcall RtlGetCriticalSectionRecursionCount(rtl::critical_section* CriticalSection);
+      uint32_t __stdcall RtlGetCriticalSectionRecursionCount(const rtl::critical_section* CriticalSection);
 
     NTL__EXTERNAPI
       uint32_t __stdcall RtlSetCriticalSectionSpinCount(rtl::critical_section* CriticalSection, uint32_t SpinCount);
@@ -153,8 +156,28 @@ namespace ntl {
         void**                Context
       );
 
+   //////////////////////////////////////////////////////////////////////////
+
+   typedef void __stdcall resource_control_t(rtl::resource*);
+   
+   NTL__EXTERNAPI 
+     resource_control_t
+      RtlInitializeResource,
+      RtlReleaseResource,
+      RtlDeleteResource,
+      RtlConvertSharedToExclusive,
+      RtlConvertExclusiveToShared;
+
+   bool __stdcall
+     RtlAcquireResourceShared(rtl::resource* Resource, bool Wait);
+
+   bool __stdcall
+     RtlAcquireResourceExclusive(rtl::resource* Resource, bool Wait);
 
 
+   /************************************************************************/
+   /* CS RAII                                                              */
+   /************************************************************************/
    class critical_section:
      protected rtl::critical_section
    {
@@ -162,6 +185,11 @@ namespace ntl {
      critical_section()
      {
        ntl::nt::RtlInitializeCriticalSection(this);
+     }
+
+     explicit critical_section(uint32_t SpinCount)
+     {
+       ntl::nt::RtlInitializeCriticalSectionAndSpinCount(this, SpinCount);
      }
 
      ~critical_section()
@@ -199,9 +227,9 @@ namespace ntl {
        if(!LockSemaphore){
          if(!try_acquire() && !explicit_wait)
           return status::invalid_handle;
+
          // wait
          ntstatus st;
-
          systime_t period = timeout;
          systime_t const interval = std::chrono::duration_cast<system_duration>( std::chrono::milliseconds(50)).count();
          do{
@@ -227,6 +255,55 @@ namespace ntl {
      {
        return wait(-1i64 * std::chrono::duration_cast<system_duration>(rel_time).count(), explicit_wait, alertable);
      }
+
+     void spin_count(uint32_t SpinCount)
+     {
+       ntl::nt::RtlSetCriticalSectionSpinCount(this, SpinCount);
+     }
+   };
+
+
+   /************************************************************************/
+   /* Resource RAII                                                        */
+   /************************************************************************/
+   class resource:
+     protected rtl::resource
+   {
+   public:
+      resource()
+      {
+        RtlInitializeResource(this);
+      }
+
+      ~resource()
+      {
+        RtlDeleteResource(this);
+      }
+
+      bool acquire(bool exclusive, bool wait)
+      {
+        (exclusive ? RtlAcquireResourceExclusive : RtlAcquireResourceShared)(this, wait);
+      }
+
+      bool acquire_shared(bool wait = true)
+      {
+        return acquire(false, wait);
+      }
+
+      bool acquire_exclusive(bool wait = true)
+      {
+        return acquire(true, wait);
+      }
+
+      void release()
+      {
+        RtlReleaseResource(this);
+      }
+
+      void convert(bool exclusive)
+      {
+        (exclusive ? RtlConvertSharedToExclusive : RtlConvertExclusiveToShared)(this);
+      }
    };
 
   } //namespace nt
