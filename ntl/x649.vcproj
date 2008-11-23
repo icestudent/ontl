@@ -306,6 +306,54 @@
 						RelativePath=".\stlx\rbtree.hxx"
 						>
 					</File>
+					<Filter
+						Name="pp"
+						>
+						<File
+							RelativePath=".\stlx\ext\pp\config.hxx"
+							>
+						</File>
+						<File
+							RelativePath=".\stlx\ext\pp\macro_counter.hxx"
+							>
+						</File>
+						<File
+							RelativePath=".\stlx\ext\pp\macro_misc.hxx"
+							>
+						</File>
+						<File
+							RelativePath=".\stlx\ext\pp\macro_params.hxx"
+							>
+						</File>
+						<File
+							RelativePath=".\stlx\ext\pp\macro_repeat.hxx"
+							>
+						</File>
+					</Filter>
+					<Filter
+						Name="ttl"
+						>
+						<File
+							RelativePath=".\stlx\ext\ttl\data_holder.hxx"
+							>
+						</File>
+						<File
+							RelativePath=".\stlx\ext\ttl\exception.hxx"
+							>
+						</File>
+						<File
+							RelativePath=".\stlx\ext\ttl\typelist.hxx"
+							>
+						</File>
+					</Filter>
+					<Filter
+						Name="parallel"
+						>
+						<File
+							RelativePath=".\stlx\ext\parallel\hash_map.hxx"
+							>
+						</File>
+					</Filter>
 				</Filter>
 				<Filter
 					Name="containers"
@@ -528,6 +576,10 @@
 					</File>
 					<File
 						RelativePath=".\stlx\tt_ismemptr.inl"
+						>
+					</File>
+					<File
+						RelativePath=".\stlx\tuple.hxx"
 						>
 					</File>
 					<File
