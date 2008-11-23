@@ -1046,7 +1046,17 @@
 #define TTL_LAST_REPEAT_511(m,p)  m(511,p)
 #define TTL_LAST_REPEAT_512(m,p)  m(512,p)
 
-
+/**
+ *	n - repeat count
+ *  m - `middle` macro
+ *  l - `last` macro
+ *  p - parameter name
+ *
+ *  where \i macro is: \code MACRO(n, p) \endcode, where 
+ *  \c n is current counter value and 
+ *  \c p is param name provided at TTL_REPEAT
+ *
+ **/
 #define TTL_REPEAT(n, m, l, p) TTL_APPEND(TTL_REPEAT_, TTL_DEC(n))(m,l,p) TTL_APPEND(TTL_LAST_REPEAT_,n)(l,p)
 #define TTL_REPEAT_BIDIR(n, m, l, p) TTL_APPEND(TTL_REPEAT_, TTL_DEC(n))(m,l,TTL_INC(p)) l(n,p)
 

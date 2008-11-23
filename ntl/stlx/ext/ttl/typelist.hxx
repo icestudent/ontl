@@ -23,6 +23,13 @@ namespace ttl
   namespace meta
   {	
     struct empty_type {};
+    struct null_type  {};
+
+    template<size_t v>
+    struct int2type
+    {
+      enum { value = v };
+    };
 
     struct exception:
       ttl::exception

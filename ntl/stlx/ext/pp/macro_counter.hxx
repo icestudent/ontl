@@ -1039,6 +1039,7 @@
 #define TTL_CNTINC_510 511
 #define TTL_CNTINC_511 512
 
+// TTL_DEC(5) is TTL_CNTDEC_ ## 5 is 4
 #define TTL_DEC(n) TTL_APPEND(TTL_CNTDEC_, n)
 #define TTL_INC(n) TTL_APPEND(TTL_CNTINC_, n)
 

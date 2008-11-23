@@ -50,6 +50,10 @@
 #define TTL_FUNC_PPARAM_END(n,t) P##n t##n
 #define TTL_FUNC_PPARAMS(n, p) TTL_REPEAT(n, TTL_FUNC_PPARAM, TTL_FUNC_PPARAM_END, p)
 
+#define TTL_FUNC_CVPARAM(n,t) TTL_CV T##n TTL_REF t##n, 
+#define TTL_FUNC_CVPARAM_END(n,t) TTL_CV T##n TTL_REF t##n
+#define TTL_FUNC_CVPARAMS(n, p) TTL_REPEAT(n, TTL_FUNC_PARAM, TTL_FUNC_PARAM_END, p)
+
 #define TTL_ENUM_ITEMS(n, t) TTL_REPEAT(n,TTL_ARG,TTL_ARG_END,t)
 
 #endif //__macro_params__hpp
