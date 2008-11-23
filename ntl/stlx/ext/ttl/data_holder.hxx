@@ -11,6 +11,8 @@
 #ifndef __ttl_impl_data_holder__hpp
 #define __ttl_impl_data_holder__hpp
 
+#include "../../type_traits.hxx"
+
 namespace ttl
 {
 	struct data_holder_base {};
@@ -18,6 +20,7 @@ namespace ttl
 	template< typename T >
 	struct data_holder : data_holder_base
 	{
+    static_assert(std::is_void<T>::value == false, "we can't to use void currently");
 		enum { const_value = 0 };
 		
 		typedef T type;
@@ -81,7 +84,7 @@ namespace ttl
 		typedef const T* const_pointer;
 
 		typedef T& return_type;
-		typedef const T& const_return_type;
+		typedef T& const_return_type;
 		typedef T& param_type;
 
 		T& d;
@@ -151,27 +154,6 @@ namespace ttl
 		reference operator*() { return *d; }
 	};
 
-	template<>
-	struct data_holder<void*> : data_holder_base
-	{
-		enum { const_value = 0 };
-		
-		typedef void type;
-		typedef void* pointer;
-
-		typedef void* return_type;
-		typedef void* param_type;
-
-		void* d;
-
-		data_holder() : d(0) {}
-		data_holder( param_type d_ ) : d(d_) {}
-
-		void set( param_type d_ ) { d = d_; }
-		return_type get() { return d; }
-		pointer operator&() { return d; }
-	};
-	
 	template< typename T >
 	struct data_holder<const T*> : data_holder_base
 	{
@@ -197,7 +179,43 @@ namespace ttl
 		const_pointer operator&() const { return d; }
 		const_reference operator*() const { return *d; }
 	};
-	
+
+  template<>
+  struct data_holder<void*> : data_holder_base
+  {
+    enum { const_value = 0 };
+
+    typedef void type;
+    typedef void* pointer;
+
+    typedef void* return_type;
+    typedef void* param_type;
+
+    void* d;
+
+    data_holder() : d(0) {}
+    data_holder( param_type d_ ) : d(d_) {}
+
+    void set( param_type d_ ) { d = d_; }
+    return_type get() { return d; }
+    pointer operator&() { return d; }
+  };
+
+
+  //template<>
+  //struct data_holder<void> : data_holder_base
+  //{
+  //  enum { const_value = 0 };
+
+  //  typedef void type;
+  //  typedef void pointer;
+
+  //  typedef void return_type;
+  //  typedef void param_type;
+
+  //  data_holder() {}
+  //};
+
 };
 
 #endif //__data_holder__hpp

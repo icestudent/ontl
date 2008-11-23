@@ -142,27 +142,6 @@ template <class T, size_t N > void swap(array<T,N>& x, array<T,N>& y)
   x.swap(y);
 }
 
-///\name  Tuple interface to class template array [6.2.2.5]
-
-template <class T> class tuple_size; // forward declaration
-template <int I, class T> class tuple_element; // forward declaration
-template <class T, size_t N> struct tuple_size<array<T, N> >;
-template <int I, class T, size_t N> struct tuple_element<I, array<T, N> >;
-
-template <int I, class T, size_t N>
-T&
-  get(array<T, N>& a)
-{
-  return a[I];
-}
-
-template <int I, class T, size_t N>
-const T&
-  get(const array<T, N>& a)
-{
-  return a[I];
-}
-
 ///@}
 /**@} lib_sequence */
 /**@} lib_containers */

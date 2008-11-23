@@ -88,6 +88,7 @@ namespace ttl
       //
 
       template< typename T, int N > struct get;
+
 #define TTL_META_TYPELIST_GET(n, t) template<typename T>  struct get<T, TTL_CNTDEC_##n>  \
       { enum {index = n-1}; typedef typename T::t##n type; };
 
@@ -115,18 +116,19 @@ namespace ttl
     };
 
     ///////////////////////////////////////////////////////////
-    template< typename L, int N, bool Ok = (N < length<L>::value) >
+    template< typename L, size_t N/*, bool Ok = (N < length<L>::value)*/ >
     struct get
     {
+      static_assert(N < length<L>::value, "N out of bounds");
       typedef typename impl::get<L,N>::type type;
       enum{ index = N };
     };
 
-    template< typename L, int N >
-    struct get<L,N,false>
-    {
-      //index is out of range
-    };
+    //template< typename L, int N >
+    //struct get<L,N,false>
+    //{
+    //  static_assertindex is out of range
+    //};
 
     ////////////////////////////////////////////////////////////
     //	run-time type switch

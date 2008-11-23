@@ -28,11 +28,15 @@
 #define TTL_ARG_END(n,t) t##n
 #define TTL_ARG_S(n,t) TTL_APPEND(t, TTL_CNTINC_##n),
 #define TTL_ARG_S_END(n,t) TTL_APPEND(t, TTL_CNTINC_##n)
+#define TTL_ARGCV(n,t) TTL_CV t##n TTL_REF, 
+#define TTL_ARGCV_END(n,t) TTL_CV t##n TTL_REF
 
 #define TTL_ARGS(n) TTL_REPEAT(n, TTL_ARG, TTL_ARG_END, T)
 #define TTL_ARGSX(n,p) TTL_REPEAT(n, TTL_ARG, TTL_ARG_END, p)
 #define TTL_ARGS_S(n) TTL_REPEAT(n, TTL_ARG_S, TTL_ARG_S_END, T)
 #define TTL_ARGS_SX(n,p) TTL_REPEAT(n, TTL_ARG_S, TTL_ARG_S_END, p)
+#define TTL_ARGSCV(n) TTL_REPEAT(n, TTL_ARGCV, TTL_ARGCV_END, T)
+#define TTL_ARGSCVX(n, p) TTL_REPEAT(n, TTL_ARGCV, TTL_ARGCV_END, p)
 
 #define TTL_TYPEDEF(n, t) typedef t##n type##n;
 #define TTL_TYPEDEF_END(n, t) typedef t##n type##n;
@@ -52,7 +56,11 @@
 
 #define TTL_FUNC_CVPARAM(n,t) TTL_CV T##n TTL_REF t##n, 
 #define TTL_FUNC_CVPARAM_END(n,t) TTL_CV T##n TTL_REF t##n
-#define TTL_FUNC_CVPARAMS(n, p) TTL_REPEAT(n, TTL_FUNC_PARAM, TTL_FUNC_PARAM_END, p)
+#define TTL_FUNC_CVPARAMS(n, p) TTL_REPEAT(n, TTL_FUNC_CVPARAM, TTL_FUNC_CVPARAM_END, p)
+
+#define TTL_FUNC_UPARAM(n,p) TTL_CV U##n TTL_REF p##n, 
+#define TTL_FUNC_UPARAM_END(n,p) TTL_CV U##n TTL_REF p##n
+#define TTL_FUNC_UPARAMS(n, p) TTL_REPEAT(n, TTL_FUNC_UPARAM, TTL_FUNC_UPARAM_END, p)
 
 #define TTL_ENUM_ITEMS(n, t) TTL_REPEAT(n,TTL_ARG,TTL_ARG_END,t)
 
