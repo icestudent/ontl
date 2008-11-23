@@ -286,6 +286,7 @@ namespace std
   :base(u)
   {}
 
+
   //template <class... UTypes> tuple(const tuple<UTypes...>&);
 
   TTL_REPEAT_NEST(TTL_MAX_TUPLE_PARAMS, TTL_TUPLE_CCTOR, TTL_TUPLE_CCTOR, p)
@@ -293,19 +294,15 @@ namespace std
   //template <class... UTypes> tuple(tuple<UTypes...>&&);
   TTL_REPEAT_NEST(TTL_MAX_TUPLE_PARAMS, TTL_TUPLE_CCTOR2, TTL_TUPLE_CCTOR2, p)
 
+#ifdef NO_TUPLE2
+  //tuple(const pair<T1, T2>& u);
   template <class U1, class U2>
-  tuple(const pair<U1, U2>& u)
-    :base(u.first, u.second)
-  {
-    static_assert(ttl::meta::length<types>::value == 2, "must be");
-  }
-  template <class U1, class U2>
-  tuple(pair<U1, U2>&& u)
-    :base(forward<U1>(u.first), forward<U1>(u.second))
-  {
-    static_assert(ttl::meta::length<types>::value == 2, "must be");
-  }
+  tuple(const pair<U1, U2>& u);
 
+  //tuple(pair<T1, T2>&& u);
+  template <class U1, class U2>
+  tuple(pair<U1, U2>&& u);
+#endif
   // TODO: allocator-extended constructors
   //template <class Alloc>
   //tuple(allocator_arg_t, const Alloc& a);
@@ -350,6 +347,111 @@ namespace std
   //template <class... UTypes> tuple& operator=(const tuple<UTypes...>&);
   TTL_REPEAT_NEST(TTL_MAX_TUPLE_PARAMS, TTL_TUPLE_ASSIGN, TTL_TUPLE_ASSIGN, p)
 
+#ifdef NO_TUPLE2
+  template <class U1, class U2>
+  tuple& operator=(const pair<U1, U2>& u);
+  template <class U1, class U2>
+  tuple& operator=(pair<U1, U2>&& u);
+#endif
+};
+
+#undef TTL_TUPLE_CALL_PARAM
+#undef TTL_TUPLE_CALL_PARAM_END
+#undef TTL_TUPLE_CALL_PARAMS
+#undef TTL_TUPLE_CTOR
+
+#ifndef NO_TUPLE2
+template<typename T1, typename T2>
+class tuple<T1,T2>: 
+  public __::tuple_data<ttl::meta::typelist<T1,T2> >
+{
+  typedef __::tuple_data<types> base;
+
+public:
+  typedef ttl::meta::typelist<T1,T2> types;
+
+  template<size_t N>
+  struct return_type
+  {
+    typedef typename ttl::data_holder<typename ttl::meta::get<types, N>::type>::return_type type;
+  };
+
+  template<size_t N>
+  struct const_return_type
+  {
+    typedef typename ttl::data_holder<typename ttl::meta::get<types, N>::type>::const_return_type type;
+  };
+
+public:
+  /// 20.4.1.2 Construction [tuple.cnstr]
+  tuple() {}
+
+  tuple(const T1& t1, const T2& t2);
+  //tuple(T1&& t1, T2&& t2);
+
+  //template <class U1, class U2>
+  //tuple(const U1& u1, const U2& u2);
+
+  template <class U1, class U2>
+  tuple(U1&& u1, U2&& u2);
+
+  tuple(const tuple& u)
+    :base(u)
+  {}
+
+  tuple(tuple&&);
+
+  template <class U1, class U2>
+  tuple(const tuple<U1,U2>&);
+
+  template <class U1, class U2>
+  tuple(tuple<U1,U2>&&);
+
+  template <class U1, class U2>
+  tuple(const pair<U1, U2>& u);
+
+  template <class U1, class U2>
+  tuple(pair<U1, U2>&& u);
+
+  // TODO: allocator-extended constructors
+  template <class Alloc>
+  tuple(allocator_arg_t, const Alloc& a);
+  //template <class Alloc>
+  //tuple(allocator_arg_t, const Alloc& a, const Types&...);
+  //template <class Alloc, class... UTypes>
+  //tuple(allocator_arg_t, const Alloc& a, const UTypes&&...);
+  //template <class Alloc>
+  //tuple(allocator_arg_t, const Alloc& a, const tuple&);
+  //template <class Alloc>
+  //tuple(allocator_arg_t, const Alloc& a, tuple&&);
+  //template <class Alloc, class... UTypes>
+  //tuple(allocator_arg_t, const Alloc& a, const tuple<UTypes...>&);
+  //template <class Alloc, class... UTypes>
+  //tuple(allocator_arg_t, const Alloc& a, tuple<UTypes...>&&);
+  template <class Alloc, class U1, class U2>
+  tuple(allocator_arg_t, const Alloc& a, const pair<U1, U2>&);
+  template <class Alloc, class U1, class U2>
+  tuple(allocator_arg_t, const Alloc& a, pair<U1, U2>&&);
+
+  tuple& operator=(const tuple& r)
+  { 
+    base::operator=(r);
+    return *this;
+  }
+
+  tuple& operator=(tuple&& r)
+  { 
+    base::operator=(forward<base>(r));
+    return *this;
+  }
+
+  template <class U1, class U2>
+  tuple& operator=(const tuple<U1,U2>&);
+
+  template <class U1, class U2>
+  tuple& operator=(tuple<U1,U2>&&);
+
+
   template <class U1, class U2>
   tuple& operator=(const pair<U1, U2>& u)
   {
@@ -363,16 +465,10 @@ namespace std
     return *this;
   }
 };
-
-#undef TTL_TUPLE_CALL_PARAM
-#undef TTL_TUPLE_CALL_PARAM_END
-#undef TTL_TUPLE_CALL_PARAMS
-#undef TTL_TUPLE_CTOR
+#endif
 
  //////////////////////////////////////////////////////////////////////////
  // 20.4.1.3 Tuple creation functions [tuple.creation]
-
- // const unspecified ignore; // wtf?
 
  namespace __
  {
@@ -401,7 +497,18 @@ namespace std
    {
      typedef tuple<TTL_ARGS(TTL_MAX_TUPLE_PARAMS)> type;
    };
+
+   struct swallow_assign
+   {
+     template<typename T>
+     const swallow_assign& operator=(const T&) const
+     { return *this; }
+   };
  }
+
+ // "ignore" allows tuple positions to be ignored when using "tie".
+ __::swallow_assign const ignore = __::swallow_assign();
+
  
  tuple<> make_tuple()
  {
