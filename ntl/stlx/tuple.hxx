@@ -33,18 +33,18 @@ namespace std
 #define TTL_TUPLE_CALL_PARAM_END(n,p) typename tuple_param<types,N+n>::type p##n
 #define TTL_TUPLE_CALL_PARAMS(n,p) TTL_REPEAT(n, TTL_TUPLE_CALL_PARAM, TTL_TUPLE_CALL_PARAM_END, p)
 
-#define TTL_TUPLE_CALL_PARAM2(n,p) U##n&& p##n,
-#define TTL_TUPLE_CALL_PARAM_END2(n,p) U##n&& p##n
+#define TTL_TUPLE_CALL_PARAM2(n,p) T##n&& p##n,
+#define TTL_TUPLE_CALL_PARAM_END2(n,p) T##n&& p##n
 #define TTL_TUPLE_CALL_PARAMS2(n,p) TTL_REPEAT(n, TTL_TUPLE_CALL_PARAM2, TTL_TUPLE_CALL_PARAM_END2, p)
 
 #define TTL_TUPLE_CTOR(n,p) explicit tuple_data(TTL_TUPLE_CALL_PARAMS(n,p)) : \
   head_(p1), \
   tail_(TTL_ARGS_SX(TTL_DEC(n),p)) {}
 
-#define TTL_TUPLE_UCTOR(n,p) template<TTL_TPARAMSX(n, U)> \
+#define TTL_TUPLE_UCTOR(n,p) template<TTL_TPARAMS(n)> \
   explicit tuple_data(TTL_TUPLE_CALL_PARAMS2(n,p)) : \
-    head_(p1), \
-    tail_(TTL_ARGS_SX(TTL_DEC(n),p)) {}
+    head_(move(p1)), \
+    tail_(TTL_ARGS_SX(TTL_DEC(n),move(p))) {}
 
    template<typename Types, size_t N, bool Stop = (N > meta::length<Types>::value) >
    struct tuple_param
@@ -74,8 +74,7 @@ namespace std
      {}
 
      TTL_REPEAT_NEST(TTL_MAX_TUPLE_PARAMS, TTL_TUPLE_CTOR, TTL_TUPLE_CTOR, p)
-     //TTL_REPEAT_NEST(TTL_MAX_TUPLE_PARAMS, TTL_TUPLE_UCTOR, TTL_TUPLE_UCTOR, p)
-     
+
      template<TTL_TPARAMSX(TTL_MAX_TUPLE_PARAMS, U)>
      tuple_data(const tuple_data<ttl::meta::typelist<TTL_ARGSX(TTL_MAX_TUPLE_PARAMS, U)>, N>& r)
        :head_(r.head_), tail_(r.tail_)
@@ -121,7 +120,7 @@ namespace std
      template<TTL_TPARAMSX(TTL_MAX_TUPLE_PARAMS, U)>
      tuple_data& operator=(tuple_data<ttl::meta::typelist<TTL_ARGSX(TTL_MAX_TUPLE_PARAMS, U)>, N>&& r)
      {
-       if(&r == this) return *this;
+       //if(&r == this) return *this;
        head_ = move(r.head_);
        tail_ = move(r.tail_);
        return *this;
@@ -238,8 +237,7 @@ namespace std
 #define TTL_TUPLE_CCTOR2(n,p)template<TTL_TPARAMSX(n, U)> tuple(tuple<TTL_TPARAMSX(n,U)>&& u): base(move(u)) {}
 
 #define TTL_TUPLE_ASSIGN(n,p) template<TTL_TPARAMSX(n, U)> tuple& operator=(const tuple<TTL_ARGSX(n,U)>& u) { base::operator=(u); return *this; }
-#define TTL_TUPLE_ASSIGN2(n,p)template<TTL_TPARAMSX(n, U)> tuple& operator=(tuple<TTL_ARGSX(n,U)>&& u) { base::operator=(u); return *this; }
-// { base::operator=(move(u)); }
+#define TTL_TUPLE_ASSIGN2(n,p)template<TTL_TPARAMSX(n, U)> tuple& operator=(tuple<TTL_ARGSX(n,U)>&& u) { base::operator=(move(u)); return *this; }
 
  /// Class template tuple [20.4.1 tuple.tuple]
  template<TTL_TPARAMS_DEF(TTL_MAX_TUPLE_PARAMS, ttl::meta::empty_type) >
@@ -297,11 +295,15 @@ namespace std
 #ifdef NO_TUPLE2
   //tuple(const pair<T1, T2>& u);
   template <class U1, class U2>
-  tuple(const pair<U1, U2>& u);
+  tuple(const pair<U1, U2>& u)
+    :base(u.first, u.second)
+  {}
 
   //tuple(pair<T1, T2>&& u);
   template <class U1, class U2>
-  tuple(pair<U1, U2>&& u);
+  tuple(pair<U1, U2>&& u)
+    :base(forward<U1>(u.first), forward<U2>(u.second))
+  {}
 #endif
   // TODO: allocator-extended constructors
   //template <class Alloc>
@@ -349,9 +351,17 @@ namespace std
 
 #ifdef NO_TUPLE2
   template <class U1, class U2>
-  tuple& operator=(const pair<U1, U2>& u);
+  tuple& operator=(const pair<U1, U2>& u)
+  {
+    base::operator=(tuple<U1,U2>(u));
+    return *this;
+  }
   template <class U1, class U2>
-  tuple& operator=(pair<U1, U2>&& u);
+  tuple& operator=(pair<U1, U2>&& u)
+  {
+    base::operator=(tuple<U1,U2>(forward<pair<U1,U2> >(u)));
+    return *this;
+  }
 #endif
 };
 
@@ -359,6 +369,11 @@ namespace std
 #undef TTL_TUPLE_CALL_PARAM_END
 #undef TTL_TUPLE_CALL_PARAMS
 #undef TTL_TUPLE_CTOR
+#undef TTL_TUPLE_UCTOR
+#undef TTL_TUPLE_CCTOR
+#undef TTL_TUPLE_CCTOR2
+#undef TTL_TUPLE_ASSIGN
+#undef TTL_TUPLE_ASSIGN2
 
 #ifndef NO_TUPLE2
 template<typename T1, typename T2>
@@ -617,8 +632,6 @@ public:
    :integral_constant<size_t, 2>
  {};
 
-#undef TTL_SIZEOF_TUPLE
-#undef TTL_SIZEOF_TUPLE_END
 
  /// tuple_element specialization for tuple
  template<size_t I, TTL_TPARAMS(TTL_MAX_TUPLE_PARAMS)>

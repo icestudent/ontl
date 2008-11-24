@@ -67,6 +67,7 @@ namespace intrinsic
 #pragma intrinsic(_InterlockedCompareExchange128, _InterlockedCompareExchangePointer, _InterlockedCompare64Exchange128, _InterlockedExchangePointer)
 #endif
 
+  extern "C" {
   // compiler intrinsics
   void __cdecl _ReadBarrier(void);
   void __cdecl _WriteBarrier(void);
@@ -92,6 +93,7 @@ namespace intrinsic
   /** Guarantees that every preceding store is globally visible before any subsequent store. */
   void __cdecl __faststorefence();
 #endif
+  };
 
 #pragma intrinsic(_ReadBarrier, _WriteBarrier, _ReadWriteBarrier, _mm_lfence, _mm_mfence, _mm_sfence, _mm_pause)
 

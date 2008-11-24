@@ -23,7 +23,7 @@ namespace ttl
   namespace meta
   {	
     struct empty_type {};
-    struct null_type  {};
+    class  null_type  {};
 
     template<size_t v>
     struct int2type

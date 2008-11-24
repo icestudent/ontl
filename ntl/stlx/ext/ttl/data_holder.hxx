@@ -33,6 +33,7 @@ namespace ttl
 		typedef const T& const_return_type;
 		typedef const T& param_type;
 
+
 		T d;
 
 		data_holder() : d() {}
