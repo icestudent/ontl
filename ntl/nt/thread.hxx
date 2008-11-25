@@ -437,8 +437,9 @@ private:
 #endif
 #else
   user_thread(user_thread& rhs)
-    :reset(rhs.release())
-  {}
+  {
+    reset(rhs.release());
+  }
 
   user_thread& operator=(user_thread& rhs)
   {
