@@ -33,7 +33,7 @@
 namespace std
 {
 
-namespace detail
+namespace __
 {
 template <class FunctionCallType >
 class result_of_function_type;
@@ -126,13 +126,13 @@ struct result_of_impl :
 {
 };
 
-} // namespace detail
+} // namespace __
 
 
 
 template <class FunctionCallType >
 class result_of :
-  public detail::result_of_impl<FunctionCallType >
+  public __::result_of_impl<FunctionCallType >
 {};
 
 
