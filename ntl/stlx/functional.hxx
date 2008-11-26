@@ -9,6 +9,7 @@
 #define NTL__STLX_FUNCTIONAL
 
 #include "type_traits.hxx"
+#include "result_of.hxx"
 
 #ifdef _MSC_VER
 #pragma warning(push)
