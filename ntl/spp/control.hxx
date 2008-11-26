@@ -24,10 +24,10 @@
  * THE SOFTWARE.
  */
 
-#ifndef NTL_SPP_CONTROL_HPP
-#define NTL_SPP_CONTROL_HPP
+#ifndef NTL_SPP_CONTROL_HXX
+#define NTL_SPP_CONTROL_HXX
 
-#include "utility.hpp"
+#include "utility.hxx"
 
 // !fr3@K!
 // === implementation detail ===
@@ -257,4 +257,4 @@
 #define NTL_SPP_COMMA_IF(value) \
   NTL_SPP_IF(value)(NTL_SPP_COMMA)
 
-#endif // !NTL_SPP_CONTROL_HPP
+#endif // !NTL_SPP_CONTROL_HXX

@@ -24,8 +24,8 @@
  * THE SOFTWARE.
  */
 
-#ifndef NTL_SPP_UTILITY_HPP
-#define NTL_SPP_UTILITY_HPP
+#ifndef NTL_SPP_UTILITY_HXX
+#define NTL_SPP_UTILITY_HXX
 
 // !fr3@K!
 // === public interface ===
@@ -33,4 +33,4 @@
 #define NTL_SPP_COMMA ,
 #define NTL_SPP_CAT(lhs, rhs) lhs##rhs
 
-#endif // !NTL_SPP_UTILITY_HPP
+#endif // !NTL_SPP_UTILITY_HXX

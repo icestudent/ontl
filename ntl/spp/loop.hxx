@@ -24,10 +24,10 @@
  * THE SOFTWARE.
  */
 
-#ifndef NTL_SPP_LOOP_HPP
-#define NTL_SPP_LOOP_HPP
+#ifndef NTL_SPP_LOOP_HXX
+#define NTL_SPP_LOOP_HXX
 
-#include "utility.hpp"
+#include "utility.hxx"
 
 // !fr3@K!
 // === implementation detail ===
@@ -95,4 +95,4 @@
 #define NTL_SPP_LOOP(init, count, meta, aux) \
   NTL_SPP_CAT(NTL_SPP_DETAIL_LOOP_, count)(init, meta, aux)
 
-#endif // !NTL_SPP_LOOP_HPP
+#endif // !NTL_SPP_LOOP_HXX

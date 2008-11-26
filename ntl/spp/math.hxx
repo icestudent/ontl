@@ -24,8 +24,8 @@
  * THE SOFTWARE.
  */
 
-#ifndef NTL_SPP_MATH_HPP
-#define NTL_SPP_MATH_HPP
+#ifndef NTL_SPP_MATH_HXX
+#define NTL_SPP_MATH_HXX
 
 // !fr3@K!
 // === implementation detail ===
@@ -126,4 +126,4 @@
   NTL_SPP_DETAIL_ADD_##n(1)
 
 
-#endif // !NTL_SPP_MATH_HPP
+#endif // !NTL_SPP_MATH_HXX

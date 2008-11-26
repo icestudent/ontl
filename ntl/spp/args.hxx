@@ -24,12 +24,12 @@
  * THE SOFTWARE.
  */
 
-#ifndef NTL_SPP_ARGS_HPP
-#define NTL_SPP_ARGS_HPP
+#ifndef NTL_SPP_ARGS_HXX
+#define NTL_SPP_ARGS_HXX
 
-#include "control.hpp"
-#include "loop.hpp"
-#include "math.hpp"
+#include "control.hxx"
+#include "loop.hxx"
+#include "math.hxx"
 
 // !fr3@K!
 // === implementation detail ===
@@ -77,4 +77,4 @@
     NTL_SPP_LOOP(NTL_SPP_INC(init), NTL_SPP_DEC(count), NTL_SPP_DETAIL_ARG_OTHER, prefix) \
   )
 
-#endif // !NTL_SPP_ARGS_HPP
+#endif // !NTL_SPP_ARGS_HXX
