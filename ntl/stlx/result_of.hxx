@@ -38,11 +38,12 @@ namespace detail
 template <class FunctionCallType >
 class result_of_function_type;
 
-#define NTL_DEFINE_NTL_RESULT_OF_FUNCTION_TYPE(n) \
+#define NTL_DEFINE_RESULT_OF_FUNCTION_TYPE(n) \
   template < \
     class ResultType NTL_SPP_COMMA_IF(n) \
     NTL_SPP_ARGS(1, n, class T) > \
-  struct result_of_function_type<ResultType (&)(NTL_SPP_ARGS(1, n, T)) > \
+  struct result_of_function_type< \
+    ResultType (&)(NTL_SPP_ARGS(1, n, T)) > \
   { \
     typedef ResultType type; \
   }; \
@@ -73,14 +74,14 @@ class result_of_function_type;
     typedef ResultType type; \
 }
 
-NTL_DEFINE_NTL_RESULT_OF_FUNCTION_TYPE(0);
-NTL_DEFINE_NTL_RESULT_OF_FUNCTION_TYPE(1);
-NTL_DEFINE_NTL_RESULT_OF_FUNCTION_TYPE(2);
-NTL_DEFINE_NTL_RESULT_OF_FUNCTION_TYPE(3);
-NTL_DEFINE_NTL_RESULT_OF_FUNCTION_TYPE(4);
-NTL_DEFINE_NTL_RESULT_OF_FUNCTION_TYPE(5);
+NTL_DEFINE_RESULT_OF_FUNCTION_TYPE(0);
+NTL_DEFINE_RESULT_OF_FUNCTION_TYPE(1);
+NTL_DEFINE_RESULT_OF_FUNCTION_TYPE(2);
+NTL_DEFINE_RESULT_OF_FUNCTION_TYPE(3);
+NTL_DEFINE_RESULT_OF_FUNCTION_TYPE(4);
+NTL_DEFINE_RESULT_OF_FUNCTION_TYPE(5);
 
-#undef NTL_DEFINE_NTL_RESULT_OF_FUNCTION_TYPE
+#undef NTL_DEFINE_RESULT_OF_FUNCTION_TYPE
 
 template <class FunctionCallType >
 struct result_of_with_nested_result_type
