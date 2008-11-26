@@ -72,7 +72,7 @@
   ( \
     NTL_SPP_DETAIL_ARG_FIRST(init, prefix) \
   ) \
-  NTL_SPP_IF_LT(init, count) \
+  NTL_SPP_IF_LT(1, count) \
   ( \
     NTL_SPP_LOOP(NTL_SPP_INC(init), NTL_SPP_DEC(count), NTL_SPP_DETAIL_ARG_OTHER, prefix) \
   )
