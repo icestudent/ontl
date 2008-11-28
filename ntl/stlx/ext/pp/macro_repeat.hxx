@@ -1057,9 +1057,9 @@
  *  \c p is param name provided at TTL_REPEAT
  *
  **/
-#define TTL_REPEAT(n, m, l, p) TTL_APPEND(TTL_REPEAT_, TTL_DEC(n))(m,l,p) TTL_APPEND(TTL_LAST_REPEAT_,n)(l,p)
+#define TTL_REPEAT(n, m, l, p)       TTL_APPEND(TTL_REPEAT_, TTL_DEC(n))(m,l,p) TTL_APPEND(TTL_LAST_REPEAT_,n)(l,p)
 #define TTL_REPEAT_BIDIR(n, m, l, p) TTL_APPEND(TTL_REPEAT_, TTL_DEC(n))(m,l,TTL_INC(p)) l(n,p)
 
-#define TTL_REPEAT_NEST(n, m, l, p) TTL_APPEND(TTL_REPEAT_, TTL_DEC(n))(m,l,p) l(n,p)
+#define TTL_REPEAT_NEST(n, m, l, p)  TTL_APPEND(TTL_REPEAT_, TTL_DEC(n))(m,l,p) l(n,p)
 
 #endif //__macro_repeat__hpp
