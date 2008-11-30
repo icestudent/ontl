@@ -28,29 +28,30 @@
 #define NTL_SPP_LOOP_HXX
 
 #include "utility.hxx"
+#include "math.hxx"
 
 // !fr3@K!
 // === implementation detail ===
-#define NTL_SPP_DETAIL_LOOP_0(init, meta, aux)
+#define NTL_SPP_DETAIL_LOOP_0(init, macro, aux)
 
-#define NTL_SPP_DETAIL_LOOP_1(init, meta, aux) \
-  meta(init, aux)
+#define NTL_SPP_DETAIL_LOOP_1(init, macro, aux) \
+  macro(init, aux)
 
-#define NTL_SPP_DETAIL_LOOP_2(init, meta, aux) \
-  NTL_SPP_DETAIL_LOOP_1(init, meta, aux) \
-  meta(NTL_SPP_ADD(init, 1), aux)
+#define NTL_SPP_DETAIL_LOOP_2(init, macro, aux) \
+  NTL_SPP_DETAIL_LOOP_1(init, macro, aux) \
+  macro(NTL_SPP_ADD(init, 1), aux)
 
-#define NTL_SPP_DETAIL_LOOP_3(init, meta, aux) \
-  NTL_SPP_DETAIL_LOOP_2(init, meta, aux) \
-  meta(NTL_SPP_ADD(init, 2), aux)
+#define NTL_SPP_DETAIL_LOOP_3(init, macro, aux) \
+  NTL_SPP_DETAIL_LOOP_2(init, macro, aux) \
+  macro(NTL_SPP_ADD(init, 2), aux)
 
-#define NTL_SPP_DETAIL_LOOP_4(init, meta, aux) \
-  NTL_SPP_DETAIL_LOOP_3(init, meta, aux) \
-  meta(NTL_SPP_ADD(init, 3), aux)
+#define NTL_SPP_DETAIL_LOOP_4(init, macro, aux) \
+  NTL_SPP_DETAIL_LOOP_3(init, macro, aux) \
+  macro(NTL_SPP_ADD(init, 3), aux)
 
-#define NTL_SPP_DETAIL_LOOP_5(init, meta, aux) \
-  NTL_SPP_DETAIL_LOOP_4(init, meta, aux) \
-  meta(NTL_SPP_ADD(init, 4), aux)
+#define NTL_SPP_DETAIL_LOOP_5(init, macro, aux) \
+  NTL_SPP_DETAIL_LOOP_4(init, macro, aux) \
+  macro(NTL_SPP_ADD(init, 4), aux)
 
 
 
@@ -58,29 +59,29 @@
 // === public interface ===
 
 // NTL_SPP_LOOP
-//    Iterative invocations of user specified meta function.
+//    Iterative invocations of user specified macro function.
 //
-//    NTL_SPP_LOOP invokes user specified meta function iteratively
+//    NTL_SPP_LOOP invokes user specified macro function iteratively
 //    `count` times with two arguments. The first argument is an index,
 //    which starts as user specified value - `init`. The index value is
-//    incremented by 1 on every invocation of `meta`. The second
-//    argument used to invoke `meta` is `aux`, which is specified by
+//    incremented by 1 on every invocation of `macro`. The second
+//    argument used to invoke `macro` is `aux`, which is specified by
 //    user.
 //
 // Parameters:
-//    init:   Initail value of first argument used to invoke `meta`.
-//    count:  Number of invocations of `meta`.
-//    meta:   A SPP meta-function in the form of:
-//              meta(n, aux)
-//    aux:    Auxiliary argument for `meta`.
+//    init:   Initail value of first argument used to invoke `macro`.
+//    count:  Number of invocations of `macro`.
+//    macro:   A SPP macro-function in the form of:
+//              macro(n, aux)
+//    aux:    Auxiliary argument for `macro`.
 //
 // Example:
 //    // example.cpp
-//    #define META(n, aux) NTL_SPP_CAT(aux, n)
+//    #define macro(n, aux) NTL_SPP_CAT(aux, n)
 //
-//    NTL_SPP_LOOP(0, 3, META, foo)
-//    NTL_SPP_LOOP(3, 2, META, bar)
-//    NTL_SPP_LOOP(5, 1, META, faux)
+//    NTL_SPP_LOOP(0, 3, macro, foo)
+//    NTL_SPP_LOOP(3, 2, macro, bar)
+//    NTL_SPP_LOOP(5, 1, macro, faux)
 //
 //    #if(0)
 //
@@ -92,7 +93,7 @@
 //    faux5
 //
 //    #endif
-#define NTL_SPP_LOOP(init, count, meta, aux) \
-  NTL_SPP_CAT(NTL_SPP_DETAIL_LOOP_, count)(init, meta, aux)
+#define NTL_SPP_LOOP(init, count, macro, aux) \
+  NTL_SPP_CAT(NTL_SPP_DETAIL_LOOP_, count)(init, macro, aux)
 
 #endif // !NTL_SPP_LOOP_HXX
