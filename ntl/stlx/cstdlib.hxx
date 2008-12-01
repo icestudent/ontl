@@ -9,6 +9,7 @@
 #define NTL__STLX_CSTDLIB
 
 #include "cstddef.hxx"
+#include "cassert.hxx"
 
 extern "C"
 {

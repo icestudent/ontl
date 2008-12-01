@@ -12,6 +12,7 @@
 #define __ttl_impl_data_holder__hpp
 
 #include "../../type_traits.hxx"
+#pragma warning(disable: 4512) // assignment operator could not be generated
 
 namespace ttl
 {
@@ -217,6 +218,8 @@ namespace ttl
   //  data_holder() {}
   //};
 
-};
+}
+
+#pragma warning(default: 4512)
 
 #endif //__data_holder__hpp

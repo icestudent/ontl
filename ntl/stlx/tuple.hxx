@@ -142,21 +142,23 @@ namespace std
      template<TTL_TPARAMSX(TTL_MAX_TUPLE_PARAMS, U)>
      tuple_data(const tuple_data<ttl::meta::typelist<TTL_ARGSX(TTL_MAX_TUPLE_PARAMS, U)>, N>& r)
      {}
+
+     #ifdef NTL__CXX_RV
      template<TTL_TPARAMSX(TTL_MAX_TUPLE_PARAMS, U)>
      tuple_data& operator=(const tuple_data<ttl::meta::typelist<TTL_ARGSX(TTL_MAX_TUPLE_PARAMS, U)>, N>&& r)
      { return *this; }
 
-     #ifdef NTL__CXX_RV
      tuple_data(this_t&& r) {}
      this_t& operator=(this_t&& r)
      { return *this; }
+
      template<TTL_TPARAMSX(TTL_MAX_TUPLE_PARAMS, U)>
      tuple_data(tuple_data<ttl::meta::typelist<TTL_ARGSX(TTL_MAX_TUPLE_PARAMS, U)>, N>&& r)
      {}
+
      template<TTL_TPARAMSX(TTL_MAX_TUPLE_PARAMS, U)>
      tuple_data& operator=(tuple_data<ttl::meta::typelist<TTL_ARGSX(TTL_MAX_TUPLE_PARAMS, U)>, N>&& r)
      { return *this; }
-
      #endif
    };
 
@@ -273,8 +275,14 @@ namespace std
   // template <class... UTypes> explicit tuple(UTypes&&... u);
 #undef TTL_CV
 #undef TTL_REF
-#define TTL_CV
-#define TTL_REF &&
+#ifdef NTL__CXX_RV
+# define TTL_CV
+# define TTL_REF &&
+#else
+# define TTL_CV const
+# define TTL_REF &
+#endif
+
 
   TTL_REPEAT_NEST(TTL_MAX_TUPLE_PARAMS, TTL_TUPLE_UCTOR, TTL_TUPLE_UCTOR, u)
 #undef TTL_CV
@@ -289,8 +297,10 @@ namespace std
 
   TTL_REPEAT_NEST(TTL_MAX_TUPLE_PARAMS, TTL_TUPLE_CCTOR, TTL_TUPLE_CCTOR, p)
 
+  #ifdef NTL__CXX_RV
   //template <class... UTypes> tuple(tuple<UTypes...>&&);
   TTL_REPEAT_NEST(TTL_MAX_TUPLE_PARAMS, TTL_TUPLE_CCTOR2, TTL_TUPLE_CCTOR2, p)
+  #endif
 
 #ifdef NO_TUPLE2
   //tuple(const pair<T1, T2>& u);
@@ -300,10 +310,12 @@ namespace std
   {}
 
   //tuple(pair<T1, T2>&& u);
+  #ifdef NTL__CXX_RV
   template <class U1, class U2>
   tuple(pair<U1, U2>&& u)
     :base(forward<U1>(u.first), forward<U2>(u.second))
   {}
+  #endif
 #endif
   // TODO: allocator-extended constructors
   //template <class Alloc>
@@ -356,12 +368,14 @@ namespace std
     base::operator=(tuple<U1,U2>(u));
     return *this;
   }
+  #ifdef NTL__CXX_RV
   template <class U1, class U2>
   tuple& operator=(pair<U1, U2>&& u)
   {
     base::operator=(tuple<U1,U2>(forward<pair<U1,U2> >(u)));
     return *this;
   }
+  #endif
 #endif
 };
 

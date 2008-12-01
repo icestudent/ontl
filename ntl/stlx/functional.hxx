@@ -67,16 +67,142 @@ template <class> class result_of; // undefined
  *@{
  */
 
-template <class T>
-class reference_wrapper
-//: public unary_function<T1, R> // see below
-//: public binary_function<T1, T2, R> // see below
+namespace __
 {
-  ///////////////////////////////////////////////////////////////////////////
+  struct empty_base
+  {};
+
+  template<typename T>
+  struct type2type
+  {};
+
+  namespace refwrap_from
+  {
+    enum type {
+      none,
+      unary,
+      binary,
+      other
+    };
+  }
+
+  template<typename T>
+  class rfw_derives_from
+  {
+    typedef char yes;
+    typedef struct { char _[2]; } no;
+
+    template<typename T1, typename R>
+    static yes probe_unary(const volatile unary_function<T1,R>*);
+    static no  probe_unary(...);
+
+    template<typename T1, typename T2, typename R>
+    static yes probe_binary(const volatile binary_function<T1,T2,R>*);
+    static no  probe_binary(...);
+
+    template<typename U>
+    static yes probe_result(type2type<typename U::result_type>*);
+    //template<typename U>
+    static no  probe_result(...);
+  public:
+    static const bool  unary = sizeof( probe_unary ((T*)0) ) == sizeof(yes);
+    static const bool binary = sizeof( probe_binary((T*)0) ) == sizeof(yes);
+    static const bool has_result_type = sizeof( probe_result((T*)0) ) == sizeof(yes);
+
+    static const refwrap_from::type value = 
+      unary ? refwrap_from::unary :
+      binary ? refwrap_from::binary :
+      has_result_type ? refwrap_from::other :
+      refwrap_from::none;
+  };
+
+  template<class T, refwrap_from::type derives_from>
+  struct refwrap_derived;
+
+  template<class T>
+  struct refwrap_derived<T, refwrap_from::none>: empty_base
+  {};
+
+  template<class T>
+  struct refwrap_derived<T, refwrap_from::unary>: 
+    unary_function<typename T::argument_type, typename T::result_type>
+  {};
+
+  template<class T>
+  struct refwrap_derived<T, refwrap_from::binary>: 
+    binary_function<typename T::first_argument_type, typename T::second_argument_type, typename T::result_type>
+  {};
+
+  template<class T>
+  struct refwrap_derived<T, refwrap_from::other>
+  {
+    typedef typename T::result_type result_type;
+  };
+
+
+  template<class T>
+  struct refwrap_base:
+    refwrap_derived<T, rfw_derives_from<T>::value>
+  {};
+
+  // functions
+  template<typename R, typename T1>
+  struct refwrap_base<R(T1)>:
+    unary_function<T1,R>
+  {};
+
+  template<typename R, typename T1, typename T2>
+  struct refwrap_base<R(T1,T2)>:
+    binary_function<T1,T2,R>
+  {};
+
+  // function pointers
+  template<typename R, typename T1>
+  struct refwrap_base<R(*)(T1)>:
+    unary_function<T1,R>
+  {};
+
+  template<typename R, typename T1, typename T2>
+  struct refwrap_base<R(*)(T1,T2)>:
+    binary_function<T1,T2,R>
+  {};
+
+  // member functions
+#define NTL_RF_MAKEBASE(_cv) \
+  template<typename R, class T> \
+  struct refwrap_base<R(T::*)() _cv>: \
+    unary_function<_cv T*,R> \
+  {}; \
+  template<typename R, class T, typename T1> \
+  struct refwrap_base<R(T::*)(T1) _cv>: \
+    binary_function<_cv T*,T1,R> \
+  {};
+
+#define _NEST(x) x
+#define _EMPTY
+  NTL_RF_MAKEBASE(_NEST(_EMPTY));
+  NTL_RF_MAKEBASE(const);
+  NTL_RF_MAKEBASE(volatile);
+  NTL_RF_MAKEBASE(const volatile);
+#undef _EMPTY
+#undef _NEST
+#undef NTL_RF_MAKEBASE
+}
+
+/**
+ *	20.6.5 Class template reference_wrapper [refwrap]
+ *  reference_wrapper<T> is a CopyConstructible and Assignable wrapper around a reference to an object of type T.
+ *
+ *  @note implements 20.6.5/3, 20.6.5/4 (N2723); has \c result_type if type \c T has it.
+ *  @todo invokation (20.6.5.4 [refwrap.invoke])
+ **/
+template <class T>
+class reference_wrapper:
+  public __::refwrap_base<typename remove_cv<T>::type>
+{
   public:
     // types
     typedef T type;
-    //typedef -- result_type; // Not always defined
 
     // construct/copy/destroy
     explicit reference_wrapper(T& t) __ntl_nothrow
@@ -86,10 +212,6 @@ class reference_wrapper
     reference_wrapper(const reference_wrapper<T>& x) __ntl_nothrow
       : ptr(&x.get())
     {}
-
-#ifdef NTL__CXX_EF
-    explicit reference_wrapper(T&&) = delete; // do not bind to temporary objects
-#endif
 
     // assignment
     reference_wrapper& operator=(const reference_wrapper<T>& x) __ntl_nothrow
@@ -123,9 +245,12 @@ class reference_wrapper
   private:
     T* ptr;
 
-#if !defined(NTL__CXX_EF) && defined(NTL__CXX_RV)
-    explicit reference_wrapper(T&&); // do not bind to temporary objects
-#endif
+    // do not bind to temporary objects
+    #if defined(NTL__CXX_EF)
+    explicit reference_wrapper(T&&) = delete; 
+    #elif defined(NTL__CXX_RV)
+    explicit reference_wrapper(T&&);
+    #endif
 };
 
 
@@ -159,6 +284,7 @@ reference_wrapper<const T> cref(reference_wrapper<T> x) __ntl_nothrow
 {
   return reference_wrapper<const T>(x.get());
 }
+
 /**@} lib_refwrap
  */
 #pragma endregion
