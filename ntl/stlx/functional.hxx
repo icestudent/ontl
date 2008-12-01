@@ -79,18 +79,34 @@ class reference_wrapper
     //typedef -- result_type; // Not always defined
 
     // construct/copy/destroy
-    explicit reference_wrapper(T&) __ntl_nothrow;
-    reference_wrapper(const reference_wrapper<T>& x) __ntl_nothrow;
+    explicit reference_wrapper(T& t) __ntl_nothrow
+      : ptr(&t)
+    {}
+
+    reference_wrapper(const reference_wrapper<T>& x) __ntl_nothrow
+      : ptr(&x.get())
+    {}
+
 #ifdef NTL__CXX_EF
     explicit reference_wrapper(T&&) = delete; // do not bind to temporary objects
 #endif
 
     // assignment
-    reference_wrapper& operator=(const reference_wrapper<T>& x) __ntl_nothrow;
+    reference_wrapper& operator=(const reference_wrapper<T>& x) __ntl_nothrow
+    {
+      ptr = x.get();
+      return *this;
+    }
 
     // access
-    operator T& () const __ntl_nothrow;
-    T& get() const __ntl_nothrow;
+    operator T& () const __ntl_nothrow
+    {
+      return this->get();
+    }
+    T& get() const __ntl_nothrow
+    {
+      return *ptr;
+    }
 
 #if NTL__CXX_VT
     // invocation
@@ -120,9 +136,29 @@ reference_wrapper<T> ref(T& t) __ntl_nothrow
   return reference_wrapper<T>(t);
 }
 
-template <class T> reference_wrapper<const T> cref(const T&) __ntl_nothrow;
-template <class T> reference_wrapper<T> ref(reference_wrapper<T>) __ntl_nothrow;
-template <class T> reference_wrapper<const T> cref(reference_wrapper<T>) __ntl_nothrow;
+template <class T>
+reference_wrapper<const T> cref(const T& t) __ntl_nothrow
+{
+  return reference_wrapper<const T>(t);
+}
+
+template <class T>
+reference_wrapper<T> ref(reference_wrapper<T> x) __ntl_nothrow
+{
+  return x;
+}
+
+template <class T>
+reference_wrapper<const T> cref(reference_wrapper<const T> x) __ntl_nothrow
+{
+  return x;
+}
+
+template <class T>
+reference_wrapper<const T> cref(reference_wrapper<T> x) __ntl_nothrow
+{
+  return reference_wrapper<const T>(x.get());
+}
 /**@} lib_refwrap
  */
 #pragma endregion
@@ -693,7 +729,7 @@ template<class> class reference_closure;
 #ifdef NTL__CXX_VT
 
 template<class R, class... ArgTypes >
-class reference_closure<R (ArgTypes...)> 
+class reference_closure<R (ArgTypes...)>
 {
 public:
   typedef R result_type;
