@@ -58,6 +58,7 @@ namespace std {
       {
         // TODO: support real move semantics for Compare?
       }
+      value_compare& operator=(value_compare&& c) { comp = move(c.comp); return *this; }
       #endif
 
       __forceinline
@@ -71,7 +72,7 @@ namespace std {
       Compare comp;
       value_compare(Compare c) : comp(c) {}
       value_compare();
-      friend void std::swap<value_compare>(value_compare&, value_compare&);
+      //friend void std::swap<value_compare>(value_compare&, value_compare&);
       value_compare& operator=(const value_compare& c) { comp = c.comp; return *this; }
     };
   } // __

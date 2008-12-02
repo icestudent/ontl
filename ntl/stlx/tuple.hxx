@@ -112,6 +112,25 @@ namespace std
       typedef typename add_rvalue_reference<const T*>::type rparam_type;
     };
 
+    //template<typename T, size_t N>
+    //struct traits<T[N]>
+    //{
+    //  typedef const T(&param_type)[N];
+    //  typedef const T* stored_type;
+    //  typedef typename add_lvalue_reference<const T*>::type return_type;
+    //  typedef typename add_rvalue_reference<const T*>::type rparam_type;
+    //};
+
+    template<typename T, size_t N>
+    struct traits<const T[N]>
+    {
+      //typedef const T(&param_type)[N];
+      typedef const T* stored_type, param_type;
+      typedef typename add_lvalue_reference<const T*>::type return_type;
+      typedef typename add_rvalue_reference<const T*>::type rparam_type;
+    };
+
+
     template<typename T>
     struct data_wrapper
     {};
@@ -378,8 +397,9 @@ namespace std
 #ifdef NTL__CXX_RV
 
     // template <class... UTypes> explicit tuple(UTypes&&... u);
+    // BUG: compiler selects 'tuple(U1&&) instead of 'tuple(const tuple&)', e.g. tuple<int> x1, x2(x1);
     template<typename U1>
-    explicit tuple(U1&& p1, typename enable_if<__::is_tuple<typename remove_reference<U1>::type>::value == false>::type* = 0)
+    explicit tuple(U1&& p1, typename enable_if<is_convertible<U1,typename __::rparam<types,0>::type>::value>::type* = 0)
       :base(rvtag(), forward<U1>(p1))
     {}
 
