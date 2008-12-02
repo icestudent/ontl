@@ -35,7 +35,7 @@ template<class T, class Alloc> struct uses_allocator
  *  \c Alloc is a \c scoped allocator. A scoped allocator specifies the memory resource to be used by a container
  *  (as all allocators do) and also specifies an inner allocator resource to be used by every element of the container.
  *
- *  @note \e Requires: If a specialization \c is_scoped_allocator<Alloc> is derived from \c true_type, 
+ *  @note \e Requires: If a specialization \c is_scoped_allocator<Alloc> is derived from \c true_type,
  *  \c Alloc shall have a nested type \c inner_allocator_type and a member function \c inner_allocator() which is
  *  callable with no arguments and which returns an object of a type that is convertible to \c inner_allocator_type.
  **/
@@ -219,7 +219,7 @@ class allocator
     __forceinline
     void deallocate(pointer p, size_type /* n */)
     {
-      ::operator delete(const_cast<remove_const<T>::type*>(p));//(address(*p));
+      ::operator delete(const_cast<typename remove_const<T>::type*>(p));//(address(*p));
     }
 
     size_type max_size() const __ntl_nothrow { return size_t(-1) / sizeof(T); }
@@ -334,7 +334,7 @@ public:
   typedef typename outer_allocator_type::value_type value_type;
 
   template <typename _Tp>
-  struct rebind 
+  struct rebind
   {
     typedef scoped_allocator_adaptor<
       typename Alloc::template rebind<_Tp>::other, void> other;
@@ -366,14 +366,14 @@ public:
   void deallocate(pointer p, size_type n);
 
   size_type max_size() const;
-  
+
   #ifdef NTL__CXX_VT
   template <class... Args>
   void construct(pointer p, Args&&... args);
   #else
   void construct(pointer p, const value_type& val);
   #endif
-  
+
   void destroy(pointer p);
 
   const outer_allocator_type& outer_allocator();
@@ -382,7 +382,7 @@ public:
 
 
 template<typename OuterA, typename InnerA>
-class scoped_allocator_adaptor : public OuterA 
+class scoped_allocator_adaptor : public OuterA
 {
 public:
   typedef OuterA outer_allocator_type;
@@ -396,7 +396,7 @@ public:
   typedef typename outer_allocator_type::value_type value_type;
 
   template <typename _Tp>
-  struct rebind 
+  struct rebind
   {
     typedef scoped_allocator_adaptor<
       typename OuterA::template rebind<_Tp>::other,
@@ -431,17 +431,17 @@ public:
   template <typename _HintP>
   pointer allocate(size_type n, _HintP u);
   void deallocate(pointer p, size_type n);
-  
+
   size_type max_size() const;
-  
-  
+
+
   #ifdef NTL__CXX_VT
   template <class... Args>
   void construct(pointer p, Args&&... args);
   #else
   void construct(pointer p, const value_type& val);
   #endif
-  
+
   void destroy(pointer p);
 
   const outer_allocator_type& outer_allocator() const;
@@ -502,7 +502,7 @@ __forceinline
 pair<T*,ptrdiff_t>
   get_temporary_buffer(ptrdiff_t n)
 {
-  T* p = allocator<T>().allocate(static_cast<allocator<T>::size_type>(n));
+  T* p = allocator<T>().allocate(static_cast<typename allocator<T>::size_type>(n));
   return make_pair(p, p ? n : 0);
 }
 
@@ -514,7 +514,7 @@ void
   // 20.7.1.1/7  n shall equal the value passed as the first argument
   //             to the invocation of allocate which returned p.
   // but allocator::deallocate() does not use n
-  allocator<T>::size_type const n = 0;
+  typename allocator<T>::size_type const n = 0;
   allocator<T>().deallocate(p, n);
 }
 
@@ -557,7 +557,7 @@ namespace __
 template <class Alloc, class T, class... Args>
 void construct_element(Alloc& alloc, T& r, Args&&... args)
 {
-  typedef typename 
+  typedef typename
     __select_or<is_scoped_allocator<Alloc>::value == false, uses_allocator<T, Alloc::inner_allocator_type>::value == false,
       __::construct_element_policy<false, false>,
       __::construct_element_policy<

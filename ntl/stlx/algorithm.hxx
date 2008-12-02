@@ -471,7 +471,7 @@ OutputIterator
   replace_copy_if(Iterator first, Iterator last, OutputIterator result,
                   Predicate pred, const T& new_value)
 {
-  for ( first != last; ++first, ++result )
+  for ( first != last; ++first; ++result )
     if ( pred(*result) != false ) *result = new_value;
 }
 
@@ -674,7 +674,7 @@ void
 
 template<class RandomAccessIterator, class UniformRandomNumberGenerator>
 inline
-void 
+void
   random_shuffle(RandomAccessIterator first,
                  RandomAccessIterator last,
                  UniformRandomNumberGenerator& g);

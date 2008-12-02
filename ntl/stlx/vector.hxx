@@ -35,14 +35,14 @@ namespace std {
 template <class T, class Allocator = allocator<T> >
 class vector
 {
-    template <class T, class traits, class Allocator> friend class basic_string;
+    template <class, class, class> friend class basic_string;
 
   ///////////////////////////////////////////////////////////////////////////
   public:
 
     typedef           T                           value_type;
     typedef Allocator                             allocator_type;
-    typedef typename  
+    typedef typename
       Allocator::template rebind<T>::other        allocator;
     typedef typename  allocator::pointer          pointer;
     typedef typename  allocator::const_pointer    const_pointer;
@@ -169,7 +169,7 @@ class vector
     }
 
     vector(vector&& x, const Allocator& a)
-      :array_allocator(a), 
+      :array_allocator(a),
       begin_(), end_(), capacity_()
     {
       if(x.get_allocator() == a){
@@ -188,7 +188,7 @@ class vector
     {
       vector__disp(il.begin(), il.end(), false_type());
     }
-    
+
     __forceinline
     ~vector() __ntl_nothrow
     {
@@ -222,7 +222,7 @@ class vector
       assign(il);
       return *this;
     }
-    
+
     template <class InputIterator>
     void assign(InputIterator first, InputIterator last)
     {
@@ -240,7 +240,7 @@ class vector
       }
       construct(n, u);
     }
-    
+
     void assign(initializer_list<T> il)
     {
       assign__disp(il.begin(), il.end(), false_type());
@@ -480,7 +480,7 @@ class vector
       return insert__impl(position, 1, forward<value_type>((x)));
     }
     #endif
-    
+
     void insert(const_iterator position, size_type n, const T& x)
     {
       insert__impl(position, n, x);
@@ -534,7 +534,7 @@ class vector
       // 1[000]2
       iterator first_ = &const_cast<value_type&>(*first), last_ = &const_cast<value_type&>(*last);
       if(first_ != last_){
-        last_ = 
+        last_ =
         #ifdef NTL__CXX_RV
           std::move
         #else
@@ -547,7 +547,7 @@ class vector
       return first_;
 #endif
     }
-    
+
     #ifdef NTL__CXX_RV
     void swap(vector<T,Allocator>&& x) __ntl_nothrow
     #else

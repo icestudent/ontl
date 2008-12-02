@@ -52,7 +52,7 @@
 
 #if defined(_MSC_VER)
 # define __noalias __declspec(noalias)
-#elif defined(__BCPLUSPLUS__)
+#elif defined(__BCPLUSPLUS__) || defined(__GNUC__)
 # define __noalias
 #endif
 
@@ -84,10 +84,12 @@
  #define __cdecl    _cdecl
  #define __stdcall  _stdcall
  #define __fastcall _fastcall
+#endif
 
- #define NTL__NORETURN __attribute__((noreturn))
-#else
+#ifndef __GNUC__
  #define NTL__NORETURN __declspec(noreturn)
+#else
+ #define NTL__NORETURN __attribute__((noreturn))
 #endif
 
 #ifndef NTL__CRTCALL

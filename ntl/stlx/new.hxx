@@ -45,12 +45,13 @@ class bad_alloc : public exception
 };
 
 struct  nothrow_t {};
-__declspec(selectany)
-extern
-#ifndef __BCPLUSPLUS__
-const nothrow_t nothrow;
-#else
-const nothrow_t nothrow = {};
+
+#if defined(_MSC_VER)
+__declspec(selectany) extern const nothrow_t nothrow = {};
+#elif defined(__BCPLUSPLUS__)
+__declspec(selectany) extern const nothrow_t nothrow;
+#elif defined(__GNUC__)
+ extern const nothrow_t nothrow;
 #endif
 
 /// Type new_handler [18.5.2.2 lib.new.handler]
@@ -115,11 +116,13 @@ void  operator delete[] (void*, void*) __ntl_nothrow            {}
 
 ///\name Variable-size structures support
 struct varsize_tag {};
-__declspec(selectany)
-#ifndef __BCPLUSPLUS__
-extern const varsize_tag varsize;
-#else
-extern const varsize_tag varsize = {};
+
+#if defined(_MSC_VER)
+__declspec(selectany) extern const varsize_tag varsize = {};
+#elif defined(__BCPLUSPLUS__)
+__declspec(selectany) extern const varsize_tag varsize;
+#elif defined(__GNUC__)
+ extern const varsize_tag varsize;
 #endif
 
 __forceinline

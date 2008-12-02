@@ -759,7 +759,7 @@ template<> class numeric_limits<long double>
     static const  bool  is_specialized    = true;
     static        T     min() __ntl_nothrow { return LDBL_MIN; }
     static        T     max() __ntl_nothrow { return LDBL_MAX; }
-    static        T     lowest()      __ntl_nothrow { LDBL_MIN; }
+    static        T     lowest() __ntl_nothrow { return LDBL_MIN; }
     static const  int   digits            = LDBL_MANT_DIG;
     static const  int   digits10          = LDBL_DIG;
     static const  bool  is_signed         = true;

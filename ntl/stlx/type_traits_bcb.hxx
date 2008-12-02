@@ -214,10 +214,10 @@ namespace __
 
 // 20.5.4 Unary Type Traits [meta.unary]
 
-#define NTL__STLX_DEF_TRAIT(X)\
-  template <class T> struct X : public integral_constant<bool, __##X(T)> {};
-#define NTL__STLX_DEF_TRAIT2(X,Y)\
-  template <class T> struct X : public integral_constant<bool, __##Y(T)> {};
+#define NTL__STLX_DEF_TRAIT(trait)\
+  template <class T> struct trait : public integral_constant<bool, __##trait(T)> {};
+#define NTL__STLX_DEF_TRAIT2(trait,builtin_trait)\
+  template <class T> struct trait : public integral_constant<bool, __##builtin_trait(T)> {};
 
 // 20.5.4.1 Primary Type Categories [meta.unary.cat]
 NTL__STLX_DEF_TRAIT(is_void)
