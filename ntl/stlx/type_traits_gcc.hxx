@@ -1,7 +1,7 @@
 /**\file*********************************************************************
  *                                                                     \brief
  *  20.5 Metaprogramming and type traits [meta]
- *  C++ builder version
+ *  GCC version
  ****************************************************************************
  */
 
@@ -33,7 +33,7 @@ template <class Base, class Derived> struct is_base_of
 : public integral_constant<bool, __is_base_of(Base, Derived)> {};
 
 template <class From, class To> struct is_convertible
-: public integral_constant<bool, __is_convertible(From, To)> {};
+: public integral_constant<bool, __is_convertible_to(From, To)> {};
 
 
 // 20.5.6 Transformations between types [meta.trans]
@@ -93,25 +93,22 @@ template <class T> struct make_unsigned;
 // 20.5.6.4 Array modifications [meta.trans.arr]
 
 template <class T> struct remove_extent { typedef T type; };
+template <class T> struct remove_extent<T[]> { typedef T type; };
 template <class T, size_t Size> struct remove_extent<T[Size]> { typedef T type; };
-template <class T, size_t Size> struct remove_extent<const T[Size]> { typedef const T type; };
-template <class T, size_t Size> struct remove_extent<volatile T[Size]> { typedef volatile T type; };
-template <class T, size_t Size> struct remove_extent<const volatile T[Size]> { typedef const volatile T type; };
-//_CHECK_TRAIT((is_same<remove_extent<int[][3]>::type, int[3]>::value));
+_CHECK_TRAIT((is_same<remove_extent<int[][3]>::type, int[3]>::value));
 _CHECK_TRAIT((is_same<remove_extent<const int>::type, const int>::value));
-//_CHECK_TRAIT((is_same<remove_extent<volatile int[]>::type, volatile int>::value));
+_CHECK_TRAIT((is_same<remove_extent<volatile int[]>::type, volatile int>::value));
 _CHECK_TRAIT((is_same<remove_extent<const volatile int[2]>::type, const volatile int>::value));
 
 template <class T> struct remove_all_extents { typedef T type; };
-//template <class T> struct remove_all_extents<T[]>
-//  { typedef typename remove_all_extents<T>::type type; };
+template <class T> struct remove_all_extents<T[]>
+  { typedef typename remove_all_extents<T>::type type; };
 template <class T, size_t Size> struct remove_all_extents<T[Size]>
   { typedef typename remove_all_extents<T>::type type; };
-
 _CHECK_TRAIT((is_same<remove_all_extents<int>::type, int>::value));
 _CHECK_TRAIT((is_same<remove_all_extents<int[2]>::type, int>::value));
 _CHECK_TRAIT((is_same<remove_all_extents<int[2][3]>::type, int>::value));
-//_CHECK_TRAIT((is_same<remove_all_extents<int[][3][6]>::type, int>::value));
+_CHECK_TRAIT((is_same<remove_all_extents<int[][3][6]>::type, int>::value));
 
 // 20.5.6.5 Pointer modifications [meta.trans.ptr]
 
@@ -127,56 +124,61 @@ _CHECK_TRAIT((is_same<add_pointer<int*&>::type, int**>::value));
 
 // 20.5.7 Other transformations [meta.trans.other]
 
-namespace __ { namespace aux {
-#define _FITS(ty) Align == alignof(ty)
-#define _NEXT_ALIGN(ty) typedef typename _Aligned<_Len, Align, ty, _FITS(ty)>::_Type _Type
+#pragma warning(push)
+#pragma warning(disable:4324) // structure was padded due to __declspec(align())
+#pragma warning(disable:4820) // 'X' bytes padding added after data member 'std::aligned_storage<Len,Align>::type::data'
 
-template<class _Ty, size_t _Len> union _Align_type
-	{	// union with size _Len bytes and alignment of _Ty
-	_Ty _Val;
-	char _Pad[_Len];
-	};
-
-template<size_t _Len, size_t Align, class _Ty, bool _Ok>
-	struct _Aligned;
-template<size_t _Len, size_t Align, class _Ty>
-	struct _Aligned<_Len, Align, _Ty, true>
-	{	// define type with size _Len and alignment _Ty
-	typedef _Align_type<_Ty, _Len> _Type;
-	};
-template<size_t _Len, size_t Align>
-	struct _Aligned<_Len, Align, long, false>
-	{	// define type with size _Len and alignment _Ty
-	typedef _Align_type<double, _Len> _Type;
-	};
-template<size_t _Len, size_t Align>
-	struct _Aligned<_Len, Align, int, false>
-	{	// define type with size _Len and alignment _Ty
-	_NEXT_ALIGN(long);
-	};
-template<size_t _Len, size_t Align>
-	struct _Aligned<_Len, Align, short, false>
-	{	// define type with size _Len and alignment _Ty
-	_NEXT_ALIGN(int);
-	};
-template<size_t _Len, size_t Align>
-	struct _Aligned<_Len, Align, char, false>
-	{	// define type with size _Len and alignment _Ty
-	_NEXT_ALIGN(short);
-	};
-#undef _NEXT_ALIGN
-}} // __
+namespace aux {
+template <std::size_t Align>struct aligner;
+// MSDN: Valid alignment values are integer powers of two from 1 to 8192 (bytes)
+template <> struct aligner<1> { __declspec(align(1)) class type {}; };
+template <> struct aligner<2> { __declspec(align(2)) class type {}; };
+template <> struct aligner<4> { __declspec(align(4)) class type {}; };
+template <> struct aligner<8> { __declspec(align(8)) class type {}; };
+template <> struct aligner<16> { __declspec(align(16)) class type {}; };
+template <> struct aligner<32> { __declspec(align(32)) class type {}; };
+template <> struct aligner<64> { __declspec(align(64)) class type {}; };
+template <> struct aligner<128> { __declspec(align(128)) class type {}; };
+template <> struct aligner<256> { __declspec(align(256)) class type {}; };
+template <> struct aligner<512> { __declspec(align(512)) class type {}; };
+template <> struct aligner<1024> { __declspec(align(1024)) class type {}; };
+template <> struct aligner<4096> { __declspec(align(4096)) class type {}; };
+template <> struct aligner<sizeof(max_align_t)> { __declspec(align(8192)) class type {}; };
+}
 
 template <std::size_t Len, std::size_t Align>
 struct aligned_storage
 {
-  typedef typename __::aux::_Aligned<Len, Align, char, _FITS(char)>::_Type type;
+  union type
+  {
+    private: unsigned char __data[Len];
+    typename aux::aligner<1 + ( Align - 1
+                             | (Align - 1) >> 1
+                             | (Align - 1) >> 2
+                             | (Align - 1) >> 3
+                             | (Align - 1) >> 4
+                             | (Align - 1) >> 5
+                             | (Align - 1) >> 6
+                             | (Align - 1) >> 7
+                             | (Align - 1) >> 8
+                             | (Align - 1) >> 9
+                             | (Align - 1) >> 10
+                             | (Align - 1) >> 11
+                             | (Align - 1) >> 12
+                             | (Align - 1) >> 13 )
+                          >::type __align;
+  };
 };
-#undef _FITS
 
-//_CHECK_TRAIT(alignof(aligned_storage<5, 8000>::type) == 8192);
+#pragma warning(pop)
+
+_CHECK_TRAIT(__alignof(aligned_storage<5, 8000>::type) == 8192);
 _CHECK_TRAIT(sizeof(aligned_storage<2, 4>::type) == 4);
 //_CHECK_TRAIT(sizeof(aligned_storage<2, 4>::type) == 2);
+
+#ifdef NTL__CXX_VT
+template <std::size_t Len, class... Types> struct aligned_union;
+#endif
 
 template <class T> struct decay;
 
@@ -229,38 +231,123 @@ namespace __
   template <class T> struct X : public integral_constant<bool, __##Y(T)> {};
 
 // 20.5.4.1 Primary Type Categories [meta.unary.cat]
-NTL__STLX_DEF_TRAIT(is_void)
+
+template <class T> struct is_void                      : public false_type {};
+template <>        struct is_void<void>                : public true_type {};
+template <>        struct is_void<const void>          : public true_type {};
+template <>        struct is_void<volatile void>       : public true_type {};
+template <>        struct is_void<const volatile void> : public true_type {};
 _CHECK_TRAIT(is_void<void>::value);
 _CHECK_TRAIT(is_void<const void>::value);
 _CHECK_TRAIT(is_void<volatile void>::value);
 _CHECK_TRAIT(is_void<const volatile void>::value);
 
-NTL__STLX_DEF_TRAIT(is_integral)
+template <class T> struct is_integral
+: public integral_constant<bool, numeric_limits<typename remove_cv<T>::type>::is_integer> {};
 _CHECK_TRAIT(is_integral<volatile const int>::value);
 _CHECK_TRAIT(is_integral<void>::value == false);
 
-NTL__STLX_DEF_TRAIT(is_floating_point)
+template <class T> struct is_floating_point
+: public integral_constant<bool, numeric_limits<typename remove_cv<T>::type>::is_iec559> {};
 _CHECK_TRAIT(is_floating_point<double>::value);
 _CHECK_TRAIT(is_floating_point<int>::value == false);
 
-NTL__STLX_DEF_TRAIT(is_array)
+template <class T> struct is_array      : public false_type {};
+template <class T> struct is_array<T[]> : public true_type {};
 _CHECK_TRAIT(is_array<int>::value == false);
 _CHECK_TRAIT(is_array<int[][2]>::value);
 
-NTL__STLX_DEF_TRAIT(is_pointer)
+template <class T> struct is_pointer                    : public false_type {};
+template <class T> struct is_pointer<T*>                : public true_type {};
+template <class T> struct is_pointer<T* const>          : public true_type {};
+template <class T> struct is_pointer<T* volatile>       : public true_type {};
+template <class T> struct is_pointer<T* const volatile> : public true_type {};
 _CHECK_TRAIT(is_pointer<void*>::value);
 _CHECK_TRAIT(is_pointer<void* const>::value);
 _CHECK_TRAIT(is_pointer<void* volatile>::value);
 _CHECK_TRAIT(is_pointer<void* const volatile>::value);
 
-NTL__STLX_DEF_TRAIT(is_lvalue_reference)
+template <class T> struct is_lvalue_reference     : public false_type {};
+template <class T> struct is_lvalue_reference<T&> : public true_type {};
 _CHECK_TRAIT(is_lvalue_reference<volatile int&>::value);
 
-NTL__STLX_DEF_TRAIT(is_rvalue_reference)
+template <class T> struct is_rvalue_reference     : public false_type {};
+#ifdef NTL__CXX_RV
+template <class T> struct is_rvalue_reference<T&&>: public true_type {};
 _CHECK_TRAIT(is_rvalue_reference<volatile int&&>::value);
+#endif
 
-NTL__STLX_DEF_TRAIT(is_member_object_pointer)
-NTL__STLX_DEF_TRAIT(is_member_function_pointer)
+template <class T>
+struct is_member_object_pointer : public false_type {};
+
+template <class T>
+struct is_member_function_pointer : public false_type {};
+
+#undef NTL_TT_TCV
+
+#undef NTL_TT_PCV
+#define NTL_TT_PCV
+#include "tt_ismemptr.inl"
+#undef NTL_TT_PCV
+#define NTL_TT_PCV const
+#include "tt_ismemptr.inl"
+#undef NTL_TT_PCV
+#define NTL_TT_PCV volatile
+#include "tt_ismemptr.inl"
+#undef NTL_TT_PCV
+#define NTL_TT_PCV const volatile
+#include "tt_ismemptr.inl"
+
+#undef NTL_TT_TCV
+#define NTL_TT_TCV const
+
+#undef NTL_TT_PCV
+#define NTL_TT_PCV
+#include "tt_ismemptr.inl"
+#undef NTL_TT_PCV
+#define NTL_TT_PCV const
+#include "tt_ismemptr.inl"
+#undef NTL_TT_PCV
+#define NTL_TT_PCV volatile
+#include "tt_ismemptr.inl"
+#undef NTL_TT_PCV
+#define NTL_TT_PCV const volatile
+#include "tt_ismemptr.inl"
+
+#undef NTL_TT_TCV
+#define NTL_TT_TCV volatile
+
+#undef NTL_TT_PCV
+#define NTL_TT_PCV
+#include "tt_ismemptr.inl"
+#undef NTL_TT_PCV
+#define NTL_TT_PCV const
+#include "tt_ismemptr.inl"
+#undef NTL_TT_PCV
+#define NTL_TT_PCV volatile
+#include "tt_ismemptr.inl"
+#undef NTL_TT_PCV
+#define NTL_TT_PCV const volatile
+#include "tt_ismemptr.inl"
+
+#undef NTL_TT_TCV
+#define NTL_TT_TCV const volatile
+
+#undef NTL_TT_PCV
+#define NTL_TT_PCV
+#include "tt_ismemptr.inl"
+#undef NTL_TT_PCV
+#define NTL_TT_PCV const
+#include "tt_ismemptr.inl"
+#undef NTL_TT_PCV
+#define NTL_TT_PCV volatile
+#include "tt_ismemptr.inl"
+#undef NTL_TT_PCV
+#define NTL_TT_PCV const volatile
+#include "tt_ismemptr.inl"
+
+#undef NTL_TT_PCV
+#undef NTL_TT_TCV
 
 namespace test__impl {
 struct has_members
@@ -281,11 +368,33 @@ NTL__STLX_DEF_TRAIT(is_union)
 
 NTL__STLX_DEF_TRAIT(is_class)
 
-NTL__STLX_DEF_TRAIT(is_function)
+template <class T>
+struct is_function : public false_type {};
+
+#include "tt_isfuncc.inl"
+
+#ifndef _M_X64
+  #define NTL_TT_CC __cdecl
+  #include "tt_isfunc.inl"
+  #undef  NTL_TT_CC
+  #define NTL_TT_CC __stdcall
+  #include "tt_isfunc.inl"
+  #undef  NTL_TT_CC
+  #define NTL_TT_CC __fastcall
+  #include "tt_isfunc.inl"
+  #undef  NTL_TT_CC
+#else
+  #define NTL_TT_CC
+  #include "tt_isfunc.inl"
+  #undef  NTL_TT_CC
+#endif
+
 _CHECK_TRAIT(is_function<void()>::value);
 _CHECK_TRAIT(is_function<void(int, int, ...)>::value);
+#ifdef _M_X64
+_CHECK_TRAIT(is_same<void __cdecl(char), void __stdcall(char)>::value);
+#endif
 
-// decay implementation
 template <class T> struct decay
 {
   private: typedef typename remove_reference<T>::type U;
@@ -302,35 +411,85 @@ template <class T> struct decay
 
 // 20.5.4.2 Composite type traits [meta.unary.comp]
 
-NTL__STLX_DEF_TRAIT(is_reference)
+template <class T> struct is_reference
+: public integral_constant<
+    bool, is_lvalue_reference<T>::value || is_rvalue_reference<T>::value
+    > {};
 
-NTL__STLX_DEF_TRAIT(is_arithmetic)
+template <class T> struct is_arithmetic
+: public integral_constant<
+    bool, is_integral<T>::value || numeric_limits<T>::is_iec559
+    > {};
 
-NTL__STLX_DEF_TRAIT(is_fundamental)
+template <class T> struct is_fundamental
+: public integral_constant<
+    bool, is_arithmetic<T>::value || is_void<T>::value
+    > {};
 
-NTL__STLX_DEF_TRAIT(is_object)
+template <class T> struct is_object
+: public integral_constant<
+    bool, !is_void<T>::value
+       && !is_reference<T>::value
+       && !is_function<T>::value
+       > {};
 
-NTL__STLX_DEF_TRAIT(is_member_pointer)
+template <class T> struct is_member_pointer
+: public integral_constant<
+    bool, is_member_object_pointer<T>::value
+       || is_member_function_pointer<T>::value
+       > {};
 
-NTL__STLX_DEF_TRAIT(is_scalar)
+template <class T> struct is_scalar
+: public integral_constant<
+    bool, is_enum<T>::value
+       || is_integral<T>::value
+       || is_pointer<T>::value
+       || is_member_pointer<T>::value
+       > {};
 
-NTL__STLX_DEF_TRAIT(is_compound)
+template <class T> struct is_compound
+: public integral_constant<
+    bool, is_array<T>::value
+       || is_function<T>::value
+       || is_pointer<T>::value
+       || is_reference<T>::value
+       || is_class<T>::value
+       || is_union<T>::value
+       || is_enum<T>::value
+       || is_member_pointer<T>::value
+       > {};
 
 // 20.5.4.3 Type properties [meta.unary.prop]
 
-NTL__STLX_DEF_TRAIT(is_const)
+template <class T> struct is_const          : public false_type {};
+template <class T> struct is_const<const T> : public true_type {};
 _CHECK_TRAIT(is_const<volatile int>::value == false);
 _CHECK_TRAIT(is_const<const int>::value);
 
-NTL__STLX_DEF_TRAIT(is_volatile)
+template <class T> struct is_volatile             : public false_type {};
+template <class T> struct is_volatile<volatile T> : public true_type {};
 _CHECK_TRAIT(is_volatile<const int>::value == false);
 _CHECK_TRAIT(is_volatile<volatile int>::value);
 
-NTL__STLX_DEF_TRAIT(is_trivial);
-NTL__STLX_DEF_TRAIT(is_standard_layout);
+namespace __ {
+  template<class T> struct is_unknown_array: false_type {};
+  template<class T> struct is_unknown_array<T[]>: true_type {};
+  template<class T, size_t Size> struct is_unknown_array<T[Size]>: false_type {};
+}
 
-NTL__STLX_DEF_TRAIT(is_pod)
+template<class T> struct is_trivial;
+template<class T> struct is_standard_layout;
+
+///\warning what about std::pair<int, int> ?
+template <class T> struct is_pod
+: public integral_constant<
+bool, is_scalar<typename remove_extent<T>::type>::value ||
+      __is_pod(typename remove_extent<T>::type) // __is_pod will return false on fundamental types
+    >
+{};
 _CHECK_TRAIT(is_pod<int>::value);
+_CHECK_TRAIT(!is_pod<void>::value && !is_pod<const void>::value);
+_CHECK_TRAIT(is_pod<int[]>::value);
 
 NTL__STLX_DEF_TRAIT(is_empty)
 
@@ -338,47 +497,69 @@ NTL__STLX_DEF_TRAIT(is_polymorphic)
 
 NTL__STLX_DEF_TRAIT(is_abstract)
 
-NTL__STLX_DEF_TRAIT(has_trivial_default_constructor)
+NTL__STLX_DEF_TRAIT2(has_trivial_default_constructor, has_trivial_constructor)
 
-NTL__STLX_DEF_TRAIT(has_trivial_copy_constructor)
+NTL__STLX_DEF_TRAIT2(has_trivial_copy_constructor, has_trivial_copy)
 
 NTL__STLX_DEF_TRAIT(has_trivial_assign)
 
 NTL__STLX_DEF_TRAIT(has_trivial_destructor)
 
-NTL__STLX_DEF_TRAIT(has_nothrow_default_constructor)
+NTL__STLX_DEF_TRAIT2(has_nothrow_default_constructor, has_nothrow_constructor)
 
-NTL__STLX_DEF_TRAIT(has_nothrow_copy_constructor)
+NTL__STLX_DEF_TRAIT2(has_nothrow_copy_constructor, has_nothrow_copy)
 
 NTL__STLX_DEF_TRAIT(has_nothrow_assign)
 
 NTL__STLX_DEF_TRAIT(has_virtual_destructor)
 
-NTL__STLX_DEF_TRAIT(is_signed)
+template <class T> struct is_signed
+//: public integral_constant<bool, (is_arithmetic<T>::value && T(-1) < T(0))> {};
+: public integral_constant<bool, (static_cast<T>(-1) < 0)> {};
 _CHECK_TRAIT(is_signed<int>::value);
 
-NTL__STLX_DEF_TRAIT(is_unsigned)
+#ifndef __ICL
+  template <class T> struct is_unsigned
+  //: public integral_constant<bool, (is_arithmetic<T>::value && T(-1) > T(0))> {};
+  : public integral_constant<bool, (static_cast<T>(-1) > 0)> {};
+#else
+  template <class T> struct is_unsigned
+    : public integral_constant<bool, (is_arithmetic<T>::value && !numeric_limits<T>::is_signed)> {};
+  //: public integral_constant<bool, (static_cast<T>(-1) > 0)> {};
+#endif
 _CHECK_TRAIT(is_unsigned<unsigned>::value);
 _CHECK_TRAIT(is_unsigned<float>::value == 0);
 
-namespace __ { namespace aux {
-  template<typename T> struct Alignof_wrap { static const size_t value = alignof(T); };
-
-  template<size_t N> struct Alignof_wrap2 {
-    typedef integral_constant<size_t, N> type;
-  };
-}}
-template <class T> struct alignment_of: __::aux::Alignof_wrap2<__::aux::Alignof_wrap<T>::value>::type {};
-template<> struct alignment_of<void>: integral_constant<size_t, 0>{};
+template <class T> struct alignment_of
+: public integral_constant<size_t, alignof(T)> {};
+template <>        struct alignment_of<void>
+: public integral_constant<size_t, 0> {};
+template <>        struct alignment_of<const void>
+: public integral_constant<size_t, 0> {};
+template <>        struct alignment_of<volatile void>
+: public integral_constant<size_t, 0> {};
+template <>        struct alignment_of<const volatile void>
+: public integral_constant<size_t, 0> {};
 _CHECK_TRAIT(alignment_of<volatile int>::value == sizeof(int));
 _CHECK_TRAIT(alignment_of<void>::value == 0);
 
-NTL__STLX_DEF_TRAIT2(rank, array_rank)
+template <class T> struct rank : public integral_constant<size_t, 0> {};
+template <class T> struct rank<T[]>
+: public integral_constant<size_t, rank<T>::value + 1> {};
+template <class T, size_t Size> struct rank<T[Size]>
+: public integral_constant<size_t, rank<T>::value + 1> {};
 _CHECK_TRAIT(rank<int>::value == 0);
 _CHECK_TRAIT(rank<int[2]>::value == 1);
-//_CHECK_TRAIT(rank<int[][4]>::value == 2);
+_CHECK_TRAIT(rank<int[][4]>::value == 2);
 
-template <class T, unsigned I = 0> struct extent: public integral_constant<size_t, __array_extent(T, I)> {};
+template <class T, unsigned I = 0> struct extent
+: public integral_constant<size_t, 0> {};
+template <class T, unsigned I> struct extent<T[], I>
+: public integral_constant<size_t, extent<T, I-1>::value> {};
+template <class T, unsigned I, size_t Size> struct extent<T[Size], I>
+: public integral_constant<size_t, extent<T, I-1>::value> {};
+template <class T, size_t Size> struct extent<T[Size], 0>
+: public integral_constant<size_t, Size> {};
 _CHECK_TRAIT(extent<int>::value == 0);
 _CHECK_TRAIT(extent<int[2]>::value == 2);
 _CHECK_TRAIT(extent<int[2][4]>::value == 2);
@@ -388,9 +569,18 @@ _CHECK_TRAIT((extent<int[2], 1>::value) == 0);
 _CHECK_TRAIT((extent<int[2][4], 1>::value) == 4);
 _CHECK_TRAIT((extent<int[][4], 1>::value) == 4);
 
+template<class T> struct is_trivial
+: public integral_constant<
+bool,( has_trivial_default_constructor<T>::value &&
+       has_trivial_copy_constructor<T>::value &&
+       has_trivial_assign<T>::value &&
+       has_trivial_destructor<T>::value
+     )                    >
+{};
+
 
 // 20.5.7.2 Other transformations [meta.trans.other]
-#ifdef NTL__CXX_VT
+#if defined(NTL__CXX_VT) && defined(NTL__CXX_TYPEOF)
 
 template <class ...T> struct common_type;
 
@@ -413,7 +603,7 @@ struct common_type<T, U, V...>
   typedef typename common_type<typename common_type<T, U>::type, V...>::type type;
 };
 
-#else // NTL__CXX_VT
+#else // NTL__CXX
 
 template<class T, class U = void, class V = void, class W = void>
 struct common_type;
@@ -431,6 +621,11 @@ struct common_type<T, U, void, void>
   static_assert(sizeof(T) > 0, "T shall be complete");
   static_assert(sizeof(T) > 0, "U shall be complete");
 
+#if 0
+  // TODO: replace this with promote algorithm
+  typedef typename <typename remove_cv<typename conditional<(sizeof(T) < sizeof(U)), T, U>::type>::type>::type type;
+
+#else
 private:
   typedef typename remove_cv<typename remove_reference<T>::type>::type rawT;
   typedef typename remove_cv<typename remove_reference<U>::type>::type rawU;
@@ -448,6 +643,7 @@ public:
         typename conditional<is_convertible<rawT,rawU>::value, rawU,
           typename conditional<is_convertible<rawU,rawT>::value, rawT, void>::type
                             >::type>::type>::type type;
+#endif
 };
 
 template<class T, class U, class V>
