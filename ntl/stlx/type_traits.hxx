@@ -18,10 +18,8 @@
 #define _CHECK_TRAIT(X)
 #endif
 
-#if defined(__BCPLUSPLUS__)
- #include "type_traits_bcb.hxx"
-#elif defined(__GNUC__)
- #include "type_traits_gcc.hxx"
+#ifdef __BCPLUSPLUS__
+#include "type_traits_bcb.hxx"
 #else
 
 namespace std {
@@ -212,29 +210,29 @@ namespace __
   // select_or<condition1, condition2, TrueType, FalseType>::type is equal to "if(condition1 || condition2) TrueType; else FalseType;
   // select_and works same, but with the "&&" operation.
 
-  template<bool cond1, bool cond2,
-  class IfTrueType, class IfFalseType>
+  template<bool cond1, bool cond2, 
+  class IfTrueType, class IfFalseType> 
   struct select_or
   { typedef IfFalseType type; };
 
-  template<bool cond2, class T, class F>
+  template<bool cond2, class T, class F>                                
   struct select_or<true, cond2, T, F>
   { typedef T type; };
 
-  template<bool cond1, class T, class F>
+  template<bool cond1, class T, class F>                                
   struct select_or<cond1, true, T, F>
   { typedef T type; };
 
-  template<class T, class F>
+  template<class T, class F>                                            
   struct select_or<true, true, T, F>
   { typedef T type; };
 
-  template<bool cond1, bool cond2,
-  class IfTrueType, class IfFalseType>
+  template<bool cond1, bool cond2, 
+  class IfTrueType, class IfFalseType> 
   struct select_and
   { typedef IfFalseType type; };
 
-  template<class T, class F>
+  template<class T, class F>                                            
   struct select_and<true, true, T, F>
   { typedef T type; };
 }
@@ -487,7 +485,7 @@ template <class T> struct is_volatile<volatile T> : public true_type {};
 _CHECK_TRAIT(is_volatile<const int>::value == false);
 _CHECK_TRAIT(is_volatile<volatile int>::value);
 
-namespace __ {
+namespace __ { 
   template<class T> struct is_unknown_array: false_type {};
   template<class T> struct is_unknown_array<T[]>: true_type {};
   template<class T, size_t Size> struct is_unknown_array<T[Size]>: false_type {};
@@ -499,7 +497,7 @@ template<class T> struct is_standard_layout;
 ///\warning what about std::pair<int, int> ?
 template <class T> struct is_pod
 : public integral_constant<
-bool, is_scalar<typename remove_extent<T>::type>::value ||
+bool, is_scalar<typename remove_extent<T>::type>::value || 
       __is_pod(typename remove_extent<T>::type) // __is_pod will return false on fundamental types
     >
 {};
@@ -591,7 +589,7 @@ bool,( has_trivial_default_constructor<T>::value &&
        has_trivial_copy_constructor<T>::value &&
        has_trivial_assign<T>::value &&
        has_trivial_destructor<T>::value
-     )                    >
+     )                    > 
 {};
 
 
@@ -677,7 +675,7 @@ struct common_type
 #endif
 
 }//namespace std
-#endif // compiler selection
+#endif // __BCPLUSPLUS__
 
 #undef _CHECK_TRAIT
 
