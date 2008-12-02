@@ -41,7 +41,8 @@ template <class T> struct remove_cv<const T>          { typedef T type; };
 template <class T> struct remove_cv<volatile T>       { typedef T type; };
 template <class T> struct remove_cv<volatile const T> { typedef T type; };
 
-template <class T> struct add_const           { typedef const T type; };
+template <class T> struct add_const           { typedef const T  type; };
+template <class T> struct add_const<T&>       { typedef const T& type; };
 
 template <class T> struct add_volatile  { typedef volatile T type; };
 
@@ -61,6 +62,9 @@ template <class T> struct add_lvalue_reference<T&> { typedef T& type; };
 template <class T> struct add_rvalue_reference     { typedef T&& type; };
 template <class T> struct add_rvalue_reference<T&> { typedef T&& type; };
 template <class T> struct add_rvalue_reference<T&&>{ typedef T&& type; };
+#else
+template <class T> struct add_rvalue_reference     { typedef T& type; };
+template <class T> struct add_rvalue_reference<T&> { typedef T& type; };
 #endif
 
 template <class T> struct add_reference : add_lvalue_reference<T> {};

@@ -44,11 +44,7 @@ namespace std
       typedef T  stored_type;
       typedef T& return_type;
       typedef const typename remove_cv<T>::type&  param_type;
-#ifdef NTL__CXX_RV
-      typedef typename remove_cv<T>::type&& rparam_type;
-#else
-      typedef typename remove_cv<T>::type&  rparam_type;
-#endif
+      typedef typename add_rvalue_reference<typename remove_cv<T>::type>::type rparam_type;
     };
 
     template<typename T>
@@ -57,11 +53,7 @@ namespace std
       typedef const T  stored_type;
       typedef const T& return_type;
       typedef const T& param_type;
-#ifdef NTL__CXX_RV
-      typedef const T&& rparam_type;
-#else
-      typedef const T&  rparam_type;
-#endif
+      typedef typename add_rvalue_reference<const T>::type rparam_type;
     };
 
     template<typename T>
@@ -70,11 +62,7 @@ namespace std
       typedef T& stored_type;
       typedef T& return_type;
       typedef T& param_type;
-#ifdef NTL__CXX_RV
-      typedef T&& rparam_type;
-#else
-      typedef T&  rparam_type;
-#endif
+      typedef typename add_rvalue_reference<T>::type rparam_type;
     };
 
     template<typename T>
@@ -83,11 +71,7 @@ namespace std
       typedef const T& stored_type;
       typedef const T& return_type;
       typedef const T& param_type;
-#ifdef NTL__CXX_RV
-      typedef const T&& rparam_type;
-#else
-      typedef const T&  rparam_type;
-#endif
+      typedef typename add_rvalue_reference<const T>::type rparam_type;
     };
 
 #ifdef NTL__CXX_RV
@@ -185,21 +169,6 @@ namespace std
         :head(p1), tail(p2, p3)
       {}
 
-#if 0
-      template<typename U1>
-      explicit tuples(typename traits<U1>::rparam_type p1)
-        :head(move(p1)), tail()
-      {}
-      template<typename U1, typename U2>
-      explicit tuples(typename traits<U1>::rparam_type p1, typename traits<U1>::rparam_type p2)
-        :head(move(p1)), tail(move(p2))
-      {}
-      template<typename U1, typename U2, typename U3>
-      explicit tuples(typename traits<U1>::rparam_type p1, typename traits<U1>::rparam_type p2, typename traits<U1>::rparam_type p3)
-        :head(p1), tail(p2, p3)
-      {}
-#endif
-
       template<typename U1, typename U2, typename U3>
       tuples(const tuples<meta::typelist<U1,U2,U3>, Idx>& r)
         :head(r.head), tail(r.tail)
@@ -276,34 +245,41 @@ namespace std
       {}
 
       template<typename U1, typename U2, typename U3>
-      tuples(const tuples<meta::typelist<U1,U2,U3>, Idx>& r)
+      tuples(const tuples<meta::typelist<U1,U2,U3>, Idx>&)
       {}
 
-      tuples(const tuples& r)
+      tuples(const tuples&)
       {}
 
-      tuples& operator=(const tuples& r)
+      tuples& operator=(const tuples&)
       { return *this; }
 
       template<typename U1, typename U2, typename U3>
-      tuples& operator=(const tuples<meta::typelist<U1,U2,U3>, Idx>& r)
+      tuples& operator=(const tuples<meta::typelist<U1,U2,U3>, Idx>&)
       { return *this; }
 
 #ifdef NTL__CXX_RV
       template<typename U1, typename U2, typename U3>
-      tuples(tuples<meta::typelist<U1,U2,U3>, Idx>&& r)
+      tuples(tuples<meta::typelist<U1,U2,U3>, Idx>&&)
       {}
 
-      tuples(tuples&& r)
+      tuples(tuples&&)
       {}
 
-      tuples& operator=(tuples&& r)
+      tuples& operator=(tuples&&)
       { return *this; }
 
       template<typename U1, typename U2, typename U3>
-      tuples& operator=(tuples<meta::typelist<U1,U2,U3>, Idx>&& r)
+      tuples& operator=(tuples<meta::typelist<U1,U2,U3>, Idx>&&)
       { return *this; }
 #endif
+
+      explicit tuples(meta::empty_type)
+      {}
+      explicit tuples(meta::empty_type, meta::empty_type)
+      {}
+      explicit tuples(meta::empty_type, meta::empty_type, meta::empty_type)
+      {}
     }; // tuples
 
 
@@ -336,6 +312,11 @@ namespace std
         return t.head;
       }
     };
+
+    template<typename T>
+    struct is_tuple: false_type{};
+    template<typename T1, typename T2, typename T3>
+    struct is_tuple<tuple<T1,T2,T3> >: true_type{};
   }
 
 
@@ -398,7 +379,7 @@ namespace std
 
     // template <class... UTypes> explicit tuple(UTypes&&... u);
     template<typename U1>
-    explicit tuple(U1&& p1, typename enable_if<is_same<U1, tuple&>::value == false>::type* = 0)
+    explicit tuple(U1&& p1, typename enable_if<__::is_tuple<typename remove_reference<U1>::type>::value == false>::type* = 0)
       :base(rvtag(), forward<U1>(p1))
     {}
 
@@ -511,9 +492,9 @@ namespace std
   /// "ignore" allows tuple positions to be ignored when using "tie".
   __::swallow_assign const ignore = __::swallow_assign();
 
-  inline tuple<> make_tuple()
+  inline tuple<ttl::meta::empty_type,ttl::meta::empty_type,ttl::meta::empty_type> make_tuple()
   {
-    return tuple<>();
+    return tuple<ttl::meta::empty_type,ttl::meta::empty_type,ttl::meta::empty_type>();
   }
 
 #ifdef NTL__CXX_RV

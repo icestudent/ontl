@@ -627,6 +627,18 @@
 						>
 					</File>
 					<File
+						RelativePath=".\stlx\type_traits_fwd.hxx"
+						>
+					</File>
+					<File
+						RelativePath=".\stlx\type_traits_gnuc.hxx"
+						>
+					</File>
+					<File
+						RelativePath=".\stlx\type_traits_msvc.hxx"
+						>
+					</File>
+					<File
 						RelativePath=".\stlx\typeinfo.hxx"
 						>
 					</File>
