@@ -573,34 +573,107 @@ template<> class numeric_limits<unsigned long long>
     static const  float_round_style round_style = round_toward_zero;
 }; //template class numeric_limits<unsigned long long>
 
-union __fvalue { uint8_t raw[sizeof(float)]; float value; };
-STATIC_ASSERT(sizeof(__fvalue) == 4);
-static const __fvalue __float_infinity      = { 0x00, 0x00, 0x80, 0x7F };
-static const __fvalue __float_quiet_NaN     = { 0x00, 0x00, 0xC0, 0x7F };
-static const __fvalue __float_signaling_NaN = { 0x01, 0x00, 0x80, 0x7F };
-static const __fvalue __float_denorm_min    = { 0x01, 0x00, 0x00, 0x00 };
+namespace __
+{
+#if defined(__GNUC__)
+  inline float float_infinity()     { return __builtin_huge_valf(); }
+  inline float float_quiet_NaN()    { return __builtin_nanf("");    }
+  inline float float_signaling_NaN(){ return __builtin_nansf("");   }
+  inline float float_denorm_min()   { return __FLT_DENORM_MIN__;    }
 
-union __dvalue { uint8_t raw[sizeof(double)]; double  value;};
-STATIC_ASSERT(sizeof(__dvalue) == 8);
-static const __dvalue __double_infinity      = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xF0, 0x7F };
-static const __dvalue __double_quiet_NaN     = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xF8, 0x7F };
-static const __dvalue __double_signaling_NaN = { 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0xF0, 0x7F };
-static const __dvalue __double_denorm_min    = { 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+  inline double double_infinity()     { return __builtin_huge_valf(); }
+  inline double double_quiet_NaN()    { return __builtin_nanf("");    }
+  inline double double_signaling_NaN(){ return __builtin_nansf("");   }
+  inline double double_denorm_min()   { return __DBL_DENORM_MIN__;    }
 
-#if DBL_DIG == LDBL_DIG
-#define __long_double_infinity      __double_infinity
-#define __long_double_quiet_NaN     __double_quiet_NaN
-#define __long_double_signaling_NaN __double_signaling_NaN
-#define __long_double_denorm_min    __double_denorm_min
+  inline long double long_double_infinity()     { return __builtin_huge_valf(); }
+  inline long double long_double_quiet_NaN()    { return __builtin_nanf("");    }
+  inline long double long_double_signaling_NaN(){ return __builtin_nansf("");   }
+  inline long double long_double_denorm_min()   { return __LDBL_DENORM_MIN__;   }
 #else
-union __ldvalue { uint8_t raw[sizeof(long double)]; long double  value;};
-#error undefined
-STATIC_ASSERT(sizeof(__ldvalue) == 10);
-static const __ldvalue __long_double_infinity;
-static const __ldvalue __long_double_quiet_NaN;
-static const __ldvalue __long_double_signaling_NaN;
-static const __ldvalue __long_double_denorm_min;
+  union fvalue { uint8_t raw[sizeof(float)]; float value; };
+  STATIC_ASSERT(sizeof(fvalue) == 4);
+  inline float float_infinity()
+  {
+    static const fvalue infinity      = { 0x00, 0x00, 0x80, 0x7F };
+    return infinity.value;
+  }
+  inline float float_quiet_NaN()
+  {
+    static const fvalue quiet_NaN     = { 0x00, 0x00, 0xC0, 0x7F };
+    return quiet_NaN.value;
+  }
+  inline float float_signaling_NaN()
+  {
+    static const fvalue signaling_NaN = { 0x01, 0x00, 0x80, 0x7F };
+    return signaling_NaN.value;
+  }
+  inline float float_denorm_min()
+  {
+    static const fvalue denorm_min    = { 0x01, 0x00, 0x00, 0x00 };
+    return denorm_min.value;
+  }
+
+  union dvalue { uint8_t raw[sizeof(double)]; double  value;};
+  STATIC_ASSERT(sizeof(dvalue) == 8);
+  inline double double_infinity()
+  {
+    static const dvalue infinity =
+    { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xF0, 0x7F };
+    return infinity.value;
+  }
+  inline double double_quiet_NaN()
+  {
+    static const dvalue quiet_NaN =
+    { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xF8, 0x7F };
+    return quiet_NaN.value;
+  }
+  inline double double_signaling_NaN()
+  {
+    static const dvalue signaling_NaN =
+    { 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0xF0, 0x7F };
+    return signaling_NaN.value;
+  }
+  inline double double_denorm_min()
+  {
+    static const dvalue denorm_min =
+    { 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+    return denorm_min.value;
+  }
+#if DBL_DIG == LDBL_DIG
+  union ldvalue { uint8_t raw[sizeof(double)]; long double value;};
+  STATIC_ASSERT(sizeof(ldvalue) == 8);
+  inline long double long_double_infinity()
+  {
+    static const ldvalue infinity =
+    { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xF0, 0x7F };
+    return infinity.value;
+  }
+  inline long double long_double_quiet_NaN()
+  {
+    static const ldvalue quiet_NaN =
+    { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xF8, 0x7F };
+    return quiet_NaN.value;
+  }
+  inline long double long_double_signaling_NaN()
+  {
+    static const ldvalue signaling_NaN =
+    { 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0xF0, 0x7F };
+    return signaling_NaN.value;
+  }
+  inline long double long_double_denorm_min()
+  {
+    static const ldvalue denorm_min =
+    { 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+    return denorm_min.value;
+  }
+#else
+  union ldvalue { uint8_t raw[sizeof(long double)]; long double value;};
+  #error undefined
 #endif
+
+#endif
+} // namespace __
 
 template<> class numeric_limits<float>
 {
@@ -628,10 +701,10 @@ template<> class numeric_limits<float>
     static const  bool  has_signaling_NaN = true;
     static const  float_denorm_style  has_denorm  = denorm_present;
     static const  bool  has_denorm_loss   = true;
-    static        T infinity()  __ntl_nothrow      { return __float_infinity.value; }
-    static        T quiet_NaN() __ntl_nothrow      { return __float_quiet_NaN.value; }
-    static        T signaling_NaN() __ntl_nothrow  { return __float_signaling_NaN.value; }
-    static        T denorm_min() __ntl_nothrow     { return __float_denorm_min.value; }
+    static        T infinity()  __ntl_nothrow      { return __::float_infinity(); }
+    static        T quiet_NaN() __ntl_nothrow      { return __::float_quiet_NaN(); }
+    static        T signaling_NaN() __ntl_nothrow  { return __::float_signaling_NaN(); }
+    static        T denorm_min() __ntl_nothrow     { return __::float_denorm_min(); }
     static const  bool  is_iec559         = true;
     static const  bool  is_bounded        = true;
     static const  bool  is_modulo         = false;
@@ -666,10 +739,10 @@ template<> class numeric_limits<double>
     static const  bool  has_signaling_NaN = true;
     static const  float_denorm_style  has_denorm  = denorm_present;
     static const  bool  has_denorm_loss   = true;
-    static        T infinity()  __ntl_nothrow      { return __double_infinity.value; }
-    static        T quiet_NaN() __ntl_nothrow      { return __double_quiet_NaN.value; }
-    static        T signaling_NaN() __ntl_nothrow  { return __double_signaling_NaN.value; }
-    static        T denorm_min() __ntl_nothrow     { return __double_denorm_min.value; }
+    static        T infinity()  __ntl_nothrow      { return __::double_infinity(); }
+    static        T quiet_NaN() __ntl_nothrow      { return __::double_quiet_NaN(); }
+    static        T signaling_NaN() __ntl_nothrow  { return __::double_signaling_NaN(); }
+    static        T denorm_min() __ntl_nothrow     { return __::double_denorm_min(); }
     static const  bool  is_iec559         = true;
     static const  bool  is_bounded        = true;
     static const  bool  is_modulo         = false;
@@ -686,7 +759,7 @@ template<> class numeric_limits<long double>
     static const  bool  is_specialized    = true;
     static        T     min() __ntl_nothrow { return LDBL_MIN; }
     static        T     max() __ntl_nothrow { return LDBL_MAX; }
-    static        T     lowest()      __ntl_nothrow { return LDBL_MIN; }
+    static        T     lowest()      __ntl_nothrow { LDBL_MIN; }
     static const  int   digits            = LDBL_MANT_DIG;
     static const  int   digits10          = LDBL_DIG;
     static const  bool  is_signed         = true;
@@ -704,10 +777,10 @@ template<> class numeric_limits<long double>
     static const  bool  has_signaling_NaN = true;
     static const  float_denorm_style  has_denorm  = denorm_present;
     static const  bool  has_denorm_loss   = true;
-    static        T infinity()  __ntl_nothrow      { return __long_double_infinity.value; }
-    static        T quiet_NaN() __ntl_nothrow      { return __long_double_quiet_NaN.value; }
-    static        T signaling_NaN() __ntl_nothrow  { return __long_double_signaling_NaN.value; }
-    static        T denorm_min() __ntl_nothrow     { return __long_double_denorm_min.value; }
+    static        T infinity()  __ntl_nothrow      { return __::long_double_infinity(); }
+    static        T quiet_NaN() __ntl_nothrow      { return __::long_double_quiet_NaN(); }
+    static        T signaling_NaN() __ntl_nothrow  { return __::long_double_signaling_NaN(); }
+    static        T denorm_min() __ntl_nothrow     { return __::long_double_denorm_min(); }
     static const  bool  is_iec559         = true;
     static const  bool  is_bounded        = true;
     static const  bool  is_modulo         = false;

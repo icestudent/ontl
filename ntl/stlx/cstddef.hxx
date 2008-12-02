@@ -24,11 +24,10 @@
   # define __ICL __INTEL_COMPILER
   #endif
 #elif defined(__GNUC__)
-// GCC 
-  #if !(__GNUC__ > 4 || __GNUC__ == 4 && __GNUC_MINOR__ >= 3)
-  # error upgrade GCC at least to the GCC 4.3
+// GCC
+  #if !(__GNUC__ > 4 || __GNUC__ == 4 && __GNUC_MINOR__ >= 2)
+  # error upgrade GCC at least to the GCC 4.2
   #endif
-  #error not supported yet.
 #else
 # pragma message("Unknown compiler, it is unsupported probably. Sorry, mate")
 #endif
@@ -59,11 +58,22 @@
 
 #define _PasteToken(x,y) x##y
 #define _Join(x,y) _PasteToken(x,y)
+
 #ifndef STATIC_ASSERT
-#define STATIC_ASSERT(e) typedef char _Join(_STATIC_ASSERT_, __COUNTER__) [(e)?1:-1]
+  #if defined(__GNUC__)
+    #if (__GNUC__ > 4 || __GNUC__ == 4 && __GNUC_MINOR__ >= 3)
+      // !fr3@K!
+      // GCC specific note: __COUNTER__ is not supported prior to 4.3
+      #define STATIC_ASSERT(e) typedef char _Join(_STATIC_ASSERT_, __COUNTER__) [(e)?1:-1]
+    #else
+      #define STATIC_ASSERT(e) typedef char _Join(_STATIC_ASSERT_, __LINE__) [(e)?1:-1]
+    #endif
+  #else
+    #define STATIC_ASSERT(e) typedef char _Join(_STATIC_ASSERT_, __COUNTER__) [(e)?1:-1]
+  #endif
 #endif
 
-#ifdef __BCPLUSPLUS__
+#if defined(__BCPLUSPLUS__) || defined(__GNUC__)
 # define __w64
 #endif
 
@@ -99,7 +109,7 @@
 #if defined(_MSC_VER) && !defined(__ICL)
 
 #if _MSC_VER >= 1600
- 
+
 /** VC10's partial C++0x support */
 
 // keywords:
@@ -308,7 +318,7 @@
     #ifdef _MSC_VER
       #define alignas(X) __declspec(align(X))
     #else
-      #define alignas(X) 
+      #define alignas(X)
     #endif
   #endif
 
@@ -361,7 +371,7 @@ namespace std {
   #endif
   #pragma warning(pop)
 #else
-  struct {} max_align_t;
+  typedef struct {} max_align_t;
 #endif
 
 /**\defgroup  lib_support_types ******** 18.1 Types [support.types] ***********************
@@ -388,8 +398,8 @@ struct nullptr_t
   //  nullptr_t(const nullptr_t&);
   //  void operator = (const nullptr_t&);
     void operator &() const;
-    template<typename any> void operator +(any) const { I Love MSVC 2005! }
-    template<typename any> void operator -(any) const { I Love MSVC 2005! }
+    template<typename any> void operator +(any) const { /*I Love MSVC 2005!*/ }
+    template<typename any> void operator -(any) const { /*I Love MSVC 2005!*/ }
 
 };
 static const nullptr_t __nullptr = {};
@@ -404,23 +414,35 @@ static_assert(sizeof(nullptr)==sizeof(void*), "3.9.1.10: sizeof(std::nullptr_t) 
 #define NULL 0
 #endif
 
-#ifdef _M_X64
-    typedef          long long  ptrdiff_t;
-# ifdef _MSC_VER
-    using ::size_t;
-# else
-    typedef unsigned long long  size_t;
-# endif
-    typedef          long long  ssize_t;
+#ifdef __GNUC__
+
+  typedef __PTRDIFF_TYPE__  ptrdiff_t;
+  typedef __SIZE_TYPE__     size_t;
+  typedef __PTRDIFF_TYPE__  ssize_t;
+
 #else
-    typedef __w64    int  ptrdiff_t;
-# ifdef _MSC_VER
-    using ::size_t;
-# else
-    typedef unsigned int  size_t;
-# endif
-    typedef __w64    int  ssize_t;
+
+  #ifdef _M_X64
+      typedef          long long  ptrdiff_t;
+  # ifdef _MSC_VER
+      using ::size_t;
+  # else
+      typedef unsigned long long  size_t;
+  # endif
+      typedef          long long  ssize_t;
+  #else
+      typedef __w64    int  ptrdiff_t;
+  # ifdef _MSC_VER
+      using ::size_t;
+  # else
+      typedef unsigned int  size_t;
+  # endif
+      typedef __w64    int  ssize_t;
+  #endif
+
 #endif
+
+
 
 #ifndef offsetof
   #define offsetof(s,m) (size_t)&reinterpret_cast<const volatile char&>((((s *)0)->m))

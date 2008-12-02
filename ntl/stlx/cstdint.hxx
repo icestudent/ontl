@@ -48,12 +48,17 @@ typedef int64_t   int_fast64_t;
 typedef uint64_t  uint_fast64_t;
 
 ///\name  Integer types capable of holding object pointers 7.18.1.4
-#ifdef _M_X64
-typedef          long long  intptr_t;
-typedef unsigned long long  uintptr_t;
+#ifdef __GNUC__
+  typedef __PTRDIFF_TYPE__  intptr_t;
+  typedef __SIZE_TYPE__     uintptr_t;
 #else
-typedef __w64          int  intptr_t;
-typedef __w64 unsigned int  uintptr_t;
+  #ifdef _M_X64
+  typedef          long long  intptr_t;
+  typedef unsigned long long  uintptr_t;
+  #else
+  typedef __w64          int  intptr_t;
+  typedef __w64 unsigned int  uintptr_t;
+  #endif
 #endif
 
 ///\name  Greatest-width integer types 7.18.1.5
@@ -120,14 +125,27 @@ typedef uint64_t  uintmax_t;
 #define UINT_FAST64_MAX   UINT64_MAX
 
 ///\name  Limits of integer types capable of holding object pointers 7.18.2.4
-#ifdef _M_X64
-#define INTPTR_MIN        INT64_MIN
-#define INTPTR_MAX        INT64_MAX
-#define UINTPTR_MAX       UINT64_MAX
+
+#ifdef __GNUC__
+  #if (__SIZEOF_POINTER__ == 4)
+    #define INTPTR_MIN        INT32_MIN
+    #define INTPTR_MAX        INT32_MAX
+    #define UINTPTR_MAX       UINT32_MAX
+  #elif (__SIZEOF_POINTER__ == 8)
+    #define INTPTR_MIN        INT64_MIN
+    #define INTPTR_MAX        INT64_MAX
+    #define UINTPTR_MAX       UINT64_MAX
+  #endif
 #else
-#define INTPTR_MIN        INT32_MIN
-#define INTPTR_MAX        INT32_MAX
-#define UINTPTR_MAX       UINT32_MAX
+  #ifdef _M_X64
+    #define INTPTR_MIN        INT64_MIN
+    #define INTPTR_MAX        INT64_MAX
+    #define UINTPTR_MAX       UINT64_MAX
+  #else
+    #define INTPTR_MIN        INT32_MIN
+    #define INTPTR_MAX        INT32_MAX
+    #define UINTPTR_MAX       UINT32_MAX
+  #endif
 #endif
 
 ///\name  Limits of greatest-width integer types 7.18.2.5

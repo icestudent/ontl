@@ -16,6 +16,12 @@
     #else
       #define STLX__USE_EXCEPTIONS 0
     #endif
+  #elif defined(__GNUC__)
+    #ifdef __EXCEPTIONS
+      #define STLX__USE_EXCEPTIONS 1
+    #else
+      #define STLX__USE_EXCEPTIONS 0
+    #endif
   #else
     #error define STLX__USE_EXCEPTIONS
   #endif
