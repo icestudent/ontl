@@ -39,17 +39,6 @@ private:
 
 public:
   static const bool value = NTL_SFINAE_EVAL(test<T>(0));
-
-  template <class U>
-  static bool testx(int U::*)
-  {
-    return true;
-  }
-  template <class>
-  static bool testx(...)
-  {
-    return false;
-  }
 };
 
 template <class T>
