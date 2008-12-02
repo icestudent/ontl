@@ -21,6 +21,19 @@ namespace std
   /**\addtogroup  lib_memory *************** 20.7 Memory [memory] **********************
   *@{*/
 
+  namespace __
+  {
+    template<typename T>
+    struct add_mutable
+    { typedef mutable T type; };
+    template<typename T>
+    struct add_mutable<mutable T>
+    { typedef mutable T type; };
+    template<typename T>
+    struct add_mutable<const T>
+    { typedef const T type; };
+  }
+
   /// 20.7.11 Class template unique_ptr [unique.ptr]
 
   ///\name 20.7.11.1 Default deleters [unique.ptr.dltr]
@@ -30,10 +43,10 @@ namespace std
   {
     default_delete() {}
     template <class U> default_delete(const default_delete<U>&) {}
-    void operator()(T* ptr) const 
+    void operator()(T* ptr) const
     {
       static_assert(sizeof(T) > 0, "incomplete type of T is not allowed");
-      ::delete ptr; 
+      ::delete ptr;
     }
   private:
     // forbid incompatible ::delete[]
@@ -44,10 +57,10 @@ namespace std
   /// 20.7.11.1.2 default_delete<T[]> [unique.ptr.dltr.dflt1]
   template <class T> struct default_delete<T[]>
   {
-    void operator()(T* ptr) const 
+    void operator()(T* ptr) const
     {
       static_assert(sizeof(T) > 0, "incomplete type of T is not allowed");
-      ::delete[] ptr; 
+      ::delete[] ptr;
     }
   };
 
@@ -68,7 +81,7 @@ namespace std
   template <class T, class D>
   class unique_ptr
   {
-#ifndef __BCPLUSPLUS__
+#if !defined(__BCPLUSPLUS__) && !defined(__GNUC__)
     typedef typename const unique_ptr::T** unspecified_pointer_type;
     typedef typename const unique_ptr::T*  unspecified_bool_type;
 #else
@@ -90,7 +103,7 @@ namespace std
       static_assert(!(is_reference<D>::value || is_pointer<D>::value), "D shall not be a reference type or pointer type");
     }
 
-    explicit unique_ptr(pointer p) __ntl_nothrow 
+    explicit unique_ptr(pointer p) __ntl_nothrow
       : ptr(p), deleter()
     {
       static_assert(!(is_reference<D>::value || is_pointer<D>::value), "D shall not be a reference type or pointer type");
@@ -100,7 +113,7 @@ namespace std
       :ptr(0), deleter()
     {}
 
-    unique_ptr(pointer p, typename conditional<is_reference<deleter_type>::value, deleter_type, typename add_lvalue_reference<const typename remove_reference<deleter_type>::type>::type>::type d) __ntl_nothrow 
+    unique_ptr(pointer p, typename conditional<is_reference<deleter_type>::value, deleter_type, typename add_lvalue_reference<const typename remove_reference<deleter_type>::type>::type>::type d) __ntl_nothrow
       : ptr(p), deleter(d)
     {}
 
@@ -120,10 +133,10 @@ namespace std
     }
 
     ///\name 20.7.11.2.2 unique_ptr destructor [unique.ptr.single.dtor]
-    ~unique_ptr() __ntl_nothrow 
+    ~unique_ptr() __ntl_nothrow
     {
       if ( get() )
-        get_deleter()(get()); 
+        get_deleter()(get());
     }
 
 
@@ -175,7 +188,7 @@ namespace std
     {
       pointer tmp = nullptr;
       std::swap(ptr, tmp);
-      return tmp; 
+      return tmp;
     }
 
     __forceinline
@@ -185,7 +198,7 @@ namespace std
       set(p);
     }
 
-    void swap(unique_ptr& u) __ntl_nothrow 
+    void swap(unique_ptr& u) __ntl_nothrow
     {
       std::swap(ptr, u.ptr);
       std::swap(deleter, u.deleter);
@@ -196,7 +209,7 @@ namespace std
     ///////////////////////////////////////////////////////////////////////////
   private:
     mutable pointer ptr;
-    typename conditional<is_const<deleter_type>::value, deleter_type, mutable deleter_type>::type deleter;
+    typename __::add_mutable<deleter_type>::type deleter;
 
     void set(T * p) { ptr = p; }
 
@@ -207,7 +220,7 @@ namespace std
   template <class T>
   class unique_ptr<T, default_delete<T> >
   {
-#ifndef __BCPLUSPLUS__
+#if !defined(__BCPLUSPLUS__) && !defined(__GNUC__)
     typedef typename const unique_ptr::T** unspecified_pointer_type;
     typedef typename const unique_ptr::T*  unspecified_bool_type;
 #else
@@ -246,10 +259,10 @@ namespace std
     }
 
     ///\name 20.7.11.2.2 unique_ptr destructor [unique.ptr.single.dtor]
-    ~unique_ptr() __ntl_nothrow 
+    ~unique_ptr() __ntl_nothrow
     {
       if ( get() )
-        get_deleter()(get()); 
+        get_deleter()(get());
     }
 
 
@@ -299,7 +312,7 @@ namespace std
     {
       pointer tmp = nullptr;
       std::swap(ptr, tmp);
-      return tmp; 
+      return tmp;
     }
 
     __forceinline
@@ -309,9 +322,9 @@ namespace std
       set(p);
     }
 
-    void swap(const unique_ptr& u) const  __ntl_nothrow 
+    void swap(const unique_ptr& u) const  __ntl_nothrow
     {
-      std::swap(ptr, u.ptr); 
+      std::swap(ptr, u.ptr);
     }
     ///\}
 
@@ -327,7 +340,7 @@ namespace std
   template <class T, class D>
   class unique_ptr<T[], D>
   {
-#ifndef __BCPLUSPLUS__
+#if !defined(__BCPLUSPLUS__) && !defined(__GNUC__)
     typedef typename const unique_ptr::T** unspecified_pointer_type;
     typedef typename const unique_ptr::T*  unspecified_bool_type;
 #else
@@ -358,7 +371,7 @@ namespace std
       :ptr(0), deleter()
     {}
 
-    unique_ptr(pointer p, typename conditional<is_reference<deleter_type>::value, deleter_type, typename add_lvalue_reference<const typename remove_reference<deleter_type>::type>::type>::type d) __ntl_nothrow 
+    unique_ptr(pointer p, typename conditional<is_reference<deleter_type>::value, deleter_type, typename add_lvalue_reference<const typename remove_reference<deleter_type>::type>::type>::type d) __ntl_nothrow
       : ptr(p), deleter(d)
     {}
 
@@ -378,10 +391,10 @@ namespace std
     }
 
     ///\name 20.7.11.2.2 unique_ptr destructor [unique.ptr.single.dtor]
-    ~unique_ptr() __ntl_nothrow 
-    { 
-      if ( get() ) 
-        get_deleter()(get()); 
+    ~unique_ptr() __ntl_nothrow
+    {
+      if ( get() )
+        get_deleter()(get());
     }
 
 
@@ -416,7 +429,7 @@ namespace std
     operator unspecified_bool_type() const __ntl_nothrow { return ptr; }
 
     ///\name 20.7.11.2.5 unique_ptr modifiers [unique.ptr.single.modifiers]
-    pointer release() const 
+    pointer release() const
     {
       pointer tmp = nullptr;
       std::swap(tmp, ptr);
@@ -432,7 +445,7 @@ namespace std
 
     void swap(unique_ptr& u) const  __ntl_nothrow
     {
-      std::swap(ptr, u.ptr); 
+      std::swap(ptr, u.ptr);
       std::swap(deleter, u.deleter);
     }
 
@@ -441,7 +454,7 @@ namespace std
     ///////////////////////////////////////////////////////////////////////////
   private:
     mutable pointer ptr;
-    typename conditional<is_const<deleter_type>::value, deleter_type, mutable deleter_type>::type deleter;
+    typename __::add_mutable<deleter_type>::type deleter;
 
     void set(T * p) const  { ptr = p; }
 
@@ -454,7 +467,7 @@ namespace std
   template <class T>
   class unique_ptr<T[], default_delete<T[]> >
   {
-#ifndef __BCPLUSPLUS__
+#if !defined(__BCPLUSPLUS__) && !defined(__GNUC__)
     typedef typename const unique_ptr::T** unspecified_pointer_type;
     typedef typename const unique_ptr::T*  unspecified_bool_type;
 #else
@@ -494,10 +507,10 @@ namespace std
     }
 
     ///\name 20.7.11.2.2 unique_ptr destructor [unique.ptr.single.dtor]
-    ~unique_ptr() __ntl_nothrow 
+    ~unique_ptr() __ntl_nothrow
     {
       if ( get() )
-        get_deleter()(get()); 
+        get_deleter()(get());
     }
 
 #ifdef NTL__CXX_EF
@@ -539,7 +552,7 @@ namespace std
     operator unspecified_bool_type() const __ntl_nothrow { return ptr; }
 
     ///\name 20.7.11.2.5 unique_ptr modifiers [unique.ptr.single.modifiers]
-    pointer release() const 
+    pointer release() const
     {
       pointer tmp = nullptr;
       std::swap(tmp, ptr);
@@ -555,7 +568,7 @@ namespace std
 
     void swap(unique_ptr& u) const  __ntl_nothrow
     {
-      std::swap(ptr, u.ptr); 
+      std::swap(ptr, u.ptr);
     }
     ///\}
 
@@ -604,10 +617,10 @@ namespace std
     }
 
     ///\name 20.7.11.4.1 unique_ptr destructor [unique.ptr.compiletime.dtor]
-    ~unique_ptr() __ntl_nothrow 
+    ~unique_ptr() __ntl_nothrow
     {
       if ( get() )
-        get_deleter()(get(), N); 
+        get_deleter()(get(), N);
     }
 
 #ifdef NTL__CXX_EF
@@ -649,11 +662,11 @@ namespace std
     operator unspecified_bool_type() const __ntl_nothrow { return ptr; }
 
     ///\name 20.7.11.2.5 unique_ptr modifiers [unique.ptr.single.modifiers]
-    pointer release() const 
+    pointer release() const
     {
       pointer tmp = nullptr;
       std::swap(ptr, tmp);
-      return tmp; 
+      return tmp;
     }
 
     __forceinline
@@ -664,8 +677,8 @@ namespace std
     }
 
     __forceinline
-    void swap(const unique_ptr& u) const __ntl_nothrow 
-    { 
+    void swap(const unique_ptr& u) const __ntl_nothrow
+    {
       pointer tmp(ptr);
       ptr = u.ptr;
       u.ptr = tmp;
@@ -862,13 +875,13 @@ namespace std
     ///\name  20.7.12.2.3 shared_ptr assignment [util.smartptr.shared.assign]
     shared_ptr& operator=(shared_ptr& r)
     {
-      r.swap(*this); 
-      return *this; 
+      r.swap(*this);
+      return *this;
     }
 
     template<class Y>
     shared_ptr& operator=(shared_ptr<Y>& r)
-    { 
+    {
       shared_ptr<T>(r).swap(*this);
       return *this;
     }
@@ -920,7 +933,7 @@ namespace std
     //{
     //  return base_type::operator base_type::unspecified_bool_type();
     //}
-    using base_type::operator base_type::unspecified_bool_type;
+    using base_type::operator typename base_type::unspecified_bool_type;
 
     ///@}
 
@@ -1089,7 +1102,7 @@ namespace std
   ///@}
 
   /// 20.7.12.4 Class template enable_shared_from_this [util.smartptr.enab]
-  template<class T> 
+  template<class T>
   class enable_shared_from_this
   {
   protected:
@@ -1110,16 +1123,16 @@ namespace std
   *	An enumeration value indicating the implementation’s treatment of pointers that are not safely derived.
   **/
   struct pointer_safety_class
-  { 
-    enum type 
-    { 
+  {
+    enum type
+    {
       /** pointers that are not safely derived will be treated the same as pointers that are safely derived for the duration of the program */
-      relaxed, 
-      /** pointers that are not safely derived will be treated the same as pointers that are safely derived for the duration of the program 
+      relaxed,
+      /** pointers that are not safely derived will be treated the same as pointers that are safely derived for the duration of the program
       but allows the implementation to hint that it could be desirable to avoid dereferencing pointers that are not safely derived as described. */
-      preferred, 
+      preferred,
       /** pointers that are not safely derived might be treated differently than pointers that are safely derived. */
-      strict 
+      strict
     };
   };
   typedef ntl::class_enum<pointer_safety_class> pointer_safety;

@@ -105,9 +105,9 @@ struct linked_iterator<Node, 1>
     typedef Node<1>         node_type;
     typedef linked_iterator this_type;
 
-    this_type() /*: p(0)*/ {}
-    this_type(node_type * const p) : p(p) {}
-    this_type(const this_type& i) : p(i.p) {}
+    linked_iterator() {}
+    linked_iterator(node_type * const p) : p(p) {}
+    linked_iterator(const linked_iterator& i) : p(i.p) {}
 
     node_type & operator* () const { return *p; }
     node_type * operator->() const { return &operator*(); }
@@ -121,7 +121,7 @@ struct linked_iterator<Node, 1>
 };
 
 typedef linked_iterator<linked, 1>        single_linked_iterator;
-#ifndef __ICL
+#if !defined(__ICL) && !defined(__GNUC__)
 typedef linked_iterator<const linked, 1>  const_single_linked_iterator;
 #else
 typedef linked_iterator<linked, 1>        const_single_linked_iterator;
@@ -134,9 +134,9 @@ struct linked_iterator<Node, 2>
     typedef Node<2>         node_type;
     typedef linked_iterator this_type;
 
-    this_type() /*: p(0)*/ {}
-    this_type(node_type * const p) : p(p) {}
-    this_type(const this_type& i) : p(i.p) {}
+    linked_iterator() /*: p(0)*/ {}
+    linked_iterator(node_type * const p) : p(p) {}
+    linked_iterator(const linked_iterator& i) : p(i.p) {}
 
     node_type & operator* () const { return *p; }
     node_type * operator->() const { return &operator*(); }
@@ -152,7 +152,7 @@ struct linked_iterator<Node, 2>
 };
 
 typedef linked_iterator<linked, 2>        double_linked_iterator;
-#ifndef __ICL
+#if !defined(__ICL) && !defined(__GNUC__)
 typedef linked_iterator<const linked, 2>  const_double_linked_iterator;
 #else
 typedef linked_iterator<linked, 2>        const_double_linked_iterator;

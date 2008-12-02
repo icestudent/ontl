@@ -113,7 +113,7 @@ namespace std {
 
       const unsigned count = min(rlen, static_cast<unsigned>(N));
       for(unsigned i = 0, rpos = static_cast<unsigned>(pos) + count - 1; i < count; ++i, --rpos){
-        const traits::char_type c = str[rpos];
+        const typename traits::char_type c = str[rpos];
         // 23.3.5.1.5.2
         if(!(c == '0' || c == '1'))
           __ntl_throw(invalid_argument);

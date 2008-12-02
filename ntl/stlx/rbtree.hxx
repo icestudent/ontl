@@ -1,13 +1,14 @@
 #pragma once
 
-#include <iterator>
-#include <memory>
-#include <functional>
+#include "iterator.hxx"
+#include "memory.hxx"
+#include "functional.hxx"
 
 namespace tree
 {
   namespace rb_tree
   {
+    using std::int8_t;
 
     template<class T, class Compare = std::less<T>, class Allocator = std::allocator<T> >
     class rb_tree
@@ -17,9 +18,9 @@ namespace tree
       typedef           Compare                     value_compare;
 
       typedef Allocator                             allocator_type;
-      typedef typename  
+      typedef typename
         Allocator::template rebind<T>::other        allocator;
-      
+
       typedef typename  allocator::pointer          pointer;
       typedef typename  allocator::const_pointer    const_pointer;
       typedef typename  allocator::reference        reference;
@@ -663,7 +664,7 @@ namespace tree
     template<class T, class Compare, class Allocator>
     bool operator != (const rb_tree<T, Compare, Allocator>& x, const rb_tree<T, Compare, Allocator>& y)
     {
-      return rel_ops::operator !=(x, y);
+      return std::rel_ops::operator !=(x, y);
     }
 
     template<class T, class Compare, class Allocator>
@@ -675,19 +676,19 @@ namespace tree
     template<class T, class Compare, class Allocator>
     bool operator > (const rb_tree<T, Compare, Allocator>& x, const rb_tree<T, Compare, Allocator>& y)
     {
-      return rel_ops::operator >(x, y);
+      return std::rel_ops::operator >(x, y);
     }
 
     template<class T, class Compare, class Allocator>
     bool operator <= (const rb_tree<T, Compare, Allocator>& x, const rb_tree<T, Compare, Allocator>& y)
     {
-      return rel_ops::operator <=(x, y);
+      return std::rel_ops::operator <=(x, y);
     }
 
     template<class T, class Compare, class Allocator>
     bool operator >= (const rb_tree<T, Compare, Allocator>& x, const rb_tree<T, Compare, Allocator>& y)
     {
-      return rel_ops::operator >=(x, y);
+      return std::rel_ops::operator >=(x, y);
     }
 
     // specialized algorithms

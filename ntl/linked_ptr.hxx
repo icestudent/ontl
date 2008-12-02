@@ -10,6 +10,7 @@
 
 #include "stlx/algorithm.hxx"
 #include "linked_list.hxx"
+#include "stdlib.hxx"
 
 namespace ntl {
 

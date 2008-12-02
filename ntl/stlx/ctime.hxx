@@ -9,8 +9,11 @@
 #define NTL__STLX_CTIME
 
 #include "cstddef.hxx"
-#include "../nt/time.hxx"
-#include "../nt/process_information.hxx"
+
+#ifndef __GNUC__
+# include "../nt/time.hxx"
+# include "../nt/process_information.hxx"
+#endif
 
 namespace std {
 
@@ -19,11 +22,16 @@ namespace std {
 /**\addtogroup  lib_date_time *** 20.9 Date and time functions [date.time] **
  *@{*/
 
+#ifndef __GNUC__
   // 100ns (10^-7)
 #define CLOCKS_PER_SEC system_time_resolution
 
 typedef ntl::nt::systime_t clock_t;
 typedef ntl::nt::systime_t time_t;
+#else
+typedef int64_t clock_t;
+typedef int64_t time_t;
+#endif
 
 /** Holds the components of a calendar time, called the broken-down time. */
 struct tm
@@ -56,13 +64,7 @@ struct tm
  *  @note Processor time can not be retrieved for the current process, therefore
  *  function returns amount of time elapsed from the program's start time.
  **/
-inline clock_t clock(void)
-{
-  // unfortunately the best solution for the current function's specification does not works:
-  // we can't retrieve the current process times except for create time field.
-  const ntl::nt::process_information<ntl::nt::kernel_user_times> process_times;
-  return process_times ? (ntl::nt::query_system_time() - process_times->CreateTime) : clock_t(-1);
-}
+inline clock_t clock(void);
 
 /**
  *	The difftime function computes the difference between two calendar times: time1 - time0.
@@ -85,17 +87,7 @@ time_t mktime(const tm* timeptr);
  *	The time function determines the current calendar time
  *  @return the time as seconds elapsed since midnight, January 1, 1970.
  **/
-inline time_t time(time_t* timer = 0)
-{
-  // Number of 100 nanosecond units from 1/1/1601 to 1/1/1970
-  static const int64_t epoch_bias = 116444736000000000i64;
-  const ntl::nt::systime_t ntime = ntl::nt::query_system_time();
-  const time_t ct = static_cast<time_t>((ntime - epoch_bias) / 10000000i64);
-  if(timer)
-    *timer = ct;
-  return ct;
-}
-
+inline time_t time(time_t* timer = 0);
 
 // Time conversion functions
 
@@ -142,6 +134,30 @@ size_t strftime(char* s,
                 size_t maxsize,
                 const char* format,
                 const tm* timeptr);
+
+// implementation
+#ifndef __GNUC__
+
+inline clock_t clock(void)
+{
+  // unfortunately the best solution for the current function's specification does not works:
+  // we can't retrieve the current process times except for create time field.
+  const ntl::nt::process_information<ntl::nt::kernel_user_times> process_times;
+  return process_times ? (ntl::nt::query_system_time() - process_times->CreateTime) : clock_t(-1);
+}
+
+inline time_t time(time_t* timer = 0)
+{
+  // Number of 100 nanosecond units from 1/1/1601 to 1/1/1970
+  static const int64_t epoch_bias = 116444736000000000i64;
+  const ntl::nt::systime_t ntime = ntl::nt::query_system_time();
+  const time_t ct = static_cast<time_t>((ntime - epoch_bias) / 10000000i64);
+  if(timer)
+    *timer = ct;
+  return ct;
+}
+
+#endif // __GNUC__
 
 /**@} lib_date_time */
 /**@} lib_utilities */

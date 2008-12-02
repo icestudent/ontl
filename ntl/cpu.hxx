@@ -12,7 +12,7 @@
 namespace ntl {
 namespace cpu {
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER)
   #ifdef _M_IX86
 
     static inline void pause() { __asm { pause } }
@@ -24,8 +24,11 @@ namespace cpu {
     }
     static inline void pause() { intrinsic::_mm_pause(); }
   #endif
-#else // ! _MSC_VER
-#error unsupported compiler
+#elif defined(__GNUC__)
+// TODO: pause()
+    static inline void pause() {}
+#else
+# error unsupported compiler
 #endif
 
 }//namespace cpu

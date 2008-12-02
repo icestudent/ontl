@@ -217,19 +217,19 @@
 //
 //  Example:
 //    // example.cpp
-//    #define TEST(n) \
-//      NTL_SPP_COMMA_IF(n) \
-//      NTL_SPP_IF_EQ(0, n) \
-//      ( \
-//        "ZERO" \
-//      ) \
-//      NTL_SPP_IF_EQ(1, n) \
-//      ( \
-//        "ONE" \
-//      ) \
-//      NTL_SPP_IF_LT(1, n) \
-//      ( \
-//        "GREATER THAN ONE" \
+//    #define TEST(n) \.
+//      NTL_SPP_COMMA_IF(n) \.
+//      NTL_SPP_IF_EQ(0, n) \.
+//      ( \.
+//        "ZERO" \.
+//      ) \.
+//      NTL_SPP_IF_EQ(1, n) \.
+//      ( \.
+//        "ONE" \.
+//      ) \.
+//      NTL_SPP_IF_LT(1, n) \.
+//      ( \.
+//        "GREATER THAN ONE" \.
 //      )
 //
 //    TEST(0) TEST(1) TEST(2)

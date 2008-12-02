@@ -23,25 +23,25 @@ namespace std
 
   namespace chrono
   {
-    template <class Rep, class Period = ratio<1>> class duration;
+    template <class Rep, class Period = ratio<1> > class duration;
     template <class Clock, class Duration = typename Clock::duration> class time_point;
 
     // Clocks
     class system_clock;
 
     /// convenience typedefs
-    typedef duration<int64_t, nano>       nanoseconds;
-    typedef duration<int64_t, micro>      microseconds;
-    typedef duration<int64_t, milli>      milliseconds;
-    typedef duration<int64_t>             seconds;
-    typedef duration<int32_t, ratio< 60>> minutes;
-    typedef duration<int32_t, ratio<3600>>hours;
+    typedef duration<int64_t, nano>        nanoseconds;
+    typedef duration<int64_t, micro>       microseconds;
+    typedef duration<int64_t, milli>       milliseconds;
+    typedef duration<int64_t>              seconds;
+    typedef duration<int32_t, ratio< 60> > minutes;
+    typedef duration<int32_t, ratio<3600> >hours;
   }
 
   // common_type traits
   /// Specializations of common_type [20.8.2.3 time.traits.specializations]
   template <class Rep1, class Period1, class Rep2, class Period2>
-  struct common_type<chrono::duration<Rep1, Period1>, chrono::duration<Rep2, Period2>>
+  struct common_type<chrono::duration<Rep1, Period1>, chrono::duration<Rep2, Period2> >
   {
     typedef chrono::duration<
       typename common_type<Rep1, Rep2>::type,
@@ -53,7 +53,7 @@ namespace std
   };
 
   template <class Clock, class Duration1, class Duration2>
-  struct common_type<chrono::time_point<Clock, Duration1>, chrono::time_point<Clock, Duration2>>
+  struct common_type<chrono::time_point<Clock, Duration1>, chrono::time_point<Clock, Duration2> >
   {
     typedef chrono::time_point<Clock, typename common_type<Duration1, Duration2>::type> type;
   };
@@ -76,6 +76,9 @@ namespace std
       static const Rep min()  { return numeric_limits<Rep>::lowest(); }
       static const Rep max()  { return numeric_limits<Rep>::max(); }
     };
+
+    template <class ToDuration, class Rep, class Period>
+    ToDuration duration_cast(const duration<Rep, Period>& d);
 
 
     /**
@@ -244,18 +247,18 @@ namespace std
     }
 
     template <class Rep1, class Period1, class Rep2, class Period2>
-    typename common_type<duration<Rep1, Period1>, duration<Rep2, Period2>>::type
+    typename common_type<duration<Rep1, Period1>, duration<Rep2, Period2> >::type
       operator+ (const duration<Rep1, Period1>& lhs, const duration<Rep2, Period2>& rhs)
     {
-      typedef typename common_type<duration<Rep1, Period1>, duration<Rep2, Period2>>::type CD;
+      typedef typename common_type<duration<Rep1, Period1>, duration<Rep2, Period2> >::type CD;
       return CD(lhs) += rhs;
     }
 
     template <class Rep1, class Period1, class Rep2, class Period2>
-    typename common_type<duration<Rep1, Period1>, duration<Rep2, Period2>>::type
+    typename common_type<duration<Rep1, Period1>, duration<Rep2, Period2> >::type
       operator- (const duration<Rep1, Period1>& lhs, const duration<Rep2, Period2>& rhs)
     {
-      typedef typename common_type<duration<Rep1, Period1>, duration<Rep2, Period2>>::type CD;
+      typedef typename common_type<duration<Rep1, Period1>, duration<Rep2, Period2> >::type CD;
       return CD(lhs) -= rhs;
     }
 
@@ -287,7 +290,7 @@ namespace std
     typename common_type<Rep1, Rep2>::type
       operator/ (const duration<Rep1, Period1>& lhs, const duration<Rep2, Period2>& rhs)
     {
-      typedef typename common_type<duration<Rep1, Period1>, duration<Rep2, Period2>>::type CD;
+      typedef typename common_type<duration<Rep1, Period1>, duration<Rep2, Period2> >::type CD;
       return CD(lhs).count() / CD(rhs).count();
     }
 
@@ -296,7 +299,7 @@ namespace std
     template <class Rep1, class Period1, class Rep2, class Period2>
     bool operator==(const duration<Rep1, Period1>& lhs, const duration<Rep2, Period2>& rhs)
     {
-      typedef typename common_type<const duration<Rep1, Period1>, const duration<Rep2, Period2>>::type CT;
+      typedef typename common_type<const duration<Rep1, Period1>, const duration<Rep2, Period2> >::type CT;
       return CT(lhs).count() == CT(rhs).count();
     }
 
@@ -309,7 +312,7 @@ namespace std
     template <class Rep1, class Period1, class Rep2, class Period2>
     bool operator< (const duration<Rep1, Period1>& lhs, const duration<Rep2, Period2>& rhs)
     {
-      typedef typename common_type<const duration<Rep1, Period1>, const duration<Rep2, Period2>>::type CT;
+      typedef typename common_type<const duration<Rep1, Period1>, const duration<Rep2, Period2> >::type CT;
       return CT(lhs).count() < CT(rhs).count();
     }
 
@@ -390,7 +393,7 @@ namespace std
       typedef typename ratio_divide<Period, typename ToDuration::period>::type    CF;
       typedef typename common_type<typename ToDuration::rep, Rep, intmax_t>::type CR;
 
-      return __::duration_cast_impl<CF::num == 1, CF::den == 1>::cast<ToDuration, CF, CR>(d);
+      return __::duration_cast_impl<CF::num == 1, CF::den == 1>::template cast<ToDuration, CF, CR>(d);
     }
 
 
@@ -458,10 +461,10 @@ namespace std
 
     /// time_point arithmetic
     template <class Clock, class Duration1, class Rep2, class Period2>
-    time_point<Clock, typename common_type<Duration1, duration<Rep2, Period2>>::type>
+    time_point<Clock, typename common_type<Duration1, duration<Rep2, Period2> >::type>
       operator+ (const time_point<Clock, Duration1>& lhs, const duration<Rep2, Period2>& rhs)
     {
-      typedef typename time_point<Clock, typename common_type<Duration1, duration<Rep2, Period2>>::type> CT;
+      typedef time_point<Clock, typename common_type<Duration1, duration<Rep2, Period2> >::type> CT;
       return CT(lhs) += rhs;
     }
 
@@ -473,7 +476,7 @@ namespace std
     }
 
     template <class Clock, class Duration1, class Rep2, class Period2>
-    time_point<Clock, typename common_type<Duration1, duration<Rep2, Period2>>::type>
+    time_point<Clock, typename common_type<Duration1, duration<Rep2, Period2> >::type>
       operator- (const time_point<Clock, Duration1>& lhs, const duration<Rep2, Period2>& rhs)
     {
       return lhs + (-rhs);
@@ -567,55 +570,21 @@ namespace std
 #endif
 
       /** \c return the time_point representing a current date and time */
-      static time_point now()
-      {
-        typedef ratio_multiply<ratio<100>, nano>::type systime_unit;
-        typedef chrono::duration<ntl::nt::systime_t, systime_unit> systime_duration;
-        STATIC_ASSERT(systime_unit::den == 10000000); // 100ns is a 10^-7 of second
-        STATIC_ASSERT(period::den == 100); // 10ms is a 10^-2 (1/100) of second
-        STATIC_ASSERT(( ratio_divide<period, systime_unit>::type::num == 100000 )); // 10ms is in 100 000 times greater than 100ns
-
-        const ntl::nt::systime_t ntime = ntl::nt::query_system_time();
-        //const systime_duration sd(ntime);
-        //const duration d = duration_cast<duration>(sd);
-        //const time_point tp(d);
-        //return tp;
-        return time_point( duration_cast<duration>(systime_duration(ntime)) );
-      }
+      static inline time_point now();
 
       /**
        *  A \c time_t object that represents the same point in time as \c t when both values are truncated to the coarser
        *  of the precisions of \c time_t and time_point.
        *  @note Precision of \c time_t less than precision of time_point.
        **/
-      static time_t to_time_t (const time_point& t)
-      {
-        // Number of seconds from 1/1/1601 to 1/1/1970 in 10ms units (see system_clock::period) (10ms = 1 centisecond)
-        typedef ratio_divide<ratio_multiply<ratio<116444736>, hecto>::type, centi>::type epochdiff_t;
-        STATIC_ASSERT(epochdiff_t::num == 1164447360000i64);
-
-        const system_clock::duration diff(epochdiff_t::num);
-        return duration_cast<chrono::seconds>(t.time_since_epoch() - diff).count();
-      }
+      static inline time_t to_time_t (const time_point& t);
 
       /**
        *  A \c time_point object that represents the same point in time as \c t when both values are truncated to the coarser
        *  of the precisions of \c time_t and time_point.
        *  @note Precision of \c time_t less than precision of time_point.
        **/
-      static time_point from_time_t(time_t t)
-      {
-        // Number of seconds from 1/1/1601 to 1/1/1970 in 10ms units (see system_clock::period) (10ms = 1 centisecond)
-        typedef ratio_divide<ratio_multiply<ratio<116444736>, hecto>::type, centi>::type epochdiff_t;
-        STATIC_ASSERT(epochdiff_t::num == 1164447360000i64);
-        typedef chrono::time_point<system_clock, chrono::seconds> seconds_time_point;
-        const system_clock::duration diff(epochdiff_t::num);
-
-        // NOTE: c++ recognizes `seconds_time_point from_tp(chrono::seconds(t))` as function declaration, so we need an alternate way:
-        //  const seconds_time_point from_tp((chrono::seconds(t))) OR
-        const seconds_time_point from_tp(static_cast<chrono::seconds>(t));
-        return time_point(duration_cast<duration>(from_tp.time_since_epoch()) + diff);
-      }
+      static inline time_point from_time_t(time_t t);
     };
 
 
@@ -647,17 +616,7 @@ namespace std
 #endif
 
       /** \c return the time_point representing a current monotonic time */
-      static time_point now()
-      {
-        typedef ratio_multiply<ratio<100>, nano>::type systime_unit;
-        typedef chrono::duration<ntl::nt::systime_t, systime_unit> systime_duration;
-        STATIC_ASSERT(systime_unit::den == 10000000); // 100ns is a 10^-7 of second
-        STATIC_ASSERT(period::den == 100); // 10ms is a 10^-2 (1/100) of second
-        STATIC_ASSERT(( ratio_divide<period, systime_unit>::type::num == 100000 )); // 10ms is in 100 000 times greater than 100ns
-
-        const ntl::nt::systime_t ntime = ntl::user_shared_data::instance().InterruptTime.get();
-        return time_point( duration_cast<duration>(systime_duration(ntime)) );
-      }
+      static inline time_point now();
     };
 
 #if 0
@@ -683,7 +642,58 @@ namespace std
     class monotonic_clock;
     class high_resolution_clock;
 #endif
-    } // namespace chrono
+
+#ifndef __GNUC__
+    inline system_clock::time_point now()
+    {
+      typedef ratio_multiply<ratio<100>, nano>::type systime_unit;
+      typedef chrono::duration<ntl::nt::systime_t, systime_unit> systime_duration;
+      STATIC_ASSERT(systime_unit::den == 10000000); // 100ns is a 10^-7 of second
+      STATIC_ASSERT(period::den == 100); // 10ms is a 10^-2 (1/100) of second
+      STATIC_ASSERT(( ratio_divide<period, systime_unit>::type::num == 100000 )); // 10ms is in 100 000 times greater than 100ns
+      const ntl::nt::systime_t ntime = ntl::nt::query_system_time();
+      return time_point( duration_cast<duration>(systime_duration(ntime)) );
+    }
+
+      inline time_t system_clock::to_time_t (const system_clock::time_point& t);
+      {
+        // Number of seconds from 1/1/1601 to 1/1/1970 in 10ms units (see system_clock::period) (10ms = 1 centisecond)
+        typedef ratio_divide<ratio_multiply<ratio<116444736>, hecto>::type, centi>::type epochdiff_t;
+        STATIC_ASSERT(epochdiff_t::num == 1164447360000LL);
+
+        const system_clock::duration diff(epochdiff_t::num);
+        return duration_cast<chrono::seconds>(t.time_since_epoch() - diff).count();
+      }
+
+      inline system_clock::time_point from_time_t(time_t t);
+      {
+        // Number of seconds from 1/1/1601 to 1/1/1970 in 10ms units (see system_clock::period) (10ms = 1 centisecond)
+        typedef ratio_divide<ratio_multiply<ratio<116444736>, hecto>::type, centi>::type epochdiff_t;
+        STATIC_ASSERT(epochdiff_t::num == 1164447360000LL);
+        typedef chrono::time_point<system_clock, chrono::seconds> seconds_time_point;
+        const system_clock::duration diff(epochdiff_t::num);
+
+        // NOTE: c++ recognizes `seconds_time_point from_tp(chrono::seconds(t))` as function declaration, so we need an alternate way:
+        //  const seconds_time_point from_tp((chrono::seconds(t))) OR
+        const seconds_time_point from_tp(static_cast<chrono::seconds>(t));
+        return time_point(duration_cast<duration>(from_tp.time_since_epoch()) + diff);
+      }
+
+
+
+    inline monotonic_clock::time_point now()
+    {
+      typedef ratio_multiply<ratio<100>, nano>::type systime_unit;
+      typedef chrono::duration<ntl::nt::systime_t, systime_unit> systime_duration;
+      STATIC_ASSERT(systime_unit::den == 10000000); // 100ns is a 10^-7 of second
+      STATIC_ASSERT(period::den == 100); // 10ms is a 10^-2 (1/100) of second
+      STATIC_ASSERT(( ratio_divide<period, systime_unit>::type::num == 100000 )); // 10ms is in 100 000 times greater than 100ns
+      const ntl::nt::systime_t ntime = ntl::user_shared_data::instance().InterruptTime.get();
+      return time_point( duration_cast<duration>(systime_duration(ntime)) );
+    }
+
+#endif
+  } // namespace chrono
 
   /**@} lib_utilities */
 } // namespace std

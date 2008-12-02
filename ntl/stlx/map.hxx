@@ -52,7 +52,7 @@ namespace std {
       value_compare(const value_compare& x)
         :comp(x.comp)
       {}
-      
+
       #ifdef NTL__CXX_RV
       __forceinline
       value_compare(value_compare&& x)
@@ -88,8 +88,9 @@ class map:
   protected tree::rb_tree::rb_tree<pair<const Key, T>, __::value_compare<Key, T, Compare, Allocator>, Allocator>
 {
   ///////////////////////////////////////////////////////////////////////////
-  typedef tree::rb_tree::rb_tree<pair<const Key, T>, __::value_compare<Key, T, Compare, Allocator>, Allocator> tree_type;
-  typedef tree_type::node node;
+  typedef __::value_compare<Key, T, Compare, Allocator>  value_compare;
+  typedef tree::rb_tree::rb_tree<pair<const Key, T>, value_compare, Allocator> tree_type;
+  typedef typename tree_type::node node;
   public:
 
     ///\name  types
@@ -99,7 +100,7 @@ class map:
     typedef Compare                                   key_compare;
 
     typedef Allocator                                 allocator_type;
-    typedef typename  
+    typedef typename
       Allocator::template rebind<value_type>::other   allocator;
 
     typedef typename  allocator::pointer              pointer;
@@ -330,7 +331,7 @@ public:
     pair<iterator,iterator> equal_range(const key_type& x)
     {
       // find a node with value which are equal or nearest to the x
-      node* p = root_;
+      node* p = tree_type::root_;
       while(p){
         if(val_comp_(value_type(x, mapped_type()), p->elem)){
           if(p->u.s.left){
@@ -342,9 +343,9 @@ public:
         }else if(val_comp_(p->elem, value_type(x, mapped_type()))) // greater
           p = p->u.s.right;
         else
-          return make_pair(make_iterator(p), make_iterator(next(p, right)));
+          return make_pair(make_iterator(p), make_iterator(next(p, tree_type::right)));
       }
-      iterator re(make_iterator(NULL));
+      iterator re(tree_type::make_iterator(NULL));
       return make_pair(re, re);
     }
 
