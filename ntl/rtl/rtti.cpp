@@ -428,3 +428,4 @@ extern "C" void* __cdecl __RTDynamicCast(void* object, int32_t vfdelta, void* sr
 }
 
 #pragma endregion
+

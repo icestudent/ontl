@@ -354,6 +354,30 @@
 							>
 						</File>
 					</Filter>
+					<Filter
+						Name="spp"
+						>
+						<File
+							RelativePath=".\spp\args.hxx"
+							>
+						</File>
+						<File
+							RelativePath=".\spp\control.hxx"
+							>
+						</File>
+						<File
+							RelativePath=".\spp\loop.hxx"
+							>
+						</File>
+						<File
+							RelativePath=".\spp\math.hxx"
+							>
+						</File>
+						<File
+							RelativePath=".\spp\utility.hxx"
+							>
+						</File>
+					</Filter>
 				</Filter>
 				<Filter
 					Name="containers"
@@ -567,11 +591,23 @@
 						>
 					</File>
 					<File
+						RelativePath=".\stlx\result_of.hxx"
+						>
+					</File>
+					<File
 						RelativePath=".\stlx\smart_ptr.hxx"
 						>
 					</File>
 					<File
 						RelativePath=".\stlx\smart_ptr_rv.hxx"
+						>
+					</File>
+					<File
+						RelativePath=".\stlx\tt_isfunc.inl"
+						>
+					</File>
+					<File
+						RelativePath=".\stlx\tt_isfuncc.inl"
 						>
 					</File>
 					<File

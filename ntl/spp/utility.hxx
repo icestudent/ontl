@@ -32,5 +32,7 @@
 
 #define NTL_SPP_COMMA ,
 #define NTL_SPP_CAT(lhs, rhs) lhs##rhs
+#define NTL_SPP_NEST2(x) x
+#define NTL_SPP_NEST(x) NTL_SPP_NEST2(x)
 
 #endif // !NTL_SPP_UTILITY_HXX

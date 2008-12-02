@@ -8,7 +8,6 @@
 #define NTL__STLX_TUPLE
 
 #include "ext/ttl/typelist.hxx"
-#include "ext/ttl/data_holder.hxx"
 
 namespace std 
 {
@@ -25,704 +24,618 @@ namespace std
  *   be instantiated with any number of arguments.
  *@{
  */
- namespace __
- {
-   namespace meta = ttl::meta;
+  template<typename T1 = ttl::meta::empty_type, typename T2 = ttl::meta::empty_type, typename T3 = ttl::meta::empty_type>
+  class tuple;
 
-#define TTL_TUPLE_CALL_PARAM(n,p) typename tuple_param<types,N+n>::type p##n,
-#define TTL_TUPLE_CALL_PARAM_END(n,p) typename tuple_param<types,N+n>::type p##n
-#define TTL_TUPLE_CALL_PARAMS(n,p) TTL_REPEAT(n, TTL_TUPLE_CALL_PARAM, TTL_TUPLE_CALL_PARAM_END, p)
+  template<typename T1 = ttl::meta::empty_type, typename T2 = ttl::meta::empty_type, typename T3 = ttl::meta::empty_type>
+  struct tuple_size;
 
-#define TTL_TUPLE_CALL_PARAM2(n,p) T##n&& p##n,
-#define TTL_TUPLE_CALL_PARAM_END2(n,p) T##n&& p##n
-#define TTL_TUPLE_CALL_PARAMS2(n,p) TTL_REPEAT(n, TTL_TUPLE_CALL_PARAM2, TTL_TUPLE_CALL_PARAM_END2, p)
-
-#define TTL_TUPLE_CTOR(n,p) explicit tuple_data(TTL_TUPLE_CALL_PARAMS(n,p)) : \
-  head_(p1), \
-  tail_(TTL_ARGS_SX(TTL_DEC(n),p)) {}
-
-#define TTL_TUPLE_UCTOR(n,p) template<TTL_TPARAMS(n)> \
-  explicit tuple_data(TTL_TUPLE_CALL_PARAMS2(n,p)) : \
-    head_(move(p1)), \
-    tail_(TTL_ARGS_SX(TTL_DEC(n),move(p))) {}
-
-   template<typename Types, size_t N, bool Stop = (N > meta::length<Types>::value) >
-   struct tuple_param
-   {
-     typedef typename ttl::data_holder<typename meta::get<Types,N-1>::type >::param_type type;
-   };
-
-   template<typename Types, size_t N >
-   struct tuple_param<Types, N, true >
-   {
-     typedef meta::empty_type type;
-   };
-
-   template<typename Types, size_t N = 0, bool Stop = (N >= meta::length<Types>::value) >
-   struct tuple_data
-   {
-     typedef Types types;
-     typedef tuple_data this_t;
-     typedef typename ttl::meta::get<types, N>::type head_t;
-     typedef tuple_data<types, N+1> tail_t;
-     head_t head_;
-     tail_t tail_;
-
-   public:
-     tuple_data()
-       :head_(), tail_()
-     {}
-
-     TTL_REPEAT_NEST(TTL_MAX_TUPLE_PARAMS, TTL_TUPLE_CTOR, TTL_TUPLE_CTOR, p)
-
-     template<TTL_TPARAMSX(TTL_MAX_TUPLE_PARAMS, U)>
-     tuple_data(const tuple_data<ttl::meta::typelist<TTL_ARGSX(TTL_MAX_TUPLE_PARAMS, U)>, N>& r)
-       :head_(r.head_), tail_(r.tail_)
-     {}
-     
-     tuple_data(const this_t& r) : head_(r.head_), tail_(r.tail_) {}
-
-     this_t& operator=(const this_t& r)
-     {
-       if(&r == this) return *this;
-       head_ = r.head_;
-       tail_ = r.tail_;
-       return *this;
-     }
-
-     template<TTL_TPARAMSX(TTL_MAX_TUPLE_PARAMS, U)>
-     tuple_data& operator= (const tuple_data<ttl::meta::typelist<TTL_ARGSX(TTL_MAX_TUPLE_PARAMS, U)>, N>& r)
-     {
-       //if(&r == this) return *this;
-       head_ = r.head_;
-       tail_ = r.tail_;
-       return *this;
-     }
-
-     #ifdef NTL__CXX_RV
-     tuple_data(this_t&& r)
-       :head_(forward<head_t>(r.head_)), 
-       tail_(forward<tail_t>(r.tail_))
-     {}
-     template<TTL_TPARAMSX(TTL_MAX_TUPLE_PARAMS, U)>
-     tuple_data(tuple_data<ttl::meta::typelist<TTL_ARGSX(TTL_MAX_TUPLE_PARAMS, U)>, N>&& r)
-       :head_(forward<head_t>(r.head_)), 
-       tail_(forward<tail_t>(r.tail_))
-     {}
-
-     this_t& operator=(this_t&& r)
-     {
-       if(&r == this) return *this;
-       head_ = move(r.head_);
-       tail_ = move(r.tail_);
-       return *this;
-     }
-     template<TTL_TPARAMSX(TTL_MAX_TUPLE_PARAMS, U)>
-     tuple_data& operator=(tuple_data<ttl::meta::typelist<TTL_ARGSX(TTL_MAX_TUPLE_PARAMS, U)>, N>&& r)
-     {
-       //if(&r == this) return *this;
-       head_ = move(r.head_);
-       tail_ = move(r.tail_);
-       return *this;
-     }
-     #endif
-   };	
-
-   template<typename Types, size_t N >
-   struct tuple_data<Types, N, true>
-   {
-     typedef Types types;
-     typedef tuple_data this_t;
-
-     tuple_data() {}
-     tuple_data(const this_t& r) {}
-     this_t& operator=(const this_t& r)
-     { return *this; }
-
-     template<TTL_TPARAMSX(TTL_MAX_TUPLE_PARAMS, U)>
-     tuple_data(const tuple_data<ttl::meta::typelist<TTL_ARGSX(TTL_MAX_TUPLE_PARAMS, U)>, N>& r)
-     {}
-
-     #ifdef NTL__CXX_RV
-     template<TTL_TPARAMSX(TTL_MAX_TUPLE_PARAMS, U)>
-     tuple_data& operator=(const tuple_data<ttl::meta::typelist<TTL_ARGSX(TTL_MAX_TUPLE_PARAMS, U)>, N>&& r)
-     { return *this; }
-
-     tuple_data(this_t&& r) {}
-     this_t& operator=(this_t&& r)
-     { return *this; }
-
-     template<TTL_TPARAMSX(TTL_MAX_TUPLE_PARAMS, U)>
-     tuple_data(tuple_data<ttl::meta::typelist<TTL_ARGSX(TTL_MAX_TUPLE_PARAMS, U)>, N>&& r)
-     {}
-
-     template<TTL_TPARAMSX(TTL_MAX_TUPLE_PARAMS, U)>
-     tuple_data& operator=(tuple_data<ttl::meta::typelist<TTL_ARGSX(TTL_MAX_TUPLE_PARAMS, U)>, N>&& r)
-     { return *this; }
-     #endif
-   };
-
-#undef TTL_TUPLE_CALL_PARAM2
-#undef TTL_TUPLE_CALL_PARAM_END2
-#undef TTL_TUPLE_CALL_PARAMS2
-#undef TTL_TUPLE_CALL_PARAM
-#undef TTL_TUPLE_CALL_PARAM_END
-#undef TTL_TUPLE_CALL_PARAMS
-#undef TTL_TUPLE_CTOR
-#undef TTL_TUPLE_UCTOR
-
-   template<typename R, size_t N >
-   struct get_field
-   {
-     template<typename T >
-     R operator()(T& t)
-     {
-       get_field<R,N-1> g;
-       return g(t.tail_);
-     }
-   };
-
-   template<typename R >
-   struct get_field<R, 0>
-   {
-     template<typename T >
-     R operator()(T& t)
-     {
-       return t.head_ ;
-     }
-   };
-
-   template<typename R, size_t N>
-   struct field
-   {
-     template<typename T>
-     static R get(T& t)
-     {
-       return field<R, N-1>::get(t.tail_);
-     }
-     template<typename T>
-     static const R get(const T& t)
-     {
-       return field<R, N-1>::get(t.tail_);
-     }
-   };
-
-   template<typename R>
-   struct field<R, 0>
-   {
-     template<typename T>
-     static R get(T& t)
-     {
-       return t.head_;
-     }
-     template<typename T>
-     static const R get(const T& t)
-     {
-       return t.head_;
-     }
-   };
+  template<size_t I, typename T1 = ttl::meta::empty_type, typename T2 = ttl::meta::empty_type, typename T3 = ttl::meta::empty_type>
+  struct tuple_element;
 
 
- };  // implementation
+  namespace __ 
+  {
+    namespace meta = ttl::meta;
 
-
-#define TTL_TUPLE_CALL_PARAM(n,p) typename __::tuple_param<types,n>::type p##n,
-#define TTL_TUPLE_CALL_PARAM_END(n,p) typename __::tuple_param<types,n>::type p##n
-#define TTL_TUPLE_CALL_PARAMS(n,p) TTL_REPEAT(n, TTL_TUPLE_CALL_PARAM, TTL_TUPLE_CALL_PARAM_END, p)
-
-#define TTL_MK_U(n,p) forward<U##n>(p##n),
-#define TTL_MK_U2(n,p) forward<U##n>(p##n)
-
-#define TTL_TUPLE_CTOR(n,p)  explicit tuple(TTL_FUNC_CVPARAMS(n,p)): base(TTL_ARGSX(n,p)) {}
-#define TTL_TUPLE_UCTOR(n,p) template<TTL_TPARAMSX(n, U)> explicit tuple(TTL_FUNC_UPARAMS(n,p)): base(TTL_REPEAT(n, TTL_MK_U, TTL_MK_U2, p)) {}
-#define TTL_TUPLE_CCTOR(n,p) template<TTL_TPARAMSX(n, U)> tuple(const tuple<TTL_TPARAMSX(n,U)>& u): base(u) {}
-#define TTL_TUPLE_CCTOR2(n,p)template<TTL_TPARAMSX(n, U)> tuple(tuple<TTL_TPARAMSX(n,U)>&& u): base(move(u)) {}
-
-#define TTL_TUPLE_ASSIGN(n,p) template<TTL_TPARAMSX(n, U)> tuple& operator=(const tuple<TTL_ARGSX(n,U)>& u) { base::operator=(u); return *this; }
-#define TTL_TUPLE_ASSIGN2(n,p)template<TTL_TPARAMSX(n, U)> tuple& operator=(tuple<TTL_ARGSX(n,U)>&& u) { base::operator=(move(u)); return *this; }
-
- /// Class template tuple [20.4.1 tuple.tuple]
- template<TTL_TPARAMS_DEF(TTL_MAX_TUPLE_PARAMS, ttl::meta::empty_type) >
- class tuple: 
-   public __::tuple_data<ttl::meta::typelist<TTL_ARGS(TTL_MAX_TUPLE_PARAMS) > >
- {
-   typedef __::tuple_data<types> base;
-
- public:
-   typedef ttl::meta::typelist<TTL_ARGS(TTL_MAX_TUPLE_PARAMS) > types;
-
-   template<size_t N>
-   struct return_type
-   {
-     typedef typename ttl::data_holder<typename ttl::meta::get<types, N>::type>::return_type type;
-   };
-
-   template<size_t N>
-   struct const_return_type
-   {
-     typedef typename ttl::data_holder<typename ttl::meta::get<types, N>::type>::const_return_type type;
-   };
-
- public:
-  /// 20.4.1.2 Construction [tuple.cnstr]
-  tuple() {}
-
-  // explicit tuple(const Types&...);
-#define TTL_CV const
-#define TTL_REF &
-  //TTL_REPEAT_NEST(TTL_MAX_TUPLE_PARAMS, TTL_TUPLE_CTOR, TTL_TUPLE_CTOR, p)
-
-  // template <class... UTypes> explicit tuple(UTypes&&... u);
-#undef TTL_CV
-#undef TTL_REF
+    template<typename T>
+    struct traits
+    {
+      typedef T  stored_type;
+      typedef T& return_type;
+      typedef const typename remove_cv<T>::type&  param_type;
 #ifdef NTL__CXX_RV
-# define TTL_CV
-# define TTL_REF &&
+      typedef typename remove_cv<T>::type&& rparam_type;
 #else
-# define TTL_CV const
-# define TTL_REF &
+      typedef typename remove_cv<T>::type&  rparam_type;
 #endif
+    };
 
-
-  TTL_REPEAT_NEST(TTL_MAX_TUPLE_PARAMS, TTL_TUPLE_UCTOR, TTL_TUPLE_UCTOR, u)
-#undef TTL_CV
-#undef TTL_REF
-  
-  tuple(const tuple& u)
-  :base(u)
-  {}
-
-
-  //template <class... UTypes> tuple(const tuple<UTypes...>&);
-
-  TTL_REPEAT_NEST(TTL_MAX_TUPLE_PARAMS, TTL_TUPLE_CCTOR, TTL_TUPLE_CCTOR, p)
-
-  #ifdef NTL__CXX_RV
-  //template <class... UTypes> tuple(tuple<UTypes...>&&);
-  TTL_REPEAT_NEST(TTL_MAX_TUPLE_PARAMS, TTL_TUPLE_CCTOR2, TTL_TUPLE_CCTOR2, p)
-  #endif
-
-#ifdef NO_TUPLE2
-  //tuple(const pair<T1, T2>& u);
-  template <class U1, class U2>
-  tuple(const pair<U1, U2>& u)
-    :base(u.first, u.second)
-  {}
-
-  //tuple(pair<T1, T2>&& u);
-  #ifdef NTL__CXX_RV
-  template <class U1, class U2>
-  tuple(pair<U1, U2>&& u)
-    :base(forward<U1>(u.first), forward<U2>(u.second))
-  {}
-  #endif
+    template<typename T>
+    struct traits<const T>
+    {
+      typedef const T  stored_type;
+      typedef const T& return_type;
+      typedef const T& param_type;
+#ifdef NTL__CXX_RV
+      typedef const T&& rparam_type;
+#else
+      typedef const T&  rparam_type;
 #endif
-  // TODO: allocator-extended constructors
-  //template <class Alloc>
-  //tuple(allocator_arg_t, const Alloc& a);
-  //template <class Alloc>
-  //tuple(allocator_arg_t, const Alloc& a, const Types&...);
-  //template <class Alloc, class... UTypes>
-  //tuple(allocator_arg_t, const Alloc& a, const UTypes&&...);
-  //template <class Alloc>
-  //tuple(allocator_arg_t, const Alloc& a, const tuple&);
-  //template <class Alloc>
-  //tuple(allocator_arg_t, const Alloc& a, tuple&&);
-  //template <class Alloc, class... UTypes>
-  //tuple(allocator_arg_t, const Alloc& a, const tuple<UTypes...>&);
-  //template <class Alloc, class... UTypes>
-  //tuple(allocator_arg_t, const Alloc& a, tuple<UTypes...>&&);
-  //template <class Alloc, class U1, class U2>
-  //tuple(allocator_arg_t, const Alloc& a, const pair<U1, U2>&);
-  //template <class Alloc, class U1, class U2>
-  //tuple(allocator_arg_t, const Alloc& a, pair<U1, U2>&&);
+    };
 
-  #ifdef NTL__CXX_RV
-  tuple(tuple&& u)
-    :base(forward<base>(u))
-  {}
-  
-  tuple& operator=(tuple&& r)
-  { 
-    base::operator=(forward<base>(r));
-    return *this;
-  }
-  
-  //template <class... UTypes> tuple& operator=(tuple<UTypes...>&&);
-  TTL_REPEAT_NEST(TTL_MAX_TUPLE_PARAMS, TTL_TUPLE_ASSIGN2, TTL_TUPLE_ASSIGN2, p)
-  #endif
-
-  tuple& operator=(const tuple& r)
-  { 
-   base::operator=(r);
-   return *this;
-  }
-
-  //template <class... UTypes> tuple& operator=(const tuple<UTypes...>&);
-  TTL_REPEAT_NEST(TTL_MAX_TUPLE_PARAMS, TTL_TUPLE_ASSIGN, TTL_TUPLE_ASSIGN, p)
-
-#ifdef NO_TUPLE2
-  template <class U1, class U2>
-  tuple& operator=(const pair<U1, U2>& u)
-  {
-    base::operator=(tuple<U1,U2>(u));
-    return *this;
-  }
-  #ifdef NTL__CXX_RV
-  template <class U1, class U2>
-  tuple& operator=(pair<U1, U2>&& u)
-  {
-    base::operator=(tuple<U1,U2>(forward<pair<U1,U2> >(u)));
-    return *this;
-  }
-  #endif
+    template<typename T>
+    struct traits<T&>
+    {
+      typedef T& stored_type;
+      typedef T& return_type;
+      typedef T& param_type;
+#ifdef NTL__CXX_RV
+      typedef T&& rparam_type;
+#else
+      typedef T&  rparam_type;
 #endif
-};
+    };
 
-#undef TTL_TUPLE_CALL_PARAM
-#undef TTL_TUPLE_CALL_PARAM_END
-#undef TTL_TUPLE_CALL_PARAMS
-#undef TTL_TUPLE_CTOR
-#undef TTL_TUPLE_UCTOR
-#undef TTL_TUPLE_CCTOR
-#undef TTL_TUPLE_CCTOR2
-#undef TTL_TUPLE_ASSIGN
-#undef TTL_TUPLE_ASSIGN2
-
-#ifndef NO_TUPLE2
-template<typename T1, typename T2>
-class tuple<T1,T2>: 
-  public __::tuple_data<ttl::meta::typelist<T1,T2> >
-{
-  typedef __::tuple_data<types> base;
-
-public:
-  typedef ttl::meta::typelist<T1,T2> types;
-
-  template<size_t N>
-  struct return_type
-  {
-    typedef typename ttl::data_holder<typename ttl::meta::get<types, N>::type>::return_type type;
-  };
-
-  template<size_t N>
-  struct const_return_type
-  {
-    typedef typename ttl::data_holder<typename ttl::meta::get<types, N>::type>::const_return_type type;
-  };
-
-public:
-  /// 20.4.1.2 Construction [tuple.cnstr]
-  tuple() {}
-
-  tuple(const T1& t1, const T2& t2);
-  //tuple(T1&& t1, T2&& t2);
-
-  //template <class U1, class U2>
-  //tuple(const U1& u1, const U2& u2);
-
-  template <class U1, class U2>
-  tuple(U1&& u1, U2&& u2);
-
-  tuple(const tuple& u)
-    :base(u)
-  {}
-
-  tuple(tuple&&);
-
-  template <class U1, class U2>
-  tuple(const tuple<U1,U2>&);
-
-  template <class U1, class U2>
-  tuple(tuple<U1,U2>&&);
-
-  template <class U1, class U2>
-  tuple(const pair<U1, U2>& u);
-
-  template <class U1, class U2>
-  tuple(pair<U1, U2>&& u);
-
-  // TODO: allocator-extended constructors
-  template <class Alloc>
-  tuple(allocator_arg_t, const Alloc& a);
-  //template <class Alloc>
-  //tuple(allocator_arg_t, const Alloc& a, const Types&...);
-  //template <class Alloc, class... UTypes>
-  //tuple(allocator_arg_t, const Alloc& a, const UTypes&&...);
-  //template <class Alloc>
-  //tuple(allocator_arg_t, const Alloc& a, const tuple&);
-  //template <class Alloc>
-  //tuple(allocator_arg_t, const Alloc& a, tuple&&);
-  //template <class Alloc, class... UTypes>
-  //tuple(allocator_arg_t, const Alloc& a, const tuple<UTypes...>&);
-  //template <class Alloc, class... UTypes>
-  //tuple(allocator_arg_t, const Alloc& a, tuple<UTypes...>&&);
-  template <class Alloc, class U1, class U2>
-  tuple(allocator_arg_t, const Alloc& a, const pair<U1, U2>&);
-  template <class Alloc, class U1, class U2>
-  tuple(allocator_arg_t, const Alloc& a, pair<U1, U2>&&);
-
-  tuple& operator=(const tuple& r)
-  { 
-    base::operator=(r);
-    return *this;
-  }
-
-  tuple& operator=(tuple&& r)
-  { 
-    base::operator=(forward<base>(r));
-    return *this;
-  }
-
-  template <class U1, class U2>
-  tuple& operator=(const tuple<U1,U2>&);
-
-  template <class U1, class U2>
-  tuple& operator=(tuple<U1,U2>&&);
-
-
-  template <class U1, class U2>
-  tuple& operator=(const pair<U1, U2>& u)
-  {
-    *this = tuple<U1,U2>(u);
-    return *this;
-  }
-  template <class U1, class U2>
-  tuple& operator=(pair<U1, U2>&& u)
-  {
-    *this = move(tuple<U1,U2>(forward<pair<U1,U2>(u)));
-    return *this;
-  }
-};
+    template<typename T>
+    struct traits<const T&>
+    {
+      typedef const T& stored_type;
+      typedef const T& return_type;
+      typedef const T& param_type;
+#ifdef NTL__CXX_RV
+      typedef const T&& rparam_type;
+#else
+      typedef const T&  rparam_type;
 #endif
-
- //////////////////////////////////////////////////////////////////////////
- // 20.4.1.3 Tuple creation functions [tuple.creation]
-
- namespace __
- {
-   template<typename T>
-   struct is_refwrap
-   {
-     static const bool value = false;
-     typedef T type;
-   };
-   template<typename T>
-   struct is_refwrap<reference_wrapper<T> >
-   {
-     static const bool value = true;
-     typedef T type;
-   };
-
-   template<typename T>
-   struct ttraits
-   {
-     typedef decay<T> U;
-     typedef typename conditional<is_refwrap<U>::value, typename is_refwrap<U>::type&, U>::type type;
-   };
-
-   template<TTL_TPARAMS_DEF(TTL_MAX_TUPLE_PARAMS, ttl::meta::empty_type)>
-   struct tmap
-   {
-     typedef tuple<TTL_ARGS(TTL_MAX_TUPLE_PARAMS)> type;
-   };
-
-   struct swallow_assign
-   {
-     template<typename T>
-     const swallow_assign& operator=(const T&) const
-     { return *this; }
-   };
- }
-
- // "ignore" allows tuple positions to be ignored when using "tie".
- __::swallow_assign const ignore = __::swallow_assign();
-
- 
- tuple<> make_tuple()
- {
-   return tuple<>();
- }
+    };
 
 #ifdef NTL__CXX_RV
-#define TTL_CV
-#define TTL_REF &&
-#else
-#define TTL_CV const
-#define TTL_REF &
+    template<typename T>
+    struct traits<T&&>
+    {
+      typedef T&& stored_type;
+      typedef T&& return_type;
+      typedef T&& param_type;
+      typedef T&& rparam_type;
+    };
+
+    template<typename T>
+    struct traits<const T&&>
+    {
+      typedef const T&& stored_type;
+      typedef const T&& return_type;
+      typedef const T&& param_type;
+      typedef const T&& rparam_type;
+    };
 #endif
 
-#define TTL_MK_P(n,p) forward<T##n>(p##n),
-#define TTL_MK_P2(n,p) forward<T##n>(p##n)
+    template<typename T>
+    struct traits<T*>
+    {
+      typedef T* stored_type;
+      typedef T* param_type;
+      typedef typename add_lvalue_reference<T*>::type return_type;
+      typedef typename add_rvalue_reference<T*>::type rparam_type;
+    };
 
-#define TTL_MAKE_TUPLE(N,p) template<TTL_TPARAMS(N)> \
-  typename __::tmap<TTL_ARGS(N)>::type \
-  make_tuple(TTL_FUNC_CVPARAMS(N, p)) \
-  { \
-    return __::tmap<TTL_ARGS(N)>::type(TTL_REPEAT(N, TTL_MK_P, TTL_MK_P2, p)); \
-  } 
+    template<typename T>
+    struct traits<const T*>
+    {
+      typedef const T* stored_type;
+      typedef const T* param_type;
+      typedef typename add_lvalue_reference<const T*>::type return_type;
+      typedef typename add_rvalue_reference<const T*>::type rparam_type;
+    };
 
-#define TTL_TIE_TUPLE(N,p) template<TTL_TPARAMS(N)> \
-  typename __::tmap<TTL_ARGSCV(N)>::type \
-  tie(TTL_FUNC_CVPARAMS(N, p)) \
- { \
-   return typename __::tmap<TTL_ARGSCV(N)>::type( TTL_ARGSX(N, p) ); \
- } 
+    template<typename T>
+    struct data_wrapper
+    {};
 
- TTL_REPEAT_NEST(TTL_MAX_TUPLE_PARAMS, TTL_MAKE_TUPLE, TTL_MAKE_TUPLE, p)
+    template<typename Typelist, size_t Idx, bool Stop = (Idx > meta::length<Typelist>::value) >
+    struct tuple_param
+    {
+      typedef typename traits<typename meta::get<Typelist,Idx-1>::type>::param_type type;
+    };
 
-#undef TTL_CV
-#undef TTL_REF
-#define TTL_CV
-#define TTL_REF &
+    template<typename Typelist, size_t Idx>
+    struct tuple_param<Typelist, Idx, true>
+    {
+      typedef meta::empty_type type;
+    };
 
- TTL_REPEAT_NEST(TTL_MAX_TUPLE_PARAMS, TTL_TIE_TUPLE, TTL_TIE_TUPLE, p)
+#ifdef NTL__CXX_RV
 
-#undef TTL_CV
-#undef TTL_REF
-#undef TTL_MK_P
-#undef TTL_MK_P2
-#undef TTL_MAKE_TUPLE
-#undef TTL_TIE_TUPLE
+    template<class Types, size_t i, bool = (i >= meta::length<Types>::value)>
+    struct rparam
+    {
+      typedef typename meta::get<Types,i>::type ft, type;
+    };
 
-//////////////////////////////////////////////////////////////////////////
- // 20.4.1.4, tuple helper classes:
- 
- /// Tuple helper class that calculates a summary size of the types which tuple<> contains
- template<TTL_TPARAMS_DEF(TTL_MAX_TUPLE_PARAMS, ttl::meta::empty_type)>
- struct tuple_size; // undefined
+    template<class Types, size_t i>
+    struct rparam<Types, i, true> { typedef meta::empty_type type; };
 
- /// Tuple helper class that returns a type at tuple in position I
- template<size_t I, TTL_TPARAMS_DEF(TTL_MAX_TUPLE_PARAMS, ttl::meta::empty_type)>
- struct tuple_element; // undefined
+    struct rvtag {};
+#endif
 
- namespace __
- {
-   namespace meta = ttl::meta;
+    template<class Typelist, size_t Idx = 0, bool empty = (Idx >= meta::length<Typelist>::value)>
+    struct tuples
+    {
+      typedef Typelist types;
+      typedef typename meta::get<types, Idx>::type raw_type;
+      typedef tuples<types, Idx+1> tail_t;
 
-   template<class Tuple, size_t N>
-   struct tuple_return
-   {
-     typedef typename conditional
-       <
-       is_const<Tuple&>::value, 
-       typename Tuple::template const_return_type<N>::type, 
-       typename Tuple::template return_type<N>::type
-       >::type type;
-   };
+      typedef typename conditional<is_void<raw_type>::value || is_function<raw_type>::value, data_wrapper<raw_type>, raw_type>::type head_t;
 
-   template<class T1, class T2>
-   struct tuple_pair
-   {
-     T1& get(pair<T1, T2>& p, meta::int2type<0>)
-     {
-       return p.first;
-     }
-     T2& get(pair<T1, T2>& p, meta::int2type<1>)
-     {
-       return p.second;
-     }
-     const T1& get(const pair<T1, T2>& p, meta::int2type<0>)
-     {
-       return p.first;
-     }
-     const T2& get(const pair<T1, T2>& p, meta::int2type<1>)
-     {
-       return p.second;
-     }
-   };
+      typename traits<head_t>::stored_type head;
+      tail_t tail;
 
- }
+    public:
+      tuples()
+        :head(), tail()
+      {}
 
- /// tuple_size specialization for tuple
- template<TTL_TPARAMS(TTL_MAX_TUPLE_PARAMS)>
- struct tuple_size<tuple<TTL_ARGS(TTL_MAX_TUPLE_PARAMS)> >
-   :integral_constant<size_t, ttl::meta::length<typename tuple<TTL_ARGS(TTL_MAX_TUPLE_PARAMS)>::types>::value>
- {};
- 
- /// tuple-like access to pair
- template <class T1, class T2> 
- struct tuple_size<std::pair<T1, T2> >
-   :integral_constant<size_t, 2>
- {};
+      explicit tuples(typename tuple_param<types, Idx+1>::type p1)
+        :head(p1), tail()
+      {}
+      explicit tuples(typename tuple_param<types, Idx+1>::type p1, typename tuple_param<types, Idx+2>::type p2)
+        :head(p1), tail(p2)
+      {}
+      explicit tuples(typename tuple_param<types, Idx+1>::type p1, typename tuple_param<types, Idx+2>::type p2, typename tuple_param<types, Idx+3>::type p3)
+        :head(p1), tail(p2, p3)
+      {}
+
+#if 0
+      template<typename U1>
+      explicit tuples(typename traits<U1>::rparam_type p1)
+        :head(move(p1)), tail()
+      {}
+      template<typename U1, typename U2>
+      explicit tuples(typename traits<U1>::rparam_type p1, typename traits<U1>::rparam_type p2)
+        :head(move(p1)), tail(move(p2))
+      {}
+      template<typename U1, typename U2, typename U3>
+      explicit tuples(typename traits<U1>::rparam_type p1, typename traits<U1>::rparam_type p2, typename traits<U1>::rparam_type p3)
+        :head(p1), tail(p2, p3)
+      {}
+#endif
+
+      template<typename U1, typename U2, typename U3>
+      tuples(const tuples<meta::typelist<U1,U2,U3>, Idx>& r)
+        :head(r.head), tail(r.tail)
+      {}
+
+      tuples(const tuples& r)
+        :head(r.head), tail(r.tail)
+      {}
+
+      tuples& operator=(const tuples& r)
+      {
+        if(this == &r) return *this;
+        head = r.head;
+        tail = r.tail;
+        return *this;
+      }
+
+      template<typename U1, typename U2, typename U3>
+      tuples& operator=(const tuples<meta::typelist<U1,U2,U3>, Idx>& r)
+      {
+        head = r.head;
+        tail = r.tail;
+        return *this;
+      }
+
+#ifdef NTL__CXX_RV
+      typedef typename rparam<types,Idx+0>::type type1;
+      typedef typename rparam<types,Idx+1>::type type2;
+      typedef typename rparam<types,Idx+2>::type type3;
+
+      tuples(rvtag, type1&& p1)
+        :head(forward<type1>(p1))
+      {}
+      tuples(rvtag, type1&& p1, type2&& p2)
+        :head(forward<type1>(p1)), tail(rvtag(), p2)
+      {}
+      tuples(rvtag, type1&& p1, type2&& p2, type3&& p3)
+        :head(forward<type1>(p1)), tail(rvtag(), p2, p3)
+      {}
+
+      template<typename U1, typename U2, typename U3>
+      tuples(tuples<meta::typelist<U1,U2,U3>, Idx>&& r)
+        :head(forward<head_t>(r.head)), tail(forward<tail_t>(r.tail))
+      {}
+
+      tuples(tuples&& r)
+        :head(forward<head_t>(r.head)), tail(forward<tail_t>(r.tail))
+      {}
+
+      tuples& operator=(tuples&& r)
+      {
+        if(this == &r) return *this;
+        head = move(r.head);
+        tail = move(r.tail);
+        return *this;
+      }
+
+      template<typename U1, typename U2, typename U3>
+      tuples& operator=(tuples<meta::typelist<U1,U2,U3>, Idx>&& r)
+      {
+        head = move(r.head);
+        tail = move(r.tail);
+        return *this;
+      }
+#endif
+    };
+
+    template<class Typelist, size_t Idx>
+    struct tuples<Typelist, Idx, true>
+    {
+      typedef Typelist types;
+    public:
+      tuples()
+      {}
+
+      template<typename U1, typename U2, typename U3>
+      tuples(const tuples<meta::typelist<U1,U2,U3>, Idx>& r)
+      {}
+
+      tuples(const tuples& r)
+      {}
+
+      tuples& operator=(const tuples& r)
+      { return *this; }
+
+      template<typename U1, typename U2, typename U3>
+      tuples& operator=(const tuples<meta::typelist<U1,U2,U3>, Idx>& r)
+      { return *this; }
+
+#ifdef NTL__CXX_RV
+      template<typename U1, typename U2, typename U3>
+      tuples(tuples<meta::typelist<U1,U2,U3>, Idx>&& r)
+      {}
+
+      tuples(tuples&& r)
+      {}
+
+      tuples& operator=(tuples&& r)
+      { return *this; }
+
+      template<typename U1, typename U2, typename U3>
+      tuples& operator=(tuples<meta::typelist<U1,U2,U3>, Idx>&& r)
+      { return *this; }
+#endif
+    }; // tuples
 
 
- /// tuple_element specialization for tuple
- template<size_t I, TTL_TPARAMS(TTL_MAX_TUPLE_PARAMS)>
- struct tuple_element<I, tuple<TTL_ARGS(TTL_MAX_TUPLE_PARAMS)> >
- {
-   typedef tuple<TTL_ARGS(TTL_MAX_TUPLE_PARAMS)> tuple_t;
-   static_assert(I < tuple_size<tuple_t>::value, "I is out of bounds");
+    template<typename R, size_t N>
+    struct field
+    {
+      template<typename T>
+      static R get(T& t)
+      {
+        return field<R, N-1>::get(t.tail);
+      }
+      template<typename T>
+      static R get(const T& t)
+      {
+        return field<R, N-1>::get(t.tail);
+      }
+    };
 
-   typedef typename ttl::meta::get<typename tuple_t::types, I>::type type;
- };
+    template<typename R>
+    struct field<R, 0>
+    {
+      template<typename T>
+      static R get(T& t)
+      {
+        return t.head;
+      }
+      template<typename T>
+      static typename R get(const T& t)
+      {
+        return t.head;
+      }
+    };
+  }
 
- template <size_t I, class T1, class T2>
- struct tuple_element<I, std::pair<T1, T2> >; // undefined
- template <class T1, class T2>
- struct tuple_element<0, std::pair<T1, T2> > { typedef T1 type; };
- template <class T1, class T2> 
- struct tuple_element<1, std::pair<T1, T2> > { typedef T2 type; };
 
- //////////////////////////////////////////////////////////////////////////
- // 20.4.1.5, element access:
- // TODO: tuple specialization
- template<size_t N, typename T>
- typename __::tuple_return<T, N>::type get(T& t)
- {
-   static_assert(N < tuple_size<T>::value, "N out of bounds");
-   typedef typename __::tuple_return<T, N>::type return_type;
-   return __::field<return_type, N>::get(t);
- }
+  template<typename T1, typename T2, typename T3>
+  class tuple:
+    public __::tuples<ttl::meta::typelist<T1,T2,T3> >
+  {
+    typedef __::rvtag rvtag;
+    typedef __::tuples<types> base;
+    typedef tuple<T1,T2,T3>   this_t;
+  public:
+    typedef ttl::meta::typelist<T1,T2,T3> types;
 
- template<size_t N, typename T>
- typename tuple_element<N, T>::type get(const T& t)
- {
-   static_assert(N < tuple_size<T>::value, "N out of bounds");
-   return __::field<tuple_element<N, T>::type, N>::get(t);
- }
+    tuple()
+    {}
 
- template<size_t I, class T1, class T2>
- typename tuple_element<I, std::pair<T1, T2> >::type& get(std::pair<T1, T2>& p)
- {
-   static_assert(I < 2, "I out of bounds");
-   return __::tuple_pair<T1, T2>::get(p, ttl::meta::int2type<I>());
- }
+    // explicit tuple(const Types&...);
+    explicit tuple(typename __::tuple_param<types,1>::type p1)
+      :base(p1)
+    {}
+    explicit tuple(typename __::tuple_param<types,1>::type p1, typename __::tuple_param<types,2>::type p2)
+      :base(p1, p2)
+    {}
+    explicit tuple(typename __::tuple_param<types,1>::type p1, typename __::tuple_param<types,2>::type p2, typename __::tuple_param<types,3>::type p3)
+      :base(p1, p2, p3)
+    {}
 
- template<size_t I, class T1, class T2> 
- const typename tuple_element<I, std::pair<T1, T2> >::type& get(const std::pair<T1, T2>& p)
- {
-   static_assert(I < 2, "I out of bounds");
-   return __::tuple_pair<T1, T2>::get(p, ttl::meta::int2type<I>());
- }
+    tuple(const tuple& r)
+      :base(static_cast<const base&>(r))
+    {}
 
- //////////////////////////////////////////////////////////////////////////
- ///\name  Tuple interface to class template array [6.2.2.5]
+    //tuple(tuple& r)
+    //  :base(static_cast<base&>(r))
+    //{}
 
- template <class T, size_t N> 
- struct tuple_size<array<T, N> >: integral_constant<size_t, N>
- {};
+    // template <class... UTypes> tuple(const tuple<UTypes...>&);
+    template<typename U1, typename U2, typename U3>
+    tuple(const tuple<U1,U2,U3>& r)
+      :base(r)
+    {}
 
- template <size_t I, class T, size_t N>
- struct tuple_element<I, array<T, N> >
- {
-   static_assert(I < N, "I out of bounds");
-   typedef T type;
- };
+    tuple& operator=(const tuple& r)
+    {
+      base::operator=(r);
+      return *this;
+    }
 
- template <int I, class T, size_t N>
- T&
-   get(array<T, N>& a)
- {
-   return a[I];
- }
+    // template <class... UTypes> tuple& operator=(const tuple<UTypes...>&);
+    template<typename U1, typename U2, typename U3>
+    tuple& operator=(const tuple<U1,U2,U3>& r)
+    {
+      base::operator=(r);
+      return *this;
+    }
 
- template <int I, class T, size_t N>
- const T&
-   get(const array<T, N>& a)
- {
-   return a[I];
- }
+
+#ifdef NTL__CXX_RV
+
+    // template <class... UTypes> explicit tuple(UTypes&&... u);
+    template<typename U1>
+    explicit tuple(U1&& p1, typename enable_if<is_same<U1, tuple&>::value == false>::type* = 0)
+      :base(rvtag(), forward<U1>(p1))
+    {}
+
+    template<typename U1, typename U2>
+    explicit tuple(U1&& p1, U2&& p2)
+      :base(rvtag(), forward<U1>(p1), forward<U2>(p2))
+    {}
+
+    template<typename U1, typename U2, typename U3>
+    explicit tuple(U1&& p1, U2&& p2, U3&& p3)
+      :base(rvtag(), forward<U1>(p1), forward<U2>(p2), forward<U3>(p3))
+    {}
+
+    tuple(tuple&& r)
+      :base(forward<base>(r))
+    {}
+
+    tuple& operator=(tuple&& r)
+    {
+      base::operator=(forward<base>(r));
+      return *this;
+    }
+
+
+    // template <class... UTypes> tuple(tuple<UTypes...>&&);
+    template<typename U1, typename U2, typename U3>
+    tuple(tuple<U1,U2,U3>&& r)
+      :base(move(r))
+    {}
+
+    // template <class... UTypes> tuple& operator=(tuple<UTypes...>&&);
+    template<typename U1, typename U2, typename U3>
+    tuple& operator=(tuple<U1,U2,U3>&& r)
+    {
+      base::operator=(r);
+      return *this;
+    }
+#endif
+
+    // pair conversions
+    template <class U1, class U2>
+    tuple(const pair<U1, U2>& p)
+      :base(p.first, p.second)
+    {
+      static_assert(types::length == 2, "invalid conversion");
+    }
+
+    template <class U1, class U2>
+    tuple& operator=(const pair<U1, U2>& p)
+    {
+      static_assert(types::length == 2, "invalid conversion");
+      return *this = tuple<U1,U2>(p);
+    }
+
+#ifdef NTL__CXX_RV
+    template <class U1, class U2>
+    tuple(pair<U1, U2>&& p)
+      :base(forward<U1>(p.first), forward<U2>(p.second))
+    {
+      static_assert(types::length == 2, "invalid conversion");
+    }
+
+    template <class U1, class U2>
+    tuple& operator=(pair<U1, U2>&& p)
+    {
+      static_assert(types::length == 2, "invalid conversion");
+      return *this = tuple<U1,U2>(forward<pair<U1,U2> >(p));
+    }
+#endif
+  }; // class tuple
+
+  // make tuple
+  namespace __
+  {
+    struct swallow_assign
+    {
+      template<typename T>
+      const swallow_assign& operator=(const T&) const
+      { return *this; }
+    };
+
+    template<typename T>
+    struct is_refwrap
+    {
+      static const bool value = false;
+      typedef T type;
+    };
+    template<typename T>
+    struct is_refwrap<reference_wrapper<T> >
+    {
+      static const bool value = true;
+      typedef T type;
+    };
+
+    template<typename T>
+    struct mktraits
+    {
+      typedef typename decay<T>::type U;
+      typedef typename conditional<is_refwrap<U>::value, typename is_refwrap<U>::type&, U>::type type;
+    };
+
+    template<typename T1 = meta::empty_type, typename T2 = meta::empty_type, typename T3 = meta::empty_type>
+    struct tmap
+    {
+      typedef tuple<typename mktraits<T1>::type, typename mktraits<T2>::type, typename mktraits<T3>::type> type;
+    };
+
+  }
+
+  /// "ignore" allows tuple positions to be ignored when using "tie".
+  __::swallow_assign const ignore = __::swallow_assign();
+
+  inline tuple<> make_tuple()
+  {
+    return tuple<>();
+  }
+
+#ifdef NTL__CXX_RV
+  template<typename T1>
+  inline typename __::tmap<T1>::type make_tuple(T1&& p1)
+  {
+    return __::tmap<T1>::type (forward<T1>(p1));
+  }
+  template<typename T1, typename T2>
+  inline typename __::tmap<T1,T2>::type make_tuple(T1&& p1, T2&& p2)
+  {
+    return __::tmap<T1,T2>::type (forward<T1>(p1),forward<T2>(p2));
+  }
+  template<typename T1, typename T2, typename T3>
+  inline typename __::tmap<T1,T2,T3>::type make_tuple(T1&& p1, T2&& p2, T3&& p3)
+  {
+    return __::tmap<T1,T2,T3>::type (forward<T1>(p1),forward<T2>(p2),forward<T3>(p3));
+  }
+#else
+  template<typename T1>
+  inline typename __::tmap<T1>::type make_tuple(const T1& p1)
+  {
+    return __::tmap<T1>::type (p1);
+  }
+  template<typename T1, typename T2>
+  inline typename __::tmap<T1,T2>::type make_tuple(const T1& p1, const T2& p2)
+  {
+    return __::tmap<T1,T2,T3>::type (p1,p2);
+  }
+  template<typename T1, typename T2, typename T3>
+  inline typename __::tmap<T1,T2,T3>::type make_tuple(const T1& p1, const T2& p2, const T3& p3)
+  {
+    return __::tmap<T1,T2,T3>::type (p1,p2,p3);
+  }
+#endif
+
+  // tie
+  template<typename T1>
+  inline tuple<T1&> tie(T1& p1)
+  {
+    return tuple<T1&> (p1);
+  }
+  template<typename T1, typename T2>
+  inline tuple<T1&,T2&> tie(T1& p1, T2& p2)
+  {
+    return tuple<T1&,T2&> (p1,p2);
+  }
+  template<typename T1, typename T2, typename T3>
+  inline tuple<T1&,T2&,T3&> tie(T1& p1, T2& p2, T3& p3)
+  {
+    return tuple<T1&,T2&,T3&> (p1,p2,p3);
+  }
+
+
+  // tuple size
+  template<typename T1, typename T2, typename T3>
+  struct tuple_size<tuple<T1,T2,T3> >:
+    integral_constant<size_t, ttl::meta::length<typename tuple<T1,T2,T3>::types>::value>
+  {};
+
+  template<size_t I, typename T1, typename T2, typename T3>
+  struct tuple_element<I, tuple<T1,T2,T3> >
+  {
+    typedef tuple<T1,T2,T3> tuple_t;
+    static_assert(I < tuple_size<tuple_t>::value, "I is out of bounds");
+
+    typedef typename ttl::meta::get<typename tuple_t::types, I>::type type;
+  };
+
+  // get(tuple<>)
+  namespace __
+  {
+    template<size_t I, class Tuple>
+    struct tuple_return
+    {
+      typedef typename ttl::meta::get<typename Tuple::types, I>::type found_type;
+      typedef typename traits<found_type>::return_type type;
+      typedef typename traits<typename add_const<found_type>::type>::return_type ctype;
+    };
+  }
+
+  template<size_t I, typename T1>
+  inline typename __::tuple_return<I, tuple<T1> >::type get(tuple<T1>& t)
+  {
+    typedef typename __::tuple_return<I, tuple<T1> >::type RT;
+    return __::field<RT, I>::get(t);
+  }
+
+  template<size_t I, typename T1>
+  inline typename __::tuple_return<I, tuple<T1> >::ctype get(const tuple<T1>& t)
+  {
+    typedef typename __::tuple_return<I, tuple<T1> >::ctype RT;
+    return __::field<RT, I>::get(t);
+  }
+
+  template<size_t I, typename T1, typename T2>
+  inline typename __::tuple_return<I, tuple<T1,T2> >::type get(tuple<T1,T2>& t)
+  {
+    typedef typename __::tuple_return<I, tuple<T1,T2> >::type RT;
+    return __::field<RT, I>::get(t);
+  }
+
+  template<size_t I, typename T1, typename T2>
+  inline typename __::tuple_return<I, tuple<T1,T2> >::ctype get(const tuple<T1,T2>& t)
+  {
+    typedef typename __::tuple_return<I, tuple<T1,T2> >::ctype RT;
+    return __::field<RT, I>::get(t);
+  }
+
+  template<size_t I, typename T1, typename T2, typename T3>
+  inline typename __::tuple_return<I, tuple<T1,T2,T3> >::type get(tuple<T1,T2,T3>& t)
+  {
+    typedef typename __::tuple_return<I, tuple<T1,T2,T3> >::type RT;
+    return __::field<RT, I>::get(t);
+  }
+
+  template<size_t I, typename T1, typename T2, typename T3>
+  inline typename __::tuple_return<I, tuple<T1,T2,T3> >::ctype get(const tuple<T1,T2,T3>& t)
+  {
+    typedef typename __::tuple_return<I, tuple<T1,T2,T3> >::ctype RT;
+    return __::field<RT, I>::get(t);
+  }
+
+
 
  /**@} lib_tuple */
  /**@} lib_utilities */

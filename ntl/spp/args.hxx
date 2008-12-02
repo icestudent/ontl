@@ -38,6 +38,15 @@
 #define NTL_SPP_DETAIL_ARG_OTHER(n, prefix) \
   NTL_SPP_CAT(NTL_SPP_COMMA prefix, n)
 
+#define NTL_SPP_DETAIL_TARG_FIRST(n, p) \
+  T##n p##n
+#define NTL_SPP_DETAIL_TARG_OTHER(n, p) \
+  NTL_SPP_CAT(NTL_SPP_COMMA T, n) p##n
+
+#define NTL_SPP_DETAIL_AARG_FIRST(n, p) \
+  A##n p##n
+#define NTL_SPP_DETAIL_AARG_OTHER(n, p) \
+  NTL_SPP_CAT(NTL_SPP_COMMA A, n) p##n
 
 // !fr3@K!
 // === public interface ===
@@ -75,6 +84,22 @@
   NTL_SPP_IF_LT(1, count) \
   ( \
     NTL_SPP_LOOP(NTL_SPP_INC(init), NTL_SPP_DEC(count), NTL_SPP_DETAIL_ARG_OTHER, prefix) \
+  )
+
+/**
+ *	@brief Produces comma-separated function parameters of type A
+ *  @example
+ *  NTL_SPP_AARGS(1,2,a)
+ *  'A1 a1, A2 p2'
+ **/
+#define NTL_SPP_AARGS(init, count, ArgName) \
+  NTL_SPP_IF(count) \
+  ( \
+  NTL_SPP_DETAIL_AARG_FIRST(init, ArgName) \
+  ) \
+  NTL_SPP_IF_LT(1, count) \
+  ( \
+  NTL_SPP_LOOP(NTL_SPP_INC(init), NTL_SPP_DEC(count), NTL_SPP_DETAIL_AARG_OTHER, ArgName) \
   )
 
 #endif // !NTL_SPP_ARGS_HXX

@@ -78,44 +78,7 @@ struct check_is_base_of
   _CHECK_TRAIT((is_base_of<short, int>::value) == false);
 };
 
-<<<<<<< .mine
 struct check_meta_trans_cv
-=======
-NTL__STLX_DEF_TRAIT(is_enum)
-
-NTL__STLX_DEF_TRAIT(is_union)
-
-NTL__STLX_DEF_TRAIT(is_class)
-
-template <class T>
-struct is_function : public false_type {};
-
-#include "tt_isfuncc.inl"
-
-#ifndef _M_X64
-  #define NTL_TT_CC __cdecl
-  #include "tt_isfunc.inl"
-  #undef  NTL_TT_CC
-  #define NTL_TT_CC __stdcall
-  #include "tt_isfunc.inl"
-  #undef  NTL_TT_CC
-  #define NTL_TT_CC __fastcall
-  #include "tt_isfunc.inl"
-  #undef  NTL_TT_CC
-#else
-  #define NTL_TT_CC
-  #include "tt_isfunc.inl"
-  #undef  NTL_TT_CC
-#endif
-
-_CHECK_TRAIT(is_function<void()>::value);
-_CHECK_TRAIT(is_function<void(int, int, ...)>::value);
-#ifdef _M_X64
-_CHECK_TRAIT(is_same<void __cdecl(char), void __stdcall(char)>::value);
-#endif
-
-template <class T> struct decay
->>>>>>> .r418
 {
   _CHECK_TRAIT((is_same<remove_const<volatile const int>::type, volatile int>::value));
   _CHECK_TRAIT((is_same<remove_const<const int>::type, const int>::value) == 0);

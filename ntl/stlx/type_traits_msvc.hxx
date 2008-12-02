@@ -72,6 +72,11 @@ _CHECK_TRAIT((is_same<remove_reference<int&>::type, int>::value));
 
 template <class T> struct add_lvalue_reference     { typedef T& type; };
 template <class T> struct add_lvalue_reference<T&> { typedef T& type; };
+#ifdef NTL__CXX_RV
+template <class T> struct add_rvalue_reference     { typedef T&& type; };
+template <class T> struct add_rvalue_reference<T&> { typedef T&& type; };
+template <class T> struct add_rvalue_reference<T&&>{ typedef T&& type; };
+#endif
 _CHECK_TRAIT((is_same<add_lvalue_reference<int&>::type, int&>::value));
 _CHECK_TRAIT((is_same<add_lvalue_reference<int>::type, int&>::value));
 
