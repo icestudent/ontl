@@ -125,7 +125,8 @@ namespace std
     struct traits<const T[N]>
     {
       //typedef const T(&param_type)[N];
-      typedef const T* stored_type, param_type;
+      typedef const T* stored_type;
+      typedef stored_type param_type;
       typedef typename add_lvalue_reference<const T*>::type return_type;
       typedef typename add_rvalue_reference<const T*>::type rparam_type;
     };

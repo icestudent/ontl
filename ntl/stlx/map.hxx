@@ -48,18 +48,23 @@ namespace std {
     public:
       typedef pair<const Key, T> value_type;
 
+      __forceinline
       value_compare(const value_compare& x)
         :comp(x.comp)
       {}
       
       #ifdef NTL__CXX_RV
+      __forceinline
       value_compare(value_compare&& x)
         :comp(move(x.comp))
-      {
-        // TODO: support real move semantics for Compare?
-      }
+      {}
+
+      __forceinline
       value_compare& operator=(value_compare&& c) { comp = move(c.comp); return *this; }
       #endif
+
+      __forceinline
+      value_compare& operator=(const value_compare& c) { comp = c.comp; return *this; }
 
       __forceinline
       bool operator()(const value_type& x, const value_type& y) const
@@ -72,8 +77,6 @@ namespace std {
       Compare comp;
       value_compare(Compare c) : comp(c) {}
       value_compare();
-      //friend void std::swap<value_compare>(value_compare&, value_compare&);
-      value_compare& operator=(const value_compare& c) { comp = c.comp; return *this; }
     };
   } // __
 
