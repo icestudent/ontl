@@ -283,7 +283,7 @@ namespace std
   private:
     static const uratio_t absa = __::static_evaluation::abs<a>::value;
     static const uratio_t absb = __::static_evaluation::abs<b>::value;
-    static const uratio_t c = 1LLU << (sizeof(uratio_t)*4);
+    static const uratio_t c = 1LL << (sizeof(uratio_t)*4);
 
     static const uratio_t a1 = absa % c;
     static const uratio_t a2 = absa / c;

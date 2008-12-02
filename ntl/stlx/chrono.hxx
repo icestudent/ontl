@@ -644,44 +644,42 @@ namespace std
 #endif
 
 #ifndef __GNUC__
-    inline system_clock::time_point now()
+    inline system_clock::time_point system_clock::now()
     {
       typedef ratio_multiply<ratio<100>, nano>::type systime_unit;
       typedef chrono::duration<ntl::nt::systime_t, systime_unit> systime_duration;
       STATIC_ASSERT(systime_unit::den == 10000000); // 100ns is a 10^-7 of second
       STATIC_ASSERT(period::den == 100); // 10ms is a 10^-2 (1/100) of second
-      STATIC_ASSERT(( ratio_divide<period, systime_unit>::type::num == 100000 )); // 10ms is in 100 000 times greater than 100ns
+      STATIC_ASSERT((ratio_divide<period, systime_unit>::type::num == 100000 )); // 10ms is in 100 000 times greater than 100ns
       const ntl::nt::systime_t ntime = ntl::nt::query_system_time();
       return time_point( duration_cast<duration>(systime_duration(ntime)) );
     }
 
-      inline time_t system_clock::to_time_t (const system_clock::time_point& t);
-      {
-        // Number of seconds from 1/1/1601 to 1/1/1970 in 10ms units (see system_clock::period) (10ms = 1 centisecond)
-        typedef ratio_divide<ratio_multiply<ratio<116444736>, hecto>::type, centi>::type epochdiff_t;
-        STATIC_ASSERT(epochdiff_t::num == 1164447360000LL);
+    inline time_t system_clock::to_time_t (const system_clock::time_point& t)
+    {
+      // Number of seconds from 1/1/1601 to 1/1/1970 in 10ms units (see system_clock::period) (10ms = 1 centisecond)
+      typedef ratio_divide<ratio_multiply<ratio<116444736>, hecto>::type, centi>::type epochdiff_t;
+      STATIC_ASSERT(epochdiff_t::num == 1164447360000LL);
 
-        const system_clock::duration diff(epochdiff_t::num);
-        return duration_cast<chrono::seconds>(t.time_since_epoch() - diff).count();
-      }
+      const system_clock::duration diff(epochdiff_t::num);
+      return duration_cast<chrono::seconds>(t.time_since_epoch() - diff).count();
+    }
 
-      inline system_clock::time_point from_time_t(time_t t);
-      {
-        // Number of seconds from 1/1/1601 to 1/1/1970 in 10ms units (see system_clock::period) (10ms = 1 centisecond)
-        typedef ratio_divide<ratio_multiply<ratio<116444736>, hecto>::type, centi>::type epochdiff_t;
-        STATIC_ASSERT(epochdiff_t::num == 1164447360000LL);
-        typedef chrono::time_point<system_clock, chrono::seconds> seconds_time_point;
-        const system_clock::duration diff(epochdiff_t::num);
+    inline system_clock::time_point system_clock::from_time_t(time_t t)
+    {
+      // Number of seconds from 1/1/1601 to 1/1/1970 in 10ms units (see system_clock::period) (10ms = 1 centisecond)
+      typedef ratio_divide<ratio_multiply<ratio<116444736>, hecto>::type, centi>::type epochdiff_t;
+      STATIC_ASSERT(epochdiff_t::num == 1164447360000LL);
+      typedef chrono::time_point<system_clock, chrono::seconds> seconds_time_point;
+      const system_clock::duration diff(epochdiff_t::num);
 
-        // NOTE: c++ recognizes `seconds_time_point from_tp(chrono::seconds(t))` as function declaration, so we need an alternate way:
-        //  const seconds_time_point from_tp((chrono::seconds(t))) OR
-        const seconds_time_point from_tp(static_cast<chrono::seconds>(t));
-        return time_point(duration_cast<duration>(from_tp.time_since_epoch()) + diff);
-      }
+      // NOTE: c++ recognizes `seconds_time_point from_tp(chrono::seconds(t))` as function declaration, so we need an alternate way:
+      //  const seconds_time_point from_tp((chrono::seconds(t))) OR
+      const seconds_time_point from_tp(static_cast<chrono::seconds>(t));
+      return time_point(duration_cast<duration>(from_tp.time_since_epoch()) + diff);
+    }
 
-
-
-    inline monotonic_clock::time_point now()
+    inline monotonic_clock::time_point monotonic_clock::now()
     {
       typedef ratio_multiply<ratio<100>, nano>::type systime_unit;
       typedef chrono::duration<ntl::nt::systime_t, systime_unit> systime_duration;

@@ -146,7 +146,7 @@ inline clock_t clock(void)
   return process_times ? (ntl::nt::query_system_time() - process_times->CreateTime) : clock_t(-1);
 }
 
-inline time_t time(time_t* timer = 0)
+inline time_t time(time_t* timer)
 {
   // Number of 100 nanosecond units from 1/1/1601 to 1/1/1970
   static const int64_t epoch_bias = 116444736000000000i64;
