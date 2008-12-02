@@ -206,10 +206,9 @@ class allocator
 
     __noalias
     __forceinline
-    T* __restrict allocate(size_type n, allocator<void>::const_pointer hint = 0)
+    T* __restrict allocate(size_type n, allocator<void>::const_pointer = 0)
       __ntl_throws(bad_alloc)
     {
-      (hint);
       const pointer p = reinterpret_cast<T*>(::operator new(sizeof(T) * n));
       __assume(p);
       return p;

@@ -145,6 +145,9 @@ template <class T> struct add_lvalue_reference<T&> { typedef T& type; };
 template <class T> struct add_rvalue_reference     { typedef T&& type; };
 template <class T> struct add_rvalue_reference<T&> { typedef T&& type; };
 template <class T> struct add_rvalue_reference<T&&>{ typedef T&& type; };
+#else
+template <class T> struct add_rvalue_reference     { typedef T& type; };
+template <class T> struct add_rvalue_reference<T&> { typedef T& type; };
 #endif
 
 template <class T> struct add_reference : add_lvalue_reference<T> {};
@@ -403,7 +406,7 @@ struct is_function : public false_type {};
 
 #include "tt_isfuncc.inl"
 
-#ifndef _M_X64
+#if !defined(_M_X64) && 0
 #define NTL_TT_CC __cdecl
 #include "tt_isfunc.inl"
 #undef  NTL_TT_CC
@@ -546,15 +549,8 @@ template <class T> struct is_signed
 : public integral_constant<bool, (static_cast<T>(-1) < 0)> {};
 _CHECK_TRAIT(is_signed<int>::value);
 
-#ifndef __ICL
-  template <class T> struct is_unsigned
-  //: public integral_constant<bool, (is_arithmetic<T>::value && T(-1) > T(0))> {};
-  : public integral_constant<bool, (static_cast<T>(-1) > 0)> {};
-#else
   template <class T> struct is_unsigned
     : public integral_constant<bool, (is_arithmetic<T>::value && !numeric_limits<T>::is_signed)> {};
-  //: public integral_constant<bool, (static_cast<T>(-1) > 0)> {};
-#endif
 _CHECK_TRAIT(is_unsigned<unsigned>::value);
 _CHECK_TRAIT(is_unsigned<float>::value == 0);
 
@@ -580,7 +576,7 @@ _CHECK_TRAIT(rank<int>::value == 0);
 _CHECK_TRAIT(rank<int[2]>::value == 1);
 _CHECK_TRAIT(rank<int[][4]>::value == 2);
 
-template <class T, unsigned I = 0> struct extent
+template <class T, unsigned I> struct extent
 : public integral_constant<size_t, 0> {};
 template <class T, unsigned I> struct extent<T[], I>
 : public integral_constant<size_t, extent<T, I-1>::value> {};
@@ -632,9 +628,6 @@ struct common_type<T, U, V...>
 };
 
 #else // NTL__CXX_VT
-
-template<class T, class U = void, class V = void, class W = void>
-struct common_type;
 
 template <class T>
 struct common_type<T, void, void, void>

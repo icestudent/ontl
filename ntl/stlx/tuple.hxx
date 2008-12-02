@@ -9,7 +9,7 @@
 
 #include "ext/ttl/typelist.hxx"
 
-namespace std 
+namespace std
 {
 
 /**\defgroup  lib_utilities *** 20 General utilities library [utilities] *****
@@ -34,7 +34,7 @@ namespace std
   struct tuple_element;
 
 
-  namespace __ 
+  namespace __
   {
     namespace meta = ttl::meta;
 
@@ -155,8 +155,8 @@ namespace std
     template<class Types, size_t i>
     struct rparam<Types, i, true> { typedef meta::empty_type type; };
 
-    struct rvtag {};
 #endif
+    struct rvtag {};
 
     template<class Typelist, size_t Idx = 0, bool empty = (Idx >= meta::length<Typelist>::value)>
     struct tuples
@@ -331,7 +331,7 @@ namespace std
         return t.head;
       }
       template<typename T>
-      static typename R get(const T& t)
+      static R get(const T& t)
       {
         return t.head;
       }
@@ -343,12 +343,14 @@ namespace std
   class tuple:
     public __::tuples<ttl::meta::typelist<T1,T2,T3> >
   {
+  public:
+    typedef ttl::meta::typelist<T1,T2,T3> types;
+  private:
     typedef __::rvtag rvtag;
     typedef __::tuples<types> base;
     typedef tuple<T1,T2,T3>   this_t;
-  public:
-    typedef ttl::meta::typelist<T1,T2,T3> types;
 
+  public:
     tuple()
     {}
 
@@ -539,7 +541,7 @@ namespace std
   template<typename T1, typename T2>
   inline typename __::tmap<T1,T2>::type make_tuple(const T1& p1, const T2& p2)
   {
-    return __::tmap<T1,T2,T3>::type (p1,p2);
+    return __::tmap<T1,T2>::type (p1,p2);
   }
   template<typename T1, typename T2, typename T3>
   inline typename __::tmap<T1,T2,T3>::type make_tuple(const T1& p1, const T2& p2, const T3& p3)

@@ -103,7 +103,7 @@ class vector
     ///\name construct/copy/destroy [23.2.6.1]
 
     explicit vector(const Allocator& a = Allocator())
-    : array_allocator(a), begin_(0), end_(0), capacity_(0) {}
+    : begin_(0), end_(0), capacity_(0), array_allocator(a) {}
 
     explicit vector(size_type n)
       :capacity_(n)
