@@ -77,6 +77,19 @@
 # define __w64
 #endif
 
+#ifdef __GNUC__
+ #define _cdecl    __attribute__((cdecl))
+ #define _stdcall  __attribute__((stdcall))
+ #define _fastcall __attribute__((fastcall))
+ #define __cdecl    _cdecl
+ #define __stdcall  _stdcall
+ #define __fastcall _fastcall
+
+ #define NTL__NORETURN __attribute__((noreturn))
+#else
+ #define NTL__NORETURN __declspec(noreturn)
+#endif
+
 #ifndef NTL__CRTCALL
 # ifdef NTL__STLX_FORCE_CDECL
   #ifdef _MSC_VER
@@ -96,6 +109,9 @@
   #elif defined(__BCPLUSPLUS__)
     #define NTL__EXTERNAPI extern "C" __declspec(dllimport) __declspec(nothrow)
     #define NTL__EXTERNVAR extern "C" __declspec(dllimport)
+  #elif defined(__GNUC__)
+    #define NTL__EXTERNAPI extern "C"
+    #define NTL__EXTERNVAR extern "C"
   #endif
 #endif
 
@@ -331,14 +347,13 @@
   #endif
   static_assert(alignof(int)==alignof(unsigned int), "wierd platform");
 
-    //static const char __func__[];
-    #ifndef __func__
-      #ifdef _MSC_VER
-        #define __func__ __FUNCSIG__
-      #else
-        #define __func__ __FUNC__
-      #endif
+  #ifndef __func__
+    #ifdef _MSC_VER
+      #define __func__ __FUNCSIG__
+    #else
+      #define __func__ __FUNC__
     #endif
+  #endif
 
   #ifndef __align
     #ifdef _MSC_VER
@@ -480,7 +495,7 @@ static_assert(sizeof(nullptr)==sizeof(void*), "3.9.1.10: sizeof(std::nullptr_t) 
 
 } //namespace std
 
-#ifdef __BCPLUSPLUS__
+#ifndef _MSC_VER
   using std::ptrdiff_t;
   using std::size_t;
 #endif

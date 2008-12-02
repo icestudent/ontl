@@ -63,7 +63,7 @@ class bad_exception : public exception
   terminate_handler set_terminate(terminate_handler f) __ntl_nothrow;
 
   /// terminate [18.7.3.3 terminate]
-  __declspec(noreturn)
+  NTL__NORETURN
   void terminate();
 
 

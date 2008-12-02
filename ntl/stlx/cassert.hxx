@@ -16,14 +16,16 @@
 
 
 #if defined NTL__DEBUG || !defined NDEBUG
-#ifdef _MSC_VER
+#if defined(_MSC_VER)
 #define __ntl_assert(__msg, __line)\
   { const char * volatile __assertion_failure; __assertion_failure = (__msg);\
     unsigned volatile __assertion_failure_at_line; __assertion_failure_at_line = (__line);\
     __debugbreak(); }
-#else
-NTL__EXTERNAPI void __stdcall DbgBreakPoint();
-#define __ntl_assert(__msg, __line) { DbgBreakPoint(); }
+#elif defined(__BCPLUSPLUS__)
+  NTL__EXTERNAPI void _stdcall DbgBreakPoint();
+  #define __ntl_assert(__msg, __line) { DbgBreakPoint(); }
+#elif defined(__GNUC__)
+  #define __ntl_assert(__msg, __line) {  }
 #endif // _MSC_VER
 #endif
 
@@ -31,7 +33,7 @@ NTL__EXTERNAPI void __stdcall DbgBreakPoint();
 #ifdef NTL__DEBUG
   #define _Assert(expr) \
     if ( !!(expr) ); else \
-    __ntl_assert("NTL Assertion ("#expr") failed in "__FUNCSIG__" //"__FILE__,__LINE__);\
+    __ntl_assert("NTL Assertion ("#expr") failed in "__func__" //"__FILE__,__LINE__);\
     ((void)0)
 #else
   #define _Assert(expr)
@@ -49,7 +51,7 @@ NTL__EXTERNAPI void __stdcall DbgBreakPoint();
 #else
   #define assert(expr) \
     if ( !!(expr) ); else \
-    __ntl_assert("Assertion ("#expr") failed in "__FUNCSIG__" //"__FILE__,__LINE__);\
+    __ntl_assert("Assertion ("#expr") failed in "__func__" //"__FILE__,__LINE__);\
     ((void)0)
 #endif
 
