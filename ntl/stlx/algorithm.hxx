@@ -369,7 +369,7 @@ BidirectionalIterator2
 
 /// 25.2.2 Swap [alg.swap]
 template<class T>
-//__forceinline
+inline
 void
   swap(T& a, T& b)
 {

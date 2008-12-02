@@ -89,6 +89,10 @@ bool operator>=(const T & x, const T & y) { return !(x < y); }
 #pragma endregion
 
 #pragma region pairs
+
+  template<class T>
+  inline void swap(T& a, T& b);
+
 /// Pairs [20.2.3 pairs]
 #pragma warning(push)
 // assignment operator could not be generated if either T is const
@@ -178,17 +182,13 @@ struct pair
     }
 
     void swap(pair&& p)
-    {
-      std::swap(first, p.first);
-      std::swap(second, p.second);
-    }
 #else
     void swap(pair& p)
+#endif
     {
       std::swap(first, p.first);
       std::swap(second, p.second);
     }
-#endif
 };
 #pragma warning(pop)
 
