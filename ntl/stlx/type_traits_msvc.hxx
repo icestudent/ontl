@@ -18,7 +18,6 @@ namespace std {
 
 template <class T, class U> struct is_same : false_type {};
 template <class T> struct is_same<T, T> : true_type {};
-_CHECK_TRAIT((is_same<volatile int, volatile int>::value));
 
 template <class Base, class Derived> struct is_base_of
 : public integral_constant<bool, __is_base_of(Base, Derived)> {};
@@ -33,32 +32,20 @@ template <class From, class To> struct is_convertible
 
 template <class T> struct remove_const              { typedef T type; };
 template <class T> struct remove_const<const T>     { typedef T type; };
-_CHECK_TRAIT((is_same<remove_const<volatile const int>::type, volatile int>::value));
-_CHECK_TRAIT((is_same<remove_const<const int>::type, const int>::value) == 0);
 
 template <class T> struct remove_volatile             { typedef T type; };
 template <class T> struct remove_volatile<volatile T> { typedef T type; };
-_CHECK_TRAIT((is_same<remove_volatile<volatile int>::type, volatile int>::value) == 0);
-_CHECK_TRAIT((is_same<remove_volatile<volatile const int>::type, const int>::value));
 
 template <class T> struct remove_cv                   { typedef T type; };
 template <class T> struct remove_cv<const T>          { typedef T type; };
 template <class T> struct remove_cv<volatile T>       { typedef T type; };
 template <class T> struct remove_cv<volatile const T> { typedef T type; };
-_CHECK_TRAIT((is_same<remove_cv<const int>::type, const int>::value) == 0);
-_CHECK_TRAIT((is_same<remove_cv<volatile int>::type, volatile int>::value) == 0);
-_CHECK_TRAIT((is_same<remove_cv<volatile const int>::type, int>::value));
 
 template <class T> struct add_const           { typedef const T type; };
-_CHECK_TRAIT((is_same<add_const<volatile int>::type, volatile const int>::value));
-_CHECK_TRAIT((is_same<add_const<int>::type, const int>::value));
 
 template <class T> struct add_volatile  { typedef volatile T type; };
-_CHECK_TRAIT((is_same<add_volatile<const int>::type, volatile const int>::value));
-_CHECK_TRAIT((is_same<add_volatile<int>::type, volatile int>::value));
 
 template <class T> struct add_cv { typedef const volatile T type; };
-_CHECK_TRAIT((is_same<add_cv<int>::type, volatile const int>::value));
 
 // 20.5.6.2 Reference modifications [meta.trans.ref]
 
@@ -66,8 +53,6 @@ template <class T> struct remove_reference     { typedef T type; };
 template <class T> struct remove_reference<T&> { typedef T type; };
 #ifdef NTL__CXX_RV
 template <class T> struct remove_reference<T&&> { typedef T type; };
-_CHECK_TRAIT((is_same<remove_reference<int&>::type, int&>::value) == 0);
-_CHECK_TRAIT((is_same<remove_reference<int&>::type, int>::value));
 #endif
 
 template <class T> struct add_lvalue_reference     { typedef T& type; };
@@ -77,8 +62,6 @@ template <class T> struct add_rvalue_reference     { typedef T&& type; };
 template <class T> struct add_rvalue_reference<T&> { typedef T&& type; };
 template <class T> struct add_rvalue_reference<T&&>{ typedef T&& type; };
 #endif
-_CHECK_TRAIT((is_same<add_lvalue_reference<int&>::type, int&>::value));
-_CHECK_TRAIT((is_same<add_lvalue_reference<int>::type, int&>::value));
 
 template <class T> struct add_reference : add_lvalue_reference<T> {};
 
@@ -91,32 +74,20 @@ template <class T> struct make_unsigned;
 template <class T> struct remove_extent { typedef T type; };
 template <class T> struct remove_extent<T[]> { typedef T type; };
 template <class T, size_t Size> struct remove_extent<T[Size]> { typedef T type; };
-_CHECK_TRAIT((is_same<remove_extent<int[][3]>::type, int[3]>::value));
-_CHECK_TRAIT((is_same<remove_extent<const int>::type, const int>::value));
-_CHECK_TRAIT((is_same<remove_extent<volatile int[]>::type, volatile int>::value));
-_CHECK_TRAIT((is_same<remove_extent<const volatile int[2]>::type, const volatile int>::value));
 
 template <class T> struct remove_all_extents { typedef T type; };
 template <class T> struct remove_all_extents<T[]>
   { typedef typename remove_all_extents<T>::type type; };
 template <class T, size_t Size> struct remove_all_extents<T[Size]>
   { typedef typename remove_all_extents<T>::type type; };
-_CHECK_TRAIT((is_same<remove_all_extents<int>::type, int>::value));
-_CHECK_TRAIT((is_same<remove_all_extents<int[2]>::type, int>::value));
-_CHECK_TRAIT((is_same<remove_all_extents<int[2][3]>::type, int>::value));
-_CHECK_TRAIT((is_same<remove_all_extents<int[][3][6]>::type, int>::value));
 
 // 20.5.6.5 Pointer modifications [meta.trans.ptr]
 
 template <class T> struct remove_pointer     { typedef T type; };
 template <class T> struct remove_pointer<T*> { typedef T type; };
-_CHECK_TRAIT((is_same<remove_pointer<const int*>::type, const int>::value));
-_CHECK_TRAIT((is_same<remove_pointer<int*>::type, int*>::value) == 0);
 
 template <class T> struct add_pointer     { typedef T* type; };
 template <class T> struct add_pointer<T&> { typedef typename remove_reference<T>::type* type; };
-_CHECK_TRAIT((is_same<add_pointer<volatile int>::type, volatile int*>::value));
-_CHECK_TRAIT((is_same<add_pointer<int*&>::type, int**>::value));
 
 // 20.5.7 Other transformations [meta.trans.other]
 
@@ -168,10 +139,7 @@ struct aligned_storage
 
 #pragma warning(pop)
 
-_CHECK_TRAIT(__alignof(aligned_storage<5, 8000>::type) == 8192);
-_CHECK_TRAIT(sizeof(aligned_storage<2, 4>::type) == 4);
-//_CHECK_TRAIT(sizeof(aligned_storage<2, 4>::type) == 2);
-
+//
 #ifdef NTL__CXX_VT
 template <std::size_t Len, class... Types> struct aligned_union;
 #endif
@@ -233,44 +201,28 @@ template <>        struct is_void<void>                : public true_type {};
 template <>        struct is_void<const void>          : public true_type {};
 template <>        struct is_void<volatile void>       : public true_type {};
 template <>        struct is_void<const volatile void> : public true_type {};
-_CHECK_TRAIT(is_void<void>::value);
-_CHECK_TRAIT(is_void<const void>::value);
-_CHECK_TRAIT(is_void<volatile void>::value);
-_CHECK_TRAIT(is_void<const volatile void>::value);
 
 template <class T> struct is_integral
 : public integral_constant<bool, numeric_limits<typename remove_cv<T>::type>::is_integer> {};
-_CHECK_TRAIT(is_integral<volatile const int>::value);
-_CHECK_TRAIT(is_integral<void>::value == false);
 
 template <class T> struct is_floating_point
 : public integral_constant<bool, numeric_limits<typename remove_cv<T>::type>::is_iec559> {};
-_CHECK_TRAIT(is_floating_point<double>::value);
-_CHECK_TRAIT(is_floating_point<int>::value == false);
 
 template <class T> struct is_array      : public false_type {};
 template <class T> struct is_array<T[]> : public true_type {};
-_CHECK_TRAIT(is_array<int>::value == false);
-_CHECK_TRAIT(is_array<int[][2]>::value);
 
 template <class T> struct is_pointer                    : public false_type {};
 template <class T> struct is_pointer<T*>                : public true_type {};
 template <class T> struct is_pointer<T* const>          : public true_type {};
 template <class T> struct is_pointer<T* volatile>       : public true_type {};
 template <class T> struct is_pointer<T* const volatile> : public true_type {};
-_CHECK_TRAIT(is_pointer<void*>::value);
-_CHECK_TRAIT(is_pointer<void* const>::value);
-_CHECK_TRAIT(is_pointer<void* volatile>::value);
-_CHECK_TRAIT(is_pointer<void* const volatile>::value);
 
 template <class T> struct is_lvalue_reference     : public false_type {};
 template <class T> struct is_lvalue_reference<T&> : public true_type {};
-_CHECK_TRAIT(is_lvalue_reference<volatile int&>::value);
 
 template <class T> struct is_rvalue_reference     : public false_type {};
 #ifdef NTL__CXX_RV
 template <class T> struct is_rvalue_reference<T&&>: public true_type {};
-_CHECK_TRAIT(is_rvalue_reference<volatile int&&>::value);
 #endif
 
 template <class T>
@@ -345,19 +297,6 @@ struct is_member_function_pointer : public false_type {};
 #undef NTL_TT_PCV
 #undef NTL_TT_TCV
 
-namespace test__impl {
-struct has_members
-{
-  //int m;
-  //void f(int);
-  _CHECK_TRAIT(is_member_object_pointer<int has_members::* const>::value);
-  //_CHECK_TRAIT(is_member_object_pointer<int *>::value == 0);
-  _CHECK_TRAIT(is_member_function_pointer<void (has_members::* volatile)()volatile>::value);
-  _CHECK_TRAIT(is_member_function_pointer<void (has_members::*)(int ...)const volatile>::value);
-  _CHECK_TRAIT(is_member_function_pointer<int (*)()>::value == 0);
-};
-}//namespace test__impl
-
 NTL__STLX_DEF_TRAIT(is_enum)
 
 NTL__STLX_DEF_TRAIT(is_union)
@@ -366,77 +305,27 @@ NTL__STLX_DEF_TRAIT(is_class)
 
 template <class T>
 struct is_function : public false_type {};
-template <class RT>
-struct is_function<RT()> : public true_type {};
-template <class RT>
-struct is_function<RT(...)> : public true_type {};
-template <class RT, class A1>
-struct is_function<RT(A1)> : public true_type {};
-template <class RT, class A1>
-struct is_function<RT(A1, ...)> : public true_type {};
-template <class RT, class A1, class A2>
-struct is_function<RT(A1, A2)> : public true_type {};
-template <class RT, class A1, class A2>
-struct is_function<RT(A1, A2, ...)> : public true_type {};
-template <class RT, class A1, class A2, class A3>
-struct is_function<RT(A1, A2, A3)> : public true_type {};
-template <class RT, class A1, class A2, class A3>
-struct is_function<RT(A1, A2, A3, ...)> : public true_type {};
-template <class RT, class A1, class A2, class A3, class A4>
-struct is_function<RT(A1, A2, A3, A4)> : public true_type {};
-template <class RT, class A1, class A2, class A3, class A4>
-struct is_function<RT(A1, A2, A3, A4, ...)> : public true_type {};
-template <class RT, class A1, class A2, class A3, class A4, class A5>
-struct is_function<RT(A1, A2, A3, A4, A5)> : public true_type {};
-template <class RT, class A1, class A2, class A3, class A4, class A5>
-struct is_function<RT(A1, A2, A3, A4, A5, ...)> : public true_type {};
-template <class RT, class A1, class A2, class A3, class A4, class A5, class A6>
-struct is_function<RT(A1, A2, A3, A4, A5, A6)> : public true_type {};
-template <class RT, class A1, class A2, class A3, class A4, class A5, class A6>
-struct is_function<RT(A1, A2, A3, A4, A5, A6, ...)> : public true_type {};
-template <class RT, class A1, class A2, class A3, class A4, class A5, class A6, class A7>
-struct is_function<RT(A1, A2, A3, A4, A5, A6, A7)> : public true_type {};
-template <class RT, class A1, class A2, class A3, class A4, class A5, class A6, class A7>
-struct is_function<RT(A1, A2, A3, A4, A5, A6, A7, ...)> : public true_type {};
-template <class RT, class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8>
-struct is_function<RT(A1, A2, A3, A4, A5, A6, A7, A8)> : public true_type {};
-template <class RT, class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8>
-struct is_function<RT(A1, A2, A3, A4, A5, A6, A7, A8, ...)> : public true_type {};
-template <class RT, class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8, class A9>
-struct is_function<RT(A1, A2, A3, A4, A5, A6, A7, A8, A9)> : public true_type {};
-template <class RT, class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8, class A9>
-struct is_function<RT(A1, A2, A3, A4, A5, A6, A7, A8, A9, ...)> : public true_type {};
-template <class RT, class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8, class A9, class A10>
-struct is_function<RT(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10)> : public true_type {};
-template <class RT, class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8, class A9, class A10>
-struct is_function<RT(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, ...)> : public true_type {};
-template <class RT, class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8, class A9, class A10, class A11>
-struct is_function<RT(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11)> : public true_type {};
-template <class RT, class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8, class A9, class A10, class A11>
-struct is_function<RT(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, ...)> : public true_type {};
-template <class RT, class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8, class A9, class A10, class A11, class A12>
-struct is_function<RT(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12)> : public true_type {};
-template <class RT, class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8, class A9, class A10, class A11, class A12>
-struct is_function<RT(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, ...)> : public true_type {};
-template <class RT, class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8, class A9, class A10, class A11, class A12, class A13>
-struct is_function<RT(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13)> : public true_type {};
-template <class RT, class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8, class A9, class A10, class A11, class A12, class A13>
-struct is_function<RT(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, ...)> : public true_type {};
-template <class RT, class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8, class A9, class A10, class A11, class A12, class A13, class A14>
-struct is_function<RT(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14)> : public true_type {};
-template <class RT, class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8, class A9, class A10, class A11, class A12, class A13, class A14>
-struct is_function<RT(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, ...)> : public true_type {};
-template <class RT, class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8, class A9, class A10, class A11, class A12, class A13, class A14, class A15>
-struct is_function<RT(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15)> : public true_type {};
-template <class RT, class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8, class A9, class A10, class A11, class A12, class A13, class A14, class A15>
-struct is_function<RT(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, ...)> : public true_type {};
-template <class RT, class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8, class A9, class A10, class A11, class A12, class A13, class A14, class A15, class A16>
-struct is_function<RT(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16)> : public true_type {};
-template <class RT, class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8, class A9, class A10, class A11, class A12, class A13, class A14, class A15, class A16>
-struct is_function<RT(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, ...)> : public true_type {};
-_CHECK_TRAIT(is_function<void()>::value);
-_CHECK_TRAIT(is_function<void(int, int, ...)>::value);
 
+#include "tt_isfuncc.inl"
+
+#ifndef _M_X64
+#define NTL_TT_CC __cdecl
+#include "tt_isfunc.inl"
+#undef  NTL_TT_CC
+#define NTL_TT_CC __stdcall
+#include "tt_isfunc.inl"
+#undef  NTL_TT_CC
+#define NTL_TT_CC __fastcall
+#include "tt_isfunc.inl"
+#undef  NTL_TT_CC
+#else
+#define NTL_TT_CC
+#include "tt_isfunc.inl"
+#undef  NTL_TT_CC
+#endif
+
+#ifdef _M_X64
+#endif
 
 template <class T> struct decay
 {
@@ -506,13 +395,9 @@ template <class T> struct is_compound
 
 template <class T> struct is_const          : public false_type {};
 template <class T> struct is_const<const T> : public true_type {};
-_CHECK_TRAIT(is_const<volatile int>::value == false);
-_CHECK_TRAIT(is_const<const int>::value);
 
 template <class T> struct is_volatile             : public false_type {};
 template <class T> struct is_volatile<volatile T> : public true_type {};
-_CHECK_TRAIT(is_volatile<const int>::value == false);
-_CHECK_TRAIT(is_volatile<volatile int>::value);
 
 namespace __ {
   template<class T> struct is_unknown_array: false_type {};
@@ -530,9 +415,6 @@ bool, is_scalar<typename remove_extent<T>::type>::value ||
       __is_pod(typename remove_extent<T>::type) // __is_pod will return false on fundamental types
     >
 {};
-_CHECK_TRAIT(is_pod<int>::value);
-_CHECK_TRAIT(!is_pod<void>::value && !is_pod<const void>::value);
-_CHECK_TRAIT(is_pod<int[]>::value);
 
 NTL__STLX_DEF_TRAIT(is_empty)
 
@@ -559,7 +441,6 @@ NTL__STLX_DEF_TRAIT(has_virtual_destructor)
 template <class T> struct is_signed
 //: public integral_constant<bool, (is_arithmetic<T>::value && T(-1) < T(0))> {};
 : public integral_constant<bool, (static_cast<T>(-1) < 0)> {};
-_CHECK_TRAIT(is_signed<int>::value);
 
 #ifndef __ICL
   template <class T> struct is_unsigned
@@ -570,8 +451,6 @@ _CHECK_TRAIT(is_signed<int>::value);
     : public integral_constant<bool, (is_arithmetic<T>::value && !numeric_limits<T>::is_signed)> {};
   //: public integral_constant<bool, (static_cast<T>(-1) > 0)> {};
 #endif
-_CHECK_TRAIT(is_unsigned<unsigned>::value);
-_CHECK_TRAIT(is_unsigned<float>::value == 0);
 
 template <class T> struct alignment_of
 : public integral_constant<size_t, alignof(T)> {};
@@ -583,17 +462,12 @@ template <>        struct alignment_of<volatile void>
 : public integral_constant<size_t, 0> {};
 template <>        struct alignment_of<const volatile void>
 : public integral_constant<size_t, 0> {};
-_CHECK_TRAIT(alignment_of<volatile int>::value == sizeof(int));
-_CHECK_TRAIT(alignment_of<void>::value == 0);
 
 template <class T> struct rank : public integral_constant<size_t, 0> {};
 template <class T> struct rank<T[]>
 : public integral_constant<size_t, rank<T>::value + 1> {};
 template <class T, size_t Size> struct rank<T[Size]>
 : public integral_constant<size_t, rank<T>::value + 1> {};
-_CHECK_TRAIT(rank<int>::value == 0);
-_CHECK_TRAIT(rank<int[2]>::value == 1);
-_CHECK_TRAIT(rank<int[][4]>::value == 2);
 
 template <class T, unsigned I> struct extent
 : public integral_constant<size_t, 0> {};
@@ -603,14 +477,6 @@ template <class T, unsigned I, size_t Size> struct extent<T[Size], I>
 : public integral_constant<size_t, extent<T, I-1>::value> {};
 template <class T, size_t Size> struct extent<T[Size], 0>
 : public integral_constant<size_t, Size> {};
-_CHECK_TRAIT(extent<int>::value == 0);
-_CHECK_TRAIT(extent<int[2]>::value == 2);
-_CHECK_TRAIT(extent<int[2][4]>::value == 2);
-_CHECK_TRAIT(extent<int[][4]>::value == 0);
-_CHECK_TRAIT((extent<int, 1>::value) == 0);
-_CHECK_TRAIT((extent<int[2], 1>::value) == 0);
-_CHECK_TRAIT((extent<int[2][4], 1>::value) == 4);
-_CHECK_TRAIT((extent<int[][4], 1>::value) == 4);
 
 template<class T> struct is_trivial
 : public integral_constant<
@@ -646,7 +512,7 @@ struct common_type<T, U, V...>
   typedef typename common_type<typename common_type<T, U>::type, V...>::type type;
 };
 
-#else // NTL__CXX
+#else // NTL__CXX_VT
 
 template<class T, class U, class V, class W>
 struct common_type;
@@ -664,11 +530,6 @@ struct common_type<T, U, void, void>
   static_assert(sizeof(T) > 0, "T shall be complete");
   static_assert(sizeof(T) > 0, "U shall be complete");
 
-#if 0
-  // TODO: replace this with promote algorithm
-  typedef typename <typename remove_cv<typename conditional<(sizeof(T) < sizeof(U)), T, U>::type>::type>::type type;
-
-#else
 private:
   typedef typename remove_cv<typename remove_reference<T>::type>::type rawT;
   typedef typename remove_cv<typename remove_reference<U>::type>::type rawU;
@@ -686,7 +547,6 @@ public:
         typename conditional<is_convertible<rawT,rawU>::value, rawU,
           typename conditional<is_convertible<rawU,rawT>::value, rawT, void>::type
                             >::type>::type>::type type;
-#endif
 };
 
 template<class T, class U, class V>
@@ -701,7 +561,7 @@ struct common_type
   typedef typename common_type<typename common_type<T, U, V>::type, W>::type type;
 };
 
-#endif
+#endif // NTL__CXX_VT
 
 }//namespace std
 

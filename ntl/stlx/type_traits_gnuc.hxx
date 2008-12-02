@@ -141,6 +141,11 @@ template <class T> struct remove_reference<T&&> { typedef T type; };
 
 template <class T> struct add_lvalue_reference     { typedef T& type; };
 template <class T> struct add_lvalue_reference<T&> { typedef T& type; };
+#ifdef NTL__CXX_RV
+template <class T> struct add_rvalue_reference     { typedef T&& type; };
+template <class T> struct add_rvalue_reference<T&> { typedef T&& type; };
+template <class T> struct add_rvalue_reference<T&&>{ typedef T&& type; };
+#endif
 
 template <class T> struct add_reference : add_lvalue_reference<T> {};
 
@@ -277,6 +282,10 @@ namespace __
 
 #endif // !fr3@K!
 // 20.5.4 Unary Type Traits [meta.unary]
+#define NTL__STLX_DEF_TRAIT(trait)\
+  template <class T> struct trait : public integral_constant<bool, __##trait(T)> {};
+#define NTL__STLX_DEF_TRAIT2(trait,builtin_trait)\
+  template <class T> struct trait : public integral_constant<bool, __##builtin_trait(T)> {};
 
 // 20.5.4.1 Primary Type Categories [meta.unary.cat]
 
@@ -383,29 +392,6 @@ struct is_member_function_pointer : public false_type {};
 #undef NTL_TT_PCV
 #undef NTL_TT_TCV
 
-namespace test__impl {
-struct has_members
-{
-  //int m;
-  //void f(int);
-  _CHECK_TRAIT(is_member_object_pointer<int has_members::* const>::value);
-  _CHECK_TRAIT(is_member_object_pointer<int *>::value == 0);
-  _CHECK_TRAIT(is_member_function_pointer<void (has_members::* volatile)()volatile>::value);
-  _CHECK_TRAIT(is_member_function_pointer<void (has_members::*)(int ...)const volatile>::value);
-  _CHECK_TRAIT(is_member_function_pointer<int (*)()>::value == 0);
-};
-
-}//namespace test__impl
-
-
-#if(0) // !fr3@K!
-// 20.5.4 Unary Type Traits [meta.unary]
-
-#define NTL__STLX_DEF_TRAIT(X)\
-  template <class T> struct X : public integral_constant<bool, __##X(T)> {};
-#define NTL__STLX_DEF_TRAIT2(X,Y)\
-  template <class T> struct X : public integral_constant<bool, __##Y(T)> {};
-
 NTL__STLX_DEF_TRAIT(is_enum)
 
 NTL__STLX_DEF_TRAIT(is_union)
@@ -414,74 +400,25 @@ NTL__STLX_DEF_TRAIT(is_class)
 
 template <class T>
 struct is_function : public false_type {};
-template <class RT>
-struct is_function<RT()> : public true_type {};
-template <class RT>
-struct is_function<RT(...)> : public true_type {};
-template <class RT, class A1>
-struct is_function<RT(A1)> : public true_type {};
-template <class RT, class A1>
-struct is_function<RT(A1, ...)> : public true_type {};
-template <class RT, class A1, class A2>
-struct is_function<RT(A1, A2)> : public true_type {};
-template <class RT, class A1, class A2>
-struct is_function<RT(A1, A2, ...)> : public true_type {};
-template <class RT, class A1, class A2, class A3>
-struct is_function<RT(A1, A2, A3)> : public true_type {};
-template <class RT, class A1, class A2, class A3>
-struct is_function<RT(A1, A2, A3, ...)> : public true_type {};
-template <class RT, class A1, class A2, class A3, class A4>
-struct is_function<RT(A1, A2, A3, A4)> : public true_type {};
-template <class RT, class A1, class A2, class A3, class A4>
-struct is_function<RT(A1, A2, A3, A4, ...)> : public true_type {};
-template <class RT, class A1, class A2, class A3, class A4, class A5>
-struct is_function<RT(A1, A2, A3, A4, A5)> : public true_type {};
-template <class RT, class A1, class A2, class A3, class A4, class A5>
-struct is_function<RT(A1, A2, A3, A4, A5, ...)> : public true_type {};
-template <class RT, class A1, class A2, class A3, class A4, class A5, class A6>
-struct is_function<RT(A1, A2, A3, A4, A5, A6)> : public true_type {};
-template <class RT, class A1, class A2, class A3, class A4, class A5, class A6>
-struct is_function<RT(A1, A2, A3, A4, A5, A6, ...)> : public true_type {};
-template <class RT, class A1, class A2, class A3, class A4, class A5, class A6, class A7>
-struct is_function<RT(A1, A2, A3, A4, A5, A6, A7)> : public true_type {};
-template <class RT, class A1, class A2, class A3, class A4, class A5, class A6, class A7>
-struct is_function<RT(A1, A2, A3, A4, A5, A6, A7, ...)> : public true_type {};
-template <class RT, class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8>
-struct is_function<RT(A1, A2, A3, A4, A5, A6, A7, A8)> : public true_type {};
-template <class RT, class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8>
-struct is_function<RT(A1, A2, A3, A4, A5, A6, A7, A8, ...)> : public true_type {};
-template <class RT, class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8, class A9>
-struct is_function<RT(A1, A2, A3, A4, A5, A6, A7, A8, A9)> : public true_type {};
-template <class RT, class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8, class A9>
-struct is_function<RT(A1, A2, A3, A4, A5, A6, A7, A8, A9, ...)> : public true_type {};
-template <class RT, class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8, class A9, class A10>
-struct is_function<RT(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10)> : public true_type {};
-template <class RT, class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8, class A9, class A10>
-struct is_function<RT(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, ...)> : public true_type {};
-template <class RT, class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8, class A9, class A10, class A11>
-struct is_function<RT(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11)> : public true_type {};
-template <class RT, class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8, class A9, class A10, class A11>
-struct is_function<RT(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, ...)> : public true_type {};
-template <class RT, class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8, class A9, class A10, class A11, class A12>
-struct is_function<RT(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12)> : public true_type {};
-template <class RT, class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8, class A9, class A10, class A11, class A12>
-struct is_function<RT(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, ...)> : public true_type {};
-template <class RT, class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8, class A9, class A10, class A11, class A12, class A13>
-struct is_function<RT(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13)> : public true_type {};
-template <class RT, class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8, class A9, class A10, class A11, class A12, class A13>
-struct is_function<RT(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, ...)> : public true_type {};
-template <class RT, class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8, class A9, class A10, class A11, class A12, class A13, class A14>
-struct is_function<RT(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14)> : public true_type {};
-template <class RT, class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8, class A9, class A10, class A11, class A12, class A13, class A14>
-struct is_function<RT(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, ...)> : public true_type {};
-template <class RT, class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8, class A9, class A10, class A11, class A12, class A13, class A14, class A15>
-struct is_function<RT(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15)> : public true_type {};
-template <class RT, class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8, class A9, class A10, class A11, class A12, class A13, class A14, class A15>
-struct is_function<RT(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, ...)> : public true_type {};
-template <class RT, class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8, class A9, class A10, class A11, class A12, class A13, class A14, class A15, class A16>
-struct is_function<RT(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16)> : public true_type {};
-template <class RT, class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8, class A9, class A10, class A11, class A12, class A13, class A14, class A15, class A16>
-struct is_function<RT(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, ...)> : public true_type {};
+
+#include "tt_isfuncc.inl"
+
+#ifndef _M_X64
+#define NTL_TT_CC __cdecl
+#include "tt_isfunc.inl"
+#undef  NTL_TT_CC
+#define NTL_TT_CC __stdcall
+#include "tt_isfunc.inl"
+#undef  NTL_TT_CC
+#define NTL_TT_CC __fastcall
+#include "tt_isfunc.inl"
+#undef  NTL_TT_CC
+#else
+#define NTL_TT_CC
+#include "tt_isfunc.inl"
+#undef  NTL_TT_CC
+#endif
+
 _CHECK_TRAIT(is_function<void()>::value);
 _CHECK_TRAIT(is_function<void(int, int, ...)>::value);
 
@@ -694,7 +631,7 @@ struct common_type<T, U, V...>
   typedef typename common_type<typename common_type<T, U>::type, V...>::type type;
 };
 
-#else // NTL__CXX
+#else // NTL__CXX_VT
 
 template<class T, class U = void, class V = void, class W = void>
 struct common_type;
@@ -712,11 +649,6 @@ struct common_type<T, U, void, void>
   static_assert(sizeof(T) > 0, "T shall be complete");
   static_assert(sizeof(T) > 0, "U shall be complete");
 
-#if 0
-  // TODO: replace this with promote algorithm
-  typedef typename <typename remove_cv<typename conditional<(sizeof(T) < sizeof(U)), T, U>::type>::type>::type type;
-
-#else
 private:
   typedef typename remove_cv<typename remove_reference<T>::type>::type rawT;
   typedef typename remove_cv<typename remove_reference<U>::type>::type rawU;
@@ -734,7 +666,6 @@ public:
         typename conditional<is_convertible<rawT,rawU>::value, rawU,
           typename conditional<is_convertible<rawU,rawT>::value, rawT, void>::type
                             >::type>::type>::type type;
-#endif
 };
 
 template<class T, class U, class V>
@@ -749,9 +680,7 @@ struct common_type
   typedef typename common_type<typename common_type<T, U, V>::type, W>::type type;
 };
 
-#endif
-
-#endif // !fr3@K!
+#endif // NTL__CXX_VT
 
 }//namespace std
 
