@@ -8,20 +8,11 @@
 #ifndef NTL__STLX_TYPE_TRAITS_BCB
 #define NTL__STLX_TYPE_TRAITS_BCB
 
+#ifndef NTL__IN_STLX_TYPE_TRAITS
+  #error Always include this file through <type_traits>.
+#endif
+
 namespace std {
-
-/// 20.5.3 Helper classes [meta.help]
-template <class T, T v>
-struct integral_constant
-{
-  static const T                  value = v;
-  typedef T                       value_type;
-  typedef integral_constant<T, v> type;
-};
-
-typedef integral_constant<bool, true>   true_type;
-typedef integral_constant<bool, false>  false_type;
-
 
 // 20.5.5 Relationships between types [meta.rel]
 
@@ -132,38 +123,38 @@ namespace __ { namespace aux {
 #define _NEXT_ALIGN(ty) typedef typename _Aligned<_Len, Align, ty, _FITS(ty)>::_Type _Type
 
 template<class _Ty, size_t _Len> union _Align_type
-	{	// union with size _Len bytes and alignment of _Ty
-	_Ty _Val;
-	char _Pad[_Len];
-	};
+  { // union with size _Len bytes and alignment of _Ty
+  _Ty _Val;
+  char _Pad[_Len];
+  };
 
 template<size_t _Len, size_t Align, class _Ty, bool _Ok>
-	struct _Aligned;
+  struct _Aligned;
 template<size_t _Len, size_t Align, class _Ty>
-	struct _Aligned<_Len, Align, _Ty, true>
-	{	// define type with size _Len and alignment _Ty
-	typedef _Align_type<_Ty, _Len> _Type;
-	};
+  struct _Aligned<_Len, Align, _Ty, true>
+  { // define type with size _Len and alignment _Ty
+  typedef _Align_type<_Ty, _Len> _Type;
+  };
 template<size_t _Len, size_t Align>
-	struct _Aligned<_Len, Align, long, false>
-	{	// define type with size _Len and alignment _Ty
-	typedef _Align_type<double, _Len> _Type;
-	};
+  struct _Aligned<_Len, Align, long, false>
+  { // define type with size _Len and alignment _Ty
+  typedef _Align_type<double, _Len> _Type;
+  };
 template<size_t _Len, size_t Align>
-	struct _Aligned<_Len, Align, int, false>
-	{	// define type with size _Len and alignment _Ty
-	_NEXT_ALIGN(long);
-	};
+  struct _Aligned<_Len, Align, int, false>
+  { // define type with size _Len and alignment _Ty
+  _NEXT_ALIGN(long);
+  };
 template<size_t _Len, size_t Align>
-	struct _Aligned<_Len, Align, short, false>
-	{	// define type with size _Len and alignment _Ty
-	_NEXT_ALIGN(int);
-	};
+  struct _Aligned<_Len, Align, short, false>
+  { // define type with size _Len and alignment _Ty
+  _NEXT_ALIGN(int);
+  };
 template<size_t _Len, size_t Align>
-	struct _Aligned<_Len, Align, char, false>
-	{	// define type with size _Len and alignment _Ty
-	_NEXT_ALIGN(short);
-	};
+  struct _Aligned<_Len, Align, char, false>
+  { // define type with size _Len and alignment _Ty
+  _NEXT_ALIGN(short);
+  };
 #undef _NEXT_ALIGN
 }} // __
 
@@ -437,7 +428,7 @@ private:
 
 public:
   /**
-   *	@brief rules of selecting the "common" type
+   *  @brief rules of selecting the "common" type
    *  1) if raw types (without qualificators) are equal, then select one of them, also raw (don't sure here)
    *  2) if one of types is convertible to other, select other type
    *  3) else place the void
@@ -465,7 +456,5 @@ struct common_type
 #endif
 
 }//namespace std
-
-#undef _CHECK_TRAIT
 
 #endif//#ifndef NTL__STLX_TYPE_TRAITS_BCB
