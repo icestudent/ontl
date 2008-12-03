@@ -19,13 +19,7 @@ namespace std
  *@{
  **/
 
-// for test purposes
-//#define SMALL_RATIO
-#ifdef __BCPLUSPLUS__
-# define SMALL_RATIO
-#endif
-
-#ifndef SMALL_RATIO
+#if _INTEGRAL_MAX_BITS > 64
   #define RATIO_MAX     LLONG_MAX
   #define RATIO_MIN     LLONG_MIN
   typedef intmax_t      ratio_t;
@@ -57,8 +51,7 @@ namespace std
 #if _INTEGRAL_MAX_BITS >= 128
   typedef ratio<1, 1000000000000000000000000> yocto; // see 20.3.4
   typedef ratio<1,    1000000000000000000000> zepto; // see 20.3.4
-#endif
-#ifndef SMALL_RATIO
+#elif _INTEGRAL_MAX_BITS > 64
   typedef ratio<1,       1000000000000000000> atto;   // 10^-18
   typedef ratio<1,          1000000000000000> femto;  // 10^-15
   typedef ratio<1,             1000000000000> pico;   // 10^-12
@@ -73,12 +66,11 @@ namespace std
   typedef ratio<                     1000, 1> kilo;   // 10^3
   typedef ratio<                  1000000, 1> mega;   // 10^6
   typedef ratio<               1000000000, 1> giga;   // 10^9
-#ifndef SMALL_RATIO
+#if _INTEGRAL_MAX_BITS > 64
   typedef ratio<            1000000000000, 1> tera;   // 10^12
   typedef ratio<         1000000000000000, 1> peta;   // 10^15
   typedef ratio<      1000000000000000000, 1> exa;    // 10^18
-#endif
-#if _INTEGRAL_MAX_BITS >= 128
+#elif _INTEGRAL_MAX_BITS >= 128
   typedef ratio<   1000000000000000000000, 1> zetta; // see 20.3.4
   typedef ratio<1000000000000000000000000, 1> yotta; // see 20.3.4
 #endif
