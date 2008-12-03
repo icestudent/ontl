@@ -595,6 +595,27 @@ namespace std
       typedef typename traits<found_type>::return_type type;
       typedef typename traits<typename add_const<found_type>::type>::return_type ctype;
     };
+
+    template<class T1, class T2>
+    struct tuple_pair
+    {
+      T1& get(pair<T1, T2>& p, meta::int2type<0>)
+      {
+        return p.first;
+      }
+      T2& get(pair<T1, T2>& p, meta::int2type<1>)
+      {
+        return p.second;
+      }
+      const T1& get(const pair<T1, T2>& p, meta::int2type<0>)
+      {
+        return p.first;
+      }
+      const T2& get(const pair<T1, T2>& p, meta::int2type<1>)
+      {
+        return p.second;
+      }
+    };
   }
 
   template<size_t I, typename T1>
@@ -639,6 +660,63 @@ namespace std
     return __::field<RT, I>::get(t);
   }
 
+  //////////////////////////////////////////////////////////////////////////
+  ///\name  Tuple interface to Pairs [20.2.3/27]
+
+  template <class T1, class T2> 
+  struct tuple_size<std::pair<T1, T2> >
+    :integral_constant<size_t, 2>
+  {};
+
+  template <size_t I, class T1, class T2>
+  struct tuple_element<I, std::pair<T1, T2> >; // undefined
+  template <class T1, class T2>
+  struct tuple_element<0, std::pair<T1, T2> > { typedef T1 type; };
+  template <class T1, class T2> 
+  struct tuple_element<1, std::pair<T1, T2> > { typedef T2 type; };
+
+  template<size_t I, class T1, class T2>
+  typename tuple_element<I, std::pair<T1, T2> >::type& get(std::pair<T1, T2>& p)
+  {
+    static_assert(I < 2, "I out of bounds");
+    return __::tuple_pair<T1, T2>::get(p, ttl::meta::int2type<I>());
+  }
+
+  template<size_t I, class T1, class T2> 
+  const typename tuple_element<I, std::pair<T1, T2> >::type& get(const std::pair<T1, T2>& p)
+  {
+    static_assert(I < 2, "I out of bounds");
+    return __::tuple_pair<T1, T2>::get(p, ttl::meta::int2type<I>());
+  }
+
+
+  //////////////////////////////////////////////////////////////////////////
+  ///\name  Tuple interface to class template array [23.2.1.6]
+
+  template <class T, size_t N> 
+  struct tuple_size<array<T, N> >: integral_constant<size_t, N>
+  {};
+
+  template <size_t I, class T, size_t N>
+  struct tuple_element<I, array<T, N> >
+  {
+    static_assert(I < N, "I out of bounds");
+    typedef T type;
+  };
+
+  template <size_t I, class T, size_t N>
+  T& get(array<T, N>& a)
+  {
+    static_assert(I < N, "I out of bounds");
+    return a[I];
+  }
+
+  template <size_t I, class T, size_t N>
+  const T& get(const array<T, N>& a)
+  {
+    static_assert(I < N, "I out of bounds");
+    return a[I];
+  }
 
 
  /**@} lib_tuple */
