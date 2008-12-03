@@ -133,15 +133,6 @@ namespace std
         get_deleter()(get()); 
     }
 
-
-#ifdef NTL__CXX_EF
-    // disable copy from lvalue
-    unique_ptr(const unique_ptr&) = delete;
-    template <class U, class E> unique_ptr(const unique_ptr<U, E>&) = delete;
-    unique_ptr& operator=(const unique_ptr&) = delete;
-    template <class U, class E> unique_ptr& operator=(const unique_ptr<U, E>&) = delete;
-#endif
-
     ///\name 20.7.11.2.3 unique_ptr assignment [unique.ptr.single.asgn]
     __forceinline
       unique_ptr& operator=(unique_ptr&& u) __ntl_nothrow
@@ -207,14 +198,11 @@ namespace std
 
     void set(T * p) { ptr = p; }
 
-#ifndef NTL__CXX_EF
     // disable copy from lvalue
-    unique_ptr(const unique_ptr&);
-    template <class U, class E> unique_ptr(const unique_ptr<U, E>&);
-    unique_ptr& operator=(const unique_ptr&);
-    template <class U, class E> unique_ptr& operator=(const unique_ptr<U, E>&);
-#endif
-
+    unique_ptr(const unique_ptr&) __deleted;
+    template <class U, class E> unique_ptr(const unique_ptr<U, E>&) __deleted;
+    unique_ptr& operator=(const unique_ptr&) __deleted;
+    template <class U, class E> unique_ptr& operator=(const unique_ptr<U, E>&) __deleted;
   };//template class unique_ptr
 
 
@@ -266,15 +254,6 @@ namespace std
       if ( get() )
         get_deleter()(get()); 
     }
-
-
-    #ifdef NTL__CXX_EF
-    // disable copy from lvalue
-    unique_ptr(const unique_ptr&) = delete;
-    template <class U, class E> unique_ptr(const unique_ptr<U, E>&) = delete;
-    unique_ptr& operator=(const unique_ptr&) = delete;
-    template <class U, class E> unique_ptr& operator=(const unique_ptr<U, E>&) = delete;
-    #endif
 
     ///\name 20.7.11.2.3 unique_ptr assignment [unique.ptr.single.asgn]
     __forceinline
@@ -336,14 +315,11 @@ namespace std
     pointer ptr;
     void set(T * p) { ptr = p; }
 
-    #ifndef NTL__CXX_EF
     // disable copy from lvalue
-    unique_ptr(const unique_ptr&);
-    template <class U, class E> unique_ptr(const unique_ptr<U, E>&);
-    unique_ptr& operator=(const unique_ptr&);
-    template <class U, class E> unique_ptr& operator=(const unique_ptr<U, E>&);
-    #endif
-
+    unique_ptr(const unique_ptr&) __deleted;
+    template <class U, class E> unique_ptr(const unique_ptr<U, E>&) __deleted;
+    unique_ptr& operator=(const unique_ptr&) __deleted;
+    template <class U, class E> unique_ptr& operator=(const unique_ptr<U, E>&) __deleted;
   };//template class unique_ptr
 
 
@@ -414,13 +390,6 @@ namespace std
         get_deleter()(get()); 
     }
 
-
-#ifdef NTL__CXX_EF
-    // disable copy from lvalue
-    unique_ptr(const unique_ptr&) = delete;
-    unique_ptr& operator=(const unique_ptr&) = delete;
-#endif
-
     ///\name 20.7.11.2.3 unique_ptr assignment [unique.ptr.single.asgn]
     __forceinline
       unique_ptr& operator=(unique_ptr&& u) __ntl_nothrow
@@ -475,11 +444,9 @@ namespace std
 
     void set(T * p) { ptr = p; }
 
-#ifndef NTL__CXX_EF
     // disable copy from lvalue
-    unique_ptr(const unique_ptr&);
-    unique_ptr& operator=(const unique_ptr&);
-#endif
+    unique_ptr(const unique_ptr&) __deleted;
+    unique_ptr& operator=(const unique_ptr&) __deleted;
 
     template<class Other> unique_ptr(Other*);
     template<class Other> void reset(Other*) const;
@@ -535,12 +502,6 @@ namespace std
       if ( get() )
         get_deleter()(get()); 
     }
-
-    #ifdef NTL__CXX_EF
-    // disable copy from lvalue
-    unique_ptr(const unique_ptr&) = delete;
-    unique_ptr& operator=(const unique_ptr&) = delete;
-    #endif
 
     ///\name 20.7.11.2.3 unique_ptr assignment [unique.ptr.single.asgn]
     __forceinline
@@ -601,11 +562,9 @@ namespace std
 
     void set(T * p) { ptr = p; }
 
-    #ifndef NTL__CXX_EF
     // disable copy from lvalue
-    unique_ptr(const unique_ptr&);
-    unique_ptr& operator=(const unique_ptr&);
-    #endif
+    unique_ptr(const unique_ptr&) __deleted;
+    unique_ptr& operator=(const unique_ptr&) __deleted;
 
     template<class Other> unique_ptr(Other*);
     template<class Other> void reset(Other*) const;
@@ -651,12 +610,6 @@ namespace std
       if ( get() )
         get_deleter()(get(), N); 
     }
-
-    #ifdef NTL__CXX_EF
-    // disable copy from lvalue
-    unique_ptr(const unique_ptr&) = delete;
-    unique_ptr& operator=(const unique_ptr&) = delete;
-    #endif
 
     ///\name 20.7.11.2.3 unique_ptr assignment [unique.ptr.single.asgn]
     __forceinline
@@ -718,11 +671,9 @@ namespace std
     pointer ptr;
     void set(T* p) { ptr = p; }
 
-    #ifndef NTL__CXX_EF
     // disable copy from lvalue
-    unique_ptr(const unique_ptr&);
-    unique_ptr& operator=(const unique_ptr&);
-    #endif
+    unique_ptr(const unique_ptr&) __deleted;
+    unique_ptr& operator=(const unique_ptr&) __deleted;
 
     template<class Other> unique_ptr(Other*);
     template<class Other> void reset(Other*) const;
@@ -903,13 +854,10 @@ namespace std
       set(r.release());
     }
 
-#ifdef NTL__CXX_EF
     /// 37 Effects: Equivalent to shared_ptr(r.release(), r.get_deleter())
     ///    when D is not a reference type,
     ///    otherwise shared_ptr(r.release(), ref(r.get_deleter())).
     /// 38 Exception safety: If an exception is thrown, the constructor has no effect.
-    template <class Y, class D> explicit shared_ptr(const unique_ptr<Y, D>& r) = delete;
-#endif
 
     template <class Y, class D> explicit shared_ptr(unique_ptr<Y, D>&& r)
     : base_type(r.release()) {/**/}
@@ -961,9 +909,6 @@ namespace std
       return *this;
     }
 
-#ifdef NTL__CXX_EF
-    template <class Y, class D> shared_ptr& operator=(const unique_ptr<Y, D>& r) = delete;
-#endif
     ///\name  20.7.12.2.4 shared_ptr modifiers [util.smartptr.shared.mod]
 
     /// 1 Effects: Exchanges the contents of *this and r.
@@ -1003,12 +948,20 @@ namespace std
 
     ///@}
 
-    ///////////////////////////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////////////
   private:
 
     void set(T * p) { base_type::set(p); }
     void free() { delete base_type::get(); }
 
+    template <class Y, class D> explicit shared_ptr(const unique_ptr<Y, D>& r) __deleted;
+    template <class Y, class D> shared_ptr& operator=(const unique_ptr<Y, D>& r) __deleted
+#ifndef NTL__CXX_EF
+    {
+      static_assert(false, "Use explicit move semantic instead of implicit copying.");
+    }
+#endif
+    ;
   };
 
   ///\name  20.7.12.2.6 shared_ptr creation [util.smartptr.shared.create]

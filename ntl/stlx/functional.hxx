@@ -246,10 +246,8 @@ class reference_wrapper:
     T* ptr;
 
     // do not bind to temporary objects
-    #if defined(NTL__CXX_EF)
-    explicit reference_wrapper(T&&) = delete; 
-    #elif defined(NTL__CXX_RV)
-    explicit reference_wrapper(T&&);
+    #if defined(NTL__CXX_RV)
+    explicit reference_wrapper(T&&) __deleted;
     #endif
 };
 

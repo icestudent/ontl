@@ -107,15 +107,9 @@ namespace std
         return this;
       }
 
-      #ifdef NTL__CXX_EF
-      base_mutex(const base_mutex&) = delete;
-      base_mutex& operator=(const base_mutex&) = delete;
-      #endif
     private:
-      #ifndef NTL__CXX_EF
-      base_mutex(const base_mutex&);
-      base_mutex& operator=(const base_mutex&);
-      #endif
+      base_mutex(const base_mutex&) __deleted;
+      base_mutex& operator=(const base_mutex&) __deleted;
     };
   }
 #endif
@@ -154,15 +148,9 @@ namespace std
       return period.count() == 0 ? try_lock() : ntl::nt::success( wait(period.count(), true) );
     }
 
-    #ifdef NTL__CXX_EF
-    timed_mutex(const timed_mutex&) = delete;
-    timed_mutex& operator=(const timed_mutex&) = delete;
-    #endif
   private:
-    #ifndef NTL__CXX_EF
-    timed_mutex(const timed_mutex&);
-    timed_mutex& operator=(const timed_mutex&);
-    #endif
+    timed_mutex(const timed_mutex&) __deleted;
+    timed_mutex& operator=(const timed_mutex&) __deleted;
   };
 
 
@@ -190,15 +178,9 @@ namespace std
       return period.count() == 0 ? try_lock() : ntl::nt::success( wait(period.count()), true );
     }
 
-#ifdef NTL__CXX_EF
-    recursive_timed_mutex(const recursive_timed_mutex&) = delete;
-    recursive_timed_mutex& operator=(const recursive_timed_mutex&) = delete;
-#endif
   private:
-    #ifndef NTL__CXX_EF
-    recursive_timed_mutex(const recursive_timed_mutex&);
-    recursive_timed_mutex& operator=(const recursive_timed_mutex&);
-    #endif
+    recursive_timed_mutex(const recursive_timed_mutex&) __deleted;
+    recursive_timed_mutex& operator=(const recursive_timed_mutex&) __deleted;
   };
 
 
@@ -224,17 +206,11 @@ namespace std
       m.unlock();
     }
     
-    #ifdef NTL__CXX_EF
-    lock_guard(lock_guard const&) = delete;
-    lock_guard& operator=(lock_guard const&) = delete;
-    #endif
   private:
     mutex_type& m;
 
-    #ifndef NTL__CXX_EF
-    lock_guard(lock_guard const&);
-    lock_guard& operator=(lock_guard const&);
-    #endif
+    lock_guard(lock_guard const&) __deleted;
+    lock_guard& operator=(lock_guard const&) __deleted;
   };
 
 
@@ -292,11 +268,6 @@ namespace std
       if(owns)
         m->unlock();
     }
-    
-    #ifdef NTL__CXX_EF
-    unique_lock(unique_lock const&) = delete;
-    unique_lock& operator=(unique_lock const&) = delete;
-    #endif
     
     unique_lock(unique_lock&& u) __ntl_nothrow
       :m(), owns(false)
@@ -380,10 +351,8 @@ namespace std
     mutex_type *m;
     bool owns;
 
-    #ifndef NTL__CXX_EF
-    unique_lock(unique_lock const&);
-    unique_lock& operator=(unique_lock const&);
-    #endif
+    unique_lock(unique_lock const&) __deleted;
+    unique_lock& operator=(unique_lock const&) __deleted;
   };
 
 
@@ -448,11 +417,6 @@ namespace std
       :inited_(false), locked_(unlocked)
     {}
 
-    #ifdef NTL__CXX_EF
-    once_flag(const once_flag&) = delete;
-    once_flag& operator=(const once_flag&) = delete;
-    #endif
-
     struct lock
     {
       inline
@@ -499,10 +463,8 @@ namespace std
     volatile uint32_t locked_;
     volatile uint32_t inited_;
 
-    #ifndef NTL__CXX_EF
-    once_flag(const once_flag&);
-    once_flag& operator=(const once_flag&);
-    #endif
+    once_flag(const once_flag&) __deleted;
+    once_flag& operator=(const once_flag&) __deleted;
   };
 
 #ifdef NTL__CXX_VT

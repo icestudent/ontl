@@ -372,6 +372,14 @@
 #endif//__cplusplus <= 199711L
 
 
+// explicit function definition
+#ifdef NTL__CXX_EF
+  #define __deleted = delete
+  #define __default = default
+#else
+  #define __deleted
+  #define __default
+#endif
 
 namespace std {
 

@@ -427,14 +427,10 @@ public:
   {
     __super::swap(rhs);
   }
-#ifdef NTL__CXX_EF
-  user_thread(const user_thread&) = delete;
-  user_thread& operator=(const user_thread&) = delete;
-#else
 private:
-  user_thread(const user_thread&);
-  user_thread& operator=(const user_thread&);
-#endif
+  user_thread(const user_thread&) __deleted;
+  user_thread& operator=(const user_thread&) __deleted;
+public:
 #else
   user_thread(user_thread& rhs)
   {

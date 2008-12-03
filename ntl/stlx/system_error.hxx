@@ -35,15 +35,7 @@ namespace std {
   {
   public:
     virtual ~error_category();
-#ifdef NTL__CXX_EF
-    error_category(const error_category&) = delete;
-    error_category& operator=(const error_category&) = delete;
-#else
   private:
-    error_category(const error_category&);
-    error_category& operator=(const error_category&);
-  public:
-#endif
     virtual const char* name() const = 0;
     virtual error_condition default_error_condition(int ev) const;
     virtual bool equivalent(int code, const error_condition& condition) const;
@@ -53,6 +45,9 @@ namespace std {
     bool operator==(const error_category& rhs) const;
     bool operator!=(const error_category& rhs) const;
     bool operator<(const error_category& rhs) const;
+  private:
+    error_category(const error_category&) __deleted;
+    error_category& operator=(const error_category&) __deleted;
   };
 
   /// 19.4.2 syserr.errcode
