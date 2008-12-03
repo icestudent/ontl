@@ -21,19 +21,6 @@ namespace std
   /**\addtogroup  lib_memory *************** 20.7 Memory [memory] **********************
   *@{*/
 
-  namespace __
-  {
-    template<typename T>
-    struct add_mutable
-    { typedef mutable T type; };
-    template<typename T>
-    struct add_mutable<mutable T>
-    { typedef mutable T type; };
-    template<typename T>
-    struct add_mutable<const T>
-    { typedef const T type; };
-  }
-
   /// 20.7.11 Class template unique_ptr [unique.ptr]
 
   ///\name 20.7.11.1 Default deleters [unique.ptr.dltr]
@@ -200,7 +187,11 @@ namespace std
     ///////////////////////////////////////////////////////////////////////////
   private:
     mutable pointer ptr;
-    typename __::add_mutable<deleter_type>::type deleter;
+#ifndef __GNUC__
+    typename conditional<is_const<deleter_type>::value, deleter_type, mutable deleter_type>::type deleter;
+#else
+    mutable deleter_type deleter;
+#endif
 
     void set(T * p) { ptr = p; }
 
@@ -431,7 +422,12 @@ namespace std
     ///////////////////////////////////////////////////////////////////////////
   private:
     mutable pointer ptr;
-    typename __::add_mutable<deleter_type>::type deleter;
+  #ifndef __GNUC__
+    typename conditional<is_const<deleter_type>::value, deleter_type, mutable deleter_type>::type deleter;
+  #else
+    mutable deleter_type deleter;
+  #endif
+
 
     void set(T * p) const  { ptr = p; }
 
