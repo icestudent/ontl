@@ -7,6 +7,7 @@
 #ifndef NTL__STLX_TUPLE
 #define NTL__STLX_TUPLE
 
+#include "array.hxx" // for tuple array access
 #include "ext/ttl/typelist.hxx"
 
 namespace std

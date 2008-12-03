@@ -523,6 +523,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\stlx\posix_error.hxx"
+						>
+					</File>
+					<File
 						RelativePath=".\stlx\stdexcept.hxx"
 						>
 					</File>
@@ -897,6 +901,10 @@
 				</File>
 				<File
 					RelativePath=".\nt\string.hxx"
+					>
+				</File>
+				<File
+					RelativePath=".\nt\system_error.hxx"
 					>
 				</File>
 				<File

@@ -67,4 +67,6 @@ typedef struct { } * va_list;
 
 }//namespace std
 
+using std::va_list;
+
 #endif//#ifndef NTL__STLX_CSTARG

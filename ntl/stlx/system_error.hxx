@@ -1,9 +1,9 @@
 /**\file*********************************************************************
-*                                                                     \brief
-*  19.4 System error support [syserr]
-*
-****************************************************************************
-*/
+ *                                                                     \brief
+ *  19.4 System error support [syserr]
+ *
+ ****************************************************************************
+ */
 #ifndef NTL__STLX_SYSTEM_ERROR
 #define NTL__STLX_SYSTEM_ERROR
 
@@ -11,10 +11,11 @@
 #include "stdexcept.hxx"
 #include "string.hxx"
 
-namespace std {
+namespace std 
+{
 
   /**
-   *	@group syserr System error support
+   *	@group syserr 19.4 System error support [syserr]
    *  @{
    **/
 
@@ -23,6 +24,9 @@ namespace std {
   class error_condition;
   class system_error;
 
+  extern const error_category& system_category;
+  extern const error_category& generic_category;
+
   template<class T>
   struct is_error_code_enum: public false_type {};
 
@@ -30,206 +34,362 @@ namespace std {
   struct is_error_condition_enum: public false_type {};
 
 
-  /// 19.4.1 syserr.errcat
+  /**
+   *	@brief 19.4.1 Class error_category [syserr.errcat]
+   *  The class error_category serves as a base class for types used to identify the source and encoding of a
+   *  particular category of error code.
+   **/
   class error_category
   {
+  protected:
+    error_category()
+    {}
   public:
-    virtual ~error_category();
-  private:
-    virtual const char* name() const = 0;
-    virtual error_condition default_error_condition(int ev) const;
-    virtual bool equivalent(int code, const error_condition& condition) const;
-    virtual bool equivalent(const error_code& code, int condition) const;
+    virtual ~error_category()
+    {}
+    
+    /** Returns a string naming the error category. */
+    virtual const char* name() const __ntl_nothrow = 0;
+
+    /** Returns a string that describes the error condition denoted by \c ev */
     virtual string message(int ev) const = 0;
 
-    bool operator==(const error_category& rhs) const;
-    bool operator!=(const error_category& rhs) const;
-    bool operator<(const error_category& rhs) const;
+    /**
+     *  @brief Returns an object of type error_condition that corresponds to ev.
+     *	@note  If the argument \c ev corresponds to a POSIX \c errno value \c posv, 
+     *  the function shall return \code error_condition(posv, generic_category) \endcode.
+     *  Otherwise, the function shall return \code error_condition(ev, system_category) \endcode.
+     **/
+    virtual error_condition default_error_condition(int ev) const __ntl_nothrow;
+
+    virtual bool equivalent(int code, const error_condition& condition) const __ntl_nothrow;
+    
+    virtual bool equivalent(const error_code& code, int condition) const __ntl_nothrow;
+
+    bool operator==(const error_category& rhs) const
+    {
+      return this == &rhs;
+    }
+    bool operator!=(const error_category& rhs) const
+    {
+      return !(this == &rhs);
+    }
+    bool operator<(const error_category& rhs) const __ntl_nothrow
+    {
+      return less<const error_category*>()(this, &rhs);
+    }
   private:
     error_category(const error_category&) __deleted;
     error_category& operator=(const error_category&) __deleted;
   };
 
-  /// 19.4.2 syserr.errcode
+  /**
+   *	@brief 19.4.2 Class error_code [syserr.errcode]
+   *  The class error_code describes an object used to hold error code values, such as those originating from the
+   *  operating system or other low-level application program interfaces.
+   *  @note Class error_code is an adjunct to error reporting by exception.
+   **/
   class error_code
   {
   public:
     // 19.4.2.2 constructors:
-    error_code();
-    error_code(int val, const error_category& cat);
+    error_code() __ntl_nothrow
+      :v(0), c(&system_category)
+    {}
+    error_code(int val, const error_category& cat) __ntl_nothrow
+      :v(val), c(&cat)
+    {}
 
     template <class ErrorCodeEnum>
-    error_code(ErrorCodeEnum e, typename enable_if<is_error_code_enum<ErrorCodeEnum>::value>::type * = 0);
+    error_code(ErrorCodeEnum e, typename enable_if<is_error_code_enum<ErrorCodeEnum>::value>::type * = 0) __ntl_nothrow
+    {
+      *this = make_error_code(e);
+    }
 
     // 19.4.2.3 modifers:
-    void assign(int val, const error_category& cat);
+    void assign(int val, const error_category& cat) __ntl_nothrow
+    {
+      v = val, c = &cat;
+    }
+
     template <class ErrorCodeEnum>
-    typename enable_if<is_error_code_enum<ErrorCodeEnum>::value>::type& operator=(ErrorCodeEnum e);
-    void clear();
+    typename enable_if<is_error_code_enum<ErrorCodeEnum>::value>::type& operator=(ErrorCodeEnum e) __ntl_nothrow
+    {
+      return *this = make_error_code(e);
+    }
+
+    void clear()
+    {
+      v = 0, c = &system_category;
+    }
 
     // 19.4.2.4 observers:
-    int value() const;
-    const error_category& category() const;
-    error_condition default_error_condition() const;
-    string message() const;
-    /*explicit */operator bool() const;
+    int value() const  __ntl_nothrow { return v; }
 
+    const error_category& category() const  __ntl_nothrow { return *c; }
+
+    error_condition default_error_condition() const  __ntl_nothrow;
+
+    string message() const { return c->message(v); }
+
+    /*explicit */operator bool() const  __ntl_nothrow { return v != 0; }
 private:
-    //int val_; // exposition only
-    //const error_category& cat_; // exposition only
+    int v;
+    const error_category* c;
   };
 
 
-  /// 19.4.3 syserr.errcondition
+  /**
+   *	@brief 19.4.3 Class error_condition [syserr.errcondition]
+   *  The class error_condition describes an object used to hold values identifying error conditions.
+   *  @note error_condition values are portable abstractions, while error_code values (19.4.2) are implementation specific.
+   **/
   class error_condition
   {
   public:
     // 19.4.3.2 constructors:
-    error_condition();
-    error_condition(int val, const error_category& cat);
+    error_condition() __ntl_nothrow
+      :v(0), c(&generic_category)
+    {}
+    
+    error_condition(int val, const error_category& cat) __ntl_nothrow
+      :v(val), c(&cat)
+    {}
+
     template <class ErrorConditionEnum>
-    error_condition(ErrorConditionEnum e, typename enable_if<is_error_condition_enum<ErrorConditionEnum>::value>::type* = 0);
+    error_condition(ErrorConditionEnum e, typename enable_if<is_error_condition_enum<ErrorConditionEnum>::value>::type* = 0) __ntl_nothrow
+    {
+      *this = make_error_condition(e);
+    }
 
     // 19.4.3.3 modifers:
-    void assign(int val, const error_category& cat);
+    void assign(int val, const error_category& cat) __ntl_nothrow
+    {
+      v = val, c = &cat;
+    }
+
     template<typename ErrorConditionEnum>
-    typename enable_if<is_error_condition_enum<ErrorConditionEnum>::value, error_code>::type& operator= (ErrorConditionEnum e);
-    void clear();
+    typename enable_if<is_error_condition_enum<ErrorConditionEnum>::value, error_code>::type& operator= (ErrorConditionEnum e) __ntl_nothrow
+    {
+      return *this = make_error_code(e);
+    }
+
+    void clear() __ntl_nothrow
+    {
+      v = 0, c = &generic_category;
+    }
 
     // 19.4.3.4 observers:
-    int value() const;
-    const error_category& category() const;
-    string message() const;
-    /*explicit */operator bool() const;
+    int value() const __ntl_nothrow { return v; }
 
+    const error_category& category() const __ntl_nothrow { return *c; }
+
+    string message() const  __ntl_nothrow { return c->message(v); }
+
+    /*explicit */operator bool() const __ntl_nothrow { return v != 0; }
   private:
-    //int val_; // exposition only
-    //const error_category& cat_; // exposition only
+    int v;
+    const error_category* c;
   };
 
-  // 19.4.3.5 non-member functions:
-  bool operator<(const error_condition& lhs, const error_condition& rhs);
-
-
-  /// 19.4.5.1 syserr.syserr
-  class system_error : public runtime_error
+  /**
+   *	@brief 19.4.5 Class system_error [syserr.syserr]
+   *  The class system_error describes an exception object used to report error conditions that have an associated error code. 
+   *  Such error conditions typically originate from the operating system or other low-level application program interfaces.
+   **/
+  class system_error:
+    public runtime_error
   {
+  protected:
+    error_code ec;
+    mutable string msg;
   public:
-    system_error(error_code ec, const string& what_arg);
-    system_error(error_code ec);
-    system_error(int ev, const error_category& ecat,
-      const string& what_arg);
-    system_error(int ev, const error_category& ecat);
-    const error_code& code() const __ntl_nothrow;
-    const char* what() const __ntl_nothrow;
+    system_error(error_code ec, const string& what_arg)
+      :runtime_error(what_arg), ec(ec)
+    {}
+    system_error(error_code ec, const char* what_arg)
+      :runtime_error(what_arg), ec(ec)
+    {}
+    system_error(error_code ec)
+      :runtime_error(""), ec(ec)
+    {}
+    system_error(int ev, const error_category& ecat, const string& what_arg)
+      :runtime_error(what_arg), ec(ev, ecat)
+    {}
+    system_error(int ev, const error_category& ecat, const char* what_arg)
+      :runtime_error(what_arg), ec(ev, ecat)
+    {}
+    system_error(int ev, const error_category& ecat)
+      :runtime_error(""), ec(ev, ecat)
+    {}
+
+    const error_code& code() const __ntl_nothrow { return ec; }
+
+    /** Returns a NTBS incorporating messages of the runtime_error and error_code. */
+    const char* what() const __ntl_nothrow
+    {
+      if (msg.empty()) {
+        __ntl_try
+        {
+          string tmp = runtime_error::what();
+          if (ec) {
+            if (!tmp.empty() && tmp != "")
+              tmp += ": ";
+            tmp += ec.message();
+          }
+          msg = move(tmp);
+        }
+        __ntl_catch(...) {
+          return runtime_error::what();
+        }
+      }
+      return msg.c_str();
+    }
   };
 
 
-
-  // 19.4.4 Comparison operators:
-  bool operator==(const error_code& lhs, const error_code& rhs);
-  bool operator==(const error_code& lhs, const error_condition& rhs);
-  bool operator==(const error_condition& lhs, const error_code& rhs);
-  bool operator==(const error_condition& lhs, const error_condition& rhs);
-  bool operator!=(const error_code& lhs, const error_code& rhs);
-  bool operator!=(const error_code& lhs, const error_condition& rhs);
-  bool operator!=(const error_condition& lhs, const error_code& rhs);
-  bool operator!=(const error_condition& lhs, const error_condition& rhs);
-
-
-  namespace posix_error 
+  //////////////////////////////////////////////////////////////////////////
+  // 19.4.2.5 non-member functions:
+  inline error_condition error_category::default_error_condition(int ev) const __ntl_nothrow
   {
-    enum posix_errno {
-      address_family_not_supported, // EAFNOSUPPORT
-      address_in_use, // EADDRINUSE
-      address_not_available, // EADDRNOTAVAIL
-      already_connected, // EISCONN
-      argument_list_too_long, // E2BIG
-      argument_out_of_domain, // EDOM
-      bad_address, // EFAULT
-      bad_file_descriptor, // EBADF
-      bad_message, // EBADMSG
-      broken_pipe, // EPIPE
-      connection_aborted, // ECONNABORTED
-      connection_already_in_progress, // EALREADY
-      connection_refused, // ECONNREFUSED
-      connection_reset, // ECONNRESET
-      cross_device_link, // EXDEV
-      destination_address_required, // EDESTADDRREQ
-      device_or_resource_busy, // EBUSY
-      directory_not_empty, // ENOTEMPTY
-      executable_format_error, // ENOEXEC
-      file_exists, // EEXIST
-      file_too_large, // EFBIG
-      filename_too_long, // ENAMETOOLONG
-      function_not_supported, // ENOSYS
-      host_unreachable, // EHOSTUNREACH
-      identifier_removed, // EIDRM
-      illegal_byte_sequence, // EILSEQ
-      inappropriate_io_control_operation, // ENOTTY
-      interrupted, // EINTR
-      invalid_argument, // EINVAL
-      invalid_seek, // ESPIPE
-      io_error, // EIO
-      is_a_directory, // EISDIR
-      message_size, // EMSGSIZE
-      network_down, // ENETDOWN
-      network_reset, // ENETRESET
-      network_unreachable, // ENETUNREACH
-      no_buffer_space, // ENOBUFS
-      no_child_process, // ECHILD
-      no_link, // ENOLINK
-      no_lock_available, // ENOLCK
-      no_message_available, // ENODATA
-      no_message, // ENOMSG
-      no_protocol_option, // ENOPROTOOPT
-      no_space_on_device, // ENOSPC
-      no_stream_resources, // ENOSR
-      no_such_device_or_address, // ENXIO
-      no_such_device, // ENODEV
-      no_such_file_or_directory, // ENOENT
-      no_such_process, // ESRCH
-      not_a_directory, // ENOTDIR
-      not_a_socket, // ENOTSOCK
-      not_a_stream, // ENOSTR
-      not_connected, // ENOTCONN
-      not_enough_memory, // ENOMEM
-      not_supported, // ENOTSUP
-      operation_canceled, // ECANCELED
-      operation_in_progress, // EINPROGRESS
-      operation_not_permitted, // EPERM
-      operation_not_supported, // EOPNOTSUPP
-      operation_would_block, // EWOULDBLOCK
-      owner_dead, // EOWNERDEAD
-      permission_denied, // EACCES
-      protocol_error, // EPROTO
-      protocol_not_supported, // EPROTONOSUPPORT
-      read_only_file_system, // EROFS
-      resource_deadlock_would_occur, // EDEADLK
-      resource_unavailable_try_again, // EAGAIN
-      result_out_of_range, // ERANGE
-      state_not_recoverable, // ENOTRECOVERABLE
-      stream_timeout, // ETIME
-      text_file_busy, // ETXTBSY
-      timed_out, // ETIMEDOUT
-      too_many_files_open_in_system, // ENFILE
-      too_many_files_open, // EMFILE
-      too_many_links, // EMLINK
-      too_many_symbolic_link_levels, // ELOOP
-      value_too_large, // EOVERFLOW
-      wrong_protocol_type, // EPROTOTYPE
-    };
-  } // namespace posix_error
+    return error_condition(ev, *this);
+  }
+
+  inline error_condition error_code::default_error_condition() const  __ntl_nothrow
+  {
+    return c->default_error_condition(v); 
+  }
+
+  inline bool error_category::equivalent(int code, const error_condition& condition) const __ntl_nothrow
+  {
+    return default_error_condition(code) == condition;
+  }
+
+  inline bool error_category::equivalent(const error_code& code, int condition) const __ntl_nothrow
+  {
+    return *this == code.category() && code.value() == condition;
+  }
+
+  inline bool operator<(const error_code& lhs, const error_code& rhs) __ntl_nothrow
+  {
+    return lhs.category() < rhs.category() || lhs.category() == rhs.category() && lhs.value() < rhs.value();
+  }
   
-  template <> struct is_error_condition_enum<posix_error::posix_errno>
-  : public true_type {};
-
-  namespace posix_error
+  // 19.4.3.5 non-member functions:
+  inline bool operator<(const error_condition& lhs, const error_condition& rhs) __ntl_nothrow
   {
-    error_code make_error_code(posix_errno e);
-    error_condition make_error_condition(posix_errno e);
-  } // namespace posix_error
+    return lhs.category() < rhs.category() || lhs.category() == rhs.category() && lhs.value() < rhs.value();
+  }
+
+  // 19.4.4 Comparison operators [syserr.compare]
+  inline bool operator==(const error_code& lhs, const error_code& rhs) __ntl_nothrow
+  {
+    return lhs.category() == rhs.category() && lhs.value() == rhs.value();
+  }
+
+  inline bool operator==(const error_code& lhs, const error_condition& rhs) __ntl_nothrow
+  {
+    return lhs.category().equivalent(lhs.value(), rhs) || rhs.category().equivalent(lhs, rhs.value());
+  }
+
+  inline bool operator==(const error_condition& lhs, const error_code& rhs) __ntl_nothrow
+  {
+    return rhs.category().equivalent(rhs.value(), lhs) || lhs.category().equivalent(rhs, lhs.value());
+  }
+
+  inline bool operator==(const error_condition& lhs, const error_condition& rhs) __ntl_nothrow
+  {
+    return lhs.category() == rhs.category() && lhs.value() == rhs.value();
+  }
+
+  inline bool operator!=(const error_code& lhs, const error_code& rhs) __ntl_nothrow
+  {
+    return !(lhs == rhs);
+  }
+
+  inline bool operator!=(const error_code& lhs, const error_condition& rhs) __ntl_nothrow
+  {
+    return !(lhs == rhs);
+  }
+
+  inline bool operator!=(const error_condition& lhs, const error_code& rhs) __ntl_nothrow
+  {
+    return !(lhs == rhs);
+  }
+
+  inline bool operator!=(const error_condition& lhs, const error_condition& rhs) __ntl_nothrow
+  {
+    return !(lhs == rhs);
+  }
+
+
+  //////////////////////////////////////////////////////////////////////////
+  namespace __ 
+  {
+    /// 19.4.1.5 Error category objects [syserr.errcat.objects]
+    class generic_error_category:
+      public error_category
+    {
+    public:
+      /** Returns a string naming the error category ("generic") */
+      const char *name() const __ntl_nothrow { return "generic"; }
+
+      virtual string message(int ev) const;
+
+      error_condition default_error_condition(int ev) const __ntl_nothrow
+      {
+        return error_condition(ev, *this);
+      }
+
+      bool equivalent(int code, const error_condition& condition) const __ntl_nothrow
+      {
+        return default_error_condition(code) == condition;
+      }
+
+      bool equivalent(const error_code& code, int condition) const __ntl_nothrow
+      {
+        return *this == code.category() && code.value() == condition;
+      }
+    };
+
+    class system_error_category:
+      public error_category
+    {
+    public:
+      /** Returns a string naming the error category ("system") */
+      const char *name() const __ntl_nothrow { return "system"; }
+
+      virtual string message(int ev) const;
+
+      /**
+       *	If the argument \c ev corresponds to a POSIX \c errno value \c posv, 
+       *  the function shall return \code error_condition(posv, generic_category) \endcode.
+       *  Otherwise, the function shall return \code error_condition(ev, system_category) \endcode.
+       **/
+      error_condition default_error_condition(int ev) const __ntl_nothrow;
+      bool equivalent(int code, const error_condition& condition) const __ntl_nothrow
+      {
+        return default_error_condition(code) == condition;
+      }
+
+      bool equivalent(const error_code& code, int condition) const __ntl_nothrow
+      {
+        return *this == code.category() && code.value() == condition;
+      }
+    };
+  }
+  //////////////////////////////////////////////////////////////////////////
+  /// 19.4.1.5 Error category objects [syserr.errcat.objects]
+  /** Returns a reference to an object of a type derived from class error_category. */
+  const error_category& get_generic_category();
+  //static const error_category& generic_category = get_generic_category();
+
+  const error_category& get_system_category();
+  //static const error_category& system_category = get_system_category();
 
   /** @} syserr */
 } // std
+
+#include "posix_error.hxx"
+
 #endif // NTL__STLX_SYSTEM_ERROR
