@@ -71,12 +71,12 @@ namespace std
     extern const native_error_category& native_category;
     const native_error_category& get_native_category();
 
-    error_code make_error_code(native_error::ntstatus st)
+    inline error_code make_error_code(native_error::ntstatus st)
     {
       return error_code(static_cast<int>(st), native_error::native_category);
     }
 
-    error_condition make_error_condition(native_error::ntstatus st)
+    inline error_condition make_error_condition(native_error::ntstatus st)
     {
       return error_condition(static_cast<int>(st), native_error::native_category);
     }

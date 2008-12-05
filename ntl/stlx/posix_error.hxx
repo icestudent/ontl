@@ -99,22 +99,26 @@ namespace std
       value_too_large, // EOVERFLOW
       wrong_protocol_type, // EPROTOTYPE
     };
+
+    /// 19.4.2.6 Class error_code non-member functions [syserr.errcode.nonmembers]
+    inline error_code make_error_code(posix_error::posix_errno e)
+    {
+      return error_code(static_cast<int>(e), generic_category);
+    }
+
+    inline error_condition make_error_condition(posix_error::posix_errno e)
+    {
+      return error_condition(static_cast<int>(e), generic_category);
+    }
+
   } // namespace posix_error
 
   template <> struct is_error_condition_enum<posix_error::posix_errno>
   : public true_type {};
 
 
-  /// 19.4.2.6 Class error_code non-member functions [syserr.errcode.nonmembers]
-  inline error_code make_error_code(posix_error::posix_errno e)
-  {
-    return error_code(static_cast<int>(e), generic_category);
-  }
-
-  inline error_condition make_error_condition(posix_error::posix_errno e)
-  {
-    return error_condition(static_cast<int>(e), generic_category);
-  }
+  using posix_error::make_error_code;
+  using posix_error::make_error_condition;
 
   /** @} syserr */
 }
