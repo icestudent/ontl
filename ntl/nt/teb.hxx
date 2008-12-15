@@ -63,9 +63,9 @@ struct peb;
 /// @note mapped at fs:0x00
 struct tib
 {
-  /* 0x00 */  exception_registration  * ExceptionList;
+  /* 0x00 */  exception_registration  * ExceptionList;/// teb32 on x64
   /* 0x04 */  void                    * StackBase;    ///< upper stack address
-  /* 0x08 */  void                    * StackLimit;  ///< lower stack address
+  /* 0x08 */  void                    * StackLimit;   ///< lower stack address
   /* 0x0C */  void                    * SubSystemTib;
               union
               {
@@ -214,7 +214,7 @@ struct teb: public tib
 
 #ifdef _M_X64
   static __forceinline
-    teb & instance32() { return *reinterpret_cast<teb*>( uintptr_t(get(&tib::Self)) + 0x4096); }
+    teb & instance32() { return *reinterpret_cast<teb*>( get(&tib::ExceptionList) ); }
 #endif
 
   // common part

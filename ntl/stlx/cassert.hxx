@@ -44,7 +44,7 @@
 #undef assert
 #ifdef NDEBUG
 # ifdef _MSC_VER
-  #define assert(expr) (__assume(expr))
+  #define assert(expr)// (__assume(expr))
 # else
   #define assert(expr) ((void)0)
 # endif
