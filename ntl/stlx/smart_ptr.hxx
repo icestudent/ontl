@@ -1116,7 +1116,11 @@ namespace std
   }
 #endif
 
-  ///\name  D.9 auto_ptr [depr.auto.ptr]
+  /**\ingroup std_depr
+   *@{*/
+
+  /**\defgroup depr_autoptr D.9 auto_ptr [depr.auto.ptr]
+   *@*/
 
   template<class X> class auto_ptr;
 
@@ -1191,14 +1195,15 @@ namespace std
     template<class Y>
     operator auto_ptr<Y>()      __ntl_nothrow { return auto_ptr<Y>(release()); }
 
-    ///@}
-
     ///////////////////////////////////////////////////////////////////////////
   private:
 
     X * ptr;
     void set(X * p) { ptr = p; }
   };
+
+  /**@} depr_autoptr */
+  /**@} std_depr */
 
   /**@} lib_memory */
   /**@} lib_utilities */

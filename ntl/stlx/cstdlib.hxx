@@ -254,7 +254,7 @@ namespace ntl
 {
 
   /**
-   *	@brief Ñ++ static initialization
+   *	@brief C++ static initialization
    *	@param[in] init initialization or termination flag
    *  @sa crt_initializer
    *

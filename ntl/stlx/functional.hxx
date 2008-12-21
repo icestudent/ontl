@@ -578,6 +578,9 @@ namespace placeholders {
 #pragma endregion
 
 #pragma region lib_binders
+/**\ingroup std_depr
+ *@{*/
+
 /**\defgroup  lib_binders ************** D.8 Binders [depr.lib.binders] ******************
  *@{
  */
@@ -654,6 +657,7 @@ binder2nd<Operation>
 
 /**@} lib_binders
  */
+/**@} std_depr */
 #pragma endregion
 
 #pragma region lib_adaptors
@@ -1013,7 +1017,7 @@ namespace __
 #endif
 }
 
-/// floating point hash function implementation
+// TODO: floating point hash function implementation
 
 /**@} lib_hash
  */

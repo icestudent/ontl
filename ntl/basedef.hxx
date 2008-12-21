@@ -1,6 +1,6 @@
 /**\file*********************************************************************
  *                                                                     \brief
- *
+ *  Native Template Library types
  *
  ****************************************************************************
  */
@@ -18,7 +18,7 @@ namespace std {
   template <class T, class Allocator> class vector;
 } // std
 
-/// NT Native Template Lybrary
+/// Native Template Lybrary
 namespace ntl {
 
 /**\addtogroup  ntative_types ********** NT Native Types ********************

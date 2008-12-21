@@ -20,6 +20,8 @@
 
 namespace ntl {
 
+/**\addtogroup  winapi_types_support *** Win32 API support library **********
+ *@{*/
 /**\addtogroup  application ****** Application support library **************
  *@{*/
 
@@ -45,7 +47,7 @@ int _Winapp_entry()
 
 
 /**@} application */
-
+/**@} winapi_types_support */
 
 }//namespace ntl
 

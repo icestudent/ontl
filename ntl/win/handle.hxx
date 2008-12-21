@@ -14,6 +14,8 @@
 
 namespace ntl {
 namespace win {
+/**\addtogroup  winapi_types_support *** Win32 API support library **********
+ *@{*/
 
 
 using nt::legacy_handle;
@@ -93,7 +95,7 @@ legacy_handle duplicate(legacy_handle handle)
 
 typedef basic_handle<legacy_handle, aux::close, aux::duplicate> handle;
 
-
+/**@} winapi_types_support */
 }//namespace win
 }//namespace ntl
 

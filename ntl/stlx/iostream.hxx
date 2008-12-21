@@ -18,10 +18,10 @@
 
 namespace std {
 
-/**\addtogroup  lib_input_output ******* [27] Input/output library [input.output] **********
+/**\addtogroup  lib_input_output ******* 27 Input/output library [input.output] **********
  *@{*/
 
-///\name  Standard iostream objects [27.3 lib.iostream.objects]
+///\name  27.3 Standard iostream objects [lib.iostream.objects]
 extern istream  cin;
 extern ostream  cout;
 extern ostream  cerr;

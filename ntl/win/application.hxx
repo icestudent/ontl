@@ -15,6 +15,8 @@
 
 namespace ntl {
 namespace win {
+/**\addtogroup  winapi_types_support *** Win32 API support library **********
+ *@{*/
 
 #pragma comment(lib,    "kernel32.lib")
 
@@ -38,10 +40,6 @@ void __stdcall
     );
 
 
-/**\addtogroup  win_application *** Win32 Application support library *******
- *@{*/
-
-
 #if defined(UNICODE) || defined(_UNICODE)
 typedef wchar_t tchar_t;
 #else
@@ -51,6 +49,8 @@ typedef char    tchar_t;
 
 typedef pe::image * hinstance;
 
+/**\addtogroup  application ****** Application support library **************
+*@{*/
 
 template<class charT>
 class application
@@ -187,7 +187,7 @@ application<wchar_t>::command_line::get()
 }
 
 
-/**@} win_application */
+/**@} application */
 
 typedef application<char>::startupinfo    startupinfoa;
 typedef application<wchar_t>::startupinfo startupinfow;
@@ -210,7 +210,7 @@ void startupinfow::get()
 {
   GetStartupInfoW(this);
 }
-
+/**@} winapi_types_support */
 }//namespace win
 }//namespace ntl
 

@@ -15,6 +15,13 @@
 namespace std 
 {
 
+/**\defgroup  std_depr **************** C++ Standard Compatibility features [depr]
+ *
+ * This Clause describes features of the C++ Standard that are specified for compatibility with existing implementations.
+ * These are deprecated features, where deprecated is defined as: Normative for the current edition of the
+ * Standard, but not guaranteed to be part of the Standard in future revisions.
+ **/
+
 /**\defgroup  lib_utilities *** 20 General utilities library [utilities]
  *
  *    Components used by other elements of the Standard C + + library.

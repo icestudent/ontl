@@ -18,6 +18,8 @@
 
 namespace ntl {
 namespace win {
+/**\addtogroup  winapi_types_support *** Win32 API support library **********
+ *@{*/
 
 
 typedef const struct _opaque { } * legacy_sc_handle;
@@ -231,6 +233,7 @@ class service_control
 
 };//template class service_control
 
+/**@} winapi_types_support */
 }//namespace win
 }//namespace ntl
 

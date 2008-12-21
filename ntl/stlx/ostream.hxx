@@ -15,13 +15,13 @@
 
 namespace std {
 
-/**\addtogroup  lib_input_output ******* [27] Input/output library [input.output] **********
+/**\addtogroup  lib_input_output ******* 27 Input/output library [input.output]
  *@{*/
 
-/**\addtogroup  lib_iostream_format **** [27.6] Formatting and manipulators *
+/**\addtogroup  lib_iostream_format **** 27.6 Formatting and manipulators
  *@{*/
 
-/**\addtogroup  lib_output_streams ***** [27.6.2] Output streams ************
+/**\addtogroup  lib_output_streams ***** 27.6.2 Output streams
  *@{*/
 
 /// 27.6.2.1 Class template basic_ostream [ostream].
@@ -210,7 +210,7 @@ class basic_ostream
 
     basic_ostream<charT, traits>& operator<<(const void* p);
 
-    ///\name  basic_ostream::operator<< [27.6.2.5.3 lib.ostream.inserters]
+    ///\name  27.6.2.5.3 basic_ostream::operator<< [lib.ostream.inserters]
 
     basic_ostream<charT, traits>&
       operator<<(basic_ostream<charT, traits>& (*pf)(basic_ostream<charT, traits>&))
@@ -308,7 +308,7 @@ class basic_ostream
 
 };// class basic_ostream
 
-///\name  Character inserter function templates [27.6.2.5.4 lib.ostream.inserters.character]
+///\name  27.6.2.5.4 Character inserter function templates [lib.ostream.inserters.character]
 
 template<class charT, class traits>
 basic_ostream<charT, traits>&
@@ -356,7 +356,7 @@ template<class traits>
 basic_ostream<char, traits>&
 operator<<(basic_ostream<char, traits>&, const unsigned char*);
 
-///\name  Standard basic_ostream manipulators [27.6.2.7 lib.ostream.manip]
+///\name  27.6.2.7 Standard basic_ostream manipulators [lib.ostream.manip]
 
 template <class charT, class traits>
 inline

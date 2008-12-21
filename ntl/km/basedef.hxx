@@ -34,7 +34,7 @@ namespace ntl {
 
   }//namespace intrinsic
 
-
+/// Kernel-mode subsystem library
 namespace km {
 
 #ifndef SYSTEM_CACHE_ALIGNMENT_SIZE

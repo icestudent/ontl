@@ -12,6 +12,8 @@
 #include "../nt/teb.hxx"
 
 namespace ntl {
+
+/// Win32 Application support
 namespace win {
 
 /**\addtogroup  winapi_types_support *** Win32 API support library **********

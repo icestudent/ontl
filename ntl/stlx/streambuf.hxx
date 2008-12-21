@@ -18,9 +18,9 @@
 
 namespace std {
 
-/**\addtogroup  lib_input_output ******* [27] Input/output library [input.output] **********
+/**\addtogroup  lib_input_output ******* 27 Input/output library [input.output]
  *@{*/
-/**\addtogroup  lib_stream_buffers ***** [27.5] Stream buffers **************
+/**\addtogroup  lib_stream_buffers ***** 27.5 Stream buffers
  *@{*/
 
 /// 27.5.2 Class template basic_streambuf<charT,traits> [streambuf]

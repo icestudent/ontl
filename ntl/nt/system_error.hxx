@@ -69,7 +69,11 @@ namespace std
     };
 
     extern const native_error_category& native_category;
-    const native_error_category& get_native_category();
+    
+    inline const native_error_category& get_native_category()
+    {
+      return native_category;
+    }
 
     inline error_code make_error_code(native_error::ntstatus st)
     {
@@ -171,7 +175,10 @@ namespace ntl { namespace nt {
         re.resize(mre->Length+1);
         ansi_string as(re);
         st = RtlUnicodeStringToAnsiString(&as, &cus, false);
-        re.resize(std::char_traits<char>::length(as.data()));
+        if(success(st))
+          re.resize(std::char_traits<char>::length(as.data()));
+        else
+          re.clear();
       }else{
         re.assign((const char*)mre->Text, mre->Length);
       }

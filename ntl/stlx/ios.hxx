@@ -18,7 +18,7 @@
 
 namespace std {
 
-/**\addtogroup  lib_input_output ******* [27] Input/output library [input.output] **********
+/**\addtogroup  lib_input_output ******* 27 Input/output library [input.output] **********
  *@{*/
 
 ///\name  27.4.1 Types [stream.types]
@@ -442,7 +442,7 @@ class basic_ios : public ios_base
 
 };
 
-/**\addtogroup  lib_std_ios_manip ****** [27.4.5] ios_base manipulators *****
+/**\addtogroup  lib_std_ios_manip ****** 27.4.5 ios_base manipulators *****
  *@{*/
 
 ///\name  27.4.5.1 fmtflags manipulators [fmtflags.manip]

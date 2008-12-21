@@ -8,6 +8,11 @@
 #ifndef NTL__NT_BASEDEF
 #define NTL__NT_BASEDEF
 
+// VC compiler always under NT and for NT
+#ifdef _MSC_VER
+# define NTL__SUBSYSTEM_NT
+#endif
+
 #include "status.hxx"
 #include "../basedef.hxx"
 #include "../stdlib.hxx"
@@ -23,6 +28,7 @@ namespace ntl {
     class image;
   }
 
+  /// Native subsystem library
   namespace nt {
 
     /**\addtogroup  native_types_support *** NT Types support library ***********

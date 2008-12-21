@@ -21,15 +21,20 @@ namespace ntl {
         RtlPcToFileHeader(const void *PcValue, void **pBaseOfImage);
 #endif
   }
+
+  /// Portable Executable images support
   namespace pe {
 
 #pragma warning(push)
 #pragma warning(disable:4820) // 'X' bytes padding added after data member
 #pragma warning(disable:4347) // behavior change: va<>() is called instead of va()
 
-    /**\addtogroup  pe_images_support *** Portable Executable images support*****
+    /**\addtogroup  pe_images_support *** Portable Executable images support
     *@{*/
 
+    /**
+     *	@brief Portable Executable image support
+     **/
     class image
     {
       ///////////////////////////////////////////////////////////////////////////
@@ -1302,3 +1307,4 @@ next_entry:;
 }//namespace ntl
 
 #endif//#ifndef NTL__PE_IMAGE
+asm
