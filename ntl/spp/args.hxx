@@ -88,9 +88,11 @@
 
 /**
  *	@brief Produces comma-separated function parameters of type A
- *  @example
- *  NTL_SPP_AARGS(1,2,a)
- *  'A1 a1, A2 p2'
+ *  Example:
+ *  \code
+    NTL_SPP_AARGS(1,2,a)
+    'A1 a1, A2 p2'
+    \endcode
  **/
 #define NTL_SPP_AARGS(init, count, ArgName) \
   NTL_SPP_IF(count) \

@@ -65,11 +65,23 @@ namespace ntl
   }
 }
 
+//////////////////////////////////////////////////////////////////////////
 int _cdecl atexit(vfv_t func)
 {
   return onexit(func) ? 0 : -1;
 }
 
+//////////////////////////////////////////////////////////////////////////
+#ifdef _MSC_VER
+extern "C" int _purecall(void)
+{
+  assert(!"pure virtual function called!");
+  abort();
+  return 0;
+}
+#endif
+
+//////////////////////////////////////////////////////////////////////////
 #if defined NTL__DEBUG || !defined NDEBUG
 extern "C" {
   char __assertion_failure_buf[4096];

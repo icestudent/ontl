@@ -83,7 +83,8 @@ struct iterator
 
 /**\addtogroup lib_std_iterator_operations ** 24.3.4 Iterator operations [iterator.operations] ****
 *@{*/
-namespace __impl {
+namespace __
+{
 
 template<class InputIterator, class Distance>
 static inline
@@ -159,16 +160,16 @@ typename iterator_traits<RandomIterator>::difference_type
   return last - first;
 }
 
-}//namespace __impl
+} //namespace __
 
-///\name  24.3.4 Iterator operations [iterator.operations]
+//\name  24.3.4 Iterator operations [iterator.operations]
 
 template<class AnyIterator, class Distance>
 inline
 void
   advance(AnyIterator& i, Distance n)
 {
-  __impl::advance(i, n, iterator_traits<AnyIterator>::iterator_category());
+  __::advance(i, n, iterator_traits<AnyIterator>::iterator_category());
 }
 
 template <class AnyIterator>
@@ -176,7 +177,7 @@ inline
 typename iterator_traits<AnyIterator>::difference_type
   distance(AnyIterator first, AnyIterator last)
 {
-  return __impl::distance(first, last,
+  return __::distance(first, last,
                           iterator_traits<AnyIterator>::iterator_category());
 }
 
@@ -198,9 +199,10 @@ InputIterator
   return x;
 }
 
-///@}
+/**@} lib_std_iterator_operations */
 
-/**\addtogroup lib_std_predef_iterators ** 24.4 Predefined iterators [predef.iterators] ****
+
+/**\addtogroup lib_std_predef_iterators ** 24.4 Predefined iterators [predef.iterators]
 *@{*/
 
 /// 24.4.1 Reverse iterators [lib.reverse.iterators]
@@ -445,9 +447,11 @@ insert_iterator<Container>
 {
   return insert_iterator<Container>( x, typename Container::iterator( i ) );
 }
+/**@}*/
 
 
-// 24.5, stream iterators:
+/**\addtogroup lib_istream_iterator ** 24.5 Stream iterators [stream.iterators]
+*@{*/
 
 /// 24.5.1 Class template istream_iterator [lib.istream.iterator]
 template <class T,

@@ -16,7 +16,7 @@
 
 namespace std
 {
-  /**\addtogroup  lib_utilities ********** 20 General utilities library [utilities] *****
+  /**\addtogroup  lib_utilities ********** 20 General utilities library [utilities]
   *@{*/
   /**\addtogroup  lib_memory *************** 20.7 Memory [memory] **********************
   *@{*/

@@ -595,6 +595,14 @@
 						>
 					</File>
 					<File
+						RelativePath=".\stlx\placeholders.hxx"
+						>
+					</File>
+					<File
+						RelativePath=".\stlx\regex.hxx"
+						>
+					</File>
+					<File
 						RelativePath=".\stlx\result_of.hxx"
 						>
 					</File>
@@ -1036,6 +1044,18 @@
 						>
 						<Tool
 							Name="MASM"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath=".\rtl\syserr.cpp"
+					>
+					<FileConfiguration
+						Name="debug|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
 						/>
 					</FileConfiguration>
 				</File>

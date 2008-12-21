@@ -9,6 +9,7 @@
 #define NTL__STLX_STRING
 
 #include "cwchar.hxx"
+#include "cuchar.hxx"
 #include "iosfwd.hxx"
 /* */
 #include "cstring.hxx"
@@ -1342,17 +1343,32 @@ basic_istream<charT,traits>&
 
 typedef basic_string<char>    string;
 typedef basic_string<wchar_t> wstring;
+typedef basic_string<char16_t> u16string;
+typedef basic_string<char32_t> u32string;
 
 
-#if 0
+//////////////////////////////////////////////////////////////////////////
+//hash specializations for basic_string:
+namespace __
+{
+  template<typename T> struct string_hash;
 
-#if CHAR_MIN == 0
-typedef signed char utf8char_t;
-#else
-typedef unsigned char utf8char_t;
-#endif
+  /// basic_string<> hash implementation
+  template <class charT, class traits, class Allocator>
+  struct string_hash<basic_string<charT, traits, Allocator> >: unary_function<basic_string<charT, traits, Allocator>, size_t>
+  {
+    /// string hash calculation
+    inline size_t operator()(const argument_type& str) const __ntl_nothrow
+    {
+      return FNVHash()(str.data(), str.length()*sizeof(charT));
+    }
+  };
+}
 
-#endif
+template <> struct hash<std::string>: __::string_hash<std::string>{};
+template <> struct hash<std::wstring>: __::string_hash<std::wstring>{};
+template <> struct hash<std::u16string>: __::string_hash<std::u16string>{};
+template <> struct hash<std::u32string>: __::string_hash<std::u32string>{};
 
 ///@}
 /**@} lib_strings */

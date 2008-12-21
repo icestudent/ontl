@@ -12,15 +12,16 @@
 #include "functional.hxx"
 
 /// Standard Template Library
-namespace std {
+namespace std 
+{
 
-/**\defgroup  lib_utilities *** 20 General utilities library [utilities] *****
+/**\defgroup  lib_utilities *** 20 General utilities library [utilities]
  *
  *    Components used by other elements of the Standard C + + library.
  *@{
  */
 
-/**\defgroup  lib_utility ************** 20.2 Utility components [utility] **********
+/**\defgroup  lib_utility ***** 20.2 Utility components [utility]
  *
  *    basic function and class templates that are used throughout
  *    the rest of the library.
@@ -28,9 +29,13 @@ namespace std {
  */
 
 #pragma region operators
-/// 20.2.1 Operators [operators]
-/// 1 To avoid redundant definitions of operator!= out of operator== and
-///   operators >, <=, and >= out of operator<, the library provides the following:
+  /**
+   *  @brief Relation operators
+   *
+   *	20.2.1 Operators [operators]\n
+   *	To avoid redundant definitions of <tt>operator!=</tt> out of <tt>operator==</tt> and
+   *	<tt>operators ></tt>, <tt><=</tt>, and <tt>>=</tt> out of <tt>operator<</tt>, the library provides the following:
+   **/
 namespace rel_ops {
 
 template<class T> inline

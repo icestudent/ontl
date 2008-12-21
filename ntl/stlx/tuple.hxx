@@ -13,24 +13,28 @@
 namespace std
 {
 
-/**\defgroup  lib_utilities *** 20 General utilities library [utilities] *****
+/**\defgroup  lib_utilities *** 20 General utilities library [utilities]
  *
  *    Components used by other elements of the Standard C + + library.
  *@{
  */
 
-/**\defgroup  lib_tuple ************** 20.4 Tuples [tuple] **********
+/**\defgroup  lib_tuple ******* 20.4 Tuples [tuple]
  *
  *   Tuple library that provides a tuple type as the class template tuple that can
  *   be instantiated with any number of arguments.
  *@{
  */
+
+  /// 20.4.1 Class template tuple [tuple.tuple]
   template<typename T1 = ttl::meta::empty_type, typename T2 = ttl::meta::empty_type, typename T3 = ttl::meta::empty_type>
   class tuple;
 
+  /// 20.4.1.4 Tuple helper classes [tuple.helper]
   template<typename T1 = ttl::meta::empty_type, typename T2 = ttl::meta::empty_type, typename T3 = ttl::meta::empty_type>
   struct tuple_size;
 
+  /// 20.4.1.4 Tuple helper classes [tuple.helper]
   template<size_t I, typename T1 = ttl::meta::empty_type, typename T2 = ttl::meta::empty_type, typename T3 = ttl::meta::empty_type>
   struct tuple_element;
 

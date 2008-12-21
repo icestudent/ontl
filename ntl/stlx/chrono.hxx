@@ -15,21 +15,25 @@
 
 namespace std
 {
-/**\defgroup  lib_utilities *** 20 General utilities library [utilities] *****
- *
- *    Components used by other elements of the Standard C + + library.
- *@{
- **/
-
+  /// Chrono library
   namespace chrono
   {
+    /**\addtogroup  lib_utilities *** 20 General utilities library [utilities]
+    *@{
+    **/
+    /**\defgroup  lib_chrono ***** 20.8 Time utilities [time]
+     *
+     *   This subclause describes the chrono library that provides generally useful time utilities.
+     *@{
+     */
+
     template <class Rep, class Period = ratio<1> > class duration;
     template <class Clock, class Duration = typename Clock::duration> class time_point;
 
     // Clocks
     class system_clock;
 
-    /// convenience typedefs
+    // convenience typedefs
     typedef duration<int64_t, nano>        nanoseconds;
     typedef duration<int64_t, micro>       microseconds;
     typedef duration<int64_t, milli>       milliseconds;
@@ -400,6 +404,7 @@ namespace std
 
     /**
      *	@brief Class template time_point [20.8.4 time.point]
+     *
      *  A time_point represents a point in time, as opposed to a duration of time.
      *  Another way of saying the same thing, is that a time_point represents an epoch plus or minus a duration.
 
@@ -545,6 +550,7 @@ namespace std
 
     /**
      *	@brief Class system_clock [20.8.5.1 time.clock.system]
+     *
      *  Objects of class system_clock represent wall clock time from the system-wide realtime clock.
      **/
     class system_clock
@@ -591,6 +597,7 @@ namespace std
 
     /**
      *	@brief Class monotonic_clock [20.8.5.2 time.clock.monotonic]
+     *
      *  Objects of class monotonic_clock represent clocks for which values of time_point never decrease as physical time
      *  advances.
      *
@@ -622,6 +629,7 @@ namespace std
 #if 0
     /**
      *	@brief Class high_resolution_clock [20.8.5.3 time.clock.hires]
+     *
      *  Objects of class high_resolution_clock represent clocks with the shortest tick period.
      **/
     class high_resolution_clock
@@ -691,9 +699,11 @@ namespace std
     }
 
 #endif
+
+    /**@} lib_chrono */
+    /**@} lib_utilities */
   } // namespace chrono
 
-  /**@} lib_utilities */
 } // namespace std
 
 #endif // NTL__STLX_CHRONO

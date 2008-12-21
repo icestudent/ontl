@@ -54,6 +54,14 @@ unsigned long int
 NTL__CRTCALL
   strtoul(const char * __restrict nptr, char ** __restrict endptr, int base);
 
+// C library extension
+char* 
+NTL__CRTCALL
+  _itoa(int value, char* strbuf, int radix);
+
+wchar_t* 
+NTL__CRTCALL
+  _itow(int value, wchar_t* strbuf, int radix);
 
 ///\name  7.20.2 Pseudo-random sequence generation functions
 
@@ -244,8 +252,39 @@ extern vfv_t* __xc_z[];
 
 namespace ntl
 {
+
+  /**
+   *	@brief Ñ++ static initialization
+   *	@param[in] init initialization or termination flag
+   *  @sa crt_initializer
+   *
+   *  This function initializes and destroys the C++ static objects. It must be called before and after the main program code runs.
+   *  For example:
+   \code
+   int main()
+   {
+      ntl::__init_crt(true);
+      int ret_code = do_main_work();
+      ntl::__init_crt(false);
+      return ret_code;
+   }
+   \endcode
+   **/
   void _cdecl __init_crt(bool init);
 
+  /**
+   *	@brief C++ static initialization helper
+   *
+   *  This class helps to initialize the C++ static objects initialization and destruction. For usage see following code:
+   *  @sa __init_crt
+   \code
+   int main()
+   {
+      ntl::crt_initializer __crt;
+      return do_main_work();
+   }
+   \endcode
+   **/
   struct crt_initializer
   {
     crt_initializer()

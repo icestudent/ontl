@@ -20,11 +20,30 @@
 
 namespace std
 {
+ /**\defgroup  lib_utilities *** 20 General utilities library [utilities]
+  *
+  *    Components used by other elements of the Standard C + + library.
+  *@{
+  **/
+
+ /**\defgroup  lib_typetraits ** 20.5 Metaprogramming and type traits [meta]
+  *
+  * This subclause describes components used by C++ programs, particularly in templates, to support the
+  * widest possible range of types, optimise template code usage, detect type related user errors, and perform
+  * type inference and transformation at compile time.
+  *
+  * It includes type classification traits, type property inspection traits, and type transformations.\n
+  * The type classification traits describe a complete taxonomy of all possible C++ types, and state 
+  * where in that taxonomy a given type belongs.
+  * The type property inspection traits allow important characteristics of types or of combinations of types to be inspected.
+  * The type transformations allow certain properties of types to be manipulated.
+  *@{
+  */
 
 namespace __
 {
   struct sfinae_small { char x; };
-  struct sfinae_big   { long x[10]; };
+  struct sfinae_big   { char x[2]; };
 
   typedef sfinae_small  sfinae_passed_tag;
   typedef sfinae_big    sfinae_failed_tag;
@@ -150,6 +169,9 @@ struct check_meta_unary_cat
 };
 
 } // namespace __
+
+/**@} lib_typetraits */
+/**@} lib_utilities */
 } // namespace std
 
 

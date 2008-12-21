@@ -352,7 +352,7 @@ private:
 
 public:
   /**
-   *  @brief rules of selecting the "common" type
+   *  rules of selecting the "common" type
    *  1) if raw types (without qualificators) are equal, then select one of them, also raw (don't sure here)
    *  2) if one of types is convertible to other, select other type
    *  3) else place the void

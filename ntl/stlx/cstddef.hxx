@@ -77,6 +77,14 @@
 # define __w64
 #endif
 
+#ifndef __GNUC__
+  #ifdef _M_X64
+  # define __SIZEOF_POINTER__ 8
+  #else
+  # define __SIZEOF_POINTER__ 4
+  #endif // x64
+#endif // __GNUC__
+
 #ifdef __GNUC__
  #define _cdecl    __attribute__((cdecl))
  #define _stdcall  __attribute__((stdcall))
@@ -487,9 +495,9 @@ static_assert(sizeof(nullptr)==sizeof(void*), "3.9.1.10: sizeof(std::nullptr_t) 
 /**@} lib_language_support */
 
 
-  /**\addtogroup  lib_utilities ********** 20 General utilities library [utilities] *****
+  /**\addtogroup  lib_utilities ********** 20 General utilities library [utilities]
   *@{*/
-  /**\addtogroup  lib_memory *************** 20.7 Memory [memory] **********************
+  /**\addtogroup  lib_memory ************* 20.7 Memory [memory]
   *@{*/
 
   /// 20.7.1 Allocator argument tag [allocator.tag]

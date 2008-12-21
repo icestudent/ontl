@@ -107,6 +107,7 @@ class exception
 #ifdef _M_X64
     /**
      *	@brief Function table entry
+     *
      *  Table-based exception handling requires a function table entry for all functions that allocate stack space
      *  or call another function (that is, nonleaf functions).
      *  @note All addresses are image relative (that is, they are 32-bit offsets from the starting address of the image that contains the function table entry).
@@ -120,6 +121,7 @@ class exception
 
     /**
      *	@brief Unwind code array entry
+     *
      *  It used to record the sequence of operations in the prolog that affect the nonvolatile registers and RSP.
      **/
     union unwind_code
@@ -170,6 +172,7 @@ class exception
 
     /**
      *	@brief Unwind data information structure
+     *
      *  The unwind data information structure is used to record the effects that a function has on the stack pointer
      *  and where the nonvolatile registers are saved on the stack.
      **/

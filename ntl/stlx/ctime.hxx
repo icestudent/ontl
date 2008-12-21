@@ -94,7 +94,7 @@ inline time_t time(time_t* timer = 0);
 /**
  *	The asctime function converts the broken-down time in the structure pointed to by
  *  \c timeptr into a string in the form\n
- *  \code Sun Sep 16 01:03:52 1973\n\0 \endcode
+ *  <tt> Sun Sep 16 01:03:52 1973\n\0 </tt>
  *  @return The asctime function returns a pointer to the string.
  *  @note This function is not required to avoid data races.
  **/
@@ -102,8 +102,7 @@ char *asctime(const tm* timeptr);
 
 /**
  *	The ctime function converts the calendar time pointed to by \c timer to local time in the
- *  form of a string. It is equivalent to
- *  \code asctime(localtime(timer)) \endcode
+ *  form of a string. It is equivalent to <tt> asctime(localtime(timer)) </tt>.
  *  @return The ctime function returns the pointer returned by the asctime function with that
  *  broken-down time as argument.
  *  @note This function is not required to avoid data races.

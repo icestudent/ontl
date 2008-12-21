@@ -444,6 +444,7 @@ namespace std
     enum state_t { unlocked, locked };
     /**
      *	@brief Takes or waits for the object's ownership.
+     *
      *  The wait implemented through a simple cycle with the short thread sleep. 
      *  Such wait takes about 60 times more CPU time than kernel synchronization object,
      *  but it's still invisible to the common system performance and it is faster and lightweight.

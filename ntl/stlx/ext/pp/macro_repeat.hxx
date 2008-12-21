@@ -1052,7 +1052,7 @@
  *  l - `last` macro
  *  p - parameter name
  *
- *  where \i macro is: \code MACRO(n, p) \endcode, where 
+ *  where \i macro is: <tt> MACRO(n, p) </tt>, where 
  *  \c n is current counter value and 
  *  \c p is param name provided at TTL_REPEAT
  *

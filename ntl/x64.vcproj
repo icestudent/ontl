@@ -374,10 +374,6 @@
 						>
 					</File>
 					<File
-						RelativePath=".\stlx\chrono.hxx"
-						>
-					</File>
-					<File
 						RelativePath=".\stlx\climits.hxx"
 						>
 					</File>
@@ -410,6 +406,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\stlx\cuchar.hxx"
+						>
+					</File>
+					<File
 						RelativePath=".\stlx\cwchar.hxx"
 						>
 					</File>
@@ -417,6 +417,14 @@
 				<Filter
 					Name="runtime"
 					>
+					<File
+						RelativePath=".\stlx\chrono.hxx"
+						>
+					</File>
+					<File
+						RelativePath=".\stlx\condition_variable.hxx"
+						>
+					</File>
 					<File
 						RelativePath=".\stlx\cstdatomic.hxx"
 						>
@@ -430,6 +438,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\stlx\future.hxx"
+						>
+					</File>
+					<File
 						RelativePath=".\stlx\locale.hxx"
 						>
 					</File>
@@ -439,6 +451,10 @@
 					</File>
 					<File
 						RelativePath=".\stlx\new.hxx"
+						>
+					</File>
+					<File
+						RelativePath=".\stlx\posix_error.hxx"
 						>
 					</File>
 					<File
@@ -506,15 +522,19 @@
 						>
 					</File>
 					<File
+						RelativePath=".\stlx\placeholders.hxx"
+						>
+					</File>
+					<File
 						RelativePath=".\stlx\regex.hxx"
 						>
 					</File>
 					<File
-						RelativePath=".\stlx\smart_ptr.hxx"
+						RelativePath=".\stlx\result_of.hxx"
 						>
 					</File>
 					<File
-						RelativePath=".\stlx\smart_ptr_rv.hxx"
+						RelativePath=".\stlx\smart_ptr.hxx"
 						>
 					</File>
 					<File
@@ -523,6 +543,10 @@
 					</File>
 					<File
 						RelativePath=".\stlx\tt_ismemptr.inl"
+						>
+					</File>
+					<File
+						RelativePath=".\stlx\tuple.hxx"
 						>
 					</File>
 					<File

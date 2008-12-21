@@ -13,11 +13,17 @@
 
 namespace std
 {
-/**\defgroup  lib_utilities *** 20 General utilities library [utilities] *****
+/**\defgroup  lib_utilities *** 20 General utilities library [utilities]
  *
  *    Components used by other elements of the Standard C + + library.
  *@{
  **/
+
+  /**\defgroup lib_ratio ****** 20.3 Compile-time rational arithmetic [ratio]
+   *  The ratio library provides a class template ratio which exactly represents any finite rational number 
+   *  with a numerator and denominator representable by compile-time constants of type intmax_t.
+   *@{
+   **/
 
 #if _INTEGRAL_MAX_BITS >= 64
   #define RATIO_MAX     LLONG_MAX
@@ -129,6 +135,7 @@ namespace std
 
     /**
      *	@brief Numerator of the ratio
+     *
      *  \c num shall have the value \f$ sign(N)*sign(D)*abs(N)/gcd \f$,
      *  but \f$ sign(N)*abs(N) == N \f$.
      **/
@@ -136,6 +143,7 @@ namespace std
 
     /**
      *	@brief Denominator of the ratio
+     *
      *  \c den shall have the value \f$ sign(N)*sign(D)*abs(D)/gcd \f$, after simplification it would be
      *  \f$ D * sign(N) / gcd \f$, but we use \f$ abs(D) / gcd \f$ (see N2661).
      **/
@@ -144,7 +152,7 @@ namespace std
 
 
 
-  /// 20.3.2 Arithmetic on ratio types [ratio.arithmetic]
+  // 20.3.2 Arithmetic on ratio types [ratio.arithmetic]
   namespace __ {
 
     /*
@@ -250,6 +258,7 @@ namespace std
 
   }
 
+  /// 20.3.2 Arithmetic on ratio types [ratio.arithmetic]
   /** static addition with overflow detection */
   template <ratio_t a, ratio_t b>
   struct ratio_checked_add
@@ -393,6 +402,7 @@ namespace std
     integral_constant<bool, !ratio_less<R1, R2>::value>
   { };
 
+  /**@} lib_ratio */
   /**@} lib_utilities */
 } // namespace std
 

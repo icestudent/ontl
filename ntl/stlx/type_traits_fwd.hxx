@@ -8,9 +8,16 @@
 #ifndef NTL__STLX_TYPE_TRAITS_FWD
 #define NTL__STLX_TYPE_TRAITS_FWD
 
-namespace std {
+namespace std 
+{
+ /**\addtogroup  lib_utilities *** 20 General utilities library [utilities]
+  *@{
+  **/
+ /**\addtogroup  lib_typetraits ** 20.5 Metaprogramming and type traits [meta]
+  *@{
+  **/
 
-/// 20.5.3 Helper classes [meta.help]
+// 20.5.3 Helper classes [meta.help]
 template <class T, T v>
 struct integral_constant
 {
@@ -154,6 +161,8 @@ struct common_type;
 
 #endif
 
+/**@} lib_typetraits */
+/**@} lib_utilities */
 }//namespace std
 
 #undef _CHECK_TRAIT

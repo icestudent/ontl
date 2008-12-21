@@ -15,7 +15,9 @@ namespace std
 {
 
   /**
-   *	@group syserr 19.4 System error support [syserr]
+   *	@defgroup syserr 19.4 System error support [syserr]
+   *  This subclause describes components that the standard library and C++ programs may use to report error
+   *  conditions originating from the operating system or other low-level application program interfaces.
    *  @{
    **/
 
@@ -36,6 +38,7 @@ namespace std
 
   /**
    *	@brief 19.4.1 Class error_category [syserr.errcat]
+   *
    *  The class error_category serves as a base class for types used to identify the source and encoding of a
    *  particular category of error code.
    **/
@@ -57,8 +60,8 @@ namespace std
     /**
      *  @brief Returns an object of type error_condition that corresponds to ev.
      *	@note  If the argument \c ev corresponds to a POSIX \c errno value \c posv, 
-     *  the function shall return \code error_condition(posv, generic_category) \endcode.
-     *  Otherwise, the function shall return \code error_condition(ev, system_category) \endcode.
+     *  the function shall return <tt> error_condition(posv, generic_category) </tt>.
+     *  Otherwise, the function shall return <tt> error_condition(ev, system_category) </tt>.
      **/
     virtual error_condition default_error_condition(int ev) const __ntl_nothrow;
 
@@ -85,6 +88,7 @@ namespace std
 
   /**
    *	@brief 19.4.2 Class error_code [syserr.errcode]
+   *
    *  The class error_code describes an object used to hold error code values, such as those originating from the
    *  operating system or other low-level application program interfaces.
    *  @note Class error_code is an adjunct to error reporting by exception.
@@ -141,6 +145,7 @@ private:
 
   /**
    *	@brief 19.4.3 Class error_condition [syserr.errcondition]
+   *
    *  The class error_condition describes an object used to hold values identifying error conditions.
    *  @note error_condition values are portable abstractions, while error_code values (19.4.2) are implementation specific.
    **/
@@ -194,6 +199,7 @@ private:
 
   /**
    *	@brief 19.4.5 Class system_error [syserr.syserr]
+   *
    *  The class system_error describes an exception object used to report error conditions that have an associated error code. 
    *  Such error conditions typically originate from the operating system or other low-level application program interfaces.
    **/
@@ -363,8 +369,8 @@ private:
 
       /**
        *	If the argument \c ev corresponds to a POSIX \c errno value \c posv, 
-       *  the function shall return \code error_condition(posv, generic_category) \endcode.
-       *  Otherwise, the function shall return \code error_condition(ev, system_category) \endcode.
+       *  the function shall return <tt> error_condition(posv, generic_category) </tt>.
+       *  Otherwise, the function shall return <tt> error_condition(ev, system_category) </tt>.
        **/
       error_condition default_error_condition(int ev) const __ntl_nothrow;
       bool equivalent(int code, const error_condition& condition) const __ntl_nothrow
@@ -381,11 +387,35 @@ private:
   //////////////////////////////////////////////////////////////////////////
   /// 19.4.1.5 Error category objects [syserr.errcat.objects]
   /** Returns a reference to an object of a type derived from class error_category. */
-  const error_category& get_generic_category();
+  inline const error_category& get_generic_category()
+  {
+    return generic_category;
+  }
   //static const error_category& generic_category = get_generic_category();
 
-  const error_category& get_system_category();
+  inline const error_category& get_system_category()
+  {
+    return system_category;
+  }
   //static const error_category& system_category = get_system_category();
+
+
+  //////////////////////////////////////////////////////////////////////////
+  ///hash specializations for error_code
+  template<> struct hash<error_code>:
+   unary_function<error_code, size_t>
+   {
+     /*** 
+      * @brief error_code hash calculation
+      *
+      * Hash calculation maked as \code hash_combine( hash(ec.value()), hash(ec.category()) ) \endcode 
+      **/
+     size_t operator()(const argument_type& ec) const __ntl_nothrow
+     {
+       typedef __::FNVHash h;
+       return h::hash_combine(ec.value(), reinterpret_cast<size_t>(&ec.category()));
+     }
+   };
 
   /** @} syserr */
 } // std

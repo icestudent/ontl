@@ -10,25 +10,76 @@
 
 #include "type_traits.hxx"
 #include "result_of.hxx"
+#include "cuchar.hxx"
 
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable:4820) // X bytes padding added...
 #endif
 
-namespace std {
+namespace std 
+{
 
-/**\addtogroup  lib_utilities ********* 20 General utilities library [utilities] ******
+/**\addtogroup  lib_utilities ********** 20 General utilities library [utilities]
  *@{*/
 
-/**\defgroup  lib_function_objects ***** 20.6 Function objects [function.objects] ************
+/**\defgroup  lib_function_objects ***** 20.6 Function objects [function.objects]
  *
  *    Function objects are objects with an operator() defined
  *@{
  */
 
+/**\defgroup  lib_func_def ************* 20.6.01 Definitions [func.def]
+ *
+ *  The following definitions apply to this Clause:
+ *  - A <em>call signature</em> is the name of a return type followed by a parenthesized comma-separated %list of zero or
+ *  more argument types.
+ *  - A <em>callable type</em> is a pointer to function, a pointer to member function, a pointer to member data, or a class
+ *  type whose objects can appear immediately to the left of a function call operator.
+ *  - A <em>callable object</em> is an object of a callable type.
+ *  - A <em>call wrapper type</em> is a type that holds a callable object and supports a call operation that forwards to that
+ *  object.
+ *  - A <em>call wrapper</em> is an object of a call wrapper type.
+ *  - A <em>target object</em> is the callable object held by a call wrapper.
+ **/
+
+/**\defgroup  lib_func_require ************* 20.6.02 Requirements [func.require]
+
+  Define <tt>INVOKE(f, t1, t2, ..., tN)</tt> as follows:
+  - <tt>(t1.*f)(t2, ..., tN)</tt> when \p f is a pointer to a member function of a class \c T and \p t1 is an object of
+ type \c T or a reference to an object of type \c T or a reference to an object of a type derived from \c T;
+  - <tt>((*t1).*f)(t2, ..., tN)</tt> when \p f is a pointer to a member function of a class \c T and \p t1 is not one of
+ the types described in the previous item;
+  - <tt>t1.*f</tt> when \p f is a pointer to member data of a class \c T and \p t1 is an object of type \c T or a reference to
+ an object of type \c T or a reference to an object of a type derived from \c T;
+  - <tt>(*t1).*f</tt> when \p f is a pointer to member data of a class \c T and \p t1 is not one of the types described in
+ the previous item;
+  - <tt>f(t1, t2, ..., tN)</tt> in all other cases.
+ 
+ Define <tt>INVOKE(f, t1, t2, ..., tN, R)</tt> as <tt>INVOKE(f, t1, t2, ..., tN)</tt> implicitly converted to \c R.
+ 
+ If a call wrapper (20.6.1) has a <em>weak result type</em> the type of its member type \c result_type is based on the
+ type \c T of the wrapper's target object (20.6.1):
+  - if \c T is a function, reference to function, or pointer to function type, \c result_type shall be a synonym
+ for the return type of \c T;
+  - if \c T is a pointer to member function, \c result_type shall be a synonym for the return type of \c T;
+  - if \c T is a class type with a member type \c result_type, then result_type shall be a synonym for
+ <tt>T::result_type</tt>;
+  - otherwise \c result_type shall not be defined.
+ 
+ Every call wrapper (20.6.1) shall be CopyConstructible. A <em>simple call wrapper</em> is a call wrapper that is
+ CopyAssignable and whose copy constructor and assignment operator do not throw exceptions. A <em>forwarding
+ call wrapper</em> is a call wrapper that can be called with an argument %list.
+
+ @note in a typical implementation forwarding call wrappers have an overloaded function call operator of the form
+ \code
+ template<class... ArgTypes>
+ R operator()(ArgTypes&&... args) cv-qual;
+ \endcode
+ **/
+
 #pragma region lib_base
-/**\defgroup  lib_base ***************** 20.6.3 Base [base] **********************
+/**\defgroup  lib_base ***************** 20.6.03 Base [base] **********************
  *
  *    provided to simplify the typedefs of the argument and result types
  *@{
@@ -53,14 +104,8 @@ struct binary_function
  */
 #pragma endregion
 
-#pragma region lib_ret
-
-template <class> class result_of; // undefined
-
-#pragma endregion
-
 #pragma region lib_refwrap
-/**\defgroup  lib_refwrap ***************** 20.6.5 Class template reference_wrapper [refwrap] *******
+/**\defgroup  lib_refwrap ************** 20.6.05 Class template reference_wrapper [refwrap] *******
  *
  *    reference_wrapper<T> is a CopyConstructible and Assignable wrapper
  *    around a reference to an object of type T.
@@ -190,7 +235,7 @@ namespace __
 }
 
 /**
- *	20.6.5 Class template reference_wrapper [refwrap]
+ *	20.6.05 Class template reference_wrapper [refwrap]
  *  reference_wrapper<T> is a CopyConstructible and Assignable wrapper around a reference to an object of type T.
  *
  *  @note implements 20.6.5/3, 20.6.5/4 (N2723); has \c result_type if type \c T has it.
@@ -289,7 +334,7 @@ reference_wrapper<const T> cref(reference_wrapper<T> x) __ntl_nothrow
 
 #pragma region lib_arithmetic_operations
 
-/**\defgroup  lib_arithmetic_operations * 20.6.6 Arithmetic operations [arithmetic.operations] ****
+/**\defgroup  lib_arithmetic_operations *** 20.6.06 Arithmetic operations [arithmetic.operations] ****
  *
  *    functors for all of the arithmetic operators
  *@{
@@ -336,7 +381,7 @@ struct negate : unary_function<T, T>
 #pragma endregion
 
 #pragma region lib_comparsions
-/**\defgroup  lib_comparisons ********** 20.6.7 Comparisons [comparisons] ***************
+/**\defgroup  lib_comparisons ********** 20.6.07 Comparisons [comparisons] ***************
  *
  *   functors for all of the comparison operators
  *@{
@@ -383,7 +428,7 @@ struct less_equal : binary_function<T, T, bool>
 #pragma endregion
 
 #pragma region lib_logical_operations
-/**\defgroup  lib_logical_operations *** 20.6.8 Logical operations [logical.operations] ********
+/**\defgroup  lib_logical_operations *** 20.6.08 Logical operations [logical.operations] ********
  *
  *   functors for all of the logical operators
  *@{
@@ -412,7 +457,7 @@ struct logical_not : unary_function<T, bool>
 #pragma endregion
 
 #pragma region lib_bitwise_operations
-/**\defgroup  lib_bitwise_operations *** 20.6.9 Bitwise operations [bitwise.operations] *********
+/**\defgroup  lib_bitwise_operations *** 20.6.09 Bitwise operations [bitwise.operations] *********
  *
  *   functors for all of the bitwise operators in the language
  *@{
@@ -441,6 +486,8 @@ template <class T> struct bit_xor : binary_function<T,T,T>
     return x ^ y;
   }
 };
+/**@} lib_bitwise_operations
+ */
 #pragma endregion
 
 #pragma region lib_negators
@@ -816,8 +863,8 @@ template <> struct hash<bool>;
 template <> struct hash<char>;
 template <> struct hash<signed char>;
 template <> struct hash<unsigned char>;
-//template <> struct hash<char16_t>;
-//template <> struct hash<char32_t>;
+template <> struct hash<char16_t>;
+template <> struct hash<char32_t>;
 template <> struct hash<wchar_t>;
 template <> struct hash<short>;
 template <> struct hash<unsigned short>;
@@ -831,19 +878,145 @@ template <> struct hash<float>;
 template <> struct hash<double>;
 template <> struct hash<long double>;
 template<class T> struct hash<T*>;
-//template <> struct hash<std::string>;
+
+//template <> struct hash<std::string>; // in <string>
 //template <> struct hash<std::u16string>;
 //template <> struct hash<std::u32string>;
 //template <> struct hash<std::wstring>;
-//template <> struct hash<std::error_code>;
-//template <> struct hash<std::thread::id>;
 
+//template <> struct hash<std::error_code>; // in <system_error>
+//template <> struct hash<std::thread::id>; // in <thread>
+
+/// generic hash function delaration
 template<class T>
 struct hash: unary_function<T, size_t>
 {
   size_t operator()(T val) const __ntl_nothrow;
 };
 
+/// hash function implementation for pointers
+template<class T>
+struct hash<T*>: unary_function<T*, size_t>
+{
+  size_t operator()(argument_type val) const __ntl_nothrow
+  {
+    return reinterpret_cast<size_t>(val);
+  }
+};
+
+
+/// integer types hash function implementation
+#define NTL_HASH_IMPL(T) \
+template<> struct hash<T>: unary_function<T, size_t> \
+{ \
+  inline size_t operator()(argument_type val) const __ntl_nothrow \
+  { \
+    return static_cast<size_t>(val); \
+  } \
+}
+
+NTL_HASH_IMPL(bool);
+NTL_HASH_IMPL(char);
+NTL_HASH_IMPL(signed char);
+NTL_HASH_IMPL(unsigned char);
+NTL_HASH_IMPL(wchar_t);
+NTL_HASH_IMPL(short);
+NTL_HASH_IMPL(unsigned short);
+NTL_HASH_IMPL(int);
+NTL_HASH_IMPL(unsigned int);
+NTL_HASH_IMPL(long);
+NTL_HASH_IMPL(unsigned long);
+
+// NOTE: if sizeof(int64_t) > sizeof(size_t) we must use some hashing algorithm (e.g. FNV) to calculate hash value of the 64-bit data, 
+// but it can produce collision between hash algorithm result and "hash value" of the fundamental data.
+#if __SIZEOF_POINTER__ == 8
+NTL_HASH_IMPL(long long);
+NTL_HASH_IMPL(unsigned long long);
+#endif
+
+#ifdef NTL__CXX_CHARS
+NTL_HASH_IMPL(char16_t);
+NTL_HASH_IMPL(char32_t);
+#endif
+#undef NTL_HASH_IMPL
+
+
+namespace __
+{
+  /**
+   *	@brief FNV Hash Function
+   *
+   *  Fowler/Noll/Vo is a non-cryptographic hash function created by Glenn Fowler, Landon Curt Noll, and Phong Vo.
+   *
+   *  @see http://en.wikipedia.org/wiki/Fowler_Noll_Vo_hash
+   **/
+  template<typename hash_t, hash_t prime, hash_t seed = 0>
+  struct FNVHashT
+  {
+    static const hash_t prime_value = prime;
+    static const hash_t seed_value  = seed;
+
+    /** Data sequence hashing (octets) */
+    template<typename Iterator>
+    inline typename enable_if<sizeof(typename iterator_traits<Iterator>::value_type) == sizeof(uint8_t), hash_t>::type operator()(Iterator first, Iterator last) const
+    {
+      hash_t hash = seed;
+      while(first != last){
+        hash = hash * prime ^ static_cast<hash_t>(*first);
+        ++first;
+      }
+      return hash;
+    }
+
+    /** Data sequence hashing (large values) */
+    template<typename Iterator>
+    inline typename enable_if<(sizeof(typename iterator_traits<Iterator>::value_type) > sizeof(uint8_t)), hash_t>::type operator()(Iterator first, Iterator last) const
+    {
+      hash_t hash = seed;
+      while(first != last){
+        size_t size = sizeof(*first);
+        for(const uint8_t* p = reinterpret_cast<const uint8_t*>(&*first); size--; p++)
+          hash = hash * prime ^ *p;
+        ++first;
+      }
+      return hash;
+    }
+
+    /** Data buffer hashing (by octets) */
+    inline hash_t operator()(const void* data, size_t size) const
+    {
+      hash_t hash = seed;
+      for(const uint8_t* p = reinterpret_cast<const uint8_t*>(data); size--; p++)
+        hash = hash * prime ^ *p;
+      return hash;
+    }
+
+    static inline hash_t hash_op(const void* data, size_t size, hash_t hash = seed)
+    {
+      for(const uint8_t* p = reinterpret_cast<const uint8_t*>(data); size--; p++)
+        hash = hash * prime ^ *p;
+      return hash;
+    }
+
+    static inline hash_t hash_combine(hash_t hash1, hash_t hash2 = seed)
+    {
+      return  hash2 * prime ^ hash1;
+    }
+  };
+
+#ifndef _M_X64
+  /// FNV Hash implementation for 32-bit code.
+  typedef FNVHashT<size_t, 0x01000193, 2166136261UL> FNVHash;
+#else
+  /// FNV Hash implementation for 64-bit code.
+  typedef FNVHashT<size_t, 0x100000001B3, 14695981039346656037ULL> FNVHash;
+#endif
+}
+
+/// floating point hash function implementation
+
+/**@} lib_hash
+ */
 #pragma endregion
 
 #pragma region func.reference_closure

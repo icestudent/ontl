@@ -1,3 +1,9 @@
+/**\file*********************************************************************
+ *                                                                     \brief
+ *  20.6 Function objects [function.objects]
+ *
+ ****************************************************************************
+ */
 /*
  * Copyright (c) 2008 fr3@K <freak@fsfoundry.org>
  *
@@ -32,6 +38,20 @@
 
 namespace std
 {
+ /**\addtogroup  lib_utilities ************ 20 General utilities library [utilities]
+  *@{
+  **/
+ /**\addtogroup  lib_function_objects ***** 20.6 Function objects [function.objects]
+  *@{
+  **/
+
+#pragma region lib_ret
+/**\defgroup lib_func_ret ***************** 20.6.04 Function object return types [func.ret]
+ *  Function return type detector
+ *@{
+ **/
+  template <class> class result_of; // undefined
+
 
 namespace __
 {
@@ -135,6 +155,13 @@ class result_of :
   public __::result_of_impl<FunctionCallType >
 {};
 
+/**@} lib_func_ret
+*/
+#pragma endregion
+
+/**@} lib_function_objects */
+
+/**@} lib_utilities */
 
 } // namespace std
 
