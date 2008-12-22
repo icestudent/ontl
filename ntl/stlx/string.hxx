@@ -387,7 +387,10 @@ public:
     /// 13 Remarks: shrink_to_fit is a non-binding request to reduce capacity()
     ///   to size(). \note The request is non-binding to allow latitude for
     ///   implementation-specific optimizations.
-    void shrink_to_fit() {}
+    void shrink_to_fit() 
+    {
+      str.shrink_to_fit();
+    }
 
     /// 14 Effects: Behaves as if the function calls: erase(begin(), end());
     void clear()                        { str.clear();      }

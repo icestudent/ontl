@@ -324,8 +324,12 @@ class vector
     {
       if ( capacity() < n ) realloc(n);
     }
+
     /** A non-binding request to reduce capacity() to size(). */
-    void shrink_to_fit();
+    void shrink_to_fit()
+    {
+      vector(*this).swap(*this);
+    }
 
     ///\name  element access
 

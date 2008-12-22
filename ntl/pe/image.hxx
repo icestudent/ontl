@@ -1307,4 +1307,3 @@ next_entry:;
 }//namespace ntl
 
 #endif//#ifndef NTL__PE_IMAGE
-asm
