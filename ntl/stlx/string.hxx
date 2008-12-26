@@ -987,8 +987,21 @@ public:
       return r != 0 ? r : traits_type::eq(s[size()], charT()) ? r : r - 1; // r == 0 here
     }
 
-    int compare(size_type pos1, size_type n1, const charT* s) const;
-    int compare(size_type pos1, size_type n1, const charT* s, size_type n2) const;
+    int compare(size_type pos1, size_type n1, const charT* s) const
+    {
+      if(pos1+n1 >= size())
+        return -1;
+      return traits_type::compare(begin()+pos1, s, n1);
+    }
+
+    int compare(size_type pos1, size_type n1, const charT* s, size_type n2) const
+    {
+      if(n1 != n2)
+        return static_cast<int>(n1 - n2);
+      if(pos1+n1 >= size())
+        return -1;
+      return traits_type::compare(begin()+pos1, s, min(n1, n2));
+    }
 
     ///\name  operator+ [21.3.8.1 string::op+]
     /// @note frends, not just non-member functions

@@ -120,6 +120,12 @@ class application
       const_iterator cbegin() const{ return begin(); }
       const_iterator cend() const  { return end(); }
 
+      // random access
+      const char_type* operator[](int argno)
+      {
+        return argv[argno];
+      }
+
       int size() const { return argc; }
       bool empty() const { return false; }
 

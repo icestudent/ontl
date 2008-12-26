@@ -823,6 +823,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\nt\system_error.hxx"
+					>
+				</File>
+				<File
 					RelativePath=".\nt\system_information.hxx"
 					>
 				</File>

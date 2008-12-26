@@ -73,7 +73,7 @@ int _cdecl atexit(vfv_t func)
 
 //////////////////////////////////////////////////////////////////////////
 #ifdef _MSC_VER
-extern "C" int _purecall(void)
+extern "C" int _cdecl _purecall(void)
 {
   assert(!"pure virtual function called!");
   abort();

@@ -124,9 +124,7 @@ void KfLowerIrql(kirql_t NewIrql)
 #ifdef _DEBUG
 NTL__EXTERNAPI
 void __stdcall
-DbgBreakPointWithStatus(
-                        ntstatus Status
-                        );
+DbgBreakPointWithStatus(ntstatus Status);
 #endif
 
 /** Interrupt request level RAII wrapper */
@@ -781,6 +779,16 @@ static const size_t pool_small_lists = 32;
       );
 
 #define ExIsResourceAcquiredLite ExIsResourceAcquiredSharedLite
+
+
+    NTL__EXTERNAPI
+      uint32_t __stdcall
+      RtlUniform(uint32_t* Seed);
+
+    NTL__EXTERNAPI
+      uint32_t __stdcall
+      RtlRandom(uint32_t* Seed);
+
 
 }//namespace km
 }//namespace ntl

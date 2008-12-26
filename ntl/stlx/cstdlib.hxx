@@ -55,12 +55,12 @@ NTL__CRTCALL
   strtoul(const char * __restrict nptr, char ** __restrict endptr, int base);
 
 // C library extension
-char* 
-NTL__CRTCALL
+NTL__EXTERNAPI
+char* _cdecl
   _itoa(int value, char* strbuf, int radix);
 
-wchar_t* 
-NTL__CRTCALL
+NTL__EXTERNAPI
+wchar_t* _cdecl
   _itow(int value, wchar_t* strbuf, int radix);
 
 ///\name  7.20.2 Pseudo-random sequence generation functions

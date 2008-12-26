@@ -102,6 +102,7 @@ namespace km {
 
 class file_handler : public handle, public device_traits<file_handler>
 {
+  typedef const file_handler* unspecified_bool_type;
   ////////////////////////////////////////////////////////////////////////////
   public:
 

@@ -110,6 +110,17 @@ namespace ntl {
         int8_t PriorityBoost
         );
 
+    NTL__EXTERNAPI
+    void __stdcall
+      IoSetCompletionRoutine(
+        irp* Irp,
+        io_completion_routine_t* CompletionRoutine,
+        void* Context,
+        bool InvokeOnSuccess,
+        bool InvokeOnError,
+        bool InvokeOnCancel
+        );
+
 
 #if defined(_M_IX86)
 #   pragma pack(push, 4)
@@ -357,6 +368,14 @@ namespace ntl {
         stack.Context = completion_routine ? context : 0;
         stack.Control = completion_routine ? static_cast<uint8_t>(control) : 0;
       }
+
+      ntstatus complete_request(ntstatus Status, priority_boost::Increment PriorityBoost = priority_boost::io_no_increment)
+      {
+        IoStatus.Status = Status;
+        IofCompleteRequest(this, PriorityBoost);
+        return Status;
+      }
+
       void complete_request(priority_boost::Increment PriorityBoost = priority_boost::io_no_increment)
       {
         IofCompleteRequest(this, PriorityBoost);

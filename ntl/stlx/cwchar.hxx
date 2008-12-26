@@ -90,6 +90,10 @@ NTL__EXTERNAPI
 int __cdecl
   _wtoi(const wchar_t* str);
 
+NTL__EXTERNAPI
+long int __cdecl
+  _wtol(const wchar_t *nptr);
+
 /**@} lib_c_strings */
 /**@} lib_strings */
 

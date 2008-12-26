@@ -38,7 +38,7 @@ extern "C"
   void dbg_pause();
 # define dbgpause() dbg_pause()
 #else
-# define dbg_pause()
+# define dbgpause()
 #endif
 
 
@@ -157,6 +157,7 @@ class exception
         RAX, RCX, RDX, RBX, RSP, RBP, RSI, RDI, R8, R9, R10, R11, R12, R13, R14, R15
       };
 
+#pragma warning(disable:4201)
       struct {
         /** offset from the beginning of the prolog to the end of the instruction that performs this operation,
             plus 1 (that is, the offset of the start of the next instruction) */
@@ -169,6 +170,7 @@ class exception
       /** specifies the scaled offset */
       uint16_t  FrameOffset;
     };
+#pragma warning(default:4201)
 
     /**
      *	@brief Unwind data information structure
@@ -261,6 +263,7 @@ class exception
       unwind_history_table_entry Entry[unwind_history_table_size];
     };
 
+#pragma warning(disable:4201)
     union frame_pointers
     {
       struct
@@ -270,7 +273,7 @@ class exception
       };
       uintptr_t FramePointers;
     };
-
+#pragma warning(default:4201)
 
     /**
      *	@brief Exception dispatch context
@@ -1034,7 +1037,7 @@ uint32_t              :27;
     // __SetState
     void current_state(const ehfuncinfo* const ehfi, ehstate_t state)
     {
-      int*** ppp = reinterpret_cast<int***>(this);
+      // TODO: int*** ppp = reinterpret_cast<int***>(this);
       ehstate_t old = *reinterpret_cast<ehstate_t*>(fp.FramePointers + ehfi->estypeinfo);
       if(old < 16)
         *reinterpret_cast<ehstate_t*>(fp.FramePointers + ehfi->estypeinfo) = state;
@@ -1047,7 +1050,7 @@ uint32_t              :27;
       ehstate_t cs = ehfi->state_from_control(dispatch);
       *frame = fp.FramePointers;
 
-      int*** ppthrown = reinterpret_cast<int***>(this);
+      // TODO: int*** ppthrown = reinterpret_cast<int***>(this);
 
       for(uint32_t i = ehfi->tryblocktable_size; i > 0; --i){
         tryblock* tb = &ehfi->tryblocktable[i-1];
@@ -1549,6 +1552,8 @@ uint32_t              :27;
       )
     {
 #ifdef _M_X64
+      (void)nested; // unreferenced parameter
+      (void)catchdepth;
       uintptr_t xframe;
       uintptr_t frame = cxxreg->establisherframe(funcinfo, dispatch, &xframe);
       cxxregistration* cxxframe = reinterpret_cast<cxxregistration*>(frame);
@@ -1650,7 +1655,7 @@ uint32_t              :27;
       // is_cxx1
       if(is_msvc(true) && !get_throwinfo()){
         // TODO: get previous throw information and rethrow it
-        dbg_pause();
+        dbgpause();
         // replasing ctx && erec
         // assert check erec again for cxx
 

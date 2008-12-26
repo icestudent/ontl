@@ -225,10 +225,17 @@ namespace rtl
       return object_attributes(/*ContainingDirectory, ContainingDirectory ? RelativeName : */path);
     }
 
+    operator const relative_name* () const // unspecified_bool_type
+    {
+      return ok_ ? this : nullptr;
+    }
+
   protected:
+    bool ok_;
+
     void convert(const wchar_t* dospath)
     {
-      RtlDosPathNameToNtPathName_U(dospath, &path, &file, this);
+      ok_ = RtlDosPathNameToNtPathName_U(dospath, &path, &file, this);
     }
   };
 }
