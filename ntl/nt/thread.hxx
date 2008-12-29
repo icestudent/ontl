@@ -452,13 +452,13 @@ public:
 }; // class user_thread
 
   template <class Clock, class Duration>
-  void sleep_until(const std::chrono::time_point<Clock, Duration>& abs_time, bool alertable = false)
+  static inline void sleep_until(const std::chrono::time_point<Clock, Duration>& abs_time, bool alertable = false)
   {
     NtDelayExecution(alertable, std::chrono::duration_cast<system_duration>(abs_time.time_since_epoch()).count());
   }
 
   template <class Rep, class Period>
-  void sleep_for(const std::chrono::duration<Rep, Period>& rel_time, bool alertable = false)
+  static inline void sleep_for(const std::chrono::duration<Rep, Period>& rel_time, bool alertable = false)
   {
     NtDelayExecution(alertable, -1i64 * std::chrono::duration_cast<system_duration>(rel_time).count());
   }

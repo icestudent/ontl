@@ -22,20 +22,20 @@ namespace ntl {
 
 
     NTL__EXTERNAPI
-      void __stdcall
+    void __stdcall
       KeInitializeEvent(
-      kevent *    Event,
-      event_type  Type,
-      bool        State
-      );
+        kevent *    Event,
+        event_type  Type,
+        bool        State
+        );
 
     NTL__EXTERNAPI
-      long __stdcall
+    long __stdcall
       KeSetEvent(
-      kevent *  Event,
-      kpriority Increment,
-      bool      Wait
-      );
+        kevent *  Event,
+        kpriority Increment,
+        bool      Wait
+        );
 
     template <event_type Type>
     struct event : kevent
@@ -104,13 +104,13 @@ namespace ntl {
 
 
     struct kthread;
-    struct fast_mutex {
-
+    struct fast_mutex
+    {
       enum {
         FM_LOCK_BIT_V        = 0x0, // Lock bit as a bit number
         FM_LOCK_BIT          = 0x1, // Actual lock bit, 1 = Unlocked, 0 = Locked
         FM_LOCK_WAITER_WOKEN = 0x2, // A single waiter has been woken to acquire this lock
-        FM_LOCK_WAITER_INC   = 0x4 // Increment value to change the waiters count
+        FM_LOCK_WAITER_INC   = 0x4  // Increment value to change the waiters count
       };
       volatile uint32_t Count;
       kthread* Owner;
@@ -144,6 +144,10 @@ namespace ntl {
       {
         ExReleaseFastMutexUnsafe(this);
       }
+
+    private:
+      fast_mutex(const fast_mutex&);
+      fast_mutex& operator=(const fast_mutex&);
     };
 
 

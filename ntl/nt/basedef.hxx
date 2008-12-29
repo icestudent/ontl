@@ -20,7 +20,16 @@
 namespace ntl {
 
   namespace km {
-    typedef uintptr_t kaffinity_t;
+    namespace priority
+    {
+      enum type {
+        low          =  0,    // Lowest thread priority level
+        low_realtime = 16,    // Lowest realtime priority level
+        high         = 31,    // Highest thread priority level
+        maximum      = 32,    // Number of thread priority levels
+      };
+    }
+    typedef uintptr_t kaffinity;
     typedef long      kpriority;
   }
 

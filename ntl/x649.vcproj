@@ -303,6 +303,10 @@
 					Name=".ext"
 					>
 					<File
+						RelativePath=".\stlx\ext\hashtable.hxx"
+						>
+					</File>
+					<File
 						RelativePath=".\stlx\rbtree.hxx"
 						>
 					</File>
@@ -716,6 +720,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\km\dpc.hxx"
+					>
+				</File>
+				<File
 					RelativePath=".\km\driver_object.hxx"
 					>
 				</File>
@@ -745,6 +753,10 @@
 				</File>
 				<File
 					RelativePath=".\km\image.hxx"
+					>
+				</File>
+				<File
+					RelativePath=".\km\io.hxx"
 					>
 				</File>
 				<File

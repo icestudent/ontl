@@ -41,6 +41,7 @@ namespace km {
 #define SYSTEM_CACHE_ALIGNMENT_SIZE 64
 #endif
 
+// shared with nt declarations
 using nt::slist_header;
 using nt::single_list_entry;
 using nt::slist_entry;
@@ -65,10 +66,18 @@ using nt::const_ansi_string;
 
 using nt::systime_t;
 
-
+// forward declarations
 struct kthread;
 struct mdl;
 struct kevent;
+
+#ifndef _M_X64
+  struct  kdpc32;
+  typedef kdpc32 kdpc;
+#else
+  struct  kdpc64;
+  typedef kdpc64 kdpc;
+#endif
 
 //enum mode { KernelMode, UserMode };
 struct kprocessor_mode { uint8_t mode; };
@@ -77,9 +86,13 @@ static const kprocessor_mode KernelMode = { 0 };
 static const kprocessor_mode UserMode = { 1 };
 
 typedef long kpriority;
-typedef uintptr_t kaffinity_t;
+typedef uintptr_t kaffinity;
 
-#if 1
+NTL__EXTERNVAR int8_t KeNumberProcessors;
+
+
+NTL__EXTERNAPI
+void* __stdcall MmGetSystemRoutineAddress(const const_unicode_string& SystemRoutineName);
 
 /// interrupt request level
 typedef uint8_t kirql_t;
@@ -233,9 +246,6 @@ public:
 	}
 };
 
-#else
-typedef uint8_t kirql;
-#endif
 
 struct kspin_lock
 {
@@ -388,6 +398,14 @@ ntstatus sleep(
   return KeDelayExecutionThread(wait_mode, alertable, interval);
 }
 
+NTL__EXTERNAPI void __stdcall KeStallExecutionProcessor(uint32_t MicroSeconds);
+
+template<times::type TimeResolution>
+static inline 
+  void stall_execution(uint32_t time)
+{
+  KeStallExecutionProcessor(TimeResolution * time / times::microseconds);
+}
 
 NTL__EXTERNAPI
 kirql_t __fastcall
@@ -441,6 +459,40 @@ void kspin_lock_at_dpc::release()
 typedef ntl::atomic_exec<kspin_lock, kirql> synchronize_access;
 typedef ntl::atomic_exec<kspin_lock_at_dpc, void> synchronize_access_at_dpc_level;
 
+namespace kobjects
+{
+  static const uint8_t LockBit = 0x80;
+  static const uint8_t TypeMask= 0x7F;
+
+  enum type {
+    EventNotificationObject,
+    EventSynchronizationObject,
+    MutantObject,
+    ProcessObject,
+    QueueObject,
+    SemaphoreObject,
+    ThreadObject,
+    Spare1Object,
+    TimerNotificationObject,
+    TimerSynchronizationObject,
+    Spare2Object,
+    Spare3Object,
+    Spare4Object,
+    Spare5Object,
+    Spare6Object,
+    Spare7Object,
+    Spare8Object,
+    Spare9Object,
+    ApcObject,
+    DpcObject,
+    DeviceQueueObject,
+    EventPairObject,
+    InterruptObject,
+    ProfileObject,
+    ThreadedDpcObject,
+    MaximumKernelObject
+  };
+}
 
 struct dispatcher_header
 {
@@ -453,63 +505,6 @@ struct dispatcher_header
 };
 
 struct kgate { dispatcher_header Header; };
-
-struct kdpc_data
-{
-  list_entry DpcListHead;
-  kspin_lock DpcLock;
-#if defined(_M_IX86)
-  volatile int32_t DpcQueueDepth;
-#elif defined(_M_X64)
-  volatile int32_t DpcQueueDepth;
-#endif
-  uint32_t DpcCount;
-};
-
-struct kdpc
-{
-  enum type
-  {
-    Normal,
-    Threaded
-  };
-
-  enum DpcImportance {
-    LowImportance,
-    MediumImportance,
-    HighImportance
-  };
-
-  uint8_t Type;
-#if defined(_M_IX86)
-  uint8_t Number;
-  uint8_t Importance;
-#elif defined(_M_X64)
-  uint8_t Importance;
-  uint8_t Number;
-  uint8_t Expedite;
-#endif
-  list_entry DpcListEntry;
-
-  void (__stdcall *DeferredRoutine)(
-    const kdpc* Dpc,
-    const void* DeferredContext,
-    const void* SystemArgument1,
-    const void* SystemArgument2);
-
-  void* DeferredContext;
-  void* SystemArgument1;
-  void* SystemArgument2;
-
-  kdpc_data* DpcData;
-};
-
-#if defined(_M_IX86)
-STATIC_ASSERT(sizeof(kdpc) == 0x20);
-#elif  _M_X64
-STATIC_ASSERT(sizeof(kdpc) == 0x40);
-#endif
-
 
 struct ksemaphore
 {

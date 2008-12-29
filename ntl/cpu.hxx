@@ -24,6 +24,9 @@ namespace cpu {
     }
     static inline void pause() { intrinsic::_mm_pause(); }
   #endif
+
+    static unsigned current();
+
 #elif defined(__GNUC__)
 // TODO: pause()
     static inline void pause() {}

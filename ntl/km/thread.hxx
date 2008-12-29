@@ -21,6 +21,9 @@
 namespace ntl {
 namespace km {
 
+#pragma warning(push)
+#pragma warning(disable:4201) // nameless struct or union
+
 using nt::client_id;
 using nt::context;
 
@@ -83,28 +86,18 @@ struct kwait_block
   uint16_t      WaitType;
 };
 
-typedef uintptr_t kaffinity_t;
-struct kaffinity
-{
-  kaffinity() {}
-  kaffinity(kaffinity_t affinity) : affinity(affinity) { }
-  kaffinity_t affinity;
-};
+static const uint32_t maximum_processors = 64;
 
-#define LOW_PRIORITY 0              // Lowest thread priority level
-#define LOW_REALTIME_PRIORITY 16    // Lowest realtime priority level
-#define HIGH_PRIORITY 31            // Highest thread priority level
-#define MAXIMUM_PRIORITY 32         // Number of thread priority levels
-
-#if defined(_M_IX86)
-struct kpcr
+#ifndef _M_X64
+struct kpcr:
+  ntl::mapped_data<kpcr>
 {
   union {
     nt::tib NtTib;
     struct {
       ntl::nt::exception::registration *Used_ExceptionList;
       void*     Used_StackBase;
-      void*     Spare2;
+      void*     PerfGlobalGroupMask;
       void*     TssCopy;
       uint32_t  ContextSwitches;
       kaffinity SetMemberCopy;
@@ -112,7 +105,7 @@ struct kpcr
     };
   };
 
-  struct kpcr*  SelfPcr;
+  kpcr*  Self;
   struct kpcrb* Pcrb;
   kirql Irql;
 
@@ -129,7 +122,7 @@ struct kpcr
   kaffinity   SetMember;
   uint32_t    StallScaleFactor;
   uint8_t     SpareUnused;
-  uint8_t     Number;
+  uint8_t     Number;     // processor number
 
   uint8_t     Spare0;
   uint8_t     SecondLevelCacheAssociativity;
@@ -138,9 +131,7 @@ struct kpcr
   uint32_t    SecondLevelCacheSize;
   uint32_t    HalReserved[16];
 };
-#elif defined(_M_X64)
-
-#define MAXIMUM_PROCESSORS 64
+#else // _M_X64
 
 
 struct kdescriptor
@@ -457,7 +448,7 @@ struct kprcb
   // Interprocessor request summary - 128-byte aligned.
   //
 
-  request_mailbox RequestMailbox[MAXIMUM_PROCESSORS];
+  request_mailbox RequestMailbox[maximum_processors];
 
   //
   // Interprocessor sender summary;
@@ -519,7 +510,7 @@ struct kprcb
   list_entry WaitListHead;
   uint32_t ReadySummary;
   uint32_t QueueIndex;
-  list_entry DispatcherReadyListHead[MAXIMUM_PRIORITY];
+  list_entry DispatcherReadyListHead[priority::maximum];
 
   //
   // Miscellaneous counters.
@@ -595,63 +586,9 @@ struct kprcb
   uint32_t CacheCount;
 };
 
-struct kpcr
+struct kpcr:
+  ntl::mapped_data<kpcr>
 {
-  template<typename type>
-  static inline type get(type kpcr::* member, Int2Type<sizeof(uint8_t)>)
-  {
-    return (type)
-#if defined(_M_IX86)
-      ntl::intrinsic::__readfsbyte
-#elif defined(_M_X64)
-      ntl::intrinsic::__readgsbyte
-#endif
-      ((uint32_t)offsetof(kpcr,*member));
-  }
-  template<typename type>
-  static inline type get(type kpcr::* member, Int2Type<sizeof(uint16_t)>)
-  {
-    return (type)
-#if defined(_M_IX86)
-      ntl::intrinsic::__readfsword
-#elif defined(_M_X64)
-      ntl::intrinsic::__readgsword
-#endif
-      ((uint32_t)offsetof(kpcr,*member));
-  }
-  template<typename type>
-  static inline type get(type kpcr::* member, Int2Type<sizeof(uint32_t)>)
-  {
-    return (type)
-#if defined(_M_IX86)
-      ntl::intrinsic::__readfsdword
-#elif defined(_M_X64)
-      ntl::intrinsic::__readgsdword
-#endif
-      ((uint32_t)offsetof(kpcr,*member));
-  }
-  template<typename type>
-  static inline type get(type kpcr::* member, Int2Type<sizeof(uint64_t)>)
-  {
-    return (type)
-#if defined(_M_IX86)
-      ntl::intrinsic::__readfsqword
-#elif defined(_M_X64)
-      ntl::intrinsic::__readgsqword
-#endif
-      ((uint32_t)offsetof(kpcr,*member));
-  }
-  template<typename type>
-  static inline type get(type kpcr::* member)
-  {
-    return get( member, Int2Type<sizeof(type)>() );
-  }
-
-  static __forceinline
-    kpcr& instance() { return *static_cast<kpcr*>(get(&kpcr::Self)); }
-
-
-
   union {
     nt::tib NtTib;
     struct {
@@ -686,6 +623,7 @@ struct kpcr
 };
 #endif
 
+
 //
 // Is the current processor executing a DPC (either a threaded DPC or a
 // legacy DPC).
@@ -707,6 +645,14 @@ bool KeIsExecutingDpc()
 
 #endif
 
+static inline uint32_t current_processor()
+{
+#ifndef _M_X64
+  return kpcr::get(&kpcr::Number);
+#else
+  return kpcr::instance().Prcb.Number;
+#endif
+}
 
 /// Common KTHREAD region
 struct kthread32
@@ -723,7 +669,7 @@ struct kthread32
   /* 0x2e */  bool              Alerted[2/*UserMode+1*/];
   /* 0x30 */  uint8_t           Iopl;
   /* 0x31 */  uint8_t           NpxState;
-  /* 0x32 */  int8_t              Saturation;
+  /* 0x32 */  int8_t            Saturation;
   /* 0x33 */  int8_t            Priority;
   /* 0x34 */  kapc_state        ApcState;
   /* 0x4c */  uint32_t          ContextSwitches;
@@ -1139,17 +1085,24 @@ class system_tread : public handle, public device_traits<system_tread>
 
 
 template <class Clock, class Duration>
-void sleep_until(const std::chrono::time_point<Clock, Duration>& abs_time, bool alertable = false)
+static inline void sleep_until(const std::chrono::time_point<Clock, Duration>& abs_time, bool alertable = false)
 {
   KeDelayExecutionThread(KernelMode, alertable, std::chrono::duration_cast<system_duration>(abs_time.time_since_epoch()).count());
 }
 
 template <class Rep, class Period>
-void sleep_for(const std::chrono::duration<Rep, Period>& rel_time, bool alertable = false)
+static inline void sleep_for(const std::chrono::duration<Rep, Period>& rel_time, bool alertable = false)
 {
   KeDelayExecutionThread(KernelMode, alertable, -1i64 * std::chrono::duration_cast<system_duration>(rel_time).count());
 }
 
+template <class Rep, class Period>
+static inline void stall_execution(const std::chrono::duration<Rep, Period>& time)
+{
+  KeStallExecutionProcessor(static_cast<uint32_t>(std::chrono::duration_cast<std::chrono::microseconds>(time).count()));
+}
+
+#pragma warning(pop)
 
 }//namspace km
 }//namespace ntl

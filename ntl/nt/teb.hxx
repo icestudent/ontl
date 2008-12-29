@@ -55,6 +55,63 @@ namespace intrinsic {
 
 struct exception_registration; ///\see exception::registration. It's a forward declaration
 
+template<class Data>
+struct mapped_data
+{
+  template<typename type>
+  static inline type get(type Data::* member, Int2Type<sizeof(uint8_t)>)
+  {
+    return (type)
+    #if defined(_M_IX86)
+      ntl::intrinsic::__readfsbyte
+    #elif defined(_M_X64)
+      ntl::intrinsic::__readgsbyte
+    #endif
+      ((uint32_t)offsetof(Data,*member));
+  }
+  template<typename type>
+  static inline type get(type Data::* member, Int2Type<sizeof(uint16_t)>)
+  {
+    return (type)
+    #if defined(_M_IX86)
+      ntl::intrinsic::__readfsword
+    #elif defined(_M_X64)
+      ntl::intrinsic::__readgsword
+    #endif
+      ((uint32_t)offsetof(Data,*member));
+  }
+  template<typename type>
+  static inline type get(type Data::* member, Int2Type<sizeof(uint32_t)>)
+  {
+    return (type)
+    #if defined(_M_IX86)
+      ntl::intrinsic::__readfsdword
+    #elif defined(_M_X64)
+      ntl::intrinsic::__readgsdword
+    #endif
+      ((uint32_t)offsetof(Data,*member));
+  }
+  template<typename type>
+  static inline type get(type Data::* member, Int2Type<sizeof(uint64_t)>)
+  {
+    return (type)
+    #if defined(_M_IX86)
+      ntl::intrinsic::__readfsqword
+    #elif defined(_M_X64)
+      ntl::intrinsic::__readgsqword
+    #endif
+      ((uint32_t)offsetof(Data,*member));
+  }
+  template<typename type>
+  static inline type get(type Data::* member)
+  {
+    return get( member, Int2Type<sizeof(type)>() );
+  }
+
+  static __forceinline
+    Data& instance() { return *static_cast<Data*>(get(&Data::Self)); }
+};
+
 namespace nt {
 
 struct peb;

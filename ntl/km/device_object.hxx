@@ -11,11 +11,10 @@
 #include "object.hxx"
 #include "irp.hxx"
 #include "event.hxx"
+#include "dpc.hxx"
 
 namespace ntl {
 namespace km {
-
-
 
 NTL__EXTERNAPI
 ntstatus __stdcall
@@ -114,6 +113,7 @@ struct device_object
   STATIC_ASSERT(mass_storage == 0x2D);
 
   struct flags { enum type {
+    none,
     do_verify_volume                = 0x00000002,
     do_buffered_io                  = 0x00000004,
     do_exclusive                    = 0x00000008,
@@ -135,6 +135,7 @@ struct device_object
   };
 
   struct characteristics { enum type {
+    none,
     removable_media            = 0x00000001,
     read_only_device           = 0x00000002,
     floppy_diskette            = 0x00000004,

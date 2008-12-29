@@ -13,13 +13,12 @@ namespace tree
     template<class T, class Compare = std::less<T>, class Allocator = std::allocator<T> >
     class rb_tree
     {
+      typedef typename
+        Allocator::template rebind<T>::other        allocator;
     public:
       typedef           T                           value_type;
       typedef           Compare                     value_compare;
-
-      typedef Allocator                             allocator_type;
-      typedef typename
-        Allocator::template rebind<T>::other        allocator;
+      typedef           Allocator                   allocator_type;
 
       typedef typename  allocator::pointer          pointer;
       typedef typename  allocator::const_pointer    const_pointer;

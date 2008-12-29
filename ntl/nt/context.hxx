@@ -12,6 +12,8 @@
 
 namespace ntl {
   namespace nt {
+#pragma warning(push)
+#pragma warning(disable:4201) // nameless struct or union
 
 #if defined(_M_IX86)
 
@@ -218,6 +220,7 @@ struct __declspec(align(16)) context {
 };
 #endif // _M_X64
 
+#pragma warning(pop)
   } // namespace nt
 } // namespace ntl
 

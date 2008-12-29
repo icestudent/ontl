@@ -1,13 +1,11 @@
 /**\file*********************************************************************
-*                                                                     \brief
-*  NT Memory
-*
-****************************************************************************
-*/
-
-
-#ifndef NTL__NT_MM
-#define NTL__NT_MM
+ *                                                                     \brief
+ *  Memory Manager
+ *
+ ****************************************************************************
+ */
+#ifndef NTL__KM_MM
+#define NTL__KM_MM
 
 #include "basedef.hxx"
 #include "../nt/virtualmem.hxx"
@@ -1098,4 +1096,4 @@ namespace ntl {
   } // km
 } // ntl
 
-#endif // NTL__NT_MM
+#endif // NTL__KM_MM

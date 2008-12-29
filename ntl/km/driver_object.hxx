@@ -50,7 +50,6 @@ struct driver_object
   void    (__stdcall *        DriverUnload)(driver_object*);
 
   device_object::dispatch_ptr MajorFunction[28];
-
 };
 
 STATIC_ASSERT(sizeof(driver_object) == 0xA8 || sizeof(driver_object) == 0x150);

@@ -180,7 +180,7 @@ struct shared_data_64 : public shared_data_32
             uint32_t      ImageFileExecutionOptions;
   union {
     uint64_t              AffinityPad;
-    km::kaffinity_t       ActiveProcessorAffinity;
+    km::kaffinity         ActiveProcessorAffinity;
   };
   volatile  uint64_t      InterruptTimeBias;
 };

@@ -64,6 +64,8 @@ class list
     };
     //#pragma warning(pop)
 
+    typedef typename  
+      Allocator::template rebind<T>::other    allocator;
     typedef typename list<T, Allocator>::node node_type;
 
   ///////////////////////////////////////////////////////////////////////////
@@ -71,9 +73,7 @@ class list
 
     // types:
     typedef           T                           value_type;
-    typedef Allocator                             allocator_type;
-    typedef typename  
-      Allocator::template rebind<T>::other        allocator;
+    typedef           Allocator                   allocator_type;
     typedef typename  allocator::pointer          pointer;
     typedef typename  allocator::const_pointer    const_pointer;
     typedef typename  allocator::reference        reference;
