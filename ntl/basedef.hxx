@@ -40,11 +40,26 @@ using std::uintptr_t;
 
 using std::ptrdiff_t;
 
-///\name
-
+/// raw data representation
 typedef std::vector<uint8_t, std::allocator<uint8_t> > raw_data;
 
-// class_enum by remark
+namespace __
+{
+  struct noncopyable
+  {
+  protected:
+    noncopyable(){}
+    ~noncopyable(){}
+  private:
+    noncopyable(const noncopyable&);
+    const noncopyable& operator=(const noncopyable&);
+  };
+}
+
+/// Base class to deny copying of derived classes.
+typedef __::noncopyable noncopyable;
+
+/// class_enum by remark
 template<typename def>
 struct class_enum : def
 {

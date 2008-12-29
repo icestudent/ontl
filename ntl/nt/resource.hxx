@@ -1,10 +1,9 @@
 /**\file*********************************************************************
-*                                                                     \brief
-*  Shared resource support
-*
-****************************************************************************
-*/
-
+ *                                                                     \brief
+ *  Shared resource support
+ *
+ ****************************************************************************
+ */
 #ifndef NTL__NT_RESOURCE
 #define NTL__NT_RESOURCE
 
@@ -178,84 +177,133 @@ namespace ntl {
    /************************************************************************/
    /* CS RAII                                                              */
    /************************************************************************/
+
+   /**
+    *	Critical section RAII wrapper
+    **/
    class critical_section:
-     protected rtl::critical_section
+     protected rtl::critical_section,
+     ntl::noncopyable
    {
    public:
+     /** Constructs CS object */
      critical_section()
      {
        ntl::nt::RtlInitializeCriticalSection(this);
      }
 
+     /** Constructs CS object with the specified spin count */
      explicit critical_section(uint32_t SpinCount)
      {
        ntl::nt::RtlInitializeCriticalSectionAndSpinCount(this, SpinCount);
      }
 
+     /** Destroys CS object. If CS was owned, it is undefined behaviour. */
      ~critical_section()
      {
        ntl::nt::RtlDeleteCriticalSection(this);
      }
 
+     /** Waits and takes ownership of CS. */
      void acquire()
      {
        ntl::nt::RtlEnterCriticalSection(this);
      }
 
+     /** Releases owlership. */
      void release()
      {
        ntl::nt::RtlLeaveCriticalSection(this);
      }
 
+     /** Attempts to take ownership of this CS object. */
      bool try_acquire()
      {
        return ntl::nt::RtlTryEnterCriticalSection(this) != 0;
      }
 
+     /** Checks owlership of this CS. */
      bool locked()
      {
        return ntl::nt::RtlIsCriticalSectionLocked(this) != 0;
      }
 
+     /** Checks is the current thread is owner of CS. */
      bool thread_locked()
      {
        return ntl::nt::RtlIsCriticalSectionLockedByThread(this) != 0;
      }
 
+     
+     /**
+      *	@brief Waits the specified time for ownership of the CS
+      *
+      * This function implements the waiting on CS object. 
+      * If the CS is haves a synchronization object, function calls standard wait mechanism,
+      * otherwise it waits with a delayed execution.
+      *
+      *	@param[in] timeout absolute or relative time to wait.
+      *	@param[in] explicit_wait If CS doesn't have a synchronization object and CS object is owled by other thread, immediately returns.
+      *	@param[in] alertable waiting is alertable.
+      *
+      *	@return Wait status
+      *
+      **/
      ntstatus wait(const systime_t& timeout, bool explicit_wait, bool alertable = true)
      {
-       if(!LockSemaphore){
-         if(!try_acquire() && !explicit_wait)
-          return status::invalid_handle;
-
-         // wait
-         ntstatus st;
-         systime_t period = timeout;
-         systime_t const interval = std::chrono::duration_cast<system_duration>( std::chrono::milliseconds(50)).count();
-         do{
-           st = NtDelayExecution(alertable, interval);
-           period -= interval;
-         }while(st == status::timeout && period > 0);
-         return st;
+       if(LockSemaphore){
+         DebugInfo->EntryCount++;
+         DebugInfo->ContentionCount++;
+         return NtWaitForSingleObject(LockSemaphore, alertable, timeout);
        }
 
-       DebugInfo->EntryCount++;
-       DebugInfo->ContentionCount++;
-       return NtWaitForSingleObject(LockSemaphore, alertable, timeout);
+       if(!try_acquire() && !explicit_wait)
+         return status::invalid_handle;
+
+       // wait
+       ntstatus st;
+       systime_t period = timeout;
+       systime_t const interval = std::chrono::duration_cast<system_duration>( std::chrono::milliseconds(50)).count();
+       do{
+         st = NtDelayExecution(alertable, interval);
+         period -= interval;
+       }while(st == status::timeout && period > 0);
+       return st;
      }
 
+     /**
+      *	@brief Waits to ownership until the specified time is occurs
+      *
+      *	@param[in] abs_time absolute time to wait
+      *	@param[in] explicit_wait force wait if CS doesn't have synchronization object
+      *	@param[in] alertable is waiting is alertable
+      *
+      *	@return Wait status
+      *
+      **/
      template <class Clock, class Duration>
      ntstatus wait_until(const std::chrono::time_point<Clock, Duration>& abs_time, bool explicit_wait = true, bool alertable = true)
      {
        return wait(std::chrono::duration_cast<system_duration>(abs_time.time_since_epoch()).count(), explicit_wait, alertable);
      }
 
+     /**
+      *	@brief Waits to ownership for specified time
+      *
+      *	@param[in] rel_time relative time to wait
+      *	@param[in] explicit_wait force wait if CS doesn't have synchronization object
+      *	@param[in] alertable is waiting is alertable
+      *
+      *	@return Wait status
+      *
+      **/
      template <class Rep, class Period>
      ntstatus wait_for(const std::chrono::duration<Rep, Period>& rel_time, bool explicit_wait = true, bool alertable = true)
      {
        return wait(-1i64 * std::chrono::duration_cast<system_duration>(rel_time).count(), explicit_wait, alertable);
      }
 
+     /** Sets spin count */
      void spin_count(uint32_t SpinCount)
      {
        ntl::nt::RtlSetCriticalSectionSpinCount(this, SpinCount);

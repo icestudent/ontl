@@ -787,6 +787,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\nt\mutex.hxx"
+					>
+				</File>
+				<File
 					RelativePath=".\nt\new.hxx"
 					>
 				</File>
