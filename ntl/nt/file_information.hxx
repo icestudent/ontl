@@ -22,55 +22,55 @@ namespace nt {
 
 enum file_information_class
 {
-  FileDirectoryInformation                = 1,
-  FileFullDirectoryInformation            = 2,
-  FileBothDirectoryInformation            = 3,
-  FileBasicInformation                    = 4,
-  FileStandardInformation                 = 5,
-  FileInternalInformation                 = 6,
-  FileEaInformation                       = 7,
-  FileAccessInformation                   = 8,
-  FileNameInformation                     = 9,
-  FileRenameInformation                   = 10,
-  FileLinkInformation                     = 11,
-  FileNamesInformation                    = 12,
-  FileDispositionInformation              = 13,
-  FilePositionInformation                 = 14,
-  FileFullEaInformation                   = 15,
-  FileModeInformation                     = 16,
-  FileAlignmentInformation                = 17,
-  FileAllInformation                      = 18,
-  FileAllocationInformation               = 19,
-  FileEndOfFileInformation                = 20,
-  FileAlternateNameInformation            = 21,
-  FileStreamInformation                   = 22,
-  FilePipeInformation                     = 23,
-  FilePipeLocalInformation                = 24,
-  FilePipeRemoteInformation               = 25,
-  FileMailslotQueryInformation            = 26,
-  FileMailslotSetInformation              = 27,
-  FileCompressionInformation              = 28,
-  FileObjectIdInformation                 = 29,
-  FileCompletionInformation               = 30,
-  FileMoveClusterInformation              = 31,
-  FileQuotaInformation                    = 32,
-  FileReparsePointInformation             = 33,
-  FileNetworkOpenInformation              = 34,
-  FileAttributeTagInformation             = 35,
-  FileTrackingInformation                 = 36,
-  FileIdBothDirectoryInformation          = 37,
-  FileIdFullDirectoryInformation          = 38,
-  FileValidDataLengthInformation          = 39,
-  FileShortNameInformation                = 40,
-  FileIoCompletionNotificationInformation = 41,
-  FileIoStatusBlockRangeInformation       = 42,
-  FileIoPriorityHintInformation           = 43,
-  FileSfioReserveInformation              = 44,
-  FileSfioVolumeInformation               = 45,
-  FileHardLinkInformation                 = 46,
-  FileProcessIdsUsingFileInformation      = 47,
-  FileNormalizedNameInformation           = 48,
-  FileNetworkPhysicalNameInformation      = 49,
+  FileDirectoryInformation    = 1,
+  FileFullDirectoryInformation,
+  FileBothDirectoryInformation,
+  FileBasicInformation,
+  FileStandardInformation,
+  FileInternalInformation,
+  FileEaInformation,
+  FileAccessInformation,
+  FileNameInformation,
+  FileRenameInformation,
+  FileLinkInformation,
+  FileNamesInformation,
+  FileDispositionInformation,
+  FilePositionInformation,
+  FileFullEaInformation,
+  FileModeInformation,
+  FileAlignmentInformation,
+  FileAllInformation,
+  FileAllocationInformation,
+  FileEndOfFileInformation,
+  FileAlternateNameInformation,
+  FileStreamInformation,
+  FilePipeInformation,
+  FilePipeLocalInformation,
+  FilePipeRemoteInformation,
+  FileMailslotQueryInformation,
+  FileMailslotSetInformation,
+  FileCompressionInformation,
+  FileObjectIdInformation,
+  FileCompletionInformation,
+  FileMoveClusterInformation,
+  FileQuotaInformation,
+  FileReparsePointInformation,
+  FileNetworkOpenInformation,
+  FileAttributeTagInformation,
+  FileTrackingInformation,
+  FileIdBothDirectoryInformation,
+  FileIdFullDirectoryInformation,
+  FileValidDataLengthInformation,
+  FileShortNameInformation,
+  FileIoCompletionNotificationInformation,
+  FileIoStatusBlockRangeInformation,
+  FileIoPriorityHintInformation,
+  FileSfioReserveInformation,
+  FileSfioVolumeInformation,
+  FileHardLinkInformation,
+  FileProcessIdsUsingFileInformation,
+  FileNormalizedNameInformation,
+  FileNetworkPhysicalNameInformation,
   FileMaximumInformation
 }; // enum file_information_class
 
@@ -210,7 +210,62 @@ struct file_standard_information
   int64_t   size() const { return EndOfFile; }
 };
 
-///\  FileRenameInformation == 10
+///\name  FileNameInformation == 9
+struct file_name_information
+{
+  static const file_information_class info_class_type = FileNameInformation;
+
+  uint32_t  FileNameLength;
+  wchar_t   FileName[1];
+
+  const_unicode_string name() const { return const_unicode_string(FileName, FileNameLength / sizeof(wchar_t)); }
+};
+
+template<>
+struct file_information<file_name_information>
+{
+  typedef file_name_information info_class;
+
+  file_information(legacy_handle file_handle)
+  {
+    // length of the name is 32 characters long max
+    for(uint32_t length = sizeof(info_class)+sizeof(wchar_t)*32; ptr.reset(new char[length]), ptr; length *= 2)
+    {
+      status_ = query(file_handle, ptr.get(), length);
+      if(status_ == status::success){
+        break;
+      }else if(status_ != status::buffer_overflow){
+        ptr.release();
+        break;
+      }
+    }
+  }
+
+  const info_class* operator->() const { return data(); }
+  info_class* operator->() { return data(); }
+
+  info_class* data() { return reinterpret_cast<info_class*>(ptr.get()); }
+  const info_class* data() const { return reinterpret_cast<const info_class*>(ptr.get()); }
+
+  operator const void*() const { return ptr.get(); }
+
+  static __forceinline
+    ntstatus query(
+    legacy_handle file_handle,
+    void*     file_information,
+    uint32_t  file_information_length
+    )
+  {
+    io_status_block iosb;
+    return NtQueryInformationFile(file_handle, &iosb, file_information, file_information_length, info_class::info_class_type);
+  }
+private:
+  std::unique_ptr<char[]> ptr;
+  ntstatus status_;
+};
+
+
+///\name  FileRenameInformation == 10
 struct file_rename_information
 {
   static const file_information_class info_class_type = FileRenameInformation;

@@ -95,7 +95,10 @@ class file_handler;
 
 template<>
 struct device_traits<km::file_handler>
-: public device_traits<nt::file_handler> {/**/};
+: public device_traits<nt::file_handler> 
+{
+  static const creation_options io_attach_device_api = static_cast<creation_options>(0x80000000);
+};
 
 
 namespace km {

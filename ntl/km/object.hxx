@@ -12,7 +12,7 @@
 #include "string.hxx"
 #include "handle.hxx"
 #include "../nt/object.hxx"
-
+#include "../memory"
 
 namespace ntl {
 namespace km {
@@ -30,7 +30,10 @@ using nt::object_session_information;
 
 struct device_object;
 struct file_object;
+struct object_type;
+struct access_state;
 
+NTL__EXTERNVAR object_type **IoDeviceObjectType, **IoDriverObjectType, **IoFileObjectType, **IoCompletionObjectType, **IoDeviceHandlerObjectType;
 
 struct object_attributes:
   public nt::object_attributes
@@ -163,6 +166,32 @@ ObjectType *
                                         desired_access, obj_type, access_mode);
 }
 
+NTL__EXTERNAPI
+ntstatus __stdcall
+  ObReferenceObjectByName(
+    const const_unicode_string& ObjectName,
+    uint32_t                    Attributes,
+    access_state*               AccessState   __optional,
+    access_mask                 DesiredAccess __optional,
+    const object_type*          ObjectType,
+    kprocessor_mode             AccessMode,
+    void*                       ParseContext  __optional,
+    void*                       Object
+    );
+
+template<typename ObjectType>
+static __forceinline 
+ObjectType* reference_object(
+  const const_unicode_string& name, 
+  const object_type* type,
+  object_attributes::attributes attributes = object_attributes::case_insensitive,
+  kprocessor_mode access_mode = KernelMode)
+{
+  ObjectType* ptr;
+  return nt::success(ObReferenceObjectByName(name, attributes, nullptr, no_access, type, access_mode, nullptr, &ptr)) ? ptr : nullptr;
+}
+
+
 
 NTL__EXTERNAPI
 void __fastcall
@@ -181,6 +210,30 @@ void dereference_object(file_object * pfo)
   ObfDereferenceObject(pfo);
 }
 
+namespace __ 
+{
+  struct dereference_object
+  {
+    inline void operator()(void* pdo)
+    {
+      ntl::km::ObfDereferenceObject(pdo);
+    }
+  };
+}
+
+/**
+ *	@brief Referenced object holder
+ *
+ *  referenced_object could be used to hold objects from ObReferenceObjectBy*. 
+ *  It calls dereference_object automatically when object is not needed anymore.
+ **/
+template<class Object>
+struct referenced_object: std::unique_ptr<Object, __::dereference_object>
+{
+  explicit referenced_object(Object* obj)
+    :unique_ptr(obj)
+  {}
+};
 
 /// Volume Parameter Block
 struct vpb
@@ -251,6 +304,5 @@ struct wait_context_block
 
 }//namspace km
 }//namespace ntl
-
 
 #endif//#ifndef NTL__KM_OBJECT

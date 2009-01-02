@@ -51,8 +51,9 @@ struct driver_object
 
   device_object::dispatch_ptr MajorFunction[28];
 };
-
 STATIC_ASSERT(sizeof(driver_object) == 0xA8 || sizeof(driver_object) == 0x150);
+
+
 
 __forceinline
 ntstatus device_object::call(irp * pirp)
@@ -97,6 +98,5 @@ IoRegisterDriverReinitialization(
 
 }//namspace km
 }//namespace ntl
-
 
 #endif//#ifndef NTL__KM_DRIVER_OBJECT

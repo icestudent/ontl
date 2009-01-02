@@ -49,7 +49,7 @@ using nt::list_entry;
 using nt::list_head;
 using nt::status;
 using nt::exception;
-using nt::access_mask;
+
 using nt::synchronize;
 using nt::generic_read;
 
@@ -65,6 +65,11 @@ using nt::const_unicode_string;
 using nt::const_ansi_string;
 
 using nt::systime_t;
+
+// access mask
+using nt::access_mask;
+using nt::no_access;
+
 
 // forward declarations
 struct kthread;

@@ -25,11 +25,29 @@ using nt::file_information_class;
 using nt::query_information_file_t;
 using nt::set_information_file_t;
 
+typedef ntstatus __stdcall io_query_information_file_t(
+  file_object*            FileObject,
+  file_information_class  FileInformationClass,
+  uint32_t                Length,
+  void*                   FileInformation,
+  uint32_t*               ReturnedLength
+  );
+
+typedef ntstatus __stdcall io_set_information_file_t(
+  file_object*            FileObject,
+  file_information_class  FileInformationClass,
+  uint32_t                Length,
+  void*                   FileInformation
+  );
+
 NTL__EXTERNAPI query_information_file_t ZwQueryInformationFile;
 NTL__EXTERNAPI set_information_file_t   ZwSetInformationFile;
+NTL__EXTERNAPI io_query_information_file_t IoQueryFileInformation;
+NTL__EXTERNAPI io_set_information_file_t   IoSetInformation;
 
 using nt::file_basic_information;
 using nt::file_standard_information;
+using nt::file_name_information;
 using nt::file_rename_information;
 using nt::file_disposition_information;
 using nt::file_end_of_file_information;
@@ -84,7 +102,6 @@ struct file_information<file_rename_information>
 
   private:
     ntstatus    status_;
-
 };
 
 

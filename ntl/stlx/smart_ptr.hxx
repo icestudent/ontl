@@ -41,6 +41,9 @@ namespace std
     template <class U, size_t S> default_delete(const default_delete<U[S]>&);
   };
 
+  template<>
+  struct default_delete<int>{};
+
   /// 20.7.11.1.2 default_delete<T[]> [unique.ptr.dltr.dflt1]
   template <class T> struct default_delete<T[]>
   {

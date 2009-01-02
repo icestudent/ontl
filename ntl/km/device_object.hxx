@@ -44,6 +44,16 @@ NTL__EXTERNAPI
 ntstatus __stdcall
   IoDeleteSymbolicLink(const const_unicode_string& SymbolicLinkName);
 
+NTL__EXTERNAPI
+ntstatus __stdcall
+  IoEnumerateDeviceObjectList(
+    const driver_object*  DriverObject,
+    device_object** DeviceObjectList,
+    uint32_t DeviceObjectListSize,
+    uint32_t* ActualNumberDeviceObjects
+    );
+
+
 struct devobj_extension
 {
   uint16_t        Type;
@@ -63,6 +73,24 @@ struct devobj_extension
 
 struct device_object
 {
+  struct io_type
+  {
+    enum type {
+      adapter,
+      controller,
+      device,
+      driver,
+      file,
+      irp,
+      master_adapter,
+      open_packet,
+      timer,
+      vpb,
+      error_log,
+      error_message,
+      device_object_extension
+    };
+  };
   enum type {
     beep = 1,
     cd_rom,
@@ -108,9 +136,23 @@ struct device_object
     bus_extender,
     modem,
     vdm,
-    mass_storage
+    mass_storage,
+    smb,
+    ks,
+    changer,
+    smartcard,
+    acpi,
+    dvd,
+    fullscreen_video,
+    dfs_file_system,
+    dfs_volume,
+    serenum,
+    termsrv,
+    ksec,
+    fips,
+    infiniband,
   };
-  STATIC_ASSERT(mass_storage == 0x2D);
+  STATIC_ASSERT(infiniband == 0x3B);
 
   struct flags { enum type {
     none,
@@ -155,7 +197,7 @@ struct device_object
     static const type propagated = static_cast<type>(removable_media|read_only_device|floppy_diskette|write_once_media|device_secure_open);
   };
 
-  const uint16_t        Type;
+  const uint16_t        Type;               // io_type
   const uint16_t        Size;
   const int32_t         ReferenceCount;
   driver_object * const DriverObject;
@@ -167,7 +209,7 @@ struct device_object
   characteristics::type Characteristics;
   vpb *                 Vpb;
   void * const          DeviceExtension;
-  type                  DeviceType;
+  type                  DeviceType;         // type
   uint8_t               StackSize;
   union { list_entry ListEntry; wait_context_block  Wcb; } Queue;
   uint32_t              AlignmentRequirement;
