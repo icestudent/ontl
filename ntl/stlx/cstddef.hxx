@@ -482,14 +482,14 @@ static_assert(sizeof(nullptr)==sizeof(void*), "3.9.1.10: sizeof(std::nullptr_t) 
   // from bcb #define offsetof( s_name, m_name )  (size_t)&(((s_name*)0)->m_name)
 #endif
 
-#define __ntl_bitmask_type(bitmask, _friend)\
-  _friend bitmask operator&(bitmask x, bitmask y) { return bitwise_and(x, y); }\
-  _friend bitmask operator|(bitmask x, bitmask y) { return bitwise_or (x, y); }\
-  _friend bitmask operator^(bitmask x, bitmask y) { return bitwise_xor(x, y); }\
-  _friend bitmask operator~(bitmask x) { return static_cast<bitmask>(~static_cast<unsigned>(x)); }\
-  _friend bitmask& operator&=(bitmask& x, bitmask y) { x = x&y ; return x ; }\
-  _friend bitmask& operator|=(bitmask& x, bitmask y) { x = x|y ; return x ; }\
-  _friend bitmask& operator^=(bitmask& x, bitmask y) { x = x^y ; return x ; }
+#define __ntl_bitmask_type(bitmask, _func_spec)\
+  _func_spec bitmask operator&(bitmask x, bitmask y) { return bitwise_and(x, y); }\
+  _func_spec bitmask operator|(bitmask x, bitmask y) { return bitwise_or (x, y); }\
+  _func_spec bitmask operator^(bitmask x, bitmask y) { return bitwise_xor(x, y); }\
+  _func_spec bitmask operator~(bitmask x) { return static_cast<bitmask>(~static_cast<unsigned>(x)); }\
+  _func_spec bitmask& operator&=(bitmask& x, bitmask y) { x = x&y ; return x ; }\
+  _func_spec bitmask& operator|=(bitmask& x, bitmask y) { x = x|y ; return x ; }\
+  _func_spec bitmask& operator^=(bitmask& x, bitmask y) { x = x^y ; return x ; }
 
 /**@} lib_support_types */
 /**@} lib_language_support */

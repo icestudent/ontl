@@ -136,7 +136,7 @@ namespace std
     /**
      *	@brief Numerator of the ratio
      *
-     *  \c num shall have the value \f$ sign(N)*sign(D)*abs(N)/gcd \f$,
+     *  \c num shall have the value \f$ \frac{sign(N)*sign(D)*abs(N)}{gcd} \f$,
      *  but \f$ sign(N)*abs(N) == N \f$.
      **/
     static const ratio_t num = N * __::static_evaluation::sign<D>::value / gcd_value;
@@ -144,8 +144,8 @@ namespace std
     /**
      *	@brief Denominator of the ratio
      *
-     *  \c den shall have the value \f$ sign(N)*sign(D)*abs(D)/gcd \f$, after simplification it would be
-     *  \f$ D * sign(N) / gcd \f$, but we use \f$ abs(D) / gcd \f$ (see N2661).
+     *  \c den shall have the value \f$ \frac{sign(N)*sign(D)*abs(D)}{gcd} \f$, after simplification it would be
+     *  \f$ \frac{D * sign(N)}{gcd} \f$, but we use \f$ \frac{abs(D)}{gcd} \f$ (see N2661).
      **/
     static const ratio_t den = __::static_evaluation::abs<D>::value / gcd_value;
   };
