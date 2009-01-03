@@ -64,9 +64,9 @@ namespace intrinsic
 #pragma intrinsic(_InterlockedCompareExchange, _InterlockedCompareExchange16, _InterlockedCompareExchange64)
 #ifdef _M_X64
 #pragma intrinsic(_InterlockedAnd64, _InterlockedOr64, _InterlockedXor64, _InterlockedIncrement64, _InterlockedDecrement64, _InterlockedExchange64, _InterlockedExchangeAdd64)
-#pragma intrinsic(_InterlockedCompareExchangePointer, _InterlockedCompare64Exchange128, _InterlockedExchangePointer)
-#if _MSC_VER >= 1500
-#pragma intrinsic(_InterlockedCompareExchange128)
+#pragma intrinsic(_InterlockedCompareExchangePointer, _InterlockedExchangePointer)
+#if _MSC_VER >= 1600
+#pragma intrinsic(_InterlockedCompareExchange128, _InterlockedCompare64Exchange128)
 #endif
 #endif
 
