@@ -263,8 +263,8 @@ private:
 
 }; // struct device_object
 
-__ntl_bitmask_type(device_object::flags::type,);
-__ntl_bitmask_type(device_object::characteristics::type,);
+__ntl_bitmask_type(device_object::flags::type, inline);
+__ntl_bitmask_type(device_object::characteristics::type, inline);
 
 typedef device_object::type device_type;
 
