@@ -38,10 +38,19 @@ class consoleapp : public win::application<win::tchar_t>
 
 };
 
+#ifdef _MSC_VER
+  // this used to prevent linker error if CRT initialization isn't needed
+  #pragma comment(linker, "/alternatename:__init_crt=__init_crt_stub")
+  extern "C" inline void _cdecl __init_crt_stub(){}
+#endif
+
 #pragma warning(push)
 #pragma warning(disable:4714)//function 'int __thiscall ntl::consoleapp::main(void)' marked as __forceinline not inlined
 int _Consoleapp_entry()
 {
+  #ifdef _MSC_VER
+  __init_crt_stub(); // dummy reference to the stub
+  #endif
   crt_initializer __crt;
   consoleapp app;
   return app.main();

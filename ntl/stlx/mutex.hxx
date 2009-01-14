@@ -40,17 +40,24 @@ namespace std
 #endif
 
 #ifndef NTL__SUBSYSTEM_KM
+  namespace __
+  {
+    namespace mtx
+    {
+      using ntl::nt::base_mutex;
+    }
+  }
+#endif
 
   /// Class mutex [30.3.1.1 thread.mutex.class]
-  typedef ntl::nt::base_mutex<false> mutex;
+  typedef __::mtx::base_mutex<false> mutex;
 
   /// Class recursive_mutex [30.3.1.2 thread.mutex.recursive]
-  typedef ntl::nt::base_mutex<true> recursive_mutex;
-#endif
-  
+  typedef __::mtx::base_mutex<true> recursive_mutex;
+
   /// Class timed_mutex [30.3.2.1 thread.timedmutex.class]
   class timed_mutex:
-    public __::base_mutex<false>
+    public __::mtx::base_mutex<false>
   {
   public:
     timed_mutex()
@@ -84,7 +91,7 @@ namespace std
 
   /// Class recursive_timed_mutex [30.3.2.2 thread.timedmutex.recursive]
   class recursive_timed_mutex:
-    __::base_mutex<true>
+    __::mtx::base_mutex<true>
   {
   public:
     recursive_timed_mutex()

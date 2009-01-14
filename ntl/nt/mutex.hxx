@@ -13,6 +13,7 @@ namespace ntl {
   namespace nt {
 
     /// STL default base mutex object
+    /// In NT subsystem implemented as futex.
     template<bool recursive>
     class base_mutex:
       protected ntl::nt::critical_section

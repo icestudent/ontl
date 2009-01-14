@@ -54,7 +54,7 @@ namespace
 
 namespace ntl
 {
-  void _cdecl __init_crt(bool init)
+  extern "C" void _cdecl __init_crt(bool init)
   {
     if(init){
       exit_list = new exit_funcs_t();

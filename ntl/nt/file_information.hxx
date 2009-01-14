@@ -10,7 +10,7 @@
 
 #include "basedef.hxx"
 #include "handle.hxx"
-#include "../stlx/../memory"
+#include "../memory"
 
 
 namespace ntl {

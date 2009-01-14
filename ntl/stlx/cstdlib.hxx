@@ -270,7 +270,7 @@ namespace ntl
    }
    \endcode
    **/
-  void _cdecl __init_crt(bool init);
+  extern "C" void _cdecl __init_crt(bool init);
 
   /**
    *	@brief C++ static initialization helper

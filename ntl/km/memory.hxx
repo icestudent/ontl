@@ -34,7 +34,7 @@ namespace ntl {
 
       __declspec(noalias) __declspec(restrict)
         __forceinline
-        pointer allocate(size_type n, std::allocator<void>::const_pointer hint = 0)
+        pointer allocate(size_type n, std::allocator<void>::const_pointer = 0)
         __ntl_nothrow
       {
         (hint);
