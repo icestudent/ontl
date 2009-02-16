@@ -60,6 +60,7 @@ namespace __
 typedef __::noncopyable noncopyable;
 
 /// class_enum by remark
+#if 0
 template<typename def, typename inner = def::type>
 struct class_enum: def
 {
@@ -73,6 +74,18 @@ struct class_enum: def
 
   inner value;
 };
+#else
+template<typename def>
+struct class_enum: def
+{
+  typedef typename def::type type;
+  __forceinline
+    class_enum(type v) : value(v) {}
+  __forceinline
+    operator type () const { return value; }
+  type value;
+};
+#endif
 
 #define __class_enum(name) struct name ## _def; typedef class_enum<name ## _def> name; struct name ## _def { enum type
 

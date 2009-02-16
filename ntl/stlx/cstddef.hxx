@@ -295,7 +295,7 @@
 // alignof
 //#define NTL__CXX_ALIGNOF
 // auto
-//#define NTL__CXX_AUTO
+#define NTL__CXX_AUTO
 // char16_t, char32_t
 //#define NTL__CXX_CHARS
 // concepts, concept_map, requires

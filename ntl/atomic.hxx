@@ -10,7 +10,7 @@
 
 namespace ntl {
 
-#ifdef  _MSC_VER
+#if defined(_MSC_VER)
 
 namespace intrinsic
 {
@@ -483,6 +483,84 @@ namespace atomic {
 
 #pragma warning(pop)
 }//namespace atomic
+
+#elif defined(__GNUC__)
+
+namespace atomic {
+
+  template<typename T>
+  static inline
+    T increment(volatile T & val)
+  {
+    return __sync_fetch_and_add(&val, 1);
+  }
+
+  template<typename T>
+  static inline
+    T decrement(volatile T & val)
+  {
+    return __sync_fetch_and_sub(&val);
+  }
+
+  template<typename T>
+  static inline
+    T and(volatile T & val, T mask)
+  {
+    return __sync_fetch_and_and(&val, mask);
+  }
+  static inline
+    bool and(volatile bool & val, bool mask)
+  {
+    return and(reinterpret_cast<volatile uint8_t&>(val), mask) == 1;
+  }
+
+  template<typename T>
+  static inline
+    T or(volatile T & val, T mask)
+  {
+    return __sync_fetch_and_or(&val, mask);
+  }
+  static inline
+    bool or(volatile bool & val, bool mask)
+  {
+    return or(reinterpret_cast<volatile uint8_t&>(val), mask) == 1;
+  }
+
+  template<typename T>
+  static inline
+    T xor(volatile T & val, T mask)
+  {
+    return __sync_fetch_and_xor(&val, mask);
+  }
+  static inline
+    bool xor(volatile bool & val, bool mask)
+  {
+    return xor(reinterpret_cast<volatile uint8_t&>(&val), mask) == 1;
+  }
+
+  template<typename T>
+  static inline
+    T exchange(volatile T & dest, T val)
+  {
+    return __sync_lock_test_and_set(&dest, val);
+  }
+
+  template<typename T>
+  static inline
+    T exchange_add(volatile T & dest, T val)
+  {
+    return __sync_fetch_and_add(&dest, val);
+  }
+
+  template<typename T>
+  static inline
+    T compare_exchange(volatile T & dest, T exchange, T comperand)
+  {
+    return __sync_val_compare_and_swap(&dest, comperand, exchange);
+  }
+
+}//namespace atomic
+
 
 #else
 

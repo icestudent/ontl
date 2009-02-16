@@ -99,6 +99,11 @@ struct kwait_reason_def
 };
 typedef ntl::class_enum<kwait_reason_def> kwait_reason;
 
+static inline const systime_t& infinite_timeout()
+{
+  static const systime_t* const p = 0;
+  return *p;
+}
 
 NTL__EXTERNAPI
 ntstatus __stdcall

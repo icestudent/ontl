@@ -287,6 +287,56 @@ struct process_basic_information: aux::read_only
   legacy_handle InheritedFromUniqueProcessId;
 };
 
+///\name  ProcessIoCounters == 2
+struct process_io_counters: aux::read_only
+{
+  static const process_information_class info_class_type = ProcessIoCounters;
+
+  uint64_t ReadOperationCount;
+  uint64_t WriteOperationCount;
+  uint64_t OtherOperationCount;
+  uint64_t ReadTransferCount;
+  uint64_t WriteTransferCount;
+  uint64_t OtherTransferCount;
+};
+
+///\name  ProcessVmCounters == 3
+struct process_vm_counters: aux::read_only
+{
+  static const process_information_class info_class_type = ProcessVmCounters;
+
+  size_t PeakVirtualSize;
+  size_t VirtualSize;
+  uint32_t PageFaultCount;
+  size_t PeakWorkingSetSize;
+  size_t WorkingSetSize;
+  size_t QuotaPeakPagedPoolUsage;
+  size_t QuotaPagedPoolUsage;
+  size_t QuotaPeakNonPagedPoolUsage;
+  size_t QuotaNonPagedPoolUsage;
+  size_t PagefileUsage;
+  size_t PeakPagefileUsage;
+};
+
+///\name  ProcessVmCounters == 3
+struct process_vm_counters_ex: aux::read_only
+{
+  static const process_information_class info_class_type = ProcessVmCounters;
+
+  size_t PeakVirtualSize;
+  size_t VirtualSize;
+  uint32_t PageFaultCount;
+  size_t PeakWorkingSetSize;
+  size_t WorkingSetSize;
+  size_t QuotaPeakPagedPoolUsage;
+  size_t QuotaPagedPoolUsage;
+  size_t QuotaPeakNonPagedPoolUsage;
+  size_t QuotaNonPagedPoolUsage;
+  size_t PagefileUsage;
+  size_t PeakPagefileUsage;
+  size_t PrivateUsage;
+};
+
 ///\name  ProcessTimes == 4
 struct kernel_user_times: aux::read_only
 {
@@ -308,6 +358,22 @@ struct process_base_priority_information: aux::write_only
   process_base_priority_information(uint32_t priority)
     :BasePriority(priority)
   {}
+};
+
+///\name  ProcessIoCounters == 14
+struct pooled_usage_and_limits: aux::read_only
+{
+  static const process_information_class info_class_type = ProcessPooledUsageAndLimits;
+
+  size_t PeakPagedPoolUsage;
+  size_t PagedPoolUsage;
+  size_t PagedPoolLimit;
+  size_t PeakNonPagedPoolUsage;
+  size_t NonPagedPoolUsage;
+  size_t NonPagedPoolLimit;
+  size_t PeakPagefileUsage;
+  size_t PagefileUsage;
+  size_t PagefileLimit;
 };
 
 ///\name  ProcessSessionInformation = 24
