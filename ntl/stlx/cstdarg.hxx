@@ -8,7 +8,7 @@
 #ifndef NTL__STLX_CSTARG
 #define NTL__STLX_CSTARG
 
-namespace std {
+//namespace std {
 
 /**\defgroup  lib_language_support ***** 18 Language support library [language.support] ******
  *@{*/
@@ -58,15 +58,17 @@ typedef struct { } * va_list;
 
 #endif//!_MSC_VER
 
-#else//! va_start
+#endif//! va_start
+
+#ifndef va_start
 #   error define va_start & Co
 #endif
 
 /**@} lib_support_runtime */
 /**@} lib_language_support */
 
-}//namespace std
+//}//namespace std
 
-using std::va_list;
+//using std::va_list;
 
 #endif//#ifndef NTL__STLX_CSTARG
