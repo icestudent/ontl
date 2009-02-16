@@ -15,6 +15,8 @@
 
 #include "initializer_list.hxx"
 
+#include "new.hxx"
+
 namespace std {
 
 /**\addtogroup  lib_utilities ********** 20 General utilities library [utilities] *****
