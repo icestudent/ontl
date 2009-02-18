@@ -71,12 +71,10 @@ class vector
     __forceinline
     void construct(InputIterator first, size_type n)
     {
-      copy_n(first, n, begin_);
-      end_ = begin_ + n;
-      //iterator i = begin_;
-      //for ( ; n--; ++first, ++i )
-        //array_allocator.construct(i, *first);
-      //end_ = i;
+      iterator i = begin_;
+      for ( ; n--; ++first, ++i )
+        array_allocator.construct(i, *first);
+      end_ = i;
     }
 
     template <class ForwardIterator>
