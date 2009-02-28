@@ -54,6 +54,7 @@ namespace std
 
   namespace __
   {
+    // TODO: inherit result_of_function_type from *nary_function<> when arguments count are matched
     template <class FunctionCallType>
     class result_of_function_type;
 
@@ -115,6 +116,45 @@ namespace std
 
 #undef NTL_DEFINE_RESULT_OF_FUNCTION_TYPE
 
+    // copy cv from T to U
+    template<class T, class U>
+    struct copy_cv
+    {
+      typedef typename remove_cv<U>::type rawU;
+      typedef typename conditional<is_const<T>::value,
+        typename add_const<rawU>::type,
+        rawU>::type cU;
+      typedef typename conditional<is_volatile<T>::value,
+        typename add_volatile<cU>::type,
+        cU>::type cvU;
+      typedef cvU type;
+    };
+
+
+    template<class A, class F> struct result_of_memptr;
+
+    template<class WeakA, typename R, class T>
+    struct result_of_memptr<WeakA, R T::*>
+    {
+      // If the type F is a pointer to data member of a class A, the nested type type is a synonym for cv R&, 
+      // where R is the declared type of F, 
+      // and cv represents the const and volatile qualifiers of the A object referred to by a1
+      typedef R result_type;
+      typedef T object_type;
+
+      // weak type A
+      typedef typename WeakA::type A;
+
+      // extract cv from real object type
+      typedef typename conditional<is_pointer<A>::value, typename remove_pointer<A>::type, A>::type cvA;
+      // copy cv to R and add reference
+      //typedef cvA type;
+      typedef typename add_reference<typename copy_cv<cvA, R>::type>::type type;
+    };
+
+    template<class F> struct extract_first_arg;
+    template<class R, class A> struct extract_first_arg<R(A)> { typedef A type; };
+
     template <class FunctionCallType>
     struct result_of_with_nested_result_type
     {
@@ -141,7 +181,26 @@ namespace std
       std::integral_constant<bool, has_nested_result_type_helper<T>::value>
     {};
 
-    // note that the FunctionCallType is always in form F(Args...)!
+
+    /**
+     *  @brief result_of implementation
+     *
+     *	For a callable type \c F and a set of argument types <tt>T1, T2, ..., TN</tt>, the type <tt>result_of<F(T1, T2, ..., TN)>::type</tt> is determined as follows:
+     *  -# If the type \c F is a function object defined in the standard library, the nested type \c type is a synonym for the return type of the call <tt>f(t1, t2, ..., tN)</tt>.
+     *  -# If the type \c F is a pointer to function or a function type, the nested type \c type is a synonym for its return type.
+     *  -# If the type \c F is a pointer to member function, the nested type \c type is a synonym for its return type.
+     *  -# If the type \c F is a pointer to data member of a class \c Ty, the nested type \c type is a synonym for <tt>cv R&</tt>, where \c R 
+     *  is the declared type of \c F, and \c cv represents the const and volatile qualifiers of the \c Ty object referred to by \c t1.
+     *  -# If the type \c F is a class that has a member named \c result_type that names a type, the nested type \c type is a synonym for \c F::result_type.[11]
+     *   <sub>[11] This requirement is not in TR1, so an implementation that conforms to the TR1 specification does not have to satisfy it. It was accidentally left out and will be added in the future.</sub>
+     *  -# If the type \c F is a class that does not have a member named \c result_type or that has a member named \c result_type that does not name a type:
+     *     -# If the argument list is empty (N is 0) the nested type \c type is a synonym for \c void.
+     *     -# Otherwise, the nested type \c type is a synonym for <tt>typename F::result<F(T1, T2, ..., TN)>::type</tt>.[12]
+     *   <sub>[12] That is, if \c F defines a nested template named \c result, \c result_of uses that template; if \c F doesn't define that template, it's an error.</sub>
+     *  -# Otherwise, the program is ill-formed.
+     *
+     *  @note Note that the FunctionCallType is always in form F(Args...)!
+     **/
     template <class FunctionCallType>
     struct result_of_impl
     {
@@ -153,6 +212,9 @@ namespace std
         || is_function<typename remove_reference<typename remove_cv<F>::type>::type>::value;
 
       static const bool is_memfunc = is_member_function_pointer<F>::value; // NOTE: is it can be ref or ptr qualified? Seems no.
+
+      // extension for "STL extensions" book
+      static const bool is_memptr = is_member_object_pointer<F>::value;
 
       static const bool has_result_type = has_nested_result_type<F>::value;
 
@@ -175,17 +237,17 @@ namespace std
 #else
       typedef typename 
         conditional<is_func || is_memfunc,
-          typename result_of_function_type<typename remove_cv<F>::type>,
-          typename conditional<has_result_type,
-            typename result_of_with_nested_result_type<F>,
-            //typename conditional<N == 0,
-              weak_void//,
-              //typename F::template result<FunctionCallType>
-              //                  >::type
+          result_of_function_type<typename remove_cv<F>::type>,
+          typename conditional<is_memptr && N == 1,
+          result_of_memptr<typename extract_first_arg<FunctionCallType>,F>,
+            typename conditional<has_result_type,
+              result_of_with_nested_result_type<F>,
+              weak_void
+                                >::type
                               >::type
                    >::type weak_type;
-      typedef typename weak_type::type type;
 
+      typedef typename weak_type::type type;
 #endif
     };
 

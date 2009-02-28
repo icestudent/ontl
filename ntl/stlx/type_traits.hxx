@@ -55,6 +55,8 @@ namespace __
   typedef sfinae_big    sfinae_failed_tag;
 
 #define NTL_SFINAE_EVAL(test) (sizeof(test) == sizeof(std::__::sfinae_passed_tag))
+#define NTL__EMPTY0
+#define NTL__EMPTY NTL__EMPTY0
 
 } // namespace __
 

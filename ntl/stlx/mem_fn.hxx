@@ -188,9 +188,7 @@ namespace std
     return mem_fn_t<R, cv T, R(T::*)(NTL_SPP_ARGS(1,n,A)) cv, tuple<NTL_SPP_ARGS(1,n,A)> > (pm); \
   }
 
-#define NTL_EMPTY0(x)
-#define NTL_EMPTY(x) NTL_EMPTY0(x)
-  NTL_DEFINE_MEMFN0(NTL_EMPTY(x));
+  NTL_DEFINE_MEMFN0(NTL__EMPTY);
   NTL_DEFINE_MEMFN0(const);
   NTL_DEFINE_MEMFN0(volatile);
   NTL_DEFINE_MEMFN0(const volatile);
@@ -220,8 +218,6 @@ namespace std
   NTL_DEFINE_MEMFN(volatile,5);
   NTL_DEFINE_MEMFN(const volatile,5);
 
-#undef NTL_EMPTY0
-#undef NTL_EMPTY
 #undef NTL_DEFINE_MEMFN
 #undef NTL_DEFINE_MEMFN0
 
