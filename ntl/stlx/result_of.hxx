@@ -139,6 +139,10 @@ namespace std
       // If the type F is a pointer to data member of a class A, the nested type type is a synonym for cv R&, 
       // where R is the declared type of F, 
       // and cv represents the const and volatile qualifiers of the A object referred to by a1
+
+      // NOTE: Но непонятно, в каких случаях должны проявляться эти cv. 
+      // Если это cv a1, но a1 не ссылка, то cv теряется! Тогда во избежание надо писать result_of<F(A&)>, но так не пишут. 
+      // Хз в общем.
       typedef R result_type;
       typedef T object_type;
 
@@ -148,7 +152,7 @@ namespace std
       // extract cv from real object type
       typedef typename conditional<is_pointer<A>::value, typename remove_pointer<A>::type, A>::type cvA;
       // copy cv to R and add reference
-      //typedef cvA type;
+      //typedef A type;
       typedef typename add_reference<typename copy_cv<cvA, R>::type>::type type;
     };
 
@@ -213,7 +217,7 @@ namespace std
 
       static const bool is_memfunc = is_member_function_pointer<F>::value; // NOTE: is it can be ref or ptr qualified? Seems no.
 
-      // extension for "STL extensions" book
+      // extension for "STL extensions" book, if provided one argument only (object)
       static const bool is_memptr = is_member_object_pointer<F>::value;
 
       static const bool has_result_type = has_nested_result_type<F>::value;
