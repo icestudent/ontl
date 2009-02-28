@@ -27,7 +27,7 @@
 #ifndef NTL_PLACEHOLDERS_HXX
 #define NTL_PLACEHOLDERS_HXX
 
-#include <type_traits>
+#include "type_traits.hxx"
 #include "spp/loop.hxx"
 #include "spp/utility.hxx"
 

@@ -24,6 +24,9 @@ namespace std
   *@{
   **/
 
+  /**
+   *	An exception of type \c bad_function_call is thrown by \c function::operator() (20.6.15.2.4) when the function wrapper object has no target.
+   **/
   class bad_function_call:
     public exception
   {
@@ -214,17 +217,25 @@ namespace std
       /************************************************************************/
       /* Function implementation                                              */
       /************************************************************************/
+
+      /**
+       *	function<> implementation
+       **/
       template<typename R, class Args = tuple<> >
       struct function:
         impl::fun_arity<R, Args>
       {
       protected:
+        /// \cond __
         struct explicit_bool { int _; };
         typedef int explicit_bool::*  explicit_bool_type;
         typedef int                   nullptr_t;
+        /// \endcond
 
       public:
-        enum { arity = tuple_size<Args>::value };
+        enum { 
+          /** arguments count */
+          arity = tuple_size<Args>::value };
 
         // allocator-aware:
         //template<class A> function(allocator_arg_t, const A&);
@@ -234,26 +245,31 @@ namespace std
         //template<class F, class A> function(allocator_arg_t, const A&, F);
         //template<class F, class A> function(allocator_arg_t, const A&, F&&);
 
+        /** default ctor */
         explicit function() __ntl_nothrow
           :caller()
         {}
 
+        /** Creates copy of \c r target */
         function(const function& r)
         {
           caller = r.caller ? r.caller->clone() : 0;
         }
 
+        /** dtor */
         ~function()
         {
           clear();
         }
 
+        /** Constructs function wrapper from copy of callable \c f */
         template<typename Fn>
         explicit function(Fn f, typename enable_if<!is_member_function_pointer<Fn>::value>::type* = 0)
         {
           caller = new impl::functor_caller<Fn, result_type, Args>(f);
         }
 
+        /** Constructs member function wrapper from \c f */
         template<typename MemFn>
         explicit function(MemFn f, typename enable_if<is_member_function_pointer<MemFn>::value>::type* = 0)
         {
@@ -262,12 +278,14 @@ namespace std
           caller = new impl::memfun_caller<MemFn, R, Args>(f);
         }
 
+        /** Constructs function wrapper from reference to callable object */
         template<typename F>
         explicit function(reference_wrapper<F> rf)
         {
           caller = new impl::refwrap_caller<F, R, Args>(rf);
         }
 
+        /** Copies \c r target */
         function& operator=(const function& r)
         {
           clear();
@@ -276,41 +294,77 @@ namespace std
           return *this;
         }
 
-#ifdef NTL__CXX_RV
-        function(function&&);
-        function& operator=(function&&);
-        template<class F> function(F&&);
-        template<class F> function& operator=(F&&);
-#endif
+    #ifdef NTL__CXX_RV
+        /** Constructs function wrapper from \r target */
+        function(function&& r)
+          :caller()
+        {
+          if(r.caller)
+            std::swap(caller, r.caller);
+        }
 
+        /** Replaces the target of this wrapper with the target of \c r */
+        function& operator=(function&& r)
+        {
+          clear();
+          if(r.caller)
+            std::swap(caller, r.caller);
+        }
+        /** Constructs function wrapper from callable \c f */
+        template<class F> function(F&& f);
+
+        /** Moves \c f to this wrapper */
+        template<class F> function& operator=(F&& f)
+        {
+          function(f).swap(*this);
+          return *this;
+        }
+    #endif
+
+        /** Copies \c f to this wrapper */
         template<class F> function& operator=(F f) 
         {
           function(f).swap(*this);
           return *this;
         }
 
-        template<class F> function& operator=(reference_wrapper<F> rf)
+        /** Takes referenced callable to this wrapper */
+        template<class F> function& operator=(reference_wrapper<F> rf) __ntl_nothrow
         {
           function(rf).swap(*this);
           return *this;
         }
 
         // 20.6.15.2.4, function invocation:
-        result_type operator()() const { return (*caller)(); }
-        result_type operator()(typename __::arg_t<0, Args>::type a1) const { return (*caller)(a1); }
-        result_type operator()(typename __::arg_t<0, Args>::type a1, typename __::arg_t<1, Args>::type a2) const { return (*caller)(a1,a2); }
+        result_type operator()() const __ntl_throws(bad_function_call)
+        { if(!caller) __ntl_throw(bad_function_call()); return (*caller)(); }
+
+        result_type operator()(typename __::arg_t<0, Args>::type a1) const __ntl_throws(bad_function_call)
+        { if(!caller) __ntl_throw(bad_function_call()); return (*caller)(a1); }
+
+        result_type operator()(typename __::arg_t<0, Args>::type a1, typename __::arg_t<1, Args>::type a2) const __ntl_throws(bad_function_call)
+        { if(!caller) __ntl_throw(bad_function_call()); return (*caller)(a1,a2); }
 
 
         // 20.6.15.2.3 function capacity
-        operator explicit_bool_type() const { return caller ? &explicit_bool::_ : 0; }
+
+        /** Returns true if this has target */
+        operator explicit_bool_type() const __ntl_nothrow { return caller ? &explicit_bool::_ : 0; }
 
 
         // 20.6.15.2.2, function modifiers:
-        void swap(function& r)
+
+        /** Swaps this target with the target of \c r */
+    #ifdef NTL__CXX_RV
+        void swap(function&& r) __ntl_nothrow
+    #else
+        void swap(function&  r) __ntl_nothrow
+    #endif
         {
           std::swap(caller, r.caller);
         }
 
+        /** Assigns this object with callable \f */
         template<class F, class A>
         void assign(F f, const A&)
         {
@@ -318,27 +372,37 @@ namespace std
         }
 
 
-#if STLX__USE_RTTI
+    #if STLX__USE_RTTI
         // 20.6.15.2.5, function target access:
-        const std::type_info& target_type() const
+
+        /** Returns type info of the target if exists; otherwise returns <tt>typeid(void)</tt> */
+        const std::type_info& target_type() const __ntl_nothrow
         {
           return caller ? caller->target_type() : typeid(void);
         }
-        template <typename T> T* target()
+
+        /** Returns pointer to target if T is type of the target or null pointer otherwise */
+        template <typename T> T* target() __ntl_nothrow
         {
           return caller && typeid(T) == target_type() ? reinterpret_cast<T*>(caller->target()) : nullptr;
         }
-        template <typename T> const T* target() const
+
+        /** Returns pointer to constant target if T is type of the target or null pointer otherwise */
+        template <typename T> const T* target() const __ntl_nothrow
         {
           return caller && typeid(T) == target_type() ? reinterpret_cast<T*>(caller->target()) : nullptr;
         }
-#endif
+    #endif
       protected:
+        /// \cond __
         inline void clear()
         {
-          delete caller;
-          caller = nullptr;
+          if(caller){
+            delete caller;
+            caller = nullptr;
+          }
         }
+        /// \endcond
       private:
         impl::caller<result_type, Args>* caller;
       };
@@ -349,6 +413,7 @@ namespace std
     /************************************************************************/
     template<class> class function;
 
+    /** function<> specialization for 0 arguments. \sa v1::function */
     template<class R>
     class function<R()>: 
       public v1::function<R>
@@ -359,8 +424,8 @@ namespace std
       explicit function(F f)
         :base(f)
       {}
-      explicit function(){}
-      function(nullptr_t){}
+      explicit function() __ntl_nothrow {}
+      function(nullptr_t) __ntl_nothrow {}
       function(function& r)
         :base(static_cast<base&>(r)){}
       function& operator=(function& r) { base::operator=(static_cast<base&>(r)); return *this; }
@@ -368,6 +433,7 @@ namespace std
       template<class F> function& operator=(F f) { base::operator=(f); return *this; }
     };
 
+    /** function<> specialization for 1 argument */
     template<class R, class A1>
     class function<R(A1)>:
       public v1::function<R, tuple<A1> >
@@ -378,8 +444,8 @@ namespace std
       explicit function(F f)
         :base(f)
       {}
-      explicit function(){}
-      function(nullptr_t){}
+      explicit function() __ntl_nothrow {}
+      function(nullptr_t) __ntl_nothrow {}
       function(function& r)
         :base(static_cast<base&>(r)){}
       function& operator=(function& r) { base::operator=(static_cast<base&>(r)); return *this; }
@@ -387,6 +453,7 @@ namespace std
       template<class F> function& operator=(F f) { base::operator=(f); return *this; }
     };
 
+    /** function<> specialization for 2 arguments */
     template<class R, class A1, class A2>
     class function<R(A1, A2)>: 
       public v1::function<R, tuple<A1,A2> >
@@ -397,8 +464,8 @@ namespace std
       explicit function(F f)
         :base(f)
       {}
-      explicit function(){}
-      function(nullptr_t){}
+      explicit function() __ntl_nothrow {}
+      function(nullptr_t) __ntl_nothrow {}
       function(function& r)
         :base(static_cast<base&>(r)){}
       function& operator=(function& r) { base::operator=(static_cast<base&>(r)); return *this; }
