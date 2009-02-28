@@ -259,7 +259,8 @@ class vector
       size_type n = static_cast<size_type>(std::distance(first, last));
       if ( capacity() < n )
       {
-        array_allocator.deallocate(begin_, capacity_);
+        if(!empty())
+          array_allocator.deallocate(begin_, capacity_);
         capacity_ = n;
         begin_= array_allocator.allocate(n);
       }

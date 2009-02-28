@@ -12,7 +12,7 @@
 #define NTL__STLX_IOMANIP
 
 #include "iosfwd.hxx"
-#include "ios"
+#include "ios.hxx"
 #include "istream.hxx"
 #include "ostream.hxx"
 

@@ -67,7 +67,6 @@ bool operator>=(const T & x, const T & y) { return !(x < y); }
   struct identity
   {
     typedef T type;
-
     const T& operator()(const T& x) const { return x; }
   };
 
@@ -86,7 +85,12 @@ bool operator>=(const T & x, const T & y) { return !(x < y); }
   }
 
 #else
-  template <class T> struct identity { typedef T type; };
+  template <class T>
+  struct identity
+  {
+    typedef T type;
+    const T& operator()(const T& x) const { return x; }
+  };
 
   template <class T>
   inline const T& forward(const typename identity<T>::type& t) { return t; }

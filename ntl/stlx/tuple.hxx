@@ -27,15 +27,17 @@ namespace std
  */
 
   /// 20.4.1 Class template tuple [tuple.tuple]
-  template<typename T1 = ttl::meta::empty_type, typename T2 = ttl::meta::empty_type, typename T3 = ttl::meta::empty_type>
+  /// \note Maximum tuple arguments is 5.
+  /// \internal Extensible places marked as TUPLE_EXT
+  template<typename T1 = ttl::meta::empty_type, typename T2 = ttl::meta::empty_type, typename T3 = ttl::meta::empty_type, typename T4 = ttl::meta::empty_type, typename T5 = ttl::meta::empty_type>
   class tuple;
 
   /// 20.4.1.4 Tuple helper classes [tuple.helper]
-  template<typename T1 = ttl::meta::empty_type, typename T2 = ttl::meta::empty_type, typename T3 = ttl::meta::empty_type>
+  template<typename T1 = ttl::meta::empty_type, typename T2 = ttl::meta::empty_type, typename T3 = ttl::meta::empty_type, typename T4 = ttl::meta::empty_type, typename T5 = ttl::meta::empty_type>
   struct tuple_size;
 
   /// 20.4.1.4 Tuple helper classes [tuple.helper]
-  template<size_t I, typename T1 = ttl::meta::empty_type, typename T2 = ttl::meta::empty_type, typename T3 = ttl::meta::empty_type>
+  template<size_t I, typename T1 = ttl::meta::empty_type, typename T2 = ttl::meta::empty_type, typename T3 = ttl::meta::empty_type, typename T4 = ttl::meta::empty_type, typename T5 = ttl::meta::empty_type>
   struct tuple_element;
 
 
@@ -184,6 +186,7 @@ namespace std
         :head(), tail()
       {}
 
+      // TUPLE_EXT:
       explicit tuples(typename tuple_param<types, Idx+1>::type p1)
         :head(p1), tail()
       {}
@@ -193,9 +196,16 @@ namespace std
       explicit tuples(typename tuple_param<types, Idx+1>::type p1, typename tuple_param<types, Idx+2>::type p2, typename tuple_param<types, Idx+3>::type p3)
         :head(p1), tail(p2, p3)
       {}
+      explicit tuples(typename tuple_param<types, Idx+1>::type p1, typename tuple_param<types, Idx+2>::type p2, typename tuple_param<types, Idx+3>::type p3, typename tuple_param<types, Idx+4>::type p4)
+        :head(p1), tail(p2, p3, p4)
+      {}
+      explicit tuples(typename tuple_param<types, Idx+1>::type p1, typename tuple_param<types, Idx+2>::type p2, typename tuple_param<types, Idx+3>::type p3, typename tuple_param<types, Idx+4>::type p4, typename tuple_param<types, Idx+5>::type p5)
+        :head(p1), tail(p2, p3, p4, p5)
+      {}
 
-      template<typename U1, typename U2, typename U3>
-      tuples(const tuples<meta::typelist<U1,U2,U3>, Idx>& r)
+      // TUPLE_EXT:
+      template<typename U1, typename U2, typename U3, typename U4, typename U5>
+      tuples(const tuples<meta::typelist<U1,U2,U3,U4,U5>, Idx>& r)
         :head(r.head), tail(r.tail)
       {}
 
@@ -211,8 +221,9 @@ namespace std
         return *this;
       }
 
-      template<typename U1, typename U2, typename U3>
-      tuples& operator=(const tuples<meta::typelist<U1,U2,U3>, Idx>& r)
+      // TUPLE_EXT:
+      template<typename U1, typename U2, typename U3, typename U4, typename U5>
+      tuples& operator=(const tuples<meta::typelist<U1,U2,U3,U4,U5>, Idx>& r)
       {
         head = r.head;
         tail = r.tail;
@@ -220,9 +231,12 @@ namespace std
       }
 
 #ifdef NTL__CXX_RV
+      // TUPLE_EXT:
       typedef typename rparam<types,Idx+0>::type type1;
       typedef typename rparam<types,Idx+1>::type type2;
       typedef typename rparam<types,Idx+2>::type type3;
+      typedef typename rparam<types,Idx+3>::type type4;
+      typedef typename rparam<types,Idx+4>::type type5;
 
       tuples(rvtag, type1&& p1)
         :head(forward<type1>(p1))
@@ -233,9 +247,15 @@ namespace std
       tuples(rvtag, type1&& p1, type2&& p2, type3&& p3)
         :head(forward<type1>(p1)), tail(rvtag(), p2, p3)
       {}
+      tuples(rvtag, type1&& p1, type2&& p2, type3&& p3, type4&& p4)
+        :head(forward<type1>(p1)), tail(rvtag(), p2, p3, p4)
+      {}
+      tuples(rvtag, type1&& p1, type2&& p2, type3&& p3, type4&& p4, type5&& p5)
+        :head(forward<type1>(p1)), tail(rvtag(), p2, p3, p4, p5)
+      {}
 
-      template<typename U1, typename U2, typename U3>
-      tuples(tuples<meta::typelist<U1,U2,U3>, Idx>&& r)
+      template<typename U1, typename U2, typename U3, typename U4, typename U5>
+      tuples(tuples<meta::typelist<U1,U2,U3,U4,U5>, Idx>&& r)
         :head(forward<head_t>(r.head)), tail(forward<tail_t>(r.tail))
       {}
 
@@ -251,8 +271,9 @@ namespace std
         return *this;
       }
 
-      template<typename U1, typename U2, typename U3>
-      tuples& operator=(tuples<meta::typelist<U1,U2,U3>, Idx>&& r)
+      // TUPLE_EXT:
+      template<typename U1, typename U2, typename U3, typename U4, typename U5>
+      tuples& operator=(tuples<meta::typelist<U1,U2,U3,U4,U5>, Idx>&& r)
       {
         head = move(r.head);
         tail = move(r.tail);
@@ -269,8 +290,9 @@ namespace std
       tuples()
       {}
 
-      template<typename U1, typename U2, typename U3>
-      tuples(const tuples<meta::typelist<U1,U2,U3>, Idx>&)
+      // TUPLE_EXT:
+      template<typename U1, typename U2, typename U3, typename U4, typename U5>
+      tuples(const tuples<meta::typelist<U1,U2,U3,U4,U5>, Idx>&)
       {}
 
       tuples(const tuples&)
@@ -279,13 +301,13 @@ namespace std
       tuples& operator=(const tuples&)
       { return *this; }
 
-      template<typename U1, typename U2, typename U3>
-      tuples& operator=(const tuples<meta::typelist<U1,U2,U3>, Idx>&)
+      template<typename U1, typename U2, typename U3, typename U4, typename U5>
+      tuples& operator=(const tuples<meta::typelist<U1,U2,U3,U4,U5>, Idx>&)
       { return *this; }
 
 #ifdef NTL__CXX_RV
-      template<typename U1, typename U2, typename U3>
-      tuples(tuples<meta::typelist<U1,U2,U3>, Idx>&&)
+      template<typename U1, typename U2, typename U3, typename U4, typename U5>
+      tuples(tuples<meta::typelist<U1,U2,U3,U4,U5>, Idx>&&)
       {}
 
       tuples(tuples&&)
@@ -294,16 +316,21 @@ namespace std
       tuples& operator=(tuples&&)
       { return *this; }
 
-      template<typename U1, typename U2, typename U3>
-      tuples& operator=(tuples<meta::typelist<U1,U2,U3>, Idx>&&)
+      template<typename U1, typename U2, typename U3, typename U4, typename U5>
+      tuples& operator=(tuples<meta::typelist<U1,U2,U3,U4,U5>, Idx>&&)
       { return *this; }
 #endif
 
+      // TUPLE_EXT:
       explicit tuples(meta::empty_type)
       {}
       explicit tuples(meta::empty_type, meta::empty_type)
       {}
       explicit tuples(meta::empty_type, meta::empty_type, meta::empty_type)
+      {}
+      explicit tuples(meta::empty_type, meta::empty_type, meta::empty_type, meta::empty_type)
+      {}
+      explicit tuples(meta::empty_type, meta::empty_type, meta::empty_type, meta::empty_type, meta::empty_type)
       {}
     }; // tuples
 
@@ -340,21 +367,21 @@ namespace std
 
     template<typename T>
     struct is_tuple: false_type{};
-    template<typename T1, typename T2, typename T3>
-    struct is_tuple<tuple<T1,T2,T3> >: true_type{};
+    template<typename T1, typename T2, typename T3, typename T4, typename T5>
+    struct is_tuple<tuple<T1,T2,T3,T4,T5> >: true_type{};
   }
 
 
-  template<typename T1, typename T2, typename T3>
+  template<typename T1, typename T2, typename T3, typename T4, typename T5>
   class tuple:
-    public __::tuples<ttl::meta::typelist<T1,T2,T3> >
+    public __::tuples<ttl::meta::typelist<T1,T2,T3,T4,T5> >
   {
   public:
-    typedef ttl::meta::typelist<T1,T2,T3> types;
+    typedef ttl::meta::typelist<T1,T2,T3,T4,T5> types;
   private:
     typedef __::rvtag rvtag;
     typedef __::tuples<types> base;
-    typedef tuple<T1,T2,T3>   this_t;
+    typedef tuple<T1,T2,T3,T4,T5>   this_t;
 
   public:
     tuple()
@@ -370,6 +397,12 @@ namespace std
     explicit tuple(typename __::tuple_param<types,1>::type p1, typename __::tuple_param<types,2>::type p2, typename __::tuple_param<types,3>::type p3)
       :base(p1, p2, p3)
     {}
+    explicit tuple(typename __::tuple_param<types,1>::type p1, typename __::tuple_param<types,2>::type p2, typename __::tuple_param<types,3>::type p3, typename __::tuple_param<types,4>::type p4)
+      :base(p1, p2, p3, p4)
+    {}
+    explicit tuple(typename __::tuple_param<types,1>::type p1, typename __::tuple_param<types,2>::type p2, typename __::tuple_param<types,3>::type p3, typename __::tuple_param<types,4>::type p4, typename __::tuple_param<types,5>::type p5)
+      :base(p1, p2, p3, p4, p5)
+    {}
 
     tuple(const tuple& r)
       :base(static_cast<const base&>(r))
@@ -380,8 +413,8 @@ namespace std
     //{}
 
     // template <class... UTypes> tuple(const tuple<UTypes...>&);
-    template<typename U1, typename U2, typename U3>
-    tuple(const tuple<U1,U2,U3>& r)
+    template<typename U1, typename U2, typename U3, typename U4, typename U5>
+    tuple(const tuple<U1,U2,U3,U4,U5>& r)
       :base(r)
     {}
 
@@ -392,8 +425,8 @@ namespace std
     }
 
     // template <class... UTypes> tuple& operator=(const tuple<UTypes...>&);
-    template<typename U1, typename U2, typename U3>
-    tuple& operator=(const tuple<U1,U2,U3>& r)
+    template<typename U1, typename U2, typename U3, typename U4, typename U5>
+    tuple& operator=(const tuple<U1,U2,U3,U4,U5>& r)
     {
       base::operator=(r);
       return *this;
@@ -419,6 +452,16 @@ namespace std
       :base(rvtag(), forward<U1>(p1), forward<U2>(p2), forward<U3>(p3))
     {}
 
+    template<typename U1, typename U2, typename U3, typename U4>
+    explicit tuple(U1&& p1, U2&& p2, U3&& p3, U4&& p4)
+      :base(rvtag(), forward<U1>(p1), forward<U2>(p2), forward<U3>(p3), forward<U4>(p4))
+    {}
+
+    template<typename U1, typename U2, typename U3, typename U4, typename U5>
+    explicit tuple(U1&& p1, U2&& p2, U3&& p3, U4&& p4, U5&& p5)
+      :base(rvtag(), forward<U1>(p1), forward<U2>(p2), forward<U3>(p3), forward<U4>(p4), forward<U5>(p5))
+    {}
+
     tuple(tuple&& r)
       :base(forward<base>(r))
     {}
@@ -431,14 +474,14 @@ namespace std
 
 
     // template <class... UTypes> tuple(tuple<UTypes...>&&);
-    template<typename U1, typename U2, typename U3>
-    tuple(tuple<U1,U2,U3>&& r)
+    template<typename U1, typename U2, typename U3, typename U4, typename U5>
+    tuple(tuple<U1,U2,U3,U4,U5>&& r)
       :base(move(r))
     {}
 
     // template <class... UTypes> tuple& operator=(tuple<UTypes...>&&);
-    template<typename U1, typename U2, typename U3>
-    tuple& operator=(tuple<U1,U2,U3>&& r)
+    template<typename U1, typename U2, typename U3, typename U4, typename U5>
+    tuple& operator=(tuple<U1,U2,U3,U4,U5>&& r)
     {
       base::operator=(r);
       return *this;
@@ -507,10 +550,11 @@ namespace std
       typedef typename conditional<is_refwrap<U>::value, typename is_refwrap<U>::type&, U>::type type;
     };
 
-    template<typename T1 = meta::empty_type, typename T2 = meta::empty_type, typename T3 = meta::empty_type>
+    // TUPLE_EXT:
+    template<typename T1 = meta::empty_type, typename T2 = meta::empty_type, typename T3 = meta::empty_type, typename T4 = meta::empty_type, typename T5 = meta::empty_type>
     struct tmap
     {
-      typedef tuple<typename mktraits<T1>::type, typename mktraits<T2>::type, typename mktraits<T3>::type> type;
+      typedef tuple<typename mktraits<T1>::type, typename mktraits<T2>::type, typename mktraits<T3>::type, typename mktraits<T4>::type, typename mktraits<T5>::type> type;
     };
 
   }
@@ -518,11 +562,12 @@ namespace std
   /// "ignore" allows tuple positions to be ignored when using "tie".
   __::swallow_assign const ignore = __::swallow_assign();
 
-  inline tuple<ttl::meta::empty_type,ttl::meta::empty_type,ttl::meta::empty_type> make_tuple()
+  inline tuple<> make_tuple()
   {
-    return tuple<ttl::meta::empty_type,ttl::meta::empty_type,ttl::meta::empty_type>();
+    return tuple<>();
   }
 
+  // TUPLE_EXT:
 #ifdef NTL__CXX_RV
   template<typename T1>
   inline typename __::tmap<T1>::type make_tuple(T1&& p1)
@@ -538,6 +583,16 @@ namespace std
   inline typename __::tmap<T1,T2,T3>::type make_tuple(T1&& p1, T2&& p2, T3&& p3)
   {
     return __::tmap<T1,T2,T3>::type (forward<T1>(p1),forward<T2>(p2),forward<T3>(p3));
+  }
+  template<typename T1, typename T2, typename T3, typename T4>
+  inline typename __::tmap<T1,T2,T3>::type make_tuple(T1&& p1, T2&& p2, T3&& p3, T4&& p4)
+  {
+    return __::tmap<T1,T2,T3>::type (forward<T1>(p1),forward<T2>(p2),forward<T3>(p3),forward<T4>(p4));
+  }
+  template<typename T1, typename T2, typename T3, typename T4, typename T5>
+  inline typename __::tmap<T1,T2,T3>::type make_tuple(T1&& p1, T2&& p2, T3&& p3, T4&& p4, T5&& p5)
+  {
+    return __::tmap<T1,T2,T3>::type (forward<T1>(p1),forward<T2>(p2),forward<T3>(p3),forward<T4>(p4),forward<T5>(p5));
   }
 #else
   template<typename T1>
@@ -555,9 +610,20 @@ namespace std
   {
     return __::tmap<T1,T2,T3>::type (p1,p2,p3);
   }
+  template<typename T1, typename T2, typename T3, typename T4>
+  inline typename __::tmap<T1,T2,T3>::type make_tuple(const T1& p1, const T2& p2, const T3& p3, const T4& p4)
+  {
+    return __::tmap<T1,T2,T3,T4>::type (p1,p2,p3,p4);
+  }
+  template<typename T1, typename T2, typename T3, typename T4, typename T5>
+  inline typename __::tmap<T1,T2,T3>::type make_tuple(const T1& p1, const T2& p2, const T3& p3, const T4& p4, const T5& p5)
+  {
+    return __::tmap<T1,T2,T3,T4,T5>::type (p1,p2,p3,p4,p5);
+  }
 #endif
 
   // tie
+  // TUPLE_EXT:
   template<typename T1>
   inline tuple<T1&> tie(T1& p1)
   {
@@ -573,18 +639,29 @@ namespace std
   {
     return tuple<T1&,T2&,T3&> (p1,p2,p3);
   }
+  template<typename T1, typename T2, typename T3, typename T4>
+  inline tuple<T1&,T2&,T3&,T4&> tie(T1& p1, T2& p2, T3& p3, T4& p4)
+  {
+    return tuple<T1&,T2&,T3&,T4&> (p1,p2,p3,p4);
+  }
+  template<typename T1, typename T2, typename T3, typename T4, typename T5>
+  inline tuple<T1&,T2&,T3&,T4&,T5&> tie(T1& p1, T2& p2, T3& p3, T4& p4, T5& p5)
+  {
+    return tuple<T1&,T2&,T3&,T4&,T5&> (p1,p2,p3,p4,p5);
+  }
 
 
   // tuple size
-  template<typename T1, typename T2, typename T3>
-  struct tuple_size<tuple<T1,T2,T3> >:
-    integral_constant<size_t, ttl::meta::length<typename tuple<T1,T2,T3>::types>::value>
+  // TUPLE_EXT:
+  template<typename T1, typename T2, typename T3, typename T4, typename T5>
+  struct tuple_size<tuple<T1,T2,T3,T4,T5> >:
+    integral_constant<size_t, ttl::meta::length<typename tuple<T1,T2,T3,T4,T5>::types>::value>
   {};
 
-  template<size_t I, typename T1, typename T2, typename T3>
-  struct tuple_element<I, tuple<T1,T2,T3> >
+  template<size_t I, typename T1, typename T2, typename T3, typename T4, typename T5>
+  struct tuple_element<I, tuple<T1,T2,T3,T4,T5> >
   {
-    typedef tuple<T1,T2,T3> tuple_t;
+    typedef tuple<T1,T2,T3,T4,T5> tuple_t;
     static_assert(I < tuple_size<tuple_t>::value, "I is out of bounds");
 
     typedef typename ttl::meta::get<typename tuple_t::types, I>::type type;
@@ -623,6 +700,7 @@ namespace std
     };
   }
 
+  // TUPLE_EXT:
   template<size_t I, typename T1>
   inline typename __::tuple_return<I, tuple<T1> >::type get(tuple<T1>& t)
   {
@@ -662,6 +740,20 @@ namespace std
   inline typename __::tuple_return<I, tuple<T1,T2,T3> >::ctype get(const tuple<T1,T2,T3>& t)
   {
     typedef typename __::tuple_return<I, tuple<T1,T2,T3> >::ctype RT;
+    return __::field<RT, I>::get(t);
+  }
+
+  template<size_t I, typename T1, typename T2, typename T3, typename T4>
+  inline typename __::tuple_return<I, tuple<T1,T2,T3,T4> >::ctype get(const tuple<T1,T2,T3,T4>& t)
+  {
+    typedef typename __::tuple_return<I, tuple<T1,T2,T3,T4> >::ctype RT;
+    return __::field<RT, I>::get(t);
+  }
+
+  template<size_t I, typename T1, typename T2, typename T3, typename T4, typename T5>
+  inline typename __::tuple_return<I, tuple<T1,T2,T3,T4,T5> >::ctype get(const tuple<T1,T2,T3,T4,T5>& t)
+  {
+    typedef typename __::tuple_return<I, tuple<T1,T2,T3,T4,T5> >::ctype RT;
     return __::field<RT, I>::get(t);
   }
 

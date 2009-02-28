@@ -42,6 +42,12 @@ namespace std
 
 namespace __
 {
+  // sfinae support
+
+  template<typename T>
+  struct type2type
+  {};
+
   struct sfinae_small { char x; };
   struct sfinae_big   { char x[2]; };
 

@@ -86,8 +86,6 @@ struct kwait_block
   uint16_t      WaitType;
 };
 
-static const uint32_t maximum_processors = 64;
-
 #ifndef _M_X64
 struct kpcr:
   ntl::mapped_data<kpcr>

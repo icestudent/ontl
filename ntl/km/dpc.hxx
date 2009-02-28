@@ -216,12 +216,12 @@ namespace km {
       KeSetTargetProcessorDpc(this, number);
     }
 
-    inline static void signal_done(void* SystemArgument1)
+    static inline void signal_done(void* SystemArgument1)
     {
       KeSignalCallDpcDone(SystemArgument1);
     }
 
-    inline static uint32_t signal_synchronize(void* SystemArgument2)
+    static inline uint32_t signal_synchronize(void* SystemArgument2)
     {
       KeSignalCallDpcSynchronize(SystemArgument2);
     }

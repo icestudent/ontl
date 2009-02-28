@@ -11,6 +11,7 @@
 #include "type_traits.hxx"
 #include "result_of.hxx"
 #include "cuchar.hxx"
+#include "iterator.hxx" // for hash
 
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -117,10 +118,6 @@ namespace __
   struct empty_base
   {};
 
-  template<typename T>
-  struct type2type
-  {};
-
   namespace refwrap_from
   {
     enum type {
@@ -134,25 +131,22 @@ namespace __
   template<typename T>
   class rfw_derives_from
   {
-    typedef char yes;
-    typedef struct { char _[2]; } no;
-
     template<typename T1, typename R>
-    static yes probe_unary(const volatile unary_function<T1,R>*);
-    static no  probe_unary(...);
+    static sfinae_passed_tag  probe_unary(const volatile unary_function<T1,R>*);
+    static sfinae_failed_tag  probe_unary(...);
 
     template<typename T1, typename T2, typename R>
-    static yes probe_binary(const volatile binary_function<T1,T2,R>*);
-    static no  probe_binary(...);
+    static sfinae_passed_tag  probe_binary(const volatile binary_function<T1,T2,R>*);
+    static sfinae_failed_tag  probe_binary(...);
 
     template<typename U>
-    static yes probe_result(type2type<typename U::result_type>*);
-    //template<typename U>
-    static no  probe_result(...);
+    static sfinae_passed_tag  probe_result(type2type<typename U::result_type>*);
+    template<typename U>
+    static sfinae_failed_tag  probe_result(...);
   public:
-    static const bool  unary = sizeof( probe_unary ((T*)0) ) == sizeof(yes);
-    static const bool binary = sizeof( probe_binary((T*)0) ) == sizeof(yes);
-    static const bool has_result_type = sizeof( probe_result((T*)0) ) == sizeof(yes);
+    static const bool  unary = sizeof( probe_unary ((T*)0) ) == sizeof(sfinae_passed_tag);
+    static const bool binary = sizeof( probe_binary((T*)0) ) == sizeof(sfinae_passed_tag);
+    static const bool has_result_type = sizeof( probe_result<T>(0) ) == sizeof(sfinae_passed_tag);
 
     static const refwrap_from::type value = 
       unary ? refwrap_from::unary :
@@ -185,12 +179,22 @@ namespace __
   };
 
 
+  /************************************************************************/
+  /* Reference wrapper base specializations                               */
+  /************************************************************************/
   template<class T>
   struct refwrap_base:
-    refwrap_derived<T, rfw_derives_from<T>::value>
+    refwrap_derived<T, rfw_derives_from<typename remove_cv<T>::type>::value>
   {};
 
   // functions
+  // TODO: take the result_of_function_type
+  template<typename R>
+  struct refwrap_base<R()>
+  {
+    typedef R result_type;
+  };
+
   template<typename R, typename T1>
   struct refwrap_base<R(T1)>:
     unary_function<T1,R>
@@ -202,6 +206,12 @@ namespace __
   {};
 
   // function pointers
+  template<typename R>
+  struct refwrap_base<R(*)()>
+  {
+    typedef R result_type;
+  };
+
   template<typename R, typename T1>
   struct refwrap_base<R(*)(T1)>:
     unary_function<T1,R>
@@ -235,11 +245,12 @@ namespace __
 }
 
 /**
- *	20.6.05 Class template reference_wrapper [refwrap]
- *  reference_wrapper<T> is a CopyConstructible and Assignable wrapper around a reference to an object of type T.
+ *	@brief 20.6.05 Class template reference_wrapper [refwrap]
+ *
+ *  \c reference_wrapper<T> is a CopyConstructible and Assignable wrapper around a reference to an object of type \c T.
  *
  *  @note implements 20.6.5/3, 20.6.5/4 (N2723); has \c result_type if type \c T has it.
- *  @todo invokation (20.6.5.4 [refwrap.invoke])
+ *  @sa result_of notes
  **/
 template <class T>
 class reference_wrapper:
@@ -250,26 +261,31 @@ class reference_wrapper:
     typedef T type;
 
     // construct/copy/destroy
+    /** Constructs a reference_wrapper object that stores a reference to \c t */
     explicit reference_wrapper(T& t) __ntl_nothrow
       : ptr(&t)
     {}
 
+    /** Constructs a reference_wrapper object that stores a reference to \c x.get() */
     reference_wrapper(const reference_wrapper<T>& x) __ntl_nothrow
       : ptr(&x.get())
     {}
 
     // assignment
+    /** Stores a reference to \c x.get() */
     reference_wrapper& operator=(const reference_wrapper<T>& x) __ntl_nothrow
     {
-      ptr = x.get();
+      ptr = &x.get();
       return *this;
     }
 
     // access
+    /** Returns the stored reference */
     operator T& () const __ntl_nothrow
     {
       return this->get();
     }
+    /** Returns the stored reference */
     T& get() const __ntl_nothrow
     {
       return *ptr;
@@ -284,6 +300,18 @@ class reference_wrapper:
     // Returns: INVOKE (get(), a1, a2, ..., aN). ([3.3])
       return get()(t1);
     }
+#else
+    typename result_of<T()>::type operator()() const { return get()(); }
+    template<class A1>
+    typename result_of<T(A1)>::type operator()(A1& a1) const { return get()(a1); }
+    template<class A1, class A2>
+    typename result_of<T(A1,A2)>::type operator()(A1& a1, A2& a2) const { return get()(a1, a2); }
+    template<class A1, class A2, class A3>
+    typename result_of<T(A1,A2,A3)>::type operator()(A1& a1, A2& a2, A3& a3) const { return get()(a1, a2, a3); }
+    template<class A1, class A2, class A3, class A4>
+    typename result_of<T(A1,A2,A3,A4)>::type operator()(A1& a1, A2& a2, A3& a3, A4& a4) const { return get()(a1, a2, a3, a4); }
+    template<class A1, class A2, class A3, class A4, class A5>
+    typename result_of<T(A1,A2,A3,A4,A5)>::type operator()(A1& a1, A2& a2, A3& a3, A4& a4, A5& a5) const { return get()(a1, a2, a3, a4, a5); }
 #endif
 
   ///////////////////////////////////////////////////////////////////////////
@@ -296,7 +324,7 @@ class reference_wrapper:
     #endif
 };
 
-
+/** Returns a reference wrapper object which holds a reference to \c t */
 template <class T>
 inline
 reference_wrapper<T> ref(T& t) __ntl_nothrow
@@ -304,24 +332,28 @@ reference_wrapper<T> ref(T& t) __ntl_nothrow
   return reference_wrapper<T>(t);
 }
 
+/** Returns a constant reference wrapper object which holds a reference to const \c t */
 template <class T>
 reference_wrapper<const T> cref(const T& t) __ntl_nothrow
 {
   return reference_wrapper<const T>(t);
 }
 
+/** Returns a reference wrapper object which holds a reference to \c x.get() */
 template <class T>
 reference_wrapper<T> ref(reference_wrapper<T> x) __ntl_nothrow
 {
   return x;
 }
 
+/** Returns a constant reference wrapper object which holds a constant reference to \c x.get() */
 template <class T>
 reference_wrapper<const T> cref(reference_wrapper<const T> x) __ntl_nothrow
 {
   return x;
 }
 
+/** Returns a constant reference wrapper object which holds a reference to \c x.get() */
 template <class T>
 reference_wrapper<const T> cref(reference_wrapper<T> x) __ntl_nothrow
 {
@@ -841,9 +873,6 @@ const_mem_fun1_ref_t<Result, T, A>
 {
   return const_mem_fun1_ref_t<Result, T, A>(f);
 }
-
-//template<class R, class T>
-//unspecified mem_fn(R T::* pm);
 
 /**@} lib_member_pointer_adaptors
  */

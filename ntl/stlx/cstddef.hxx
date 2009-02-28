@@ -33,8 +33,11 @@
 #endif
 
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER)
 # pragma warning(disable:4514)// unreferenced inline function has been removed
+#elif defined(__GNUC__)
+# define __forceinline __attribute__((always_inline))
+# define __assume(X)
 #else
 # define __forceinline inline
 # define __assume(X)

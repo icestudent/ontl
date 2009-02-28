@@ -10,7 +10,7 @@
 
 #include "cstddef.hxx"
 #include "cstdarg.hxx"
-using std::va_list;
+//using std::va_list;
 
 
 #ifndef _INC_STDLIB// MSVC compatibility

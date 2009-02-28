@@ -93,7 +93,8 @@ static const kprocessor_mode UserMode = { 1 };
 typedef long kpriority;
 typedef uintptr_t kaffinity;
 
-NTL__EXTERNVAR int8_t KeNumberProcessors;
+static const uint32_t maximum_processors = 64;
+NTL__EXTERNVAR volatile int8_t KeNumberProcessors;
 
 
 NTL__EXTERNAPI

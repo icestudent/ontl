@@ -309,6 +309,30 @@
 						RelativePath=".\stlx\rbtree.hxx"
 						>
 					</File>
+					<Filter
+						Name="spp"
+						>
+						<File
+							RelativePath=".\spp\args.hxx"
+							>
+						</File>
+						<File
+							RelativePath=".\spp\control.hxx"
+							>
+						</File>
+						<File
+							RelativePath=".\spp\loop.hxx"
+							>
+						</File>
+						<File
+							RelativePath=".\spp\math.hxx"
+							>
+						</File>
+						<File
+							RelativePath=".\spp\utility.hxx"
+							>
+						</File>
+					</Filter>
 				</Filter>
 				<Filter
 					Name="containers"
@@ -517,6 +541,14 @@
 				<Filter
 					Name="utility"
 					>
+					<File
+						RelativePath=".\stlx\function.hxx"
+						>
+					</File>
+					<File
+						RelativePath=".\stlx\mem_fn.hxx"
+						>
+					</File>
 					<File
 						RelativePath=".\stlx\memory.hxx"
 						>

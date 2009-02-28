@@ -6,6 +6,10 @@
 #include "../nt/status.hxx"
 #include "../nt/peb.hxx"
 
+#ifdef _MSC_VER
+#pragma warning(disable:4510 4512 4610 4100)
+#endif
+
 #pragma region typeinfo::name implementation
 
 #define CRT_UNDNAME

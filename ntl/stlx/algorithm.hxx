@@ -311,15 +311,30 @@ OutputIterator
   return result;
 }
 
+namespace __
+{
+  template<class InputIterator, class Size, class OutputIterator>
+  inline OutputIterator copy_n(InputIterator first, Size n, OutputIterator result, const input_iterator_tag&)
+  {
+    for(; n; --n, ++first, ++result)
+    {
+      *result = *first;
+    }
+    return result;
+  }
+
+  template<class RandomAccessIterator, class Size, class OutputIterator>
+  inline OutputIterator copy_n(RandomAccessIterator first, Size n, OutputIterator result, const random_access_iterator_tag&)
+  {
+    return copy(first, first+n, result);
+  }
+
+}
 template<class InputIterator, class Size, class OutputIterator>
 OutputIterator
   copy_n(InputIterator first, Size n, OutputIterator result)
 {
-  for(; n; --n, ++first, ++result)
-  {
-    *result = *first;
-  }
-  return result;
+  return __::copy_n(first, n, result, iterator_traits<InputIterator>::iterator_category());
 }
 
 template<class InputIterator, class OutputIterator, class Predicate>
