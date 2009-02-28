@@ -292,5 +292,4 @@ namespace std
 
 } // namespace std
 
-
 #endif // !NTL_RESULT_OF_HXX

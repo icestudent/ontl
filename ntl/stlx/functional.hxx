@@ -268,14 +268,14 @@ class reference_wrapper:
 
     /** Constructs a reference_wrapper object that stores a reference to \c x.get() */
     reference_wrapper(const reference_wrapper<T>& x) __ntl_nothrow
-      : ptr(&x.get())
+      : ptr(x.ptr)
     {}
 
     // assignment
     /** Stores a reference to \c x.get() */
     reference_wrapper& operator=(const reference_wrapper<T>& x) __ntl_nothrow
     {
-      ptr = &x.get();
+      ptr = x.ptr;
       return *this;
     }
 
