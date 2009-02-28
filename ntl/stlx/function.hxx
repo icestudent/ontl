@@ -364,7 +364,7 @@ namespace std
           std::swap(caller, r.caller);
         }
 
-        /** Assigns this object with callable \f */
+        /** Assigns this object with callable \c f */
         template<class F, class A>
         void assign(F f, const A&)
         {

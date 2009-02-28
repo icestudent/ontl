@@ -546,6 +546,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\stlx\initializer_list.hxx"
+						>
+					</File>
+					<File
 						RelativePath=".\stlx\mem_fn.hxx"
 						>
 					</File>
@@ -631,6 +635,10 @@
 					</File>
 					<File
 						RelativePath=".\stlx\numeric.hxx"
+						>
+					</File>
+					<File
+						RelativePath=".\stlx\random.hxx"
 						>
 					</File>
 					<File

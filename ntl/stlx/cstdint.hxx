@@ -1,6 +1,6 @@
 /**\file*********************************************************************
  *                                                                     \brief
- *  Integer types ISO9899: 7.18
+ *  18.3 Integer types [cstdint]
  *
  ****************************************************************************
  */
@@ -14,7 +14,9 @@ namespace std {
 
 /**\addtogroup  lib_language_support *** 18 Language support library [language.support] ******
  *@{*/
-/**\addtogroup  lib_support_types ****** 18.1 Types [support.types] ***********************
+/** \defgroup   lib_cstdint 18.3 Integer types [cstdint]
+ *
+ *  This defines all functions, types, and macros the same as C99 7.18.
  *@{*/
 
 ///\name  Exact-width integer types 7.18.1.1
@@ -158,7 +160,7 @@ typedef uint64_t  uintmax_t;
 
 #endif//#ifdef __STDC_LIMIT_MACROS
 
-/**@} lib_support_limits */
+/** @} lib_cstdint */
 /**@} lib_language_support */
 
 }//namespace std

@@ -18,7 +18,11 @@
 namespace std
 {
   /**
-   *	@addtogroup thread Thread support library [thread]
+   *	@addtogroup threads 30 Thread support library [thread]
+   *  @{
+   **/
+  /**
+   *	@defgroup thread_mutex 30.3 Mutual exclusion [thread.mutex]
    *  @{
    **/
 
@@ -523,7 +527,8 @@ namespace std
 #endif
 #pragma endregion
 
-  /** @} thread */
+  /** @} thread_mutex */
+  /** @} threads */
 } // std
 
 #endif // NTL__STLX_MUTEX

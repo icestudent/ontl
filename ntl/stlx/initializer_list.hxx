@@ -1,6 +1,6 @@
 /**\file*********************************************************************
  *                                                                     \brief
- *  Initializer lists [18.8 support.initlist]
+ *  18.8 Initializer lists [support.initlist]
  *
  ****************************************************************************
  */
@@ -12,7 +12,13 @@
 #include "cstddef.hxx" // for size_t
 #endif
 
-namespace std {
+namespace std
+{
+  /**\addtogroup  lib_language_support *** 18 Language support library [language.support] ******
+  *@{*/
+
+  /**\defgroup  lib_support_initlist ***** 18.8 Initializer lists [support.initlist]
+  *@{*/
 
   /// Initializer lists [18.8 support.initlist]
   template<class E> 
@@ -24,6 +30,9 @@ namespace std {
     const E* begin() const { return nullptr; }
     const E* end() const { return nullptr; }
   };
-}
+
+  /** @} lib_support_initlist */
+  /** @} lib_language_support */
+} // namespace std
 
 #endif // NTL__STLX_INITLIST

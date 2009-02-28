@@ -94,7 +94,7 @@ inline time_t time(time_t* timer = 0);
 /**
  *	The asctime function converts the broken-down time in the structure pointed to by
  *  \c timeptr into a string in the form\n
- *  <tt> Sun Sep 16 01:03:52 1973\n\0 </tt>
+ *  <tt> Sun Sep 16 01:03:52 1973\\n\\0 </tt>
  *  @return The asctime function returns a pointer to the string.
  *  @note This function is not required to avoid data races.
  **/

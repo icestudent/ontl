@@ -1,19 +1,19 @@
 /**\file*********************************************************************
  *                                                                     \brief
- *  Numerics library [25 lib.numerics]
+ *  26 Numerics library [numerics]
  *
  ****************************************************************************
  */
-
 #ifndef NTL__STLX_NUMERICS
 #define NTL__STLX_NUMERICS
 
 #include "iterator.hxx"
 
-
-namespace std {
-
-// 26.6 Generalized numeric operations [numeric.ops]
+namespace std
+{
+ /**\defgroup  lib_numeric ************ 26 Numerics library [numerics]
+  *@{
+  **/
 
   // 26.6.1 Accumulate [accumulate]
   template <class InputIterator, class T>
@@ -41,5 +41,7 @@ namespace std {
     return init;
   }
 
+  /**@} lib_numeric */
 } // namespace std
+
 #endif // NTL__STLX_NUMERICS

@@ -207,6 +207,25 @@ struct system_information
                                 NtQuerySystemInformation>
 {};
 
+//////////////////////////////////////////////////////////////////////////
+
+///\name  SystemBasicInformation (0)
+struct system_basic_information
+{
+  static const system_information_class info_class_type = SystemBasicInformation;
+
+  uint32_t Reserved;
+  uint32_t TimerResolution;
+  uint32_t PageSize;
+  uint32_t NumberOfPhysicalPages;
+  uint32_t LowestPhysicalPageNumber;
+  uint32_t HighestPhysicalPageNumber;
+  uint32_t AllocationGranularity;
+  uintptr_t MinimumUserModeAddress;
+  uintptr_t MaximumUserModeAddress;
+  uintptr_t ActiveProcessorsAffinityMask;
+  int8_t    NumberOfProcessors;
+};
 
 ///\name  SystemProcessInformation (5)
 
