@@ -1,6 +1,6 @@
 /**\file*********************************************************************
  *                                                                     \brief
- *  Process Information
+ *  Process and Thread Information
  *
  ****************************************************************************
  */
@@ -10,6 +10,7 @@
 
 #include "basedef.hxx"
 #include "handle.hxx"
+#include "teb.hxx"
 
 #include "../stlx/type_traits.hxx"
 
@@ -130,32 +131,34 @@ namespace aux
 
   /// default query policy
   template<class                        InformationClass,
-          query_process_information_t   QueryInformation,
+          class                         QueryInformationT,
           bool                          write_only>
-  struct query_process_information_policy
+  struct query_information_policy
   {
     static __forceinline
       ntstatus
       _query(
-      legacy_handle   process_handle,
+      QueryInformationT             QueryInformation,
+      legacy_handle   handle,
       void *          info,
       uint32_t        info_length
       )
     {
-      return QueryInformation(process_handle, InformationClass::info_class_type, info, info_length, nullptr);
+      return QueryInformation(handle, InformationClass::info_class_type, info, info_length, nullptr);
     }
   protected:
     InformationClass info;
   };
 
   /// write-only policy
-  template<class                        InformationClass,
-          query_process_information_t   QueryInformation>
-  struct query_process_information_policy<InformationClass, QueryInformation, true>
+  template<class                  InformationClass,
+          class                   QueryInformationT>
+  struct query_information_policy<InformationClass, QueryInformationT, true>
   {
     static __forceinline
       ntstatus
       _query(
+      QueryInformationT,
       legacy_handle,
       void *,
       uint32_t
@@ -168,33 +171,35 @@ namespace aux
   };
 
   template <class                       InformationClass,
-            set_process_information_t   SetInformation,
+            class                       SetInformationT,
             bool                        read_only>
-  struct set_process_information_policy
+  struct set_information_policy
   {
     static const bool is_read_only = false;
 
       static __forceinline
       ntstatus
         _set(
-          legacy_handle   process_handle,
+          SetInformationT SetInformation,
+          legacy_handle   handle,
           const void *    info,
           uint32_t        info_length
           )
       {
-        return SetInformation(process_handle, InformationClass::info_class_type, info, info_length);
+        return SetInformation(handle, InformationClass::info_class_type, info, info_length);
       }
   };
 
   template <class                       InformationClass,
-            set_process_information_t   SetInformation>
-  struct set_process_information_policy<InformationClass, SetInformation, true>
+            class                       SetInformationT>
+  struct set_information_policy<InformationClass, SetInformationT, true>
   {
     static const bool is_read_only = true;
 
     static __forceinline
       ntstatus
       _set(
+      SetInformationT,
       legacy_handle,
       const void *,
       uint32_t
@@ -210,24 +215,24 @@ template <class                       InformationClass,
           query_process_information_t QueryInformation,
           set_process_information_t   SetInformation>
 struct process_information_base:
-  aux::query_process_information_policy<InformationClass, QueryInformation, std::is_base_of<aux::write_only, InformationClass>::value>,
-  aux::set_process_information_policy<InformationClass, SetInformation, std::is_base_of<aux::read_only, InformationClass>::value>
+  aux::query_information_policy<InformationClass, query_process_information_t, std::is_base_of<aux::write_only, InformationClass>::value>,
+  aux::set_information_policy<InformationClass, query_process_information_t, std::is_base_of<aux::read_only, InformationClass>::value>
 {
     typedef InformationClass info_class;
 
-    process_information_base(legacy_handle process_handle) __ntl_nothrow
+    process_information_base(legacy_handle handle) __ntl_nothrow
     {
       static_assert((std::is_base_of<aux::write_only, InformationClass>::value == false), "Cannot query a write-only information class");
-      status_ = _query(process_handle, &info, sizeof(info));
+      status_ = _query(QueryInformation, handle, &info, sizeof(info));
     }
 
     process_information_base(
-      legacy_handle       process_handle,
+      legacy_handle       handle,
       const info_class &  new_info
       ) __ntl_nothrow
     {
       static_assert(is_read_only == false, "Cannot set a read-only information class");
-      status_ = _set(process_handle, &new_info, sizeof(info_class));
+      status_ = _set(SetInformation, handle, &new_info, sizeof(info_class));
     }
 
     info_class * data() { return nt::success(status_) ? &info : 0; }
@@ -236,32 +241,26 @@ struct process_information_base:
     const info_class * operator->() const { return data(); }
 
     operator bool() const { return nt::success(status_); }
-
     operator ntstatus() const { return status_; }
 
-
-
-  ///////////////////////////////////////////////////////////////////////////
-  private:
-
+  protected:
     ntstatus    status_;
 }; //class process_information_base
 
 
-template<class InformationClass>
+template<class ProcessInformationClass>
 struct process_information
-: public process_information_base <InformationClass,
-                                   NtQueryInformationProcess,
-                                   NtSetInformationProcess>
+: public process_information_base <ProcessInformationClass, NtQueryInformationProcess, NtSetInformationProcess>
 {
+  typedef process_information_base <ProcessInformationClass, NtQueryInformationProcess, NtSetInformationProcess> base;
   process_information(legacy_handle process_handle = current_process()) __ntl_nothrow
-  : process_information_base<InformationClass, NtQueryInformationProcess, NtSetInformationProcess>(process_handle)
+  : base(process_handle)
   {/**/}
 
   process_information(
     legacy_handle             process_handle,
-    const InformationClass &  info) __ntl_nothrow
-  : process_information_base<InformationClass, NtQueryInformationProcess, NtSetInformationProcess>(process_handle, info)
+    const ProcessInformationClass &  info) __ntl_nothrow
+  : base(process_handle, info)
   {/**/}
 };
 
@@ -392,10 +391,146 @@ struct process_session_information
   {}
 };
 
-
-#pragma pack(pop)
   /**@} process_information */
 
+//////////////////////////////////////////////////////////////////////////
+/**\addtogroup thread_information @{ */
+enum thread_info_class
+{
+  ThreadBasicInformation,
+  ThreadTimes,
+  ThreadPriority,
+  ThreadBasePriority,
+  ThreadAffinityMask,
+  ThreadImpersonationToken,
+  ThreadDescriptorTableEntry,
+  ThreadEnableAlignmentFaultFixup,
+  ThreadEventPair,
+  ThreadQuerySetWin32StartAddress,
+  ThreadZeroTlsCell,
+  ThreadPerformanceCount,
+  ThreadAmILastThread,
+  ThreadIdealProcessor,
+  ThreadPriorityBoost,
+  ThreadSetTlsArrayAddress,
+  MaxThreadInfoClass
+};
+
+typedef
+ntstatus __stdcall
+query_thread_information_t (
+                            legacy_handle     ThreadHandle,
+                            thread_info_class ThreadInformationClass,
+                            void*             ThreadInformation,
+                            uint32_t          ThreadInformationLength,
+                            uint32_t*         ReturnLength
+                            );
+
+typedef
+ntstatus __stdcall
+set_thread_information_t (
+                          legacy_handle     ThreadHandle,
+                          thread_info_class ThreadInformationClass,
+                          void*             ThreadInformation,
+                          uint32_t          ThreadInformationLength
+                          );
+
+NTL__EXTERNAPI query_thread_information_t NtQueryInformationThread;
+NTL__EXTERNAPI set_thread_information_t   NtSetInformationThread;
+
+template <class                       InformationClass,
+          query_thread_information_t QueryInformation,
+          set_thread_information_t   SetInformation>
+struct thread_information_base:
+  aux::query_information_policy<InformationClass, query_thread_information_t, std::is_base_of<aux::write_only, InformationClass>::value>,
+  aux::set_information_policy<InformationClass, query_thread_information_t, std::is_base_of<aux::read_only, InformationClass>::value>
+{
+  typedef InformationClass info_class;
+
+  thread_information_base(legacy_handle handle) __ntl_nothrow
+  {
+    static_assert((std::is_base_of<aux::write_only, InformationClass>::value == false), "Cannot query a write-only information class");
+    status_ = _query(QueryInformation, handle, &info, sizeof(info));
+  }
+
+  thread_information_base(
+    legacy_handle       handle,
+    const info_class &  new_info
+    ) __ntl_nothrow
+  {
+    static_assert(is_read_only == false, "Cannot set a read-only information class");
+    status_ = _set(SetInformation, handle, &new_info, sizeof(info_class));
+  }
+
+  info_class * data() { return nt::success(status_) ? &info : 0; }
+  const info_class * data() const { return nt::success(status_) ? &info : 0; }
+  info_class * operator->() { return data(); }
+  const info_class * operator->() const { return data(); }
+
+  operator bool() const { return nt::success(status_); }
+  operator ntstatus() const { return status_; }
+
+protected:
+  ntstatus    status_;
+}; //class thread_information_base
+
+template<class ThreadInformationClass>
+struct thread_information
+  :public thread_information_base <ThreadInformationClass, NtQueryInformationThread, NtSetInformationThread>
+{
+  typedef thread_information_base <ThreadInformationClass, NtQueryInformationThread, NtSetInformationThread> base;
+
+  thread_information(legacy_handle thread_handle = current_thread()) __ntl_nothrow
+    : base(thread_handle)
+  {/**/}
+
+  thread_information(
+    legacy_handle thread_handle,
+    const ThreadInformationClass&  info) __ntl_nothrow
+    : base(thread_handle, info)
+  {/**/}
+};
+
+template<>
+struct thread_information<kernel_user_times>
+{
+  typedef kernel_user_times info_class;
+
+  thread_information(legacy_handle thread_handle = current_thread()) __ntl_nothrow
+  {
+    status_ = NtQueryInformationThread(thread_handle, ThreadTimes, &info, sizeof(info), nullptr);
+  }
+
+  info_class * data() { return nt::success(status_) ? &info : 0; }
+  const info_class * data() const { return nt::success(status_) ? &info : 0; }
+  info_class * operator->() { return data(); }
+  const info_class * operator->() const { return data(); }
+
+  operator bool() const { return nt::success(status_); }
+  operator ntstatus() const { return status_; }
+private:
+  kernel_user_times info;
+  ntstatus    status_;
+};
+
+/************************************************************************/
+/* Thread informations                                                  */
+/************************************************************************/
+struct thread_basic_information
+{
+  static const thread_info_class info_class_type = ThreadBasicInformation;
+
+  ntstatus ExitStatus;
+  teb* TebBaseAddress;
+  client_id ClientId;
+  uintptr_t AffinityMask;
+  km::kpriority Priority;
+  km::kpriority BasePriority;
+};
+
+/** @} thread_information */
+
+#pragma pack(pop)
 }//namespace nt
 }//namespace ntl
 

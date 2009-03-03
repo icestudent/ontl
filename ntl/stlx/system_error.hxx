@@ -330,6 +330,7 @@ private:
 
 
   //////////////////////////////////////////////////////////////////////////
+  error_code& throws();
   namespace __ 
   {
     /// 19.4.1.5 Error category objects [syserr.errcat.objects]
@@ -394,7 +395,11 @@ private:
       /** Just a stub for error_category::message */
       virtual string message(int) const { return "just exception flag, should never used"; }
 
-      error_condition default_error_condition(int ev) const __ntl_nothrow;
+      error_condition default_error_condition(int /*ev*/) const __ntl_nothrow
+      {
+        error_code& ec = throws();
+        return error_condition(ec.value(), ec.category());
+      }
       bool equivalent(int code, const error_condition& condition) const __ntl_nothrow
       {
         return default_error_condition(code) == condition;

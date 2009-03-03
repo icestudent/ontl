@@ -15,6 +15,11 @@
 # include "../nt/teb.hxx"
 # include "../nt/system_information.hxx"
 # include "../nt/new.hxx"
+
+// replace this with corresponding headers!
+
+# include "smart_ptr.hxx"
+# include "function.hxx"
 #else
 # error Km unsupported currently
 #endif
@@ -38,6 +43,43 @@ namespace std
   /// 30.2.2 Namespace this_thread [thread.thread.this]
   namespace this_thread
   {}
+
+  namespace __
+  {
+    template<class>
+    struct thread_cleanup
+    {
+
+    };
+
+    struct thread_params_base
+    {
+      volatile uint32_t cleanup;
+      ntl::nt::legacy_handle handle;
+
+      thread_params_base()
+        :cleanup(), handle()
+      {}
+      virtual ~thread_params_base(){}
+      virtual void run() = 0;
+    };
+
+    template<class F, class Args = tuple<> >
+    struct thread_params: thread_params_base
+    {
+      std::func::v1::function<void, Args> fn;
+      Args args;
+
+      explicit thread_params(F f, const Args& a)
+        :fn(f), args(a)
+      {}
+
+      void run()
+      {
+        fn(args);
+      }
+    };
+  }
 
   /**
    *	@brief thread class
@@ -66,7 +108,7 @@ namespace std
 
     // construct/copy/destroy:
     thread()
-      :h(),tid(),end(),cleanup()
+      :h(),tid(),cleanup()
     {}
     ~thread()
     {
@@ -78,6 +120,9 @@ namespace std
 
   #ifdef NTL__CXX_VT
     template <class F, class ...Args> thread(F&& f, Args&&... args);
+  #else
+    template <class F, class A1> thread(F f, A1 a1);
+    template <class F, class A1, class A2> thread(F f, A1 a1, A2 a2);
   #endif
 
   #ifdef NTL__CXX_RV
@@ -85,11 +130,11 @@ namespace std
     thread& operator=(thread&&);
     void swap(thread&&) __ntl_nothrow;
   #else
-    thread(thread&);
-    thread& operator=(thread&);
+    thread(const thread& r);
+    thread& operator=(const thread& r);
 
     // members:
-    void swap(thread&) __ntl_nothrow;
+    void swap(const thread& r) __ntl_nothrow;
   #endif
 
     bool joinable() const __ntl_nothrow;
@@ -102,23 +147,17 @@ namespace std
     native_handle_type native_handle() const __ntl_nothrow { return h; }
     
     // static members:
-    static unsigned hardware_concurrency()
-    {
-      static int threads = -1;
-      if(threads == -1){
-        threads = 0;
+    static unsigned hardware_concurrency();
 
-        using namespace ntl::nt;
-        system_information<system_basic_information> basicInfo;
-        if(basicInfo)
-          threads = basicInfo->NumberOfProcessors;
-      }
-      return threads;
-    }
+  protected:
+    static uint32_t __stdcall start_routine(void* Parm);
+    bool alive() const __ntl_nothrow;
+    bool check_alive() __ntl_nothrow;
+    void start(__::thread_params_base* tp);
 
   private:
-    volatile native_handle_type h, tid, end;
-    volatile uint32_t cleanup; // true if cleanup required
+    mutable native_handle_type h, tid;
+    mutable volatile uint32_t* cleanup; // true if cleanup required
   };
 
   namespace this_thread
@@ -153,6 +192,11 @@ namespace std
     friend bool operator> (id x, id y) { return x.tid_ >  y.tid_; }
     friend bool operator>=(id x, id y) { return x.tid_ >= y.tid_; }
 
+    template<class charT, class traits>
+    friend basic_ostream<charT, traits>& operator<< (basic_ostream<charT, traits>& out, thread::id id)
+    {
+      return out << reinterpret_cast<uint32_t>(id.tid_);
+    }
   protected:
     id(native_handle_type tid)
       :tid_(tid)
@@ -202,6 +246,20 @@ namespace std
     }
   }
 
+  inline unsigned thread::hardware_concurrency()
+  {
+    static int threads = -1;
+    if(threads == -1){
+      threads = 0;
+
+      using namespace ntl::nt;
+      system_information<system_basic_information> basicInfo;
+      if(basicInfo)
+        threads = basicInfo->NumberOfProcessors;
+    }
+    return threads;
+  }
+
   // thread implementation
 
   inline thread::id thread::get_id() const __ntl_nothrow
@@ -213,11 +271,21 @@ namespace std
   inline bool thread::joinable() const
   {
     // get_id() != id()
-    return h != 0;
+    return alive();
+  }
+
+  inline bool thread::check_alive() __ntl_nothrow
+  {
+    if(alive())
+      return true;
+    ntl::nt::close(h);
+    h = nullptr;
+    return false;
   }
 
   inline void thread::join(error_code& ec) __ntl_throws(system_error)
   {
+    check_alive();
     if(!h || !tid || get_id() == this_thread::get_id()){
       if(!h){
         ec = posix_error::make_error_code(posix_error::invalid_argument);
@@ -240,19 +308,122 @@ namespace std
     }
     // wait ok, release handle
     close(h);
-    h = 0;
+    h = nullptr,
+      cleanup = nullptr;
+    tid = 0;
   }
 
   inline void thread::detach(error_code& ec) __ntl_throws(system_error)
   {
+    // detect alive
+    check_alive();
     if(!h || !tid){
       ec = h ? posix_error::make_error_code(posix_error::no_such_process) :posix_error::make_error_code(posix_error::invalid_argument);
       if(ec == throws())
         __ntl_throw(system_error(ec));
       return;
     }
-    ntl::atomic::increment(cleanup);
+    ntl::atomic::increment(*cleanup);
+    h = nullptr;
+    tid = 0;
   }
+
+  // noinline :-\..
+  inline uint32_t __stdcall thread::start_routine(void* Parm)
+  {
+    __::thread_params_base* tp = reinterpret_cast<__::thread_params_base*>(Parm);
+    tp->run();
+    if(ntl::atomic::compare_exchange(tp->cleanup, 0, 1)){
+      // close handle
+      ntl::nt::close(tp->handle);
+    }
+    delete tp;
+    return 0;
+  }
+
+  inline bool thread::alive() const __ntl_nothrow
+  {
+    //return ntl::nt::NtWaitForSingleObject(h, false, 0) == ntl:nt::status::still_active;
+    return ntl::nt::user_thread::exitstatus(h) == ntl::nt::status::still_active; // may be faster
+  }
+
+#ifdef NTL__CXX_RV
+  thread(thread&&);
+  thread& operator=(thread&&);
+  void swap(thread&&) __ntl_nothrow;
+#else
+  inline thread::thread(const thread& r)
+    :h(), tid(),cleanup()
+  {
+    swap(r);
+  }
+
+  inline thread& thread::operator=(const thread& r) __ntl_nothrow
+  {
+    error_code ec;
+    if(joinable())
+      detach(ec);
+    swap(r);
+  }
+
+  // members:
+  inline void thread::swap(const thread& r) __ntl_nothrow
+  {
+    volatile native_handle_type h0 = h, t0 = tid;
+    volatile uint32_t* c0 = cleanup;
+    h = r.h,
+      tid = r.tid,
+      cleanup = r.cleanup;
+    r.h = h0,
+      r.tid = t0,
+      r.cleanup = c0;
+  }
+#endif
+
+  inline void thread::start(__::thread_params_base* tp)
+  {
+    cleanup = &tp->cleanup;
+    ntl::nt::user_thread ut(start_routine, tp, true); // suspended
+    tp->handle = ut.get();
+    tid = ut.get_id();
+
+    // run
+    ut.resume();
+    h = ut.release();
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  // thread construction
+
+  template<class F>
+  inline thread::thread(F f)
+    :h(),tid(),cleanup()
+  {
+    // create
+    __::thread_params<F>* tp = new __::thread_params<F>(f, make_tuple());
+    start(tp);
+  }
+
+  template <class F, class A1>
+  inline thread::thread(F f, A1 a1)
+    :h(),tid(),cleanup()
+  {
+    typedef __::thread_params<F, tuple<A1> > tparams;
+    tparams* tp = new tparams(f, std::move(make_tuple(a1)));
+    start(tp);
+  }
+
+  template <class F, class A1, class A2>
+  inline thread::thread(F f, A1 a1, A2 a2)
+    :h(),tid(),cleanup()
+  {
+    typedef __::thread_params<F, tuple<A1,A2> > tparams;
+    tparams* tp = new tparams(f, std::move(make_tuple(a1,a2)));
+    start(tp);
+  }
+
+
+  //////////////////////////////////////////////////////////////////////////
 
   /** @} thread_thread */
   /** @} threads */

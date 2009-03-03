@@ -8,11 +8,10 @@
 #ifndef NTL__STLX_TYPEINFO
 #define NTL__STLX_TYPEINFO
 
-/**\addtogroup  lib_language_support *** 18 Language support library [language.support] ******
-*@{*/
-/**\defgroup  lib_support_rtti ****** 18.6 Type identification [support.rtti]
-*@{*/
-
+/**\addtogroup  lib_language_support *** 18 Language support library [language.support]
+ * @{ */
+/**\defgroup    lib_support_rtti ******* 18.6 Type identification [support.rtti]
+ * @{ */
 
 #ifndef STLX__USE_RTTI
   #if defined(_MSC_VER)
@@ -142,9 +141,8 @@ public:
   }
 };
 
-/** @} lib_support_rtti */
-/** @} lib_language_support */
-
 }//namespace std
 
+/** @} lib_support_rtti */
+/** @} lib_language_support */
 #endif//#ifndef NTL__STLX_TYPEINFO

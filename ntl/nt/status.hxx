@@ -59,6 +59,7 @@ struct status
     alerted                                                        = (int)0x00000101,
     timeout                                                        = (int)0x00000102,
     pending                                                        = (int)0x00000103,
+    still_active = pending,
     reparse                                                        = (int)0x00000104,
     more_entries                                                   = (int)0x00000105,
     not_all_assigned                                               = (int)0x00000106,

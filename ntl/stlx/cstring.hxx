@@ -12,7 +12,8 @@
 #include "cassert.hxx"
 
 
-namespace std {
+namespace std
+{
 
 /**\addtogroup  lib_strings ************ 21 Strings library [strings] ****************
  *@{*/

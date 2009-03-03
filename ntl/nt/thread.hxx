@@ -11,7 +11,6 @@
 #include "basedef.hxx"
 #include "../device_traits.hxx"
 #include "object.hxx"
-#include "teb.hxx"
 #include "apc.hxx"
 #include "csr.hxx"
 #include "context.hxx"
@@ -64,47 +63,6 @@ control_thread_t NtAlertResumeThread;
 NTL__EXTERNAPI
 control_thread_t NtSuspendThread;
 
-
-enum thread_info_class
-{
-  ThreadBasicInformation,
-  ThreadTimes,
-  ThreadPriority,
-  ThreadBasePriority,
-  ThreadAffinityMask,
-  ThreadImpersonationToken,
-  ThreadDescriptorTableEntry,
-  ThreadEnableAlignmentFaultFixup,
-  ThreadEventPair,
-  ThreadQuerySetWin32StartAddress,
-  ThreadZeroTlsCell,
-  ThreadPerformanceCount,
-  ThreadAmILastThread,
-  ThreadIdealProcessor,
-  ThreadPriorityBoost,
-  ThreadSetTlsArrayAddress,
-  MaxThreadInfoClass
-};
-
-
-NTL__EXTERNAPI
-ntstatus __stdcall
-  NtQueryInformationThread (
-    legacy_handle     ThreadHandle,
-    thread_info_class ThreadInformationClass,
-    void*             ThreadInformation,
-    uint32_t          ThreadInformationLength,
-    uint32_t*         ReturnLength
-    );
-
-NTL__EXTERNAPI
-ntstatus __stdcall
-  NtSetInformationThread (
-    legacy_handle     ThreadHandle,
-    thread_info_class ThreadInformationClass,
-    void*             ThreadInformation,
-    uint32_t          ThreadInformationLength
-    );
 
 class user_thread;
   }//namspace nt
@@ -370,6 +328,28 @@ public:
   }
 
   static legacy_handle get_current() { return current_thread(); }
+
+  static ntstatus exitstatus(legacy_handle thread_handle)
+  {
+    thread_information<thread_basic_information> info(thread_handle);
+    return info ? info->ExitStatus : info;
+  }
+
+  ntstatus exitstatus () const
+  {
+    return exitstatus(get());
+  }
+
+  bool alive() const
+  {
+    return exitstatus() == status::still_active;
+  }
+
+  legacy_handle get_id() const
+  {
+    thread_information<thread_basic_information> info(get());
+    return info ? info->ClientId.UniqueThread : 0;
+  }
 
   __declspec(noreturn)
   static void exit(ntstatus Status)

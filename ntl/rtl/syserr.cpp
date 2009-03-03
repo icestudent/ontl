@@ -28,7 +28,8 @@ namespace std
   extern const error_category& system_category = system_category_instance;
 
   extern const __::exception_error_category& exception_category = exception_category_instance;
-  extern error_code& throws_error_code = throws_error_code_instance;
+  
+  extern error_code& __::throws_error_code = throws_error_code_instance;
 
 
   // TODO: implement generic error value mapping to the current subsystem error values
