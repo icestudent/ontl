@@ -40,7 +40,7 @@ namespace std
 
     // [2.2.3] Class template shared_ptr
 
-    namespace impl
+    namespace __
     {
       template<class T>
       struct shared_ptr_data
@@ -88,6 +88,7 @@ namespace std
       struct shared_cast_static{};
       struct shared_cast_dynamic{};
       struct shared_cast_const{};
+      template<class> struct check_shared;
     }
 
     /**
@@ -100,7 +101,7 @@ namespace std
     template<class T>
     class shared_ptr
     {
-      typedef impl::shared_ptr_data<T> shared_data;
+      typedef __::shared_ptr_data<T> shared_data;
 
       struct explicit_bool { int _; };
       typedef int explicit_bool::*  explicit_bool_type;
@@ -119,6 +120,8 @@ namespace std
       template<class U>
       inline reference get_reference(true_type)  const { return ptr->p;  }
 
+      template<class Y>
+      void check_shared(Y* p, const shared_ptr<T>* ptr);
     public:
       typedef T element_type;
 
@@ -130,11 +133,12 @@ namespace std
       template<class Y> explicit shared_ptr(Y* p)
       {
         ptr = new shared_data(p);
+        check_shared(p, this);
       }
 
       template<class Y, class D> shared_ptr(Y* p, D d)
       {
-        ptr = new impl::shared_ptr_deleter<T,D>(p, d);
+        ptr = new __::shared_ptr_deleter<T,D>(p, d);
       }
 
       shared_ptr(const shared_ptr& r) __ntl_nothrow
@@ -173,7 +177,7 @@ namespace std
       {
         if(r.get()){
           // currently unique_ptr's deleter always are reference
-          ptr = new impl::shared_ptr_deleter<T,D>(r.get(), ref(r.get_deleter()));
+          ptr = new __::shared_ptr_deleter<T,D>(r.get(), ref(r.get_deleter()));
           r.release();
         }
       }
@@ -232,12 +236,13 @@ namespace std
       {
         reset();
         ptr = new shared_data(p);
+        check_shared(p, this);
       }
       
       template<class Y, class D> void reset(Y* p, D d)
       {
         reset();
-        ptr = new impl::shared_ptr_deleter<T,D>(p, d);
+        ptr = new __::shared_ptr_deleter<T,D>(p, d);
       }
       
       // [2.2.3.5] observers
@@ -273,19 +278,19 @@ namespace std
       template<class T, class U>
       friend bool operator<(shared_ptr<T> const& a, shared_ptr<U> const& b) __ntl_nothrow;
 
-      template<class Y> shared_ptr(const shared_ptr<Y>& r, impl::shared_cast_const) __ntl_nothrow
+      template<class Y> shared_ptr(const shared_ptr<Y>& r, __::shared_cast_const) __ntl_nothrow
         :ptr(reinterpret_cast<shared_data*>(r.ptr))
       {
         const_cast<T*>((Y*)0);
         add_ref();
       }
-      template<class Y> shared_ptr(const shared_ptr<Y>& r, impl::shared_cast_static) __ntl_nothrow
+      template<class Y> shared_ptr(const shared_ptr<Y>& r, __::shared_cast_static) __ntl_nothrow
         :ptr(reinterpret_cast<shared_data*>(r.ptr))
       {
         static_cast<T*>((Y*)0);
         add_ref();
       }
-      template<class Y> shared_ptr(const shared_ptr<Y>& r, impl::shared_cast_dynamic) __ntl_nothrow
+      template<class Y> shared_ptr(const shared_ptr<Y>& r, __::shared_cast_dynamic) __ntl_nothrow
         :ptr()
       {
         if(dynamic_cast<T*>(r.get())){
@@ -339,18 +344,18 @@ namespace std
     inline shared_ptr<T> static_pointer_cast(shared_ptr<U> const& r) __ntl_nothrow
     {
       static_cast<T*>((U*)0); // check
-      return r.empty() ? shared_ptr<T>() : shared_ptr<T>(r, impl::shared_cast_static());
+      return r.empty() ? shared_ptr<T>() : shared_ptr<T>(r, __::shared_cast_static());
     }
     template<class T, class U> 
     inline shared_ptr<T> dynamic_pointer_cast(shared_ptr<U> const& r) __ntl_nothrow
     {
-      return r.empty() ? shared_ptr<T>() : shared_ptr<T>(r, impl::shared_cast_dynamic());
+      return r.empty() ? shared_ptr<T>() : shared_ptr<T>(r, __::shared_cast_dynamic());
     }
     template<class T, class U> 
     inline shared_ptr<T> const_pointer_cast(shared_ptr<U> const& r) __ntl_nothrow
     {
       const_cast<T*>((U*)0); // check
-      return r.empty() ? shared_ptr<T>() : shared_ptr<T>(r, impl::shared_cast_const());
+      return r.empty() ? shared_ptr<T>() : shared_ptr<T>(r, __::shared_cast_const());
     }
 
     // [2.2.3.7] shared_ptr I/O
@@ -377,7 +382,7 @@ namespace std
     template<class T>
     class weak_ptr
     {
-      typedef impl::shared_ptr_data<T>* shared_data;
+      typedef __::shared_ptr_data<T>* shared_data;
 
       template<class Y> friend class shared_ptr;
     public:
@@ -490,26 +495,19 @@ namespace std
      *
      *  A class \c T can inherit from \c enable_shared_from_this<T> to inherit the \c shared_from_this member functions that
      *  obtain a shared_ptr instance pointing to \c *this.
-     *
-     *  @bug Currently a condition <tt>(!(p < q ) && !(q < p))</tt> is not true, only <tt>p == </tt>.
      **/
     template<class T>
     class enable_shared_from_this
     {
-      shared_ptr<T> weak_this;
+      weak_ptr<T> weak_this;
+      friend struct __::check_shared<T>;
     protected:
       enable_shared_from_this() __ntl_nothrow
-      {
-        weak_this = shared_ptr<T>(static_cast<T*>(this));
-      }
-      enable_shared_from_this(enable_shared_from_this const& r) __ntl_nothrow
-        :weak_this(r.weak_this)
       {}
-      enable_shared_from_this& operator=(enable_shared_from_this const& r) __ntl_nothrow
-      {
-        weak_this = r.weak_this;
-        return *this;
-      }
+      enable_shared_from_this(enable_shared_from_this const&) __ntl_nothrow
+      {}
+      enable_shared_from_this& operator=(enable_shared_from_this const&) __ntl_nothrow
+      { return *this; }
       ~enable_shared_from_this() __ntl_nothrow
       {}
     public:
@@ -523,6 +521,30 @@ namespace std
         return shared_ptr<T const>(weak_this);
       }
     };
+
+    namespace __
+    {
+      template<class T>
+      struct check_shared
+      {
+        template<class>
+        static inline void check(...) {}
+
+        template<class Y>
+        static inline void check(enable_shared_from_this<T>* p, const shared_ptr<T>& ptr)
+        {
+          p->weak_this = ptr;
+        }
+      };
+    }
+
+    template<class T>
+    template<class Y>
+    inline void shared_ptr<T>::check_shared(Y* p, const shared_ptr<T>* ptr)
+    {
+      if(p)
+        __::check_shared<T>::check<Y>(p, *ptr);
+    }
 
     /**@} lib_tr1_util_smartptr */
     /**@} lib_tr1_util */
