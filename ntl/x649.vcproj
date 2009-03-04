@@ -299,6 +299,10 @@
 			<Filter
 				Name="stlx"
 				>
+				<File
+					RelativePath=".\stlx\0order.hxx"
+					>
+				</File>
 				<Filter
 					Name=".ext"
 					>
@@ -595,6 +599,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\stlx\mem_fn.hxx"
+						>
+					</File>
+					<File
 						RelativePath=".\stlx\memory.hxx"
 						>
 					</File>
@@ -616,6 +624,10 @@
 					</File>
 					<File
 						RelativePath=".\stlx\smart_ptr_rv.hxx"
+						>
+					</File>
+					<File
+						RelativePath=".\stlx\smart_ptr_tr1.hxx"
 						>
 					</File>
 					<File

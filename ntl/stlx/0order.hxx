@@ -49,6 +49,36 @@
 
 /** @} lib_language_support */
 
+
+/**\defgroup  lib_utilities *** 20 General utilities library [utilities]
+*
+*    Components used by other elements of the Standard C + + library.
+@{
+\defgroup  lib_utility ***** 20.2 Utility components [utility]
+*
+*    basic function and class templates that are used throughout
+*    the rest of the library.
+\defgroup lib_ratio ****** 20.3 Compile-time rational arithmetic [ratio]
+*  The ratio library provides a class template ratio which exactly represents any finite rational number 
+*  with a numerator and denominator representable by compile-time constants of type intmax_t.
+\defgroup  lib_tuple ******* 20.4 Tuples [tuple]
+*
+*   Tuple library that provides a tuple type as the class template tuple that can
+*   be instantiated with any number of arguments.
+\defgroup  lib_typetraits ** 20.5 Metaprogramming and type traits [meta]
+\defgroup  lib_function_objects ***** 20.6 Function objects [function.objects]
+\defgroup  lib_memory *************** 20.7 Memory [memory]
+@{
+
+\addtogroup  lib_uniqueptr ********** 20.7.11 Class template unique_ptr (legacy) [unique.ptr]
+\addtogroup  lib_uniqueptr_rv ********** 20.7.11 Class template unique_ptr [unique.ptr]
+\addtogroup  lib_smartptr *************** 20.7.12 Smart pointers (legacy) [util.smartptr]
+\addtogroup  lib_smartptr_rv *************** 20.7.12 Smart pointers [util.smartptr]
+
+@} lib_memory 
+
+@} lib_utilities */
+
   /**
    *	@defgroup threads 30 Thread support library [thread]
    *  

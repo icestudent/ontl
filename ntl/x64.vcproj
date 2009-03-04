@@ -298,6 +298,10 @@
 			<Filter
 				Name="stlx"
 				>
+				<File
+					RelativePath=".\stlx\0order.hxx"
+					>
+				</File>
 				<Filter
 					Name=".ext"
 					>
@@ -542,10 +546,6 @@
 					Name="utility"
 					>
 					<File
-						RelativePath=".\stlx\function.hxx"
-						>
-					</File>
-					<File
 						RelativePath=".\stlx\initializer_list.hxx"
 						>
 					</File>
@@ -623,6 +623,10 @@
 					>
 					<File
 						RelativePath=".\stlx\algorithm.hxx"
+						>
+					</File>
+					<File
+						RelativePath=".\stlx\function.hxx"
 						>
 					</File>
 					<File

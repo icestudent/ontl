@@ -269,12 +269,40 @@ class allocator
       ::new((void *)p) T(std::forward<Arg>(val), std::forward<Arg2>(val2), std::forward<Arg3>(val3), std::forward<Arg4>(val4), std::forward<Arg5>(val5));
     }
 #else
+    template<class Arg>
     __forceinline
-    void construct(pointer p, const T & val)
+    void construct(pointer p, const Arg& val)
     {
       __assume(p);
-      ///\todo ::new((void *)p ) T(std::forward<U>(val))
       ::new((void *)p) T(val);
+    }
+    template<class A1, class A2>
+    __forceinline
+    void construct(pointer p, const A1& a1, const A2& a2)
+    {
+      __assume(p);
+      ::new((void *)p) T(a1,a2);
+    }
+    template<class A1, class A2, class A3>
+    __forceinline
+    void construct(pointer p, const A1& a1, const A2& a2, const A3& a3)
+    {
+      __assume(p);
+      ::new((void *)p) T(a1,a2,a3);
+    }
+    template<class A1, class A2, class A3, class A4>
+    __forceinline
+      void construct(pointer p, const A1& a1, const A2& a2, const A3& a3, const A4& a4)
+    {
+      __assume(p);
+      ::new((void *)p) T(a1,a2,a3,a4);
+    }
+    template<class A1, class A2, class A3, class A4, class A5>
+    __forceinline
+      void construct(pointer p, const A1& a1, const A2& a2, const A3& a3, const A4& a4, const A5& a5)
+    {
+      __assume(p);
+      ::new((void *)p) T(a1,a2,a3,a4,a5);
     }
 #endif
 
