@@ -216,7 +216,7 @@ template <class                       InformationClass,
           set_process_information_t   SetInformation>
 struct process_information_base:
   aux::query_information_policy<InformationClass, query_process_information_t, std::is_base_of<aux::write_only, InformationClass>::value>,
-  aux::set_information_policy<InformationClass, query_process_information_t, std::is_base_of<aux::read_only, InformationClass>::value>
+  aux::set_information_policy<InformationClass, set_process_information_t, std::is_base_of<aux::read_only, InformationClass>::value>
 {
     typedef InformationClass info_class;
 

@@ -45,7 +45,7 @@ struct linked_ptr
     ~linked_ptr()
     {
       /// unless this is not the last one
-      //if ( links.prev != links.next )
+      if ( links.prev != links.next )
         links.unlink(links.prev, links.next);
     }
 

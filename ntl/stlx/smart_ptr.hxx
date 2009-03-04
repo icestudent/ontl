@@ -896,7 +896,7 @@ namespace std
   private:
 
     void set(T * p) { base_type::set(p); }
-    void free() { delete base_type::get(); }
+    void free() { delete base_type::get(); set(nullptr); }
 
     template <class Y, class D> shared_ptr& operator=(const unique_ptr<Y, D>& r)  __deleted;
   };

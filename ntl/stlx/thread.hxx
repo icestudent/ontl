@@ -84,16 +84,16 @@ namespace std
   /**
    *	@brief thread class
    *
-   *  The class thread provides a mechanism to create a new thread of execution, to join with a thread (i.e. wait
-   *  for a thread to complete), and to perform other operations that manage and query the state of a thread.
+   *  The class thread provides a mechanism to create a new %thread of execution, to join with a %thread (i.e. wait
+   *  for a %thread to complete), and to perform other operations that manage and query the state of a %thread.
    *  
-   *  A thread object uniquely represents a particular thread of execution. That representation may be transferred
-   *  to other thread objects in such a way that no two thread objects simultaneously represent the same thread
-   *  of execution. A thread of execution is detached when no thread object represents that thread. Objects of
-   *  class thread can be in a state that does not represent a thread of execution. 
+   *  A thread object uniquely represents a particular %thread of execution. That representation may be transferred
+   *  to other thread objects in such a way that no two thread objects simultaneously represent the same %thread
+   *  of execution. A %thread of execution is detached when no thread object represents that %thread. Objects of
+   *  class thread can be in a state that does not represent a %thread of execution. 
    *
-   *  @note A thread object does not represent a thread of execution after default construction, after being moved from, 
-   *  or after a successful call to detach or join.
+   *  @note A thread object does not represent a %thread of execution after default construction, after being moved from, 
+   *  or after a successful call to \c thread::detach or \c thread::join.
    **/
   class thread
   {
@@ -104,18 +104,31 @@ namespace std
   public:
     // types:
     class id;
+    /// Platform-specific %thread handle
     typedef ntl::nt::legacy_handle native_handle_type;
 
-    // construct/copy/destroy:
-    thread()
+    /** Constructs a thread object that does not represent a %thread of execution. */
+    thread()__ntl_nothrow
       :h(),tid(),cleanup()
     {}
+    /**
+     *	@brief Detaches from the thread if it joinable.
+     *  @note Destroying a joinable thread can be unsafe if the %thread accesses objects or the standard library 
+     *  unless the %thread performs explicit synchronization to ensure that it does not access the objects or the standard library 
+     *  past their respective lifetimes. Terminating the process with \c _exit() or \c quick_exit() removes some of these obligations.
+     **/
     ~thread()
     {
       if(joinable())
         detach();
     }
 
+    /**
+     *	@brief Constructs an object and executes \c f in a new %thread of execution.
+     *  @param[in] f Callable object that will be called in the new %thread context
+     *  @note Return value of provided callable object is ignored.
+     *  @note If \c f terminates with an uncaught exception, \c std::terminate() shall be called.
+     **/
     template <class F> explicit thread(F f);
 
   #ifdef NTL__CXX_VT
@@ -133,20 +146,25 @@ namespace std
     thread(const thread& r);
     thread& operator=(const thread& r);
 
-    // members:
+    /** Swaps the current object's state with \c r */
     void swap(const thread& r) __ntl_nothrow;
   #endif
 
+    /** Is this thread a joinable */
     bool joinable() const __ntl_nothrow;
 
+    /** Waits for a thread to complete */
     void join(error_code& ec = throws()) __ntl_throws(system_error);
+    /** Detaches from a thread of execution */
     void detach(error_code& ec = throws()) __ntl_throws(system_error);
 
+    /** Returns a %thread id if object represents a valid %thread of execution or default constructed id otherwise */
     id get_id() const __ntl_nothrow;
 
+    /** Returns the platform-specific %thread handle */
     native_handle_type native_handle() const __ntl_nothrow { return h; }
     
-    // static members:
+    /** Returns the number of hardware %thread contexts. */
     static unsigned hardware_concurrency();
 
   protected:
@@ -162,20 +180,19 @@ namespace std
 
   namespace this_thread
   {
-    thread::id get_id();
+    thread::id get_id() __ntl_nothrow;
   }
 
   /**
    *	@brief Unique thread identifier
    *
-   *  An object of type thread::id provides a unique identifier for each thread of execution and a single distinct
-   *  value for all thread objects that do not represent a thread of execution (30.2.1).
+   *  An object of type thread::id provides a unique identifier for each %thread of execution and a single distinct
+   *  value for all thread objects that do not represent a %thread of execution (30.2.1).
    *
-   *  Each thread of execution has an associated thread::id object that is not equal to the thread::id object of any other thread of execution
-   *  and that is not equal to the thread::id object of any std::thread object that does not represent threads
-   *  of execution. 
+   *  Each %thread of execution has an associated thread::id object that is not equal to the thread::id object of any other %thread of execution
+   *  and that is not equal to the thread::id object of any std::thread object that does not represent threads of execution. 
    *
-   *  The library may reuse the value of a thread::id of a terminated thread that can no longer be joined.
+   *  The library may reuse the value of a thread::id of a terminated %thread that can no longer be joined.
    *  @note Relational operators allow thread::id objects to be used as keys in associative containers.
    **/
   class thread::id
@@ -218,27 +235,27 @@ namespace std
 
   namespace this_thread
   {
-    /** Returns an object of type thread::id that uniquely identifies the current thread of execution. */
+    /** Returns an object of type thread::id that uniquely identifies the current %thread of execution. */
     inline thread::id get_id() __ntl_nothrow
     {
       return ntl::nt::teb::instance().ClientId.UniqueThread;
     }
 
-    /** Offers the operating system the opportunity to schedule another thread. */
+    /** Offers the operating system the opportunity to schedule another %thread. */
     inline void yield() __ntl_nothrow
     {
       // NOTE: i'm not sure about this
       ntl::nt::sleep(0, true);
     }
 
-    /** Blocks the calling thread at least until the time specified by abs_time. */
+    /** Blocks the calling %thread at least until the time specified by \c abs_time. */
     template <class Clock, class Duration>
     inline void sleep_until(const chrono::time_point<Clock, Duration>& abs_time)
     {
       ntl::nt::sleep_until(abs_time);
     }
 
-    /** Blocks the calling thread for at least the time specified by rel_time. */
+    /** Blocks the calling %thread for at least the time specified by \c rel_time. */
     template <class Rep, class Period>
     inline void sleep_for(const chrono::duration<Rep, Period>& rel_time)
     {

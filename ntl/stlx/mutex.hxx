@@ -23,6 +23,14 @@ namespace std
    **/
   /**
    *	@defgroup thread_mutex 30.3 Mutual exclusion [thread.mutex]
+   *
+   *  A mutex object facilitates protection against data races and allows thread-safe synchronization of data
+   *  between threads. A %thread \i owns a mutex from the time it successfully calls one of the lock functions until
+   *  it calls unlock. Mutexes may be either recursive or non-recursive, and may grant simultaneous ownership
+   *  to one or many threads. The mutex types supplied by the standard library provide exclusive ownership
+   *  semantics: only one %thread may own the mutex at a time. Both recursive and non-recursive mutexes are
+   *  supplied.
+   *
    *  @{
    **/
 
@@ -53,13 +61,33 @@ namespace std
   }
 #endif
 
-  /// Class mutex [30.3.1.1 thread.mutex.class]
+  /**
+   *	@brief Class mutex [30.3.1.1 thread.mutex.class]
+   *
+   *  The class mutex provides a non-recursive mutex with exclusive ownership semantics. If one %thread owns a
+   *  mutex object, attempts by another %thread to acquire ownership of that object will fail (for \c try_lock()) or
+   *  block (for \c lock()) until the owning %thread has released ownership with a call to \c unlock().
+   **/
   typedef __::mtx::base_mutex<false> mutex;
 
-  /// Class recursive_mutex [30.3.1.2 thread.mutex.recursive]
+  /**
+   *	@brief Class recursive_mutex [30.3.1.2 thread.mutex.recursive]
+   *
+   *  The class recursive_mutex provides a recursive mutex with exclusive ownership semantics. If one %thread
+   *  owns a recursive_mutex object, attempts by another %thread to acquire ownership of that object will fail
+   *  (for \c try_lock()) or block (for \c lock()) until the first %thread has completely released ownership.
+   **/
   typedef __::mtx::base_mutex<true> recursive_mutex;
 
-  /// Class timed_mutex [30.3.2.1 thread.timedmutex.class]
+  /**
+   *	@brief Class timed_mutex [30.3.2.1 thread.timedmutex.class]
+   *
+   *  The class timed_mutex provides a non-recursive mutex with exclusive ownership semantics. If one %thread
+   *  owns a timed_mutex object, attempts by another %thread to acquire ownership of that object will fail (for
+   *  \c try_lock()) or block (for \c lock(), \c try_lock_for(), and \c try_lock_until()) until the owning %thread has
+   *  released ownership with a call to \c unlock() or the call to \c try_lock_for() or \c try_lock_until() times out
+   *  (having failed to obtain ownership).
+   **/
   class timed_mutex:
     public __::mtx::base_mutex<false>
   {
@@ -69,6 +97,13 @@ namespace std
     ~timed_mutex()
     {}
 
+    /**
+     *	@brief The function attempts to obtain ownership of the mutex within the time specified by \c rel_time.
+     *
+     *  If the time specified by \c rel_time is less than or equal to 0, the function attempts to obtain ownership
+     *  without blocking (as if by calling \c try_lock()). The function shall return within the time specified by
+     *  rel_time only if it has obtained ownership of the mutex object.
+     **/
     template <class Rep, class Period>
     bool try_lock_for(const chrono::duration<Rep, Period>& rel_time) __ntl_nothrow
     {
@@ -78,6 +113,13 @@ namespace std
       return period.count() <= 0 ? try_lock() : ntl::nt::success( wait( -1i64*period.count(), true ) );
     }
 
+    /**
+     *	@brief The function attempts to obtain ownership of the mutex by the time specified by \c abs_time.
+     *
+     *  If \c abs_time has already passed, the function attempts to obtain ownership without blocking (as if
+     *  by calling \c try_lock()). The function shall return before the time specified by \c abs_time only if it
+     *  has obtained ownership of the mutex object.
+     **/
     template <class Clock, class Duration>
     bool try_lock_until(const chrono::time_point<Clock, Duration>& abs_time) __ntl_nothrow
     {
@@ -93,7 +135,15 @@ namespace std
   };
 
 
-  /// Class recursive_timed_mutex [30.3.2.2 thread.timedmutex.recursive]
+  /**
+   *	@brief Class recursive_timed_mutex [30.3.2.2 thread.timedmutex.recursive]
+   *
+   *  The class recursive_timed_mutex provides a recursive mutex with exclusive ownership semantics. If one
+   *  %thread owns a recursive_timed_mutex object, attempts by another %thread to acquire ownership of that
+   *  object will fail (for \c try_lock()) or block (for \c lock(), \c try_lock_for(), and \c try_lock_until()) until the
+   *  owning %thread has completely released ownership or the call to \c try_lock_for() or \c try_lock_until() times
+   *  out (having failed to obtain ownership).
+   **/
   class recursive_timed_mutex:
     __::mtx::base_mutex<true>
   {
@@ -103,6 +153,13 @@ namespace std
     ~recursive_timed_mutex()
     {}
 
+    /**
+     *	@brief The function attempts to obtain ownership of the mutex within the time specified by \c rel_time.
+     *
+     *  If the time specified by \c rel_time is less than or equal to 0, the function attempts to obtain ownership
+     *  without blocking (as if by calling \c try_lock()). The function shall return within the time specified by
+     *  rel_time only if it has obtained ownership of the mutex object.
+     **/
     template <class Rep, class Period>
     bool try_lock_for(const chrono::duration<Rep, Period>& rel_time) __ntl_nothrow
     {
@@ -110,6 +167,13 @@ namespace std
       return period.count() <= 0 ? try_lock() : ntl::nt::success( wait( -1i64*period.count(), true ) );
     }
 
+    /**
+     *	@brief The function attempts to obtain ownership of the mutex by the time specified by \c abs_time.
+     *
+     *  If \c abs_time has already passed, the function attempts to obtain ownership without blocking (as if
+     *  by calling \c try_lock()). The function shall return before the time specified by \c abs_time only if it
+     *  has obtained ownership of the mutex object.
+     **/
     template <class Clock, class Duration>
     bool try_lock_until(const chrono::time_point<Clock, Duration>& abs_time) __ntl_nothrow
     {
@@ -123,23 +187,33 @@ namespace std
   };
 
 
-  /// Class template lock_guard [30.3.3.1 thread.lock.guard]
+  /**
+   *	@brief Class template lock_guard [30.3.3.1 thread.lock.guard]
+   *
+   *  An object of type lock_guard controls the ownership of a mutex object within a scope. A lock_guard
+   *  object maintains ownership of a mutex object throughout the lock_guard object's lifetime. The behavior
+   *  of a program is undefined if the mutex referenced by pm does not exist for the entire lifetime (3.8) of the
+   *  lock_guard object.
+   **/
   template <class Mutex>
   class lock_guard 
   {
   public:
     typedef Mutex mutex_type;
 
+    /** Locks the mutex \c m */
     explicit lock_guard(mutex_type& m)
       :m(m)
     {
       m.lock();
     }
 
+    /** Takes the mutex \m without locking it */
     lock_guard(mutex_type& m, adopt_lock_t) __ntl_nothrow
       :m(m)
     {}
 
+    /** Unlocks the mutex */
     ~lock_guard() __ntl_nothrow
     {
       m.unlock();
@@ -153,7 +227,15 @@ namespace std
   };
 
 
-  /// Class template unique_lock [30.3.3.2 thread.lock.unique]
+  /**
+   *	@brief Class template unique_lock [30.3.3.2 thread.lock.unique]
+   *
+   *  An object of type unique_lock controls the ownership of a mutex within a scope. Mutex ownership may
+   *  be acquired at construction or after construction, and may be transferred, after acquisition, to another
+   *  unique_lock object. Objects of type unique_lock are not copyable but are movable. The behavior of a
+   *  program is undefined if the contained pointer \c pm is not null and the mutex pointed to by \c pm does not exist
+   *  for the entire remaining lifetime (3.8) of the unique_lock object.
+   **/
   template <class Mutex>
   class unique_lock 
   {
@@ -348,7 +430,11 @@ namespace std
   //////////////////////////////////////////////////////////////////////////
 #pragma region thread.once
 
-  /// Call once [30.3.5 thread.once]
+  /**
+   *	@brief Call once [30.3.5 thread.once]
+   *
+   *  The class once_flag is an opaque data structure that call_once uses to initialize data without causing a data race or deadlock.
+   **/
   struct once_flag 
   {
     /** Constructs an object of type once_flag */
@@ -384,7 +470,7 @@ namespace std
     /**
      *	@brief Takes or waits for the object's ownership.
      *
-     *  The wait implemented through a simple cycle with the short thread sleep. 
+     *  The wait implemented through a simple cycle with the short %thread sleep. 
      *  Such wait takes about 60 times more CPU time than kernel synchronization object,
      *  but it's still invisible to the common system performance and it is faster and lightweight.
      **/
@@ -470,6 +556,7 @@ namespace std
     };
   }
 
+  // 30.3.5.2 Function call_once [thread.once.callonce]
   template<class Callable>
   void call_once(once_flag& flag, Callable func)
   {

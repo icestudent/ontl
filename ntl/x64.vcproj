@@ -574,6 +574,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\stlx\smart_ptr_tr1.hxx"
+						>
+					</File>
+					<File
 						RelativePath=".\stlx\tt_isfuncc.inl"
 						>
 					</File>
