@@ -3,4 +3,5 @@
 #  include "stlx/smart_ptr_rv.hxx"
 #else
 #  include "stlx/smart_ptr.hxx"
+#  include "stlx/smart_ptr_tr1.hxx"
 #endif
