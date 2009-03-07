@@ -404,7 +404,7 @@ public:
     ///   if pos == size(), returns charT().
     const_reference operator[](size_type pos) const
     {
-      static const charT zero_char;// = charT();
+      static const charT zero_char = charT();
       return pos < str.size() ? *(begin() + pos) : zero_char;
     }
 
@@ -972,33 +972,56 @@ public:
 
     int compare(const basic_string& str) const
     {
-      const int r = traits_type::compare(begin(), str.begin(),
-                                            std::min(size(), str.size()));
+      const size_t rlen = std::min(size(), str.size());
+      if(!rlen)
+        return static_cast<int>(size() - str.size());
+      const int r = traits_type::compare(begin(), str.begin(), rlen);
       return r != 0 ? r : static_cast<int>(size() - str.size());
     }
 
-    int compare(size_type pos1, size_type n1, const basic_string& str) const;
-    int compare(size_type pos1, size_type n1, const basic_string& str, size_type pos2, size_type n2) const;
+    int compare(size_type pos, size_type n, const basic_string& str) const
+    {
+      if(pos+n >= size())
+        return -1;
+      const size_t rlen = std::min(n, str.size());
+      if(!rlen)
+        return static_cast<int>(n - str.size());
+      return traits_type::compare(begin()+pos, str.begin(), rlen);
+    }
+
+    int compare(size_type pos1, size_type n1, const basic_string& str, size_type pos2, size_type n2) const
+    {
+      if(pos1+n1 >= size())
+        return -1;
+      else if(pos2+n2 >= str.size())
+        return 1;
+      const size_t rlen = std::min(n1, n2);
+      if(!rlen)
+        return static_cast<int>(n1 - n2);
+      return traits_type::compare(begin()+pos1, str.begin()+pos2, rlen);
+    }
 
     int compare(const charT* s) const
     {
+      if(!s)
+        return static_cast<int>(size());
       const int r = traits_type::compare(begin(), s, size());
       // s may be longer than *this
       return r != 0 ? r : traits_type::eq(s[size()], charT()) ? r : r - 1; // r == 0 here
     }
 
-    int compare(size_type pos1, size_type n1, const charT* s) const
+    int compare(size_type pos, size_type n, const charT* s) const
     {
-      if(pos1+n1 >= size())
+      if(!s || pos+n >= size())
         return -1;
-      return traits_type::compare(begin()+pos1, s, n1);
+      return traits_type::compare(begin()+pos, s, n);
     }
 
     int compare(size_type pos1, size_type n1, const charT* s, size_type n2) const
     {
       if(n1 != n2)
         return static_cast<int>(n1 - n2);
-      if(pos1+n1 >= size())
+      else if(pos1+n1 >= size())
         return -1;
       return traits_type::compare(begin()+pos1, s, min(n1, n2));
     }
