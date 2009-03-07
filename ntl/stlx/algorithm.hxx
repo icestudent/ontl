@@ -195,7 +195,7 @@ bool
         InputIterator2 first2, BinaryPredicate pred)
 {
   for ( ; first1 != last1; ++first1, ++first2 )
-    if ( pred(*first1, *first2) != false ) return false;
+    if ( !pred(*first1, *first2) ) return false;
   return true;
 }
 
