@@ -354,11 +354,16 @@ public:
       return const_cast<map*>(this)->equal_range(x);
     }
 
-    friend bool operator==(const map<Key,T,Compare,Allocator>& x,
-      const map<Key,T,Compare,Allocator>& y)
+    friend bool operator==(const map<Key,T,Compare,Allocator>& x, const map<Key,T,Compare,Allocator>& y)
     {
       return static_cast<const tree_type&>(x) == static_cast<const tree_type&>(y);
     }
+
+    friend bool operator< (const map<Key,T,Compare,Allocator>& x, const map<Key,T,Compare,Allocator>& y)
+    {
+      return static_cast<const tree_type&>(x) < static_cast<const tree_type&>(y);
+    }
+      
 
   private:
     value_compare val_comp_;
@@ -366,38 +371,35 @@ public:
 }; //class template map
 
 
-#if 0
-template <class Key, class T, class Compare, class Allocator>
-bool operator==(const map<Key,T,Compare,Allocator>& x,
-                const map<Key,T,Compare,Allocator>& y);
 
 template <class Key, class T, class Compare, class Allocator>
-bool operator< (const map<Key,T,Compare,Allocator>& x,
-                const map<Key,T,Compare,Allocator>& y);
-
-template <class Key, class T, class Compare, class Allocator>
-bool operator!=(const map<Key,T,Compare,Allocator>& x,
-                const map<Key,T,Compare,Allocator>& y);
-
-template <class Key, class T, class Compare, class Allocator>
-bool operator> (const map<Key,T,Compare,Allocator>& x,
-                const map<Key,T,Compare,Allocator>& y);
-
-template <class Key, class T, class Compare, class Allocator>
-bool operator>=(const map<Key,T,Compare,Allocator>& x,
-                const map<Key,T,Compare,Allocator>& y);
-
-template <class Key, class T, class Compare, class Allocator>
-bool operator<=(const map<Key,T,Compare,Allocator>& x,
-                const map<Key,T,Compare,Allocator>& y);
-#endif
-
-template <class Key, class T, class Compare, class Allocator>
-void swap(map<Key,T,Compare,Allocator>& x,
-          map<Key,T,Compare,Allocator>& y)
+inline bool operator!=(const map<Key,T,Compare,Allocator>& x, const map<Key,T,Compare,Allocator>& y)
 {
-  x.swap(y);
+  return rel_ops::operator !=(x,y);
 }
+
+template <class Key, class T, class Compare, class Allocator>
+inline bool operator> (const map<Key,T,Compare,Allocator>& x, const map<Key,T,Compare,Allocator>& y)
+{
+  return rel_ops::operator >(x,y);
+}
+
+template <class Key, class T, class Compare, class Allocator>
+inline bool operator>=(const map<Key,T,Compare,Allocator>& x, const map<Key,T,Compare,Allocator>& y)
+{
+  return rel_ops::operator >=(x,y);
+}
+
+
+template <class Key, class T, class Compare, class Allocator>
+inline bool operator<=(const map<Key,T,Compare,Allocator>& x, const map<Key,T,Compare,Allocator>& y)
+{
+  return rel_ops::operator <=(x,y);
+}
+
+
+template <class Key, class T, class Compare, class Allocator>
+void swap(map<Key,T,Compare,Allocator>& x, map<Key,T,Compare,Allocator>& y) { x.swap(y); }
 
 #ifdef NTL__CXX_RV
 template <class Key, class T, class Compare, class Allocator>
@@ -405,7 +407,6 @@ void swap(map<Key,T,Compare,Allocator>&& x, map<Key,T,Compare,Allocator>& y) { x
 
 template <class Key, class T, class Compare, class Allocator>
 void swap(map<Key,T, Compare, Allocator>& x, map<Key,T, Compare, Allocator>&& y) { x.swap(y); }
-
 #endif
 
 template <class Key, class T, class Compare, class Allocator>
