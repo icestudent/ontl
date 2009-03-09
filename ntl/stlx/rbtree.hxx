@@ -185,7 +185,7 @@ namespace tree
         :node_allocator(x.node_allocator), comparator_(x.comparator_),
         root_(), first_(), last_(), count_()
       {
-        insert(x.begin(), x.end());
+        insert_range(x.cbegin(), x.cend());
       }
 
       #ifdef NTL__CXX_RV

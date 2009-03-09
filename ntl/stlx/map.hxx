@@ -133,7 +133,7 @@ public:
     }
 
     map(const map<Key, T, Compare, Allocator> & x)
-      :val_comp_(x.val_comp_), tree_type(val_comp_, x.get_allocator())
+      :val_comp_(x.val_comp_), tree_type(static_cast<const tree_type&>(x))
     {}
 
 #ifdef NTL__CXX_RV
