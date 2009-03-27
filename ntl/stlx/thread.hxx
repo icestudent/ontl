@@ -34,8 +34,7 @@ namespace std
    *  and communicate conditions between threads.
    *
    *  @{
-   **/
-  /**
+   *
    *	@defgroup thread_thread 30.2 Threads [thread.threads]
    *  @{
    **/

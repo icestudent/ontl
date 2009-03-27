@@ -20,8 +20,7 @@ namespace std
   /**
    *	@addtogroup threads 30 Thread support library [thread]
    *  @{
-   **/
-  /**
+   *
    *	@defgroup thread_mutex 30.3 Mutual exclusion [thread.mutex]
    *
    *  A mutex object facilitates protection against data races and allows thread-safe synchronization of data
