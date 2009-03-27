@@ -87,7 +87,7 @@ struct class_enum: def
 };
 #endif
 
-#define __class_enum(name) struct name ## _def; typedef class_enum<name ## _def> name; struct name ## _def { enum type
+#define __class_enum(name) struct name ## _def; typedef ntl::class_enum<name ## _def> name; struct name ## _def { enum type
 
 __class_enum(times) 
 {

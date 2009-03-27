@@ -396,7 +396,7 @@ public:
     none,
     no_serialize              = 0x00000001,
     growable                  = 0x00000002,
-    generate_exceprions       = 0x00000004,
+    generate_exceptions       = 0x00000004,
     zero_memory               = 0x00000008,
     realloc_in_place_only     = 0x00000010,
     tail_checking_enabled     = 0x00000020,

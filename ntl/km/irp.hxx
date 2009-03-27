@@ -130,13 +130,31 @@ namespace ntl {
 
     struct io_stack_location
     {
-      enum control_flags
+      enum control_flags: uint8_t
       {
         pending_returned  = 0x01,
         error_returned    = 0x02,
         invoke_on_cancel  = 0x20,
         invoke_on_success = 0x40,
-        invoke_on_error   = 0x80
+        invoke_on_error   = 0x80,
+
+        // lock
+        fail_immediately             = 0x01,
+        exclusive_lock               = 0x02,
+
+        // create
+        force_access_check           = 0x01,
+        open_paging_file             = 0x02,
+        open_target_directory        = 0x04,
+        stop_on_symlink              = 0x08,
+        case_sensitive               = 0x80,
+
+        // read/write
+        key_specified                = 0x01,
+        override_verify_volume       = 0x02,
+        write_through                = 0x04,
+        ft_sequential_write          = 0x08,
+        force_direct_write           = 0x10,
       };
 
       friend
@@ -244,7 +262,7 @@ namespace ntl {
 
     struct irp
     {
-      enum major_function
+      enum major_function: uint8_t
       {
         mj_create,                    ///< 0x00
         mj_create_named_pipe,         ///< 0x01
@@ -279,10 +297,43 @@ namespace ntl {
       };
       STATIC_ASSERT(mj_maximum_function == 0x1b);
 
+      struct flags
+      {
+        enum type
+        {
+          nocache                     = 0x00000001,
+          paging_io                   = 0x00000002,
+          mount_completion            = 0x00000002,
+          synchronous_api             = 0x00000004,
+          associated_irp              = 0x00000008,
+          buffered_io                 = 0x00000010,
+          deallocate_buffer           = 0x00000020,
+          input_operation             = 0x00000040,
+          synchronous_paging_io       = 0x00000040,
+          create_operation            = 0x00000080,
+          read_operation              = 0x00000100,
+          write_operation             = 0x00000200,
+          close_operation             = 0x00000400,
+          defer_io_completion         = 0x00000800,
+          ob_query_name               = 0x00001000,
+          hold_device_queue           = 0x00002000,
+
+          // alternate allocation
+          quota_charged               = 0x01,
+          allocated_must_succeed      = 0x02,
+          allocated_fixed_size        = 0x04,
+          lookaside_allocation        = 0x08
+        };
+        friend type operator | (type m1, type m2)
+        {
+          return bitwise_or(m1, m2);
+        }
+      };
+
       uint16_t          Type;
       uint16_t          Size;
       mdl *             MdlAddress;
-      uint32_t          Flags;
+      flags::type       Flags;
       union
       {
         irp *   MasterIrp;
@@ -397,6 +448,7 @@ namespace ntl {
 
     }; // struct irp
 
+    typedef irp::flags::type irp_flags;
 
     NTL__EXTERNAPI
       irp * __stdcall
