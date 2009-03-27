@@ -494,6 +494,11 @@ static_assert(sizeof(nullptr)==sizeof(void*), "3.9.1.10: sizeof(std::nullptr_t) 
   _func_spec bitmask& operator|=(bitmask& x, bitmask y) { x = x|y ; return x ; }\
   _func_spec bitmask& operator^=(bitmask& x, bitmask y) { x = x^y ; return x ; }
 
+#ifdef _M_X64
+# define __ptr_align alignas(8)
+#else
+# define __ptr_align alignas(4)
+#endif
 /**@} lib_support_types */
 /**@} lib_language_support */
 
