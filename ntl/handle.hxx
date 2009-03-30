@@ -11,9 +11,11 @@
 
 //#include <functional>
 #include "cstdint"
-#include "stlx/exception.hxx"
+#include "stlx/excptdef.hxx"
+#include "stlx/cstddef.hxx"
 
-namespace ntl {
+namespace ntl
+{
 
 
 namespace aux {
@@ -29,7 +31,6 @@ class basic_handle
 {
   ///////////////////////////////////////////////////////////////////////////
   public:
-
     typedef X element_type;
 
     explicit basic_handle(X h = X())  __ntl_nothrow : h(h) {}
@@ -45,6 +46,8 @@ class basic_handle
     ~basic_handle() __ntl_nothrow { if ( get() ) Delete(get()); }
 
     bool is_valid() const { return Validate(get()); }
+
+    operator explicit_bool_type() const __ntl_nothrow { return explicit_bool(Validate(h)); }
 
     X get() const __ntl_nothrow { return h; }
     X get() const volatile __ntl_nothrow { return h; }

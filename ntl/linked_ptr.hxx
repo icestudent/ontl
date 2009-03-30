@@ -18,7 +18,6 @@ template<typename T>
 struct linked_ptr
 {
     typedef linked_ptr  this_type;
-    typedef T(this_type::*unspecified_bool_type)();
 
     typedef T         value_type;
     typedef T*        pointer;
@@ -66,10 +65,10 @@ struct linked_ptr
       return links.prev == links.next && ptr;
     }
 
-    operator unspecified_bool_type() const
+    operator explicit_bool_type() const
     {
       // ptr != 0 forces a few bloat instructions
-      return brute_cast<unspecified_bool_type>(ptr);
+      return explicit_bool(ptr);
     }
 
     void swap(this_type & r)

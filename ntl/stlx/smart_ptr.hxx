@@ -74,10 +74,8 @@ namespace std
   {
 #if !defined(__BCPLUSPLUS__) && !defined(__GNUC__)
     typedef typename const unique_ptr::T** unspecified_pointer_type;
-    typedef typename const unique_ptr::T*  unspecified_bool_type;
 #else
     typedef const T** unspecified_pointer_type;
-    typedef const T*  unspecified_bool_type;
 #endif
 
     ///////////////////////////////////////////////////////////////////////////
@@ -163,7 +161,7 @@ namespace std
     typename add_lvalue_reference<deleter_type>::type get_deleter() __ntl_nothrow { return deleter; }
     typename add_lvalue_reference<const typename remove_reference<deleter_type>::type>::type get_deleter() const __ntl_nothrow { return deleter; }
 
-    operator unspecified_bool_type() const __ntl_nothrow { return ptr; }
+    operator __::explicit_bool_type() const __ntl_nothrow { return __::explicit_bool(ptr); }
 
     ///\name 20.7.11.2.5 unique_ptr modifiers [unique.ptr.single.modifiers]
     pointer release()
@@ -208,10 +206,8 @@ namespace std
   {
 #if !defined(__BCPLUSPLUS__) && !defined(__GNUC__)
     typedef typename const unique_ptr::T** unspecified_pointer_type;
-    typedef typename const unique_ptr::T*  unspecified_bool_type;
 #else
     typedef const T** unspecified_pointer_type;
-    typedef const T*  unspecified_bool_type;
 #endif
 
     ///////////////////////////////////////////////////////////////////////////
@@ -283,7 +279,7 @@ namespace std
     deleter_type& get_deleter() __ntl_nothrow { return *(deleter_type*)0; }
     const deleter_type& get_deleter() const __ntl_nothrow { return *(deleter_type*)0; }
 
-    operator unspecified_bool_type() const __ntl_nothrow { return ptr; }
+    operator __::explicit_bool_type() const __ntl_nothrow { return __::explicit_bool(ptr); }
 
     ///\name 20.7.11.2.5 unique_ptr modifiers [unique.ptr.single.modifiers]
     pointer release() const
@@ -320,10 +316,8 @@ namespace std
   {
 #if !defined(__BCPLUSPLUS__) && !defined(__GNUC__)
     typedef typename const unique_ptr::T** unspecified_pointer_type;
-    typedef typename const unique_ptr::T*  unspecified_bool_type;
 #else
     typedef const T** unspecified_pointer_type;
-    typedef const T*  unspecified_bool_type;
 #endif
 
     ///////////////////////////////////////////////////////////////////////////
@@ -398,7 +392,7 @@ namespace std
     typename add_lvalue_reference<deleter_type>::type get_deleter() __ntl_nothrow { return deleter; }
     typename add_lvalue_reference<const typename remove_reference<deleter_type>::type>::type get_deleter() const __ntl_nothrow { return deleter; }
 
-    operator unspecified_bool_type() const __ntl_nothrow { return ptr; }
+    operator __::explicit_bool_type() const __ntl_nothrow { return __::explicit_bool(ptr); }
 
     ///\name 20.7.11.2.5 unique_ptr modifiers [unique.ptr.single.modifiers]
     pointer release() const
@@ -446,10 +440,8 @@ namespace std
   {
 #if !defined(__BCPLUSPLUS__) && !defined(__GNUC__)
     typedef typename const unique_ptr::T** unspecified_pointer_type;
-    typedef typename const unique_ptr::T*  unspecified_bool_type;
 #else
     typedef const T** unspecified_pointer_type;
-    typedef const T*  unspecified_bool_type;
 #endif
 
     ///////////////////////////////////////////////////////////////////////////
@@ -520,7 +512,7 @@ namespace std
       return deleter;
     }
 
-    operator unspecified_bool_type() const __ntl_nothrow { return ptr; }
+    operator __::explicit_bool_type() const __ntl_nothrow { return __::explicit_bool(ptr); }
 
     ///\name 20.7.11.2.5 unique_ptr modifiers [unique.ptr.single.modifiers]
     pointer release() const
@@ -561,7 +553,6 @@ namespace std
   class unique_ptr<T[N], default_delete<T[N]> >
   {
     typedef typename const unique_ptr::T** unspecified_pointer_type;
-    typedef typename const unique_ptr::T*  unspecified_bool_type;
 
     ///////////////////////////////////////////////////////////////////////////
   public:
@@ -624,7 +615,7 @@ namespace std
       return deleter;
     }
 
-    operator unspecified_bool_type() const __ntl_nothrow { return ptr; }
+    operator __::explicit_bool_type() const __ntl_nothrow { return __::explicit_bool(ptr); }
 
     ///\name 20.7.11.2.5 unique_ptr modifiers [unique.ptr.single.modifiers]
     pointer release() const

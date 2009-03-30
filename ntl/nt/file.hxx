@@ -225,9 +225,9 @@ namespace rtl
       return object_attributes(/*ContainingDirectory, ContainingDirectory ? RelativeName : */path);
     }
 
-    operator const relative_name* () const // unspecified_bool_type
+    operator explicit_bool_type() const
     {
-      return ok_ ? this : nullptr;
+      return explicit_bool(ok_);
     }
 
   protected:

@@ -478,8 +478,6 @@ static_assert(sizeof(nullptr)==sizeof(void*), "3.9.1.10: sizeof(std::nullptr_t) 
 
 #endif
 
-
-
 #ifndef offsetof
   #define offsetof(s,m) (size_t)&reinterpret_cast<const volatile char&>((((s *)0)->m))
   // from bcb #define offsetof( s_name, m_name )  (size_t)&(((s_name*)0)->m_name)
@@ -531,5 +529,25 @@ template <typename T, size_t N>
 char (*__countof_helper(T(&array)[N]))[N];
 #define _countof(array) sizeof(*__countof_helper(array))
 
+namespace ntl
+{
+  struct explicit_bool_t { int _; };
+  typedef int explicit_bool_t::*  explicit_bool_type;
+
+  template<typename T>
+  __forceinline
+  explicit_bool_type explicit_bool(T cond)
+  {
+    return *reinterpret_cast<explicit_bool_type*>(&cond);
+  }
+
+  __forceinline
+  explicit_bool_type explicit_bool(bool cond)
+  {
+    return cond ? &explicit_bool_t::_ : 0;
+  }
+}
+
+namespace std { namespace __{ using ntl::explicit_bool; using ntl::explicit_bool_type; } }
 
 #endif //#ifndef NTL__STLX_CSTDDEF

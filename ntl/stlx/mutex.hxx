@@ -238,9 +238,6 @@ namespace std
   template <class Mutex>
   class unique_lock 
   {
-    #ifndef NTL__CXX_EXPLICITOP
-    typedef const Mutex* unspecified_bool_type;
-    #endif
   public:
     typedef Mutex mutex_type;
 
@@ -364,7 +361,7 @@ namespace std
     #ifdef NTL__CXX_EXPLICITOP
     explicit operator bool () const;
     #else
-    operator unspecified_bool_type() const __ntl_nothrow { return (unspecified_bool_type)owns; }
+    operator __::explicit_bool_type() const __ntl_nothrow { return owns ? &__::explicit_bool::_ : 0; }
     #endif
 
   private:

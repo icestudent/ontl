@@ -300,12 +300,7 @@ namespace std
         impl::fun_arity<R, Args>
       {
       protected:
-        /// \cond __
-        struct explicit_bool { int _; };
-        typedef int explicit_bool::*  explicit_bool_type;
         typedef int                   nullptr_t;
-        /// \endcond
-
       public:
         enum { 
           /** arguments count */
@@ -430,7 +425,7 @@ namespace std
         // 20.6.15.2.3 function capacity
 
         /** Returns true if this has target */
-        operator explicit_bool_type() const __ntl_nothrow { return caller ? &explicit_bool::_ : 0; }
+        operator __::explicit_bool_type() const __ntl_nothrow { return caller ? &__::explicit_bool::_ : 0; }
 
 
         // 20.6.15.2.2, function modifiers:

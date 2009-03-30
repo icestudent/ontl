@@ -105,7 +105,6 @@ namespace km {
 
 class file_handler : public handle, public device_traits<file_handler>
 {
-  typedef const file_handler* unspecified_bool_type;
   ////////////////////////////////////////////////////////////////////////////
   public:
 
@@ -162,9 +161,9 @@ class file_handler : public handle, public device_traits<file_handler>
       return ZwOpenFile(this, desired_access, &oa, &iosb, share, co);
     }
 
-    operator unspecified_bool_type() const
+    operator explicit_bool_type() const
     { 
-      return ntl::brute_cast<unspecified_bool_type>(get());
+      return explicit_bool(get());
     } 
 
     void close() { reset(); }
