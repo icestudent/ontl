@@ -664,11 +664,11 @@ namespace ntl { namespace km {
 
     NTL__EXTERNAPI ntstatus __stdcall FltGetFilterFromName(const const_unicode_string&, filter_handle*);
     NTL__EXTERNAPI ntstatus __stdcall FltRegisterFilter(driver_object*, const registration*, filter_handle*);
-    NTL__EXTERNAPI ntstatus __stdcall FltStartFiltering(filter_handle*);
-    NTL__EXTERNAPI ntstatus __stdcall FltUnregisterFilter(filter_handle*);
+    NTL__EXTERNAPI ntstatus __stdcall FltStartFiltering(object*);
+    NTL__EXTERNAPI ntstatus __stdcall FltUnregisterFilter(object*);
 
-    NTL__EXTERNAPI ntstatus __stdcall FltGetVolumeFromName(filter_handle* Filter, const const_unicode_string&, filter_handle* Volume);
-    NTL__EXTERNAPI ntstatus __stdcall FltGetVolumeName(const filter_handle* Volume, unicode_string*, uint32_t*);
+    NTL__EXTERNAPI ntstatus __stdcall FltGetVolumeFromName(object* Filter, const const_unicode_string&, filter_handle* Volume);
+    NTL__EXTERNAPI ntstatus __stdcall FltGetVolumeName(const object* Volume, unicode_string*, uint32_t*);
 
 
     //////////////////////////////////////////////////////////////////////////
@@ -716,12 +716,12 @@ namespace ntl { namespace km {
 
       ntstatus start()
       {
-        return FltStartFiltering(this);
+        return FltStartFiltering(get());
       }
 
       void stop()
       {
-        FltUnregisterFilter(this);
+        FltUnregisterFilter(get());
       }
     };
 
@@ -738,7 +738,7 @@ namespace ntl { namespace km {
        **/
       explicit volume(filter& Filter, const const_unicode_string& VolumeName, ntstatus& st)
       {
-        st = FltGetVolumeFromName(&Filter, VolumeName, this);
+        st = FltGetVolumeFromName(Filter.get(), VolumeName, this);
       }
 #ifdef SYSTEM_ERROR_SUPPORT
       /// get volume object by its name (variant #3 of the object construction)
@@ -759,11 +759,11 @@ namespace ntl { namespace km {
       {
         uint32_t size; 
         std::wstring volume_name; 
-        ntstatus st = FltGetVolumeName(this, nullptr, &size); 
+        ntstatus st = FltGetVolumeName(get(), nullptr, &size); 
         if(st == status::buffer_too_small){
           volume_name.resize(size/sizeof(wchar_t));
           unicode_string us(volume_name); // wstring to unicode_string wrapper 
-          st = FltGetVolumeName(this, &us, nullptr); 
+          st = FltGetVolumeName(get(), &us, nullptr); 
           if(!success(st))
             volume_name.clear();
         }
