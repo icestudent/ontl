@@ -385,39 +385,6 @@ private:
       }
     };
 
-    class exception_error_category:
-      public error_category
-    {
-    public:
-      /** Returns a string naming the error category ("exception") */
-      virtual const char* name() const __ntl_nothrow { return "exception flag"; }
-
-      /** Just a stub for error_category::message */
-      virtual string message(int) const { return "just exception flag, should never used"; }
-
-      error_condition default_error_condition(int /*ev*/) const __ntl_nothrow
-      {
-        error_code& ec = throws();
-        return error_condition(ec.value(), ec.category());
-      }
-      bool equivalent(int code, const error_condition& condition) const __ntl_nothrow
-      {
-        return default_error_condition(code) == condition;
-      }
-
-      bool equivalent(const error_code& code, int condition) const __ntl_nothrow
-      {
-        return *this == code.category() && code.value() == condition;
-      }
-    };
-
-    extern const exception_error_category& exception_category;
-    extern error_code& throws_error_code;
-
-    inline const error_category& get_exception_category()
-    {
-      return exception_category;
-    }
   }
   //////////////////////////////////////////////////////////////////////////
   /// 19.4.1.5 Error category objects [syserr.errcat.objects]
@@ -438,11 +405,12 @@ private:
   /// N2828 (http://open-std.org/jtc1/sc22/wg21/docs/papers/2009/n2828.html)
   ///
 
-  /** Returns a reference that can be used as a default function argument to signify 
-    an exception should be thrown when an error is detected */
+  /** Returns a null reference that can be used as a default function argument to signify an exception should be thrown when an error is detected ([semantics.throws]). 
+    Dereferencing the returned reference results in undefined behavior. */
   inline error_code& throws()
   {
-    return __::throws_error_code;
+    static error_code* tec = 0;
+    return *tec;
   }
 
   //////////////////////////////////////////////////////////////////////////

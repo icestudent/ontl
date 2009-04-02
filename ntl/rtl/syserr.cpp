@@ -18,19 +18,12 @@ namespace
 {
   static const std::__::generic_error_category generic_category_instance;
   static const std::__::system_error_category system_category_instance;
-
-  static const std::__::exception_error_category exception_category_instance;
-  static std::error_code throws_error_code_instance(0, exception_category_instance);
 }
+
 namespace std
 {
   extern const error_category& generic_category = generic_category_instance;
   extern const error_category& system_category = system_category_instance;
-
-  extern const __::exception_error_category& exception_category = exception_category_instance;
-  
-  extern error_code& __::throws_error_code = throws_error_code_instance;
-
 
   // TODO: implement generic error value mapping to the current subsystem error values
   string __::generic_error_category::message(int ev) const

@@ -425,7 +425,7 @@ namespace std
         // 20.6.15.2.3 function capacity
 
         /** Returns true if this has target */
-        operator __::explicit_bool_type() const __ntl_nothrow { return caller ? &__::explicit_bool::_ : 0; }
+        operator __::explicit_bool_type() const __ntl_nothrow { return __::explicit_bool(caller); }
 
 
         // 20.6.15.2.2, function modifiers:
