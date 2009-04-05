@@ -17,7 +17,7 @@
 namespace ntl { namespace nt {
   struct peb;
 
-  /**\addtogroup  process_information ********* Process Information *************
+  /**\defgroup process_information Process Information
    *@{*/
 
   /// Process Information Class
@@ -390,11 +390,13 @@ struct process_session_information
     :SessionId(SessionId)
   {}
 };
+///\}
 
-  /**@} process_information */
+/**@} process_information */
 
 //////////////////////////////////////////////////////////////////////////
-/**\addtogroup thread_information @{ */
+/**\addtogroup thread_information
+ *@{*/
 enum thread_info_class
 {
   ThreadBasicInformation,

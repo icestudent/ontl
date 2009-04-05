@@ -168,47 +168,74 @@ class basic_ostream
     ///   numeric formatting and parsing. These inserter functions use the imbued
     ///   locale value to perform numeric formatting.
 
-    basic_ostream<charT, traits>& operator<<(bool n)
+  protected:
+    template<typename ValueT>
+    basic_ostream<charT, traits>& put_impl(const ValueT& value/*, typename enable_if<is_integral<ValueT>::value>::type* =0*/)
     {
       sentry good( *this );
       ios_base::iostate state = ios_base::badbit;
       if ( good )
         __ntl_try
-        {
-          typedef ostreambuf_iterator<charT, traits> iterator;
-          typedef num_put<charT, iterator> numput;
-          if ( !use_facet<numput>(this->getloc()).put(iterator(*this), *this,
-                                                    this->fill(), n).failed() )
-            state = ios_base::goodbit;
-        }
-        __ntl_catch(...)
-        {
-          ///\todo shall no throw
-          //this->setstate(ios_base::badbit);
-        }
+      {
+        typedef ostreambuf_iterator<charT, traits> iterator;
+        typedef num_put<charT, iterator> facet_t;
+        if ( !use_facet<facet_t>(this->getloc()).put(iterator(*this), *this, this->fill(), value).failed() )
+          state = ios_base::goodbit;
+      }
+      __ntl_catch(...)
+      {
+        ///\todo shall no throw
+        //this->setstate(ios_base::badbit);
+      }
       this->setstate(state);
       return *this;
     }
 
-    basic_ostream<charT, traits>& operator<<(short n);
-
-    basic_ostream<charT, traits>& operator<<(unsigned short n);
-
-    basic_ostream<charT, traits>& operator<<(int n);
-
-    basic_ostream<charT, traits>& operator<<(unsigned int n);
-
-    basic_ostream<charT, traits>& operator<<(long n);
-
-    basic_ostream<charT, traits>& operator<<(unsigned long n);
-
-    basic_ostream<charT, traits>& operator<<(float f);
-
-    basic_ostream<charT, traits>& operator<<(double f);
-
-    basic_ostream<charT, traits>& operator<<(long double f);
-
-    basic_ostream<charT, traits>& operator<<(const void* p);
+  public:
+    basic_ostream<charT, traits>& operator<<(bool n)
+    {
+      return put_impl(n);
+    }
+    basic_ostream<charT, traits>& operator<<(short n)
+    {
+      return put_impl(static_cast<long>(n));
+    }
+    basic_ostream<charT, traits>& operator<<(unsigned short n)
+    {
+      return put_impl(static_cast<unsigned long>(n));
+    }
+    basic_ostream<charT, traits>& operator<<(int n)
+    {
+      return put_impl(static_cast<long>(n));
+    }
+    basic_ostream<charT, traits>& operator<<(unsigned int n)
+    {
+      return put_impl(static_cast<unsigned long>(n));
+    }
+    basic_ostream<charT, traits>& operator<<(long n)
+    {
+      return put_impl(n);
+    }
+    basic_ostream<charT, traits>& operator<<(unsigned long n)
+    {
+      return put_impl(n);
+    }
+    basic_ostream<charT, traits>& operator<<(float f)
+    {
+      return put_impl(n);
+    }
+    basic_ostream<charT, traits>& operator<<(double f)
+    {
+      return put_impl(n);
+    }
+    basic_ostream<charT, traits>& operator<<(long double f)
+    {
+      return put_impl(n);
+    }
+    basic_ostream<charT, traits>& operator<<(const void* p)
+    {
+      return put_impl(n);
+    }
 
     ///\name  27.6.2.5.3 basic_ostream::operator<< [lib.ostream.inserters]
 
@@ -274,7 +301,21 @@ class basic_ostream
     /// — n characters are inserted;
     /// — inserting in the output sequence fails (in which case the function
     ///   calls setstate(badbit), which may throw ios_base::failure.
-    basic_ostream<charT, traits>& write(const char_type* s, streamsize n);
+    basic_ostream<charT, traits>& write(const char_type* s, streamsize n)
+    {
+      sentry good( *this );
+      ios_base::iostate state = ios_base::badbit;
+      if (good)
+        __ntl_try {
+        if (this->rdbuf()->sputn(s, n) != traits_type::eof())
+          state = ios_base::goodbit;;
+      }
+      __ntl_catch(...)
+      {
+      }
+      this->setstate(state);
+      return *this;
+    }
 
     /// 7 Effects: Behaves as an unformatted output function.
     ///   If rdbuf() is not a null pointer, constructs a sentry object.
@@ -311,40 +352,97 @@ class basic_ostream
 ///\name  27.6.2.5.4 Character inserter function templates [lib.ostream.inserters.character]
 
 template<class charT, class traits>
-basic_ostream<charT, traits>&
-  operator<<(basic_ostream<charT, traits>&, charT);
+inline basic_ostream<charT, traits>& operator<<(basic_ostream<charT, traits>& os, charT c)
+{
+  return os.put(c);
+}
 
 template<class charT, class traits>
-basic_ostream<charT, traits>&
-  operator<<(basic_ostream<charT, traits>&, char);
+inline basic_ostream<charT, traits>& operator<<(basic_ostream<charT, traits>& os, char c)
+{
+  return os.put(os.widen(c));
+}
 
 ///\name  specialization
 template<class traits>
-basic_ostream<char, traits>&
-  operator<<(basic_ostream<char, traits>&, char);
+inline basic_ostream<char, traits>& operator<<(basic_ostream<char, traits>& os, char c)
+{
+  return os.put(c);
+}
+
+#ifdef NTL__CXX_RV
+template<class charT, class traits>
+inline basic_ostream<charT, traits>& operator<<(basic_ostream<charT, traits>&& os, charT c)
+{
+  return os.put(c);
+}
+template<class charT, class traits>
+inline basic_ostream<charT, traits>& operator<<(basic_ostream<charT, traits>&& os, char c)
+{
+  return os.put(os.widen(c));
+}
+template<class traits>
+inline basic_ostream<char, traits>& operator<<(basic_ostream<char, traits>&& os, char c)
+{
+  return os.put(c);
+}
+#endif
 
 ///\name  signed and unsigned
 
 template<class traits>
-basic_ostream<char, traits>&
-  operator<<(basic_ostream<char, traits>&, signed char);
+basic_ostream<char, traits>& operator<<(basic_ostream<char, traits>&, signed char);
 
 template<class traits>
-basic_ostream<char, traits>&
-  operator<<(basic_ostream<char, traits>&, unsigned char);
+basic_ostream<char, traits>& operator<<(basic_ostream<char, traits>&, unsigned char);
 
 template<class charT, class traits>
-basic_ostream<charT, traits>&
-  operator<<(basic_ostream<charT, traits>&, const charT*);
+inline basic_ostream<charT, traits>& operator<<(basic_ostream<charT, traits>& os, const charT*& s)
+{
+  assert(s != 0 && "s shall not be a null pointer");
+  if(s) os.write(s, traits::length(s));
+  return os;
+}
 
 template<class charT, class traits>
-basic_ostream<charT, traits>&
-  operator<<(basic_ostream<charT, traits>&, const char*);
+inline basic_ostream<charT, traits>& operator<<(basic_ostream<charT, traits>& os, const char*& s)
+{
+  assert(s != 0 && "s shall not be a null pointer");
+  if(s){
+    size_t l = char_traits<char>::length(s);
+    while(l-- && os)
+      os.put(os.widen(*s++));
+  }
+  return os;
+}
 
 ///\name  partial specializationss
 template<class traits>
-basic_ostream<char, traits>&
-  operator<<(basic_ostream<char, traits>&, const char*);
+inline basic_ostream<char, traits>& operator<<(basic_ostream<char, traits>& os, const char*& s)
+{
+  assert(s != 0 && "s shall not be a null pointer");
+  if(s) os.write(s, char_traits<char>::length(s));
+  return os;
+}
+
+template<class charT, class traits, size_t length>
+inline basic_ostream<charT, traits>& operator<<(basic_ostream<charT, traits>& os, const charT (&s)[length])
+{
+  return os.write(s, length-1);
+}
+template<class traits, size_t length>
+inline basic_ostream<char, traits>& operator<<(basic_ostream<char, traits>& os, const char (&s)[length])
+{
+  return os.write(s, length-1);
+}
+template<class charT, class traits, size_t length>
+inline basic_ostream<charT, traits>& operator<<(basic_ostream<charT, traits>& os, const char (&s)[length])
+{
+  size_t l = length-1;
+  while(l-- && os)
+    os.put(os.widen(*s++));
+  return os;
+}
 
 ///\name  signed and unsigned
 
@@ -355,6 +453,46 @@ basic_ostream<char, traits>&
 template<class traits>
 basic_ostream<char, traits>&
 operator<<(basic_ostream<char, traits>&, const unsigned char*);
+
+#ifdef NTL__CXX_RV
+template<class charT, class traits>
+inline basic_ostream<charT, traits>& operator<<(basic_ostream<charT, traits>&& os, const charT* s)
+{
+  assert(s != 0 && "s shall not be a null pointer");
+  if(s) os.write(s, traits::length(s));
+  return os;
+}
+template<class charT, class traits>
+inline basic_ostream<charT, traits>& operator<<(basic_ostream<charT, traits>&& os, const char* s)
+{
+  assert(s != 0 && "s shall not be a null pointer");
+  if(s){
+    size_t l = char_traits<char>::length(s);
+    while(l-- && os)
+      os.put(os.widen(*s++));
+  }
+  return os;
+}
+template<class traits>
+inline basic_ostream<char, traits>& operator<<(basic_ostream<char, traits>&& os, const char* s)
+{
+  assert(s != 0 && "s shall not be a null pointer");
+  if(s) os.write(s, char_traits<char>::length(s));
+  return os;
+}
+#endif
+
+///\name Swap
+template <class charT, class traits>
+void swap(basic_ostream<charT, traits>& x, basic_ostream<charT, traits>& y)  { x.swap(y); }
+
+#ifdef NTL__CXX_RV
+template <class charT, class traits>
+void swap(basic_ostream<charT, traits>&& x, basic_ostream<charT, traits>& y) { x.swap(y); }
+template <class charT, class traits>
+void swap(basic_ostream<charT, traits>& x, basic_ostream<charT, traits>&& y) { x.swap(y); }
+#endif
+
 
 ///\name  27.6.2.7 Standard basic_ostream manipulators [lib.ostream.manip]
 
@@ -386,7 +524,14 @@ basic_ostream<charT, traits>&
   return os;
 }
 
-///@}
+///\name  Inserters and extractors [21.3.7.9 string.io]
+template<class charT, class traits, class Allocator>
+basic_ostream<charT, traits>& operator<<(typename __::ostream<charT,traits>::type os, const basic_string<charT,traits,Allocator>& str)
+{
+  return os.write(str.c_str(), str.length());
+}
+
+
 /**@} lib_output_streams */
 /**@} lib_iostream_format */
 /**@} lib_input_output */

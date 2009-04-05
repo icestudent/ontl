@@ -23,7 +23,14 @@ namespace std {
 /**\addtogroup  lib_stream_buffers ***** 27.5 Stream buffers
  *@{*/
 
-/// 27.5.2 Class template basic_streambuf<charT,traits> [streambuf]
+/**
+ *	@brief 27.5.2 Class template basic_streambuf<charT,traits> [streambuf]
+ *
+ *  The class template basic_streambuf<charT,traits> serves as an abstract base class for deriving various
+ *  stream buffers whose objects each control two character sequences:
+ *  - a character input sequence;
+ *  - a character output sequence.
+ **/
 template <class charT, class traits /*= char_traits<charT>*/ >
 class basic_streambuf
 {
@@ -47,10 +54,37 @@ class basic_streambuf
       pbeg(0), pend(0), pnext(0)/*, l(locale())*/
     {/**/}
 
-    basic_streambuf(const basic_streambuf& rhs);
-    basic_streambuf& operator=(const basic_streambuf& rhs);
+    basic_streambuf(const basic_streambuf& r)
+    : gbeg(r.gbeg), gend(r.gend), gnext(r.gnext),
+      pbeg(r.pbeg), pend(r.pend), pnext(r.pnext)
+  #if STLX__CONFORMING_LOCALE
+      , l(r.l)
+  #endif
+    {/**/}
+  
+    basic_streambuf& operator=(const basic_streambuf& r)
+    {
+      gbeg = r.gbeg; gend = r.gend; gnext = r.gnext;
+      pbeg = r.pbeg; pend = r.pend; pnext = r.pnext;
+    #if STLX__CONFORMING_LOCALE
+      l = r.l;
+    #endif
+      return *this;
+    }
 
-    void swap(basic_streambuf&/*&*/ rhs);
+  #ifdef NTL__CXX_RV
+    void swap(basic_streambuf&& rhs)
+  #else
+    void swap(basic_streambuf&  rhs)
+  #endif
+    {
+      std::swap(gbeg,  rhs.gbeg);
+      std::swap(gend,  rhs.gend);
+      std::swap(gnext, rhs.gnext);
+      std::swap(pbeg,  rhs.pbeg);
+      std::swap(pend,  rhs.pend);
+      std::swap(pnext, rhs.pnext);
+    }
 
   public:
 
@@ -58,19 +92,24 @@ class basic_streambuf
 
     //  27.5.2.2 basic_streambuf public member functions [streambuf.members]
 
-    ///\name  // 27.5.2.2.1 Locales [streambuf.locales]
+    ///\name 27.5.2.2.1 Locales [streambuf.locales]
 
-    locale pubimbue(const locale& loc);
+    locale pubimbue(const locale& loc)
+    {
+      locale prev = getloc();
+      imbue(loc);
+      return prev;
+    }
 
     locale getloc() const
     {
-#if !STLX__CONFORMING_LOCALE
+  #if !STLX__CONFORMING_LOCALE
       locale  l;
-#endif
+  #endif
       return l;
     }
 
-    ///\name  // 27.5.2.2.2 Buffer management and positioning [streambuf.buffer]
+    ///\name 27.5.2.2.2 Buffer management and positioning [streambuf.buffer]
 
     basic_streambuf<char_type,traits>* pubsetbuf(char_type* s, streamsize n)
     {
@@ -192,12 +231,12 @@ class basic_streambuf
     // 27.5.2.4 basic_streambuf virtual functions [streambuf.virtuals]
 
     ///\name  27.5.2.4.1 Locales [streambuf.virt.locales]
-#if STLX__CONFORMING_LOCALE
+  #if STLX__CONFORMING_LOCALE
     virtual void imbue(const locale&)
     {
       // Default behavior: Does nothing.
     }
-#endif
+  #endif
 
     ///\name  27.5.2.4.2 Buffer management and positioning [streambuf.virt.buffer]
 
@@ -333,9 +372,9 @@ class basic_streambuf
     char_type * pbeg;
     char_type * pend;
     char_type * pnext;
-#if STLX__CONFORMING_LOCALE
+  #if STLX__CONFORMING_LOCALE
     locale      l;
-#endif
+  #endif
 };
 
 /**@} lib_stream_buffers */

@@ -28,17 +28,17 @@ namespace std {
 
 typedef ptrdiff_t streamoff;
 
-/**\defgroup  lib_strings ************* 21 Strings library [strings] ****************
+/**\defgroup  lib_strings ************* 21 Strings library [strings]
  *@{*/
 
-/**\defgroup  lib_char_traits ********* 21.1 Character traits [char.traits] *************
+/**\defgroup  lib_char_traits ********* 21.1 Character traits [char.traits]
  *@{*/
 
 /// 21.1 Character traits [char.traits]
 /// a basis for explicit specializations.
 template<class charT> struct char_traits;
 
-/// 21.1.3 char_traits specializations [char.traits.specializations]
+///\name 21.1.3 char_traits specializations [char.traits.specializations]
 
 /// 21.1.3.1 struct char_traits<char> [char.traits.specializations.char]
 template<>
@@ -108,34 +108,38 @@ struct char_traits<wchar_t>
     { return c1 == c2; }
   static int_type eof() { return WEOF; }
 };
+///\}
+/**@} lib_char_traits */
 
-/**@} lib_char_traits
- */
-
-/// 21.3 Class template basic_string [basic.string]
-/// 1 The class template basic_string describes objects that can store a sequence
-///   consisting of a varying number of arbitrary char-like objects with
-///   the first element of the sequence at position zero. Such a sequence is
-///   also called a “string” if the type of the char-like objects that it holds
-///   is clear from context. In the rest of this clause, the type of the char-like
-///   objects held in a basic_string object is designated by charT.
-/// 2 The member functions of basic_string use an object of the Allocator class
-///   passed as a template parameter to allocate and free storage for the contained
-///   char-like objects. (Allocator::value_type must name the same type as charT (21.3.1))
-/// 3 The class template basic_string conforms to the requirements for a Sequence
-///   Container (23.1.3), for a Reversible Container (23.1), and for
-///   an Allocator-aware container (92). The iterators supported by basic_string
-///   are random access iterators (24.1.5).
-/// 4 In all cases, size() <= capacity().
-/// 5 The functions described in this clause can report two kinds of errors,
-///   each associated with an exception type:
-///   — a length error is associated with exceptions of type length_error (19.1.4);
-///   — an out-of-range error is associated with exceptions of type out_of_range (19.1.5).
-///\note 21.3.1/3
-///   The char-like objects in a basic_string object shall be stored contiguously.
-///   That is, for any basic_string object s,
-///   the identity &*(s.begin() + n) == &*s.begin() + n
-///   shall hold for all values of n such that 0 <= n < s.size().
+/**
+ *  @brief 21.3 Class template basic_string [basic.string]
+ *
+ *  - The class template basic_string describes objects that can store a sequence
+ *    consisting of a varying number of arbitrary char-like objects with
+ *    the first element of the sequence at position zero. Such a sequence is
+ *    also called a "string" if the type of the char-like objects that it holds
+ *    is clear from context. In the rest of this clause, the type of the char-like
+ *    objects held in a basic_string object is designated by charT.
+ *  - The member functions of basic_string use an object of the Allocator class
+ *    passed as a template parameter to allocate and free storage for the contained
+ *    char-like objects. (Allocator::value_type must name the same type as charT (21.3.1))
+ *  - The class template basic_string conforms to the requirements for a Sequence
+ *    Container (23.1.3), for a Reversible Container (23.1), and for
+ *    an Allocator-aware container (92). The iterators supported by basic_string
+ *    are random access iterators (24.1.5).
+ *  - In all cases, <tt>size() <= capacity()</tt>.
+ *  - The functions described in this clause can report two kinds of errors,
+ *    each associated with an exception type:
+ *    - a length error is associated with exceptions of type length_error (19.1.4);
+ *    - an out-of-range error is associated with exceptions of type out_of_range (19.1.5).
+ *    .
+ *  .
+ * \note 21.3.1/3
+ *    The char-like objects in a basic_string object shall be stored contiguously.
+ *    That is, for any basic_string object s,
+ *    the identity <tt>&*(s.begin() + n) == &*s.begin() + n</tt>
+ *    shall hold for all values of \e n such that <tt>0 <= n < s.size()</tt>.
+ **/
 template <class charT,
           class traits    = char_traits<charT>,
           class Allocator = allocator<charT> >
@@ -437,7 +441,7 @@ public:
 
     basic_string& operator+=(const basic_string& str) { return append(str);   }
     basic_string& operator+=(const charT* s)          { return append(s);     }
-    basic_string& operator+=(charT c) { push_back(c); return *this; }
+    basic_string& operator+=(charT c) { str.push_back(c); return *this; }
 
     basic_string& operator+=(initializer_list<charT> il) { return append(il); }
 
@@ -1364,28 +1368,24 @@ struct constructible_with_allocator_suffix<
 ///\name  Inserters and extractors [21.3.7.9 string.io]
 
 template<class charT, class traits, class Allocator>
-basic_istream<charT,traits>&
-  operator>>(basic_istream<charT,traits>& is,
-             basic_string<charT,traits,Allocator>& str);
+basic_istream<charT,traits>& operator>>(typename __::istream<charT,traits>::type is, basic_string<charT,traits,Allocator>& str);
 
 template<class charT, class traits, class Allocator>
-basic_ostream<charT, traits>&
-  operator<<(basic_ostream<charT, traits>& os,
-             const basic_string<charT,traits,Allocator>& str);
+basic_ostream<charT, traits>& operator<<(typename __::ostream<charT,traits>::type os, const basic_string<charT,traits,Allocator>& str);
 
 template<class charT, class traits, class Allocator>
-basic_istream<charT,traits>&
-  getline(basic_istream<charT,traits>& is,
-          basic_string<charT,traits,Allocator>& str, charT delim);
+basic_istream<charT,traits>& getline(typename __::istream<charT,traits>::type is, basic_string<charT,traits,Allocator>& str, charT delim);
 
 template<class charT, class traits, class Allocator>
-basic_istream<charT,traits>&
-  getline(basic_istream<charT,traits>& is,
-          basic_string<charT,traits,Allocator>& str);
+basic_istream<charT,traits>& getline(typename __::istream<charT,traits>::type is, basic_string<charT,traits,Allocator>& str);
 
+/** Specialization of basic_string for the \e char characters */
 typedef basic_string<char>    string;
+/** Specialization of basic_string for the \e wchar_t characters */
 typedef basic_string<wchar_t> wstring;
+/** Specialization of basic_string for the \e char16_t characters */
 typedef basic_string<char16_t> u16string;
+/** Specialization of basic_string for the \e char32_t characters */
 typedef basic_string<char32_t> u32string;
 
 

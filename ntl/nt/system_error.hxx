@@ -136,15 +136,6 @@ namespace ntl { namespace nt {
       uint32_t* ReturnLength
       );
 
-  NTL__EXTERNAPI
-  ntstatus __stdcall
-    RtlUnicodeStringToAnsiString(
-      ansi_string* DestinationString,
-      const const_unicode_string* SourceString,
-      bool AllocateDestinationString
-      );
-
-
   static std::string strerror(ntstatus Status)
   {
     std::string re("");
@@ -174,7 +165,7 @@ namespace ntl { namespace nt {
         const_unicode_string cus((const wchar_t*)mre->Text, mre->Length);
         re.resize(mre->Length+1);
         ansi_string as(re);
-        st = RtlUnicodeStringToAnsiString(&as, &cus, false);
+        st = RtlUnicodeStringToAnsiString(as, cus, false);
         if(success(st))
           re.resize(std::char_traits<char>::length(as.data()));
         else

@@ -46,7 +46,15 @@ namespace __
 
   template<typename T>
   struct type2type
-  {};
+  {
+    typedef T type;
+  };
+
+  template<size_t v>
+  struct int2type
+  {
+    enum { value = v };
+  };
 
   struct sfinae_small { char x; };
   struct sfinae_big   { char x[2]; };

@@ -47,8 +47,7 @@ class ios_base
     typedef uint16_t fmtflags;
     /// flushes output after each output operation
     static const fmtflags unitbuf     = 1 << 0;
-    /// replaces certain lowercase letters with their uppercase equivalents
-    /// in generated output
+    /// replaces certain lowercase letters with their uppercase equivalents in generated output
     static const fmtflags uppercase   = 1 << 1;
     /// adds fill characters at a designated internal point in certain generated
     /// output, or identical to right if no such point is designated
@@ -76,8 +75,7 @@ class ios_base
     /// generates floating-point output in scientific notation
     static const fmtflags scientific  = 1 << 12;
     static const fmtflags floatfield  = scientific | fixed;
-    /// generates a decimal-point character unconditionally in generated
-    /// floating-point output
+    /// generates a decimal-point character unconditionally in generated floating-point output
     static const fmtflags showpoint   = 1 << 13;
     /// skips leading whitespace before certain input operations
     static const fmtflags skipws      = 1 << 14;
@@ -393,9 +391,17 @@ class basic_ios : public ios_base
 
     basic_ios& copyfmt(const basic_ios& rhs);
 
+  #ifdef NTL__CXX_RV
+    void move(basic_ios&& rhs);
+    void swap(basic_ios&& rhs);
+  #else
+    void move(basic_ios& rhs);
+    void swap(basic_ios& rhs);
+  #endif
+
     ///\name 27.4.4.3 basic_ios flags functions [iostate.flags]
 
-    operator void*() const { return fail() ? 0 : this; }
+    operator __::explicit_bool_type() const { return __::explicit_bool(!fail()); }
     bool operator!() const { return fail(); }
 
     iostate rdstate() const { return state; }

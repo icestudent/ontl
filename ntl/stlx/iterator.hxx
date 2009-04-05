@@ -85,7 +85,6 @@ struct iterator
 *@{*/
 namespace __
 {
-
 template<class InputIterator, class Distance>
 static inline
 void
@@ -203,9 +202,10 @@ InputIterator
 
 
 /**\addtogroup lib_std_predef_iterators ** 24.4 Predefined iterators [predef.iterators]
-*@{*/
+ *@{*/
 
 /// 24.4.1 Reverse iterators [lib.reverse.iterators]
+/// @todo  Enable the random-access members by-request through SFINAE
 template <class Iterator>
 class reverse_iterator
 : public iterator<typename iterator_traits<Iterator>::iterator_category,

@@ -9,6 +9,7 @@
 #define NTL__STLX_IOSFWD
 
 #include "cwchar.hxx"
+#include "type_traits.hxx"
 
 // 1 Default template arguments are described as appearing both in <iosfwd> and
 //   in the synopsis of other headers but it is well-formed to include
@@ -131,6 +132,21 @@ typedef fpos<mbstate_t/*char_traits<char>::state_type*/>     streampos;
 typedef fpos<mbstate_t/*char_traits<wchar_t>::state_type*/>  wstreampos;
 
 ///@}
+
+namespace __
+{
+  template<class charT, class traits>
+  struct ostream
+  {
+    typedef typename add_rvalue_reference<basic_ostream<charT,traits> >::type type;
+  };
+  template<class charT, class traits>
+  struct istream
+  {
+    typedef typename add_rvalue_reference<basic_istream<charT,traits> >::type type;
+  };
+}
+
 /**@} lib_input_output */
 
 }//namespace std

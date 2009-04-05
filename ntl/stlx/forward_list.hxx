@@ -63,11 +63,11 @@ namespace std {
     typedef typename  
       Alloc::template rebind<node_type>::other      node_allocator_type;
 
-#ifdef NTL__CXX_RV
+  #ifdef NTL__CXX_RV
     typedef forward_list<T, Alloc>&& list_reference;
-#else
+  #else
     typedef forward_list<T, Alloc>&  list_reference;
-#endif
+  #endif
 
   public:
     // types:
@@ -185,14 +185,14 @@ namespace std {
       insert_after(cbefore_begin(), x.begin(), x.end());
     }
 
-    #ifdef NTL__CXX_RV
+  #ifdef NTL__CXX_RV
     forward_list(forward_list<T,Alloc>&& x)
       :node_allocator()
     {
       init_head();
       swap(x);
     }
-#endif
+  #endif
 
     forward_list(initializer_list<T> il, const Alloc& a = Alloc())
       :node_allocator(a)
@@ -213,7 +213,7 @@ namespace std {
       return *this;
     }
 
-#ifdef NTL__CXX_RV
+  #ifdef NTL__CXX_RV
     forward_list<T,Alloc>& operator=(forward_list<T,Alloc>&& x)
     {
       if(this != &x){
@@ -222,7 +222,7 @@ namespace std {
       }
       return *this;
     }
-#endif
+  #endif
     forward_list& operator=(initializer_list<T> il)
     {
       assign(il);
@@ -287,13 +287,13 @@ namespace std {
     
     // 23.2.3.4 modifiers:
     
-#ifdef NTL__CXX_VT
+  #ifdef NTL__CXX_VT
     template <class... Args>
     void emplace_front(Args&&... args)
     {
       insert_after(cbefore_begin(), forward<Args>(args)...);
     }
-#elif defined(NTL__CXX_RV)
+  #elif defined(NTL__CXX_RV)
 
     template<class Arg1>
     void emplace_front(Arg1&& arg1)
@@ -311,7 +311,7 @@ namespace std {
     {
       insert_after(cbefore_begin(), move(x));
     }
-#endif
+  #endif
 
     void push_front(const T& x)
     {
@@ -323,9 +323,9 @@ namespace std {
       erase_after(cbefore_begin());
     }
     
-#ifdef NTL__CXX_VT
+  #ifdef NTL__CXX_VT
     template <class... Args> iterator emplace_after(const_iterator position, Args&&... args);
-#elif defined NTL__CXX_RV
+  #elif defined NTL__CXX_RV
     template <class Arg1>
     iterator emplace_after(const_iterator position, Arg1&& arg1)
     {
@@ -345,7 +345,7 @@ namespace std {
       p->link(pp);
       return p;
     }
-#endif
+  #endif
 
     iterator insert_after(const_iterator position, const T& x)
     {
@@ -374,7 +374,7 @@ namespace std {
 
     iterator erase_after(const_iterator position)
     {
-#if 0
+  #if 0
       single_linked* node = const_cast<single_linked*>(position.p);
       if(node){
         node_type* np = static_cast<node_type*>(node->next);
@@ -386,7 +386,7 @@ namespace std {
         }
       }
       return node ? node->next : node;
-#else
+  #else
       single_linked* pos = const_cast<single_linked*>(position.p);
       if(pos){
         // return erase(tmp)
@@ -401,15 +401,15 @@ namespace std {
       }else{
         return end();
       }
-#endif
+  #endif
     }
 
     iterator erase_after(const_iterator position, iterator last)
     {
-#if 0
+  #if 0
       while ( position != last ) position = erase_after(position);
       return const_cast<single_linked*>(last.p);
-#else
+  #else
       single_linked* pos = const_cast<single_linked*>(position.p);
       single_linked* cur = pos->next;
       while(cur){
@@ -422,7 +422,7 @@ namespace std {
           break;
       }
       return pos;
-#endif
+  #endif
     };
     
     void swap(list_reference x)

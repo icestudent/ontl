@@ -239,9 +239,12 @@ private:
         {
           string tmp = runtime_error::what();
           if (ec) {
-            if (!tmp.empty() && tmp != "")
-              tmp += ": ";
+            bool nonempty = !tmp.empty() && tmp != "";
+            if(nonempty)
+              tmp += ": '";
             tmp += ec.message();
+            if(nonempty)
+              tmp += "'";
           }
           msg = move(tmp);
         }

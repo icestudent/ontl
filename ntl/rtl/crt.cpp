@@ -38,8 +38,11 @@ namespace
 
   vfv_t* onexit(vfv_t* func)
   {
-    exit_list->push_back(func);
-    return func;
+    if(exit_list){
+      exit_list->push_back(func);
+      return func;
+    }
+    return 0;
   }
 
   void doexit(int /*code*/, int quick, int /*retcaller*/)

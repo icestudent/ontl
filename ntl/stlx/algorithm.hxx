@@ -490,6 +490,17 @@ OutputIterator
     if ( pred(*result) != false ) *result = new_value;
 }
 
+namespace __
+{
+  /// 25.2.5 Fill [alg.fill]
+  template<class OutputIterator, class Size, class T>
+  __forceinline OutputIterator fill_n(OutputIterator first, Size n, const T& value)
+  {
+    for ( ; n--; ++first ) *first = value;
+    return first;
+  }
+}
+
 /// 25.2.5 Fill [alg.fill]
 template<class ForwardIterator, class T>
 __forceinline

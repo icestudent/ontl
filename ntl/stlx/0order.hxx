@@ -47,7 +47,15 @@
 @}
 @}*/
 
-  /**\defgroup threads 30 Thread support library [thread]
+/** \defgroup lib_locale          22 Localization library [localization]
+*@{
+
+\defgroup lib_locales             22.1 Locales [locales]
+\defgroup lib_locale_categories   22.2 Standard locale categories [locale.categories]
+\defgroup lib_locale_stdcvt       22.3 Standard code conversion facets [locale.stdcvt]
+@}*/
+
+  /**\defgroup threads      30 Thread support library [thread]
    *  
    *  The following subclauses describe components to create and manage threads (1.10), perform mutual exclusion, 
    *  and communicate conditions between threads.

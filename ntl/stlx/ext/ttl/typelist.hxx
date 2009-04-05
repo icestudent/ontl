@@ -192,15 +192,15 @@ namespace ttl
 
 
     //////////////////////////////////////////////
-    template< typename T, typename L, int N = 0, bool Stop=(N>=length<L>::value) >
+    template< typename T, typename TypeList, int N = 0, bool Stop=(N>=length<TypeList>::value) >
     struct find
     {
     private:
-      typedef impl::get<L,N> get_type;
+      typedef impl::get<TypeList,N> get_type;
 
       typedef typename std::conditional< std::is_same<typename get_type::type, T>::value,
         get_type,
-        find<T,L,N+1> 
+        find<T,TypeList,N+1> 
       >::type found;
 
     public:
@@ -208,9 +208,32 @@ namespace ttl
       enum {index = found::index};
     };
 
-    template<typename T, typename L, int N>
-    struct find<T, L, N, true>
+    template<typename T, typename TypeList, int N>
+    struct find<T, TypeList, N, true>
     {};
+
+    template<typename T, typename TypeList, int N = 0, bool Stop=(N>=length<TypeList>::value) >
+    struct index_of
+    {
+    private:
+      typedef impl::get<TypeList,N> get_type;
+
+      typedef typename std::conditional<std::is_same<typename get_type::type, T>::value,
+        get_type,
+        index_of<T,TypeList,N+1>
+      >::type found;
+
+    public:
+      typedef typename found::type type;
+      enum {index = found::index};
+    };
+
+    template<typename T, typename TypeList, int N>
+    struct index_of<T, TypeList, N, true>
+    {
+      typedef void type;
+      enum { index = -1 };
+    };
 
   };
 };

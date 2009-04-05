@@ -1,6 +1,6 @@
 /**\file*********************************************************************
  *                                                                     \brief
- *  N2315 22 Localization library [localization]
+ *  22 Localization library [localization]
  *
  ****************************************************************************
  */
@@ -31,8 +31,16 @@
 #endif
 
 namespace std {
+  /** \addtogroup lib_locale 22 Localization library [localization]
+   *@{*/
 
-// 22.1 Locales [locales]
+  /** \addtogroup lib_locales 22.1 Locales [locales]
+   *@{*/
+
+  namespace __
+  {
+    struct facets;
+  }
 
 /// 22.1.1 Class locale [locale]
 class locale
@@ -104,6 +112,7 @@ class locale
 
     static locale global(const locale&);
     static const locale& classic();
+    ///\}
 
 };// class locale
 
@@ -175,8 +184,9 @@ template <class charT> bool isgraph(charT c, const locale& loc)
 {
   use_facet<ctype<charT> >(loc).is(ctype_base::graph, c);
 }
+///\}
 
-// 22.1.3.2 Character conversions [conversions]
+///\name 22.1.3.2 Character conversions [conversions]
 
 template <class charT>
 charT
@@ -191,9 +201,12 @@ charT
 {
   return use_facet<ctype<charT> >(loc).tolower(c);
 }
+///\}
 
-///\name 22.2 Standard locale categories [locale.categories]
+/** @} lib_locales */
 
+/** \addtogroup lib_locale_categories   22.2 Standard locale categories [locale.categories]
+ *@{*/
 
 // ensure GetStringTypeX API is usable
 #if  defined C1_UPPER && defined C1_LOWER && defined C1_DIGIT \
@@ -221,7 +234,8 @@ static const int16_t __ct_xdigit = 0x0080;
 static const int16_t __ct_alpha = 0x0100;
 #endif
 
-/// 22.2.1 The ctype category [category.ctype]
+/** \defgroup lib_locale_ctype 22.2.1 The ctype category [category.ctype]
+ *@{*/
 class ctype_base
 {
   public:
@@ -240,7 +254,11 @@ class ctype_base
       graph = alnum|punct;
 };
 
-/// 22.2.1.1 Class template ctype [locale.ctype]
+/**
+ *	@brief 22.2.1.1 Class template ctype [locale.ctype]
+ *  @details Class ctype encapsulates the C library \c <cctype> features. istream members are required to use ctype<>
+ *  for character classing during input parsing.
+ **/
 template <class charT>
 class ctype : public locale::facet, public ctype_base
 {
@@ -319,7 +337,7 @@ class ctype : public locale::facet, public ctype_base
     virtual const char* do_widen(const char* low, const char* high, charT* dest) const;
     virtual char do_narrow(charT, char dfault) const;
     virtual const charT* do_narrow(const charT* low, const charT* high, char dfault, char* dest) const;
-
+    ///\}
 };// class ctype
 
 /// 22.2.1.2 Class template ctype_byname [locale.ctype.byname]
@@ -345,7 +363,11 @@ class ctype_byname : public ctype<charT>
     virtual const charT* do_narrow(const charT* low, const charT* high, char dfault, char* dest) const;
 };
 
-/// 22.2.1.3 ctype specializations [facet.ctype.special]
+/**
+ *	@brief 22.2.1.3 ctype specializations [facet.ctype.special]
+ *  @details A specialization ctype<char> is provided so that the member functions on type \c char can be implemented inline.
+ *  The implementation-defined value of member \c table_size is at least 256.
+ **/
 template <> class ctype<char>
 : public locale::facet, public ctype_base
 {
@@ -484,21 +506,6 @@ template <> class ctype<char>
 
 };// class ctype<char>
 
-template<>
-__forceinline
-const ctype<char>& use_facet<ctype<char> >(const locale&)
-{
-  // static ctype<char> is constructed with the default table which is not to be freed,
-  // so the destructor call may be not queued up to the atexit function.
-  // This is why it is implemented through placement new over a raw storage.
-  static void * f[sizeof(ctype<char>)/sizeof(void*)];
-  ctype<char> * const p = reinterpret_cast<ctype<char>*>(f);
-  // The first class member is VTable ptr or the tab ptr member,
-  // both are non-null after initialization is done.
-  if ( !f[0] ) new (p) ctype<char>;
-  return *p;
-}
-
 
 /// 22.2.1.4 Class ctype_byname<char> [lib.locale.ctype.byname.special]
 template <> class ctype_byname<char>
@@ -523,8 +530,32 @@ template <> class ctype_byname<char>
 
 // 22.2.1.5 Class template codecvt [lib.locale.codecvt]
 
-class codecvt_base { public: enum result { ok, partial, error, noconv }; };
+/** Class codecvt base that defines a result enumeration */
+class codecvt_base 
+{
+public:
+  /** do_in/do_out result values */
+  enum result { 
+    /** completed the conversion */
+    ok, 
+    /** not all source characters converted 
+      or space for more than <tt>to_limit-to</tt> destination elements was needed to terminate a sequence given the value of specified state (for unshift())*/
+    partial, 
+    /** encountered a character in [from,from_end) that it could not convert or an unspecified error has occurred (for unshift()) */
+    error, 
+    /** internT and externT are the same type, and input sequence is identical to converted sequence or no termination is needed for this \c state_type (for unshift()) */
+    noconv 
+  };
+};
 
+/**
+ *	@brief 22.2.1.4 Class template codecvt [locale.codecvt]
+ *  
+ *  The class codecvt<internT,externT,stateT> is for use when converting from one codeset to another, such
+ *  as from wide characters to multibyte characters or between wide character encodings such as Unicode and EUC.
+ *
+ *  @tparam stateT The stateT argument selects the %pair of codesets being mapped between.
+ **/
 template <class internT, class externT, class stateT>
 class codecvt : public locale::facet, public codecvt_base
 {
@@ -537,6 +568,11 @@ class codecvt : public locale::facet, public codecvt_base
 
     explicit codecvt(size_t refs = 0);
 
+    /**
+     *	Translates characters in the source range [from,from_end), placing the results in sequential
+     *  positions starting at destination \a to. Converts no more than (<tt>from_end-from</tt>) source elements, and
+     *  stores no more than (<tt>to_limit-to<tt>) destination elements.
+     **/
     result out(      stateT &   state,
                const internT *  from,
                const internT *  from_end,
@@ -545,11 +581,22 @@ class codecvt : public locale::facet, public codecvt_base
                      externT *  to_limit,
                      externT *& to_next) const;
 
+    /**
+     *	Places characters starting at \a to that should be appended to terminate a sequence when the
+     *  current \c stateT is given by \a state.
+     *  Stores no more than (<tt>to_limit-to</tt>) destination elements, and
+     *  leaves the \a to_next pointer pointing one beyond the last element successfully stored.
+     **/
     result unshift(stateT &   state,
                    externT *  to,
                    externT *  to_limit,
                    externT *& to_next) const;
 
+    /**
+     *	Translates characters in the source range [from,from_end), placing the results in sequential
+     *  positions starting at destination \a to. Converts no more than (<tt>from_end-from</tt>) source elements, and
+     *  stores no more than (<tt>to_limit-to</tt>) destination elements.
+     **/
     result in(      stateT &   state,
               const externT *  from,
               const externT *  from_end,
@@ -558,14 +605,19 @@ class codecvt : public locale::facet, public codecvt_base
                     internT *  to_limit,
                     internT *& to_next) const;
 
+    /** Returns -1 if the encoding of the \a externT sequence is state-dependent; else the constant number of
+      \a externT characters needed to produce an internal character; or 0 if this number is not a constant */
     int encoding() const __ntl_nothrow;
+
+    /** Returns \c true if \c do_in() and \c do_out() return \c noconv for all valid argument values. */
     bool always_noconv() const __ntl_nothrow;
 
-    int length(stateT &,
-               const externT* from,
-               const externT* end,
-               size_t max) const;
+    /** The effect on the \a state argument is "as if" it called 
+        <tt>do_in(state, from, from_end, from, to, to+max, to)</tt> for \a to pointing to a buffer of at least \a max elements. */
+    int length(stateT &, const externT* from, const externT* end, size_t max) const;
 
+    /** Returns the maximum value that <tt>do_length(state, from, from_end, 1)</tt> 
+      can return for any valid range <tt>[from, from_end)</tt> and \c stateT value \a state. */
     int max_length() const __ntl_nothrow;
 
     static locale::id id;
@@ -629,13 +681,23 @@ class codecvt_byname : public codecvt<internT, externT, stateT>
 
 };
 
+/** @} lib_locale_ctype */
+/** @} lib_locale_categories */
+/** @} lib_locale */
+
 }//namespace std
 
 #include "ios.hxx"
 
 namespace std {
 
-// 22.2.3 The numeric punctuation facet [lib.facet.numpunct]
+/** \addtogroup lib_locale 22 Localization library [localization]
+ *@{*/
+/** \addtogroup lib_locale_categories 22.2 Standard locale categories [locale.categories]
+ *@{*/
+
+/** \defgroup lib_locale_numpunct 22.2.3 The numeric punctuation facet [facet.numpunct]
+ *@{*/
 
 /// 22.2.3.1 Class template numpunct [locale.numpunct]
 /// 1 numpunct<> specifies numeric punctuation.
@@ -647,7 +709,9 @@ class numpunct : public locale::facet
     typedef charT char_type;
     typedef basic_string<charT> string_type;
 
-    explicit numpunct(size_t refs = 0);
+    explicit numpunct(size_t refs = 0)
+      :facet(refs)
+    {}
 
     ///\name 22.2.3.1.1 numpunct members [facet.numpunct.members]
 
@@ -660,10 +724,10 @@ class numpunct : public locale::facet
     static locale::id id;
 
   protected:
-
     ///\name 22.2.3.1.2 numpunct virtual functions [facet.numpunct.virtuals]
-
-    ~numpunct(); // virtual
+    friend struct __::facets;
+    ~numpunct() // virtual
+    {}
 
     /// Returns: A character for use as the decimal radix separator.
     /// The required specializations return ’.’ or L’.’.
@@ -695,8 +759,10 @@ class numpunct : public locale::facet
 
 template <class charT> class numpunct_byname;
 
+/** @} lib_locale_numpunct */
 
-// 22.2.2 The numeric category [lib.category.numeric]
+/** \defgroup lib_locale_numeric 22.2.2 The numeric category [lib.category.numeric]
+*@{*/
 
 /// 22.2.2.1 Class template num_get [lib.locale.num.get]
 template <class charT, class InputIterator = istreambuf_iterator<charT> >
@@ -748,7 +814,9 @@ class num_put : public locale::facet
     typedef charT           char_type;
     typedef OutputIterator  iter_type;
 
-    explicit num_put(size_t refs = 0);
+    explicit num_put(size_t refs = 0)
+      :facet(refs)
+    {}
 
     ///\name 22.2.2.2.1 num_put members [facet.num.put.members]
     /// 1 Returns: do_put(out, str, fill, val).
@@ -763,10 +831,14 @@ class num_put : public locale::facet
       return do_put(s, f, fill, v);
     }
 
+    iter_type put(iter_type s, ios_base& f, char_type fill, long long v) const;
+
     iter_type put(iter_type s, ios_base& f, char_type fill, unsigned long v) const
     {
       return do_put(s, f, fill, v);
     }
+
+    iter_type put(iter_type s, ios_base& f, char_type fill, unsigned long long v) const;
 
     iter_type put(iter_type s, ios_base& f, char_type fill, double v) const
     {
@@ -787,8 +859,9 @@ class num_put : public locale::facet
 
   ///////////////////////////////////////////////////////////////////////////
   protected:
-
-    ~num_put(); //virtual
+    friend struct __::facets;
+    ~num_put() //virtual
+    {}
 
     ///\name 22.2.2.2.2 num_put virtual functions [facet.num.put.virtuals]
 
@@ -801,43 +874,118 @@ class num_put : public locale::facet
     virtual iter_type
       do_put(iter_type out, ios_base& str, char_type fill, bool val) const
     {
-      if ( (str.flags() & ios_base::boolalpha) == 0 )
-        return do_put(out, str, fill, static_cast<long>(val));
+      if ( !(str.flags() & ios_base::boolalpha) )
+        return do_put(out, str, fill, static_cast<unsigned long>(val));
       const numpunct<charT>& np = use_facet<numpunct<charT> >(str.getloc());
       const numpunct<charT>::string_type s = val ? np.truename() : np.falsename();
       return copy(s.begin(), s.end(), out);
     }
 
-    virtual iter_type do_put(iter_type, ios_base&, char_type fill, long v) const;
-    virtual iter_type do_put(iter_type, ios_base&, char_type fill, unsigned long) const;
-    virtual iter_type do_put(iter_type, ios_base&, char_type fill, double v) const;
-    virtual iter_type do_put(iter_type, ios_base&, char_type fill, long double v) const;
-    virtual iter_type do_put(iter_type, ios_base&, char_type fill, const void* v) const;
+    virtual iter_type do_put(iter_type out, ios_base& str, char_type fill, long v) const
+    {
+      return put_int(out, str, fill, v, true);
+    }
+    virtual iter_type do_put(iter_type out, ios_base& str, char_type fill, unsigned long v) const
+    {
+      return put_int(out, str, fill, v, false);
+    }
+    virtual iter_type do_put(iter_type out, ios_base&, char_type fill, double v) const
+    {
+      return out;
+    }
+    virtual iter_type do_put(iter_type out, ios_base&, char_type fill, long double v) const
+    {
+      return out;
+    }
+    virtual iter_type do_put(iter_type out, ios_base&, char_type fill, const void* v) const
+    {
+      return out;
+    }
 
     ///\}
+  private:
+    iter_type put_int(iter_type out, ios_base& str, char_type fill, unsigned long long v, bool is_signed, bool is_long = false) const
+    {
+      const ios_base::fmtflags flags = str.flags();
+      const ios_base::fmtflags adjust = flags & ios_base::adjustfield;
+      const ios_base::fmtflags basefield = flags & ios_base::basefield;
+      const bool               uppercase = (flags & ios_base::uppercase) != 0;
+      //const ios_base::fmtflags floatfield = flags & ios_base::floatfield;
+      const bool               showpos = (flags & ios_base::showpos) != 0;
+      const bool               showbase = (flags & ios_base::showbase) != 0;
+
+      const streamsize width = str.width();
+
+      // [dec, oct, hex]
+      static const char bases[] = {'u', 'o', 'x'};
+
+      // %[flags] [width] [.precision] [{h | l | ll | I | I32 | I64}]type
+      char fmtbuf[16];
+      char* fmt = fmtbuf;
+      *fmt++ = '%';
+
+      if(showpos)
+        *fmt++ = '+';
+      if(showbase)
+        *fmt++ = '#';
+      if(adjust == ios_base::internal){
+        *fmt++ = '0';
+        if(width){
+          _itoa(width, fmt, 10);
+          fmt += strlen(fmt);
+        }
+      }
+
+      if(is_long)
+        *fmt++ = 'I', *fmt++ = '6', *fmt++ = '4';
+
+      *fmt = bases[(basefield >> 5) - 1];
+
+      if(basefield == ios_base::dec && is_signed)
+        *fmt = 'd';
+      else if(basefield == ios_base::hex && uppercase)
+        *fmt = 'X';
+      *++fmt = 0;
+
+      char buf[32]; // may not enough if large width
+      streamsize l = _snprintf(buf, _countof(buf), fmtbuf, is_long ? v : static_cast<unsigned long>(v));
+
+      // adjust
+      if(width && width > l){
+        const streamsize pad = width - l;
+        if(adjust != ios_base::left && adjust != ios_base::internal) // before
+          out = __::fill_n(out, pad, fill);
+
+        out = copy_n(buf,l,out);
+
+        if(adjust == ios_base::left)
+          out = __::fill_n(out, pad, fill);
+      }else
+        out = copy_n(buf,l,out);
+      return out;
+    }
 
 };
-
-#if 0
-template<class charT, class OutputIterator>
-num_put<charT, OutputIterator> &
-  use_facet<num_put<charT, OutputIterator> >(const locale&)
-{
-#if !STLX__CONFORMING_LOCALE
-  static const num_put<charT, OutputIterator> numput;
-  return numput;
-#endif
-}
-#endif
 
 //template <>
 //class num_put<char>;// : public locale::facet
 
+/** @} lib_locale_numeric */
+
+
+
+/** \defgroup lib_locale_collate 22.2.4 The collate category [category.collate]
+ *@{*/
 
 // 22.2.4, collation:
 
 template <class charT> class collate;
 template <class charT> class collate_byname;
+
+/** @} lib_locale_collate */
+
+/** \defgroup lib_locale_time 22.2.5 The time category [category.time]
+*@{*/
 
 // 22.2.5, date and time:
 
@@ -847,6 +995,11 @@ template <class charT, class InputIterator> class time_get_byname;
 template <class charT, class OutputIterator> class time_put;
 template <class charT, class OutputIterator> class time_put_byname;
 
+/** @} lib_locale_time */
+
+/** \defgroup lib_locale_monetary 22.2.6 The monetary category [category.monetary]
+*@{*/
+
 // 22.2.6, money:
 
 class money_base;
@@ -855,12 +1008,88 @@ template <class charT, class OutputIterator> class money_put;
 template <class charT, bool Intl> class moneypunct;
 template <class charT, bool Intl> class moneypunct_byname;
 
+/** @} lib_locale_monetary */
+
+/** \defgroup lib_locale_messages 22.2.7 The message retrieval category [category.messages]
+*@{*/
+
 // 22.2.7, message retrieval:
 
 class messages_base;
 template <class charT> class messages;
 template <class charT> class messages_byname;
 
+/** @} lib_locale_messages */
+/** @} lib_locale_categories */
+
+#if !STLX__CONFORMING_LOCALE
+
+namespace __
+{
+  struct facets
+  {
+    // has_facet
+    template<class Facet>
+    struct has_facet: false_type {};
+
+    template<class charT, class OutputIterator>
+    struct has_facet<num_put<charT, OutputIterator> >: true_type{};
+
+    template<class charT>
+    struct has_facet<numpunct<charT> >: true_type{};
+
+    template<>
+    struct has_facet<ctype<char> >: true_type{};
+
+    //////////////////////////////////////////////////////////////////////////
+    // use_facet
+    template<class charT, class OutputIterator>
+    static const num_put<charT, OutputIterator>& get_facet(const locale&, type2type<num_put<charT, OutputIterator> >/*, typename enable_if<is_same<charT,char>::value>::type* =0*/)
+    {
+      static const num_put<charT, OutputIterator> facet;
+      return facet;
+    }
+
+    template<class charT>
+    static const numpunct<charT>& get_facet(const locale&, type2type<numpunct<charT> >)
+    {
+      static const numpunct<charT> facet;
+      return facet;
+    }
+
+    __forceinline
+    static const ctype<char>& get_facet(const locale&, type2type<ctype<char> >)
+    {
+      // static ctype<char> is constructed with the default table which is not to be freed,
+      // so the destructor call may be not queued up to the atexit function.
+      // This is why it is implemented through placement new over a raw storage.
+      static void * f[sizeof(ctype<char>)/sizeof(void*)];
+      ctype<char> * const p = reinterpret_cast<ctype<char>*>(f);
+      // The first class member is VTable ptr or the tab ptr member,
+      // both are non-null after initialization is done.
+      if ( !f[0] ) new (p) ctype<char>;
+      return *p;
+    }
+
+  };
+}
+
+template <class Facet> 
+const Facet& use_facet(const locale& loc)
+{
+  return __::facets::get_facet(loc, __::type2type<Facet>());
+}
+
+/// 5 Returns: true if the facet requested is present in loc; otherwise false.
+template <class Facet>
+bool has_facet(const locale&) __ntl_nothrow
+{
+  return __::facets::has_facet<Facet>::value;
+}
+
+#endif // STLX__CONFORMING_LOCALE
+
+/** @} lib_locale */
 }//namespace std
 
 #ifdef _MSC_VER

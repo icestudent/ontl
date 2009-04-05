@@ -337,6 +337,38 @@
 							>
 						</File>
 					</Filter>
+					<Filter
+						Name="tr2"
+						>
+						<File
+							RelativePath=".\stlx\ext\tr2\filesystem.hxx"
+							>
+						</File>
+						<File
+							RelativePath=".\stlx\ext\tr2\fs_directory.hxx"
+							>
+						</File>
+						<File
+							RelativePath=".\stlx\ext\tr2\fs_operations.hxx"
+							>
+						</File>
+					</Filter>
+					<Filter
+						Name="ttl"
+						>
+						<File
+							RelativePath=".\stlx\ext\ttl\data_holder.hxx"
+							>
+						</File>
+						<File
+							RelativePath=".\stlx\ext\ttl\exception.hxx"
+							>
+						</File>
+						<File
+							RelativePath=".\stlx\ext\ttl\typelist.hxx"
+							>
+						</File>
+					</Filter>
 				</Filter>
 				<Filter
 					Name="containers"
@@ -447,6 +479,10 @@
 					>
 					<File
 						RelativePath=".\stlx\chrono.hxx"
+						>
+					</File>
+					<File
+						RelativePath=".\stlx\codecvt.hxx"
 						>
 					</File>
 					<File

@@ -217,7 +217,7 @@ namespace rtl
       #endif
 
       if(!path.empty())
-        RtlFreeUnicodeString(&path);
+        RtlFreeUnicodeString(path);
     }
 
     operator const object_attributes() const

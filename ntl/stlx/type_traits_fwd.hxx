@@ -47,6 +47,7 @@ template <class T> struct add_cv;
 // 20.5.6.2 Reference modifications [meta.trans.ref]
 template <class T> struct remove_reference;
 template <class T> struct add_lvalue_reference;
+template <class T> struct add_rvalue_reference;
 template <class T> struct add_reference;
 
 // 20.5.6.3 Sign modifications [meta.trans.sign]

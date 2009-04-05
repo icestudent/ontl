@@ -113,6 +113,39 @@ namespace std
     struct gcd: gcd_impl< abs<a>::value, abs<b>::value >
     {};
 
+    // power of 2
+    template<ratio_t v>
+    struct power2:
+      integral_constant<ratio_t, (1 << v)>
+    {};
+
+    // log2 
+    template<ratio_t v, bool strict = false>
+    struct log2
+    {
+      static const ratio_t value = 1 + log2<(v >> 1)>::value;
+      typedef ratio_t value_type;
+      typedef integral_constant<ratio_t, value> type;
+    };
+
+    template<>
+    struct log2<1>:
+      integral_constant<ratio_t, 0>
+    {};
+
+    // is power of 2?
+    template<ratio_t v>
+    struct is_power2: 
+      integral_constant<bool, power2<log2<v>::value>::value == v>
+    {};
+
+    // strict log2
+    template<ratio_t v>
+    struct log2<v, true>
+      :log2<v, false>
+    {
+      static_assert(is_power2<v>::value, "specified value isn't a power of 2");
+    };
   }}
 
   /**
