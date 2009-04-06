@@ -344,8 +344,14 @@ class basic_streambuf
         const streamsize wavail = pend - pnext;
         if ( !(0 < wavail) )
         {
-          if ( traits_type::eq_int_type(traits_type::eof(), overflow()) )
+          const char_type c = *s;
+          if ( traits_type::eq_int_type(traits_type::eof(), overflow(traits_type::to_int_type(c))) )
             return copied;
+          if(pbeg)
+            *pnext++ = c;
+          s++;
+          copied++;
+          n--;
           continue;
         }
         //__assume(n >= 0 && ravail >= 0);

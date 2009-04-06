@@ -58,6 +58,16 @@ class console
 {
   ///////////////////////////////////////////////////////////////////////////
   public:
+    enum type {
+      stdin,
+      stdout,
+      stderr
+    };
+
+    static legacy_handle handle(type t)
+    {
+      return *(&nt::peb::instance().ProcessParameters->StandardInput + t);
+    }
 
     static __forceinline
     bool alloc()
@@ -137,11 +147,21 @@ class console_buffer:
   typedef std::streamsize streamsize;
   static const size_t buffer_size = 128;
 public:
-  console_buffer()
+  explicit console_buffer(legacy_handle outh)
+    :outh(outh)
   {
-    outh = nt::peb::instance().ProcessParameters->StandardOutput;
-    buffer = new char_type[buffer_size];
-    setbuf(buffer, buffer_size);
+    init();
+  }
+
+  explicit console_buffer(console::type type)
+    :outh(console::handle(type))
+  {
+    init();
+  }
+
+  ~console_buffer()
+  {
+    delete[] buffer;
   }
 
 protected:
@@ -180,6 +200,11 @@ protected:
   }
 
 protected:
+  void init()
+  {
+    buffer = new char_type[buffer_size];
+    setbuf(buffer, buffer_size);
+  }
   void reset()
   {
     setp(pbase(), epptr());

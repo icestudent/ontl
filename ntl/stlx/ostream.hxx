@@ -396,7 +396,7 @@ namespace __
       if(length)
         os.setstate(ios_base::badbit);
     }
-    static inline stream_t& formatted_write(stream_t& os, const void* const vdata, size_t size, bool narrow = false)
+    static inline stream_t& formatted_write(stream_t& os, const void* const vdata, size_t size, bool do_wide = false)
     {
       stream_t::sentry good(os);
       ios_base::iostate state = ios_base::badbit;
@@ -411,12 +411,12 @@ namespace __
               fill(os, os.width() - size);
 
             if(os.good())
-              (narrow ? write_narrow : write_widden)(os, data, size);
+              (do_wide ? write_narrow : write_widden)(os, data, size);
 
             if(os.good() && adjust == ios_base::left)
               fill(os, os.width() - size);
           }else{
-            (narrow ? write_narrow : write_widden)(os, data, size);
+            (do_wide ? write_narrow : write_widden)(os, data, size);
           }
           if(os.good())
             state = ios_base::goodbit;
