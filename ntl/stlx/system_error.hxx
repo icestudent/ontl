@@ -10,6 +10,7 @@
 #include "type_traits.hxx"
 #include "stdexcept.hxx"
 #include "string.hxx"
+#include "iosfwd.hxx"
 
 namespace std 
 {
@@ -282,6 +283,12 @@ private:
   inline bool operator<(const error_code& lhs, const error_code& rhs) __ntl_nothrow
   {
     return lhs.category() < rhs.category() || lhs.category() == rhs.category() && lhs.value() < rhs.value();
+  }
+
+  template <class charT, class traits>
+  inline basic_ostream<charT,traits>& operator<<(basic_ostream<charT,traits>& os, const error_code& ec)
+  {
+    return os << ec.category().name() << ':' << ec.value();
   }
   
   // 19.4.3.5 non-member functions:

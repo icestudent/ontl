@@ -646,74 +646,49 @@ class vector
 ///\name  Vector comparisons
 
 template <class T, class Allocator>
-inline
-bool operator==(const vector<T, Allocator>& x, const vector<T, Allocator>& y)
-  __ntl_nothrow
+inline bool operator==(const vector<T, Allocator>& x, const vector<T, Allocator>& y) __ntl_nothrow
 {
   return x.size() == y.size() && equal(x.begin(), x.end(), y.begin());
 }
 
 template <class T, class Allocator>
-inline
-bool operator< (const vector<T, Allocator>& x, const vector<T, Allocator>& y)
-  __ntl_nothrow
+inline bool operator< (const vector<T, Allocator>& x, const vector<T, Allocator>& y) __ntl_nothrow
 {
   return lexicographical_compare(x.begin(), x.end(), y.begin(), y.end());
 }
 
 template <class T, class Allocator>
-inline
-bool operator!=(const vector<T, Allocator>& x, const vector<T, Allocator>& y)
-  __ntl_nothrow
+inline bool operator!=(const vector<T, Allocator>& x, const vector<T, Allocator>& y) __ntl_nothrow
 {
   return rel_ops::operator !=(x, y);
 }
 
 template <class T, class Allocator>
-inline
-bool operator> (const vector<T, Allocator>& x, const vector<T, Allocator>& y)
-  __ntl_nothrow
+inline bool operator> (const vector<T, Allocator>& x, const vector<T, Allocator>& y) __ntl_nothrow
 {
   return rel_ops::operator >(x, y);
 }
 
 template <class T, class Allocator>
-inline
-bool operator>=(const vector<T, Allocator>& x, const vector<T, Allocator>& y)
-  __ntl_nothrow
+inline bool operator>=(const vector<T, Allocator>& x, const vector<T, Allocator>& y) __ntl_nothrow
 {
   return rel_ops::operator >=(x, y);
 }
 
 template <class T, class Allocator>
-inline
-bool operator<=(const vector<T, Allocator>& x, const vector<T, Allocator>& y)
-  __ntl_nothrow
+inline bool operator<=(const vector<T, Allocator>& x, const vector<T, Allocator>& y) __ntl_nothrow
 {
   return rel_ops::operator <=(x, y);
 }
 
 ///\name  Vector specialized algorithms
 template <class T, class Allocator>
-inline
-void swap(vector<T, Allocator>& x, vector<T, Allocator>& y) __ntl_nothrow
-{
-  x.swap(y);
-}
-
+inline void swap(vector<T, Allocator>& x, vector<T, Allocator>& y) __ntl_nothrow { x.swap(y); }
 #ifdef NTL__CXX_RV
   template <class T, class Allocator>
-  void swap(vector<T,Allocator>&& x, vector<T,Allocator>& y)
-  {
-    x.swap(y);
-  }
-
+  inline void swap(vector<T,Allocator>&& x, vector<T,Allocator>& y) __ntl_nothrow { x.swap(y); }
   template <class T, class Allocator>
-  void swap(vector<T,Allocator>& x, vector<T,Allocator>&& y)
-  {
-    x.swap(y);
-  }
-
+  inline void swap(vector<T,Allocator>& x, vector<T,Allocator>&& y) __ntl_nothrow { x.swap(y); }
 #endif
 
 template <class T, class Allocator>

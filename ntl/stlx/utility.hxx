@@ -273,20 +273,10 @@ bool
   return !(x < y);
 }
 
-template<class T1, class T2> void swap(pair<T1, T2>& x, pair<T1, T2>& y)
-{
-  x.swap(y);
-}
+template<class T1, class T2> inline void swap(pair<T1, T2>& x, pair<T1, T2>& y) { x.swap(y); }
 #ifdef NTL__CXX_RV
-template<class T1, class T2> void swap(pair<T1, T2>&& x, pair<T1, T2>& y)
-{
-  x.swap(y);
-}
-template<class T1, class T2> void swap(pair<T1, T2>& x, pair<T1, T2>&& y)
-{
-  x.swap(y);
-}
-
+template<class T1, class T2> inline void swap(pair<T1, T2>&& x, pair<T1, T2>& y) { x.swap(y); }
+template<class T1, class T2> inline void swap(pair<T1, T2>& x, pair<T1, T2>&& y) { x.swap(y); }
 #endif
 ///@}
 

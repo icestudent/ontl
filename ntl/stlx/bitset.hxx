@@ -496,8 +496,10 @@ namespace std {
     operator>>(basic_istream<charT, traits>& is, bitset<N>& x);
 
   template <class charT, class traits, size_t N>
-  basic_ostream<charT, traits>&
-    operator<<(basic_ostream<charT, traits>& os, const bitset<N>& x);
+  inline basic_ostream<charT, traits>& operator<<(basic_ostream<charT, traits>& os, const bitset<N>& x)
+  {
+    return os << x.template to_string<charT,traits,allocator<char> >();
+  }
 
   ///@}
   /**@} lib_associative */

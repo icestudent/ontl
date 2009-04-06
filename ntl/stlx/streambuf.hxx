@@ -244,8 +244,7 @@ class basic_streambuf
 
     ///\name  27.5.2.4.2 Buffer management and positioning [streambuf.virt.buffer]
 
-    virtual basic_streambuf<char_type,traits>*
-      setbuf(char_type*, streamsize)
+    virtual basic_streambuf<char_type,traits>* setbuf(char_type*, streamsize)
     {
       // Default behavior: Does nothing.
       return this;
