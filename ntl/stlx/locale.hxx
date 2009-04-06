@@ -889,22 +889,22 @@ class num_put : public locale::facet
     {
       return put_int(out, str, fill, v, false);
     }
-    virtual iter_type do_put(iter_type out, ios_base&, char_type fill, double v) const
+    virtual iter_type do_put(iter_type out, ios_base& str, char_type fill, double v) const
     {
       return out;
     }
-    virtual iter_type do_put(iter_type out, ios_base&, char_type fill, long double v) const
+    virtual iter_type do_put(iter_type out, ios_base& str, char_type fill, long double v) const
     {
       return out;
     }
-    virtual iter_type do_put(iter_type out, ios_base&, char_type fill, const void* v) const
+    virtual iter_type do_put(iter_type out, ios_base& str, char_type fill, const void* v) const
     {
-      return out;
+      return put_int(out,str,fill,reinterpret_cast<unsigned long long>(v), false, sizeof(void*) > sizeof(long), true);
     }
 
     ///\}
   private:
-    iter_type put_int(iter_type out, ios_base& str, char_type fill, unsigned long long v, bool is_signed, bool is_long = false) const
+    iter_type put_int(iter_type out, ios_base& str, char_type fill, unsigned long long v, bool is_signed, bool is_long = false, bool is_pointer = false) const
     {
       const ios_base::fmtflags flags = str.flags();
       const ios_base::fmtflags adjust = flags & ios_base::adjustfield;
@@ -930,38 +930,49 @@ class num_put : public locale::facet
         *fmt++ = '#';
       if(adjust == ios_base::internal){
         *fmt++ = '0';
-        if(width){
-          _itoa(width, fmt, 10);
-          fmt += strlen(fmt);
-        }
+        if(width)
+          *fmt++ = '*';
       }
 
-      if(is_long)
-        *fmt++ = 'I', *fmt++ = '6', *fmt++ = '4';
+      if(is_pointer){
+        *fmt = 'p';
+      }else{
+        if(is_long)
+          *fmt++ = 'I', *fmt++ = '6', *fmt++ = '4';
 
-      *fmt = bases[(basefield >> 5) - 1];
+        *fmt = bases[(basefield >> 5) - 1];
 
-      if(basefield == ios_base::dec && is_signed)
-        *fmt = 'd';
-      else if(basefield == ios_base::hex && uppercase)
-        *fmt = 'X';
+        if(basefield == ios_base::dec && is_signed)
+          *fmt = 'd';
+        else if(basefield == ios_base::hex && uppercase)
+          *fmt = 'X';
+      }
       *++fmt = 0;
 
       char buf[32]; // may not enough if large width
-      streamsize l = _snprintf(buf, _countof(buf), fmtbuf, is_long ? v : static_cast<unsigned long>(v));
+      streamsize l = adjust == ios_base::internal && width
+        ? _snprintf(buf, _countof(buf), fmtbuf, width, is_long ? v : static_cast<unsigned long>(v))
+      : _snprintf(buf, _countof(buf), fmtbuf, is_long ? v : static_cast<unsigned long>(v));
 
       // adjust
       if(width && width > l){
-        const streamsize pad = width - l;
+        streamsize pad = width - l;
+        if(is_pointer)
+          pad -= 2;
         if(adjust != ios_base::left && adjust != ios_base::internal) // before
           out = __::fill_n(out, pad, fill);
 
+        if(is_pointer)
+          out = copy_n("0x",2,out);
         out = copy_n(buf,l,out);
 
         if(adjust == ios_base::left)
           out = __::fill_n(out, pad, fill);
-      }else
+      }else{
+        if(is_pointer)
+          out = copy_n("0x",2,out);
         out = copy_n(buf,l,out);
+      }
       return out;
     }
 

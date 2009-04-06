@@ -222,19 +222,19 @@ class basic_ostream
     }
     basic_ostream<charT, traits>& operator<<(float f)
     {
-      return put_impl(n);
+      return put_impl(f);
     }
     basic_ostream<charT, traits>& operator<<(double f)
     {
-      return put_impl(n);
+      return put_impl(f);
     }
     basic_ostream<charT, traits>& operator<<(long double f)
     {
-      return put_impl(n);
+      return put_impl(f);
     }
     basic_ostream<charT, traits>& operator<<(const void* p)
     {
-      return put_impl(n);
+      return put_impl(p);
     }
 
     ///\name  27.6.2.5.3 basic_ostream::operator<< [lib.ostream.inserters]
