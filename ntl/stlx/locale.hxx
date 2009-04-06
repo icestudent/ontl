@@ -64,8 +64,8 @@ class locale
         explicit facet(size_t /*refs*/ = 0) {}
         _NTL_LOC_VIRTUAL ~facet() {}
       private:
-        facet(const facet&); // not defined
-        void operator=(const facet&); // not defined
+        facet(const facet&) __deleted;
+        void operator=(const facet&) __deleted;
     };
 
     /// 22.1.1.1.3 Class locale::id [locale.id]
@@ -74,8 +74,8 @@ class locale
       public:
         id();
       private:
-        void operator=(const id&); // not defined
-        id(const id&); // not defined
+        void operator=(const id&) __deleted;
+        id(const id&) __deleted;
     };
 
     ///\name 22.1.1.2 locale constructors and destructor [locale.cons]
@@ -132,57 +132,57 @@ template <class Facet> bool has_facet(const locale&) __ntl_nothrow;
 
 template <class charT> bool isspace(charT c, const locale& loc)
 {
-  use_facet<ctype<charT> >(loc).is(ctype_base::space, c);
+  return use_facet<ctype<charT> >(loc).is(ctype_base::space, c);
 }
 
 template <class charT> bool isprint(charT c, const locale& loc)
 {
-  use_facet<ctype<charT> >(loc).is(ctype_base::print, c);
+  return use_facet<ctype<charT> >(loc).is(ctype_base::print, c);
 }
 
 template <class charT> bool iscntrl(charT c, const locale& loc)
 {
-  use_facet<ctype<charT> >(loc).is(ctype_base::cntrl, c);
+  return use_facet<ctype<charT> >(loc).is(ctype_base::cntrl, c);
 }
 
 template <class charT> bool isupper(charT c, const locale& loc)
 {
-  use_facet<ctype<charT> >(loc).is(ctype_base::upper, c);
+  return use_facet<ctype<charT> >(loc).is(ctype_base::upper, c);
 }
 
 template <class charT> bool islower(charT c, const locale& loc)
 {
-  use_facet<ctype<charT> >(loc).is(ctype_base::lower, c);
+  return use_facet<ctype<charT> >(loc).is(ctype_base::lower, c);
 }
 
 template <class charT> bool isalpha(charT c, const locale& loc)
 {
-  use_facet<ctype<charT> >(loc).is(ctype_base::alpha, c);
+  return use_facet<ctype<charT> >(loc).is(ctype_base::alpha, c);
 }
 
 template <class charT> bool isdigit(charT c, const locale& loc)
 {
-  use_facet<ctype<charT> >(loc).is(ctype_base::digit, c);
+  return use_facet<ctype<charT> >(loc).is(ctype_base::digit, c);
 }
 
 template <class charT> bool ispunct(charT c, const locale& loc)
 {
-  use_facet<ctype<charT> >(loc).is(ctype_base::punct, c);
+  return use_facet<ctype<charT> >(loc).is(ctype_base::punct, c);
 }
 
 template <class charT> bool isxdigit(charT c, const locale& loc)
 {
-  use_facet<ctype<charT> >(loc).is(ctype_base::xdigit, c);
+  return use_facet<ctype<charT> >(loc).is(ctype_base::xdigit, c);
 }
 
 template <class charT> bool isalnum(charT c, const locale& loc)
 {
-  use_facet<ctype<charT> >(loc).is(ctype_base::alnum, c);
+  return use_facet<ctype<charT> >(loc).is(ctype_base::alnum, c);
 }
 
 template <class charT> bool isgraph(charT c, const locale& loc)
 {
-  use_facet<ctype<charT> >(loc).is(ctype_base::graph, c);
+  return use_facet<ctype<charT> >(loc).is(ctype_base::graph, c);
 }
 ///\}
 
@@ -236,21 +236,37 @@ static const int16_t __ct_alpha = 0x0100;
 
 /** \defgroup lib_locale_ctype 22.2.1 The ctype category [category.ctype]
  *@{*/
+
+/**
+ *	Class ctype_base that declares characters class mask values
+ **/
 class ctype_base
 {
   public:
+    /// character class mask type
     typedef int16_t mask;
     static const mask
+      /** is lower */
       lower = __ct_lower,
+      /** is upper */
       upper = __ct_upper,
+      /** is letter */
       alpha = lower|upper|__ct_alpha,
+      /** is control character */
       cntrl = __ct_cntrl,
+      /** is digit */
       digit = __ct_digit,
+      /** is hexadecimal digit */
       xdigit = __ct_xdigit,
+      /** is whitespace */
       space = __ct_space|__ct_blank,
+      /** is punctuation */
       punct = __ct_punct,
-      print = alpha|digit|xdigit|punct|__ct_blank,// __ct_space?
+      /** is printable, including space */
+      print = alpha|digit|punct|__ct_blank,// __ct_space?
+      /** is alphanumeric */
       alnum = alpha|digit,
+      /** is graphic character, excluding space */
       graph = alnum|punct;
 };
 
@@ -271,46 +287,58 @@ class ctype : public locale::facet, public ctype_base
 
     ///\name 22.2.1.1.1 ctype members [locale.ctype.members]
 
+    /** Classifies a character. */
     bool is(mask m, charT c) const { return do_is(m, c); }
 
+    /** Classifies a character or sequence of characters. @return \a high */
     const charT* is(const charT* low, const charT* high, mask* vec) const
     {
       return do_is(low, high, vec);
     }
 
+    /** Locates a character in a buffer that conforms to a classification \a m. */
     const charT* scan_is(mask m, const charT* low, const charT* high) const
     {
       return do_scan_is(m, low, high);
     }
 
+    /** Locates a character in a buffer that fails to conform to a classification \a m. */
     const charT* scan_not(mask m, const charT* low, const charT* high) const
     {
       return do_scan_not(m, low, high);
     }
 
+    /** Converts a character to upper case. */
     charT toupper(charT c) const { return do_toupper(c); }
 
+    /** Replaces each character \c *p in the range <tt>[low,high)</tt> for which a corresponding upper-case character exists, with that character. */
     const charT* toupper(charT* low, const charT* high) const
     {
       return do_toupper(low, high);
     }
 
+    /** Converts a character to lower case. */
     charT tolower(charT c) const { return do_tolower(c); }
 
+    /** Replaces each character \c *p in the range <tt>[low,high)</tt> and for which a corresponding lower-case character exists, with that character. */
     const charT* tolower(charT* low, const charT* high) const
     {
       return do_tolower(low, high);
     }
 
+    /** Applies the simplest reasonable transformation from a char value to the corresponding \c charT value. */
     charT widen(char c) const { return do_widen(c); }
 
+    /** Applies the simplest reasonable transformation from a sequence of char values to the corresponding \c charT values. */
     const char* widen(const char* low, const char* high, charT* to) const
     {
       return do_widen(low, high, to);
     }
 
+    /** Applies the simplest reasonable transformation from a \c charT value to the corresponding \c char value. */
     char narrow(charT c, char dfault) const { return do_narrow(c,dfault); }
 
+    /** Applies the simplest reasonable transformation from a sequence of \c charT values to the corresponding \c char values. */
     const charT* narrow(const charT* low, const charT*, char dfault, char* to) const
     {
       return do_narrow(low, high, dfault, to);
@@ -364,63 +392,73 @@ class ctype_byname : public ctype<charT>
 };
 
 /**
- *	@brief 22.2.1.3 ctype specializations [facet.ctype.special]
+ *	@brief 22.2.1.3 ctype<char> specialization [facet.ctype.special]
  *  @details A specialization ctype<char> is provided so that the member functions on type \c char can be implemented inline.
  *  The implementation-defined value of member \c table_size is at least 256.
  **/
 template <> class ctype<char>
 : public locale::facet, public ctype_base
 {
+  template <class Facet> friend const Facet& use_facet(const locale&);
   ///////////////////////////////////////////////////////////////////////////
   public:
-
-    template <class Facet> friend const Facet& use_facet(const locale&);
-
     typedef char char_type;
 
     explicit ctype(const mask* tab = 0, bool del = false, size_t refs = 0)
     : locale::facet(refs), tab(tab ? tab : classic_table()), del(del) {}
 
+    /** Classifies a character. */
     bool is(mask m, char c) const
     {
-      return 0 != (table()[static_cast<unsigned char>(c)] & m);
+      return (tab[static_cast<unsigned char>(c)] & m) != 0;
     }
 
+    /** Classifies a character or sequence of characters. @return \a high */
     const char* is(const char* low, const char* high, mask* vec) const
     {
       while ( low != high )
-        *vec++ = table()[static_cast<unsigned char>(*low++)];
+        *vec++ = tab[static_cast<unsigned char>(*low++)];
       return high;
     }
 
+    /** Locates a character in a buffer that conforms to a classification \a m. */
     const char* scan_is(mask m, const char* low, const char* high) const
     {
-      while ( low != high && !(table()[static_cast<unsigned char>(*low)] & m) )
+      while ( low != high && !(tab[static_cast<unsigned char>(*low)] & m) )
           ++low;
       return low;
     }
 
+    /** Locates a character in a buffer that fails to conform to a classification \a m. */
     const char* scan_not(mask m, const char* low, const char* high) const
     {
-      while ( low != high && (table()[static_cast<unsigned char>(*low)] & m) )
+      while ( low != high && (tab[static_cast<unsigned char>(*low)] & m) )
           ++low;
       return low;
     }
 
+    /** Converts a character to upper case. */
     char toupper(char c) const { return do_toupper(c); }
 
+    /** Replaces each character \c *p in the range <tt>[low,high)</tt> for which a corresponding upper-case character exists, with that character. */
     const char* toupper(char* low, const char* high) const { return do_toupper(low, high); }
 
+    /** Converts a character to lower case. */
     char tolower(char c) const { return do_tolower(c); }
 
+    /** Replaces each character \c *p in the range <tt>[low,high)</tt> and for which a corresponding lower-case character exists, with that character. */
     const char* tolower(char* low, const char* high) const {return do_tolower(low, high); }
 
+    /** Applies the simplest reasonable transformation from a char value to the corresponding \c charT value. */
     char widen(char c) const { return do_widen(c); }
 
+    /** Applies the simplest reasonable transformation from a sequence of char values to the corresponding \c charT values. */
     const char* widen(const char* low, const char* high, char* to) const { return do_widen(low, high, to); }
 
+    /** Applies the simplest reasonable transformation from a \c charT value to the corresponding \c char value. */
     char narrow(char c, char dfault) const { return do_narrow(c, dfault); }
 
+    /** Applies the simplest reasonable transformation from a sequence of \c charT values to the corresponding \c char values. */
     const char* narrow(const char * low, const char * high, char dfault, char * to) const
     {
       return do_narrow(low, high, dfault, to);
@@ -435,16 +473,36 @@ template <> class ctype<char>
 
     ~ctype()
     {
-      // tab pointer is allways initialyzed by the constructor
+      // tab pointer is always initialized by the constructor
       if ( /*tab &&*/ del )
         delete[] tab;
     }
 
     const mask* table() const __ntl_nothrow { return tab; }
 
+    /** Returns a pointer to the initial element of an array of size table_size which represents the classifications of characters in the "C" locale */
     static const mask* classic_table() __ntl_nothrow
     {
-      return 0;
+      static const mask ascii_mask[256] =
+      {
+        0x020, 0x020, 0x020, 0x020, 0x020, 0x020, 0x020, 0x020, 0x020, 0x068, 0x028, 0x028, 0x028, 0x028, 0x020, 0x020,
+        0x020, 0x020, 0x020, 0x020, 0x020, 0x020, 0x020, 0x020, 0x020, 0x020, 0x020, 0x020, 0x020, 0x020, 0x020, 0x020,
+        0x048, 0x010, 0x010, 0x010, 0x000, 0x010, 0x010, 0x010, 0x010, 0x010, 0x010, 0x000, 0x010, 0x010, 0x010, 0x010,
+        0x084, 0x084, 0x084, 0x084, 0x084, 0x084, 0x084, 0x084, 0x084, 0x084, 0x010, 0x010, 0x000, 0x000, 0x000, 0x010,
+        0x010, 0x181, 0x181, 0x181, 0x181, 0x181, 0x181, 0x101, 0x101, 0x101, 0x101, 0x101, 0x101, 0x101, 0x101, 0x101,
+        0x101, 0x101, 0x101, 0x101, 0x101, 0x101, 0x101, 0x101, 0x101, 0x101, 0x101, 0x010, 0x010, 0x010, 0x000, 0x010,
+        0x000, 0x182, 0x182, 0x182, 0x182, 0x182, 0x182, 0x102, 0x102, 0x102, 0x102, 0x102, 0x102, 0x102, 0x102, 0x102,
+        0x102, 0x102, 0x102, 0x102, 0x102, 0x102, 0x102, 0x102, 0x102, 0x102, 0x102, 0x010, 0x000, 0x010, 0x000, 0x020,
+        0x020, 0x020, 0x020, 0x020, 0x020, 0x028, 0x020, 0x020, 0x020, 0x020, 0x020, 0x020, 0x020, 0x020, 0x020, 0x020,
+        0x020, 0x020, 0x020, 0x020, 0x020, 0x020, 0x020, 0x020, 0x020, 0x020, 0x020, 0x020, 0x020, 0x020, 0x020, 0x020,
+        0x048, 0x010, 0x000, 0x000, 0x000, 0x000, 0x000, 0x000, 0x000, 0x000, 0x102, 0x010, 0x000, 0x020, 0x000, 0x000,
+        0x000, 0x000, 0x000, 0x000, 0x000, 0x102, 0x000, 0x010, 0x000, 0x000, 0x102, 0x010, 0x000, 0x000, 0x000, 0x010,
+        0x101, 0x101, 0x101, 0x101, 0x101, 0x101, 0x101, 0x101, 0x101, 0x101, 0x101, 0x101, 0x101, 0x101, 0x101, 0x101,
+        0x101, 0x101, 0x101, 0x101, 0x101, 0x101, 0x101, 0x000, 0x101, 0x101, 0x101, 0x101, 0x101, 0x101, 0x101, 0x102,
+        0x102, 0x102, 0x102, 0x102, 0x102, 0x102, 0x102, 0x102, 0x102, 0x102, 0x102, 0x102, 0x102, 0x102, 0x102, 0x102,
+        0x102, 0x102, 0x102, 0x102, 0x102, 0x102, 0x102, 0x000, 0x102, 0x102, 0x102, 0x102, 0x102, 0x102, 0x102, 0x102
+      };
+      return ascii_mask;
     }
 
     ///\name 22.2.1.3.4 ctype<char> virtual functions [facet.ctype.char.virtuals]
@@ -498,8 +556,8 @@ template <> class ctype<char>
 
   private:
 
-    ctype(const ctype&); // not defined
-    void operator=(const ctype&); // not defined
+    ctype(const ctype&) __deleted;
+    void operator=(const ctype&) __deleted;
 
     const mask * const  tab;
     const bool          del;
@@ -524,9 +582,154 @@ template <> class ctype_byname<char>
     virtual char do_narrow(char c, char dfault) const;
     virtual const char* do_narrow(const char* low, const char* high, char dfault, char* to) const;
   private:
-    ctype_byname(const ctype_byname&); // not defined
-    void operator=(const ctype_byname&); // not defined
+    ctype_byname(const ctype_byname&) __deleted;
+    void operator=(const ctype_byname&) __deleted;
 };
+
+/**
+ *	@brief 22.2.1.3 ctype<wchar_t> specialization [facet.ctype.special]
+ *  @details A specialization ctype<wchar_t> is provided so that the member functions on type \c wchar_t can be implemented inline.
+ *  The implementation-defined value of member \c table_size is 65536.
+ **/
+template <> class ctype<wchar_t>
+: public locale::facet, public ctype_base
+{
+  template <class Facet> friend const Facet& use_facet(const locale&);
+  ///////////////////////////////////////////////////////////////////////////
+public:
+
+  typedef wchar_t char_type;
+
+  explicit ctype(const mask* table, size_t refs = 0)
+    : locale::facet(refs), tab(table)
+  {}
+
+  /** Classifies a character. */
+  bool is(mask m, char_type c) const
+  {
+    return (tab[c] & m) != 0;
+  }
+
+  /** Classifies a character or sequence of characters. @return \a high */
+  const char_type* is(const char_type* low, const char_type* high, mask* vec) const
+  {
+    while ( low != high )
+      *vec++ = tab[*low++];
+    return high;
+  }
+
+  /** Locates a character in a buffer that conforms to a classification \a m. */
+  const char_type* scan_is(mask m, const char_type* low, const char_type* high) const
+  {
+    while ( low != high && !(tab[*low] & m) )
+      ++low;
+    return low;
+  }
+
+  /** Locates a character in a buffer that fails to conform to a classification \a m. */
+  const char_type* scan_not(mask m, const char_type* low, const char_type* high) const
+  {
+    while ( low != high && (tab[*low] & m) )
+      ++low;
+    return low;
+  }
+
+  /** Converts a character to upper case. */
+  char_type toupper(char_type c) const { return do_toupper(c); }
+
+  /** Replaces each character \c *p in the range <tt>[low,high)</tt> for which a corresponding upper-case character exists, with that character. */
+  const char_type* toupper(char_type* low, const char_type* high) const { return do_toupper(low, high); }
+
+  /** Converts a character to lower case. */
+  char_type tolower(char_type c) const { return do_tolower(c); }
+
+  /** Replaces each character \c *p in the range <tt>[low,high)</tt> and for which a corresponding lower-case character exists, with that character. */
+  const char_type* tolower(char_type* low, const char_type* high) const {return do_tolower(low, high); }
+
+  /** Applies the simplest reasonable transformation from a char value to the corresponding \c charT value. */
+  char_type widen(char c) const { return do_widen(c); }
+
+  /** Applies the simplest reasonable transformation from a sequence of char values to the corresponding \c charT values. */
+  const char* widen(const char* low, const char* high, char_type* to) const { return do_widen(low, high, to); }
+
+  /** Applies the simplest reasonable transformation from a \c charT value to the corresponding \c char value. */
+  char narrow(char_type c, char dfault) const { return do_narrow(c, dfault); }
+
+  /** Applies the simplest reasonable transformation from a sequence of \c charT values to the corresponding \c char values. */
+  const char_type* narrow(const char_type * low, const char_type * high, char dfault, char * to) const
+  {
+    return do_narrow(low, high, dfault, to);
+  }
+
+  static locale::id id;
+
+  static const size_t table_size = WCHAR_MAX+1;
+
+  ///////////////////////////////////////////////////////////////////////////
+protected:
+
+  ~ctype()
+  {
+  }
+
+  ///\name 22.2.1.3.4 ctype<char_type> virtual functions [facet.ctype.char.virtuals]
+
+  _NTL_LOC_VIRTUAL char_type do_toupper(char_type c) const
+  {
+    return is(c, lower) ? ntl::nt::RtlUpcaseUnicodeChar(c) : c;
+  }
+
+  _NTL_LOC_VIRTUAL const char_type* do_toupper(char_type* low, const char_type* high) const
+  {
+    while ( low != high )
+      *low++ = do_toupper(*low);
+    return high;
+  }
+
+  _NTL_LOC_VIRTUAL char_type do_tolower(char_type c) const
+  {
+    return is(c, upper) ? ntl::nt::RtlDowncaseUnicodeChar(c) : c;
+  }
+
+  _NTL_LOC_VIRTUAL const char_type* do_tolower(char_type* low, const char_type* high) const
+  {
+    while ( low != high )
+      *low++ = do_tolower(*low);
+    return high;
+  }
+
+  _NTL_LOC_VIRTUAL char_type do_widen(char c) const { return static_cast<unsigned char>(c) < 128 ? c : ntl::nt::RtlAnsiCharToUnicodeChar(c); }
+
+  _NTL_LOC_VIRTUAL const char* do_widen(const char* low, const char* high, char_type* to) const
+  {
+    while ( low != high )
+      *to++ = do_widen(*low++);
+    return high;
+  }
+
+  _NTL_LOC_VIRTUAL char do_narrow(char_type c, char dfault) const
+  {
+    char nc;
+    return wcstombs(&nc, &c, 1) == 0 ? dfault : nc;
+  }
+
+  _NTL_LOC_VIRTUAL const char_type* do_narrow(const char_type* low, const char_type* high, char dfault, char* to) const
+  {
+    while ( low != high )
+      *to++ = do_narrow(*low++, dfault);
+    return high;
+  }
+  ///\}
+
+private:
+private:
+  const mask* const tab;
+
+  ctype(const ctype&) __deleted;
+  void operator=(const ctype&) __deleted;
+
+};// class ctype<wchar_t>
+
 
 // 22.2.1.5 Class template codecvt [lib.locale.codecvt]
 
@@ -566,7 +769,9 @@ class codecvt : public locale::facet, public codecvt_base
     typedef externT extern_type;
     typedef stateT  state_type;
 
-    explicit codecvt(size_t refs = 0);
+    explicit codecvt(size_t refs = 0)
+      :facet(refs)
+    {}
 
     /**
      *	Translates characters in the source range [from,from_end), placing the results in sequential
@@ -607,39 +812,39 @@ class codecvt : public locale::facet, public codecvt_base
 
     /** Returns -1 if the encoding of the \a externT sequence is state-dependent; else the constant number of
       \a externT characters needed to produce an internal character; or 0 if this number is not a constant */
-    int encoding() const __ntl_nothrow;
+    int encoding() const __ntl_nothrow { return do_encoding(); }
 
     /** Returns \c true if \c do_in() and \c do_out() return \c noconv for all valid argument values. */
-    bool always_noconv() const __ntl_nothrow;
+    bool always_noconv() const __ntl_nothrow { return do_always_noconv(); }
 
     /** The effect on the \a state argument is "as if" it called 
         <tt>do_in(state, from, from_end, from, to, to+max, to)</tt> for \a to pointing to a buffer of at least \a max elements. */
-    int length(stateT &, const externT* from, const externT* end, size_t max) const;
+    int length(stateT &, const externT* from, const externT* end, size_t max) const { return do_length(); }
 
     /** Returns the maximum value that <tt>do_length(state, from, from_end, 1)</tt> 
       can return for any valid range <tt>[from, from_end)</tt> and \c stateT value \a state. */
-    int max_length() const __ntl_nothrow;
+    int max_length() const __ntl_nothrow { return do_max_length(); }
 
     static locale::id id;
 
   ///////////////////////////////////////////////////////////////////////////
   protected:
+    ~codecvt()
+    {}
 
-    ~codecvt(); //virtual
+    virtual result do_out(state_type& state, const intern_type* from, const intern_type* from_end,
+      const intern_type*& from_next, extern_type* to, extern_type* to_limit, extern_type*& to_next) const;
 
-    virtual result do_out(stateT& state, const internT* from, const internT* from_end,
-      const internT*& from_next, externT* to, externT* to_limit, externT*& to_next) const;
+    virtual result do_in(state_type& state, const extern_type* from, const extern_type* from_end,
+      const extern_type*& from_next, intern_type* to, intern_type* to_limit, intern_type*& to_next) const;
 
-    virtual result do_in(stateT& state, const externT* from, const externT* from_end,
-      const externT*& from_next, internT* to, internT* to_limit, internT*& to_next) const;
-
-    virtual result do_unshift(stateT& state, externT* to, externT* to_limit, externT*& to_next) const;
+    virtual result do_unshift(state_type& state, extern_type* to, extern_type* to_limit, extern_type*& to_next) const;
 
     virtual int do_encoding() const __ntl_nothrow;
 
     virtual bool do_always_noconv() const __ntl_nothrow;
 
-    virtual int do_length(stateT&, const externT* from, const externT* end, size_t max) const;
+    virtual int do_length(state_type&, const extern_type* from, const extern_type* end, size_t max) const;
 
     virtual int do_max_length() const __ntl_nothrow;
 
@@ -825,31 +1030,30 @@ class num_put : public locale::facet
     {
       return do_put(s, f, fill, v);
     }
-
     iter_type put(iter_type s, ios_base& f, char_type fill, long v) const
     {
       return do_put(s, f, fill, v);
     }
-
-    iter_type put(iter_type s, ios_base& f, char_type fill, long long v) const;
-
+    iter_type put(iter_type s, ios_base& f, char_type fill, long long v) const
+    {
+      return do_put(s, f, fill, v);
+    }
     iter_type put(iter_type s, ios_base& f, char_type fill, unsigned long v) const
     {
       return do_put(s, f, fill, v);
     }
-
-    iter_type put(iter_type s, ios_base& f, char_type fill, unsigned long long v) const;
-
+    iter_type put(iter_type s, ios_base& f, char_type fill, unsigned long long v) const
+    {
+      return do_put(s, f, fill, v);
+    }
     iter_type put(iter_type s, ios_base& f, char_type fill, double v) const
     {
       return do_put(s, f, fill, v);
     }
-
     iter_type put(iter_type s, ios_base& f, char_type fill, long double v) const
     {
       return do_put(s, f, fill, v);
     }
-
     iter_type put(iter_type s, ios_base& f, char_type fill, const void* v) const
     {
       return do_put(s, f, fill, v);
@@ -990,7 +1194,46 @@ class num_put : public locale::facet
 
 // 22.2.4, collation:
 
-template <class charT> class collate;
+/**
+ *	@brief    22.2.4.1 Class template collate [locale.collate]
+ *  @details  The class collate<charT> provides features for use in the collation (comparison) and hashing of strings.
+ *  A locale member function template, operator(), uses the collate facet to allow a locale to act directly
+ *  as the predicate argument for standard algorithms (Clause 25) and containers operating on strings.
+ **/
+template <class charT>
+class collate:
+  public locale::facet 
+{
+public:
+  typedef charT char_type;
+  typedef basic_string<charT> string_type;
+
+  explicit collate(size_t refs = 0)
+    :facet(refs)
+  {}
+
+  /** Returns 1 if the first string is greater than the second, -1 if less, zero otherwise. */
+  int compare(const charT* low1, const charT* high1, const charT* low2, const charT* high2) const;
+
+  /** Returns a basic_string<charT> value that, compared lexicographically with the result of calling
+    transform() on another string, yields the same result as calling do_compare() on the same two
+    strings. */
+  string_type transform(const charT* low, const charT* high) const;
+
+  /** Returns an integer value equal to the result of calling hash() on any other string for which 
+    do_compare() returns 0 (equal) when passed the two strings. */
+  long hash(const charT* low, const charT* high) const;
+
+  static locale::id id;
+protected:
+  ~collate()
+  {}
+
+  virtual int do_compare(const charT* low1, const charT* high1, const charT* low2, const charT* high2) const;
+  virtual string_type do_transform(const charT* low, const charT* high) const;
+  virtual long do_hash (const charT* low, const charT* high) const;
+};
+
 template <class charT> class collate_byname;
 
 /** @} lib_locale_collate */
@@ -1037,6 +1280,9 @@ template <class charT> class messages_byname;
 
 namespace __
 {
+  extern const unsigned char wchar_masks[];
+  extern const unsigned wchar_masks_size;
+
   struct facets
   {
     // has_facet
@@ -1051,6 +1297,8 @@ namespace __
 
     template<>
     struct has_facet<ctype<char> >: true_type{};
+    template<>
+    struct has_facet<ctype<wchar_t> >: true_type{};
 
     //////////////////////////////////////////////////////////////////////////
     // use_facet
@@ -1079,6 +1327,28 @@ namespace __
       // The first class member is VTable ptr or the tab ptr member,
       // both are non-null after initialization is done.
       if ( !f[0] ) new (p) ctype<char>;
+      return *p;
+    }
+
+    __forceinline
+      static const ctype<wchar_t>& get_facet(const locale&, type2type<ctype<wchar_t> >)
+    {
+      static void * f[sizeof(ctype<wchar_t>)/sizeof(void*)];
+      ctype<wchar_t> * const p = reinterpret_cast<ctype<wchar_t>*>(f);
+      static ctype_base::mask* table = 0;
+      if(!table){
+        // get table
+        table = new ctype_base::mask[ctype<wchar_t>::table_size];
+        using namespace ntl::nt;
+
+        uint32_t dsize;
+        ntstatus st = RtlDecompressBuffer(compression::default_format, table, ctype<wchar_t>::table_size, wchar_masks, wchar_masks_size, &dsize);
+        if(!success(st)){
+          delete[] table;
+          table = nullptr;
+        }
+      }
+      if ( !f[0] ) new (p) ctype<wchar_t>(table);
       return *p;
     }
 

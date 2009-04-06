@@ -387,15 +387,39 @@ class basic_ios : public ios_base
       return old;
     }
 
-    basic_ios& copyfmt(const basic_ios& rhs);
+    basic_ios& copyfmt(const basic_ios& x)
+    {
+      if(this != &x){
+        prec = x.prec;
+        wide = x.wide;
+        fmtl = x.fmtl;
+        fillc = x.fillc;
+        loc = x.loc;
+        // tiestr?
+
+        /*
+        If any newly stored pointer values in *this point at objects stored outside the object rhs, and
+        those objects are destroyed when rhs is destroyed, the newly stored pointer values are altered to
+        point at newly constructed copies of the objects.
+        */
+
+        exceptions(x.exceptmask);
+      }
+      return *this;
+    }
 
   #ifdef NTL__CXX_RV
-    void move(basic_ios&& x);
+    void move(basic_ios&& x)
+    {
+      swap(x);
+    }
     void swap(basic_ios&& x)
   #else
     void swap(basic_ios& x)
   #endif
     {
+      if(this == &x)
+        return;
       // ios_base
       std::swap(prec, x.prec);
       std::swap(wide, x.wide);
@@ -407,7 +431,6 @@ class basic_ios : public ios_base
     #endif
 
       // basic_ios
-      std::swap(sb,x.sb);
       std::swap(tiestr,x.tiestr);
       std::swap(fillc,x.fillc);
     }

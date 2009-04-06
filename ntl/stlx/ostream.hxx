@@ -58,7 +58,10 @@ class basic_ostream
     /// 5 Effects: Move constructs from the rvalue rhs. This is accomplished
     ///   by default constructing the base class and calling
     ///   basic_ios<charT, traits>::move(rhs) to initialize the base class.
-    basic_ostream(basic_ostream&& rhs);
+    basic_ostream(basic_ostream&& rhs)
+    {
+      basic_ios::move(rhs);
+    }
 #endif
 
     ///\name  basic_ostream destructor
@@ -69,13 +72,18 @@ class basic_ostream
 
 #ifdef NTL__CXX_RV
     ///\name 27.6.2.3 Class basic_ostream assign and swap [ostream.assign]
-    basic_ostream& operator=(basic_ostream&& rhs);
+    basic_ostream& operator=(basic_ostream&& rhs)
+    {
+      swap(rhs);
+      return *this;
+    }
     void swap(basic_ostream&& x)
 #else
     void swap(basic_ostream& x)
 #endif
     {
-      basic_ios::swap(x);
+      if(this != &x)
+        basic_ios::swap(x);
     }
 
     ///\name 27.6.2.4 Class basic_ostream::sentry [ostream::sentry].
@@ -349,8 +357,8 @@ class basic_ostream
 
   ///////////////////////////////////////////////////////////////////////////
   private:
-    basic_ostream(const basic_ostream&); // not defined
-    basic_ostream& operator=(const basic_ostream&); // not defined
+    basic_ostream(const basic_ostream&) __deleted;
+    basic_ostream& operator=(const basic_ostream&) __deleted;
 
 };// class basic_ostream
 

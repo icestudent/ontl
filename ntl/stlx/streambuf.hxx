@@ -64,6 +64,8 @@ class basic_streambuf
   
     basic_streambuf& operator=(const basic_streambuf& r)
     {
+      if(this == &r)
+        return *this;
       gbeg = r.gbeg; gend = r.gend; gnext = r.gnext;
       pbeg = r.pbeg; pend = r.pend; pnext = r.pnext;
     #if STLX__CONFORMING_LOCALE
@@ -78,6 +80,8 @@ class basic_streambuf
     void swap(basic_streambuf&  rhs)
   #endif
     {
+      if(this == &rhs)
+        return;
       std::swap(gbeg,  rhs.gbeg);
       std::swap(gend,  rhs.gend);
       std::swap(gnext, rhs.gnext);

@@ -251,6 +251,7 @@ NTL__EXTERNAPI wchar_t __stdcall RtlUpcaseUnicodeChar(wchar_t);
 NTL__EXTERNAPI wchar_t __stdcall RtlDowncaseUnicodeChar(wchar_t);
 NTL__EXTERNAPI ntstatus __stdcall RtlUpcaseUnicodeString(unicode_string& DestinationString, const_unicode_string const& SourceString, bool AllocateDestination);
 NTL__EXTERNAPI void __stdcall RtlUpperString(ansi_string& DestinationString, const_ansi_string const& SourceString);
+
 NTL__EXTERNAPI wchar_t __stdcall RtlAnsiCharToUnicodeChar(char);
 
 ///\name String comparation
