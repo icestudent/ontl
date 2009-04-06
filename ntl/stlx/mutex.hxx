@@ -361,7 +361,7 @@ namespace std
     #ifdef NTL__CXX_EXPLICITOP
     explicit operator bool () const;
     #else
-    operator __::explicit_bool_type() const __ntl_nothrow { return owns ? &__::explicit_bool::_ : 0; }
+    operator __::explicit_bool_type() const __ntl_nothrow { return __::explicit_bool(owns); }
     #endif
 
   private:

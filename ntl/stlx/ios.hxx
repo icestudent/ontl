@@ -267,10 +267,8 @@ class ios_base
 
   ///////////////////////////////////////////////////////////////////////////
   private:
-
-    ios_base(const ios_base&);
-    ios_base& operator=(const ios_base&);
-
+    ios_base(const ios_base&) __deleted;
+    ios_base& operator=(const ios_base&) __deleted;
 };
 
 /// 27.4.3 Class template fpos [fpos]
@@ -392,12 +390,27 @@ class basic_ios : public ios_base
     basic_ios& copyfmt(const basic_ios& rhs);
 
   #ifdef NTL__CXX_RV
-    void move(basic_ios&& rhs);
-    void swap(basic_ios&& rhs);
+    void move(basic_ios&& x);
+    void swap(basic_ios&& x)
   #else
-    void move(basic_ios& rhs);
-    void swap(basic_ios& rhs);
+    void swap(basic_ios& x)
   #endif
+    {
+      // ios_base
+      std::swap(prec, x.prec);
+      std::swap(wide, x.wide);
+      std::swap(fmtfl, x.fmtfl);
+      std::swap(state, x.state);
+      std::swap(exceptmask, x.exceptmask);
+    #if STLX__CONFORMING_LOCALE
+      std::swap(loc, x.loc);
+    #endif
+
+      // basic_ios
+      std::swap(sb,x.sb);
+      std::swap(tiestr,x.tiestr);
+      std::swap(fillc,x.fillc);
+    }
 
     ///\name 27.4.4.3 basic_ios flags functions [iostate.flags]
 
@@ -438,14 +451,13 @@ class basic_ios : public ios_base
   ///////////////////////////////////////////////////////////////////////////
   private:
 
-    basic_ios(const basic_ios&); // not defined
-    basic_ios& operator=(const basic_ios&); // not defined
+    basic_ios(const basic_ios&) __deleted;
+    basic_ios& operator=(const basic_ios&) __deleted;
 
     basic_streambuf<charT, traits>* sb;
     basic_ostream<charT, traits>*   tiestr;
 
     char_type fillc;
-
 };
 
 /**\addtogroup  lib_std_ios_manip ****** 27.4.5 ios_base manipulators *****

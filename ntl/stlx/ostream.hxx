@@ -67,11 +67,16 @@ class basic_ostream
     virtual ~basic_ostream() {}
     ///@}
 
-#ifdef NTL__CXX
+#ifdef NTL__CXX_RV
     ///\name 27.6.2.3 Class basic_ostream assign and swap [ostream.assign]
-    basic_ostream& operator=((basic_ostream&& rhs);
-    void swap(basic_ostream&& rhs);
+    basic_ostream& operator=(basic_ostream&& rhs);
+    void swap(basic_ostream&& x)
+#else
+    void swap(basic_ostream& x)
 #endif
+    {
+      basic_ios::swap(x);
+    }
 
     ///\name 27.6.2.4 Class basic_ostream::sentry [ostream::sentry].
     /// 1 The class sentry defines a class that is responsible for doing
@@ -222,7 +227,7 @@ class basic_ostream
     }
     basic_ostream<charT, traits>& operator<<(float f)
     {
-      return put_impl(f);
+      return put_impl(static_cast<double>(f));
     }
     basic_ostream<charT, traits>& operator<<(double f)
     {
@@ -484,13 +489,12 @@ inline basic_ostream<char, traits>& operator<<(basic_ostream<char, traits>&& os,
 
 ///\name Swap
 template <class charT, class traits>
-void swap(basic_ostream<charT, traits>& x, basic_ostream<charT, traits>& y)  { x.swap(y); }
-
+inline void swap(basic_ostream<charT, traits>& x, basic_ostream<charT, traits>& y)  { x.swap(y); }
 #ifdef NTL__CXX_RV
 template <class charT, class traits>
-void swap(basic_ostream<charT, traits>&& x, basic_ostream<charT, traits>& y) { x.swap(y); }
+inline void swap(basic_ostream<charT, traits>&& x, basic_ostream<charT, traits>& y) { x.swap(y); }
 template <class charT, class traits>
-void swap(basic_ostream<charT, traits>& x, basic_ostream<charT, traits>&& y) { x.swap(y); }
+inline void swap(basic_ostream<charT, traits>& x, basic_ostream<charT, traits>&& y) { x.swap(y); }
 #endif
 
 
