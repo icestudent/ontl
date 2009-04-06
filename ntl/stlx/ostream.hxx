@@ -372,7 +372,7 @@ namespace __
     static inline void write_widden(stream_t& os, const charT* data, size_t length)
     {
       if(os.rdbuf()->sputn(data,length) != length)
-        os.setstate(ios_base::badbit);
+        os.setstate(ios_base::failbit);
     }
     static inline void write_narrow(stream_t& os, const charT* data, size_t length)
     {
@@ -383,6 +383,8 @@ namespace __
         if(traits::eq_int_type(buf->sputc(os.widen(*data++)), eof))
           break;
       }
+      if(length)
+        os.setstate(ios_base::failbit);
     }
     static inline void fill(stream_t& os, size_t length)
     {
@@ -394,7 +396,7 @@ namespace __
           break;
       }
       if(length)
-        os.setstate(ios_base::badbit);
+        os.setstate(ios_base::failbit);
     }
     static inline stream_t& formatted_write(stream_t& os, const void* const vdata, size_t size, bool do_wide = false)
     {

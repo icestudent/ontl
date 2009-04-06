@@ -82,9 +82,14 @@ class ios_base
 
     /// 27.4.2.1.3 Type ios_base::iostate [ios::iostate]
     typedef uint8_t iostate;
+    /** indicates a good state */
     static const iostate goodbit  = 0;
+    /** indicates a loss of integrity in an input or output sequence (such as an irrecoverable read error from a file) */
     static const iostate badbit   = 1 << 0;
+    /** indicates that an input operation reached the end of an input sequence */
     static const iostate eofbit   = 1 << 1;
+    /** indicates that an input operation failed to read the expected characters, or
+    that an output operation failed to generate the desired characters */
     static const iostate failbit  = 1 << 2;
 
     static
@@ -106,15 +111,28 @@ class ios_base
 
     /// 27.4.2.1.4 Type ios_base::openmode [ios::openmode]
     typedef uint8_t openmode;
+    /** seek to end before each write */
     static const openmode app     = 1 << 0;
+    /** open and seek to end immediately after opening */
     static const openmode ate     = 1 << 1;
+    /** truncate an existing stream when opening */
     static const openmode trunc   = 1 << 2;
+    /** open for input */
     static const openmode in      = 1 << 3;
+    /** open for output */
     static const openmode out     = 1 << 4;
+    /** perform input and output in binary mode (as opposed to text mode) */
     static const openmode binary  = 1 << 5;
 
     /// 27.4.2.1.5 Type ios_base::seekdir [ios::seekdir]
-    enum seekdir { beg, end, cur };
+    enum seekdir { 
+      /** request a seek (for subsequent input or output) relative to the beginning of the stream */
+      beg,
+      /** request a seek relative to the current end of the sequence */
+      end,
+      /** request a seek relative to the current position within the sequence */
+      cur
+    };
 
     /// 27.4.2.1.6 Class ios_base::Init [ios::Init]
     class Init
