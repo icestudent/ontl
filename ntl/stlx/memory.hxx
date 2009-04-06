@@ -324,17 +324,13 @@ template<class T> struct allocator_propagate_never<allocator<T> >
 ///\name  20.7.5.2 allocator globals [allocator.globals]
 
 template<class T, class U>
-inline
-bool
-  operator==(const allocator<T>&, const allocator<U>&) __ntl_nothrow
+inline bool operator==(const allocator<T>&, const allocator<U>&) __ntl_nothrow
 {
   return true;
 }
 
 template<class T, class U>
-inline
-bool
-  operator!=(const allocator<T>&, const allocator<U>&) __ntl_nothrow
+inline bool operator!=(const allocator<T>&, const allocator<U>&) __ntl_nothrow
 {
   return false;
 }
@@ -486,13 +482,13 @@ struct allocator_propagate_never<scoped_allocator_adaptor<OuterA, InnerA> >
   : true_type { };
 
 template<typename OuterA1, typename OuterA2, typename InnerA>
-bool operator==(const scoped_allocator_adaptor<OuterA1,InnerA>& a, const scoped_allocator_adaptor<OuterA2,InnerA>& b)
+inline bool operator==(const scoped_allocator_adaptor<OuterA1,InnerA>& a, const scoped_allocator_adaptor<OuterA2,InnerA>& b)
 {
   return a.outer_allocator() == b.outer_allocator() && a.inner_allocator() == b.inner_allocator();
 }
 
 template<typename OuterA1, typename OuterA2, typename InnerA>
-bool operator!=(const scoped_allocator_adaptor<OuterA1,InnerA>& a, const scoped_allocator_adaptor<OuterA2,InnerA>& b)
+inline bool operator!=(const scoped_allocator_adaptor<OuterA1,InnerA>& a, const scoped_allocator_adaptor<OuterA2,InnerA>& b)
 {
   return !(a == b);
 }

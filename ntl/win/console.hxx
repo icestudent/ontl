@@ -13,6 +13,7 @@
 #include "../nt/peb.hxx"
 #include "application.hxx"
 #include "stlx/string.hxx"
+#include "stlx/streambuf.hxx"
 
 namespace ntl {
 namespace win {
@@ -126,8 +127,83 @@ class console
 
 };//class console
 
+/** \defgroup console_stream  Console I/O Streams support 
+ *@{*/
+
+template<typename charT, class traits = std::char_traits<charT> >
+class console_buffer:
+  public std::basic_streambuf<charT, traits>
+{
+  typedef std::streamsize streamsize;
+  static const size_t buffer_size = 128;
+public:
+  console_buffer()
+  {
+    outh = nt::peb::instance().ProcessParameters->StandardOutput;
+    buffer = new char_type[buffer_size];
+    setbuf(buffer, buffer_size);
+  }
+
+protected:
+  ///\name overloaded members
+  virtual std::basic_streambuf<charT, traits>* setbuf(char_type* s, streamsize n)
+  {
+    setp(s, s+n);
+    return this;
+  }
+
+  virtual int sync()
+  {
+    streamsize size = pptr() - pbase();
+    if(size){
+      size = write(pbase(), size);
+      reset();
+    }
+    return static_cast<int>(size);
+  }
+  virtual int_type overflow(int_type c)
+  {
+    const bool eofc = traits_type::eq_int_type(c, traits_type::eof());
+    if(!pbase() && eofc)
+      return traits_type::eof();
+    bool ok = true;
+    if(pbase()){
+      const streamsize pending = pptr() - pbase();
+      ok = write(pbase(), pending) == pending;
+      reset();
+    }
+    if(!eofc){
+      const char_type cc = traits_type::to_char_type(c);
+      ok &= write(&cc, 1) == 1;
+    }
+    return ok ? (traits_type::eq_int_type(c, traits_type::eof()) ? traits_type::not_eof(c) : c) : traits_type::eof();
+  }
+
+protected:
+  void reset()
+  {
+    setp(pbase(), epptr());
+  }
+  streamsize write(const char* data, streamsize n)
+  {
+    uint32_t written = 0;
+    WriteConsoleA(outh, data, static_cast<uint32_t>(n), &written, 0);
+    return static_cast<streamsize>(written);
+  }
+  streamsize write(const wchar_t* data, streamsize n)
+  {
+    uint32_t written = 0;
+    WriteConsoleW(outh, data, static_cast<uint32_t>(n), &written, 0);
+    return static_cast<streamsize>(written);
+  }
+
+private:
+  char_type* buffer;
+  legacy_handle outh;
+};
 
 
+/**@} console_stream */
 /**@} console */
 
 

@@ -362,42 +362,113 @@ class basic_ostream
 
 };// class basic_ostream
 
+namespace __
+{
+  template<class charT, class traits>
+  struct stream_writer
+  {
+    typedef basic_ostream<charT, traits> stream_t;
+
+    static inline void write_widden(stream_t& os, const charT* data, size_t length)
+    {
+      if(os.rdbuf()->sputn(data,length) != length)
+        os.setstate(ios_base::badbit);
+    }
+    static inline void write_narrow(stream_t& os, const charT* data, size_t length)
+    {
+      const typename traits::int_type eof = traits::eof();
+      basic_streambuf<charT,traits>* buf = os.rdbuf();
+      const char* p = reinterpret_cast<const char*>(data);
+      while(length--){
+        if(traits::eq_int_type(buf->sputc(os.widen(*data++)), eof))
+          break;
+      }
+    }
+    static inline void fill(stream_t& os, size_t length)
+    {
+      const typename traits::int_type eof = traits::eof();
+      const typename stream_t::char_type fillc = os.fill();
+      basic_streambuf<charT,traits>* buf = os.rdbuf();
+      while(length--){
+        if(traits::eq_int_type(buf->sputc(fillc), eof))
+          break;
+      }
+      if(length)
+        os.setstate(ios_base::badbit);
+    }
+    static inline stream_t& formatted_write(stream_t& os, const void* const vdata, size_t size, bool narrow = false)
+    {
+      stream_t::sentry good(os);
+      ios_base::iostate state = ios_base::badbit;
+      if (good)
+        __ntl_try {
+          const charT* const data = reinterpret_cast<const charT*>(vdata);
+          if(os.width() && os.width() > static_cast<streamsize>(size)){
+            // need padd
+            const ios_base::fmtflags adjust = os.flags() & ios_base::adjustfield;
+
+            if(adjust != ios_base::left && adjust != ios_base::internal) // before
+              fill(os, os.width() - size);
+
+            if(os.good())
+              (narrow ? write_narrow : write_widden)(os, data, size);
+
+            if(os.good() && adjust == ios_base::left)
+              fill(os, os.width() - size);
+          }else{
+            (narrow ? write_narrow : write_widden)(os, data, size);
+          }
+          if(os.good())
+            state = ios_base::goodbit;
+      }
+      __ntl_catch(...)
+      {
+      }
+      os.setstate(state);
+      return os;
+    }
+  };
+}
+
+
 ///\name  27.6.2.5.4 Character inserter function templates [lib.ostream.inserters.character]
 
 template<class charT, class traits>
 inline basic_ostream<charT, traits>& operator<<(basic_ostream<charT, traits>& os, charT c)
 {
-  return os.put(c);
+  return __::stream_writer<charT,traits>::formatted_write(os, &c, 1);
 }
 
 template<class charT, class traits>
 inline basic_ostream<charT, traits>& operator<<(basic_ostream<charT, traits>& os, char c)
 {
-  return os.put(os.widen(c));
+  charT wc = os.widen(c);
+  return __::stream_writer<charT,traits>::formatted_write(os, &wc, 1);
 }
 
 ///\name  specialization
 template<class traits>
 inline basic_ostream<char, traits>& operator<<(basic_ostream<char, traits>& os, char c)
 {
-  return os.put(c);
+  return __::stream_writer<char,traits>::formatted_write(os, &c, 1);
 }
 
 #ifdef NTL__CXX_RV
 template<class charT, class traits>
 inline basic_ostream<charT, traits>& operator<<(basic_ostream<charT, traits>&& os, charT c)
 {
-  return os.put(c);
+  return __::stream_writer<charT,traits>::formatted_write(os, &c, 1);
 }
 template<class charT, class traits>
 inline basic_ostream<charT, traits>& operator<<(basic_ostream<charT, traits>&& os, char c)
 {
-  return os.put(os.widen(c));
+  charT wc = os.widen(c);
+  return __::stream_writer<charT,traits>::formatted_write(os, &wc, 1);
 }
 template<class traits>
 inline basic_ostream<char, traits>& operator<<(basic_ostream<char, traits>&& os, char c)
 {
-  return os.put(c);
+  return __::stream_writer<charT,traits>::formatted_write(os, &c, 1);
 }
 #endif
 
@@ -413,7 +484,7 @@ template<class charT, class traits>
 inline basic_ostream<charT, traits>& operator<<(basic_ostream<charT, traits>& os, const charT*& s)
 {
   assert(s != 0 && "s shall not be a null pointer");
-  if(s) os.write(s, traits::length(s));
+  if(s) __::stream_writer<charT,traits>::formatted_write(os, s, traits::length(s));
   return os;
 }
 
@@ -421,11 +492,7 @@ template<class charT, class traits>
 inline basic_ostream<charT, traits>& operator<<(basic_ostream<charT, traits>& os, const char*& s)
 {
   assert(s != 0 && "s shall not be a null pointer");
-  if(s){
-    size_t l = char_traits<char>::length(s);
-    while(l-- && os)
-      os.put(os.widen(*s++));
-  }
+  if(s) __::stream_writer<charT,traits>::formatted_write(os, s, char_traits<char>::length(s), true);
   return os;
 }
 
@@ -434,27 +501,24 @@ template<class traits>
 inline basic_ostream<char, traits>& operator<<(basic_ostream<char, traits>& os, const char*& s)
 {
   assert(s != 0 && "s shall not be a null pointer");
-  if(s) os.write(s, char_traits<char>::length(s));
+  if(s) __::stream_writer<char,traits>::formatted_write(os, s, char_traits<char>::length(s));
   return os;
 }
 
 template<class charT, class traits, size_t length>
 inline basic_ostream<charT, traits>& operator<<(basic_ostream<charT, traits>& os, const charT (&s)[length])
 {
-  return os.write(s, length-1);
+  return __::stream_writer<charT,traits>::formatted_write(os, s, length-1);
 }
 template<class traits, size_t length>
 inline basic_ostream<char, traits>& operator<<(basic_ostream<char, traits>& os, const char (&s)[length])
 {
-  return os.write(s, length-1);
+  return __::stream_writer<char,traits>::formatted_write(os, s, length-1);
 }
 template<class charT, class traits, size_t length>
 inline basic_ostream<charT, traits>& operator<<(basic_ostream<charT, traits>& os, const char (&s)[length])
 {
-  size_t l = length-1;
-  while(l-- && os)
-    os.put(os.widen(*s++));
-  return os;
+  return __::stream_writer<charT,traits>::formatted_write(os, s, length-1, true);
 }
 
 ///\name  signed and unsigned
@@ -536,68 +600,11 @@ basic_ostream<charT, traits>&
   return os;
 }
 
-namespace __
-{
-  template<class charT, class traits>
-  struct stream_writer
-  {
-    typedef basic_ostream<charT, traits> stream_t;
-
-    static inline void write(stream_t& os, const charT* data, size_t length)
-    {
-      if(os.rdbuf()->sputn(data,length) != length)
-        os.setstate(ios_base::badbit);
-    }
-    static inline void fill(stream_t& os, size_t length)
-    {
-      const typename traits::int_type eof = traits::eof();
-      const typename stream_t::char_type fillc = os.fill();
-      basic_streambuf<charT,traits>* buf = os.rdbuf();
-      while(length--){
-        if(traits::eq_int_type(buf->sputc(fillc), eof))
-          break;
-      }
-      if(length)
-        os.setstate(ios_base::badbit);
-    }
-    static inline void formatted_write(stream_t& os, const charT* data, size_t size)
-    {
-      stream_t::sentry good(os);
-      ios_base::iostate state = ios_base::badbit;
-      if (good)
-        __ntl_try {
-          if(os.width() && os.width() > static_cast<streamsize>(size)){
-            // need padd
-            const ios_base::fmtflags adjust = os.flags() & ios_base::adjustfield;
-
-            if(adjust != ios_base::left && adjust != ios_base::internal) // before
-              fill(os, os.width() - size);
-
-            if(os.good())
-              write(os, data, size);
-
-            if(os.good() && adjust == ios_base::left)
-              fill(os, os.width() - size);
-          }else{
-            write(os, data, size);
-          }
-          if(os.good())
-            state = ios_base::goodbit;
-      }
-      __ntl_catch(...)
-      {
-      }
-      os.setstate(state);
-    }
-  };
-}
-
 ///\name  Inserters and extractors [21.3.7.9 string.io]
 template<class charT, class traits, class Allocator>
 basic_ostream<charT, traits>& operator<<(typename __::ostream<charT,traits>::type os, const basic_string<charT,traits,Allocator>& str)
 {
-  __::stream_writer<charT,traits>::formatted_write(os, str.data(), str.size());
-  return os;
+  return __::stream_writer<charT,traits>::formatted_write(os, str.data(), str.size());
 }
 
 
