@@ -40,7 +40,7 @@ class consoleapp : public win::application<win::tchar_t>
 
 #ifdef _MSC_VER
   // this used to prevent linker error if CRT initialization isn't needed
-  #pragma comment(linker, "/alternatename:__init_crt=__init_crt_stub")
+  #pragma comment(linker, "/alternatename:___init_crt=___init_crt_stub")
   extern "C" inline void _cdecl __init_crt_stub(){}
 #endif
 

@@ -53,7 +53,7 @@ typedef pe::image * hinstance;
 *@{*/
 
 template<class charT>
-class application
+class application: noncopyable
 {
   ///////////////////////////////////////////////////////////////////////////
   public:

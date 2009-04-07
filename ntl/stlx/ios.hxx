@@ -125,7 +125,8 @@ class ios_base
     static const openmode binary  = 1 << 5;
 
     /// 27.4.2.1.5 Type ios_base::seekdir [ios::seekdir]
-    enum seekdir { 
+    enum seekdir
+    { 
       /** request a seek (for subsequent input or output) relative to the beginning of the stream */
       beg,
       /** request a seek relative to the current end of the sequence */
@@ -138,27 +139,8 @@ class ios_base
     class Init
     {
       public:
-
-        Init()
-        {
-          if ( ! init_cnt )
-          {
-            init_cnt = 1;
-            // __ntl_construct_iostream_objects();
-          }
-          ++init_cnt;
-        }
-
-        ~Init()
-        {
-          if ( --init_cnt == 1 )
-          {
-            // __ntl_destroy_iostream_objects();
-          }
-        }
-
-      private:
-        static int init_cnt;
+        Init();
+        ~Init();
     };
 
     ///\name  27.4.2.2 ios_base state functions [fmtflags.state]
@@ -413,7 +395,7 @@ class basic_ios : public ios_base
         fmtl = x.fmtl;
         fillc = x.fillc;
         loc = x.loc;
-        // tiestr?
+        tiestr = x.tiestr;
 
         /*
         If any newly stored pointer values in *this point at objects stored outside the object rhs, and

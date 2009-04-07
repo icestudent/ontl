@@ -8,6 +8,7 @@
 #ifndef NTL__NT_STRING
 #define NTL__NT_STRING
 
+#include "basedef.hxx"
 #include "../stdexcept"
 #include "../string"
 #include "../type_traits"

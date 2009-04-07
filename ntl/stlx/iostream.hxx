@@ -9,14 +9,13 @@
 #define NTL__STLX_IOSTREAM
 
 #include "iosfwd.hxx"
-#if 1
-#include <ios>
-#include <streambuf>
-#include <istream>
-#include <ostream>
-#endif
+#include "ios.hxx"
+#include "streambuf.hxx"
+#include "istream.hxx"
+#include "ostream.hxx"
 
-namespace std {
+namespace std
+{
 
 /**\addtogroup  lib_input_output ******* 27 Input/output library [input.output] **********
  *@{*/
@@ -31,9 +30,15 @@ extern wostream wcout;
 extern wostream wcerr;
 extern wostream wclog;
 
+namespace
+{
+  std::ostream::Init __init_ostream;
+  std::wostream::Init __init_wostream;
+}
+
 ///@}
 /**@} lib_input_output */
 
 }//namespace std
 
-#endif//#ifndef NTL__STLX_IOSTREAM
+#endif // NTL__STLX_IOSTREAM

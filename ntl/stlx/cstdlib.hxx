@@ -112,9 +112,7 @@ NTL__CRTCALL
 ///\name  7.20.4 Communication with the environment
 
 /// 7.20.4.1 The abort function + 18.3/3
-void
-NTL__CRTCALL
-  abort();
+void _cdecl abort();
 
 /// 7.20.4.2 The atexit function
 int __cdecl atexit(vfv_t func);
@@ -271,6 +269,8 @@ namespace ntl
    \endcode
    **/
   extern "C" void _cdecl __init_crt(bool init);
+
+  extern "C" void _cdecl __init_iostream_objects(bool init);
 
   /**
    *	@brief C++ static initialization helper

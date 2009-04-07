@@ -18,10 +18,12 @@ namespace cpu {
     static inline void pause() { __asm { pause } }
 
   #else // ! _M_IX86
-    namespace intrinsic {
-      extern "C" void __cdecl _mm_pause();
-      #pragma intrinsic(_mm_pause)
-    }
+} // cpu
+namespace intrinsic {
+  extern "C" void __cdecl _mm_pause();
+  #pragma intrinsic(_mm_pause)
+}
+namespace cpu {
     static inline void pause() { intrinsic::_mm_pause(); }
   #endif
 

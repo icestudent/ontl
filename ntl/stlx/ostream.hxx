@@ -369,19 +369,20 @@ namespace __
   {
     typedef basic_ostream<charT, traits> stream_t;
 
-    static inline void write_widden(stream_t& os, const charT* data, size_t length)
+    static inline void write_widden(stream_t& os, const charT* const data, size_t length)
     {
       if(os.rdbuf()->sputn(data,length) != length)
         os.setstate(ios_base::failbit);
     }
-    static inline void write_narrow(stream_t& os, const charT* data, size_t length)
+    static inline void write_narrow(stream_t& os, const charT* const data, size_t length)
     {
       const typename traits::int_type eof = traits::eof();
       basic_streambuf<charT,traits>* buf = os.rdbuf();
       const char* p = reinterpret_cast<const char*>(data);
-      while(length--){
-        if(traits::eq_int_type(buf->sputc(os.widen(*data++)), eof))
+      while(length){
+        if(traits::eq_int_type(buf->sputc(os.widen(*p++)), eof))
           break;
+        length--;
       }
       if(length)
         os.setstate(ios_base::failbit);
@@ -391,9 +392,10 @@ namespace __
       const typename traits::int_type eof = traits::eof();
       const typename stream_t::char_type fillc = os.fill();
       basic_streambuf<charT,traits>* buf = os.rdbuf();
-      while(length--){
+      while(length){
         if(traits::eq_int_type(buf->sputc(fillc), eof))
           break;
+        length--;
       }
       if(length)
         os.setstate(ios_base::failbit);

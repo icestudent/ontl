@@ -148,13 +148,14 @@ class console_buffer:
   static const size_t buffer_size = 128;
 public:
   explicit console_buffer(legacy_handle outh)
-    :outh(outh)
+    :outh(outh), buffer()
   {
-    init();
+    if(outh)
+      init();
   }
 
   explicit console_buffer(console::type type)
-    :outh(console::handle(type))
+    :outh(console::handle(type)), buffer()
   {
     init();
   }

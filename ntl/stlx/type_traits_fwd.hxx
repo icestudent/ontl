@@ -69,7 +69,7 @@ namespace aux {
 template <std::size_t Align>struct aligner;
 } // namespace aux
 
-template <std::size_t Len, std::size_t Align>
+template <std::size_t Len, std::size_t Align = alignof(void*)>
 struct aligned_storage;
 
 #ifdef NTL__CXX_VT

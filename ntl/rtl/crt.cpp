@@ -15,6 +15,7 @@ sec(".CRT$XCZ") vfv_t* __xc_z[]= {0};
 #pragma endregion
 
 #include "../stlx/vector.hxx"
+#include "../stlx/ios.hxx"
 
 #ifdef NTL__SUBSYSTEM_KM
 # include "../km/new.hxx"
@@ -25,7 +26,7 @@ sec(".CRT$XCZ") vfv_t* __xc_z[]= {0};
 namespace
 {
   typedef std::vector<vfv_t*> exit_funcs_t;
-  exit_funcs_t* exit_list;
+  static exit_funcs_t* exit_list = 0;
 
   void initterm(vfv_t** from, vfv_t** to)
   {
@@ -55,13 +56,21 @@ namespace
   }
 } // namespace
 
+extern "C" void _cdecl __check_iostream_objects();
+extern "C" void _cdecl __check_iostreams_stub(){}
+#pragma comment(linker, "/alternatename:___check_iostream_objects=___check_iostreams_stub")
+
 namespace ntl
 {
+
   extern "C" void _cdecl __init_crt(bool init)
   {
     if(init){
       exit_list = new exit_funcs_t();
       initterm(__xc_a, __xc_z);
+
+      __check_iostreams_stub();
+      __check_iostream_objects();
     }else{
       doexit(0,false,true);
     }
@@ -76,9 +85,11 @@ int _cdecl atexit(vfv_t func)
 
 //////////////////////////////////////////////////////////////////////////
 #ifdef _MSC_VER
+#include "../nt/debug.hxx" // for abort implementation
 extern "C" int _cdecl _purecall(void)
 {
   assert(!"pure virtual function called!");
+  debug_abort();
   abort();
   return 0;
 }

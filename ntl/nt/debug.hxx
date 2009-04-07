@@ -11,6 +11,7 @@
 
 #include "basedef.hxx"
 #include "string.hxx"
+#include "../stlx/cstdlib.hxx"
 
 namespace ntl {
   namespace nt {
@@ -222,18 +223,22 @@ namespace ntl {
       }
     };
 
-    namespace intrinsic {
-      extern "C" void __cdecl __debugbreak();
+  } // namespace nt
+  namespace intrinsic {
+    extern "C" void __cdecl __debugbreak();
+    
     #ifdef _MSC_VER
-      #pragma intrinsic(__debugbreak)
+    # pragma intrinsic(__debugbreak)
     #endif
-      static __forceinline
-        void debugbreak()
-      {
-        intrinsic::__debugbreak();
-      }
 
-    }//namespace intrinsic
+    static __forceinline
+      void debugbreak()
+    {
+      intrinsic::__debugbreak();
+    }
+
+  }//namespace intrinsic
+  namespace nt {
 
 #pragma warning(pop)
 
@@ -271,5 +276,11 @@ namespace ntl {
 
   }//namespace nt
 }//namespace ntl
+
+#pragma comment(linker, "/alternatename:_abort=_debug_abort")
+extern "C" inline void _cdecl debug_abort()
+{
+  ntl::intrinsic::debugbreak();
+}
 
 #endif // NTL__NT_DEBUG

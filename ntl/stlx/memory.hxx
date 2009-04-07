@@ -269,6 +269,12 @@ class allocator
       ::new((void *)p) T(std::forward<Arg>(val), std::forward<Arg2>(val2), std::forward<Arg3>(val3), std::forward<Arg4>(val4), std::forward<Arg5>(val5));
     }
 #else
+    __forceinline
+    void construct(pointer p)
+    {
+      __assume(p);
+      ::new((void *)p) T();
+    }
     template<class Arg>
     __forceinline
     void construct(pointer p, const Arg& val)
@@ -648,6 +654,103 @@ void
 ///@}
 
 ///\}
+
+namespace __ {
+
+  /**
+   *	Static storage helper
+   **/
+  template<class T>
+  struct static_storage
+  {
+    /** returns uninitialized storage */
+    static T* get_buffer()
+    {
+      // reserve space for constructed flag
+      static aligned_storage<sizeof(T)+sizeof(int), alignof(T)>::type buf;
+      return reinterpret_cast<T*>(&buf);
+    }
+
+    /** returns default-constructed object */
+    static T* get_object()
+    {
+      T* p = get_buffer();
+      if(!check_constructed(p, true))
+        allocator<T>().construct(p);
+      return p;
+    }
+
+    /** returns object which constructed with specified argument(s) */
+    template<class A1>
+    static T* get_object(const A1& a1)
+    {
+      T* p = get_buffer();
+      if(!check_constructed(p, true))
+        allocator<T>().construct(p, a1);
+      return p;
+    }
+    template<class A1, class A2>
+    static T* get_object(const A1& a1, const A2& a2)
+    {
+      T* p = get_buffer();
+      if(!check_constructed(p, true))
+        allocator<T>().construct(p, a1, a2);
+      return p;
+    }
+    template<class A1, class A2, class A3>
+    static T* get_object(const A1& a1, const A2& a2, const A3& a3)
+    {
+      T* p = get_buffer();
+      if(!check_constructed(p, true))
+        allocator<T>().construct(p, a1, a2, a3);
+      return p;
+    }
+    /** schedules object destruction at program exit */
+    static void schedule_destruction(T* p) { atexit(dtor); }
+
+    /** decrements object's reference count and destroys the object if it is zero */
+    static bool destroy_object(T*& p)
+    {
+      bool re = check_constructed(p, false) == 1;
+      if(re)
+        allocator<T>().destroy(p);
+      p = nullptr;
+      return re;
+    }
+
+    /** returns object's reference count */
+    static int refcount()
+    {
+      const T* const p = get_buffer();
+      return *reinterpret_cast<const int*>(p+1);
+    }
+
+    /** decrements reference count */
+    static int release()
+    {
+      T* p = get_buffer();
+      destroy_object(p);
+      return refcount();
+    }
+  private:
+    static void __cdecl dtor()
+    {
+      destroy_object(get_buffer());
+    }
+    // returns true if object already constructed
+    static bool is_constructed(const T* p)
+    {
+      return *reinterpret_cast<const int*>(p+1) != 0;
+    }
+    // marks the object and returns previous state
+    static int check_constructed(T* p, bool mark)
+    {
+      int re = *reinterpret_cast<int*>(p+1);
+      *reinterpret_cast<int*>(p+1) += mark ? 1 : -1;
+      return re;
+    }
+  };
+} // __
 
 /**@} lib_memory */
 /**@} lib_utilities */

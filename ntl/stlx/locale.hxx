@@ -25,6 +25,8 @@
 #include "string.hxx"
 #include "stdexcept.hxx"
 
+#include "../nt/string.hxx"
+
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable:4820)// X bytes padding added... (class ctype<char>)
@@ -1305,15 +1307,17 @@ namespace __
     template<class charT, class OutputIterator>
     static const num_put<charT, OutputIterator>& get_facet(const locale&, type2type<num_put<charT, OutputIterator> >/*, typename enable_if<is_same<charT,char>::value>::type* =0*/)
     {
-      static const num_put<charT, OutputIterator> facet;
-      return facet;
+      //static const num_put<charT, OutputIterator> facet;
+      //return facet;
+      return *static_storage<num_put<charT,OutputIterator> >::get_object();
     }
 
     template<class charT>
     static const numpunct<charT>& get_facet(const locale&, type2type<numpunct<charT> >)
     {
-      static const numpunct<charT> facet;
-      return facet;
+      //static const  facet;
+      //return facet;
+      return *static_storage<numpunct<charT> >::get_object();
     }
 
     __forceinline
@@ -1322,19 +1326,20 @@ namespace __
       // static ctype<char> is constructed with the default table which is not to be freed,
       // so the destructor call may be not queued up to the atexit function.
       // This is why it is implemented through placement new over a raw storage.
-      static void * f[sizeof(ctype<char>)/sizeof(void*)];
-      ctype<char> * const p = reinterpret_cast<ctype<char>*>(f);
+      //static void * f[sizeof(ctype<char>)/sizeof(void*)];
+      //ctype<char> * const p = reinterpret_cast<ctype<char>*>(f);
       // The first class member is VTable ptr or the tab ptr member,
       // both are non-null after initialization is done.
-      if ( !f[0] ) new (p) ctype<char>;
-      return *p;
+      //if ( !f[0] ) new (p) ctype<char>;
+      //return *p;
+      return *static_storage<ctype<char> >::get_object();
     }
 
     __forceinline
-      static const ctype<wchar_t>& get_facet(const locale&, type2type<ctype<wchar_t> >)
+    static const ctype<wchar_t>& get_facet(const locale&, type2type<ctype<wchar_t> >)
     {
-      static void * f[sizeof(ctype<wchar_t>)/sizeof(void*)];
-      ctype<wchar_t> * const p = reinterpret_cast<ctype<wchar_t>*>(f);
+      //static void * f[sizeof(ctype<wchar_t>)/sizeof(void*)];
+      //ctype<wchar_t> * const p = reinterpret_cast<ctype<wchar_t>*>(f);
       static ctype_base::mask* table = 0;
       if(!table){
         // get table
@@ -1348,8 +1353,9 @@ namespace __
           table = nullptr;
         }
       }
-      if ( !f[0] ) new (p) ctype<wchar_t>(table);
-      return *p;
+      //if ( !f[0] ) new (p) ctype<wchar_t>(table);
+      //return *p;
+      return *static_storage<ctype<wchar_t> >::get_object(table);
     }
 
   };

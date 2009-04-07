@@ -1043,6 +1043,18 @@
 					</FileConfiguration>
 				</File>
 				<File
+					RelativePath=".\rtl\iostream.cpp"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
 					RelativePath=".\rtl\rtti.cpp"
 					>
 					<FileConfiguration
