@@ -35,6 +35,7 @@
 
 #if defined(_MSC_VER)
 # pragma warning(disable:4514)// unreferenced inline function has been removed
+# pragma warning(disable:4480)// nonstandard extension used: specifying underlying type for enum 'enum'
 #elif defined(__GNUC__)
 # define __forceinline __attribute__((always_inline))
 # define __assume(X)
@@ -114,6 +115,8 @@
   #define NTL__CRTCALL
 # endif
 #endif
+
+#define NTL__CRTIMP __cdecl
 
 #ifndef NTL__EXTERNAPI
   #ifdef  _MSC_VER

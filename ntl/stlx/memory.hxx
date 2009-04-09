@@ -269,8 +269,9 @@ class allocator
       ::new((void *)p) T(std::forward<Arg>(val), std::forward<Arg2>(val2), std::forward<Arg3>(val3), std::forward<Arg4>(val4), std::forward<Arg5>(val5));
     }
 #else
+    template<class Pointer>
     __forceinline
-    void construct(pointer p)
+    typename enable_if<is_same<Pointer, pointer>::value>::type construct(Pointer p)
     {
       __assume(p);
       ::new((void *)p) T();
@@ -706,7 +707,7 @@ namespace __ {
       return p;
     }
     /** schedules object destruction at program exit */
-    static void schedule_destruction(T* p) { atexit(dtor); }
+    static void schedule_destruction(T*) { atexit(dtor); }
 
     /** decrements object's reference count and destroys the object if it is zero */
     static bool destroy_object(T*& p)
@@ -735,7 +736,8 @@ namespace __ {
   private:
     static void __cdecl dtor()
     {
-      destroy_object(get_buffer());
+      T* p = get_buffer();
+      destroy_object(p);
     }
     // returns true if object already constructed
     static bool is_constructed(const T* p)

@@ -361,17 +361,24 @@ namespace tree
         return insert_impl(construct_node(x));
       }
 
-      iterator insert(iterator /*position*/, const value_type& x)
+      iterator insert(const_iterator /*position*/, const value_type& x)
       {
         // TODO: implement fast insert function based on position
         return insert(x).first;
       }
 
-      iterator erase(iterator position)
+      template <class InputIterator>
+      __forceinline
+        void insert(InputIterator first, InputIterator last)
       {
-        node *y, *z = position.p;
+        insert_range(first, last);
+      }
+
+      iterator erase(const_iterator position)
+      {
+        node *y, *z = const_cast<node*>(position.p);
         if(!z)
-          return position;
+          return make_iterator(nullptr);
 
         ++position;
 
@@ -424,15 +431,15 @@ namespace tree
         node_allocator.deallocate(y, 1);
         if(count_)
           --count_;
-        return position;
+        return make_iterator(const_cast<node*>(position.p));
       }
 
-      iterator erase(iterator first, iterator last)
+      iterator erase(const_iterator first, const_iterator last)
       {
         while(first != last)
           first = erase(first);
 
-        return empty() ? end() : last;
+        return empty() ? end() : make_iterator(const_cast<node*>(last.p));
       }
 
       size_type erase(const value_type& x)

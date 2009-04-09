@@ -430,6 +430,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\stlx\cctype.hxx"
+						>
+					</File>
+					<File
 						RelativePath=".\stlx\cfloat.hxx"
 						>
 					</File>
@@ -471,6 +475,10 @@
 					</File>
 					<File
 						RelativePath=".\stlx\cwchar.hxx"
+						>
+					</File>
+					<File
+						RelativePath=".\stlx\cwctype.hxx"
 						>
 					</File>
 				</Filter>

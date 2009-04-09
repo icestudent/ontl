@@ -187,19 +187,6 @@ int
 NTL__CRTCALL
   wctomb(char *s, wchar_t wc);
 
-
-///\name  7.20.8 Multibyte/wide string conversion functions
-
-/// 7.20.8.1 The mbstowcs function
-size_t
-NTL__CRTCALL
-  mbstowcs(wchar_t * __restrict pwcs, const char * __restrict s, size_t n);
-
-/// 7.20.8.2 The wcstombs function
-size_t
-NTL__CRTCALL
-  wcstombs(char * __restrict s, const wchar_t * __restrict pwcs, size_t n);
-
 #endif// #ifndef _INC_STDLIB
 
 /// 7.20.1.2 The atoll function
@@ -303,16 +290,6 @@ namespace std {
 
 /**\addtogroup  lib_language_support *** 18 Language support library [language.support] ******
  *@{*/
-/**\addtogroup  lib_support_start_term * 18.4 Start and termination [support.start.term] *******
- *@{*/
-
-
-//extern "C"    int atexit(void (*f)(void));
-//extern "C++"  int atexit(void (*f)(void));
-
-
-/**@} lib_support_start_term
- */
 
 /**\addtogroup  lib_general_utilities ** C Library filees [c.files  ] *******
  *@{*/
@@ -361,9 +338,6 @@ using::lldiv;
 using::mblen;
 using::mbtowc;
 using::wctomb;
-
-using::mbstowcs;
-using::wcstombs;
 
 /**@} lib_general_utilities
  */

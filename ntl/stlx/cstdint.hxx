@@ -66,11 +66,9 @@ typedef uint64_t  uint_fast64_t;
 ///\name  Greatest-width integer types 7.18.1.5
 typedef int64_t   intmax_t;
 typedef uint64_t  uintmax_t;
+///\}
 
-///@}
-
-/**@} lib_support_types
- */
+/**@} lib_cstdint */
 
 /**\addtogroup  lib_support_limits ***** 18.2 Implementation properties [support.limits] ***
  *@{*/
@@ -160,7 +158,7 @@ typedef uint64_t  uintmax_t;
 
 #endif//#ifdef __STDC_LIMIT_MACROS
 
-/** @} lib_cstdint */
+/**@} lib_support_limits */
 /**@} lib_language_support */
 
 }//namespace std

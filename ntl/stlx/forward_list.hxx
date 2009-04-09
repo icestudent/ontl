@@ -495,7 +495,7 @@ namespace std {
       splice_after(position, x, i, i.p->next);
     }
 
-    void splice_after(const_iterator position, list_reference x, const_iterator first, const_iterator last)
+    void splice_after(const_iterator position, list_reference /*x*/, const_iterator first, const_iterator last)
     {
       node::transfer_after(const_cast<single_linked*>(position.p), const_cast<single_linked*>(first.p), const_cast<single_linked*>(last.p)); 
     }

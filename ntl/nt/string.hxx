@@ -248,12 +248,25 @@ NTL__EXTERNAPI uint32_t __stdcall RtlUnicodeStringToAnsiSize(const const_unicode
 NTL__EXTERNAPI ntstatus __stdcall RtlAnsiStringToUnicodeString(unicode_string& DestinationString, const const_ansi_string& SourceString, bool AllocateDestination);
 NTL__EXTERNAPI uint32_t __stdcall RtlAnsiStringToUnicodeSize(const const_ansi_string& SourceString);
 
+NTL__EXTERNAPI ntstatus __stdcall RtlMultiByteToUnicodeSize(uint32_t& BytesInUnicodeString, const char* MultiByteString, uint32_t BytesInMultiByteString);
+NTL__EXTERNAPI ntstatus __stdcall RtlUnicodeToMultiByteSize(uint32_t& BytesInMultiByteString, const wchar_t* UnicodeString, uint32_t BytesInUnicodeString);
+NTL__EXTERNAPI ntstatus __stdcall RtlMultiByteToUnicodeN(wchar_t* UnicodeString, uint32_t MaxBytesInUnicodeString, uint32_t* BytesInUnicodeString __optional, const char* MultiByteString, uint32_t BytesInMultiByteString);
+NTL__EXTERNAPI ntstatus __stdcall RtlUnicodeToMultiByteN(char* MultiByteString, uint32_t MaxBytesInMultiByteString, uint32_t* BytesInMultiByteString __optional, const wchar_t* UnicodeString, uint32_t BytesInUnicodeString);
+
+NTL__EXTERNAPI wchar_t __stdcall RtlAnsiCharToUnicodeChar(unsigned char**);
+
+__forceinline wchar_t __fastcall widen(char c)
+{
+  unsigned char* pc = reinterpret_cast<unsigned char*>(&c);
+  return RtlAnsiCharToUnicodeChar(&pc);
+}
+
+///\name String case mapping conversion
 NTL__EXTERNAPI wchar_t __stdcall RtlUpcaseUnicodeChar(wchar_t);
 NTL__EXTERNAPI wchar_t __stdcall RtlDowncaseUnicodeChar(wchar_t);
 NTL__EXTERNAPI ntstatus __stdcall RtlUpcaseUnicodeString(unicode_string& DestinationString, const_unicode_string const& SourceString, bool AllocateDestination);
 NTL__EXTERNAPI void __stdcall RtlUpperString(ansi_string& DestinationString, const_ansi_string const& SourceString);
 
-NTL__EXTERNAPI wchar_t __stdcall RtlAnsiCharToUnicodeChar(char);
 
 ///\name String comparation
 NTL__EXTERNAPI int32_t __stdcall RtlCompareUnicodeStrings(const wchar_t* String1, size_t String1Length, const wchar_t* String2, size_t String2Length);

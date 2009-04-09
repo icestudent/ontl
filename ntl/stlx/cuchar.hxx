@@ -20,8 +20,8 @@
 namespace std {
 
 #ifndef NTL__CXX_CHARS
-  typedef uint16_t char16_t;
-  typedef uint32_t char32_t;
+  typedef uint_least16_t char16_t;
+  typedef uint_least32_t char32_t;
 #endif
 
   size_t c16rtomb(char *__restrict s, char16_t wc, mbstate_t *__restrict ps);

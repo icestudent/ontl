@@ -137,7 +137,7 @@ class basic_ostream
     ///   Otherwise, returns rdbuf()->pubseekoff(0, cur, out).
     pos_type tellp()
     {
-      return this->fail() ? pos_type(-1) : this->rdbuf()->pubseekoff(0, cur, out);
+      return this->fail() ? this_base::pos_type(-1) : this->rdbuf()->pubseekoff(0, cur, out);
     }
 
     /// 2 Effects: If fail() != true, executes rdbuf()->pubseekpos(pos, ios_base::out).
@@ -156,7 +156,7 @@ class basic_ostream
     basic_ostream<charT, traits>& seekp(off_type off, ios_base::seekdir dir)
     {
       if ( ! this->fail() )
-        this->rdbuf()->pubseekoff(off, dir, ios_base::out).;
+        this->rdbuf()->pubseekoff(off, dir, ios_base::out);
       return *this;
     }
 
@@ -371,7 +371,7 @@ namespace __
 
     static inline void write_widden(stream_t& os, const charT* const data, size_t length)
     {
-      if(os.rdbuf()->sputn(data,length) != length)
+      if(os.rdbuf()->sputn(data,length) != static_cast<streamsize>(length))
         os.setstate(ios_base::failbit);
     }
     static inline void write_narrow(stream_t& os, const charT* const data, size_t length)

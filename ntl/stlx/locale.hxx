@@ -23,6 +23,7 @@
 #endif
 
 #include "string.hxx"
+#include "cwctype.hxx"
 #include "stdexcept.hxx"
 
 #include "../nt/string.hxx"
@@ -511,7 +512,7 @@ template <> class ctype<char>
 
     _NTL_LOC_VIRTUAL char do_toupper(char c) const
     {
-      return is(c, lower) ? c + 'A'-'a' : c;
+      return is(lower, c) ? c + 'A'-'a' : c;
     }
 
     _NTL_LOC_VIRTUAL const char* do_toupper(char* low, const char* high) const
@@ -523,7 +524,7 @@ template <> class ctype<char>
 
     _NTL_LOC_VIRTUAL char do_tolower(char c) const
     {
-      return is(c, upper) ? c + 'A'-'a' : c;
+      return is(upper, c) ? c + 'a'-'A' : c;
     }
 
     _NTL_LOC_VIRTUAL const char* do_tolower(char* low, const char* high) const
@@ -537,8 +538,9 @@ template <> class ctype<char>
 
     _NTL_LOC_VIRTUAL const char* do_widen(const char* low, const char* high, char* to) const
     {
-      while ( low != high )
-        *to++ = *low++;
+      //while ( low != high )
+      //  *to++ = *low++;
+      memcpy(to, low, high-low);
       return high;
     }
 
@@ -549,8 +551,9 @@ template <> class ctype<char>
                        char         /*dfault*/,
                        char *       to) const
     {
-      while ( low != high )
-        *to++ = *low++;
+      //while ( low != high )
+      //  *to++ = *low++;
+      memcpy(to, low, high-low);
       return high;
     }
 
@@ -669,16 +672,15 @@ public:
 
   ///////////////////////////////////////////////////////////////////////////
 protected:
-
   ~ctype()
   {
   }
 
-  ///\name 22.2.1.3.4 ctype<char_type> virtual functions [facet.ctype.char.virtuals]
+  ///\name 22.2.1.3.4 ctype<wchar_t> virtual functions [facet.ctype.char.virtuals]
 
   _NTL_LOC_VIRTUAL char_type do_toupper(char_type c) const
   {
-    return is(c, lower) ? ntl::nt::RtlUpcaseUnicodeChar(c) : c;
+    return is(lower, c) ? (c < 128 ? c + 'A'-'a' : ntl::nt::RtlUpcaseUnicodeChar(c)) : c;
   }
 
   _NTL_LOC_VIRTUAL const char_type* do_toupper(char_type* low, const char_type* high) const
@@ -690,7 +692,7 @@ protected:
 
   _NTL_LOC_VIRTUAL char_type do_tolower(char_type c) const
   {
-    return is(c, upper) ? ntl::nt::RtlDowncaseUnicodeChar(c) : c;
+    return is(upper, c) ? (c < 128 ? c + 'a'-'A' : ntl::nt::RtlDowncaseUnicodeChar(c)) : c;
   }
 
   _NTL_LOC_VIRTUAL const char_type* do_tolower(char_type* low, const char_type* high) const
@@ -700,7 +702,10 @@ protected:
     return high;
   }
 
-  _NTL_LOC_VIRTUAL char_type do_widen(char c) const { return static_cast<unsigned char>(c) < 128 ? c : ntl::nt::RtlAnsiCharToUnicodeChar(c); }
+  _NTL_LOC_VIRTUAL char_type do_widen(char c) const
+  {
+    return static_cast<unsigned char>(c) < 128 ? c : ntl::nt::widen(c);
+  }
 
   _NTL_LOC_VIRTUAL const char* do_widen(const char* low, const char* high, char_type* to) const
   {
@@ -712,7 +717,7 @@ protected:
   _NTL_LOC_VIRTUAL char do_narrow(char_type c, char dfault) const
   {
     char nc;
-    return wcstombs(&nc, &c, 1) == 0 ? dfault : nc;
+    return c < 128 ? static_cast<char>(c) : ntl::nt::success(ntl::nt::RtlUnicodeToMultiByteN(&nc, 1, nullptr, &c, 1)) ? nc : dfault;
   }
 
   _NTL_LOC_VIRTUAL const char_type* do_narrow(const char_type* low, const char_type* high, char dfault, char* to) const
@@ -1095,11 +1100,11 @@ class num_put : public locale::facet
     {
       return put_int(out, str, fill, v, false);
     }
-    virtual iter_type do_put(iter_type out, ios_base& str, char_type fill, double v) const
+    virtual iter_type do_put(iter_type out, ios_base&, char_type, double) const
     {
       return out;
     }
-    virtual iter_type do_put(iter_type out, ios_base& str, char_type fill, long double v) const
+    virtual iter_type do_put(iter_type out, ios_base&, char_type, long double) const
     {
       return out;
     }

@@ -74,6 +74,85 @@ struct char_traits<char>
   static int_type eof() { return EOF; }
 };
 
+/// 21.1.3.2 struct char_traits<char16_t> [char.traits.specializations.char16_t]
+template<>
+struct char_traits<char16_t>
+{
+  typedef char16_t        char_type;
+  typedef uint_least16_t  int_type;
+  typedef streamoff       off_type;
+  typedef u16streampos    pos_type;
+  typedef mbstate_t       state_type;
+
+  static void assign(char_type& c1, const char_type& c2) { c1 = c2; }
+  static bool eq(const char_type& c1, const char_type& c2) { return c1 == c2; }
+  static bool lt(const char_type& c1, const char_type& c2) { return c1 < c2; }
+
+  static int compare(const char_type* s1, const char_type* s2, size_t n)
+  { return wcsncmp(reinterpret_cast<const wchar_t*>(s1), reinterpret_cast<const wchar_t*>(s2), n); }
+  static size_t length(const char_type* s) { return wcslen(reinterpret_cast<const wchar_t*>(s)); }
+  static const char_type* find(const char_type* s, size_t n, const char_type& a)
+  { while ( n-- ) if ( a != *s ) ++s; else return s; return 0; }
+  static char_type* move(char_type* dst, const char_type* src, size_t n)
+  { return reinterpret_cast<char_type*>(memmove(dst, src, n)); }
+  static char_type* copy(char_type* dst, const char_type* src, size_t n)
+  { return reinterpret_cast<char_type*>(memcpy(dst, src, n)); }
+  static char_type* assign(char_type* s, size_t n, char_type a)
+  { for ( char_type * p = s; n; --n, ++p ) *p = a; return s; }
+
+  static int_type not_eof(const int_type& c) { return eof() != c ? c : 0; }
+  static char_type to_char_type(const int_type& c)
+  { return static_cast<char_type>(static_cast<unsigned char>(c)); }
+  static int_type to_int_type(const char_type& c)
+  { return static_cast<unsigned char>(c); }
+  static bool eq_int_type(const int_type& c1, const int_type& c2)
+  { return c1 == c2; }
+  static int_type eof() { return static_cast<int_type>(EOF); }
+};
+
+
+/// 21.1.3.3 struct char_traits<char32_t> [char.traits.specializations.char16_t]
+template<>
+struct char_traits<char32_t>
+{
+  typedef char32_t        char_type;
+  typedef uint_least32_t  int_type;
+  typedef streamoff       off_type;
+  typedef u32streampos    pos_type;
+  typedef mbstate_t       state_type;
+
+  static void assign(char_type& c1, const char_type& c2) { c1 = c2; }
+  static bool eq(const char_type& c1, const char_type& c2) { return c1 == c2; }
+  static bool lt(const char_type& c1, const char_type& c2) { return c1 < c2; }
+
+  static int compare(const char_type* s1, const char_type* s2, size_t n)
+  { return memcmp(s1, s2, n*sizeof(char_type)); }
+  static size_t length(const char_type* s)
+  {
+    size_t n = 0;
+    while(*s++)
+      n++;
+    return n;
+  }
+  static const char_type* find(const char_type* s, size_t n, const char_type& a)
+  { while ( n-- ) if ( a != *s ) ++s; else return s; return 0; }
+  static char_type* move(char_type* dst, const char_type* src, size_t n)
+  { return reinterpret_cast<char_type*>(memmove(dst, src, n)); }
+  static char_type* copy(char_type* dst, const char_type* src, size_t n)
+  { return reinterpret_cast<char_type*>(memcpy(dst, src, n)); }
+  static char_type* assign(char_type* s, size_t n, char_type a)
+  { for ( char_type * p = s; n; --n, ++p ) *p = a; return s; }
+
+  static int_type not_eof(const int_type& c) { return eof() != c ? c : 0; }
+  static char_type to_char_type(const int_type& c)
+  { return static_cast<char_type>(static_cast<unsigned char>(c)); }
+  static int_type to_int_type(const char_type& c)
+  { return static_cast<unsigned char>(c); }
+  static bool eq_int_type(const int_type& c1, const int_type& c2)
+  { return c1 == c2; }
+  static int_type eof() { return static_cast<int_type>(EOF); }
+};
+
 /// 21.1.3.4 struct char_traits<wchar_t> [char.traits.specializations.wchar.t]
 template<>
 struct char_traits<wchar_t>

@@ -195,7 +195,7 @@ class basic_streambuf
     {
       const int_type ic = traits_type::to_int_type(c);
       const streamsize wavail = pend - pnext;
-      return !(0 < wavail) ? overflow(ic) : *pnext++ = traits_type::to_char_type(ic), ic;
+      return !(0 < wavail) ? overflow(ic) : *pnext++ = c /*traits_type::to_char_type(ic)*/, ic;
     }
 
     streamsize sputn(const char_type* s, streamsize n)
@@ -235,12 +235,10 @@ class basic_streambuf
     // 27.5.2.4 basic_streambuf virtual functions [streambuf.virtuals]
 
     ///\name  27.5.2.4.1 Locales [streambuf.virt.locales]
-  #if STLX__CONFORMING_LOCALE
     virtual void imbue(const locale&)
     {
       // Default behavior: Does nothing.
     }
-  #endif
 
     ///\name  27.5.2.4.2 Buffer management and positioning [streambuf.virt.buffer]
 

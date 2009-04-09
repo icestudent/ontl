@@ -493,7 +493,7 @@ namespace std
         pos_type slashpos = path_.rfind(slash<path_type>::value);
         if(slashpos == npos) // path is filename
           return 0;
-        else if(slashpos == path_.size()-1)  // path ends with slash
+        else if(slashpos == static_cast<pos_type>(path_.size()-1))  // path ends with slash
           return npos;
         return slashpos + 1;
       }
@@ -720,7 +720,7 @@ namespace std
 
           }
         }
-        if(pos == path->size())
+        if(pos == static_cast<pos_type>(path->size()))
           element = end;
         return *this;
       }

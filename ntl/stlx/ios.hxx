@@ -392,10 +392,13 @@ class basic_ios : public ios_base
       if(this != &x){
         prec = x.prec;
         wide = x.wide;
-        fmtl = x.fmtl;
+        fmtfl = x.fmtfl;
         fillc = x.fillc;
-        loc = x.loc;
         tiestr = x.tiestr;
+
+      #if STLX__CONFORMING_LOCALE
+        loc = x.loc;
+      #endif
 
         /*
         If any newly stored pointer values in *this point at objects stored outside the object rhs, and

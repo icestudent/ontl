@@ -150,7 +150,7 @@ template <std::size_t Len, class... Types> struct aligned_union;
 
 template <class T> struct decay;
 
-template <bool, class T> struct enable_if {};
+template <bool Condition, class T> struct enable_if {};
 template <class T> struct enable_if<true, T> { typedef T type; };
 
 template <bool, class IfTrueType, class IfFalseType> struct conditional;

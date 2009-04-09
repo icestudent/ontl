@@ -18,6 +18,10 @@
 
 #include "../memory"
 
+#pragma warning(push)
+#pragma warning(disable:4201) // nameless union
+#pragma warning(disable:4510 4512 4610) // ctor/operator could not be generated
+
 namespace ntl { namespace km { 
 
 #ifdef SYSTEM_ERROR_SUPPORT
@@ -821,5 +825,7 @@ namespace ntl { namespace km {
 #endif // NTL_TEST
 
 }} // ntl::km
+
+#pragma warning(pop)
 
 #endif//#ifndef NTL__KM_FLTMGR

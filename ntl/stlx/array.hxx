@@ -19,8 +19,22 @@ namespace std {
 /**\addtogroup  lib_sequence *********** 23.2 Sequence containers [sequences] *******************
  *@{*/
 
-/// Class template array [6.2.2 tr.array.array]
-///@note  No explicit construct/copy/destroy for aggregate type
+  /**
+   *	@brief 23.2.1 Class template array [%array]
+   *
+   *  The header <array> defines a class template for storing fixed-size sequences of objects. An array supports
+   *  random access iterators. An instance of <tt>array<T, N></tt> stores \e N elements of type \e T, 
+   *  so that <tt>size() == N</tt> is an invariant.
+   *  The elements of an array are stored contiguously, meaning that if \c a is an <tt>array<T, N></tt> then
+   *  it obeys the %identity <tt>&a[n] == &a[0] + n</tt> for all <tt>0 <= n < N</tt>.
+   *
+   *  An array is an aggregate (8.5.1) that can be initialized with the syntax: <tt>array a<T, N> = { initializer-list };</tt>
+   *  where <i>initializer-list</i> is a comma separated %list of up to \e N elements whose types are convertible to \e T.
+   *
+   *  Unless otherwise specified, all array operations are as described in 23.1. Descriptions are provided here only
+   *  for operations on array that are not described in that Clause or for operations where there is additional
+   *  semantic information.
+   **/
 template <class T, size_t N>
 struct array
 {
@@ -36,9 +50,12 @@ struct array
     typedef std::reverse_iterator<iterator>       reverse_iterator;
     typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
 
-    void assign(const T& u) { *this = u; }
+    void fill(const T& u) 
+    {
+      fill_n(begin(), N, u);
+    }
 
-    void swap( array<T, N> & y)
+    void swap(array<T, N> & y)
     {
       //swap_ranges(x.begin(), x.end(), y.begin() );
       for ( size_t i = 0; i != size(); ++i )
@@ -68,7 +85,7 @@ struct array
 
     size_type size() const      { return N; }
     size_type max_size() const  { return N; }
-    bool empty() const          { return 0 != N; }
+    bool empty() const          { return N != 0; }
 
     ///\name  element access
 
@@ -89,8 +106,8 @@ struct array
 
     reference       front()       { return *begin(); }
     const_reference front() const { return *begin(); }
-    reference       back()        { return *(--end()); }
-    const_reference back()  const { return *(--end()); }
+    reference       back()        { return __elems[N-1]; }
+    const_reference back()  const { return __elems[N-1]; }
 
           T * data()        { return __elems; }
     const T * data() const  { return __elems; }

@@ -263,13 +263,6 @@ public:
     //}
 #endif
 
-    template <class InputIterator>
-    __forceinline
-    void insert(InputIterator first, InputIterator last)
-    {
-      insert_range(first, last);
-    }
-
     __forceinline
     void insert(initializer_list<value_type> il)
     {

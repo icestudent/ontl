@@ -10,7 +10,6 @@
 
 #include "cstddef"
 #include "cstdint"
-//#include "vector"
 
 // std::vector forward declaration
 namespace std {

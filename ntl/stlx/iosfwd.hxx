@@ -127,8 +127,10 @@ typedef basic_fstream<wchar_t>        wfstream;
 ///   file position information.
 template <class state> class fpos;
 
-///\name  These types are used for positioning streams specialized on char and wchar_t respectively. (9)
+///\name  These types are used for positioning streams specialized on char, char16_t, char32_t and wchar_t respectively. (9)
 typedef fpos<mbstate_t/*char_traits<char>::state_type*/>     streampos;
+typedef fpos<mbstate_t/*char_traits<char16_t>::state_type*/> u16streampos;
+typedef fpos<mbstate_t/*char_traits<char32_t>::state_type*/> u32streampos;
 typedef fpos<mbstate_t/*char_traits<wchar_t>::state_type*/>  wstreampos;
 
 ///@}

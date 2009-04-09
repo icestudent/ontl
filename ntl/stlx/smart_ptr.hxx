@@ -164,7 +164,7 @@ namespace std
     operator __::explicit_bool_type() const __ntl_nothrow { return __::explicit_bool(ptr); }
 
     ///\name 20.7.11.2.5 unique_ptr modifiers [unique.ptr.single.modifiers]
-    pointer release()
+    pointer release() const
     {
       pointer tmp = nullptr;
       std::swap(ptr, tmp);
@@ -180,7 +180,7 @@ namespace std
 
     void swap(unique_ptr& u) __ntl_nothrow
     {
-      std::swap(ptr, u.shared);
+      std::swap(ptr, u.ptr);
       std::swap(deleter, u.deleter);
     }
 
