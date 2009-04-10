@@ -378,12 +378,9 @@ namespace __
     {
       const typename traits::int_type eof = traits::eof();
       basic_streambuf<charT,traits>* buf = os.rdbuf();
-      const char* p = reinterpret_cast<const char*>(data);
-      while(length){
-        if(traits::eq_int_type(buf->sputc(os.widen(*p++)), eof))
-          break;
-        length--;
-      }
+      for(const char* p = reinterpret_cast<const char*>(data); 
+        length && !traits::eq_int_type(buf->sputc(os.widen(*p++)), eof); 
+        length--);
       if(length)
         os.setstate(ios_base::failbit);
     }
@@ -391,12 +388,9 @@ namespace __
     {
       const typename traits::int_type eof = traits::eof();
       const typename stream_t::char_type fillc = os.fill();
-      basic_streambuf<charT,traits>* buf = os.rdbuf();
-      while(length){
-        if(traits::eq_int_type(buf->sputc(fillc), eof))
-          break;
-        length--;
-      }
+      for(basic_streambuf<charT,traits>* buf = os.rdbuf();
+        length && !traits::eq_int_type(buf->sputc(fillc), eof);
+        length--);
       if(length)
         os.setstate(ios_base::failbit);
     }
