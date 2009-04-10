@@ -22,7 +22,7 @@ namespace std {
   /**
    *	@brief 23.2.1 Class template array [%array]
    *
-   *  The header <array> defines a class template for storing fixed-size sequences of objects. An array supports
+   *  The header \<array\> defines a class template for storing fixed-size sequences of objects. An array supports
    *  random access iterators. An instance of <tt>array<T, N></tt> stores \e N elements of type \e T, 
    *  so that <tt>size() == N</tt> is an invariant.
    *  The elements of an array are stored contiguously, meaning that if \c a is an <tt>array<T, N></tt> then

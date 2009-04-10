@@ -275,7 +275,7 @@ class ctype_base
 
 /**
  *	@brief 22.2.1.1 Class template ctype [locale.ctype]
- *  @details Class ctype encapsulates the C library \c <cctype> features. istream members are required to use ctype<>
+ *  @details Class ctype encapsulates the C library \c \<cctype\> features. istream members are required to use ctype<>
  *  for character classing during input parsing.
  **/
 template <class charT>
@@ -783,7 +783,7 @@ class codecvt : public locale::facet, public codecvt_base
     /**
      *	Translates characters in the source range [from,from_end), placing the results in sequential
      *  positions starting at destination \a to. Converts no more than (<tt>from_end-from</tt>) source elements, and
-     *  stores no more than (<tt>to_limit-to<tt>) destination elements.
+     *  stores no more than (<tt>to_limit-to</tt>) destination elements.
      **/
     result out(      stateT &   state,
                const internT *  from,

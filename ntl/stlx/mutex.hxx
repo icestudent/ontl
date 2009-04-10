@@ -24,7 +24,7 @@ namespace std
    *	@defgroup thread_mutex 30.3 Mutual exclusion [thread.mutex]
    *
    *  A mutex object facilitates protection against data races and allows thread-safe synchronization of data
-   *  between threads. A %thread \i owns a mutex from the time it successfully calls one of the lock functions until
+   *  between threads. A %thread \e owns a mutex from the time it successfully calls one of the lock functions until
    *  it calls unlock. Mutexes may be either recursive or non-recursive, and may grant simultaneous ownership
    *  to one or many threads. The mutex types supplied by the standard library provide exclusive ownership
    *  semantics: only one %thread may own the mutex at a time. Both recursive and non-recursive mutexes are
@@ -207,7 +207,7 @@ namespace std
       m.lock();
     }
 
-    /** Takes the mutex \m without locking it */
+    /** Takes the mutex \e m without locking it */
     lock_guard(mutex_type& m, adopt_lock_t) __ntl_nothrow
       :m(m)
     {}
