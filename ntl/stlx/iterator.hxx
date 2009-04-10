@@ -242,7 +242,7 @@ class reverse_iterator
       return reverse_iterator( current - n );
     }
 
-    reverse_iterator operator+=(difference_type n)
+    reverse_iterator& operator+=(difference_type n)
     {
       current -= n;
       return *this;
@@ -253,7 +253,7 @@ class reverse_iterator
       return reverse_iterator( current + n );
     }
 
-    reverse_iterator operator-=(difference_type n)
+    reverse_iterator& operator-=(difference_type n)
     {
       current += n;
       return *this;
