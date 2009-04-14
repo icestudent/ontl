@@ -21,12 +21,19 @@
 #define WCHAR_MAX   0xffff
 #endif
 
+/** an object type other than an array type that can hold the conversion state
+  information necessary to convert between sequences of multibyte characters and wide
+  characters */
 typedef int mbstate_t;
 
+/** an integer type unchanged by default argument promotions that can hold any
+  value corresponding to members of the extended character set, as well as at least one
+  value that does not correspond to any member of the extended character set */
 typedef unsigned short wint_t;
 
 #ifndef WEOF
-#define WEOF ((wint_t)0xFFFF)
+  // expands to a constant expression of type wint_t whose value does not correspond to any member of the extended character set.
+# define WEOF ((wint_t)0xFFFF)
 #endif
 
 namespace std {
@@ -167,9 +174,13 @@ wchar_t* NTL__CRTCALL wmemset(wchar_t*s, wchar_t c, size_t n)
 }
 
 ///\name Wide character time conversion functions
+
+///\name Multibyte/wide string conversion functions
+
 NTL__EXTERNAPI size_t NTL__CRTIMP mbstowcs(wchar_t* __restrict wcstr, const char* __restrict mbstr, size_t count);
 
 NTL__EXTERNAPI size_t NTL__CRTIMP wcstombs(char* __restrict mbstr, const wchar_t* __restrict wcstr, size_t count);
+
 ///\}
 
 /**@} lib_c_strings_cwchar */

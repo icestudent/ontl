@@ -178,14 +178,10 @@ NTL__CRTCALL
   mblen(const char *s, size_t n);
 
 /// 7.20.7.2 The mbtowc function
-int
-NTL__CRTCALL
-  mbtowc(wchar_t * __restrict pwc, const char * __restrict s, size_t n);
+NTL__EXTERNAPI int NTL__CRTIMP mbtowc(wchar_t * __restrict pwc, const char * __restrict s, size_t n);
 
 /// 7.20.7.3 The wctomb function
-int
-NTL__CRTCALL
-  wctomb(char *s, wchar_t wc);
+NTL__EXTERNAPI int NTL__CRTIMP wctomb(char *s, wchar_t wc);
 
 #endif// #ifndef _INC_STDLIB
 

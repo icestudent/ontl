@@ -133,79 +133,218 @@ template <class Facet> bool has_facet(const locale&) __ntl_nothrow;
 
 ///\name 22.1.3.1 Character classification [classification]
 
+/** Returns true if character is a space */
 template <class charT> bool isspace(charT c, const locale& loc)
 {
   return use_facet<ctype<charT> >(loc).is(ctype_base::space, c);
 }
 
+/** Returns true if character is printable */
 template <class charT> bool isprint(charT c, const locale& loc)
 {
   return use_facet<ctype<charT> >(loc).is(ctype_base::print, c);
 }
 
+/** Returns true if character is control */
 template <class charT> bool iscntrl(charT c, const locale& loc)
 {
   return use_facet<ctype<charT> >(loc).is(ctype_base::cntrl, c);
 }
 
+/** Returns true if character is an upper */
 template <class charT> bool isupper(charT c, const locale& loc)
 {
   return use_facet<ctype<charT> >(loc).is(ctype_base::upper, c);
 }
 
+/** Returns true if character is a lower */
 template <class charT> bool islower(charT c, const locale& loc)
 {
   return use_facet<ctype<charT> >(loc).is(ctype_base::lower, c);
 }
 
+/** Returns true if character is a letter */
 template <class charT> bool isalpha(charT c, const locale& loc)
 {
   return use_facet<ctype<charT> >(loc).is(ctype_base::alpha, c);
 }
 
+/** Returns true if character is a digit */
 template <class charT> bool isdigit(charT c, const locale& loc)
 {
   return use_facet<ctype<charT> >(loc).is(ctype_base::digit, c);
 }
 
+/** Returns true if character is punctuation character */
 template <class charT> bool ispunct(charT c, const locale& loc)
 {
   return use_facet<ctype<charT> >(loc).is(ctype_base::punct, c);
 }
 
+/** Returns true if character is hexadecimal digit */
 template <class charT> bool isxdigit(charT c, const locale& loc)
 {
   return use_facet<ctype<charT> >(loc).is(ctype_base::xdigit, c);
 }
 
+/** Returns true if character is alphanumeric */
 template <class charT> bool isalnum(charT c, const locale& loc)
 {
   return use_facet<ctype<charT> >(loc).is(ctype_base::alnum, c);
 }
 
+/** Returns true if character is a graphic character, excluding space */
 template <class charT> bool isgraph(charT c, const locale& loc)
 {
   return use_facet<ctype<charT> >(loc).is(ctype_base::graph, c);
 }
 ///\}
 
-///\name 22.1.3.2 Character conversions [conversions]
+/**\defgroup lib_conversions 22.1.3.2 Conversions [conversions]
+ *@{*/
 
+///\name 22.1.3.21 Character conversions [conversions.character]
+
+/** Converts a character to upper case */
 template <class charT>
-charT
-  toupper(charT c, const locale& loc)
+inline charT toupper(charT c, const locale& loc)
 {
   return use_facet<ctype<charT> >(loc).toupper(c);
 }
 
+/** Converts a character to lower case */
 template <class charT>
-charT
-  tolower(charT c, const locale& loc)
+inline charT tolower(charT c, const locale& loc)
 {
   return use_facet<ctype<charT> >(loc).tolower(c);
 }
-///\}
 
+///\name 22.1.3.2.2 string conversions [conversions.string]
+
+/**
+ *	@brief Class template wstring_convert
+ *
+ *  Class template wstring_convert performs conversions between a wide %string and a byte %string. It lets you
+ *  specify a code conversion facet (like class template codecvt) to perform the conversions, without affecting
+ *  any streams or locales.
+ *
+ *  The class template describes an object that controls conversions between wide %string objects of class
+ *  <tt>std::basic_string<Elem></tt> and byte %string objects of class <tt>std::basic_string<char></tt> (also known as
+ *  std::string). The class template defines the types \c wide_string and \c byte_string as synonyms for these
+ *  two types. Conversion between a sequence of \e Elem values (stored in a \c wide_string object) and multi-byte sequences 
+ *  (stored in a \c byte_string object) is performed by an object of class <tt>Codecvt<Elem, char, std::mbstate_t></tt>, 
+ *  which meets the requirements of the standard code-conversion facet <tt>std::codecvt<Elem, char, std::mbstate_t></tt>.
+ *  @sa codecvt
+ **/
+template<class Codecvt, class Elem = wchar_t>
+class wstring_convert
+{
+public:
+  typedef basic_string<char>                          byte_string;
+  typedef basic_string<Elem>                          wide_string;
+  typedef typename Codecvt::state_type                state_type;
+  typedef typename wide_string::traits_type::int_type int_type;
+
+  wstring_convert(Codecvt *pcvt = new Codecvt)
+    :cvptr(pcvt), cvtstate()
+  {}
+  wstring_convert(Codecvt *pcvt, state_type state)
+    :cvptr(pcvt), cvtstate(state)
+  {}
+  wstring_convert(const byte_string& byte_err, const wide_string& wide_err = wide_string())
+    :cvtptr(new Codecvt), cvtstate(), serr(byte_err), werr(wide_err)
+  {}
+  ~wstring_convert()
+  {
+    delete cvptr;
+  }
+
+  /** convert the single-element sequence byte to a wide %string */
+  wide_string from_bytes(char byte) __ntl_throws(range_error);
+  /** convert the null-terminated sequence beginning at \e ptr to a wide %string. */
+  wide_string from_bytes(const char *ptr) __ntl_throws(range_error);
+  /** convert the sequence stored in \e str to a wide %string */
+  wide_string from_bytes(const byte_string& str) __ntl_throws(range_error);
+  /** convert the sequence defined by the range <tt>[first,last)</tt> to a wide %string */
+  wide_string from_bytes(const char *first, const char *last) __ntl_throws(range_error);
+
+  /** convert the single-element sequence \e wchar to a byte %string */
+  byte_string to_bytes(Elem wchar);
+  /** convert the null-terminated sequence beginning at \e wptr to a byte %string */
+  byte_string to_bytes(const Elem *wptr);
+  /** convert the sequence stored in \e wstr to a byte %string */
+  byte_string to_bytes(const wide_string& wstr);
+  /** convert the sequence defined by the range <tt>[first,last)</tt> to a byte %string */
+  byte_string to_bytes(const Elem *first, const Elem *last);
+
+  size_t converted() const { return cvtcount; }
+  state_type state() const { return cvtstate; }
+
+private:
+  // a byte string to display on errors
+  byte_string serr;
+  // a wide string to display on errors
+  wide_string werr;
+  // a pointer to the allocated conversion object
+  Codecvt *cvtptr;
+  // a conversion state object
+  state_type cvtstate;
+  // a conversion count
+  size_t cvtcount;
+};
+
+
+///\name 22.1.3.2.3 Buffer conversions [conversions.buffer]
+
+/**
+ *	@brief Class template wbuffer_convert
+ *
+ *  Class template wbuffer_convert looks like a wide stream buffer, but performs all its I/O through an
+ *  underlying byte stream buffer that you specify when you construct it. Like class template wstring_convert,
+ *  it lets you specify a code conversion facet to perform the conversions, without affecting any streams or locales.
+ *
+ *  The class template describes a stream buffer that controls the transmission of elements of type \e Elem, whose
+ *  character traits are described by the class \e Tr, to and from a byte stream buffer of type \c streambuf.
+ *  Conversion between a sequence of \e Elem values and multibyte sequences is performed by an object of
+ *  class <tt>Codecvt<Elem, char, std::mbstate_t></tt>, which shall meet the requirements of the standard code-conversion
+ *  facet <tt>std::codecvt<Elem, char, std::mbstate_t></tt>.
+ *  @sa codecvt
+ **/
+template<class Codecvt, class Elem = wchar_t, class Tr = char_traits<Elem> >
+class wbuffer_convert
+  :public basic_streambuf<Elem, Tr>
+{
+public:
+  typedef typename Tr::state_type state_type;
+
+  wbuffer_convert(std::streambuf *bytebuf = 0, Codecvt *pcvt = new Codecvt, state_type state = state_type())
+    :buf(bytebuf), cvtptr(pcvt), cvtstate(state)
+  {}
+
+  ~wbuffer_convert()
+  {
+    delete cvtptr;
+  }
+
+  std::streambuf *rdbuf() const { return buf; }
+  std::streambuf *rdbuf(streambuf *bytebuf)
+  {
+    std::swap(buf, bytebuf);
+    return bytebuf;
+  }
+
+  state_type state() const { return cvtstate; }
+private:
+  // a pointer to its underlying byte stream buffer
+  streambuf *buf;
+  // a pointer to the allocated conversion object
+  Codecvt *cvtptr;
+  // a conversion state object
+  state_type cvtstate;
+};
+
+///\}
+/** @} lib_conversions */
 /** @} lib_locales */
 
 /** \addtogroup lib_locale_categories   22.2 Standard locale categories [locale.categories]
@@ -767,11 +906,11 @@ public:
  *  @tparam stateT The stateT argument selects the %pair of codesets being mapped between.
  **/
 template <class internT, class externT, class stateT>
-class codecvt : public locale::facet, public codecvt_base
+class codecvt:
+  public locale::facet,
+  public codecvt_base
 {
-  ///////////////////////////////////////////////////////////////////////////
   public:
-
     typedef internT intern_type;
     typedef externT extern_type;
     typedef stateT  state_type;
@@ -791,7 +930,10 @@ class codecvt : public locale::facet, public codecvt_base
                const internT *& from_next,
                      externT *  to,
                      externT *  to_limit,
-                     externT *& to_next) const;
+                     externT *& to_next) const
+    {
+      return do_out(state,from,from_end,from_next,to,to_limit,to_next);
+    }
 
     /**
      *	Places characters starting at \a to that should be appended to terminate a sequence when the
@@ -802,7 +944,10 @@ class codecvt : public locale::facet, public codecvt_base
     result unshift(stateT &   state,
                    externT *  to,
                    externT *  to_limit,
-                   externT *& to_next) const;
+                   externT *& to_next) const
+    {
+      return do_unshift(state,to,to_limit,to_next);
+    }
 
     /**
      *	Translates characters in the source range [from,from_end), placing the results in sequential
@@ -815,7 +960,10 @@ class codecvt : public locale::facet, public codecvt_base
               const externT *& from_next,
                     internT *  to,
                     internT *  to_limit,
-                    internT *& to_next) const;
+                    internT *& to_next) const
+    {
+      return do_in(state,from,from_end,from_next,to,to_limit,to_next);
+    }
 
     /** Returns -1 if the encoding of the \a externT sequence is state-dependent; else the constant number of
       \a externT characters needed to produce an internal character; or 0 if this number is not a constant */
@@ -826,7 +974,7 @@ class codecvt : public locale::facet, public codecvt_base
 
     /** The effect on the \a state argument is "as if" it called 
         <tt>do_in(state, from, from_end, from, to, to+max, to)</tt> for \a to pointing to a buffer of at least \a max elements. */
-    int length(stateT &, const externT* from, const externT* end, size_t max) const { return do_length(); }
+    int length(stateT& state, const externT* from, const externT* end, size_t max) const { return do_length(state, from, end, max); }
 
     /** Returns the maximum value that <tt>do_length(state, from, from_end, 1)</tt> 
       can return for any valid range <tt>[from, from_end)</tt> and \c stateT value \a state. */
@@ -839,21 +987,21 @@ class codecvt : public locale::facet, public codecvt_base
     ~codecvt()
     {}
 
-    virtual result do_out(state_type& state, const intern_type* from, const intern_type* from_end,
+    _NTL_LOC_VIRTUAL result do_out(state_type& state, const intern_type* from, const intern_type* from_end,
       const intern_type*& from_next, extern_type* to, extern_type* to_limit, extern_type*& to_next) const;
 
-    virtual result do_in(state_type& state, const extern_type* from, const extern_type* from_end,
+    _NTL_LOC_VIRTUAL result do_in(state_type& state, const extern_type* from, const extern_type* from_end,
       const extern_type*& from_next, intern_type* to, intern_type* to_limit, intern_type*& to_next) const;
 
-    virtual result do_unshift(state_type& state, extern_type* to, extern_type* to_limit, extern_type*& to_next) const;
+    _NTL_LOC_VIRTUAL result do_unshift(state_type& state, extern_type* to, extern_type* to_limit, extern_type*& to_next) const;
 
-    virtual int do_encoding() const __ntl_nothrow;
+    _NTL_LOC_VIRTUAL int do_encoding() const __ntl_nothrow;
 
-    virtual bool do_always_noconv() const __ntl_nothrow;
+    _NTL_LOC_VIRTUAL bool do_always_noconv() const __ntl_nothrow;
 
-    virtual int do_length(state_type&, const extern_type* from, const extern_type* end, size_t max) const;
+    _NTL_LOC_VIRTUAL int do_length(state_type&, const extern_type* from, const extern_type* end, size_t max) const;
 
-    virtual int do_max_length() const __ntl_nothrow;
+    _NTL_LOC_VIRTUAL int do_max_length() const __ntl_nothrow;
 
 };// codecvt
 
@@ -870,7 +1018,7 @@ class codecvt_byname : public codecvt<internT, externT, stateT>
 
     ~codecvt_byname(); // virtual
 
-    virtual result do_out(stateT& state,
+    _NTL_LOC_VIRTUAL result do_out(stateT& state,
                           const internT* from,
                           const internT* from_end,
                           const internT*& from_next,
@@ -878,20 +1026,224 @@ class codecvt_byname : public codecvt<internT, externT, stateT>
                           externT* to_limit,
                           externT*& to_next) const;
 
-    virtual result do_in(stateT& state, const externT* from, const externT* from_end,
+    _NTL_LOC_VIRTUAL result do_in(stateT& state, const externT* from, const externT* from_end,
       const externT*& from_next, internT* to, internT* to_limit, internT*& to_next) const;
 
-    virtual int do_encoding() const __ntl_nothrow;
+    _NTL_LOC_VIRTUAL int do_encoding() const __ntl_nothrow;
 
-    virtual bool do_always_noconv() const __ntl_nothrow;
+    _NTL_LOC_VIRTUAL bool do_always_noconv() const __ntl_nothrow;
 
-    virtual int do_length(stateT&, const externT* from, const externT* end, size_t max) const;
+    _NTL_LOC_VIRTUAL int do_length(stateT&, const externT* from, const externT* end, size_t max) const;
 
-    virtual result do_unshift(stateT& state, externT* to, externT* to_limit, externT*& to_next) const;
+    _NTL_LOC_VIRTUAL result do_unshift(stateT& state, externT* to, externT* to_limit, externT*& to_next) const;
 
-    virtual int do_max_length() const __ntl_nothrow;
+    _NTL_LOC_VIRTUAL int do_max_length() const __ntl_nothrow;
 
 };
+
+///\name codecvt specializations
+
+/**
+ *	@brief codecvt<char, char, mbstate_t> implements a degenerate conversion; it does not convert at all.
+ *  @sa codecvt
+ **/
+template<>
+class codecvt<char,char,mbstate_t>:
+  public locale::facet,
+  public codecvt_base
+{
+public:
+  typedef char      intern_type;
+  typedef char      extern_type;
+  typedef mbstate_t state_type;
+
+  explicit codecvt(size_t refs = 0)
+    :facet(refs)
+  {}
+
+
+  result out(state_type&, const intern_type* from, const intern_type* /*from_end*/, const intern_type*& from_next, extern_type* to, extern_type* /*to_limit*/, extern_type*& to_next) const
+  {
+    from_next = from,
+      to_next = to;
+    return noconv;
+  }
+
+  result unshift(state_type&, extern_type* to, extern_type* /*to_limit*/, extern_type*& to_next) const
+  {
+    to_next = to;
+    return noconv;
+  }
+
+  result in(state_type&, const extern_type* from, const extern_type* /*from_end*/, const extern_type*& from_next, intern_type* to, intern_type* /*to_limit*/, intern_type*& to_next) const
+  {
+    from_next = from,
+      to_next = to;
+    return noconv;
+  }
+
+  /** @return the constant number of externT characters needed to produce an internal character */
+  int encoding() const __ntl_nothrow { return 1; }
+
+  bool always_noconv() const __ntl_nothrow { return true; }
+
+  int length(state_type&, const extern_type* from, const extern_type* end, size_t max) const { return min(max, static_cast<size_t>(end - from)); }
+
+  int max_length() const __ntl_nothrow { return 1; }
+
+  static locale::id id;
+};
+
+
+/** The specialization codecvt<char16_t, char, mbstate_t> converts between the UTF-16 and UTF-8 encodings schemes */
+template<>
+class codecvt<char16_t,char,mbstate_t>:
+  public locale::facet,
+  public codecvt_base
+{
+
+};
+
+
+/** The specialization codecvt<char32_t, char, mbstate_t> converts between the UTF-32 and UTF-8 encodings schemes */
+template<>
+class codecvt<char32_t,char,mbstate_t>:
+  public locale::facet,
+  public codecvt_base
+{
+
+};
+
+
+/**
+ *	@brief codecvt<wchar_t,char,mbstate_t> converts between the native character sets for narrow and wide characters.
+ *  @sa codecvt
+ **/
+template<>
+class codecvt<wchar_t,char,mbstate_t>:
+  public locale::facet,
+  public codecvt_base
+{
+public:
+  typedef wchar_t   intern_type;
+  typedef char      extern_type;
+  typedef mbstate_t state_type;
+
+  explicit codecvt(size_t refs = 0)
+    :facet(refs)
+  {}
+
+  /** conversion from wide string to the multibyte string */
+  result out(state_type& state, const intern_type* from, const intern_type* from_end, const intern_type*& from_next, extern_type* to, extern_type* to_limit, extern_type*& to_next) const
+  {
+    return do_out(state,from,from_end,from_next,to,to_limit,to_next);
+  }
+
+  result unshift(state_type& state, extern_type* to, extern_type* to_limit, extern_type*& to_next) const
+  {
+    return do_unshift(state,to,to_limit,to_next);
+  }
+
+  /** conversion from multibyte string to the wide string */
+  result in(state_type& state, const extern_type* from, const extern_type* from_end, const extern_type*& from_next, intern_type* to, intern_type* to_limit, intern_type*& to_next) const
+  {
+    return do_in(state,from,from_end,from_next,to,to_limit,to_next);
+  }
+
+  /** @return the constant number of externT characters needed to produce an internal character */
+  int encoding() const __ntl_nothrow { return do_encoding(); }
+
+  bool always_noconv() const __ntl_nothrow { return do_always_noconv(); }
+
+  /** calculates length of the multibyte string */
+  int length(state_type& state, const extern_type* from, const extern_type* end, size_t max) const
+  {
+    return do_length(state, from, end, max);
+  }
+
+  int max_length() const __ntl_nothrow { return do_max_length(); }
+
+  static locale::id id;
+
+protected:
+  _NTL_LOC_VIRTUAL result do_out(state_type& /*state*/, const intern_type* from, const intern_type* from_end,
+    const intern_type*& from_next, extern_type* to, extern_type* to_limit, extern_type*& to_next) const
+  {
+    // wcstombs
+    result r = ok;
+    while(from < from_end && to < to_limit){
+      size_t c = wcstombs(to, from, 1);
+      if(c == static_cast<size_t>(-1)){
+        r = error;
+        break;
+      }else if(c == 0){
+        if(*from == 0)
+          *to = 0;
+        c = 1;
+      }
+      from++;
+      to += c;
+    }
+    from_next = from,
+      to_next = to;
+    if(r == ok && from < from_end)
+      r = partial;
+    return r;
+  }
+
+  _NTL_LOC_VIRTUAL result do_in(state_type& /*state*/, const extern_type* from, const extern_type* from_end,
+    const extern_type*& from_next, intern_type* to, intern_type* to_limit, intern_type*& to_next) const
+  {
+    // mbstowcs
+    result r = ok;
+    while(from < from_end && to < to_limit){
+      size_t c = mbstowcs(to, from, 1);
+      if(c == static_cast<size_t>(-1)){
+        r = error;
+        break;
+      }else if(c == 0){
+        if(*from == 0)
+          *to = 0;
+        c = 1;
+      }
+      from += c;
+      to++;
+    }
+    from_next = from,
+      to_next = to;
+    if(r == ok && from < from_end)
+      r = partial;
+    return r;
+  }
+
+  _NTL_LOC_VIRTUAL result do_unshift(state_type& /*state*/, extern_type* to, extern_type* /*to_limit*/, extern_type*& to_next) const
+  {
+    to_next = to;
+    return noconv;
+  }
+
+  _NTL_LOC_VIRTUAL int do_encoding() const __ntl_nothrow
+  {
+    return 1;
+  }
+
+  _NTL_LOC_VIRTUAL bool do_always_noconv() const __ntl_nothrow
+  {
+    return false;
+  }
+
+  _NTL_LOC_VIRTUAL int do_length(state_type&, const extern_type* from, const extern_type* end, size_t max) const
+  {
+    return min(max,static_cast<size_t>(end-from));
+  }
+
+  _NTL_LOC_VIRTUAL int do_max_length() const __ntl_nothrow
+  {
+    return 1;
+  }
+};
+
+///\}
 
 /** @} lib_locale_ctype */
 /** @} lib_locale_categories */

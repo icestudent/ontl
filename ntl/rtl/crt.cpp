@@ -15,7 +15,6 @@ sec(".CRT$XCZ") vfv_t* __xc_z[]= {0};
 #pragma endregion
 
 #include "../stlx/vector.hxx"
-#include "../stlx/ios.hxx"
 
 #ifdef NTL__SUBSYSTEM_KM
 # include "../km/new.hxx"
@@ -40,7 +39,8 @@ namespace
   vfv_t* onexit(vfv_t* func)
   {
     if(exit_list){
-      exit_list->push_back(func);
+      if(func)
+        exit_list->push_back(func);
       return func;
     }
     return 0;
@@ -67,6 +67,7 @@ namespace ntl
   {
     if(init){
       exit_list = new exit_funcs_t();
+      exit_list->reserve(__xc_z - __xc_a);
       initterm(__xc_a, __xc_z);
 
       __check_iostreams_stub();

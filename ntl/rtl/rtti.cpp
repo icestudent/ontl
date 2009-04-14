@@ -12,7 +12,7 @@
 
 #pragma region typeinfo::name implementation
 
-#define CRT_UNDNAME
+//#define CRT_UNDNAME
 
 #ifdef CRT_UNDNAME
 # include "../nt/new.hxx"

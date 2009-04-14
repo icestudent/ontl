@@ -29,6 +29,12 @@ namespace std
     little_endian = 1
   };
 
+
+  /**
+   *	@brief Class template codecvt_utf8
+   *  @details The facet shall convert between UTF-8 multibyte sequences and UCS2 or UCS4 (depending on the
+   *  size of \e Elem) within the program.
+   **/
   template<class Elem, unsigned long Maxcode = 0x10ffff, codecvt_mode Mode = (codecvt_mode)0>
   class codecvt_utf8
     : public codecvt<Elem, char, mbstate_t>
@@ -51,8 +57,13 @@ namespace std
     virtual int do_max_length() const __ntl_nothrow;
   };
 
-  template<class Elem, unsigned long Maxcode = 0x10ffff,
-    codecvt_mode Mode = (codecvt_mode)0>
+  
+  /**
+   *	@brief Class template codecvt_utf16
+   *  @details The facet shall convert between UTF-16 multibyte sequences and UCS2 or UCS4 (depending on the
+   *  size of \e Elem) within the program
+   **/
+  template<class Elem, unsigned long Maxcode = 0x10ffff, codecvt_mode Mode = (codecvt_mode)0>
   class codecvt_utf16
     : public codecvt<Elem, char, mbstate_t>
   {
@@ -74,8 +85,13 @@ namespace std
     virtual int do_max_length() const __ntl_nothrow;
   };
 
-  template<class Elem, unsigned long Maxcode = 0x10ffff,
-    codecvt_mode Mode = (codecvt_mode)0>
+
+  /**
+   *	@brief Class template codecvt_utf8_utf16
+   *  @details The facet shall convert between UTF-8 multibyte sequences and UTF-16 (one or two 16-bit codes)
+   *  within the program.
+   **/
+  template<class Elem, unsigned long Maxcode = 0x10ffff, codecvt_mode Mode = (codecvt_mode)0>
   class codecvt_utf8_utf16
     : public codecvt<Elem, char, mbstate_t>
   {

@@ -284,6 +284,15 @@ strlen(const char * const s)
 }
 #endif
 
+
+inline char* NTL__CRTCALL strdup(const char* s)
+{
+  if(!s)
+    return nullptr;
+  char* const p = new char[strlen(s)];
+  return p ? strcpy(p, s) : p;
+}
+
 /**@} lib_c_strings_cstring */
 /**@} lib_c_strings */
 /**@} lib_strings */
