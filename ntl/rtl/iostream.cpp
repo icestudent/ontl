@@ -83,6 +83,8 @@ static void destroy_iostream_objects()
   ostream*  noss[3] = {&cout,&clog,&cerr};
   wostream* woss[3] = {&wcout,&wclog,&wcerr};
 
+  std::allocator<buffer_n> na;
+  std::allocator<buffer_w> wa;
   for(unsigned i = 0; i < _countof(noss); i++){
     __ntl_try{
       noss[i]->flush();
@@ -92,8 +94,8 @@ static void destroy_iostream_objects()
       woss[i]->flush();
     }
     __ntl_catch(...){}
-    delete noss[i]->rdbuf(nullptr);
-    delete woss[i]->rdbuf(nullptr);
+    na.destroy( static_cast<buffer_n*>( noss[i]->rdbuf(nullptr) ) );
+    wa.destroy( static_cast<buffer_w*>( woss[i]->rdbuf(nullptr) ) );
   }
 }
 

@@ -277,7 +277,12 @@ namespace ntl {
   }//namespace nt
 }//namespace ntl
 
-#pragma comment(linker, "/alternatename:_abort=_debug_abort")
+#ifdef _M_X64
+# pragma comment(linker, "/alternatename:abort=debug_abort")
+#else
+# pragma comment(linker, "/alternatename:_abort=_debug_abort")
+#endif
+
 extern "C" inline void _cdecl debug_abort()
 {
   ntl::intrinsic::debugbreak();

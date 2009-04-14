@@ -1087,7 +1087,7 @@ public:
 
   bool always_noconv() const __ntl_nothrow { return true; }
 
-  int length(state_type&, const extern_type* from, const extern_type* end, size_t max) const { return min(max, static_cast<size_t>(end - from)); }
+  int length(state_type&, const extern_type* from, const extern_type* end, size_t max) const { return static_cast<int>(min(max, static_cast<size_t>(end - from))); }
 
   int max_length() const __ntl_nothrow { return 1; }
 
@@ -1234,7 +1234,7 @@ protected:
 
   _NTL_LOC_VIRTUAL int do_length(state_type&, const extern_type* from, const extern_type* end, size_t max) const
   {
-    return min(max,static_cast<size_t>(end-from));
+    return static_cast<int>(min(max,static_cast<size_t>(end-from)));
   }
 
   _NTL_LOC_VIRTUAL int do_max_length() const __ntl_nothrow

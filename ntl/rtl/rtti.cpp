@@ -347,11 +347,11 @@ namespace {
     using namespace ntl::cxxruntime;
     __try {
       const pe::image* imagebase =
-#ifdef _M_X64
+      #ifdef _M_X64
         pe::image::base_from(object);
-#else
+      #else
         NULL;
-#endif
+      #endif
       const object_locator2& locator = object_locator2::instance(object);
       locator.validate();
 
@@ -373,7 +373,9 @@ namespace {
     }
     __except(exception_code == nt::status::access_violation ? exception_execute_handler : exception_continue_search){
       __ntl_throw(std::bad_typeid(/*"A typeid of bad pointer attempted"*/));
-      return NULL;
+    #if STLX__USE_EXCEPTIONS == 0
+      return nullptr;
+    #endif
     }
   }
 } // namespace
@@ -392,7 +394,9 @@ extern "C" void* __cdecl __RTCastToVoid (void* object) __ntl_throws(...)
   }
   __except(exception_code == nt::status::access_violation ? exception_execute_handler : exception_continue_search){
     __ntl_throw(std::bad_typeid(/*"A typeid of bad pointer attempted"*/));
-    return NULL;
+    #if STLX__USE_EXCEPTIONS == 0
+      return nullptr;
+    #endif
   }
 }
 
@@ -401,7 +405,9 @@ extern "C" void* __cdecl __RTtypeid(void* object) __ntl_throws(...)
 {
   if(!object){
     __ntl_throw(std::bad_typeid(/*"A typeid of NULL pointer attempted"*/));
-    return NULL;
+    #if STLX__USE_EXCEPTIONS == 0
+      return nullptr;
+    #endif
   }
   __try{
     const cxxruntime::object_locator2& locator = cxxruntime::object_locator2::instance(object);
@@ -412,14 +418,18 @@ extern "C" void* __cdecl __RTtypeid(void* object) __ntl_throws(...)
     const pe::image* pe;
     if(!locator.type || !(pe = pe::image::base_from(object))){
       __ntl_throw(std::bad_typeid(/*"A typeid of bad pointer attempted"*/));
-      return NULL;
+    #if STLX__USE_EXCEPTIONS == 0
+      return nullptr;
+    #endif
     }
     return pe->va<void*>(locator.type);
 #endif
   }
   __except(exception_code == nt::status::access_violation ? exception_execute_handler : exception_continue_search){
     __ntl_throw(std::bad_typeid(/*"A typeid of bad pointer attempted"*/));
-    return NULL;
+    #if STLX__USE_EXCEPTIONS == 0
+      return nullptr;
+    #endif
   }
 }
 

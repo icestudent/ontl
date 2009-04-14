@@ -372,11 +372,11 @@
     #endif
   #endif
 
-  #ifndef __align
+  #ifndef __name__
     #ifdef _MSC_VER
-    # define __align(X) __declspec(align(X))
+      #define __name__ __FUNCTION__
     #else
-    # define __align(X)
+      #define __name__ __FUNC__
     #endif
   #endif
 

@@ -751,9 +751,11 @@ namespace ntl { namespace km {
       {
         ntstatus st = FltGetVolumeFromName(&Filter, VolumeName, this);
         if(!success(st)){
-          ec = make_error_code(st);
+          std::error_code e = make_error_code(st);
           if(ec == std::throws())
-            __ntl_throw(std::system_error(ec));
+            __ntl_throw(std::system_error(e));
+          else
+            ec = e;
         }
       }
 #endif

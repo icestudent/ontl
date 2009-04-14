@@ -233,6 +233,13 @@ class allocator
       ::new((void*)p) T(forward<Args>(args)...);
     }
 #elif defined(NTL__CXX_RV) //&& 0
+    template<class Pointer>
+    __forceinline
+      typename enable_if<is_same<Pointer, pointer>::value>::type construct(Pointer p)
+    {
+      __assume(p);
+      ::new((void *)p) T();
+    }
     template<class Arg>
     __forceinline
     void construct(pointer p, Arg&& val)

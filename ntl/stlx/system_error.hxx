@@ -135,7 +135,11 @@ namespace std
 
     error_condition default_error_condition() const  __ntl_nothrow;
 
-    string message() const { return c->message(v); }
+    string message() const 
+    {
+      assert(("C++ static objects wasn't initialized!", c));
+      return c->message(v);
+    }
 
     /*explicit */operator bool() const  __ntl_nothrow { return v != 0; }
 private:
@@ -300,17 +304,17 @@ private:
   // 19.4.4 Comparison operators [syserr.compare]
   inline bool operator==(const error_code& lhs, const error_code& rhs) __ntl_nothrow
   {
-    return lhs.category() == rhs.category() && lhs.value() == rhs.value();
+    return &lhs == &rhs || (&lhs && &rhs && lhs.category() == rhs.category() && lhs.value() == rhs.value());
   }
 
   inline bool operator==(const error_code& lhs, const error_condition& rhs) __ntl_nothrow
   {
-    return lhs.category().equivalent(lhs.value(), rhs) || rhs.category().equivalent(lhs, rhs.value());
+    return &lhs && (lhs.category().equivalent(lhs.value(), rhs) || rhs.category().equivalent(lhs, rhs.value()));
   }
 
   inline bool operator==(const error_condition& lhs, const error_code& rhs) __ntl_nothrow
   {
-    return rhs.category().equivalent(rhs.value(), lhs) || lhs.category().equivalent(rhs, lhs.value());
+    return &rhs && (rhs.category().equivalent(rhs.value(), lhs) || lhs.category().equivalent(rhs, lhs.value()));
   }
 
   inline bool operator==(const error_condition& lhs, const error_condition& rhs) __ntl_nothrow
@@ -412,7 +416,7 @@ private:
   //static const error_category& system_category = get_system_category();
 
   //////////////////////////////////////////////////////////////////////////
-  /// N2828 (http://open-std.org/jtc1/sc22/wg21/docs/papers/2009/n2828.html)
+  /// N2838 (http://open-std.org/jtc1/sc22/wg21/docs/papers/2009/n2838.html)
   ///
 
   /** Returns a null reference that can be used as a default function argument to signify an exception should be thrown when an error is detected ([semantics.throws]). 

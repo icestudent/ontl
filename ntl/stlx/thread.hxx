@@ -302,24 +302,29 @@ namespace std
   inline void thread::join(error_code& ec) __ntl_throws(system_error)
   {
     check_alive();
+    error_code e;
     if(!h || !tid || get_id() == this_thread::get_id()){
       if(!h){
-        ec = posix_error::make_error_code(posix_error::invalid_argument);
+        e = posix_error::make_error_code(posix_error::invalid_argument);
       }else if(!tid){
-        ec = posix_error::make_error_code(posix_error::no_such_process);
+        e = posix_error::make_error_code(posix_error::no_such_process);
       }else{
-        ec = posix_error::make_error_code(posix_error::resource_deadlock_would_occur);
+        e = posix_error::make_error_code(posix_error::resource_deadlock_would_occur);
       }
       if(ec == throws())
-        __ntl_throw(system_error(ec));
+        __ntl_throw(system_error(e));
+      else
+        ec = e;
       return;
     }
     using namespace ntl::nt;
     ntstatus st = NtWaitForSingleObject(h, true, infinite_timeout());
     if(st != status::wait_0){
-      ec = posix_error::make_error_code(posix_error::no_such_process);
+      e = posix_error::make_error_code(posix_error::no_such_process);
       if(ec == throws())
-        __ntl_throw(system_error(ec));
+        __ntl_throw(system_error(e));
+      else
+        ec = e;
       return;
     }
     // wait ok, release handle
@@ -334,9 +339,11 @@ namespace std
     // detect alive
     check_alive();
     if(!h || !tid){
-      ec = h ? posix_error::make_error_code(posix_error::no_such_process) :posix_error::make_error_code(posix_error::invalid_argument);
+      error_code e = h ? posix_error::make_error_code(posix_error::no_such_process) : posix_error::make_error_code(posix_error::invalid_argument);
       if(ec == throws())
-        __ntl_throw(system_error(ec));
+        __ntl_throw(system_error(e));
+      else
+        ec = e;
       return;
     }
     ntl::atomic::increment(*cleanup);

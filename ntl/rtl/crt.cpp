@@ -58,7 +58,11 @@ namespace
 
 extern "C" void _cdecl __check_iostream_objects();
 extern "C" void _cdecl __check_iostreams_stub(){}
-#pragma comment(linker, "/alternatename:___check_iostream_objects=___check_iostreams_stub")
+#ifdef _M_X64
+# pragma comment(linker, "/alternatename:__check_iostream_objects=__check_iostreams_stub")
+#else
+# pragma comment(linker, "/alternatename:___check_iostream_objects=___check_iostreams_stub")
+#endif
 
 namespace ntl
 {
@@ -89,7 +93,9 @@ int _cdecl atexit(vfv_t func)
 #include "../nt/debug.hxx" // for abort implementation
 extern "C" int _cdecl _purecall(void)
 {
+#pragma warning(disable:4127)
   assert(!"pure virtual function called!");
+#pragma warning(default:4127)
   debug_abort();
   abort();
   return 0;

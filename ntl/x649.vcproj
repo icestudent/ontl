@@ -4,7 +4,7 @@
 	Version="9,00"
 	Name=".ntl"
 	ProjectGUID="{081E6E33-CC33-4BBF-81E8-2865B1D8FD67}"
-	RootNamespace="x64"
+	RootNamespace=".ntl"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -386,6 +386,22 @@
 							>
 						</File>
 					</Filter>
+					<Filter
+						Name="tr2"
+						>
+						<File
+							RelativePath=".\stlx\ext\tr2\filesystem.hxx"
+							>
+						</File>
+						<File
+							RelativePath=".\stlx\ext\tr2\fs_directory.hxx"
+							>
+						</File>
+						<File
+							RelativePath=".\stlx\ext\tr2\fs_operations.hxx"
+							>
+						</File>
+					</Filter>
 				</Filter>
 				<Filter
 					Name="containers"
@@ -447,6 +463,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\stlx\cctype.hxx"
+						>
+					</File>
+					<File
 						RelativePath=".\stlx\cfloat.hxx"
 						>
 					</File>
@@ -490,12 +510,20 @@
 						RelativePath=".\stlx\cwchar.hxx"
 						>
 					</File>
+					<File
+						RelativePath=".\stlx\cwctype.hxx"
+						>
+					</File>
 				</Filter>
 				<Filter
 					Name="runtime"
 					>
 					<File
 						RelativePath=".\stlx\chrono.hxx"
+						>
+					</File>
+					<File
+						RelativePath=".\stlx\codecvt.hxx"
 						>
 					</File>
 					<File
@@ -707,6 +735,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\stlx\random.hxx"
+						>
+					</File>
+					<File
 						RelativePath=".\stlx\ratio.hxx"
 						>
 					</File>
@@ -757,6 +789,10 @@
 				</File>
 				<File
 					RelativePath=".\km\file_object.hxx"
+					>
+				</File>
+				<File
+					RelativePath=".\km\fltmgr.hxx"
 					>
 				</File>
 				<File
@@ -1036,6 +1072,26 @@
 					</FileConfiguration>
 				</File>
 				<File
+					RelativePath=".\rtl\iostream.cpp"
+					>
+					<FileConfiguration
+						Name="debug|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
 					RelativePath=".\rtl\rtti.cpp"
 					>
 					<FileConfiguration
@@ -1078,6 +1134,26 @@
 				<File
 					RelativePath=".\rtl\syserr.cpp"
 					>
+					<FileConfiguration
+						Name="debug|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath=".\rtl\wchar_mask_data.cpp"
+					>
+					<FileConfiguration
+						Name="debug|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
 					<FileConfiguration
 						Name="debug|Win32"
 						ExcludedFromBuild="true"

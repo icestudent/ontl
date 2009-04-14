@@ -4,7 +4,7 @@
 	Version="8,00"
 	Name=".ntl"
 	ProjectGUID="{081E6E33-CC33-4BBF-81E8-2865B1D8FD67}"
-	RootNamespace="x64"
+	RootNamespace=".ntl"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -622,6 +622,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\stlx\tt_isfunc.inl"
+						>
+					</File>
+					<File
 						RelativePath=".\stlx\tt_isfuncc.inl"
 						>
 					</File>
@@ -1053,6 +1057,14 @@
 				<File
 					RelativePath=".\rtl\iostream.cpp"
 					>
+					<FileConfiguration
+						Name="Debug|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
 					<FileConfiguration
 						Name="Debug|Win32"
 						ExcludedFromBuild="true"

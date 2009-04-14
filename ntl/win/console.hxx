@@ -163,6 +163,7 @@ public:
   ~console_buffer()
   {
     delete[] buffer;
+    buffer = nullptr;
   }
 
 protected:

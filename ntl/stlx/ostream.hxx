@@ -452,6 +452,7 @@ inline basic_ostream<char, traits>& operator<<(basic_ostream<char, traits>& os, 
 }
 
 #ifdef NTL__CXX_RV
+
 template<class charT, class traits>
 inline basic_ostream<charT, traits>& operator<<(basic_ostream<charT, traits>&& os, charT c)
 {
@@ -468,16 +469,11 @@ inline basic_ostream<char, traits>& operator<<(basic_ostream<char, traits>&& os,
 {
   return __::stream_writer<charT,traits>::formatted_write(os, &c, 1);
 }
+
 #endif
 
-///\name  signed and unsigned
-
-template<class traits>
-basic_ostream<char, traits>& operator<<(basic_ostream<char, traits>&, signed char);
-
-template<class traits>
-basic_ostream<char, traits>& operator<<(basic_ostream<char, traits>&, unsigned char);
-
+#if 0
+// doesn't works in vc10
 template<class charT, class traits>
 inline basic_ostream<charT, traits>& operator<<(basic_ostream<charT, traits>& os, const charT*& s)
 {
@@ -519,7 +515,58 @@ inline basic_ostream<charT, traits>& operator<<(basic_ostream<charT, traits>& os
   return __::stream_writer<charT,traits>::formatted_write(os, s, length-1, true);
 }
 
+template<class charT, class traits, size_t length>
+inline basic_ostream<charT, traits>& operator<<(basic_ostream<charT, traits>& os, charT (&s)[length])
+{
+  return __::stream_writer<charT,traits>::formatted_write(os, s, traits::length(s));
+}
+template<class traits, size_t length>
+inline basic_ostream<char, traits>& operator<<(basic_ostream<char, traits>& os, char (&s)[length])
+{
+  return __::stream_writer<char,traits>::formatted_write(os, s, traits::length(s));
+}
+template<class charT, class traits, size_t length>
+inline basic_ostream<charT, traits>& operator<<(basic_ostream<charT, traits>& os, char (&s)[length])
+{
+  return __::stream_writer<charT,traits>::formatted_write(os, s, traits::length(s), true);
+}
+
+#endif
+
+template<class charT, class traits>
+inline basic_ostream<charT, traits>& operator<<(basic_ostream<charT, traits>& os, const charT* s)
+{
+  assert(("s shall not be a null pointer",s));
+  if(s) __::stream_writer<charT,traits>::formatted_write(os, s, traits::length(s));
+  return os;
+}
+
+template<class charT, class traits>
+inline basic_ostream<charT, traits>& operator<<(basic_ostream<charT, traits>& os, const char* s)
+{
+  assert(("s shall not be a null pointer",s));
+  if(s) __::stream_writer<charT,traits>::formatted_write(os, s, char_traits<char>::length(s), true);
+  return os;
+}
+
+///\name  partial specializationss
+template<class traits>
+inline basic_ostream<char, traits>& operator<<(basic_ostream<char, traits>& os, const char* s)
+{
+  assert(("s shall not be a null pointer",s));
+  if(s) __::stream_writer<char,traits>::formatted_write(os, s, char_traits<char>::length(s));
+  return os;
+}
+
+
 ///\name  signed and unsigned
+
+template<class traits>
+basic_ostream<char, traits>& operator<<(basic_ostream<char, traits>&, signed char);
+
+template<class traits>
+basic_ostream<char, traits>& operator<<(basic_ostream<char, traits>&, unsigned char);
+
 
 template<class traits>
 basic_ostream<char, traits>&
@@ -533,14 +580,14 @@ operator<<(basic_ostream<char, traits>&, const unsigned char*);
 template<class charT, class traits>
 inline basic_ostream<charT, traits>& operator<<(basic_ostream<charT, traits>&& os, const charT* s)
 {
-  assert(s != 0 && "s shall not be a null pointer");
+  assert(("s shall not be a null pointer",s));
   if(s) os.write(s, traits::length(s));
   return os;
 }
 template<class charT, class traits>
 inline basic_ostream<charT, traits>& operator<<(basic_ostream<charT, traits>&& os, const char* s)
 {
-  assert(s != 0 && "s shall not be a null pointer");
+  assert(("s shall not be a null pointer",s));
   if(s){
     size_t l = char_traits<char>::length(s);
     while(l-- && os)
@@ -551,7 +598,7 @@ inline basic_ostream<charT, traits>& operator<<(basic_ostream<charT, traits>&& o
 template<class traits>
 inline basic_ostream<char, traits>& operator<<(basic_ostream<char, traits>&& os, const char* s)
 {
-  assert(s != 0 && "s shall not be a null pointer");
+  assert(("s shall not be a null pointer",s));
   if(s) os.write(s, char_traits<char>::length(s));
   return os;
 }

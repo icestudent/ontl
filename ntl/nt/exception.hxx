@@ -1128,9 +1128,9 @@ uint32_t              :27;
     {
       uintptr_t const _ebp = stackbaseptr();
       __asm mov   eax, unwindfunclet
-        __asm push  ebp
-        __asm mov   ebp, _ebp
-        __asm call  eax;
+      __asm push  ebp
+      __asm mov   ebp, _ebp
+      __asm call  eax;
       __asm pop   ebp
     }
 #pragma warning(pop)
