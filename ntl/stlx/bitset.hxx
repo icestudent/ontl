@@ -102,7 +102,7 @@ namespace std {
 
       // 23.3.5.1.4
       if(pos > str.size())
-        __ntl_throw(out_of_range);
+        __ntl_throw(out_of_range("pos > str.size()"));
 
       // 23.3.5.1.5
       const unsigned rlen = static_cast<unsigned>(min(n, str.size()-pos));
@@ -116,7 +116,7 @@ namespace std {
         const typename traits::char_type c = str[rpos];
         // 23.3.5.1.5.2
         if(!(c == '0' || c == '1'))
-          __ntl_throw(invalid_argument);
+          __ntl_throw(invalid_argument("str"));
 
         storage_type xval = storage_[i/element_size_];
         const unsigned mod = i & element_mod_;
@@ -364,7 +364,7 @@ namespace std {
         // check that all upper bits are zero
         for(unsigned pos = elements_count_-1; pos >= sizeof(T) / sizeof(storage_type); --pos){
           if(storage_[pos] != 0)
-            __ntl_throw(overflow_error);
+            __ntl_throw(overflow_error("bitset cannot be represented as specified type"));
         }
       }
       T val = 0;

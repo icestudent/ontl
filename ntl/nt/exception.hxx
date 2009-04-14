@@ -1383,13 +1383,13 @@ uint32_t              :27;
       __asm
       {
         mov   ecx,  cxxreg
-          mov   eax,  funclet
-          mov   esp,  [ecx-4]
+        mov   eax,  funclet
+        mov   esp,  [ecx-4]
         mov   ebp,  _ebp
-          // work arround C4740: flow in or out of inline asm code suppresses global optimization
-          //jmp   funclet
-          push  eax
-          ret
+        // work arround C4740: flow in or out of inline asm code suppresses global optimization
+        //jmp   funclet
+        push  eax
+        ret
       }
     }
 
@@ -1669,6 +1669,7 @@ uint32_t              :27;
         //    throw std::bad_exception();
         //  }
         //}
+        //return;
       }
 
       // not cxx: is_cxx2
@@ -1684,9 +1685,15 @@ uint32_t              :27;
             if(tb->trylow <= cs && cs <= tb->tryhigh){
               const ehandler* eh = dispatch->va<ehandler*>(tb->catchsym);
               for(int catches = tb->ncatches; catches != 0; catches--, eh++){
+
+                const char* catch_block_name = dispatch->va<type_info*>(eh->typeinfo)->name();
+
                 for(uint32_t catchables = 0; catchables < clist->size; catchables++){
                   rva_t catchable = clist->type[catchables];
                   catchabletype* ct = dispatch->va<catchabletype*>(catchable);
+
+                  const char* thrown_cast_name = dispatch->va<type_info*>(ct->typeinfo)->name();
+
                   if(eh->type_match(ct, ti, dispatch)){
                     // OK.  We finally found a match.  Activate the catch.
                     catched = true;
@@ -1746,6 +1753,7 @@ next_try:;
           )
         {
           const throwinfo * const ti = get_throwinfo();
+          //__debugbreak();
           if ( !ti ) // rethrow?
           {
             // MSVC keeps previous thrown object in the per-thread data...
@@ -1758,10 +1766,14 @@ next_try:;
           {
             const tryblock* const tb = tr.first;
             if ( tb->trylow <= cs && cs <= tb->tryhigh )
-              for ( int c = 0; c < tb->catchhigh; ++c ){
+              for ( int c = 0; c < tb->ncatches; ++c ){ // iterate through catch blocks
                 ehandler* eh = &tb->catchsym[c];
-                for ( unsigned i = 0; i < ti->catchabletypearray->size; ++i ){
-                  if(eh[c].type_match(ti->catchabletypearray->type[i], ti, dispatch))
+                const char* catch_block_name = eh->typeinfo->name();
+
+                for ( unsigned i = 0; i < ti->catchabletypearray->size; ++i ){  // iterate through list of possibly casts of the thrown object
+                  const char* thrown_cast_name = ti->catchabletypearray->type[i]->typeinfo->name();
+
+                  if(eh->type_match(ti->catchabletypearray->type[i], ti, dispatch)) // catch block <=> cast type of the thrown object
                   {
                     catchit(ereg, ctx, dispatch, ehfi, eh,
                       ti->catchabletypearray->type[i], tb, trylevel, nested_eframe, destruct);

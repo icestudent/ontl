@@ -19,7 +19,12 @@ __forceinline
 void * __cdecl
   operator new(std::size_t size) throw(std::bad_alloc)
 {
-  return ntl::nt::heap::alloc(ntl::nt::process_heap(), size);
+  void* const ptr = ntl::nt::heap::alloc(ntl::nt::process_heap(), size);
+#if STLX__USE_EXCEPTIONS
+  if(!ptr)
+    __ntl_throw(std::bad_alloc());
+#endif
+  return ptr;
 }
 
 __forceinline
@@ -50,7 +55,12 @@ __forceinline
 void * __cdecl
   operator new[](std::size_t size) throw(std::bad_alloc)
 {
-  return ntl::nt::heap::alloc(ntl::nt::process_heap(), size);
+  void* const ptr = ntl::nt::heap::alloc(ntl::nt::process_heap(), size);
+#if STLX__USE_EXCEPTIONS
+  if(!ptr)
+    __ntl_throw(std::bad_alloc());
+#endif
+  return ptr;
 }
 
 __forceinline

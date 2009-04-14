@@ -554,4 +554,6 @@ namespace ntl
 
 namespace std { namespace __{ using ntl::explicit_bool; using ntl::explicit_bool_type; } }
 
+namespace stlx = std;
+
 #endif //#ifndef NTL__STLX_CSTDDEF
