@@ -19,6 +19,29 @@ namespace nt {
 /**\addtogroup  file_information ********* File Information ***************
  *@{*/
 
+  struct file_attribute
+  {
+    enum type {
+      readonly             = 0x00000001,
+      hidden               = 0x00000002,
+      system               = 0x00000004,
+      directory            = 0x00000010,
+      archive              = 0x00000020,
+      device               = 0x00000040,
+      normal               = 0x00000080,
+      temporary            = 0x00000100,
+      sparse_file          = 0x00000200,
+      reparse_point        = 0x00000400,
+      compressed           = 0x00000800,
+      offline              = 0x00001000,
+      not_content_indexed  = 0x00002000,
+      encrypted            = 0x00004000,
+      /** virtual */
+      virtual_file         = 0x00010000,
+    };
+
+    __ntl_bitmask_type(type, friend)
+  };
 
 enum file_information_class
 {
@@ -124,7 +147,6 @@ struct file_information_base
     const info_class * operator->() const { return data(); }
 
     operator bool() const { return nt::success(status_); }
-
     operator ntstatus() const { return status_; }
 
     static __forceinline
@@ -210,108 +232,77 @@ struct file_standard_information
   int64_t   size() const { return EndOfFile; }
 };
 
-///\name  FileNameInformation == 9
-struct file_name_information
+///\name  FileInternalInformation == 6
+struct file_internal_information
 {
-  static const file_information_class info_class_type = FileNameInformation;
+  static const file_information_class info_class_type = FileInternalInformation;
 
-  uint32_t  FileNameLength;
-  wchar_t   FileName[1];
-
-  const_unicode_string name() const { return const_unicode_string(FileName, FileNameLength / sizeof(wchar_t)); }
+  int64_t   IndexNumber;
 };
 
-template<>
-struct file_information<file_name_information>
+///\name  FileEaInformation == 7
+struct file_ea_information
 {
-  typedef file_name_information info_class;
+  static const file_information_class info_class_type = FileEaInformation;
 
-  file_information(legacy_handle file_handle)
-  {
-    // length of the name is 32 characters long max
-    for(uint32_t length = sizeof(info_class)+sizeof(wchar_t)*32; ptr.reset(new char[length]), ptr; length *= 2)
-    {
-      status_ = query(file_handle, ptr.get(), length);
-      if(status_ == status::success){
-        break;
-      }else if(status_ != status::buffer_overflow){
-        ptr.release();
-        break;
-      }
-    }
-  }
-
-  const info_class* operator->() const { return data(); }
-  info_class* operator->() { return data(); }
-
-  info_class* data() { return reinterpret_cast<info_class*>(ptr.get()); }
-  const info_class* data() const { return reinterpret_cast<const info_class*>(ptr.get()); }
-
-  operator const void*() const { return ptr.get(); }
-
-  static __forceinline
-    ntstatus query(
-    legacy_handle file_handle,
-    void*     file_information,
-    uint32_t  file_information_length
-    )
-  {
-    io_status_block iosb;
-    return NtQueryInformationFile(file_handle, &iosb, file_information, file_information_length, info_class::info_class_type);
-  }
-private:
-  std::unique_ptr<char[]> ptr;
-  ntstatus status_;
+  uint32_t  EaSize;
 };
 
+///\name  FileAccessInformation == 8
+struct file_access_information
+{
+  static const file_information_class info_class_type = FileAccessInformation;
+
+  access_mask AccessFlags;
+};
 
 ///\name  FileRenameInformation == 10
 struct file_rename_information
 {
   static const file_information_class info_class_type = FileRenameInformation;
 
-  typedef std::unique_ptr<file_rename_information> file_rename_information_ptr;
+  typedef std::unique_ptr<file_rename_information> ptr;
 
-  static inline
-    file_rename_information_ptr
-      alloc(
-        const const_unicode_string &  new_name,
-        bool                          replace_if_exists,
-        legacy_handle                 root_directory = legacy_handle())
-    {
-      file_rename_information_ptr ptr (new (varsize, new_name.size()*sizeof(wchar_t)) file_rename_information(new_name, replace_if_exists, root_directory));
-      return ptr;
-    }
+  static inline ptr alloc(const const_unicode_string& new_name, bool replace_if_exists, legacy_handle root_directory = legacy_handle())
+  {
+    return ptr(new (varsize, new_name.size()*sizeof(wchar_t)) file_rename_information(new_name, replace_if_exists, root_directory));
+  }
 
-    bool          ReplaceIfExists;
-    legacy_handle RootDirectory;
-    uint32_t      FileNameLength;
-    wchar_t       FileName[1];
+  bool          ReplaceIfExists;
+  legacy_handle RootDirectory;
+  uint32_t      FileNameLength;
+  wchar_t       FileName[1];
 
-  protected:
-
-    file_rename_information(
-      const const_unicode_string &  new_name,
-      bool                          replace_if_exists,
-      legacy_handle                 root_directory)
+protected:
+  file_rename_information(
+    const const_unicode_string &  new_name,
+    bool                          replace_if_exists,
+    legacy_handle                 root_directory
+  )
     : ReplaceIfExists(replace_if_exists),
-      RootDirectory(root_directory),
-      FileNameLength(new_name.size()*sizeof(wchar_t))
-    {
-      std::copy(new_name.begin(), new_name.end(), FileName);
-    }
-
+    RootDirectory(root_directory),
+    FileNameLength(new_name.size()*sizeof(wchar_t))
+  {
+    std::copy(new_name.begin(), new_name.end(), FileName);
+  }
 };
 
 template<>
 struct file_information<file_rename_information>
 {
-    file_information(
-      legacy_handle                   file_handle,
-      const file_rename_information & info) __ntl_nothrow
-    : status_(_set(file_handle, &info,
-              sizeof(info) + info.FileNameLength - sizeof(wchar_t)))
+  typedef file_rename_information info_class;
+
+    file_information(legacy_handle file_handle, const info_class& info) __ntl_nothrow
+    : status_(_set(file_handle, &info, sizeof(info) + info.FileNameLength - sizeof(wchar_t)))
     {/**/}
+
+    file_information(legacy_handle file_handle, const const_unicode_string& new_name, bool replace_if_exists, legacy_handle root_directory = legacy_handle())
+    {
+      info_class::ptr p = info_class::alloc(new_name, replace_if_exists, root_directory);
+      status_ = p 
+        ? _set(file_handle, p.get(), sizeof(info_class)+p->FileNameLength-sizeof(wchar_t))
+        : status::insufficient_resources;
+    }
 
     operator bool() const { return nt::success(status_); }
 
@@ -326,17 +317,132 @@ struct file_information<file_rename_information>
         )
     {
       io_status_block iosb;
-      return NtSetInformationFile(file_handle, &iosb, info, info_length,
-                                  file_rename_information::info_class_type);
+      return NtSetInformationFile(file_handle, &iosb, info, info_length, info_class::info_class_type);
     }
 
-  ///////////////////////////////////////////////////////////////////////////
-  private:
-
+  protected:
     ntstatus    status_;
+};
+
+///\name  FileLinkInformation == 11
+struct file_link_information: file_rename_information
+{
+  static const file_information_class info_class_type = FileLinkInformation;
+
+  typedef std::unique_ptr<file_link_information> ptr;
 
 };
 
+template<>
+struct file_information<file_link_information>
+  : file_information<file_rename_information>
+{
+  typedef file_link_information info_class;
+
+  file_information(legacy_handle file_handle, const const_unicode_string& name, bool replace_if_exists, legacy_handle root_directory = legacy_handle())
+    :file_information<file_rename_information>(file_handle, name, replace_if_exists, root_directory)
+  {}
+};
+
+///\name FileNamesInformation == 12
+struct file_names_information
+{
+  static const file_information_class info_class_type = FileNamesInformation;
+
+  uint32_t NextEntryOffset;
+  uint32_t FileIndex;
+  uint32_t FileNameLength;
+  wchar_t  FileName[1];
+
+  const_unicode_string name() const { return const_unicode_string(FileName, FileNameLength); }
+};
+
+template<>
+struct file_information<file_names_information>
+{
+  typedef file_names_information info_class;
+
+  file_information(legacy_handle file_handle) __ntl_nothrow
+  {
+    for(uint32_t size = sizeof(info_class)+256*sizeof(wchar_t); ptr.reset(new char[size]), ptr; size *= 2) {
+      st = _query(file_handle, ptr.get(), size);
+      if(st == status::success)
+        break;
+      else if(st != status::buffer_overflow){
+        ptr.reset();
+        break;
+      }
+    }
+  }
+
+  const info_class * data() const { return nt::success(st) ? reinterpret_cast<const info_class*>(ptr.get()) : 0; }
+  const info_class * operator->() const { return data(); }
+
+  operator bool() const { return nt::success(st); }
+
+  operator ntstatus() const { return st; }
+
+  static __forceinline
+    ntstatus
+    _query(
+    legacy_handle   file_handle,
+    void *          info,
+    unsigned long   info_length
+    )
+  {
+    io_status_block iosb;
+    return NtQueryInformationFile(file_handle, &iosb, info, info_length, info_class::info_class_type);
+  }
+
+  struct iterator:
+    std::iterator<std::forward_iterator_tag, const info_class, uint32_t>
+  {
+    friend bool operator== (const iterator& x, const iterator& y) { return x.p == y.p; }
+    friend bool operator!= (const iterator& x, const iterator& y) { return x.p != y.p; }
+
+    reference operator*()   const { return *p; }
+    pointer   operator->()  const { return p;  }
+
+    iterator& operator++()  
+    { 
+      p = p->NextEntryOffset ? reinterpret_cast<value_type*>(uintptr_t(p) + p->NextEntryOffset) : 0;
+      return *this;
+    }
+
+    iterator operator++(int)
+    {
+      iterator tmp(*this);
+      ++*this;
+      return tmp;
+    }
+
+    iterator() :p() {}
+  protected:
+    friend struct file_information<info_class>;
+
+    explicit iterator(const info_class* p)
+      :p(p)
+    {}
+  private:
+    const info_class* p;
+  };
+  typedef iterator const_iterator;
+
+  const_iterator begin() const
+  {
+    return const_iterator(data());
+  }
+  const_iterator end() const
+  {
+    return const_iterator(nullptr);
+  }
+  const_iterator cbegin() const { return begin(); }
+  const_iterator cend()   const { return end();   }
+
+private:
+  std::unique_ptr<char[]> ptr;
+  ntstatus st;
+};
 
 ///\name  FileDispositionInformation == 13
 template<bool Del = true>
@@ -445,7 +551,7 @@ struct volume_information<file_fs_volume_information>
 {
   typedef file_fs_volume_information info_class;
 
-  volume_information(legacy_handle volume_handle)
+  explicit volume_information(legacy_handle volume_handle, bool with_label = true)
   {
     // length of the label is 34 characters long max
     for(uint32_t length = sizeof(info_class)+sizeof(wchar_t)*34; ptr.reset(new char[length]), ptr; length*= 2)
@@ -454,7 +560,9 @@ struct volume_information<file_fs_volume_information>
       if(status_ == status::success){
         break;
       }else if(status_ != status::buffer_overflow){
-        ptr.release();
+        ptr.reset();
+        break;
+      }else if(!with_label && status_ == status::buffer_overflow){
         break;
       }
     }
@@ -465,8 +573,10 @@ struct volume_information<file_fs_volume_information>
 
   info_class* data() { return reinterpret_cast<info_class*>(ptr.get()); }
   const info_class* data() const { return reinterpret_cast<const info_class*>(ptr.get()); }
-
   operator const void*() const { return ptr.get(); }
+
+  operator bool() const { return nt::success(status_); }
+  operator ntstatus() const { return status_; }
 
   static __forceinline
     ntstatus query(

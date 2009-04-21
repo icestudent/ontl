@@ -146,7 +146,7 @@ namespace ntl { namespace nt {
     if(errcode == error_mid_not_found)
       return re;
 
-    static const pe::image* kernel = nullptr;
+    static const pe::image* kernel = 0;
     if(!kernel){
       peb::find_dll find_kernel(&peb::instance());
       kernel = find_kernel("kernel32.dll");

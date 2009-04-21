@@ -268,10 +268,10 @@ class exception
     {
       struct
       {
-        rva_t MemoryStackFp;
-        rva_t MemoryStoreFp;
+        /*0x00*/ rva_t MemoryStackFp;
+        /*0x04*/ rva_t MemoryStoreFp;
       };
-      uintptr_t FramePointers;
+        /*0x00*/ uintptr_t FramePointers;
     };
 #pragma warning(default:4201)
 
@@ -489,8 +489,8 @@ static const exception_disposition
       ExceptionNestedException    = nt::exception::NestedException,
       ExceptionCollidedUnwind     = nt::exception::CollidedUnwind;
 
-extern "C" int __cdecl  _abnormal_termination();
-extern "C" unsigned long __cdecl  _exception_code();
+//extern "C" int __cdecl  _abnormal_termination();
+//extern "C" unsigned long __cdecl  _exception_code();
 extern "C" exception_pointers * __cdecl _exception_info();
 
 #define _exception_status() static_cast<ntstatus>(_exception_code())
@@ -714,24 +714,23 @@ namespace cxxruntime {
     uint32_t isreference  : 1;
 
 #ifdef _M_X64
-uint32_t              :27;
+    uint32_t              :27;
     uint32_t ishz         : 1;
 #endif
 
-#ifdef _M_IX86
+#ifndef _M_X64
     /** pointer to the type descriptor of this catch object */
     const type_info *     typeinfo;
     ptrdiff_t             eobject_bpoffset; // 0 = no object (catch by type)
     /** pointer to the catch funclet */
     generic_function_t *  handler;
-#endif
-#ifdef _M_X64
+#else
     /** offset to the type descriptor of this catch object */
-    rva_t                 typeinfo;
-    int                   eobject_bpoffset;
+    /*0x04*/ rva_t        typeinfo;         // dispType
+    /*0x08*/ int          eobject_bpoffset; // dispCatchObj
     /** offset to the catch clause funclet */
-    rva_t                 handler;
-    uint32_t              reserved;
+    /*0x0C*/ rva_t        handler;          // dispOfHandler
+    /*0x10*/ uint32_t     frame;            // dispFrame
 #endif
 
     /// 15.1/3  A throw-expression initializes a temporary object, called
@@ -876,8 +875,8 @@ uint32_t              :27;
     /* 0x10 */  rva_t           tryblocktable;
     /* 0x14 */  uint32_t        ipmap_count;
     /* 0x18 */  rva_t           ipmap;
-    /* 0x1C */  rva_t           estypeinfo;
-    /* 0x20 */  uint32_t        reserved;
+    /* 0x1C */  rva_t           unwindhelp;
+    /* 0x20 */  rva_t           estypeinfo;
     /* 0x24 */  uint32_t        synchronous : 1; // EHFlags
   };
 
@@ -889,15 +888,24 @@ uint32_t              :27;
 
   struct ehfuncinfo
   {
+    // compiler version
     uint32_t        magic : 30;
+    // max_state, unwind map size
     ehstate_t       unwindtable_size;
+    // unwind map
     unwindtable*    unwindtable;
+    // try block count in this function
     uint32_t        tryblocktable_size;
+    // try block table
     tryblock*       tryblocktable;
+    // IP-to-state map size
     uint32_t        ipmap_count;
+    // IP-to-state map
     ipstateentry*   ipmap;
+    rva_t           unwindhelp;
+    // ES type list
     rva_t           estypeinfo;
-    uint32_t        reserved;
+    // synchronous exception (SEH)
     uint32_t        synchronous : 1; // EHFlags
 
     ehfuncinfo(const ehfuncinfo_packed& fi, uintptr_t base)
@@ -906,14 +914,15 @@ uint32_t              :27;
       unwindtable_size = fi.unwindtable_size;
       tryblocktable_size = fi.tryblocktable_size;
       ipmap_count = fi.ipmap_count;
-      synchronous = fi.synchronous;
+      unwindhelp = fi.unwindhelp;
       estypeinfo = fi.estypeinfo;
+      synchronous = fi.synchronous;
 
       // fix ptrs
       const uintptr_t p = (const uintptr_t)base;
       unwindtable = (ntl::cxxruntime::unwindtable*)(fi.unwindtable + p);
-      tryblocktable = (tryblock*)(fi.tryblocktable+ p);
-      ipmap = (ipstateentry*)(fi.ipmap+p);
+      tryblocktable = (tryblock*)(fi.tryblocktable + p);
+      ipmap = (ipstateentry*)(fi.ipmap + p);
     }
 
     tryblock::ranges
@@ -934,6 +943,65 @@ uint32_t              :27;
       ++r.first;
       return r;
     }
+
+    tryblock::ranges get_try_ranges2(int depth, ehstate_t state) const
+    {
+      // find block which contain the state
+      const tryblock* tb = tryblocktable;
+      uint32_t start, end = tryblocktable_size - 1;
+      for(start = 0; start <= end; start++){
+        if(state >= tb[start].trylow && state <= tb[start].tryhigh)
+          break;
+      }
+
+      while(depth > 0 && start < end){
+        if(state > tb[end].tryhigh && state <= tb[end].catchhigh)
+          depth--;
+        end--;
+      }
+      tryblock::ranges r(&tryblocktable[start], &tryblocktable[end+1]);
+      assert(r.second >= r.first && r.second <= &tryblocktable[tryblocktable_size]);
+      return r;
+    }
+
+    tryblock::ranges get_try_ranges3(int depth, ehstate_t state, const dispatcher_context* const dispatch, bool& found) const
+    {
+      ehstate_t cs = state_from_control(dispatch);
+      if(tryblocktable_size == 0)
+        std::terminate();
+      found = true;
+      const tryblock* tbe = 0;
+      uint32_t i, start = -1, end = -1;
+      for(i = tryblocktable_size; i > 0; i--){
+        const tryblock* tb = &tryblocktable[i-1];
+        if(cs <= tb->tryhigh)
+          continue;
+        if(cs > tb->catchhigh)
+          continue;
+        break;
+      }
+      if(i)
+        tbe = &tryblocktable[i-1];
+      for(i = 0; i < tryblocktable_size; i++){
+        const tryblock* tb = &tryblocktable[i];
+        if(tbe){
+          if(tb->trylow <= tbe->tryhigh || tb->tryhigh > tbe->catchhigh)
+            continue;
+        }
+        if(state < tb->trylow || state > tb->tryhigh)
+          continue;
+        if(start == -1)
+          start = i;
+        end = i+1;
+      }
+      if(start == -1){
+        start = end = 0;
+        found = 0;
+        return tryblock::ranges(&tryblocktable[tryblocktable_size], &tryblocktable[tryblocktable_size]);
+      }
+      return tryblock::ranges(&tryblocktable[start], &tryblocktable[end]);
+    }
+
 
     const tryblock* catch_try_block(ehstate_t state) const
     {
@@ -960,8 +1028,9 @@ uint32_t              :27;
     {
       return state_from_ip(dispatch, dispatch->ControlPc);
     }
-
   };
+
+  STATIC_ASSERT(sizeof(ehfuncinfo_packed) == 0x28);
 
   NTL__EXTERNAPI
     nt::exception::runtime_function*  __stdcall
@@ -982,7 +1051,7 @@ uint32_t              :27;
     nt::exception::unwind_history_table*  HistoryTable
     );
 
-  extern "C" generic_function_t* __CxxCallCatchBlock(void* unknown);
+  extern "C" generic_function_t* __CxxCallCatchBlock(void* ehrec);
   extern "C" generic_function_t* _CallSettingFrame(void (*unwindfunclet)(), void* frame, int notify_param);
 
 #endif // _M_IX86
@@ -994,6 +1063,43 @@ uint32_t              :27;
   +0x80 - SE translator
   */
 
+  ///\name VC++ _tiddata clone
+  struct tiddata
+  {
+    /** Thread ID */
+    uint32_t tid;
+
+    /** Current exception */
+    exception_pointers curexception;
+    exception_record* prevER;
+    void* setranslator;
+    void* frame_info;
+  };
+
+  inline tiddata* _initptd()
+  {
+    tiddata* tid = new tiddata();
+    nt::teb::set(&nt::teb::EnvironmentPointer, tid);
+    return tid;
+  }
+
+  inline tiddata* _getptd()
+  {
+    tiddata* tid = reinterpret_cast<tiddata*>(nt::teb::get(&nt::teb::EnvironmentPointer));
+    if(!tid)
+      tid = _initptd();
+    return tid;
+  }
+
+  inline tiddata* _getptd_noinit()
+  {
+    return reinterpret_cast<tiddata*>(nt::teb::get(&nt::teb::EnvironmentPointer));
+  }
+
+  inline void _freeptd()
+  {
+    delete _getptd_noinit();
+  }
 
   struct cxxregistration
 #ifdef _M_IX86
@@ -1015,7 +1121,7 @@ uint32_t              :27;
 
     ehstate_t current_state(const ehfuncinfo * const  ehfi) const
     {
-      // what this stuff is abaut to do?
+      // what this stuff is about to do?
       const ehstate_t cs = ehfi->unwindtable_size <= 0x80 ?
         static_cast<int8_t>(this->state) : this->state;
       _Assert( cs > -1 );
@@ -1025,32 +1131,49 @@ uint32_t              :27;
 
 #endif // _M_IX86
 #ifdef _M_X64
+    typedef nt::exception::frame_pointers frame_pointers;
 
-    ehstate_t current_state(const ehfuncinfo* const ehfi, const dispatcher_context* const dispatch) const
+    __forceinline static frame_pointers* framepointers(uintptr_t fp, const ehfuncinfo* const ehfi)
     {
-      ehstate_t cs = *reinterpret_cast<ehstate_t*>(fp.FramePointers + ehfi->estypeinfo);
+      return reinterpret_cast<frame_pointers*>( fp + ehfi->unwindhelp);
+    }
+
+    ehstate_t unwind_try_block(uintptr_t fp, const ehfuncinfo* const ehfi, const dispatcher_context* const dispatch) const
+    {
+      uintptr_t frame;
+      const_cast<cxxregistration*>(this)->establisherframe(ehfi, dispatch, reinterpret_cast<frame_pointers*>(&frame));
+      ehstate_t etb1 = *reinterpret_cast<ehstate_t*>( frame + ehfi->unwindhelp + 4 );
+      ehstate_t etb  = framepointers(fp,ehfi)->MemoryStoreFp; // *(eframe+unwindhelp+4)
+      return etb;
+    }
+
+    void unwind_try_block(ehstate_t state, uintptr_t fp, const ehfuncinfo* const ehfi, const dispatcher_context* const dispatch)
+    {
+      ehstate_t etb = unwind_try_block(fp, ehfi, dispatch);
+      if(state > etb)
+        framepointers(fp,ehfi)->MemoryStoreFp = state;
+    }
+
+    // __GetCurrentState
+    ehstate_t current_state(const ehfuncinfo* const ehfi, uintptr_t fp, const dispatcher_context* const dispatch) const
+    {
+      ehstate_t cs = framepointers(fp,ehfi)->MemoryStackFp;
       if(cs == -2)
         cs = ehfi->state_from_control(dispatch);
       return cs;
     }
 
     // __SetState
-    void current_state(const ehfuncinfo* const ehfi, ehstate_t state)
+    void current_state(const ehfuncinfo* const ehfi, uintptr_t fp, ehstate_t state)
     {
-      // TODO: int*** ppp = reinterpret_cast<int***>(this);
-      ehstate_t old = *reinterpret_cast<ehstate_t*>(fp.FramePointers + ehfi->estypeinfo);
-      if(old < 16)
-        *reinterpret_cast<ehstate_t*>(fp.FramePointers + ehfi->estypeinfo) = state;
-      else
-        dbgpause();
+      ehstate_t old = framepointers(fp,ehfi)->MemoryStackFp;
+      framepointers(fp,ehfi)->MemoryStackFp = state;
     }
 
-    uintptr_t establisherframe(const ehfuncinfo* const ehfi, const dispatcher_context* const dispatch, uintptr_t* frame)
+    frame_pointers* establisherframe(const ehfuncinfo* const ehfi, const dispatcher_context* const dispatch, frame_pointers* frame) const
     {
       ehstate_t cs = ehfi->state_from_control(dispatch);
-      *frame = fp.FramePointers;
-
-      // TODO: int*** ppthrown = reinterpret_cast<int***>(this);
+      *frame = fp;
 
       for(uint32_t i = ehfi->tryblocktable_size; i > 0; --i){
         tryblock* tb = &ehfi->tryblocktable[i-1];
@@ -1063,12 +1186,13 @@ uint32_t              :27;
         for(int j = 0; j < tb->ncatches; j++){
           ehandler& eh = catchtable[j];
           if(eh.handler == funcStart){
-            *frame = fp.FramePointers + 0x10; // sizeof(ehandler?)
-            return reinterpret_cast<uintptr_t>(frame);
+            uintptr_t f = fp.FramePointers; // [rcx]
+            frame->FramePointers = *reinterpret_cast<uintptr_t*>( f + eh.frame );
+            return frame;
           }
         }
       }
-      return reinterpret_cast<uintptr_t>(frame);
+      return frame;
     }
 
     struct frame_info
@@ -1076,7 +1200,8 @@ uint32_t              :27;
       frame_info(void* thrown_object)
       {
         object_ = thrown_object;
-        next = info_;
+        frame_info* head = info_ < this ? 0 : info_;
+        next = head;
         info_ = this;
       }
 
@@ -1098,13 +1223,14 @@ uint32_t              :27;
         frame_info* p = info_;
         while(p){
           if(p->object_ == object)
-            return true;
+            return false;
         }
-        return false;
+        return true;
       }
     private:
       void* object_;
       frame_info* next;
+      // TODO: replace this with ptd
       static frame_info* info_;
     };
 
@@ -1182,35 +1308,35 @@ uint32_t              :27;
       }
 #endif // _M_IX86
 #ifdef _M_X64
+      frame_pointers frame;
+      establisherframe(ehfi, dispatch, &frame);
       if(to_state == -1){
         // __FrameUnwindToEmptyState
-        uintptr_t frame;
-        establisherframe(ehfi, dispatch, &frame);
         ehstate_t state = ehfi->state_from_control(dispatch);
         const tryblock* tb = ehfi->catch_try_block(state);
         to_state = tb ? tb->tryhigh : -1;
       }
       // __FrameUnwindToState
       ehstate_t uestate, cs;
-      for(uestate = -1, cs = current_state(ehfi, dispatch); cs != -1 && cs > to_state; )
+      for(uestate = -1, cs = current_state(ehfi, frame.FramePointers, dispatch); cs != -1 && cs > to_state; )
       {
         __try {
           unwindtable* ute = &ehfi->unwindtable[cs];
           uestate = ute->state;
           generic_function_t* action = ute->unwindfunclet ? dispatch->va<generic_function_t*>(ute->unwindfunclet) : NULL;
           if(action){
-            current_state(ehfi, uestate);
+            current_state(ehfi, frame.FramePointers, uestate);
             callsettingframe(action, this);
           }
           cs &= 0x30; // ??
         }
-        __except(unwindfilter(_exception_info())){
+        __except(unwindfilter(_exception_status())){
           cs = uestate;
         }
       }
       if(cs != -1 && cs > to_state)
         std::terminate();
-      current_state(ehfi, cs);
+      current_state(ehfi, frame.FramePointers, cs);
 
 #endif // _M_X64
     }
@@ -1537,8 +1663,7 @@ uint32_t              :27;
 #endif
     }
 
-    void
-      catchit(
+    void catchit (
       cxxregistration *               const cxxreg,
       const nt::context *             const ctx,
       dispatcher_context *            const dispatch,
@@ -1548,14 +1673,15 @@ uint32_t              :27;
       const tryblock *                const tb,
       int                             const catchdepth,
       const exception_registration *  const nested,
+      /* bool                               rethrow, // not used */
       bool                                  recursive
       )
     {
 #ifdef _M_X64
       (void)nested; // unreferenced parameter
       (void)catchdepth;
-      uintptr_t xframe;
-      uintptr_t frame = cxxreg->establisherframe(funcinfo, dispatch, &xframe);
+      cxxregistration::frame_pointers xframe;
+      cxxregistration::frame_pointers* frame = cxxreg->establisherframe(funcinfo, dispatch, &xframe);
       cxxregistration* cxxframe = reinterpret_cast<cxxregistration*>(frame);
 #else
       recursive;
@@ -1581,7 +1707,7 @@ uint32_t              :27;
       if ( continuation )
         jumptocontinuation(continuation, cxxreg);
 #else
-      cxxreg->unwindnestedframes(this, ctx, frame, dispatch->va(catchblock->handler), tb->trylow, funcinfo, dispatch, recursive);
+      cxxreg->unwindnestedframes(this, ctx, uintptr_t(frame), dispatch->va(catchblock->handler), tb->trylow, funcinfo, dispatch, recursive);
 #endif
     }
 
@@ -1613,16 +1739,31 @@ uint32_t              :27;
     }
 #endif
 
+    exception_record* current_exception() const
+    {
+      return _getptd()->curexception.ExceptionRecord;
+    }
+
+    void set_current_exception()
+    {
+      _getptd()->curexception.ExceptionRecord = this;
+    }
+
+    void restore_exception()
+    {
+      exception_record* er = _getptd()->curexception.ExceptionRecord;
+      std::memcpy(this, er, sizeof(exception_record));
+    }
+
     /// 15.1/2  When an exception is thrown, control is transferred
     ///         to the nearest handler with a matching type (15.3)
     ///\return  does not return on handled exceptions.
-    void
-      find_handler(
+    void find_handler(
       cxxregistration *       const ereg,
-      const nt::context *     const ctx,
+      const nt::context *           ctx,
       dispatcher_context *    const dispatch,
       const ehfuncinfo *      const ehfi,
-      const bool                    destruct,
+      const bool                    recursive,
       const ehstate_t               trylevel,
       const exception_registration *const nested_eframe)
     {
@@ -1630,34 +1771,53 @@ uint32_t              :27;
       ehstate_t cs = ereg->current_state(ehfi);
 #endif
 #ifdef _M_X64
+      // get the current state
       ehstate_t cs = ehfi->state_from_control(dispatch);
-      uintptr_t frame;
+
+      // get establisher frame
+      cxxregistration::frame_pointers frame;
       ereg->establisherframe(ehfi, dispatch, &frame);
 
-      // get unwind try block
-      ehstate_t etb = *reinterpret_cast<ehstate_t*>(frame + ehfi->estypeinfo + 4);
+      // unwind try block
+      ehstate_t etb = ereg->unwind_try_block(frame.FramePointers, ehfi, dispatch);
       if(cs > etb){
-        // set state
-        // BUG: use &frame instead, but isn't works :((
-        ereg->current_state(ehfi, cs);
-        //reinterpret_cast<cxxregistration*>(&frame)->current_state(ehfi, cs);
-        // set unwind try block
-        *reinterpret_cast<ehstate_t*>(frame + ehfi->estypeinfo + 4) = cs;
+        ereg->current_state(ehfi, frame.FramePointers, cs);
+        ereg->unwind_try_block(cs, frame.FramePointers, ehfi, dispatch);
       }else{
         cs = etb;
       }
 
+      assert(cs >= -1 && cs < ehfi->unwindtable_size);
       if(cs < -1 || cs >= ehfi->unwindtable_size)
         std::terminate();
 
       bool catched = false;
+      bool isRethrow = false;
 
       // is_cxx1
       if(is_msvc(true) && !get_throwinfo()){
-        // TODO: get previous throw information and rethrow it
-        dbgpause();
-        // replasing ctx && erec
-        // assert check erec again for cxx
+        __debugbreak();
+
+        // check the current exception
+        if(!current_exception())
+          return;
+
+        // restore exception information
+        isRethrow = true;
+        restore_exception();
+        ctx = _getptd()->curexception.ContextRecord;
+
+        if(iscxx() && !get_throwinfo())
+          std::terminate();
+
+        f108_t* ptd_108 = 0;
+        if(ptd_108){
+          f108_t* f108 = 0;
+          std::swap(ptd_108, f108);
+          if(!is_inexceptionSpec(f108, dispatch)){
+
+          }
+        }
 
         //if(ptd.field108){
         //  auto f108 = 0;
@@ -1675,9 +1835,17 @@ uint32_t              :27;
       // not cxx: is_cxx2
       bool is_cxx = is_msvc(true);
       if(is_cxx){
+        __debugbreak();
         if(ehfi->tryblocktable_size){
           // _GetRangeOfTrysToCheck
+          ehstate_t state = ehfi->state_from_control(dispatch);
+          assert(cs == state);
           const tryblock::ranges ranges = ehfi->get_try_ranges(trylevel, cs);
+          const tryblock::ranges r2 = ehfi->get_try_ranges2(trylevel, cs);
+          bool tryfound;
+          const tryblock::ranges r3 = ehfi->get_try_ranges3(trylevel, cs, dispatch, tryfound);
+          assert(ranges == r2 && ranges == r3);
+
           const tryblock* tb = ranges.first;
           const throwinfo* const ti = get_throwinfo();
           const catchabletypearray* const clist = thrown_va<catchabletypearray*>(ti->catchabletypearray);
@@ -1697,7 +1865,7 @@ uint32_t              :27;
                   if(eh->type_match(ct, ti, dispatch)){
                     // OK.  We finally found a match.  Activate the catch.
                     catched = true;
-                    catchit(ereg, ctx, dispatch, ehfi, eh, ct, tb, trylevel, nested_eframe, destruct);
+                    catchit(ereg, ctx, dispatch, ehfi, eh, ct, tb, trylevel, nested_eframe, recursive);
                     goto next_try;
                   }
 
@@ -1709,19 +1877,21 @@ next_try:;
         }
 
         // tryEmpty:
-        if(catched && ehfi->magic >= ehmagic1300){
-          const f108_t* ehtable = ehfi->reserved ? dispatch->va<f108_t*>(ehfi->reserved) : 0;
+        if(catched == false && ehfi->magic >= ehmagic1300){
+          const f108_t* ehtable = ehfi->estypeinfo ? dispatch->va<f108_t*>(ehfi->estypeinfo) : 0;
           if(ehtable){
+            __debugbreak();
             if(is_inexceptionSpec(ehtable, dispatch)){
               uintptr_t frame;
-              ereg->establisherframe(ehfi, dispatch, &frame);
-              ereg->unwindnestedframes(this, ctx, frame, NULL, -1, ehfi, dispatch, destruct);
+              ereg->establisherframe(ehfi, dispatch, reinterpret_cast<cxxregistration::frame_pointers*>(&frame));
+              // TODO: _ptd()->110 = {tmp508, ereg, 0, frame}
+              ereg->unwindnestedframes(this, ctx, frame, NULL, -1, ehfi, dispatch, recursive);
             }
 
           }
         }
       }else if(ehfi->tryblocktable_size){
-        if(destruct)
+        if(recursive)
           std::terminate();
         // FindHandlerForForeignException
         // _GetRangeOfTrysToCheck
@@ -1734,7 +1904,7 @@ next_try:;
             if(eh.is_ellipsis(dispatch)){
               // OK.  We finally found a match.  Activate the catch.
               catched = true;
-              catchit(ereg, ctx, dispatch, ehfi, &eh, NULL, tb, trylevel, nested_eframe, destruct);
+              catchit(ereg, ctx, dispatch, ehfi, &eh, NULL, tb, trylevel, nested_eframe, recursive);
             }
           }
         }
@@ -1776,7 +1946,7 @@ next_try:;
                   if(eh->type_match(ti->catchabletypearray->type[i], ti, dispatch)) // catch block <=> cast type of the thrown object
                   {
                     catchit(ereg, ctx, dispatch, ehfi, eh,
-                      ti->catchabletypearray->type[i], tb, trylevel, nested_eframe, destruct);
+                      ti->catchabletypearray->type[i], tb, trylevel, nested_eframe, recursive);
                     // rethrown excetion
                     goto next_try;
                   }
@@ -1784,11 +1954,11 @@ next_try:;
 next_try: ;
               }
           }
-          if ( destruct )
+          if ( recursive )
             destruct_eobject();
         }
         //return;
-      }else if(ehfi->tryblocktable_size > 0 && !destruct) {
+      }else if(ehfi->tryblocktable_size > 0 && !recursive) {
         // TODO: SEH translation
         for ( tryblock::ranges tr = ehfi->get_try_ranges(trylevel, cs);
           tr.first < tr.second;
@@ -1803,7 +1973,7 @@ next_try: ;
               // check for ellipsis
               if(eh.is_ellipsis()){
                 // ok, it can catch exception
-                catchit(ereg, ctx, dispatch, ehfi, &eh, NULL, tb, trylevel, nested_eframe, destruct);
+                catchit(ereg, ctx, dispatch, ehfi, &eh, NULL, tb, trylevel, nested_eframe, recursive);
                 // rethrown exception
               }
             }

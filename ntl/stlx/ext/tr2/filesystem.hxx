@@ -472,8 +472,8 @@ namespace std
         // convert separators
         string_type native = path_;
         for(string_type::iterator i = native.begin(), endi = native.end(); i != endi; ++i)
-          if(*i == backslash)
-            *i = slashval;
+          if(*i == slashval)
+            *i = backslash;
         return native;
       }
 
@@ -647,8 +647,10 @@ namespace std
           path_ += slashval;
 
         // append
-        while(size--)
+        while(size--){
           path_ += *p == backslash ? slashval : *p;
+          p++;
+        }
         return *this;
       }
 

@@ -1,4 +1,5 @@
 #include "../stlx/cstdlib.hxx"
+#include "../nt/exception.hxx"
 
 #pragma region section_attributes
 #pragma comment(linker, "/merge:.CRT=.rdata")
@@ -70,13 +71,21 @@ namespace ntl
   extern "C" void _cdecl __init_crt(bool init)
   {
     if(init){
+      // init exception support on current thread
+      #if STLX__USE_EXCEPTIONS
+      cxxruntime::_initptd();
+      #endif
+
+      // init static objects
       exit_list = new exit_funcs_t();
       exit_list->reserve(__xc_z - __xc_a);
       initterm(__xc_a, __xc_z);
 
+      // init io streams
       __check_iostreams_stub();
       __check_iostream_objects();
     }else{
+      // free static objects
       doexit(0,false,true);
     }
   }

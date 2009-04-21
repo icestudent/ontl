@@ -263,7 +263,7 @@ struct device_traits<nt::file_handler> : public device_traits<>
   enum access_mask
   {
       read_data             = 0x0001,
-      list_directoy         = 0x0001,
+      list_directory        = 0x0001,
       write_data            = 0x0002,
       add_file              = 0x0002,
       append_data           = 0x0004,
@@ -579,14 +579,15 @@ class file_handler : public handle, public device_traits<file_handler>
       return file_info;
     }
 
-    ntstatus rename(
-      const const_unicode_string &  new_name,
-      bool                          replace_if_exists)
+    ntstatus rename(const const_unicode_string& new_name, bool replace_if_exists = true)
     {
-      file_rename_information::file_rename_information_ptr fi =
-                    file_rename_information::alloc(new_name, replace_if_exists);
-      if ( !fi ) return status::insufficient_resources;
-      file_information<file_rename_information> file_info(get(), *fi);
+      file_information<file_rename_information> file_info(get(), new_name, replace_if_exists);
+      return file_info;
+    }
+
+    ntstatus link(const const_unicode_string& name, bool replace_if_exists = false)
+    {
+      file_information<file_link_information> file_info(get(), name, replace_if_exists);
       return file_info;
     }
 

@@ -43,6 +43,21 @@ namespace nt {
    **/
 struct status
 {
+  enum type;
+
+  static bool is_error(const type s)
+  {
+    return static_cast<unsigned>(s) >> 30 == 3;
+  }
+  static bool is_warning(const type s)
+  {
+    return static_cast<unsigned>(s) >> 30 == 2;
+  }
+  static bool is_informational(const type s)
+  {
+    return static_cast<unsigned>(s) >> 30 == 1;
+  }
+
   enum type
   {
     success                                                        = (int)0x00000000,
@@ -1666,15 +1681,16 @@ struct status
   };
 };
 
+typedef nt::status::type ntstatus;
+
 static __forceinline
-bool success(const status::type & s)
+bool success(const ntstatus s)
 {
   return s >= 0;
 }
 
 /**@} native_types_support */
 
-typedef nt::status::type ntstatus;
 
 }//namespace nt
 

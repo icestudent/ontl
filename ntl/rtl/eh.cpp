@@ -118,13 +118,12 @@ ntl::cxxruntime::cxxframehandler(
   }
 
   if(!ehfi->tryblocktable_size){
-    if(ehfi->magic < ehmagic1300 || !ehfi->reserved)
+    if(ehfi->magic < ehmagic1300 || !ehfi->unwindhelp)
       return ExceptionContinueSearch;
   }
 
   cxxrecord* cxxer = static_cast<cxxrecord*>(er);
   if(cxxer->iscxx() && er->NumberParameters >= 3 && cxxer->get_ehmagic() > ehmagic1400){
-
     throwinfo::forwardcompathandler_t* fch = NULL;
     if(cxxer->get_throwinfo()->forwardcompathandler){
       fch = (throwinfo::forwardcompathandler_t*)(cxxer->get_throwinfo()->forwardcompathandler + cxxer->get_throwimagebase());
@@ -140,8 +139,8 @@ ntl::cxxruntime::cxxframehandler(
 
 void cxxregistration::unwindnestedframes(const exception_record* ehrec, const nt::context* ctx, uintptr_t establishedframe, const void* handler, int state, const ehfuncinfo* ehfi, dispatcher_context* const dispatch, bool recursive)
 {
-  nt::context octx;
-  static exception_record ehtemplate = {ntl::nt::status::unwind_consolidate, exception_noncontinuable, NULL, NULL, exception_record::maximum_parameters, {ehmagic1200}};
+  static const exception_record ehtemplate = {ntl::nt::status::unwind_consolidate, exception_noncontinuable, NULL, NULL, exception_record::maximum_parameters, {ehmagic1200}};
+
   exception_record er = ehtemplate;
   er.ExceptionInformation[0] = (uintptr_t)__CxxCallCatchBlock,
     er.ExceptionInformation[1] = establishedframe,
@@ -153,43 +152,80 @@ void cxxregistration::unwindnestedframes(const exception_record* ehrec, const nt
     er.ExceptionInformation[7] = recursive,
     er.ExceptionInformation[8] = ehmagic1200;
 
-  ntl::nt::exception::frame_pointers lfp;
-  lfp.FramePointers = fp.FramePointers;
-  RtlUnwindEx(lfp, dispatch->ControlPc, &er, NULL, &octx, dispatch->HistoryTable);
+  nt::context octx;
+  STATIC_ASSERT(sizeof(octx) == 0x4d0);
+  RtlUnwindEx(fp, dispatch->ControlPc, &er, NULL, &octx, dispatch->HistoryTable);
 }
 
 //////////////////////////////////////////////////////////////////////////
 cxxregistration::frame_info* cxxregistration::frame_info::info_ = NULL;
 
+exception_filter ExFilterRethrow(exception_pointers* ep)
+{
+  cxxrecord* ehrec = static_cast<cxxrecord*>(ep->ExceptionRecord);
+  exception_record* ehrec2 = 0;
+  bool arg10 = false;
+  if(ehrec->is_msvc(true)){
+    if(ehrec->ExceptionInformation[1] == ehrec2->ExceptionInformation[1])
+      arg10 = true;
+    if(ehrec->ExceptionInformation[1]){
+      // ptd->2d0 = 1
+      arg10 = true;
+    }
+  }
+  return arg10 ? exception_execute_handler : exception_continue_search;
+}
+
+void RethrowException(exception_record* ehrec)
+{
+  cxxrecord* cxxer = static_cast<cxxrecord*>(ehrec);
+  cxxer->raise();
+}
+
 extern "C" generic_function_t* __CxxCallCatchBlock(exception_record* ehrec)
 {
+  // save the current exception
+  exception_pointers* ep = &_getptd()->curexception;
+  exception_pointers saved_exception = *ep;
+  ep->ExceptionRecord = reinterpret_cast<exception_record*>(ehrec->ExceptionInformation[6]);
+  ep->ContextRecord = reinterpret_cast<nt::context*>(ehrec->ExceptionInformation[4]);
+
   // original record
   cxxrecord* cxxer = reinterpret_cast<cxxrecord*>(ehrec->ExceptionInformation[6]);
   cxxregistration* eframe = reinterpret_cast<cxxregistration*>(ehrec->ExceptionInformation[1]);
   generic_function_t* ret;
-  //bool fail = false;
+  bool fail = false;
   cxxregistration::frame_info frame(cxxer->get_object());
 
+  exception_record* tmpER = 0;
   generic_function_t *handler = reinterpret_cast<generic_function_t*>(ehrec->ExceptionInformation[2]);
   bool recursive = ehrec->ExceptionInformation[7] != 0;
+  if(recursive){
+    tmpER = _getptd()->prevER;
+    _getptd()->curexception.ExceptionRecord = tmpER;
+
+  }
   __try{
-    //__try{
-    ret = _CallSettingFrame(handler, eframe, 0x100);
-    //}
-    //__except(ExFilterRethrow(_exception_info())){
-    //  fail = true;
-    //  if(recursive){
-    //    __DestructExceptionObject(cxxer);
-    //    __RethrowException(ptd.prevEHRec);
-    //  }else{
-    //    __RethrowException(cxxer);
-    //  }
-    //}
+    __try{
+      ret = _CallSettingFrame(handler, eframe, 0x100);
+    }
+    __except(ExFilterRethrow(ntl::_exception_info())){
+      fail = true;
+      // ptd->2d0 = 0
+      if(recursive){
+        cxxer->destruct_eobject(true);
+        RethrowException(_getptd()->prevER);
+      }else{
+        RethrowException(cxxer);
+      }
+    }
+
   }
   __finally{
     frame.unlink();
-    if(!abnormal_termination && cxxer->is_msvc(true)){
-      if(!cxxregistration::frame_info::find(cxxer->get_object()))
+    fail |= _abnormal_termination() != 0;
+    if(!fail && cxxer->is_msvc(true)){
+      if(cxxregistration::frame_info::find(cxxer->get_object()))
         cxxer->destruct_eobject();
     }
   }
@@ -198,8 +234,12 @@ extern "C" generic_function_t* __CxxCallCatchBlock(exception_record* ehrec)
   //  if(!cxxregistration::frame_info::find(cxxer->get_object()))
   //    cxxer->destruct_eobject();
   //}
-  *reinterpret_cast<uintptr_t*>(
-    eframe->fp.FramePointers + reinterpret_cast<ehfuncinfo*>(ehrec->ExceptionInformation[5])->estypeinfo) = -2;
+
+  // restore saved exception
+  ep = &_getptd()->curexception;
+  *ep = saved_exception;
+
+  *reinterpret_cast<uintptr_t*>(eframe->fp.FramePointers + reinterpret_cast<ehfuncinfo*>(ehrec->ExceptionInformation[5])->unwindhelp) = -2;
   return ret;
 }
 
@@ -256,13 +296,20 @@ __CxxFrameHandler3(
   uintptr_t imagebase;
   RtlPcToFileHeader(__CxxFrameHandler3, (void**)&imagebase);
 
-  const ehfuncinfo_packed* ehfip;
-  fixptr(imagebase, *dispatch->HandlerData, ehfip);
+  const ehfuncinfo_packed* ehfip = reinterpret_cast<const ehfuncinfo_packed*>( imagebase + *dispatch->HandlerData );
+
+  struct frame_t
+  {
+    cxxregistration* frame;
+    uintptr_t var30;
+    uintptr_t var38;
+    uintptr_t var40;
+  } lframe = {frame};
 
   ehfuncinfo efi(*ehfip, imagebase);
   const ehfuncinfo* ehfi = &efi;
-  cxxregistration* lframe = (cxxregistration*)&frame;
-  return cxxframehandler(er, lframe, ectx, dispatch, ehfi);
+
+  return cxxframehandler(er, reinterpret_cast<cxxregistration*>(&lframe), ectx, dispatch, ehfi);
 #endif
 }
 

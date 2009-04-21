@@ -73,6 +73,82 @@ namespace std
         /** Specialization of basic_recursive_directory_iterator for wpath */
         typedef basic_recursive_directory_iterator<wpath> wrecursive_directory_iterator;
 
+        void f()
+        {
+          ::std::tr2::sys::filesystem::file_status f0;
+          file_status fst;
+          file_status f2(regular_file);
+        }
+
+        //////////////////////////////////////////////////////////////////////////
+        template <class Path>
+        class basic_directory_entry
+        {
+        public:
+          typedef Path path_type;
+          typedef typename Path::string_type string_type;
+
+          ///\name constructors
+          basic_directory_entry()
+          {}
+
+          explicit basic_directory_entry(const path_type& p, file_status st = file_status(), file_status symlink_st = file_status())
+            :p(p),st(st), lst(symlink_st)
+          {}
+
+          ///\name modifiers
+          void assign(const path_type& p, file_status st = file_status(), file_status symlink_st = file_status())
+          {
+            this->p = p, this->st = st, lst = symlink_st;
+          }
+
+          void replace_leaf(const string_type& s, file_status st = file_status(), file_status symlink_st = file_status())
+          {
+            p = p.branch() / s;
+            this->st = st, lst = symlink_st;
+          }
+
+          ///\name observers
+          const Path& path() const     { return p; }
+          operator const Path&() const { return p; }
+
+          file_status status(error_code& ec = throws()) const
+          {
+            if(!status_known(st)){
+              if(status_known(lst) && !is_symlink(lst))
+                st = lst;
+              else
+                st = status(p, ec);
+            }else if(ec != throws())
+              ec = 0;
+            return st;
+          }
+
+          file_status  symlink_status(error_code& ec = throws()) const
+          {
+            if(!status_known(lst))
+              lst = status(p, ec);
+            else if(ec != throws())
+              ec = 0;
+            return lst;
+          }
+
+          ///\name comparisons
+          bool operator<(const basic_directory_entry<Path>& rhs);
+          bool operator==(const basic_directory_entry<Path>& rhs);
+          bool operator!=(const basic_directory_entry<Path>& rhs);
+          bool operator>(const basic_directory_entry<Path>& rhs);
+          bool operator<=(const basic_directory_entry<Path>& rhs);
+          bool operator>=(const basic_directory_entry<Path>& rhs);
+          ///\}
+
+        private:
+          path_type            p;
+          mutable file_status  st;
+          mutable file_status  lst;
+        };
+
+        //////////////////////////////////////////////////////////////////////////
       }
     }
   }
