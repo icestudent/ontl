@@ -107,9 +107,9 @@ namespace std
         static bool imbue(const locale& loc, std::nothrow_t);
       };
 
-      template<class Path> struct slash { static const char value = '/'; };
-      template<class Path> struct dot   { static const char value = '.'; };
-      template<class Path> struct colon { static const char value = ':'; };
+      template<class Path> struct slash { static const typename Path::value_type value = '/'; };
+      template<class Path> struct dot   { static const typename Path::value_type value = '.'; };
+      template<class Path> struct colon { static const typename Path::value_type value = ':'; };
 
       template<> struct slash <path>{ static const char value = '/'; };
       template<> struct dot   <path>{ static const char value = '.'; };
@@ -217,12 +217,24 @@ namespace std
 
         ///\name observers
         const string_type string() const { return path_; }
-        const string_type file_string() const;
-        const string_type directory_string() const;
+        const string_type file_string(bool normalize = true) const;
+        const string_type directory_string(bool normalize = true) const { return file_string(); }
 
-        const external_string_type external_file_string() const { return traits_type::to_external(*this, file_string()); }
-        const external_string_type external_directory_string() const{ return traits_type::to_external(*this, directory_string()); }
+        const external_string_type external_file_string(bool normalize = true) const
+        {
+          if(normalize){
+            external_string_type xs = traits_type::to_external(*this, path_);
+            ntl::nt::rtl::relative_name rel(xs.c_str());
+            if(rel)
+              return rel.path.get_string();
+          }
+          return traits_type::to_external(*this, file_string(normalize));
+        }
 
+        const external_string_type external_directory_string(bool normalize = true) const{ return traits_type::to_external(*this, directory_string(normalize)); }
+
+        /** extension: returns UNC server name if any */
+        string_type  unc_name() const;
         string_type  root_name() const;
         string_type  root_directory() const;
         basic_path   root_path() const;
@@ -233,6 +245,8 @@ namespace std
 
         bool empty() const { return path_.empty(); }
         bool is_complete() const;
+        /** extension: checks is path have a UNC prefix */
+        bool is_unc() const { return path_.size() > 2 && path_[0] == slashval && path_[1] == slashval; }
 
         bool has_root_name() const;
         bool has_root_directory() const;
@@ -326,9 +340,27 @@ namespace std
       private:
         basic_path& append(const value_type* s, typename string_type::size_type size);
         
-        bool is_unc() const { return path_.size() > 2 && path_[0] == slashval && path_[1] == slashval; }
         bool has_drive() const { return path_.size() >= 2 && path_[1] == colonval; }
         static bool is_sep(value_type c) { return c == slashval || c == backslash; }
+
+        template<bool>
+        bool do_normalize(string_type& native, std::__::int2type<true>) const
+        {
+          ntl::nt::rtl::relative_name rel(path_.c_str());
+          if(rel)
+            native = rel.path.get_string();
+          return rel;
+        }
+
+        template<bool>
+        bool do_normalize(string_type& native, std::__::int2type<false>) const
+        {
+          external_string_type xs = traits_type::to_external(*this, path_);
+          ntl::nt::rtl::relative_name rel(xs.c_str());
+          if(rel)
+            native = traits_type::to_internal(*this, rel.path.get_string());
+          return rel;
+        }
 
         pos_type filename_pos() const;
       private:
@@ -337,6 +369,7 @@ namespace std
         static const value_type slashval = slash<path_type>::value;
         static const value_type colonval = colon<path_type>::value;
         static const value_type backslash = '\\';
+        static const value_type qmark = '?';
         static const pos_type npos = string_type::npos;
       };
 
@@ -447,7 +480,12 @@ namespace std
         template<bool>
         static string to_string(const wpath& p)
         {
-          return path_traits::to_internal(path(), p.file_string());
+          const wpath::string_type& ws = p.string();
+          string s; s.resize(ws.size());
+          typedef ctype<wpath::string_type::value_type> ctype;
+          const ctype& ct = use_facet<ctype>(locale::classic());
+          ct.narrow(ws.cbegin(),ws.cend(),'\0',s.begin());
+          return s;
         }
         template<bool, class PathT>
         static string to_string(const PathT&);
@@ -464,23 +502,39 @@ namespace std
       /* basic_path                                                           */
       /************************************************************************/
       template <class String, class Traits>
-      const String basic_path<String,Traits>::file_string() const
+      const String basic_path<String,Traits>::file_string(bool normalize) const
       {
         if(path_.empty())
           return string_type();
 
-        // convert separators
-        string_type native = path_;
-        for(string_type::iterator i = native.begin(), endi = native.end(); i != endi; ++i)
-          if(*i == slashval)
-            *i = backslash;
-        return native;
-      }
+        string_type native;
+        if(normalize){
+          static const bool same = is_same<string_type,external_string_type>::value;
+          do_normalize<same>(native, std::__::int2type<same>());
+          if(!native.empty())
+            return native;
+        }
 
-      template <class String, class Traits>
-      const String basic_path<String,Traits>::directory_string() const
-      {
-        return file_string();
+        // prepend the NT prefixes if path has drive
+        static const char *ntprefix = "\\??\\", *uncprefix = "UNC\\";
+
+        const bool abs = has_drive(), unc = is_unc();
+        native.resize(abs*4 + path_.size() + unc*2); // '\??\' + (?unc 'UNC\' - '//') + path
+
+        if(abs || unc){
+          const ctype<value_type>& ct = use_facet<ctype<value_type> >(locale::classic());
+          if(abs)
+            ct.widen(ntprefix, ntprefix+4, native.begin());
+          if(unc)
+            ct.widen(uncprefix, uncprefix+4, native.begin()+4*abs);
+        }
+
+        // convert separators
+        string_type::const_iterator j = path_.cbegin()+unc*2;
+        for(string_type::iterator i = native.begin()+4*abs+4*unc, endi = native.end(); i != endi; ++i, ++j){
+          *i = *j != slashval ? *j : backslash;
+        }
+        return native;
       }
 
       template <class String, class Traits>
@@ -630,27 +684,60 @@ namespace std
       }
 
       template <class String, class Traits>
+      String basic_path<String,Traits>::unc_name() const
+      {
+        return is_unc() ? root_name() : string_type();
+      }
+
+      template <class String, class Traits>
       basic_path<String,Traits>& basic_path<String,Traits>::append(const typename basic_path<String,Traits>::value_type* p, typename String::size_type size)
       {
         if(!p || size == 0 || !*p)
           return *this;
 
-        // explicit native sequence
-        const bool native = size > 3 && p[0] == slashval && p[1] == slashval && p[2] == colonval;
-        if(native)
-          p += 3, size -= 3;
-        if(!size)
-          return *this;
+        // check Native subsystem name '\??\'
+        const bool native = path_.empty() && size > 4 && p[0] == backslash && p[1] == qmark && p[2] == qmark && p[3] == backslash;
+        bool unc = false;
+        if(native){
+          p += 4, size -= 4;
+          // check the UNC name 'UNC\'
+          unc = size > 4 && p[0] == 'U' && p[1] == 'N' && p[2] == 'C' && p[3] == backslash;
+          if(unc){
+            p += 4, size -= 4;
+            // prepend the portable UNC prefix '//'
+            path_ += slashval, path_ += slashval;
+          }
+          if(!size)
+            return *this;
+        }
 
-        // separator
+        // explicit native sequence (posix?) '//:'
+        // NOTE: can this sequence be inside path?
+        // All basic_path string or sequence arguments that describe a path shall accept the portable pathname format, 
+        // and shall accept the native format if explicitly identified by a native format escape sequence prefix of slash slash colon ('//:').
+        const bool pnative = size > 3 && p[0] == slashval && p[1] == slashval && p[2] == colonval;
+        if(pnative){
+          p += 3, size -= 3;
+          if(!size)
+            return *this;
+        }
+
+        // check trailing separator
         if(!path_.empty() && !is_sep(*p) && path_[path_.size()-1] != slashval)
           path_ += slashval;
+
+        // NOTE: should be it?
+        //if(pnative){
+        //  path_.append(p,size);
+        //  return *this;
+        //}
 
         // append
         while(size--){
           path_ += *p == backslash ? slashval : *p;
           p++;
         }
+        path_.c_str();
         return *this;
       }
 

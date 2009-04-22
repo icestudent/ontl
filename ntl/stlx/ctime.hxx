@@ -145,12 +145,23 @@ inline clock_t clock(void)
   return process_times ? (ntl::nt::query_system_time() - process_times->CreateTime) : clock_t(-1);
 }
 
-inline time_t time(time_t* timer)
+inline time_t ntime2ctime(ntl::nt::systime_t ntime)
 {
   // Number of 100 nanosecond units from 1/1/1601 to 1/1/1970
   static const int64_t epoch_bias = 116444736000000000i64;
-  const ntl::nt::systime_t ntime = ntl::nt::query_system_time();
-  const time_t ct = static_cast<time_t>((ntime - epoch_bias) / 10000000i64);
+  return static_cast<time_t>((ntime - epoch_bias) / 10000000i64);
+}
+
+inline ntl::nt::systime_t ctime2ntime(time_t t)
+{
+  // Number of 100 nanosecond units from 1/1/1601 to 1/1/1970
+  static const int64_t epoch_bias = 116444736000000000i64;
+  return t * 10000000i64 + epoch_bias;
+}
+
+inline time_t time(time_t* timer)
+{
+  const time_t ct = ntime2ctime(ntl::nt::query_system_time());
   if(timer)
     *timer = ct;
   return ct;

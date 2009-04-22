@@ -287,34 +287,29 @@ protected:
   }
 };
 
-template<>
-struct file_information<file_rename_information>
+namespace __
 {
-  typedef file_rename_information info_class;
+  template<class info_class>
+  struct file_rename_information_impl
+  {
+    operator bool() const { return nt::success(status_); }
+    operator ntstatus() const { return status_; }
 
-    file_information(legacy_handle file_handle, const info_class& info) __ntl_nothrow
-    : status_(_set(file_handle, &info, sizeof(info) + info.FileNameLength - sizeof(wchar_t)))
-    {/**/}
-
-    file_information(legacy_handle file_handle, const const_unicode_string& new_name, bool replace_if_exists, legacy_handle root_directory = legacy_handle())
+    file_rename_information_impl(legacy_handle file_handle, const const_unicode_string& new_name, bool replace_if_exists, legacy_handle root_directory)
     {
-      info_class::ptr p = info_class::alloc(new_name, replace_if_exists, root_directory);
+      info_class::ptr p(static_cast<info_class*>(info_class::alloc(new_name, replace_if_exists, root_directory).release()));
       status_ = p 
         ? _set(file_handle, p.get(), sizeof(info_class)+p->FileNameLength-sizeof(wchar_t))
         : status::insufficient_resources;
     }
 
-    operator bool() const { return nt::success(status_); }
-
-    operator ntstatus() const { return status_; }
-
     static __forceinline
-    ntstatus
+      ntstatus
       _set(
-        legacy_handle   file_handle,
-        const void *    info,
-        unsigned long   info_length
-        )
+      legacy_handle   file_handle,
+      const void *    info,
+      unsigned long   info_length
+      )
     {
       io_status_block iosb;
       return NtSetInformationFile(file_handle, &iosb, info, info_length, info_class::info_class_type);
@@ -322,6 +317,16 @@ struct file_information<file_rename_information>
 
   protected:
     ntstatus    status_;
+  };
+}
+
+template<>
+struct file_information<file_rename_information>:
+  __::file_rename_information_impl<file_rename_information>
+{
+  file_information(legacy_handle file_handle, const const_unicode_string& new_name, bool replace_if_exists, legacy_handle root_directory = legacy_handle())
+    :file_rename_information_impl(file_handle, new_name, replace_if_exists, root_directory)
+  {}
 };
 
 ///\name  FileLinkInformation == 11
@@ -330,17 +335,14 @@ struct file_link_information: file_rename_information
   static const file_information_class info_class_type = FileLinkInformation;
 
   typedef std::unique_ptr<file_link_information> ptr;
-
 };
 
 template<>
-struct file_information<file_link_information>
-  : file_information<file_rename_information>
+struct file_information<file_link_information>:
+  __::file_rename_information_impl<file_link_information>
 {
-  typedef file_link_information info_class;
-
-  file_information(legacy_handle file_handle, const const_unicode_string& name, bool replace_if_exists, legacy_handle root_directory = legacy_handle())
-    :file_information<file_rename_information>(file_handle, name, replace_if_exists, root_directory)
+  file_information(legacy_handle file_handle, const const_unicode_string& new_name, bool replace_if_exists, legacy_handle root_directory = legacy_handle())
+    :file_rename_information_impl(file_handle, new_name, replace_if_exists, root_directory)
   {}
 };
 

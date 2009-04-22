@@ -120,7 +120,7 @@ namespace std
               else
                 st = status(p, ec);
             }else if(ec != throws())
-              ec = 0;
+              ec.clear();
             return st;
           }
 
@@ -129,7 +129,7 @@ namespace std
             if(!status_known(lst))
               lst = status(p, ec);
             else if(ec != throws())
-              ec = 0;
+              ec.clear();
             return lst;
           }
 

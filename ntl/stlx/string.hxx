@@ -728,8 +728,10 @@ public:
                           ;
 
     ///\name  basic_string::copy [21.3.6.7 string::copy]
-    size_type copy(charT* s, size_type n, size_type pos = 0) const
+    size_type copy(charT* s, size_type n, size_type pos = 0) const// __ntl_throws(out_of_range)
     {
+      if(pos > size())
+        return 0;
       const size_type tail = size() - pos;
       const size_type rlen = min(n, tail);
       for ( size_type i = 0; i != rlen; ++i )

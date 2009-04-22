@@ -85,6 +85,15 @@ ntstatus __stdcall
     );
 
 NTL__EXTERNAPI
+ntstatus __stdcall NtQueryAttributesFile(const object_attributes& ObjectAttributes, file_basic_information& FileInformation);
+
+NTL__EXTERNAPI
+ntstatus __stdcall NtQueryFullAttributesFile(const object_attributes& ObjectAttributes, file_network_open_information& FileInformation);
+
+NTL__EXTERNAPI
+ntstatus __stdcall NtDeleteFile(const object_attributes& ObjectAttributes);
+
+NTL__EXTERNAPI
 ntstatus __stdcall
   NtCreateSection(
     handle*                     SectionHandle,
@@ -189,6 +198,20 @@ void __stdcall RtlReleaseRelativeName(rtl_relative_name*);
 
 namespace rtl
 {
+  struct path_type
+  {
+    enum type {
+      Unknown,
+      UncAbsolute,
+      DriveAbsolute,
+      DriveRelative,
+      Rooted,
+      Relative,
+      LocalDevice,
+      RootLocalDevice
+    };
+  };
+
   struct relative_name: rtl_relative_name
   {
     unicode_string  path;
@@ -239,6 +262,10 @@ namespace rtl
     }
   };
 }
+
+typedef rtl::path_type::type rtl_path_type;
+
+NTL__EXTERNAPI rtl_path_type __stdcall RtlDetermineDosPathNameType_U(const wchar_t* DosFileName);
 
 //#pragma warning(pop)
 

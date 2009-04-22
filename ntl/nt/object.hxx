@@ -180,6 +180,102 @@ NtQueryObject(
 		int32_t* ResultLength
 	  );
 
+///\name Symbolic link objects
+
+NTL__EXTERNAPI
+ntstatus __stdcall
+NtCreateSymbolicLinkObject(
+    handle*         LinkHandle,
+    uint32_t        DesiredAccess,
+    const object_attributes& ObjectAttributes,
+    const const_unicode_string& LinkTarget
+    );
+
+NTL__EXTERNAPI
+ntstatus __stdcall
+NtOpenSymbolicLinkObject(
+    handle*         LinkHandle,
+    uint32_t        DesiredAccess,
+    const object_attributes& ObjectAttributes
+    );
+
+NTL__EXTERNAPI
+ntstatus __stdcall
+NtQuerySymbolicLinkObject(
+    legacy_handle   LinkHandle,
+    unicode_string& LinkTarget,
+    uint32_t*       ReturnedLength
+    );
+
+class symbolic_link;
+} // nt
+
+template<>
+struct device_traits<nt::symbolic_link>:
+  private device_traits<>
+{
+  enum access_mask {
+    query_access = 1,
+    all_access = query_access | standard_rights_required
+  };
+
+  friend access_mask operator | (access_mask m, access_mask m2)
+  {
+    return bitwise_or(m, m2);
+  }
+
+  friend access_mask operator | (access_mask m, nt::access_mask m2)
+  {
+    return m | static_cast<access_mask>(m2);
+  }
+
+  friend access_mask operator | (nt::access_mask m, access_mask m2)
+  {
+    return m2 | m;
+  }
+};
+
+namespace nt {
+  class symbolic_link:
+    public handle,
+    public device_traits<symbolic_link>
+  {
+  public:
+    // create
+    explicit symbolic_link(const const_unicode_string& Object, const const_unicode_string& Target, access_mask DesiredAccess = all_access)
+    {
+      const object_attributes oa(Object);
+      st = NtCreateSymbolicLinkObject(this, DesiredAccess, oa, Target);
+    }
+
+    // open
+    explicit symbolic_link(const const_unicode_string& Object, access_mask DesiredAccess = query_access)
+    {
+      const object_attributes oa(Object);
+      st = NtOpenSymbolicLinkObject(this, DesiredAccess, oa);
+    }
+
+    std::wstring query() const
+    {
+      std::wstring ws;
+      unicode_string us;
+      uint32_t len = 0;
+      st = NtQuerySymbolicLinkObject(get(), us, &len);
+      if(len){
+        ws.resize(len/sizeof(wchar_t));
+        unicode_string us2(ws);
+        st = NtQuerySymbolicLinkObject(get(), us2, nullptr);
+        if(!success(st))
+          ws.clear();
+      }
+      return ws;
+    }
+
+    operator ntstatus() const { return st; }
+  private:
+    mutable ntstatus st;
+  };
+
 }//namespace nt
 }//namespace ntl
 

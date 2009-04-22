@@ -114,7 +114,11 @@ class locale
     ///\name 22.1.1.5 locale static members [locale.statics]
 
     static locale global(const locale&);
-    static const locale& classic();
+    static const locale& classic()
+    {
+      static const locale loc;
+      return loc;
+    }
     ///\}
 
 };// class locale

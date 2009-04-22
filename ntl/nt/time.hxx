@@ -27,7 +27,6 @@ namespace nt {
     int16_t Weekday;     // range [0..6] == [Sunday..Saturday]
   };
 
-//typedef system_time::type systime_t;
 typedef systime_t file_time;
 
 static const systime_t system_time_resolution = system_time::resolution;
