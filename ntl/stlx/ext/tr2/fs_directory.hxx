@@ -74,6 +74,38 @@ namespace std
             :p(p),st(st), lst(symlink_st)
           {}
 
+#ifdef NTL__CXX_RV
+          explicit basic_directory_entry(path_type&& p, file_status st = file_status(), file_status symlink_st = file_status())
+            :p(forward<path_type>(p)),st(st), lst(symlink_st)
+          {}
+          basic_directory_entry(basic_directory_entry&& r)
+          {
+            swap(r);
+          }
+          basic_directory_entry& operator=(basic_directory_entry&& r)
+          {
+            basic_directory_entry(r).swap(*this);
+          }
+
+          void assign(path_type&& p, file_status st = file_status(), file_status symlink_st = file_status())
+          {
+            this->p = move(p), this->st = st, lst = symlink_st;
+          }
+
+          friend void swap(basic_directory_entry&&x, basic_directory_entry& y) { x.swap(y); }
+          friend void swap(basic_directory_entry& x, basic_directory_entry&&y) { x.swap(y); }
+          void swap(basic_directory_entry&& r)
+#else
+          void swap(basic_directory_entry& r)
+#endif
+          {
+            p.swap(r.p);
+            std::swap(st,r.st);
+            std::swap(lst,r.lst);
+          }
+
+          friend void swap(basic_directory_entry& x, basic_directory_entry& y) { x.swap(y); }
+
           ///\name modifiers
           /** Assigns the stored path and statuses with the new values */
           void assign(const path_type& p, file_status st = file_status(), file_status symlink_st = file_status())
@@ -195,6 +227,49 @@ namespace std
           }
           ~basic_directory_iterator() __ntl_nothrow
           {}
+#ifdef NTL__CXX_RV
+          explicit basic_directory_iterator(Path&& dp) __ntl_nothrow
+            :dp(forward<Path>(dp)), di(), base(), memsize()
+          {
+            error_code ec;
+            ReadDirectory(dp, ec);
+          }
+          basic_directory_iterator(Path&& dp, error_code& ec) __ntl_nothrow
+            :dp(forward<Path>(dp)), di(), base(), memsize()
+          {
+            error_code e;
+            ReadDirectory(dp, e);
+            if(ec != throws())
+              ec = e;
+          }
+          basic_directory_iterator(basic_directory_iterator&& r) __ntl_nothrow
+            :di()
+          {
+            swap(r);
+          }
+          basic_directory_iterator& operator=(basic_directory_iterator&& r) __ntl_nothrow
+          {
+            dp = move(r.dp),
+              base = move(r.base),
+              di = r.di,
+              bdi = r.bdi,
+              memsize = r.memsize;
+            r.di = nullptr;
+            return *this;
+          }
+          void swap(basic_directory_iterator&& r)
+#else
+          void swap(basic_directory_iterator& r)
+#endif
+          {
+            dp.swap(r.dp);
+            base.swap(r.base);
+            std::swap(di,r.di);
+            bdi.swap(r.bdi);
+            std::swap(memsize,r.memsize);
+          }
+
+
 
           ///\name Input iterator operations
           const basic_directory_entry<Path>& operator*()  const { assert(di != nullptr); return bdi;  }
@@ -211,7 +286,7 @@ namespace std
           {
             basic_directory_iterator tmp(*this);
             operator++();
-            return tmp;
+            return move(tmp);
           }
 
           ///\name Comparsions
@@ -341,6 +416,14 @@ namespace std
           Path dp;
         };
 
+        template <class Path>
+        inline void swap(basic_directory_iterator<Path>& x, basic_directory_iterator<Path>& y) { x.swap(y); }
+#ifdef NTL__CXX_RV
+        template <class Path>
+        inline void swap(basic_directory_iterator<Path>&&x, basic_directory_iterator<Path>& y) { x.swap(y); }
+        template <class Path>
+        inline void swap(basic_directory_iterator<Path>& x, basic_directory_iterator<Path>&&y) { x.swap(y); }
+#endif
         //////////////////////////////////////////////////////////////////////////
         /**
          *	@brief Class template basic_recursive_directory_iterator
@@ -378,7 +461,7 @@ namespace std
               if(ec != throws())
                 ec = e;
             }else{
-              depth.push(it);
+              depth.push(move(it));
             }
           }
           basic_recursive_directory_iterator(const basic_recursive_directory_iterator& rhs)
@@ -391,6 +474,41 @@ namespace std
           }
           ~basic_recursive_directory_iterator()
           {}
+#ifdef NTL__CXX_RV
+          explicit basic_recursive_directory_iterator(Path&& dp, error_code& ec = throws())
+            :recursive(true)
+          {
+            error_code e;
+            basic_directory_iterator it(forward<Path>(dp), e);
+            if(e){
+              if(ec != throws())
+                ec = e;
+            }else{
+              depth.push(move(it));
+            }
+          }
+          basic_recursive_directory_iterator(basic_recursive_directory_iterator&& rhs)
+            :recursive(rhs.recursive), depth(move(rhs.depth))
+          {
+            rhs.recursive = false; // reset
+          }
+          basic_recursive_directory_iterator& operator=(basic_recursive_directory_iterator&& rhs)
+          {
+            recursive = rhs.recursive;
+            rhs.recursive = false; // reset
+            swap(depth, rhs.depth);
+          }
+          friend void swap(basic_recursive_directory_iterator&&x, basic_recursive_directory_iterator& y) { x.swap(y); }
+          friend void swap(basic_recursive_directory_iterator& x, basic_recursive_directory_iterator&&y) { x.swap(y); }
+          void swap(basic_recursive_directory_iterator&& r)
+#else
+          void swap(basic_recursive_directory_iterator& r)
+#endif
+          {
+            swap(depth,r.depth);
+            swap(recursive,r.recursive);
+          }
+          friend void swap(basic_recursive_directory_iterator& x, basic_recursive_directory_iterator& y) { x.swap(y); }
 
           ///\name Observers
 
@@ -418,19 +536,21 @@ namespace std
             const basic_directory_iterator end = basic_directory_iterator();
 
             // check the current object
-            basic_directory_iterator& it = depth.top();
-            if(recursive && is_directory(it->status())){
-              // go to the child, if directory
-              basic_directory_iterator dit(it->path());
-              if(dit != basic_directory_iterator()){
-                // current directory isn't empty
-                depth.push(dit);
-                return *this;
+            {
+              basic_directory_iterator& it = depth.top();
+              if(recursive && is_directory(it->status())){
+                // go to the child, if directory
+                basic_directory_iterator dit(it->path());
+                if(dit != end){
+                  // current directory isn't empty
+                  depth.push(move(dit));
+                  return *this;
+                }
               }
+              // if it isn't directory, go to other sibling
+              ++it;
             }
             
-            // if it isn't directory, go to other sibling
-            ++it;
             basic_directory_iterator* pit = &depth.top();
             while(*pit == end){
               depth.pop();
@@ -448,7 +568,7 @@ namespace std
           {
             basic_directory_iterator tmp(*this);
             operator++();
-            return tmp;
+            return move(tmp);
           }
 
           ///\name Comparsions

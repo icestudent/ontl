@@ -369,6 +369,14 @@
 							>
 						</File>
 					</Filter>
+					<Filter
+						Name="tr1"
+						>
+						<File
+							RelativePath=".\stlx\ext\tr1\smart_ptr_tr1.hxx"
+							>
+						</File>
+					</Filter>
 				</Filter>
 				<Filter
 					Name="containers"
@@ -615,10 +623,6 @@
 					</File>
 					<File
 						RelativePath=".\stlx\smart_ptr.hxx"
-						>
-					</File>
-					<File
-						RelativePath=".\stlx\smart_ptr_tr1.hxx"
 						>
 					</File>
 					<File

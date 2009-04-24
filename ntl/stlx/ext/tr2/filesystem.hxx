@@ -108,7 +108,10 @@ namespace std
         static external_string_type to_external(const wpath&, const internal_string_type& is) { return is; }
         /** \a xs, converted by the \c m_locale \c codecvt facet to to internal_string_type. */
         static internal_string_type to_internal(const wpath&, const external_string_type& xs) { return xs; }
-
+#ifdef NTL__CXX_RV
+        static external_string_type to_external(const wpath&, internal_string_type&& is)      { return move(is); }
+        static internal_string_type to_internal(const wpath&, external_string_type&& xs)      { return move(xs); }
+#endif
         static void imbue(const locale& loc);
         static bool imbue(const locale& loc, std::nothrow_t);
       };
@@ -172,7 +175,15 @@ namespace std
         {
           operator /=(s);
         }
-
+#ifdef NTL__CXX_RV
+        basic_path(basic_path&& p)
+          :path_(forward<string_type>(p.path_))
+        {}
+        basic_path(string_type&& s)
+        {
+          operator /=(forward<string_type>(s));
+        }
+#endif
         template <class InputIterator>
         basic_path(InputIterator first, InputIterator last)
         {
@@ -200,7 +211,19 @@ namespace std
           path_.clear();
           return operator /=(s);
         }
+#ifdef NTL__CXX_RV
+        basic_path& operator=(basic_path&& p)
+        {
+          path_.clear();
+          return operator /=(forward<string_type>(p.path_));
+        }
 
+        basic_path& operator=(string_type&& s)
+        {
+          path_.clear();
+          return operator /=(forward<string_type>(s));
+        }
+#endif
         template <class InputIterator>
         basic_path& assign(InputIterator first, InputIterator last)
         {
@@ -212,7 +235,11 @@ namespace std
         basic_path& operator/=(const basic_path& rhs) { return append(rhs.string().c_str(), rhs.string().size()); }
         basic_path& operator/=(const string_type& s)  { return append(s.c_str(), s.size()); }
         basic_path& operator/=(const value_type* s)   { return append(s, s ? string_type::traits_type::length(s) : 0); }
-
+#ifdef NTL__CXX_RV
+        // useless
+        basic_path& operator/=(basic_path&& rhs) { return append(rhs.string().c_str(), rhs.string().size()); }
+        basic_path& operator/=(string_type&& s)  { return append(s.c_str(), s.size()); }
+#endif
         template <class InputIterator>
         basic_path& append(InputIterator first, InputIterator last);
 
@@ -237,23 +264,42 @@ namespace std
         ///\name observers
 
         /** Returns the stored path */
-        const string_type string() const { return path_; }
+        const string_type& string() const { return path_; }
         /** Returns the stored path, formatted according to the Native subsystem rules for file names */
-        const string_type file_string(bool normalize = true) const;
+        string_type file_string(bool normalize = true) const;
         /** Returns the stored path, formatted according to the Native subsystem rules for directory names (same as file_string()) */
-        const string_type directory_string(bool normalize = true) const { return file_string(); }
+        string_type directory_string(bool normalize = true) const { return move(file_string()); }
 
         /** Returns the stored path, formatted and encoded according to the Native subsystem rules for file names */
-        const external_string_type external_file_string(bool normalize = true) const
+        external_string_type external_file_string(bool normalize = true) const
         {
-          if(normalize){
-            external_string_type xs = traits_type::to_external(*this, path_);
-            ntl::nt::rtl::relative_name rel(xs.c_str());
-            if(rel)
-              return rel.path.get_string();
-          }
+          if(empty())
+            return external_string_type();
+          if(normalize)
+            return do_normalize<true>(is_same<string_type,external_string_type>());
           return traits_type::to_external(*this, file_string(normalize));
         }
+      protected:
+        template<bool>
+        external_string_type do_normalize(true_type) const
+        {
+          ntl::nt::rtl::relative_name rel(path_.c_str());
+          if(rel)
+            return rel.path.get_string();
+          else
+            return traits_type::to_external(*this, forward<string_type>(file_string(true)));
+        }
+        template<bool>
+        external_string_type do_normalize(false_type) const
+        {
+          external_string_type xs = traits_type::to_external(*this, path_);
+          ntl::nt::rtl::relative_name rel(xs.c_str());
+          if(rel)
+            return move(rel.path.get_string());
+          else
+            return traits_type::to_external(*this, forward<string_type>(file_string(true)));
+        }
+      public:
 
         /** Returns the stored path, formatted and encoded according to the Native subsystem rules for directory names */
         const external_string_type external_directory_string(bool normalize = true) const{ return traits_type::to_external(*this, directory_string(normalize)); }
@@ -322,6 +368,23 @@ namespace std
           iterator()
             :path(), pos(), element()
           {}
+
+#ifdef NTL__CXX_RV
+          iterator(iterator&& r)
+            :name(forward<string_type>(r.name)), path(r.path), pos(r.pos), element(r.element)
+          {
+            r.path = nullptr;
+            r.pos = 0;
+          }
+          iterator& operator=(iterator&& r)
+          {
+            path = move(r.path);
+            pos = r.pos;
+            element = r.element;
+            r.pos = 0;
+            return *this;
+          }
+#endif
 
           static_assert((is_same<const string_type&, reference>::value), "brb");
 
@@ -396,7 +459,7 @@ namespace std
         static bool is_sep(value_type c) { return c == slashval || c == backslash; }
 
         template<bool>
-        bool do_normalize(string_type& native, std::__::int2type<true>) const
+        bool do_normalize(string_type& native, true_type) const
         {
           ntl::nt::rtl::relative_name rel(path_.c_str());
           if(rel)
@@ -405,7 +468,7 @@ namespace std
         }
 
         template<bool>
-        bool do_normalize(string_type& native, std::__::int2type<false>) const
+        bool do_normalize(string_type& native, false_type) const
         {
           external_string_type xs = traits_type::to_external(*this, path_);
           ntl::nt::rtl::relative_name rel(xs.c_str());
@@ -558,7 +621,7 @@ namespace std
           typedef ctype<wpath::string_type::value_type> ctype;
           const ctype& ct = use_facet<ctype>(locale::classic());
           ct.narrow(ws.cbegin(),ws.cend(),'\0',s.begin());
-          return s;
+          return move(s);
         }
         template<bool, class PathT>
         static string to_string(const PathT&);
@@ -576,15 +639,14 @@ namespace std
       /* basic_path                                                           */
       /************************************************************************/
       template <class String, class Traits>
-      const String basic_path<String,Traits>::file_string(bool normalize) const
+      String basic_path<String,Traits>::file_string(bool normalize) const
       {
         if(path_.empty())
           return string_type();
 
         string_type native;
         if(normalize){
-          static const bool same = is_same<string_type,external_string_type>::value;
-          do_normalize<same>(native, std::__::int2type<same>());
+          do_normalize<true>(native, is_same<string_type,external_string_type>());
           if(!native.empty())
             return native;
         }
@@ -608,7 +670,7 @@ namespace std
         for(string_type::iterator i = native.begin()+4*abs+4*unc, endi = native.end(); i != endi; ++i, ++j){
           *i = *j != slashval ? *j : backslash;
         }
-        return native;
+        return move(native);
       }
 
       template <class String, class Traits>
@@ -712,7 +774,7 @@ namespace std
         string_type root = root_name();
         if(!root.empty() && path_.size() > root.size())
           root += slashval; // += root_directory()
-        return root;
+        return move(root);
       }
 
       template <class String, class Traits>
@@ -760,7 +822,7 @@ namespace std
         // filename without extension, if any
         string_type fname = leaf();
         pos_type dotpos = fname.rfind(dotval);
-        return dotpos == npos ? fname : fname.substr(0, dotpos);
+        return dotpos == npos ? move(fname) : fname.substr(0, dotpos);
       }
 
       template <class String, class Traits>
@@ -826,7 +888,9 @@ namespace std
           path_ += *p == backslash ? slashval : *p;
           p++;
         }
+#ifdef _DEBUG
         path_.c_str();
+#endif
         return *this;
       }
 

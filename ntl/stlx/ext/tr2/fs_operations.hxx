@@ -73,6 +73,9 @@ namespace std
 
           file_type type() const { return type_; }
           void type(file_type v) { type_ = v; }
+
+          bool operator== (const file_status& r) const { return type_ == r.type_; }
+          bool operator!= (const file_status& r) const { return type_ != r.type_; }
         };
 
         /** Information about used and free space */
@@ -190,7 +193,7 @@ namespace std
             file_handler f1, f2;
             ntstatus st = f1.open(const_unicode_string(p1.external_file_string()), file::read_attributes|synchronize, file::share_valid_flags, file::open_for_backup_intent);
             if(success(st))
-              st = f2.open(const_unicode_string(p.external_file_string()), file::read_attributes|synchronize, file::share_valid_flags, file::open_for_backup_intent);
+              st = f2.open(const_unicode_string(p2.external_file_string()), file::read_attributes|synchronize, file::share_valid_flags, file::open_for_backup_intent);
             ec.clear();
             if(success(st)){
               // compare the volumes
@@ -231,10 +234,12 @@ namespace std
             else
               __ntl_throw(basic_filesystem_error<Path2>( "Failed to determine equivalence", p2, make_error_code(!e2 ? posix_error::no_such_file_or_directory : posix_error::file_exists) ));
           }
+          if(s1 != s2)
+            return false;
           error_code ec;
           bool re = __::equivalent(p1,p2,ec);
           if(ec){
-            typedef basic_path<typename Path1::external_string_type> epath;
+            typedef basic_path<typename Path1::external_string_type, typename Path1::traits_type> epath;
             __ntl_throw(basic_filesystem_error<epath>("Failed to determine equivalence", Path1::traits_type::to_external(p1, p1.string()), Path2::traits_type::to_external(p2, p2.string()), ec));
           }
           return re;
@@ -267,7 +272,21 @@ namespace std
         /** Returns the current path */
         template <class Path> inline Path current_path()
         {
-          return Path::traits_type::to_internal(Path(), ntl::nt::peb::instance().ProcessParameters->CurrentDirectory.DosPath);
+          return Path::traits_type::to_internal(Path(), ntl::nt::peb::instance().ProcessParameters->CurrentDirectory.DosPath.get_string());
+        }
+
+        /** Sets the current path */
+        template <class Path> inline void current_path(const Path& p, error_code& ec = throws())
+        {
+          using namespace ntl::nt;
+          ntstatus st = RtlSetCurrentDirectory_U(const_unicode_string(p.external_file_string()));
+          if(!success(st)){
+            error_code e = make_error_code(st);
+            if(ec == throws())
+              __ntl_throw(basic_filesystem_error<Path>("Failed to set the current path", p, e));
+            else ec = e;
+          }else if(ec != throws())
+            ec.clear();
         }
 
         /** Returns the current path at the first call of initial_path() */
@@ -481,9 +500,9 @@ namespace std
 
           using namespace ntl::nt;
           file_handler f;
-          ntstatus st = f.open(const_unicode_string(from), file::read_attributes|file::delete_access|synchronize, file::share_read|file::share_write|file::share_delete, file::creation_options_default);
+          ntstatus st = f.open(const_unicode_string(from), file::read_attributes|delete_access|synchronize, file::share_read|file::share_write|file::share_delete, file::creation_options_default);
           if(success(st))
-            st = f.rename(const_unicode_string(to))
+            st = f.rename(const_unicode_string(to));
           if(!success(st)){
             error_code e = make_error_code(st);
             if(ec == throws())

@@ -38,10 +38,18 @@ class stack
     typedef typename Container::size_type   size_type;
     typedef          Container              container_type;
 
-    explicit stack(const Container& c = Container()) : c(c) {}
     
     #ifdef NTL__CXX_RV
-    explicit stack(Container&& = Container());
+    explicit stack(const Container& c)
+      :c(c)
+    {}
+    explicit stack(Container&& c = Container())
+      :c(forward<Container>(c))
+    {}
+    #else
+    explicit stack(const Container& c = Container()):
+    c(c)
+    {}
     #endif
 
     template <class Alloc>
@@ -64,7 +72,10 @@ class stack
     void              pop()                     { c.pop_back(); }
 
     #ifdef NTL__CXX_RV
-    void push(value_type&& x);
+    void push(value_type&& x)
+    {
+      c.push_back(move(x));
+    }
     #endif
     #ifdef NTL__CXX_VT
     template <class... Args>
@@ -80,7 +91,6 @@ class stack
 
   ///////////////////////////////////////////////////////////////////////////
   protected:
-
     Container c;
 
   ///////////////////////////////////////////////////////////////////////////
@@ -99,21 +109,14 @@ class stack
 
 };//class stack
 
-// misprint?
-template <class T, class Allocator>
-void swap(stack<T,Allocator>& x, stack<T,Allocator>& y);
-
 template <class T, class Container>
-void swap(stack<T, Container>& x, stack<T, Container>& y)
-{
-  x.swap(y);
-}
+void swap(stack<T,Container>& x, stack<T,Container>& y)  { x.swap(y); }
 
 #ifdef NTL__CXX_RV
 template <class T, class Allocator>
-void swap(stack<T,Allocator>&& x, stack<T,Allocator>& y);
+void swap(stack<T,Allocator>&& x, stack<T,Allocator>&  y){ x.swap(y); }
 template <class T, class Allocator>
-void swap(stack<T,Allocator>& x, stack<T,Allocator>&& y);
+void swap(stack<T,Allocator>& x,  stack<T,Allocator>&& y){ x.swap(y); }
 #endif
 
 

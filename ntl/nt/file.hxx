@@ -93,6 +93,14 @@ ntstatus __stdcall NtQueryFullAttributesFile(const object_attributes& ObjectAttr
 NTL__EXTERNAPI
 ntstatus __stdcall NtDeleteFile(const object_attributes& ObjectAttributes);
 
+//////////////////////////////////////////////////////////////////////////
+NTL__EXTERNAPI
+uint32_t __stdcall RtlGetCurrentDirectory_U(uint32_t nBufferLength, wchar_t* lpBuffer);
+
+NTL__EXTERNAPI
+ntstatus __stdcall RtlSetCurrentDirectory_U(const const_unicode_string& PathName);
+
+//////////////////////////////////////////////////////////////////////////
 NTL__EXTERNAPI
 ntstatus __stdcall
   NtQueryDirectoryFile(
