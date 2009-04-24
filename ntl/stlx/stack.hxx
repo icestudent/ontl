@@ -88,29 +88,12 @@ class stack
   ///\name  Stack operators
   ///@{
 
-  friend
-    bool operator==(const stack<T, Container>& x, const stack<T, Container>& y)
-      { return x.c == y.c; }
-
-  friend
-    bool operator< (const stack<T, Container>& x, const stack<T, Container>& y)
-      { return x.c < y.c; }
-
-  friend
-    bool operator!=(const stack<T, Container>& x, const stack<T, Container>& y)
-      { return x.c != y.c }
-
-  friend
-    bool operator> (const stack<T, Container>& x, const stack<T, Container>& y)
-      { return x.c > y.c; }
-
-  friend
-    bool operator>=(const stack<T, Container>& x, const stack<T, Container>& y)
-      { return x.c >= y.c; }
-
-  friend
-    bool operator<=(const stack<T, Container>& x, const stack<T, Container>& y)
-      { return x.c <= y.c; }
+  friend bool operator==(const stack<T, Container>& x, const stack<T, Container>& y) { return x.c == y.c; }
+  friend bool operator< (const stack<T, Container>& x, const stack<T, Container>& y) { return x.c <  y.c; }
+  friend bool operator!=(const stack<T, Container>& x, const stack<T, Container>& y) { return x.c != y.c; }
+  friend bool operator> (const stack<T, Container>& x, const stack<T, Container>& y) { return x.c >  y.c; }
+  friend bool operator>=(const stack<T, Container>& x, const stack<T, Container>& y) { return x.c >= y.c; }
+  friend bool operator<=(const stack<T, Container>& x, const stack<T, Container>& y) { return x.c <= y.c; }
 
   ///@}
 

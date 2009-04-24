@@ -95,6 +95,22 @@ ntstatus __stdcall NtDeleteFile(const object_attributes& ObjectAttributes);
 
 NTL__EXTERNAPI
 ntstatus __stdcall
+  NtQueryDirectoryFile(
+    legacy_handle  FileHandle,
+    legacy_handle  Event,
+    io_apc_routine*  ApcRoutine,
+    void* ApcContext,
+    io_status_block* IoStatusBlock,
+    void* FileInformation,
+    uint32_t Length,
+    file_information_class FileInformationClass,
+    bool ReturnSingleEntry,
+    const const_unicode_string* FileName,
+    bool RestartScan
+    );
+
+NTL__EXTERNAPI
+ntstatus __stdcall
   NtCreateSection(
     handle*                     SectionHandle,
     uint32_t                    DesiredAccess,
@@ -281,7 +297,9 @@ class section;
 
 
 template<>
-struct device_traits<nt::file_handler> : public device_traits<>
+struct device_traits<nt::file_handler>:
+  public device_traits<>,
+  public nt::file_attribute
 {
   bool success(ntstatus s) { return nt::success(s); }
 
@@ -407,25 +425,13 @@ struct device_traits<nt::file_handler> : public device_traits<>
     return bitwise_or(m, m2);
   }
 
-  enum attributes
-  {
-    readonly            = 0x00000001,
-    hidden              = 0x00000002,
-    system              = 0x00000004,
-    archive             = 0x00000020,
-    normal              = 0x00000080,
-    temporary           = 0x00000100,
-    offline             = 0x00001000,
-    not_content_indexed = 0x00002000,
-    encrypted           = 0x00004000,
-    reparse_point       = 0x00200000,
-  };
+  typedef file_attribute::type attributes;
   static const attributes attribute_default = static_cast<attributes>(0);
 
-  friend attributes operator | (attributes m, attributes m2)
-  {
-    return bitwise_or(m, m2);
-  }
+  //friend attributes operator | (attributes m, attributes m2)
+  //{
+  //  return bitwise_or(m, m2);
+  //}
 
 };
 

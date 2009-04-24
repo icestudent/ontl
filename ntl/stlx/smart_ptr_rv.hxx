@@ -763,33 +763,44 @@ namespace std
 
   namespace __
   {
-    template<class T>
-    struct shared_ptr_data:
+    struct shared_ptr_base:
       private ntl::noncopyable
     {
-      T* p;
       long use_count, weak_count;
 
-      explicit shared_ptr_data()
-        :p(), use_count(0), weak_count(0)
+      explicit shared_ptr_base()
+        :use_count(0), weak_count(0)
       {}
-      explicit shared_ptr_data(T* p)
-        :p(p), use_count(1), weak_count(0)
-      {}
-      virtual ~shared_ptr_data() __ntl_nothrow {}
-
-      virtual void free() __ntl_nothrow
-      {
-        delete p;
-      }
+      virtual ~shared_ptr_base() __ntl_nothrow {}
+      virtual void free() __ntl_nothrow = 0;
       virtual const void* get_deleter(const type_info&) const __ntl_nothrow
       {
         return nullptr;
       }
       virtual void dispose() __ntl_nothrow
       {
-        free();
         delete this;
+      }
+    };
+    template<class T>
+    struct shared_ptr_data:
+      shared_ptr_base
+    {
+      T* p;
+
+      explicit shared_ptr_data(T* p)
+        :p(p)
+      {
+        use_count = 1;
+      }
+      virtual ~shared_ptr_data() __ntl_nothrow {}
+
+      virtual void free() __ntl_nothrow
+      {
+        if(p){
+          T* pp = p; p = nullptr;
+          delete pp;
+        }
       }
     };
 
@@ -805,7 +816,10 @@ namespace std
 
       void free()__ntl_nothrow
       {
-        deleter(p);
+        if(p){
+          T* pp = p; p = nullptr;
+          deleter(pp);
+        }
       }
       const void* get_deleter(const type_info& ti) const __ntl_nothrow
       {
@@ -847,7 +861,7 @@ namespace std
   template<class T>
   class shared_ptr
   {
-    typedef __::shared_ptr_data<T> shared_data;
+    typedef __::shared_ptr_base* shared_data;
 
     struct explicit_bool { int _; };
     typedef int explicit_bool::*  explicit_bool_type;
@@ -894,7 +908,7 @@ namespace std
       :shared(),ptr()
     {
       __ntl_try {
-        shared = new shared_data(p);
+        shared = new __::shared_ptr_data<Y>(p);
         set(p);
         check_shared(p, this);
       }
@@ -907,7 +921,7 @@ namespace std
       :shared(),ptr()
     {
       __ntl_try {
-        shared = new __::shared_ptr_deleter<T,D>(p, d);
+        shared = new __::shared_ptr_deleter<Y,D>(p, d);
         set(p);
       }
       __ntl_catch(bad_alloc){
@@ -918,7 +932,7 @@ namespace std
     template<class Y, class D, class A> shared_ptr(Y* p, D d, A a)
       :shared(),ptr()
     {
-      typedef __::shared_ptr_da<T,D,A> shared_data3;
+      typedef __::shared_ptr_da<Y,D,A> shared_data3;
       typename A::template rebind<shared_data3>::other alloc(a);
 
       __ntl_try {
@@ -943,20 +957,20 @@ namespace std
       swap(r);
     }
     template<class Y> shared_ptr(const shared_ptr<Y>& r) __ntl_nothrow
-      :shared(__::shared_data_cast<T>(r.shared)),ptr(r.get())
+      :shared(/*__::shared_data_cast<T>*/(r.shared)),ptr(r.get())
     {
       static_assert((is_convertible<Y*,T*>::value), "Y* shall be convertible to T*");
       add_ref();
     }
     template<class Y> shared_ptr(shared_ptr<Y>&& r) __ntl_nothrow
-      :shared(__::shared_data_cast<T>(r.shared)),ptr(r.get())
+      :shared(/*__::shared_data_cast<T>*/(r.shared)),ptr(r.get())
     {
       static_assert((is_convertible<Y*,T*>::value), "Y* shall be convertible to T*");
       r.shared = nullptr,
         r.ptr = nullptr;
     }
     template<class Y> shared_ptr(const shared_ptr<Y>& r, T* p) __ntl_nothrow
-      :shared(__::shared_data_cast<T>(r.shared)), ptr()
+      :shared(/*__::shared_data_cast<T>*/(r.shared)), ptr()
     {
       add_ref(p);
     }
@@ -968,14 +982,14 @@ namespace std
       if(r.expired())
         __ntl_throw(bad_weak_ptr());
 
-      shared = __::shared_data_cast<T>(r.shared);
+      shared = /*__::shared_data_cast<T>*/(r.shared);
       add_ref(r.ptr);
     }
     template<class Y> explicit shared_ptr(auto_ptr<Y>&& r)__ntl_throws(bad_alloc)
       :shared(),ptr()
     {
       if(r.get()){
-        shared = new shared_data(r.get());
+        shared = new __::shared_ptr_data<Y>(r.get());
         ptr = r.release();
       }
     }
@@ -985,7 +999,7 @@ namespace std
     {
       if(r.get()){
         // currently unique_ptr's deleter always are reference
-        shared = new __::shared_ptr_deleter<T,D>(r.get(), ref(r.get_deleter()));
+        shared = new __::shared_ptr_deleter<Y,D>(r.get(), ref(r.get_deleter()));
         ptr = r.release();
       }
     }
@@ -1015,13 +1029,13 @@ namespace std
     }
     template<class Y> shared_ptr& operator=(const shared_ptr<Y>& r)
     {
-      if(shared != __::shared_data_cast<T>(r.shared))
+      if(shared != /*__::shared_data_cast<T>*/(r.shared))
         shared_ptr(r).swap(*this);
       return *this;
     }
     template<class Y> shared_ptr& operator=(shared_ptr<Y>&& r)
     {
-      if(shared != __::shared_data_cast<T>(r.shared))
+      if(shared != /*__::shared_data_cast<T>*/(r.shared))
         shared_ptr(r).swap(*this);
       return *this;
     }
@@ -1055,14 +1069,14 @@ namespace std
     template<class Y> void reset(Y* p)
     {
       reset();
-      shared = new shared_data(p);
+      shared = new __::shared_ptr_data<Y>(p);
       set(p);
       check_shared(p, this);
     }
     template<class Y, class D> void reset(Y* p, D d)
     {
       reset();
-      shared = new __::shared_ptr_deleter<T,D>(p, d);
+      shared = new __::shared_ptr_deleter<Y,D>(p, d);
       set(p);
     }
     template<class Y, class D, class A> void reset(Y* p, D d, A a)
@@ -1102,13 +1116,13 @@ namespace std
     friend bool operator<(shared_ptr<T> const& a, shared_ptr<U> const& b) __ntl_nothrow;
 
     template<class Y> shared_ptr(const shared_ptr<Y>& r, __::shared_cast_const) __ntl_nothrow
-      :shared(__::shared_data_cast<T>(r.shared))
+      :shared(/*__::shared_data_cast<T>*/(r.shared))
     {
       const_cast<T*>((Y*)0);
       add_ref();
     }
     template<class Y> shared_ptr(const shared_ptr<Y>& r, __::shared_cast_static) __ntl_nothrow
-      :shared(__::shared_data_cast<T>(r.shared))
+      :shared(/*__::shared_data_cast<T>*/(r.shared))
     {
       static_cast<T*>((Y*)0);
       add_ref();
@@ -1117,7 +1131,7 @@ namespace std
       :shared()
     {
       if(dynamic_cast<T*>(r.get())){
-        shared = __::shared_data_cast<T>(r.shared);
+        shared = /*__::shared_data_cast<T>*/(r.shared);
         add_ref();
       }
     }
@@ -1147,7 +1161,7 @@ namespace std
       }
     }
   private:
-    shared_data* shared;
+    shared_data shared;
     T* ptr;
   };
 
@@ -1282,7 +1296,7 @@ namespace std
   template<class T>
   class weak_ptr
   {
-    typedef __::shared_ptr_data<T>* shared_data;
+    typedef __::shared_ptr_base* shared_data;
 
     template<class Y> friend class shared_ptr;
   public:
@@ -1299,13 +1313,13 @@ namespace std
     }
 
     template<class Y> weak_ptr(weak_ptr<Y> const& r) __ntl_nothrow
-      :shared(__::shared_data_cast<T>(r.shared)),ptr(r.ptr)
+      :shared(/*__::shared_data_cast<T>*/(r.shared)),ptr(r.ptr)
     {
       add_ref();
     }
 
     template<class Y> weak_ptr(shared_ptr<Y> const& r) __ntl_nothrow
-      :shared(__::shared_data_cast<T>(r.shared)),ptr(r.ptr)
+      :shared(/*__::shared_data_cast<T>*/(r.shared)),ptr(r.ptr)
     {
       add_ref();
     }
@@ -1328,9 +1342,9 @@ namespace std
     }
     template<class Y> weak_ptr& operator=(weak_ptr<Y> const& r) __ntl_nothrow
     {
-      if(shared != __::shared_data_cast<T>(r.shared)){
+      if(shared != /*__::shared_data_cast<T>*/(r.shared)){
         reset();
-        shared = __::shared_data_cast<T>(r.shared);
+        shared = /*__::shared_data_cast<T>*/(r.shared);
         ptr = r.ptr;
         add_ref();
       }
@@ -1338,9 +1352,9 @@ namespace std
     }
     template<class Y> weak_ptr& operator=(shared_ptr<Y> const& r) __ntl_nothrow
     {
-      if(shared != __::shared_data_cast<T>(r.shared)){
+      if(shared != /*__::shared_data_cast<T>*/(r.shared)){
         reset();
-        shared = __::shared_data_cast<T>(r.shared);
+        shared = /*__::shared_data_cast<T>*/(r.shared);
         ptr = r.ptr;
         add_ref();
       }

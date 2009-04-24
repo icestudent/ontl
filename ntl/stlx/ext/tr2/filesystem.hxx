@@ -20,6 +20,12 @@
 // implementation
 #include "../../../nt/string.hxx"
 
+#ifndef NTL__SUBSYSTEM_KM
+# include "../../../nt/new.hxx"
+#else
+# include "../../../km/new.hxx"
+#endif
+
 namespace std
 {
   /// C++ Standard Library Technical Report 2
@@ -107,16 +113,25 @@ namespace std
         static bool imbue(const locale& loc, std::nothrow_t);
       };
 
+      /** Portable %slash character (\e solidus) */
       template<class Path> struct slash { static const typename Path::value_type value = '/'; };
+      /** Portable %dot character (\e period) */
       template<class Path> struct dot   { static const typename Path::value_type value = '.'; };
+      /** Portable %colon character */
       template<class Path> struct colon { static const typename Path::value_type value = ':'; };
 
+      /** Slash character which used by path */
       template<> struct slash <path>{ static const char value = '/'; };
+      /** Dot character which used by path */
       template<> struct dot   <path>{ static const char value = '.'; };
+      /** Colon character which used by path */
       template<> struct colon <path>{ static const char value = ':'; };
 
+      /** Slash character which used by wpath */
       template<> struct slash <wpath>{ static const wchar_t value = '/'; };
+      /** Dot character which used by wpath */
       template<> struct dot   <wpath>{ static const wchar_t value = '.'; };
+      /** Colon character which used by wpath */
       template<> struct colon <wpath>{ static const wchar_t value = ':'; };
       ///\}
       #pragma endregion
@@ -201,7 +216,9 @@ namespace std
         template <class InputIterator>
         basic_path& append(InputIterator first, InputIterator last);
 
+        /** Clears the path */
         void clear() { path_.clear(); }
+        /** Swaps the paths */
       #ifdef NTL__CXX_RV
         void swap(basic_path&& rhs)
       #else
@@ -211,15 +228,22 @@ namespace std
           std::swap(path_, rhs.path_);
         }
 
+        /** Removes the last \e filename from the path */
         basic_path& remove_leaf();
 
-        basic_path& replace_stem(const string_type& new_stem = string_type());
+        /** Replaces the extension of \e filename with the new extension */
+        basic_path& replace_extension(const string_type& new_ext = string_type());
 
         ///\name observers
+
+        /** Returns the stored path */
         const string_type string() const { return path_; }
+        /** Returns the stored path, formatted according to the Native subsystem rules for file names */
         const string_type file_string(bool normalize = true) const;
+        /** Returns the stored path, formatted according to the Native subsystem rules for directory names (same as file_string()) */
         const string_type directory_string(bool normalize = true) const { return file_string(); }
 
+        /** Returns the stored path, formatted and encoded according to the Native subsystem rules for file names */
         const external_string_type external_file_string(bool normalize = true) const
         {
           if(normalize){
@@ -231,30 +255,55 @@ namespace std
           return traits_type::to_external(*this, file_string(normalize));
         }
 
+        /** Returns the stored path, formatted and encoded according to the Native subsystem rules for directory names */
         const external_string_type external_directory_string(bool normalize = true) const{ return traits_type::to_external(*this, directory_string(normalize)); }
 
         /** extension: returns UNC server name if any */
         string_type  unc_name() const;
+        /** Returns the \e root-name, if any (e.g. UNC server name or drive name) */
         string_type  root_name() const;
+        /** Returns the \e root-directory, if any (currently its always slash) */
         string_type  root_directory() const;
+        /** Returns the \e root-path, if any (\e root-name with trailing slash) */
         basic_path   root_path() const;
-        basic_path   branch_path() const;
-        basic_path   relative_path() const;
-        string_type  leaf() const;
-        string_type  stem() const;
 
+        /** Returns the \e branch-path, if any (aka \e parent-path) */
+        basic_path   branch_path() const;
+        /** Returns the relative path, if any (path without \e root-name) */
+        basic_path   relative_path() const;
+        
+        /** Returns the base object name (without path), if any */
+        string_type  leaf() const;
+        /** Returns the base object name without \e extension, if any */
+        string_type  stem() const;
+        /** Returns the extension of the base object name, if any */
+        string_type  extension() const;
+
+        /** Returns \c true if path is empty */
         bool empty() const { return path_.empty(); }
+
+        /** Returns \c true if elements of root_path() uniquely identify a directory */
         bool is_complete() const;
+
         /** extension: checks is path have a UNC prefix */
         bool is_unc() const { return path_.size() > 2 && path_[0] == slashval && path_[1] == slashval; }
 
+        /** Returns \c true if path has the \e root-name */
         bool has_root_name() const;
+        /** Returns \c true if path has the \e root-directory */
         bool has_root_directory() const;
+        /** Returns \c true if path has the \e root-path */
         bool has_root_path() const;
+        /** Returns \c true if path has the branch (parent) path */
         bool has_branch_path() const;
+        /** Returns \c true if path has the relative (without \e root-name) path */
         bool has_relative_path() const;
+        /** Returns \c true if path has the base object name */
         bool has_leaf() const;
+        /** Returns \c true if path has the base object name without extension (useless) */
         bool has_stem() const;
+        /** Returns \c true if path has the extension of the base object name */
+        bool has_extension() const;
 
         ///\name iterators
         /**
@@ -306,6 +355,8 @@ namespace std
           {
             if(!start)
               pos = value_type::npos, element = end;
+            else
+              operator++();
           }
 
           enum elements {
@@ -327,7 +378,7 @@ namespace std
         /** Returns an iterator for the first present element in the traversal list above. If no elements are present, the end iterator. */
         iterator begin() const { return iterator(path_, true ); }
         /** Returns the end iterator. */
-        iterator end() const   { return iterator(path_, false); }
+        iterator end()   const { return iterator(path_, false); }
 
         /** Returns an iterator for the first present element in the traversal list above. If no elements are present, the end iterator. */
         const_iterator cbegin() const { return begin(); }
@@ -335,6 +386,7 @@ namespace std
         const_iterator cend() const { return end(); }
         ///\}
 
+        /** Compares a two path objects */
         friend bool operator==(const basic_path& a, const basic_path& b) { return a.path_ == b.path_; }
 
       private:
@@ -381,21 +433,28 @@ namespace std
       template <class String, class Traits>
       struct is_basic_path<basic_path<String, Traits> >: true_type{};
 
-      template<class String, class Traits>
-      inline void swap(basic_path<String, Traits> & lhs, basic_path<String, Traits> & rhs)
-      {
-        lhs.swap(rhs);
-      }
-
       #pragma region basic_path non-member operators
-      ///\name basic_path non-member operators
+
+      ///\name basic_path non-member operators (basic_path comparsion)
+      /** Swaps two path objects */
+      template<class String, class Traits>
+      inline void swap(basic_path<String, Traits> & lhs, basic_path<String, Traits> & rhs) { lhs.swap(rhs); }
+      
+    #ifdef NTL__CXX_RV
+      template<class String, class Traits>
+      inline void swap(basic_path<String, Traits>&& lhs, basic_path<String, Traits> & rhs) { lhs.swap(rhs); }
+      template<class String, class Traits>
+      inline void swap(basic_path<String, Traits> & lhs, basic_path<String, Traits>&& rhs) { lhs.swap(rhs); }
+    #endif
+
+    #ifndef __DOXYGEN__
       template<class String, class Traits> inline bool operator<(basic_path<String, Traits>& a, basic_path<String, Traits>& b) { return lexicographical_compare(a.begin(), a.end(), b.begin(), b.end()); }
       template<class String, class Traits> bool operator==(basic_path<String, Traits>& a, basic_path<String, Traits>& b);
       template<class String, class Traits> inline bool operator!=(basic_path<String, Traits>& a, basic_path<String, Traits>& b){ return rel_ops::operator !=(a,b); }
       template<class String, class Traits> inline bool operator>(basic_path<String, Traits>& a, basic_path<String, Traits>& b) { return rel_ops::operator >(a,b);  }
       template<class String, class Traits> inline bool operator<=(basic_path<String, Traits>& a, basic_path<String, Traits>& b){ return rel_ops::operator <=(a,b); }
       template<class String, class Traits> inline bool operator>=(basic_path<String, Traits>& a, basic_path<String, Traits>& b){ return rel_ops::operator >=(a,b); }
-      template<class String, class Traits> inline bool operator/(basic_path<String, Traits>& a, basic_path<String, Traits>& b) { return basic_path<String, Traits>(a) /= b; }
+      template<class String, class Traits> inline basic_path<String, Traits> operator/(basic_path<String, Traits>& a, basic_path<String, Traits>& b) { return basic_path<String, Traits>(a) /= b; }
 
       template<class String, class Traits> inline bool operator<(const typename basic_path<String, Traits>::string_type& a, basic_path<String, Traits>& b) { return basic_path<String, Traits>(a) < b; }
       template<class String, class Traits> inline bool operator==(const typename basic_path<String, Traits>::string_type& a, basic_path<String, Traits>& b){ return basic_path<String, Traits>(a) == b; }
@@ -403,7 +462,7 @@ namespace std
       template<class String, class Traits> inline bool operator>(const typename basic_path<String, Traits>::string_type& a, basic_path<String, Traits>& b) { return basic_path<String, Traits>(a) > b; }
       template<class String, class Traits> inline bool operator<=(const typename basic_path<String, Traits>::string_type& a, basic_path<String, Traits>& b){ return basic_path<String, Traits>(a) <= b; }
       template<class String, class Traits> inline bool operator>=(const typename basic_path<String, Traits>::string_type& a, basic_path<String, Traits>& b){ return basic_path<String, Traits>(a) >= b; }
-      template<class String, class Traits> inline bool operator/(const typename basic_path<String, Traits>::string_type& a, basic_path<String, Traits>& b) { return basic_path<String, Traits>(a) /= b; }
+      template<class String, class Traits> inline basic_path<String, Traits> operator/(const typename basic_path<String, Traits>::string_type& a, basic_path<String, Traits>& b) { return basic_path<String, Traits>(a) /= b; }
 
       template<class String, class Traits> inline bool operator<(const typename basic_path<String, Traits>::string_type::value_type* a, basic_path<String, Traits>& b) { return basic_path<String, Traits>(a) < b; }
       template<class String, class Traits> inline bool operator==(const typename basic_path<String, Traits>::string_type::value_type* a, basic_path<String, Traits>& b){ return basic_path<String, Traits>(a) == b; }
@@ -411,7 +470,7 @@ namespace std
       template<class String, class Traits> inline bool operator>(const typename basic_path<String, Traits>::string_type::value_type* a, basic_path<String, Traits>& b) { return basic_path<String, Traits>(a) > b; }
       template<class String, class Traits> inline bool operator<=(const typename basic_path<String, Traits>::string_type::value_type* a, basic_path<String, Traits>& b){ return basic_path<String, Traits>(a) <= b; }
       template<class String, class Traits> inline bool operator>=(const typename basic_path<String, Traits>::string_type::value_type* a, basic_path<String, Traits>& b){ return basic_path<String, Traits>(a) >= b; }
-      template<class String, class Traits> inline bool operator/(const typename basic_path<String, Traits>::string_type::value_type* a, basic_path<String, Traits>& b) { return basic_path<String, Traits>(a) /= b; }
+      template<class String, class Traits> inline basic_path<String, Traits> operator/(const typename basic_path<String, Traits>::string_type::value_type* a, basic_path<String, Traits>& b) { return basic_path<String, Traits>(a) /= b; }
 
       template<class String, class Traits> inline bool operator<(const basic_path<String, Traits>& a, typename basic_path<String, Traits>::string_type& b) { return a < basic_path<String, Traits>(b); }
       template<class String, class Traits> inline bool operator==(const basic_path<String, Traits>& a, typename basic_path<String, Traits>::string_type& b){ return a == basic_path<String, Traits>(b); }
@@ -419,7 +478,7 @@ namespace std
       template<class String, class Traits> inline bool operator>(const basic_path<String, Traits>& a, typename basic_path<String, Traits>::string_type& b) { return a > basic_path<String, Traits>(b); }
       template<class String, class Traits> inline bool operator<=(const basic_path<String, Traits>& a, typename basic_path<String, Traits>::string_type& b){ return a <= basic_path<String, Traits>(b); }
       template<class String, class Traits> inline bool operator>=(const basic_path<String, Traits>& a, typename basic_path<String, Traits>::string_type& b){ return a >= basic_path<String, Traits>(b); }
-      template<class String, class Traits> inline bool operator/(const basic_path<String, Traits>& a, typename basic_path<String, Traits>::string_type& b) { return a /= basic_path<String, Traits>(b); }
+      template<class String, class Traits> inline basic_path<String, Traits> operator/(const basic_path<String, Traits>& a, typename basic_path<String, Traits>::string_type& b) { return basic_path<String, Traits>(a) /= basic_path<String, Traits>(b); }
 
       template<class String, class Traits> inline bool operator<(const basic_path<String, Traits>& a, typename basic_path<String, Traits>::string_type::value_type* b) { return a < basic_path<String, Traits>(b); }
       template<class String, class Traits> inline bool operator==(const basic_path<String, Traits>& a, typename basic_path<String, Traits>::string_type::value_type* b){ return a == basic_path<String, Traits>(b); }
@@ -427,10 +486,12 @@ namespace std
       template<class String, class Traits> inline bool operator>(const basic_path<String, Traits>& a, typename basic_path<String, Traits>::string_type::value_type* b) { return a > basic_path<String, Traits>(b); }
       template<class String, class Traits> inline bool operator<=(const basic_path<String, Traits>& a, typename basic_path<String, Traits>::string_type::value_type* b){ return a <= basic_path<String, Traits>(b); }
       template<class String, class Traits> inline bool operator>=(const basic_path<String, Traits>& a, typename basic_path<String, Traits>::string_type::value_type* b){ return a >= basic_path<String, Traits>(b); }
-      template<class String, class Traits> inline bool operator/(const basic_path<String, Traits>& a, typename basic_path<String, Traits>::string_type::value_type* b) { return a /= basic_path<String, Traits>(b); }
+      template<class String, class Traits> inline basic_path<String, Traits> operator/(const basic_path<String, Traits>& a, typename basic_path<String, Traits>::string_type::value_type* b) { return a /= basic_path<String, Traits>(b); }
+    #endif
       ///\}
       #pragma endregion 
 
+      /** Prints basic_path to the %stream */
       template<class Path>
       inline basic_ostream<typename Path::string_type::value_type, typename Path::string_type::traits_type> &
         operator<<(basic_ostream<typename Path::string_type::value_type, typename Path::string_type::traits_type>& os, const Path& ph)
@@ -438,9 +499,16 @@ namespace std
         return os << ph.string();
       }
 
+      /** Reads the basic_path from the %stream */
       template<class Path>
-      basic_istream<typename Path::string_type::value_type, typename Path::string_type::traits_type> &
-        operator>>(basic_istream<typename Path::string_type::value_type, typename Path::string_type::traits_type>& is, Path & ph);
+      inline basic_istream<typename Path::string_type::value_type, typename Path::string_type::traits_type> &
+        operator>>(basic_istream<typename Path::string_type::value_type, typename Path::string_type::traits_type>& is, Path & ph)
+      {
+        typename Path::string_type str;
+        is >> str;
+        ph = str;
+        return is;
+      }
 
 
       /**
@@ -457,6 +525,7 @@ namespace std
       public:
         typedef Path path_type;
 
+        ///\name Constructors
         explicit basic_filesystem_error(const std::string& what_arg, error_code ec)
           :system_error(ec, what_arg)
         {}
@@ -467,10 +536,14 @@ namespace std
         :system_error(ec, what_arg), p1(p1), p2(p2)
         {}
 
+        ///\name Observers
+        /** Returns the stored path #1 */
         const path_type& path1() const { return p1; }
+        /** Returns the stored path #2 */
         const path_type& path2() const { return p2; }
 
         inline const char* what() const;
+        ///\}
       private:
         template<bool>
         static string to_string(const path& p)
@@ -496,6 +569,7 @@ namespace std
       /** Specialization of basic_filesystem_error for wpath */
       typedef basic_filesystem_error<wpath> wfilesystem_error;
 
+      #ifndef __DOXYGEN__
       //////////////////////////////////////////////////////////////////////////
       // IMPLEMENTATION
       /************************************************************************/
@@ -598,6 +672,12 @@ namespace std
       }
 
       template <class String, class Traits>
+      bool basic_path<String,Traits>::has_extension() const
+      {
+        return !extension().empty();
+      }
+
+      template <class String, class Traits>
       bool basic_path<String,Traits>::has_branch_path() const
       {
         return !branch_path().empty();
@@ -684,6 +764,15 @@ namespace std
       }
 
       template <class String, class Traits>
+      String basic_path<String,Traits>::extension() const
+      {
+        // filename's extension, if any
+        string_type fname = leaf();
+        pos_type dotpos = fname.rfind(dotval);
+        return dotpos == npos ? string_type() : fname.substr(dotpos+1, npos);
+      }
+
+      template <class String, class Traits>
       String basic_path<String,Traits>::unc_name() const
       {
         return is_unc() ? root_name() : string_type();
@@ -749,14 +838,14 @@ namespace std
       }
 
       template <class String, class Traits>
-      basic_path<String,Traits>& basic_path<String,Traits>::replace_stem(const typename basic_path<String,Traits>::string_type& new_stem)
+      basic_path<String,Traits>& basic_path<String,Traits>::replace_extension(const typename basic_path<String,Traits>::string_type& new_ext)
       {
-        string_type ext = stem();
+        string_type ext = extension();
         if(!ext.empty())
           path_.erase(path_.size() - ext.size());
-        if(!new_stem.empty() && new_stem[0] != dotval)
+        if(!new_ext.empty() && new_ext[0] != dotval)
           path_ += dotval;
-        path_ += new_stem;
+        path_ += new_ext;
         return *this;
       }
 
@@ -770,47 +859,30 @@ namespace std
           return *this;
 
         value_type& p = *path;
-        typename value_type::size_type size = path->size();
-        pos_type cur = pos;
-
-        switch(element)
-        {
-        case dot:
-          {
-            // return ext
-            name = path->substr(pos);
-            pos = path->size();
-            element = end;
-          }
-          break;
-        case begin:
-          {
-            // process root name if any
-            if(size >= 2){
-              if(is_unc(p) || has_drive(p)){
-                // has root name
-                pos = p.find(slashval, p[1] == colonval ? 0 : 2);
-                name = p.substr(0, pos);
-                element = rootname;
-                break;
-              }
-            }
-          }
-        case rootname:
-          {
-            // process root dir
-
-
-
-          }
-        default:
-          {
-            // process names. if last, select a dot
-
-          }
-        }
-        if(pos == static_cast<pos_type>(path->size()))
+        const typename value_type::size_type size = path->size();
+        if(pos == npos || pos == static_cast<pos_type>(size)){
           element = end;
+          pos = npos;
+          name.clear();
+          return *this;
+        }
+
+        // skip leading slashes
+        if(!pos){
+          while(pos < static_cast<pos_type>(size) && p[pos] == slashval)
+            pos++;
+        }
+
+        pos_type cur = pos;
+        pos = p.find(slashval, cur);
+        if(pos == npos)
+          pos = size;
+        name = p.substr(cur, pos-cur);
+        if(pos != size)
+          pos++;
+      #if _DEBUG
+        name.c_str();
+      #endif
         return *this;
       }
 
@@ -900,9 +972,10 @@ namespace std
         return is;
       }
 
+      #endif // __DOXYGEN__
+
       /** @} tr2_filesystem */
       /** @} tr2 */
-
     } // filesystem
     } // sys
     /** @} tr2 */

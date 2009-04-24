@@ -1,3 +1,9 @@
+/**\file*********************************************************************
+ *                                                                     \brief
+ *  Filesystem library
+ *
+ ****************************************************************************
+ */
 #ifndef NTL__STLX_TR2_FILESYSTEM
 #error internal header
 #endif
@@ -13,8 +19,42 @@ namespace std
     {
       namespace filesystem
       {
-        enum file_type { status_unknown, file_not_found, regular_file, directory_file,
-          symlink_file, block_file, character_file, fifo_file, socket_file,
+      /**
+       *  \addtogroup tr2
+       *  @{
+       *  \defgroup tr2_filesystem Filesystem Library
+       *  @{
+       *  \defgroup tr2_filesystem_ops Filesystem operations
+       *  @{
+       **/
+
+
+        /** File object types */
+        enum file_type {
+          /** Unknown status which indicates an error of status() function */
+          status_unknown,
+          /** File or directory is not exists */
+          file_not_found,
+          /** It is a file */
+          regular_file,
+          /** It is a directory */
+          directory_file,
+          /** It is a symbolic link to file or directory */
+          symlink_file,
+          block_file,
+          /** Console input or output */
+          character_file,
+          /** Pipe object */
+          fifo_file,
+          /** Socket object (not supported on NT) */
+          socket_file,
+          /** Pipe object */
+          pipe_file = fifo_file,
+          /** Mailslot object */
+          mailslot_file,
+          /** Kernel-mode device object */
+          device_file,
+          /** Unknown file type */
           type_unknown
         };
 
@@ -47,8 +87,9 @@ namespace std
         namespace __
         {
           template <class Path>
-          static file_status status(const Path& p, error_code& ec, bool follow_symlink = true)
+          static file_status status(const Path& p, error_code& ec, bool follow_symlink = true) __ntl_nothrow
           {
+            // TODO: determine console, pipe, mailslot, device, etc.
             ec.clear();
             using namespace ntl::nt;
             file_basic_information fbi;
@@ -61,45 +102,21 @@ namespace std
                 ft = symlink_file;
               return file_status(ft);
             }
-            ec = ntl::nt::make_error_code(st);
-            return file_status(st == status::object_name_not_found ? file_not_found : status_unknown);
-            //file_handler f;
-            //file_handler::creation_options co = file::open_for_backup_intent;
-            //if(!follow_symlink)
-            //  co = co | file::open_reparse_point;
-            //ntstatus st = f.open(const_unicode_string(p.external_file_string()), file::read_attributes|synchronize, file::share_read|file::share_write, co);
-            //if(!success(st)){
-            //  ec = ntl::nt::make_error_code(st);
-            //  return file_status(st == status::object_name_not_found ? file_not_found : status_unknown);
-            //}
+            if(st == status::object_name_not_found || status::object_path_not_found)
+              return file_status(file_not_found);
 
-            //file_information<file_standard_information> fi(f.get());
-            //if(!success(fi)){
-            //  ec = make_error_code(st);
-            //  return file_status(status_unknown);
-            //}
-            //if(fi->Directory)
-            //  return file_status(directory_file);
-            //else {
-            //  // check, is this a link (symbolic)
-            //  file_information<file_basic_information> fb(f.get());
-            //  if(!success(fb)){
-            //    ec = make_error_code(fb);
-            //    return file_status(status_unknown);
-            //  }
-            //  if(fb->FileAttributes & file_attribute::reparse_point)
-            //    return file_status(symlink_file);
-            //  else
-            //    return file_status(regular_file);
-            //}
+            ec = ntl::nt::make_error_code(st);
+            return file_status(status_unknown);
           }
         } // __
         
-        template <class Path> inline file_status status(const Path& p, error_code& ec)
+        /** Determines the attributes of \c p. Symlinks are resolved. */
+        template <class Path> inline file_status status(const Path& p, error_code& ec) __ntl_nothrow
         {
           return __::status(p, ec, true);
         }
-
+        
+        /** Determines the attributes of \c p. Symlinks are resolved. */
         template <class Path> inline file_status status(const Path& p) __ntl_throws(basic_filesystem_error<Path>)
         {
           error_code ec;
@@ -109,11 +126,13 @@ namespace std
           return fs;
         }
 
-        template <class Path> inline file_status symlink_status(const Path& p, error_code& ec)
+        /** Determines the attributes of \c p. */
+        template <class Path> inline file_status symlink_status(const Path& p, error_code& ec) __ntl_nothrow
         {
           return __::status(p, ec, false);
         }
 
+        /** Determines the attributes of \c p. */
         template <class Path> inline file_status symlink_status(const Path& p) __ntl_throws(basic_filesystem_error<Path>)
         {
           error_code ec;
@@ -124,18 +143,29 @@ namespace std
         }
 
         ///\name predicate functions
+        /** Is status known? */
         inline bool status_known(file_status s) { return s.type() != status_unknown; }
+        /** Is file object exists? */
         inline bool exists(file_status s)       { return s.type() != status_unknown && s.type() != file_not_found; }
+        /** Is it a file? */
         inline bool is_regular(file_status s)   { return s.type() == regular_file; }
+        /** Is it a directory? */
         inline bool is_directory(file_status s) { return s.type() == directory_file; }
+        /** Is it a symbolic link? */
         inline bool is_symlink(file_status s)   { return s.type() == symlink_file; }
+        /** Is it not a file, directory or symbolic link? */
         inline bool is_other(file_status s)     { return exists(s) && s.type() != regular_file && s.type() != directory_file && s.type() != symlink_file; }
 
+        /** Is file object exists? */
         template <class Path> inline bool exists(const Path& p)       { return exists(status(p)); }
-        template <class Path> inline bool is_directory(const Path& p) { return is_directory(status(p)); }
+        /** Is it a file? */
         template <class Path> inline bool is_regular(const Path& p)   { return is_regular(status(p)); }
-        template <class Path> inline bool is_other(const Path& p)     { return is_other(status(p)); }
+        /** Is it a directory? */
+        template <class Path> inline bool is_directory(const Path& p) { return is_directory(status(p)); }
+        /** Is it a symbolic link? */
         template <class Path> inline bool is_symlink(const Path& p)   { return is_symlink(status(p)); }
+        /** Is it not a file, directory or symbolic link? */
+        template <class Path> inline bool is_other(const Path& p)     { return is_other(status(p)); }
 
         /** Determines, is the file or directory is empty */
         template <class Path> inline bool is_empty(const Path& p) __ntl_throws(basic_filesystem_error<Path>)
@@ -150,36 +180,85 @@ namespace std
             : file_size(p) == 0;
         }
 
+        namespace __
+        {
+          template <class Path1, class Path2>
+          static bool equivalent(const Path1& p1, const Path2& p2, error_code& ec)
+          {
+            // open files
+            using namespace ntl::nt;
+            file_handler f1, f2;
+            ntstatus st = f1.open(const_unicode_string(p1.external_file_string()), file::read_attributes|synchronize, file::share_valid_flags, file::open_for_backup_intent);
+            if(success(st))
+              st = f2.open(const_unicode_string(p.external_file_string()), file::read_attributes|synchronize, file::share_valid_flags, file::open_for_backup_intent);
+            ec.clear();
+            if(success(st)){
+              // compare the volumes
+              volume_information<file_fs_volume_information> v1(f1.get(), false), v2(f2.get(), false);
+              if(status::is_error(v1) || status::is_error(v2)){
+                ec = make_error_code( status::is_error(v1) ? v1.operator ntstatus() : v2.operator ntstatus() );
+                return false;
+              }
+              if(v1->VolumeSerialNumber != v2->VolumeSerialNumber)
+                return false;
+
+              // compare files
+              file_information<file_internal_information> fi1(f1.get()), fi2(f2.get());
+              if(!fi1 || !fi2){
+                ec = make_error_code( status::is_error(fi1) ? fi1.operator ntstatus() : fi2.operator ntstatus() );
+                return false;
+              }
+              if(fi1->IndexNumber != fi2->IndexNumber)
+                return false;
+              // TODO: resolve links
+              return true;
+            }
+            ec = make_error_code(st);
+            return false;
+          }
+        }
+
         /** Determines, is the given paths are the same */
         template <class Path1, class Path2>
         inline bool equivalent(const Path1& p1, const Path2& p2) __ntl_throws(basic_filesystem_error<Path1>, basic_filesystem_error<Path2>)
         {
-          static_assert((is_same<typename Path1::external_string_type,typename Path2::external_string_type>::value), "shall be same type");
+          // check paths
           file_status s1 = status(p1), s2 = status(p2);
           bool e1 = exists(s1), e2 = exists(s2);
           if((!e1 && !e2) || (is_other(s1) && is_other(s2))){
             if(!e1 || is_other(s1))
-              __ntl_throw(basic_filesystem_error<Path1>( !e1 ? "file_not_exists" : "is_other()", p1, make_error_code(!e1 ? posix_error::no_such_file_or_directory : posix_error::file_exists) ));
+              __ntl_throw(basic_filesystem_error<Path1>( "Failed to determine equivalence", p1, make_error_code(!e1 ? posix_error::no_such_file_or_directory : posix_error::file_exists) ));
             else
-              __ntl_throw(basic_filesystem_error<Path2>( !e2 ? "file_not_exists" : "is_other()", p2, make_error_code(!e2 ? posix_error::no_such_file_or_directory : posix_error::file_exists) ));
+              __ntl_throw(basic_filesystem_error<Path2>( "Failed to determine equivalence", p2, make_error_code(!e2 ? posix_error::no_such_file_or_directory : posix_error::file_exists) ));
           }
-          using namespace ntl::nt;
-          // TODO: try to open files
-          file f1, f2;
+          error_code ec;
+          bool re = __::equivalent(p1,p2,ec);
+          if(ec){
+            typedef basic_path<typename Path1::external_string_type> epath;
+            __ntl_throw(basic_filesystem_error<epath>("Failed to determine equivalence", Path1::traits_type::to_external(p1, p1.string()), Path2::traits_type::to_external(p2, p2.string()), ec));
+          }
+          return re;
+        }
 
-          // compare the volumes
-          volume_information<file_fs_volume_information> v1(f1.handler().get(), false), v2(f2.handler().get(), false);
-          if(status::is_error(v1) || status::is_error(v2))
-            return false;
-          if(v1->VolumeSerialNumber != v2->VolumeSerialNumber)
-            return false;
+        /** Determines, is the given paths are the same */
+        template <class Path1, class Path2>
+        inline bool equivalent(const Path1& p1, const Path2& p2, error_code& ec) __ntl_nothrow
+        {
+          static_assert((is_same<typename Path1::external_string_type,typename Path2::external_string_type>::value), "must be same type");
+          if(ec == throws())
+            return equivalent(p1,p2);
 
-          // compare files
-          file_information<file_internal_information> fi1(f1.handler().get()), fi2(f2.handler().get());
-          if(!fi1 || !fi2 || fi1->IndexNumber != fi2->IndexNumber)
+          // check paths
+          file_status s1 = status(p1), s2 = status(p2);
+          bool e1 = exists(s1), e2 = exists(s2);
+          if((!e1 && !e2) || (is_other(s1) && is_other(s2))){
+            if(!e1 || is_other(s1))
+              ec = make_error_code(!e1 ? posix_error::no_such_file_or_directory : posix_error::file_exists);
+            else
+              ec = make_error_code(!e2 ? posix_error::no_such_file_or_directory : posix_error::file_exists);
             return false;
-          // TODO: resolve links
-          return true;
+          }
+          return __::equivalent(p1,p2,ec);
         }
 
 
@@ -198,6 +277,7 @@ namespace std
           return cwd;
         }
 
+        /** Returns the size of file, in bytes */
         template <class Path> inline uintmax_t file_size(const Path& p, error_code& ec = throws())
         {
           static const uintmax_t errval = 0;
@@ -218,8 +298,10 @@ namespace std
           return size;
         }
 
+        /** Returns the space information of the file system, which \c p points to. */
         template <class Path> space_info space(const Path& p);
 
+        /** Returns the posix time of last data modification of \c p */
         template <class Path> inline std::time_t last_write_time(const Path& p, error_code& ec = throws())
         {
           using namespace ntl::nt;
@@ -240,6 +322,7 @@ namespace std
           return val;
         }
 
+        /** Returns the posix time of last data modification of \c p */
         template <class Path> inline void last_write_time(const Path& p, const std::time_t new_time, error_code& ec = throws())
         {
           using namespace ntl::nt;
@@ -264,9 +347,28 @@ namespace std
             ec.clear();
         }
 
-        ///\name operations functions
-        template <class Path> bool create_directory(const Path& dp);
 
+        ///\name operations functions
+        
+        /** Creates a directory object, returns false if directory is already exists */
+        template <class Path> inline bool create_directory(const Path& dp, error_code& ec = throws())
+        {
+          using namespace ntl::nt;
+          file_handler f;
+          ntstatus st = f.create(const_unicode_string(dp.external_file_string()), file::create_new, file::list_directory|synchronize, file::share_read|file::share_write, 
+            file::directory_file|file::open_for_backup_intent|file::synchronous_io_nonalert, file_attribute::normal);
+          if(!success(st) && st != status::object_name_collision){
+            error_code e = make_error_code(st);
+            if(ec != throws())
+              ec = e;
+            else
+              __ntl_throw(basic_filesystem_error<Path>("Failed to create directory", dp, e));
+          }else if(ec != throws())
+            ec.clear();
+          return success(st);
+        }
+
+        /** Creates a hard link, named \c new_fp, to \c old_fp */
         template <class Path1, class Path2>
         static error_code create_hard_link(const Path1& old_fp, const Path2& new_fp, error_code& ec)
         {
@@ -316,6 +418,7 @@ namespace std
           return ec;
         }
         
+        /** Creates a hard link, named \c new_fp, to \c old_fp */
         template <class Path1, class Path2>
         void inline create_hard_link(const Path1& old_fp, const Path2& new_fp) __ntl_throws(basic_filesystem_error<Path1::external_string_type>)
         {
@@ -326,9 +429,11 @@ namespace std
             __ntl_throw(basic_filesystem_error<Path1::external_string_type>("Failed to create hard link [from:to]", old_fp.external_file_string(), new_fp.external_file_string(), ec));
         }
 
+        /** Creates a symbolic link, named \c new_fp, to \c old_fp */
         template <class Path1, class Path2>
         static error_code create_symlink(const Path1& old_fp, const Path2& new_fp, error_code& ec);
         
+        /** Creates a symbolic link, named \c new_fp, to \c old_fp */
         template <class Path1, class Path2>
         void inline create_symlink(const Path1& old_fp, const Path2& new_fp) __ntl_throws(basic_filesystem_error<Path1::external_string_type>)
         {
@@ -339,6 +444,7 @@ namespace std
             __ntl_throw(basic_filesystem_error<Path1::external_string_type>("Failed to create symlink [from:to]", old_fp.external_file_string(), new_fp.external_file_string(), ec));
         }
 
+        /** Removes the file object */
         template <class Path> inline bool remove(const Path& p, error_code& ec = throws())
         {
           using namespace ntl::nt;
@@ -355,7 +461,11 @@ namespace std
           }
           return success(st);
         }
+
+        /** Recursively deletes the contents of \c p if it exists, then deletes file \c p itself */
+        template <class Path> unsigned long remove_all(const Path& p);
         
+        /** Renames the file object from \c from_p to \c to_p */
         template <class Path1, class Path2>
         inline void rename(const Path1& from_p, const Path2& to_p, error_code& ec = throws())
         {
@@ -383,22 +493,78 @@ namespace std
           }
         }
         
+        /** The contents and attributes of the file \c from_fp resolves to are copied to the file \c to_fp resolves to. */
         template <class Path1, class Path2>
         void copy_file(const Path1& from_fp, const Path2& to_fp);
         
+        /** Composes a complete path from \c p, using the same rules used by the operating system to resolve a path passed as the filename argument to standard library open functions. */
         template <class Path> Path system_complete(const Path& p);
         
+        /** Composes a complete path from \c p and \c base */
         template <class Path> Path complete(const Path& p, const Path& base = initial_path<Path>());
 
-        ///\name convenience functions
-        template <class Path> bool create_directories(const Path& p);
 
-        template <class Path> typename Path::string_type extension(const Path& p)
+        ///\name convenience functions
+
+        /** Creates a directory. If one or more of the intermediate folders do not exist, it creates them. */
+        template <class Path> static bool create_directories(const Path& p, error_code& ec)
         {
-          return p.stem();
+          ec.clear();
+          if(p.empty())
+            return false;
+
+          // check path
+          file_status fst = status(p, ec);
+          if(!ec && exists(fst)){
+            if(is_directory(fst))
+              return false;       // directory already exists
+            ec = make_error_code(posix_error::not_a_directory);
+          }
+          if(ec)
+            return false;
+
+          // convert to external
+          const wpath wp = p.external_file_string();
+          if(!wp.has_relative_path()){
+            ec = make_error_code(ntl::nt::status::object_path_invalid);
+            return false;
+          }
+
+          // iterate through it
+          wpath::const_iterator part = wp.cbegin(), pend = wp.cend();
+          wpath q = *part;
+          for(++part; !ec && part != pend; ++part){
+            q /= *part;
+            fst = status(q, ec);
+            if(ec) break;
+            if(is_directory(fst))
+              continue;
+            if(!exists(fst))
+              create_directory(q, ec);
+            else
+              ec = make_error_code(posix_error::not_a_directory);
+          }
+          return !ec;
+        }
+
+        /** Creates a directory. If one or more of the intermediate folders do not exist, it creates them. */
+        template <class Path> inline bool create_directories(const Path& p) __ntl_throws(basic_filesystem_error<Path>)
+        {
+          error_code ec;
+          bool re = create_directories(p, ec);
+          if(ec)
+            __ntl_throw(basic_filesystem_error<Path>("Failed to create directories", p, ec));
+          return re;
+        }
+
+        /** Returns the extension of \c p. \deprecated \see basic_path::extension() */
+        template <class Path> inline typename Path::string_type extension(const Path& p) __ntl_nothrow
+        {
+          return p.extension();
         }
         
-        template <class Path> typename Path::string_type basename(const Path& p)
+        /** Returns the base filename without extension of \c p. \deprecated \see basic_path::stem() */
+        template <class Path> inline typename Path::string_type basename(const Path& p) __ntl_nothrow
         {
           typename Path::string_type leaf = p.leaf();
           if(!leaf.empty()){
@@ -409,11 +575,16 @@ namespace std
           return leaf;
         }
 
-        template <class Path> Path replace_extension(const Path& p, const typename Path::string_type& new_extension)
+        /** Replaces the extension of \c p with the \c new_extension. \deprecated \see basic_path::replace_extension() */
+        template <class Path> inline Path replace_extension(const Path& p, const typename Path::string_type& new_extension) __ntl_nothrow
         {
           return Path(p).replace_stem(new_extension);
         }
         ///\}
+
+        /** @} tr2_filesystem_ops */
+        /** @} tr2_filesystem */
+        /** @} tr2 */
       }
     }
   }

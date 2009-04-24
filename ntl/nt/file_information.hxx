@@ -203,6 +203,23 @@ struct file_information
   {/**/}
 };
 
+///\name FileDirectoryInformation == 1
+struct file_directory_information
+{
+  static const file_information_class info_class_type = FileDirectoryInformation;
+
+  uint32_t  NextEntryOffset;
+  uint32_t  FileIndex;
+  int64_t   CreationTime;
+  int64_t   LastAccessTime;
+  int64_t   LastWriteTime;
+  int64_t   ChangeTime;
+  int64_t   EndOfFile;
+  int64_t   AllocationSize;
+  uint32_t  FileAttributes;
+  uint32_t  FileNameLength;
+  wchar_t   FileName[1];
+};
 
 ///\name   FileBasicInformation == 4
 struct file_basic_information
@@ -213,7 +230,7 @@ struct file_basic_information
   int64_t LastAccessTime;
   int64_t LastWriteTime;
   int64_t ChangeTime;
-  int32_t FileAttributes;
+  uint32_t FileAttributes;
 };
 STATIC_ASSERT(sizeof(file_basic_information) == 0x28);
 

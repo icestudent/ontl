@@ -144,7 +144,7 @@ namespace std
 
       template<class Y, class D> shared_ptr(Y* p, D d)
       {
-        ptr = new __::shared_ptr_deleter<T,D>(p, d);
+        ptr = new __::shared_ptr_deleter<Y,D>(p, d);
       }
 
       shared_ptr(const shared_ptr& r) __ntl_nothrow
@@ -183,7 +183,7 @@ namespace std
       {
         if(r.get()){
           // currently unique_ptr's deleter always are reference
-          ptr = new __::shared_ptr_deleter<T,D>(r.get(), ref(r.get_deleter()));
+          ptr = new __::shared_ptr_deleter<Y,D>(r.get(), ref(r.get_deleter()));
           r.release();
         }
       }
@@ -241,14 +241,14 @@ namespace std
       template<class Y> void reset(Y* p)
       {
         reset();
-        ptr = new shared_data(p);
+        shared = new __::shared_ptr_data<Y>(p);
         check_shared(p, this);
       }
       
       template<class Y, class D> void reset(Y* p, D d)
       {
         reset();
-        ptr = new __::shared_ptr_deleter<T,D>(p, d);
+        ptr = new __::shared_ptr_deleter<Y,D>(p, d);
       }
       
       // [2.2.3.5] observers

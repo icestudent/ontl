@@ -863,7 +863,7 @@ namespace std
         :shared(),ptr()
       {
         __ntl_try {
-          shared = new __::shared_ptr_deleter<T,D>(p, d);
+          shared = new __::shared_ptr_deleter<Y,D>(p, d);
           set(p);
           check_shared(p, this);
         }
@@ -875,7 +875,7 @@ namespace std
       template<class Y, class D, class A> shared_ptr(Y* p, D d, A a)
         :shared(),ptr()
       {
-        typedef __::shared_ptr_da<T,D,A> shared_data3;
+        typedef __::shared_ptr_da<Y,D,A> shared_data3;
         typename A::template rebind<shared_data3>::other alloc(a);
 
         __ntl_try {
@@ -931,7 +931,7 @@ namespace std
       {
         if(r.get()){
           // currently unique_ptr's deleter always are reference
-          shared = new __::shared_ptr_deleter<T,D>(r.get(), ref(r.get_deleter()));
+          shared = new __::shared_ptr_deleter<Y,D>(r.get(), ref(r.get_deleter()));
           ptr = r.release();
         }
       }
@@ -989,14 +989,14 @@ namespace std
       template<class Y> void reset(Y* p)
       {
         reset();
-        shared = new shared_data(p);
+        shared = new __::shared_ptr_data<Y>(p);
         set(p);
         check_shared(p, this);
       }
       template<class Y, class D> void reset(Y* p, D d)
       {
         reset();
-        shared = new __::shared_ptr_deleter<T,D>(p, d);
+        shared = new __::shared_ptr_deleter<Y,D>(p, d);
         set(p);
       }
       template<class Y, class D, class A> void reset(Y* p, D d, A a)
