@@ -16,8 +16,8 @@ namespace std {
 
 // 20.5.5 Relationships between types [meta.rel]
 
-template <class T, class U> struct is_same : false_type {};
-template <class T> struct is_same<T, T> : true_type {};
+template <class T, class U> struct is_same : public false_type {};
+template <class T> struct is_same<T, T> : public true_type {};
 
 template <class Base, class Derived> struct is_base_of
 : public integral_constant<bool, __is_base_of(Base, Derived)> {};
@@ -67,7 +67,7 @@ template <class T> struct add_rvalue_reference     { typedef T& type; };
 template <class T> struct add_rvalue_reference<T&> { typedef T& type; };
 #endif
 
-template <class T> struct add_reference : add_lvalue_reference<T> {};
+template <class T> struct add_reference : public add_lvalue_reference<T> {};
 
 // 20.5.6.3 Sign modifications [meta.trans.sign]
 template <class T> struct make_signed;
@@ -404,9 +404,9 @@ template <class T> struct is_volatile             : public false_type {};
 template <class T> struct is_volatile<volatile T> : public true_type {};
 
 namespace __ {
-  template<class T> struct is_unknown_array: false_type {};
-  template<class T> struct is_unknown_array<T[]>: true_type {};
-  template<class T, size_t Size> struct is_unknown_array<T[Size]>: false_type {};
+  template<class T> struct is_unknown_array: public false_type {};
+  template<class T> struct is_unknown_array<T[]>: public true_type {};
+  template<class T, size_t Size> struct is_unknown_array<T[Size]>: public false_type {};
 }
 
 template<class T> struct is_trivial;

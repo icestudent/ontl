@@ -96,7 +96,9 @@ namespace std
             ec.clear();
             using namespace ntl::nt;
             file_basic_information fbi;
-            ntstatus st = NtQueryAttributesFile(const_unicode_string(p.external_file_string()), fbi);
+
+            const object_attributes::attributes attr = object_attributes::case_insensitive|(follow_symlink ? object_attributes::none : object_attributes::openlink);
+            ntstatus st = NtQueryAttributesFile(object_attributes(const_unicode_string(p.external_file_string()), attr), fbi);
             if(success(st)){
               file_type ft = regular_file;
               if(fbi.FileAttributes & file_attribute::directory)

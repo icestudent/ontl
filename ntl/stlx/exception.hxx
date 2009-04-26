@@ -30,7 +30,7 @@ class exception
     exception() __ntl_nothrow {}
     exception(const exception&) __ntl_nothrow {}
     exception& operator=(const exception&) __ntl_nothrow { return *this; }
-    virtual ~exception() __ntl_nothrow {}
+    virtual ~exception() /*__ntl_nothrow */{}
     virtual const char* what() const __ntl_nothrow { return "exception"; }
 };
 

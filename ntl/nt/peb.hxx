@@ -13,8 +13,13 @@
 #include "../pe/image.hxx"
 #include "teb.hxx"
 
+
 namespace ntl {
 namespace nt {
+
+#pragma warning(push)
+#pragma warning(disable:4820) // 'X' bytes padding added after data member 'peb::MinimumStackCommit'
+#pragma warning(disable:4626) // assignment operator could not be generated
 
 struct rtl_critical_section;
 struct rtl_heap;
@@ -150,8 +155,6 @@ other_name:;
 };
 STATIC_ASSERT(sizeof(ldr_data_table_entry) == 0x50 || sizeof(ldr_data_table_entry) == 0x98);
 
-#pragma warning(push)
-#pragma warning(disable:4820) // 'X' bytes padding added after data member 'peb::MinimumStackCommit'
 
 struct peb
 {

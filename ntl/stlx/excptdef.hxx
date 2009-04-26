@@ -38,14 +38,17 @@
 
 #elif STLX__USE_EXCEPTIONS == 2
   // SEH exceptions
+
+  template<class O>
+  inline void __ntl_seh_throw_impl(const O&){}
+
   #define __ntl_try       __try
   #define __ntl_catch     __except(1)
-  #define __ntl_throw(X)  __ntl_seh_throw_impl((const void*)&X)
+  #define __ntl_throw(X)  __ntl_seh_throw_impl(X)
   #define __ntl_rethrow (0)
   #define __ntl_throws(...)
   #define __ntl_nothrow
 
-  inline void __ntl_seh_throw_impl(const void*){}
 
 #else
   #define __ntl_try

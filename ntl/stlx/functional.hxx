@@ -11,7 +11,8 @@
 #include "type_traits.hxx"
 #include "result_of.hxx"
 #include "cuchar.hxx"
-#include "iterator.hxx" // for hash
+#include "iterator.hxx" // for iterator_traits which used by fnv hash
+#include "typeinfo.hxx" // for hash<type_index>
 
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -235,10 +236,16 @@ namespace __
 
 #define _NEST(x) x
 #define _EMPTY
+#ifdef __ICL
+#pragma warning(disable:424)
+#endif
   NTL_RF_MAKEBASE(_NEST(_EMPTY));
   NTL_RF_MAKEBASE(const);
   NTL_RF_MAKEBASE(volatile);
   NTL_RF_MAKEBASE(const volatile);
+#ifdef __ICL
+#pragma warning(default:424)
+#endif
 #undef _EMPTY
 #undef _NEST
 #undef NTL_RF_MAKEBASE
@@ -291,7 +298,7 @@ class reference_wrapper:
       return *ptr;
     }
 
-#if NTL__CXX_VT
+#ifdef NTL__CXX_VT
     // invocation
     template <class T1, class T2, ..., class TN>
     typename result_of<T(T1, T2, ..., TN)>::type
@@ -334,28 +341,28 @@ reference_wrapper<T> ref(T& t) __ntl_nothrow
 
 /** Returns a constant reference wrapper object which holds a reference to const \c t */
 template <class T>
-reference_wrapper<const T> cref(const T& t) __ntl_nothrow
+inline reference_wrapper<const T> cref(const T& t) __ntl_nothrow
 {
   return reference_wrapper<const T>(t);
 }
 
 /** Returns a reference wrapper object which holds a reference to \c x.get() */
 template <class T>
-reference_wrapper<T> ref(reference_wrapper<T> x) __ntl_nothrow
+inline reference_wrapper<T> ref(reference_wrapper<T> x) __ntl_nothrow
 {
   return x;
 }
 
 /** Returns a constant reference wrapper object which holds a constant reference to \c x.get() */
 template <class T>
-reference_wrapper<const T> cref(reference_wrapper<const T> x) __ntl_nothrow
+inline reference_wrapper<const T> cref(reference_wrapper<const T> x) __ntl_nothrow
 {
   return x;
 }
 
 /** Returns a constant reference wrapper object which holds a reference to \c x.get() */
 template <class T>
-reference_wrapper<const T> cref(reference_wrapper<T> x) __ntl_nothrow
+inline reference_wrapper<const T> cref(reference_wrapper<T> x) __ntl_nothrow
 {
   return reference_wrapper<const T>(x.get());
 }
@@ -707,7 +714,7 @@ class pointer_to_unary_function : public unary_function<Arg, Result>
 };
 
 template <class Arg, class Result>
-pointer_to_unary_function<Arg,Result>
+inline pointer_to_unary_function<Arg,Result>
   ptr_fun(Result (*f)(Arg))
 {
   return pointer_to_unary_function<Arg, Result>(f);
@@ -800,7 +807,7 @@ mem_fun1_t<Result, T, A>
 }
 
 template <class Result, class T, class A>
-const_mem_fun1_t<Result, T, A>
+inline const_mem_fun1_t<Result, T, A>
   mem_fun(Result (T::*f)(A) const)
 {
   return const_mem_fun1_t<Result, T, A>(f);
@@ -972,6 +979,23 @@ NTL_HASH_IMPL(char16_t);
 NTL_HASH_IMPL(char32_t);
 #endif
 #undef NTL_HASH_IMPL
+
+/**
+ *	@brief 18.7.2.3 Template specialization hash&lt;type_index&gt; [type.index.templ] (N2857)
+ *  @ingroup lib_support_rtti
+ **/
+template<>
+struct hash<type_index>:
+  unary_function<type_index, size_t>
+{
+  typedef size_t result_type;
+  typedef type_index argument_type;
+
+  size_t operator()(const type_index& index) const
+  {
+    return index.hash_code();
+  }
+};
 
 
 namespace __

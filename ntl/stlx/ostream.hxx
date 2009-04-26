@@ -38,11 +38,11 @@ class basic_ostream
   public:
 
     ///\name Types (inherited from basic_ios (27.4.4)):
-    using this_base::char_type;
-    using this_base::int_type;
-    using this_base::pos_type;
-    using this_base::off_type;
-    using this_base::traits_type;
+    using typename this_base::char_type;
+    using typename this_base::int_type;
+    using typename this_base::pos_type;
+    using typename this_base::off_type;
+    using typename this_base::traits_type;
 
     ///\name  27.6.2.2 basic_ostream constructors [ostream.cons]
     /// 1 Effects: Constructs an object of class basic_ostream, assigning

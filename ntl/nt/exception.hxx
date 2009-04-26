@@ -41,6 +41,10 @@ extern "C"
 # define dbgpause()
 #endif
 
+#ifdef __ICL
+#pragma warning(disable:2259) // [remark] non-pointer conversion from
+#endif
+
 
 namespace ntl {
 namespace nt {
@@ -539,9 +543,9 @@ void inline
     const std::array<T, N> & args)
 {
   static_assert(N <= exception_record::maximum_parameters,
-                __name__" : invalid number of arguments");
+                "raise_exception: invalid number of arguments");
   static_assert(sizeof(T) == sizeof(uintptr_t),
-                __name__" : sizeof shall be equal to sizeof(uintptr_t)");
+                "raise_exception: sizeof shall be equal to sizeof(uintptr_t)");
   RaiseException(code, flags, N, reinterpret_cast<const uintptr_t*>(&args));
 }
 
@@ -637,7 +641,7 @@ namespace cxxruntime {
     uint32_t    hasvirtbase : 1;
 #ifndef _M_X64
     /** pointer to the type descriptor */
-    type_info *       typeinfo;
+    type_info * typeinfo;
 #else
     /** offset to the type descriptor */
     rva_t       typeinfo;
@@ -651,11 +655,11 @@ namespace cxxruntime {
     union
     {
 #ifndef _M_X64
-      eobject::ctor_ptr copyctor;
-      eobject::ctor_ptr2 copyctor2;
+      eobject::ctor_ptr   copyctor;
+      eobject::ctor_ptr2  copyctor2;
 #else
-      rva_t           copyctor;
-      rva_t           copyctor2;
+      rva_t               copyctor;
+      rva_t               copyctor2;
 #endif
 
     };
@@ -742,7 +746,7 @@ namespace cxxruntime {
     {
       // catch(...) handles them all
 #ifdef _M_IX86
-      dispatch;
+      (void)dispatch;
       const type_info *ti1 = this->typeinfo, *ti2 = ct->typeinfo;
 #endif
 #ifdef _M_X64
@@ -1258,6 +1262,9 @@ namespace cxxruntime {
       __asm mov   ebp, _ebp
       __asm call  eax;
       __asm pop   ebp
+#ifdef __ICL
+#pragma warning(disable:1011)// missing return statement
+#endif
     }
 #pragma warning(pop)
 #endif // _M_X64
@@ -1291,7 +1298,7 @@ namespace cxxruntime {
       unwind(const dispatcher_context * const dispatch, const ehfuncinfo * const ehfi, ehstate_t to_state = -1) ///< defaults to empty state
     {
 #ifdef _M_IX86
-      dispatch;
+      (void)dispatch;
       for ( ehstate_t cs = current_state(ehfi); cs != to_state; cs = ehfi->unwindtable[cs].state )
       {
         __try
@@ -1497,8 +1504,8 @@ namespace cxxruntime {
 #pragma warning(disable:4731)//frame pointer register 'ebp' modified by inline assembly code
 #pragma warning(disable:4733)//Inline asm assigning to 'FS:0' : handler not registered as safe handler
     // SE handlers already registered should be SAFESEH
-    __declspec(noreturn)
-      static void jumptocontinuation(generic_function_t * funclet, cxxregistration *cxxreg)
+    static __declspec(noreturn)
+      void jumptocontinuation(generic_function_t * funclet, cxxregistration *cxxreg)
     {
       using namespace nt;
       // unlink SE handler
@@ -1534,7 +1541,7 @@ namespace cxxruntime {
       guard.cxxreg      = cxxreg;
       guard.catchdepth  = catchdepth + 1;
       nt::teb::set(&nt::teb::ExceptionList, &guard);
-      generic_function_t * const continuation = cxxreg->callsettingframe(handler, nlg_code);
+      generic_function_t * const continuation = cxxreg->callsettingframe(handler, static_cast<int>(nlg_code));
       nt::teb::set(&nt::teb::ExceptionList, guard.next);
       return continuation;
     }
@@ -1618,7 +1625,7 @@ namespace cxxruntime {
         std::terminate();
       }
 #else // _M_X64
-      dispatch;
+      (void)dispatch;
       if ( !catchblock->typeinfo ) return;
       if ( !catchblock->eobject_bpoffset ) return;
       void** catchstackframe = reinterpret_cast<void**>(cxxreg->stackbaseptr()
@@ -1684,7 +1691,7 @@ namespace cxxruntime {
       cxxregistration::frame_pointers* frame = cxxreg->establisherframe(funcinfo, dispatch, &xframe);
       cxxregistration* cxxframe = reinterpret_cast<cxxregistration*>(frame);
 #else
-      recursive;
+      (void)recursive;
       cxxregistration* const cxxframe = cxxreg;
 #endif
 
@@ -2062,5 +2069,9 @@ next_try: ;
 #endif//#ifdef _MSC_VER
 } // cxxruntime
 }//namespace ntl
+
+#ifdef __ICL
+#pragma warning(default:2259)
+#endif
 
 #endif//#ifndef NTL__NT_EXCEPTION

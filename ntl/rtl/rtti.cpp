@@ -8,6 +8,9 @@
 
 #ifdef _MSC_VER
 #pragma warning(disable:4510 4512 4610 4100)
+#ifdef __ICL
+#pragma warning(disable:69)
+#endif
 #endif
 
 #pragma region typeinfo::name implementation
@@ -84,13 +87,19 @@ namespace {
 } // namespace
 
 //////////////////////////////////////////////////////////////////////////
-const char* std::type_info::name() const
+const char* std::type_info::name() const __ntl_nothrow
 {
   if(!data)
     data = const_cast<char*>(undname(mname));
   return reinterpret_cast<const char*>(data);
 }
 
+#ifdef __ICL
+std::type_info::~type_info()
+{
+
+}
+#endif
 #pragma endregion
 
 #pragma region dynamic_cast implementation

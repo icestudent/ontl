@@ -23,7 +23,7 @@ Function
 {
   while ( first != last ) f(*first++);
   return f;
-};
+}
 
 /// 25.1.2 Find [alg.find]
 template<class InputIterator, class T>
@@ -331,14 +331,14 @@ namespace __
 
 }
 template<class InputIterator, class Size, class OutputIterator>
-OutputIterator
+inline OutputIterator
   copy_n(InputIterator first, Size n, OutputIterator result)
 {
   return __::copy_n(first, n, result, iterator_traits<InputIterator>::iterator_category());
 }
 
 template<class InputIterator, class OutputIterator, class Predicate>
-OutputIterator
+inline OutputIterator
   copy_if(InputIterator first, InputIterator last,
           OutputIterator result, Predicate pred)
 {
@@ -362,7 +362,7 @@ BidirectionalIterator2
 
 /// 25.2.1 Copy [alg.move]
 template<class InputIterator, class OutputIterator>
-OutputIterator move(InputIterator first, InputIterator last, OutputIterator result)
+inline OutputIterator move(InputIterator first, InputIterator last, OutputIterator result)
 {
   while ( first != last )
   {
@@ -374,7 +374,7 @@ OutputIterator move(InputIterator first, InputIterator last, OutputIterator resu
 }
 
 template<class BidirectionalIterator1, class BidirectionalIterator2>
-BidirectionalIterator2
+inline BidirectionalIterator2
   move_backward(BidirectionalIterator1 first, BidirectionalIterator1 last,
                 BidirectionalIterator2 result)
 {

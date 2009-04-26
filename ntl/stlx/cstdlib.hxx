@@ -228,7 +228,7 @@ NTL__CRTCALL
 extern vfv_t* __xc_a[];
 extern vfv_t* __xc_z[];
 
-}; // extern "C"
+} // extern "C"
 ///@}
 
 namespace ntl

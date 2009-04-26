@@ -1671,7 +1671,7 @@ struct status
     ipsec_integrity_check_failed                                   = (int)0xC0360006,
     ipsec_clear_text_drop                                          = (int)0xC0360007,
 
-#ifndef __BCPLUSPLUS__
+#if !defined(__BCPLUSPLUS__) && !defined(__ICL)
     cxx_exception = (int)(0xE0000000|'msc'),
     com_exception = (int)(0xE0000000|'MOC')
 #else

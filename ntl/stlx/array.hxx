@@ -131,33 +131,38 @@ struct array
 };//struct array
 
 ///\name  Array comparisons
-template <class T, size_t N> bool operator== (const array<T,N>& x, const array<T,N>& y);
-template <class T, size_t N> bool operator!= (const array<T,N>& x, const array<T,N>& y)
+template <class T, size_t N> inline bool operator== (const array<T,N>& x, const array<T,N>& y)
+{
+  return equal(x.cbegin(), x.cend(), y.cbegin());
+}
+
+template <class T, size_t N> inline bool operator!= (const array<T,N>& x, const array<T,N>& y)
 {
   return rel_ops::operator !=(x, y);
 }
 
-template <class T, size_t N> bool operator< (const array<T,N>& x, const array<T,N>& y);
-template <class T, size_t N> bool operator> (const array<T,N>& x, const array<T,N>& y)
+template <class T, size_t N> inline bool operator< (const array<T,N>& x, const array<T,N>& y)
+{
+  return lexicographical_compare(x.cbegin(), x.cend(), y.cbegin(), y.cend());
+}
+
+template <class T, size_t N> inline bool operator> (const array<T,N>& x, const array<T,N>& y)
 {
   return rel_ops::operator >(x, y);
 }
 
-template <class T, size_t N> bool operator<= (const array<T,N>& x, const array<T,N>& y)
+template <class T, size_t N> inline bool operator<= (const array<T,N>& x, const array<T,N>& y)
 {
   return rel_ops::operator <=(x, y);
 }
 
-template <class T, size_t N> bool operator>= (const array<T,N>& x, const array<T,N>& y)
+template <class T, size_t N> inline bool operator>= (const array<T,N>& x, const array<T,N>& y)
 {
   return rel_ops::operator >=(x, y);
 }
 
 ///\name  Array specialized algorithms [6.2.2.2]
-template <class T, size_t N > void swap(array<T,N>& x, array<T,N>& y)
-{
-  x.swap(y);
-}
+template <class T, size_t N > inline void swap(array<T,N>& x, array<T,N>& y) { x.swap(y); }
 
 ///@}
 /**@} lib_sequence */

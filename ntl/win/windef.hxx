@@ -86,6 +86,7 @@ struct lasterror
   {
     err_ = static_cast<type>(error);
     set(error);
+    return *this;
   }
 
   operator type() const { return err_; }

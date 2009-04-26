@@ -19,7 +19,7 @@
 #if defined(_MSC_VER)
 #define __ntl_assert(__msg, __line)\
   { const char * volatile __assertion_failure; __assertion_failure = (__msg);\
-    unsigned volatile __assertion_failure_at_line; __assertion_failure_at_line = (__line);\
+    long volatile __assertion_failure_at_line; __assertion_failure_at_line = (__line);\
     __debugbreak(); }
 #elif defined(__BCPLUSPLUS__)
   NTL__EXTERNAPI void _stdcall DbgBreakPoint();

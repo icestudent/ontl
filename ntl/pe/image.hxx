@@ -28,7 +28,10 @@ namespace ntl {
 #pragma warning(push)
 #pragma warning(disable:4820) // 'X' bytes padding added after data member
 #pragma warning(disable:4347) // behavior change: va<>() is called instead of va()
-
+#pragma warning(disable:4365) // signed/unsigned mismatch
+#ifdef __ICL
+#pragma warning(disable:2259)
+#endif
     /**\addtogroup  pe_images_support *** Portable Executable images support
     *@{*/
 

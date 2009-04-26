@@ -58,6 +58,20 @@ namespace __
 /// Base class to deny copying of derived classes.
 typedef __::noncopyable noncopyable;
 
+/// Type helper for the template specialization for functions 
+template<typename T>
+struct type2type
+{
+  typedef T type;
+};
+
+/// Integral value helper for the template specialization for functions 
+template<size_t v>
+struct int2type
+{
+  enum { value = v };
+};
+
 /// class_enum by remark
 #if 0
 template<typename def, typename inner = def::type>
@@ -75,7 +89,7 @@ struct class_enum: def
 };
 #else
 template<typename def>
-struct class_enum: def
+struct class_enum: public def
 {
   typedef typename def::type type;
   __forceinline

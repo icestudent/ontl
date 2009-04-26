@@ -347,7 +347,8 @@ struct file_information<file_rename_information>:
 };
 
 ///\name  FileLinkInformation == 11
-struct file_link_information: file_rename_information
+struct file_link_information: file_rename_information,
+  private ntl::noncopyable
 {
   static const file_information_class info_class_type = FileLinkInformation;
 

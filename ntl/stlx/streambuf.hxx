@@ -327,7 +327,7 @@ class basic_streambuf
       ///      Other calls shall also satisfy that constraint.
       _Assert(!gptr() || gptr() >= eback()
           || !traits_type::eq(traits_type::to_char_type(c),gnext[-1]));
-      (c);
+      (void)(c);
       //  Default behavior: Returns traits::eof().
       return traits_type::eof();
     }

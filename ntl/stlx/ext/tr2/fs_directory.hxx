@@ -403,7 +403,8 @@ namespace std
               ft = symlink_file;
             else if(di->FileAttributes & file_attribute::device)
               ft = device_file;
-            Path p = dp / Path::traits_type::to_internal(dp, Path::external_string_type(di->FileName, di->FileNameLength/sizeof(wchar_t)));
+            Path p;// = dp / 
+              Path::traits_type::to_internal(dp, Path::external_string_type(di->FileName, di->FileNameLength/sizeof(wchar_t)));
             bdi.assign(p, file_status(ft));
             //bdi.assign(Path::traits_type::to_internal(dp, Path::external_string_type(di->FileName, di->FileNameLength/sizeof(wchar_t))), file_status(ft));
           }

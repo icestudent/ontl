@@ -499,13 +499,16 @@ class istream_iterator
 };
 
 /// 24.5.2 Class template ostream_iterator [lib.ostream.iterator]
+#ifdef __ICL
+#pragma warning(disable:444) // [remark] destructor for base class "std::iterator<std::output_iterator_tag, void, void, void, void>" (declared at line 74) is not virtual
+#endif
 template <class T,
           class charT = char,
           class traits = char_traits<charT> >
 class ostream_iterator
 : public iterator<output_iterator_tag, void, void, void, void>
 {
-    typedef ostream_iterator<T, charT, traits> this_type;
+  typedef ostream_iterator<T, charT, traits> this_type;
 
   public:
     typedef charT                         char_type;
@@ -534,6 +537,9 @@ class ostream_iterator
     ostream_type *  out_stream;
     const char *    delim;
 };//class ostream_iterator
+#ifdef __ICL
+#pragma warning(default:444)
+#endif
 
 /// 24.5.3 Class template istreambuf_iterator [lib.istreambuf.iterator]
 template<class charT, class traits

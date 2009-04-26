@@ -51,15 +51,15 @@ typedef uint64_t  uint_fast64_t;
 
 ///\name  Integer types capable of holding object pointers 7.18.1.4
 #ifdef __GNUC__
-  typedef __PTRDIFF_TYPE__  intptr_t;
-  typedef __SIZE_TYPE__     uintptr_t;
+  typedef __PTRDIFF_TYPE__    intptr_t;
+  typedef __SIZE_TYPE__       uintptr_t;
 #else
   #ifdef _M_X64
   typedef          long long  intptr_t;
   typedef unsigned long long  uintptr_t;
   #else
-  typedef __w64          int  intptr_t;
-  typedef __w64 unsigned int  uintptr_t;
+  typedef __w64          long intptr_t;
+  typedef __w64 unsigned long uintptr_t;
   #endif
 #endif
 

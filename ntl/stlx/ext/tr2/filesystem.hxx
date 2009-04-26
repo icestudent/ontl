@@ -268,7 +268,7 @@ namespace std
         /** Returns the stored path, formatted according to the Native subsystem rules for file names */
         string_type file_string(bool normalize = true) const;
         /** Returns the stored path, formatted according to the Native subsystem rules for directory names (same as file_string()) */
-        string_type directory_string(bool normalize = true) const { return move(file_string()); }
+        string_type directory_string(bool normalize = true) const { return move(file_string(normalize)); }
 
         /** Returns the stored path, formatted and encoded according to the Native subsystem rules for file names */
         external_string_type external_file_string(bool normalize = true) const
@@ -485,7 +485,7 @@ namespace std
         static const value_type colonval = colon<path_type>::value;
         static const value_type backslash = '\\';
         static const value_type qmark = '?';
-        static const pos_type npos = string_type::npos;
+        static const typename string_type::size_type npos = string_type::npos;
       };
 
       /// Type \c is_basic_path shall be specialized for path, wpath, and any user-specialized basic_path types.
@@ -942,7 +942,7 @@ namespace std
         if(pos == npos)
           pos = size;
         name = p.substr(cur, pos-cur);
-        if(pos != size)
+        if(pos != static_cast<pos_type>(size))
           pos++;
       #if _DEBUG
         name.c_str();

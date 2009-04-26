@@ -1,3 +1,5 @@
+//#pragma warning(disable:4820 4061)
+
 #include "../stlx/cstdlib.hxx"
 #include "../nt/exception.hxx"
 
@@ -58,7 +60,7 @@ namespace
 } // namespace
 
 extern "C" void _cdecl __check_iostream_objects();
-extern "C" void _cdecl __check_iostreams_stub(){}
+extern "C" inline void _cdecl __check_iostreams_stub(){}
 #ifdef _M_X64
 # pragma comment(linker, "/alternatename:__check_iostream_objects=__check_iostreams_stub")
 #else
@@ -78,7 +80,7 @@ namespace ntl
 
       // init static objects
       exit_list = new exit_funcs_t();
-      exit_list->reserve(__xc_z - __xc_a);
+      exit_list->reserve(static_cast<size_t>(__xc_z - __xc_a));
       initterm(__xc_a, __xc_z);
 
       // init io streams
@@ -95,6 +97,17 @@ namespace ntl
 int _cdecl atexit(vfv_t func)
 {
   return onexit(func) ? 0 : -1;
+}
+
+namespace ntl
+{
+  extern "C" volatile std::new_handler __new_handler = 0;
+}
+
+std::new_handler std::set_new_handler(std::new_handler new_p) __ntl_nothrow
+{
+  std::new_handler prev = new_p;
+  return ntl::atomic::generic_op::exchange(ntl::__new_handler, prev);
 }
 
 //////////////////////////////////////////////////////////////////////////

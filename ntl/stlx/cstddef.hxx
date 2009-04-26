@@ -36,7 +36,13 @@
 #if defined(_MSC_VER)
 # pragma warning(disable:4514)// unreferenced inline function has been removed
 # pragma warning(disable:4480)// nonstandard extension used: specifying underlying type for enum 'enum'
+# ifdef __ICL
+#  pragma warning(disable:981)  // [remark] operands are evaluated in unspecified order (http://software.intel.com/en-us/articles/cdiag981/)
+#  pragma warning(disable:2268) // [remark] the declaration of the copy assignment operator for "type1s" has been suppressed because that of "type2" was suppressed
+#  pragma warning(disable:2270) // [remark] the declaration of the copy assignment operator for "type1" has been suppressed because that of "type2" is inaccessible
+# else
 # pragma runtime_checks( "", off )
+# endif
 #elif defined(__GNUC__)
 # define __forceinline __attribute__((always_inline))
 # define __assume(X)
@@ -237,9 +243,9 @@
 //#define NTL__CXX_VT
 #elif defined(__ICL)
 
-# if __ICL > 1100
+# if __ICL >= 1100 && !defined(_MSC_EXTENSIONS)
 
-// TODO: detect -std=C++0x presence
+// detecting -std=C++0x presence^^^
 
 /** ICL's (East Mill) partial C++0x support */
 
@@ -356,9 +362,7 @@
   #endif
 
   #ifndef NTL__CXX_ALIGNOF
-    #if defined(__ICL)
-      #define alignof(X) __ALIGNOF__(X)
-    #elif _MSC_VER <= 1600
+    #if defined(__ICL) || _MSC_VER <= 1600
       #define alignof(X) __alignof(X)
     #endif
   #endif
@@ -484,6 +488,7 @@ static_assert(sizeof(nullptr)==sizeof(void*), "3.9.1.10: sizeof(std::nullptr_t) 
 
 #ifndef offsetof
   #define offsetof(s,m) (size_t)&reinterpret_cast<const volatile char&>((((s *)0)->m))
+  #define offsetof_ptr(s,memptr) (size_t)&reinterpret_cast<const volatile char&>((((s *)0)->*memptr))
   // from bcb #define offsetof( s_name, m_name )  (size_t)&(((s_name*)0)->m_name)
 #endif
 

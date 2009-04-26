@@ -17,8 +17,10 @@
 #include "../stlx/array.hxx"
 #include "../stlx/functional.hxx"
 
+
 namespace ntl {
 namespace nt {
+
 
 /**\addtogroup  native_types_support *** NT Types support library ***********
  *@{*/
@@ -112,11 +114,13 @@ class native_string
       return std::basic_string<value_type>(begin(), size());
     }
 
+#ifndef __ICL
     operator
       const native_string<typename std::add_const<charT>::type, traits>&() const
     {
       return *reinterpret_cast<const native_string<std::add_const<charT>::type, traits>*>(this);
     }
+#endif
 
     ///\name  native_string iterator support
 

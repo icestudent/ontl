@@ -57,7 +57,7 @@ namespace intrinsic
     uint8_t __cdecl _InterlockedCompareExchange128(volatile uint64_t *, uint64_t, uint64_t, uint64_t*);
     int64_t __cdecl _InterlockedCompare64Exchange128(uint64_t volatile* Destination, uint64_t ExchangeHigh, uint64_t ExchangeLow, uint64_t Comperand);
     void*   __cdecl _InterlockedExchangePointer(void* volatile* Target, void* Value);
-  };
+  }
 
 #pragma intrinsic(_InterlockedAnd, _InterlockedAnd8, _InterlockedAnd16, _InterlockedOr, _InterlockedOr8, _InterlockedOr16, _InterlockedXor, _InterlockedXor8, _InterlockedXor16)
 #pragma intrinsic(_InterlockedIncrement, _InterlockedIncrement16, _InterlockedDecrement, _InterlockedDecrement16, _InterlockedExchange, _InterlockedExchangeAdd)
@@ -96,7 +96,7 @@ namespace intrinsic
   /** Guarantees that every preceding store is globally visible before any subsequent store. */
   void __cdecl __faststorefence();
 #endif
-  };
+  }
 
 #pragma intrinsic(_ReadBarrier, _WriteBarrier, _ReadWriteBarrier, _mm_lfence, _mm_mfence, _mm_sfence, _mm_pause)
 
@@ -271,37 +271,37 @@ namespace atomic {
 
   static inline
     uint16_t
-    compare_exchange(volatile uint16_t & dest, uint16_t exchange, uint16_t comperand)
+    compare_exchange(volatile uint16_t & dest, uint16_t exchange, uint16_t comparand)
   {
-    return intrinsic::_InterlockedCompareExchange16(&dest, exchange, comperand);
+    return intrinsic::_InterlockedCompareExchange16(&dest, exchange, comparand);
   }
 
   static inline
     uint32_t
-    compare_exchange(volatile uint32_t & dest, uint32_t exchange, uint32_t comperand)
+    compare_exchange(volatile uint32_t & dest, uint32_t exchange, uint32_t comparand)
   {
-    return intrinsic::_InterlockedCompareExchange(&dest, exchange, comperand);
+    return intrinsic::_InterlockedCompareExchange(&dest, exchange, comparand);
   }
 
   static inline
     uint64_t
-    compare_exchange(volatile uint64_t & dest, uint64_t exchange, uint64_t comperand)
+    compare_exchange(volatile uint64_t & dest, uint64_t exchange, uint64_t comparand)
   {
-    return intrinsic::_InterlockedCompareExchange64(&dest, exchange, comperand);
+    return intrinsic::_InterlockedCompareExchange64(&dest, exchange, comparand);
   }
 
   static inline
     uint8_t
-    compare_exchange(volatile uint64_t & dest, uint64_t exchange_high, uint64_t exchange_low, uint64_t* comperand)
+    compare_exchange(volatile uint64_t & dest, uint64_t exchange_high, uint64_t exchange_low, uint64_t* comparand)
   {
-    return intrinsic::_InterlockedCompareExchange128(&dest, exchange_high, exchange_low, comperand);
+    return intrinsic::_InterlockedCompareExchange128(&dest, exchange_high, exchange_low, comparand);
   }
 
   static inline
     uint64_t
-    compare_exchange(volatile uint64_t & dest, uint64_t exchange_high, uint64_t exchange_low, uint64_t comperand)
+    compare_exchange(volatile uint64_t & dest, uint64_t exchange_high, uint64_t exchange_low, uint64_t comparand)
   {
-    return intrinsic::_InterlockedCompare64Exchange128(&dest, exchange_high, exchange_low, comperand);
+    return intrinsic::_InterlockedCompare64Exchange128(&dest, exchange_high, exchange_low, comparand);
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -447,39 +447,111 @@ namespace atomic {
 
   static inline
     int16_t
-    compare_exchange(volatile int16_t & dest, int16_t exchange, int16_t comperand)
+    compare_exchange(volatile int16_t & dest, int16_t exchange, int16_t comparand)
   {
-    return intrinsic::_InterlockedCompareExchange16(reinterpret_cast<volatile uint16_t*>(&dest), exchange, comperand);
+    return intrinsic::_InterlockedCompareExchange16(reinterpret_cast<volatile uint16_t*>(&dest), exchange, comparand);
   }
 
   static inline
     int32_t
-    compare_exchange(volatile int32_t & dest, int32_t exchange, int32_t comperand)
+    compare_exchange(volatile int32_t & dest, int32_t exchange, int32_t comparand)
   {
-    return intrinsic::_InterlockedCompareExchange(reinterpret_cast<volatile uint32_t*>(&dest), exchange, comperand);
+    return intrinsic::_InterlockedCompareExchange(reinterpret_cast<volatile uint32_t*>(&dest), exchange, comparand);
   }
 
   static inline
     int64_t
-    compare_exchange(volatile int64_t & dest, int64_t exchange, int64_t comperand)
+    compare_exchange(volatile int64_t & dest, int64_t exchange, int64_t comparand)
   {
-    return intrinsic::_InterlockedCompareExchange64(reinterpret_cast<volatile uint64_t*>(&dest), exchange, comperand);
+    return intrinsic::_InterlockedCompareExchange64(reinterpret_cast<volatile uint64_t*>(&dest), exchange, comparand);
   }
 
   static inline
     int8_t
-    compare_exchange(volatile int64_t & dest, int64_t exchange_high, int64_t exchange_low, int64_t* comperand)
+    compare_exchange(volatile int64_t & dest, int64_t exchange_high, int64_t exchange_low, int64_t* comparand)
   {
-    return intrinsic::_InterlockedCompareExchange128(reinterpret_cast<volatile uint64_t*>(&dest), exchange_high, exchange_low, reinterpret_cast<uint64_t*>(comperand));
+    return intrinsic::_InterlockedCompareExchange128(reinterpret_cast<volatile uint64_t*>(&dest), exchange_high, exchange_low, reinterpret_cast<uint64_t*>(comparand));
   }
 
   static inline
     int64_t
-    compare_exchange(volatile int64_t & dest, int64_t exchange_high, int64_t exchange_low, int64_t comperand)
+    compare_exchange(volatile int64_t & dest, int64_t exchange_high, int64_t exchange_low, int64_t comparand)
   {
-    return intrinsic::_InterlockedCompare64Exchange128(reinterpret_cast<volatile uint64_t*>(&dest), exchange_high, exchange_low, comperand);
+    return intrinsic::_InterlockedCompare64Exchange128(reinterpret_cast<volatile uint64_t*>(&dest), exchange_high, exchange_low, comparand);
   }
 
+
+  static inline void* exchange(void* volatile & dest, void* src)
+  {
+    return reinterpret_cast<void*>(exchange(reinterpret_cast<volatile uintptr_t&>(dest), reinterpret_cast<uintptr_t>(src)));
+  }
+
+  struct generic_op
+  {
+  private:
+    template<size_t v> struct int2type { enum { value = v }; };
+    template<typename T> 
+    struct tmap
+    {
+    private:
+      template<size_t> struct map;
+      template<> struct map<1> { typedef uint8_t type; };
+      template<> struct map<2> { typedef uint16_t type; };
+      template<> struct map<4> { typedef uint32_t type; };
+      template<> struct map<8> { typedef uint64_t type; };
+    public:
+      typedef typename map<sizeof(T)>::type type;
+    };
+  public:
+    template<typename T>
+    static inline T increment(volatile T& val)
+    {
+      typedef typename tmap<T>::type U;
+      return reinterpret_cast<T>(atomic::increment(reinterpret_cast<volatile U&>(val)));
+    }
+    template<typename T>
+    static inline T decrement(volatile T& val)
+    {
+      typedef typename tmap<T>::type U;
+      return reinterpret_cast<T>(atomic::decrement(reinterpret_cast<volatile U&>(val)));
+    }
+    template<typename T>
+    static inline T or(volatile T& val, T mask)
+    {
+      typedef typename tmap<T>::type U;
+      return reinterpret_cast<T>(atomic::or(reinterpret_cast<volatile U&>(val), reinterpret_cast<U>(mask)));
+    }
+    template<typename T>
+    static inline T xor(volatile T& val, T mask)
+    {
+      typedef typename tmap<T>::type U;
+      return reinterpret_cast<T>(atomic::xor(reinterpret_cast<volatile U&>(val), reinterpret_cast<U>(mask)));
+    }
+    template<typename T>
+    static inline T and(volatile T& val, T mask)
+    {
+      typedef typename tmap<T>::type U;
+      return reinterpret_cast<T>(atomic::and(reinterpret_cast<volatile U&>(val), reinterpret_cast<U>(mask)));
+    }
+    template<typename T>
+    static inline T exchange(volatile T& dest, T val)
+    {
+      typedef typename tmap<T>::type U;
+      return reinterpret_cast<T>(atomic::exchange(reinterpret_cast<volatile U&>(dest), reinterpret_cast<U>(val)));
+    }
+    template<typename T>
+    static inline T exchange_add(volatile T& dest, T val)
+    {
+      typedef typename tmap<T>::type U;
+      return reinterpret_cast<T>(atomic::exchange_add(reinterpret_cast<volatile U&>(dest), reinterpret_cast<U>(val)));
+    }
+    template<typename T>
+    static inline T compare_exchange(volatile T& dest, T exchange, T comparand)
+    {
+      typedef typename tmap<T>::type U;
+      return reinterpret_cast<T>(atomic::compare_exchange(reinterpret_cast<volatile U&>(dest), reinterpret_cast<U>(exchange), reinterpret_cast<U>(comparand)));
+    }
+  };
 
 #pragma warning(pop)
 }//namespace atomic
@@ -554,9 +626,9 @@ namespace atomic {
 
   template<typename T>
   static inline
-    T compare_exchange(volatile T & dest, T exchange, T comperand)
+    T compare_exchange(volatile T & dest, T exchange, T comparand)
   {
-    return __sync_val_compare_and_swap(&dest, comperand, exchange);
+    return __sync_val_compare_and_swap(&dest, comparand, exchange);
   }
 
 }//namespace atomic
@@ -597,7 +669,7 @@ unsigned long
 static inline
 unsigned long
   compare_exchange(volatile unsigned long & dest, unsigned long exchange,
-                   unsigned long comperand)
+                   unsigned long comparand)
 {
   return 0;
 }
@@ -620,8 +692,8 @@ struct atomic_t
       { return atomic::exchange(value, val); }
     unsigned long exchange_add(unsigned long val)
       { return atomic::exchange_add(value, val); }
-    unsigned long exchange_if_equal(unsigned long val, unsigned long comperand)
-      { return atomic::compare_exchange(value, val, comperand); }
+    unsigned long exchange_if_equal(unsigned long val, unsigned long comparand)
+      { return atomic::compare_exchange(value, val, comparand); }
 
   private: unsigned long volatile value;
 };//struct atomic_t

@@ -31,6 +31,10 @@
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable:4820)// X bytes padding added... (class ctype<char>)
+#ifdef __ICL
+#pragma warning(disable:444)
+#pragma warning(disable:2259) // [remark] non-pointer conversion from
+#endif
 #endif
 
 namespace std {
@@ -138,67 +142,67 @@ template <class Facet> bool has_facet(const locale&) __ntl_nothrow;
 ///\name 22.1.3.1 Character classification [classification]
 
 /** Returns true if character is a space */
-template <class charT> bool isspace(charT c, const locale& loc)
+template <class charT> inline bool isspace(charT c, const locale& loc)
 {
   return use_facet<ctype<charT> >(loc).is(ctype_base::space, c);
 }
 
 /** Returns true if character is printable */
-template <class charT> bool isprint(charT c, const locale& loc)
+template <class charT> inline bool isprint(charT c, const locale& loc)
 {
   return use_facet<ctype<charT> >(loc).is(ctype_base::print, c);
 }
 
 /** Returns true if character is control */
-template <class charT> bool iscntrl(charT c, const locale& loc)
+template <class charT> inline bool iscntrl(charT c, const locale& loc)
 {
   return use_facet<ctype<charT> >(loc).is(ctype_base::cntrl, c);
 }
 
 /** Returns true if character is an upper */
-template <class charT> bool isupper(charT c, const locale& loc)
+template <class charT> inline bool isupper(charT c, const locale& loc)
 {
   return use_facet<ctype<charT> >(loc).is(ctype_base::upper, c);
 }
 
 /** Returns true if character is a lower */
-template <class charT> bool islower(charT c, const locale& loc)
+template <class charT> inline bool islower(charT c, const locale& loc)
 {
   return use_facet<ctype<charT> >(loc).is(ctype_base::lower, c);
 }
 
 /** Returns true if character is a letter */
-template <class charT> bool isalpha(charT c, const locale& loc)
+template <class charT> inline bool isalpha(charT c, const locale& loc)
 {
   return use_facet<ctype<charT> >(loc).is(ctype_base::alpha, c);
 }
 
 /** Returns true if character is a digit */
-template <class charT> bool isdigit(charT c, const locale& loc)
+template <class charT> inline bool isdigit(charT c, const locale& loc)
 {
   return use_facet<ctype<charT> >(loc).is(ctype_base::digit, c);
 }
 
 /** Returns true if character is punctuation character */
-template <class charT> bool ispunct(charT c, const locale& loc)
+template <class charT> inline bool ispunct(charT c, const locale& loc)
 {
   return use_facet<ctype<charT> >(loc).is(ctype_base::punct, c);
 }
 
 /** Returns true if character is hexadecimal digit */
-template <class charT> bool isxdigit(charT c, const locale& loc)
+template <class charT> inline bool isxdigit(charT c, const locale& loc)
 {
   return use_facet<ctype<charT> >(loc).is(ctype_base::xdigit, c);
 }
 
 /** Returns true if character is alphanumeric */
-template <class charT> bool isalnum(charT c, const locale& loc)
+template <class charT> inline bool isalnum(charT c, const locale& loc)
 {
   return use_facet<ctype<charT> >(loc).is(ctype_base::alnum, c);
 }
 
 /** Returns true if character is a graphic character, excluding space */
-template <class charT> bool isgraph(charT c, const locale& loc)
+template <class charT> inline bool isgraph(charT c, const locale& loc)
 {
   return use_facet<ctype<charT> >(loc).is(ctype_base::graph, c);
 }
@@ -513,6 +517,9 @@ class ctype : public locale::facet, public ctype_base
     virtual const charT* do_narrow(const charT* low, const charT* high, char dfault, char* dest) const;
     ///\}
 };// class ctype
+#ifdef __ICL
+#pragma warning(disable:444)
+#endif
 
 /// 22.2.1.2 Class template ctype_byname [locale.ctype.byname]
 template <class charT>
@@ -537,6 +544,9 @@ class ctype_byname : public ctype<charT>
     virtual const charT* do_narrow(const charT* low, const charT* high, char dfault, char* dest) const;
 };
 
+#ifdef __ICL
+#pragma warning(disable:444)
+#endif
 /**
  *	@brief 22.2.1.3 ctype<char> specialization [facet.ctype.special]
  *  @details A specialization ctype<char> is provided so that the member functions on type \c char can be implemented inline.
@@ -711,7 +721,9 @@ template <> class ctype<char>
     const bool          del;
 
 };// class ctype<char>
-
+#ifdef __ICL
+#pragma warning(default:444)
+#endif
 
 /// 22.2.1.4 Class ctype_byname<char> [lib.locale.ctype.byname.special]
 template <> class ctype_byname<char>
@@ -1018,7 +1030,7 @@ class codecvt_byname : public codecvt<internT, externT, stateT>
 
   protected:
 
-    using codecvt<internT, externT, stateT>::result;
+    using typename codecvt<internT, externT, stateT>::result;
 
     ~codecvt_byname(); // virtual
 
@@ -1681,8 +1693,7 @@ namespace __
       return *static_storage<numpunct<charT> >::get_object();
     }
 
-    __forceinline
-    static const ctype<char>& get_facet(const locale&, type2type<ctype<char> >)
+    static __forceinline const ctype<char>& get_facet(const locale&, type2type<ctype<char> >)
     {
       // static ctype<char> is constructed with the default table which is not to be freed,
       // so the destructor call may be not queued up to the atexit function.
@@ -1696,8 +1707,7 @@ namespace __
       return *static_storage<ctype<char> >::get_object();
     }
 
-    __forceinline
-    static const ctype<wchar_t>& get_facet(const locale&, type2type<ctype<wchar_t> >)
+    static __forceinline const ctype<wchar_t>& get_facet(const locale&, type2type<ctype<wchar_t> >)
     {
       //static void * f[sizeof(ctype<wchar_t>)/sizeof(void*)];
       //ctype<wchar_t> * const p = reinterpret_cast<ctype<wchar_t>*>(f);

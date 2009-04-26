@@ -96,7 +96,7 @@ struct check_meta_rel
 struct check_is_base_of
 {
   struct Base {};
-  struct Derived : Base {};
+  struct Derived : public Base {};
   class Foo {};
 
   _CHECK_TRAIT((is_base_of<Base, Derived>::value));

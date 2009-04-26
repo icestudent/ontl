@@ -38,14 +38,14 @@ namespace ntl {
     };
 
    NTL__EXTERNAPI
-      ntstatus __stdcall
+      ntstatus
       DbgPrint(
       const char  Format[],
       ...
       );
 
     NTL__EXTERNAPI
-      ntstatus __stdcall
+      ntstatus
       DbgPrintEx(
       dpfltr::type  ComponentId,
       dpfltr::level Level,

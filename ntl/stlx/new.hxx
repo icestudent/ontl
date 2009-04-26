@@ -47,7 +47,7 @@ class bad_alloc : public exception
 struct  nothrow_t {};
 
 #if defined(_MSC_VER)
-__declspec(selectany) extern const nothrow_t nothrow = {};
+extern __declspec(selectany) const nothrow_t nothrow = {};
 #elif defined(__BCPLUSPLUS__)
 __declspec(selectany) extern const nothrow_t nothrow;
 #elif defined(__GNUC__)
@@ -118,7 +118,7 @@ void  operator delete[] (void*, void*) __ntl_nothrow            {}
 struct varsize_tag {};
 
 #if defined(_MSC_VER)
-__declspec(selectany) extern const varsize_tag varsize = {};
+extern __declspec(selectany) const varsize_tag varsize = {};
 #elif defined(__BCPLUSPLUS__)
 __declspec(selectany) extern const varsize_tag varsize;
 #elif defined(__GNUC__)

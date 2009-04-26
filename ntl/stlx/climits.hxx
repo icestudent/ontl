@@ -110,11 +110,11 @@ namespace std {
 #endif
 
 #ifndef LLONG_MIN
-  #if defined(_MSC_VER) || defined(__BCPLUSPLUS__)
-    #define LLONG_MIN   (-9223372036854775808i64)
-  #elif defined(__GNUC__)
+  //#if defined(_MSC_VER) || defined(__BCPLUSPLUS__)
+  //  #define LLONG_MIN   (-9223372036854775808i64)
+  //#elif defined(__GNUC__)
     #define LLONG_MIN   (-LLONG_MAX-1)
-  #endif
+  //#endif
 #endif
 
 #ifndef ULLONG_MAX

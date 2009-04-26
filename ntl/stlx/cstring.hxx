@@ -11,6 +11,9 @@
 #include "cstddef.hxx"
 #include "cassert.hxx"
 
+#ifdef __ICL
+#pragma warning(disable:2259) // [remark] non-pointer conversion from
+#endif
 
 namespace std
 {
@@ -333,5 +336,9 @@ int NTL__CRTIMP
     );
 
 #endif // #ifndef _INC_STDLIB
+
+#ifdef __ICL
+#pragma warning(default:2259)
+#endif
 
 #endif//#ifndef NTL__STLX_CSTRING

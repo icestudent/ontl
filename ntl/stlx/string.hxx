@@ -38,6 +38,10 @@ typedef ptrdiff_t streamoff;
 /// a basis for explicit specializations.
 template<class charT> struct char_traits;
 
+#ifdef __ICL
+#pragma warning(disable:2259) // non-pointer conversion from "std::uint_least16_t" to "unsigned char" may lose significant bits
+#endif
+
 ///\name 21.1.3 char_traits specializations [char.traits.specializations]
 
 /// 21.1.3.1 struct char_traits<char> [char.traits.specializations.char]
@@ -100,7 +104,7 @@ struct char_traits<char16_t>
   static char_type* assign(char_type* s, size_t n, char_type a)
   { for ( char_type * p = s; n; --n, ++p ) *p = a; return s; }
 
-  static int_type not_eof(const int_type& c) { return eof() != c ? c : 0; }
+  static int_type not_eof(const int_type& c) { return eof() != c ? c : 0U; }
   static char_type to_char_type(const int_type& c)
   { return static_cast<char_type>(static_cast<unsigned char>(c)); }
   static int_type to_int_type(const char_type& c)
@@ -152,16 +156,19 @@ struct char_traits<char32_t>
   { return c1 == c2; }
   static int_type eof() { return static_cast<int_type>(EOF); }
 };
+#ifdef __ICL
+#pragma warning(default:2259)
+#endif
 
 /// 21.1.3.4 struct char_traits<wchar_t> [char.traits.specializations.wchar.t]
 template<>
 struct char_traits<wchar_t>
 {
-  typedef wchar_t   char_type;
-  typedef wint_t    int_type;
-  typedef streamoff off_type;
-  typedef wstreampos pos_type;
-  typedef mbstate_t state_type;
+  typedef wchar_t     char_type;
+  typedef wint_t      int_type;
+  typedef streamoff   off_type;
+  typedef wstreampos  pos_type;
+  typedef mbstate_t   state_type;
 
   static void assign(char_type& c1, const char_type& c2) { c1 = c2; }
   static bool eq(const char_type& c1, const char_type& c2) { return c1 == c2; }
@@ -751,14 +758,17 @@ public:
     const charT* c_str() const // explicit
     {
       // ensure string is null-terminated
-      str.push_back(charT());
+      static const charT empty = 0;
+      if(!str.capacity())
+        return &empty;
+      str.push_back(empty);
       str.pop_back();
       return str.begin();
     }
 
     const charT* data() const
     {
-      static const charT empty;
+      static const charT empty = 0;
       return /*size()*/ capacity() ? begin() : &empty;
     }
 

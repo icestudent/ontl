@@ -25,7 +25,7 @@
   void dbg_pause()
   {
     ntl::nt::dbg::bp();
-  };
+  }
 #endif
 
 #pragma region std::terminate
@@ -250,6 +250,9 @@ extern "C" generic_function_t* __CxxCallCatchBlock(exception_record* ehrec)
 ///         An object is passed and the type of that object determines which
 ///         handlers can catch it.
 ///\note    MSVC's throw; statement sets both pointers to nulls.
+#ifdef __ICL
+typedef ntl::cxxruntime::throwinfo _s__ThrowInfo;
+#endif
 __declspec(noreturn)
 extern "C"
 void __stdcall _CxxThrowException(void * object, _s__ThrowInfo const * info)
@@ -313,6 +316,21 @@ __CxxFrameHandler3(
 #endif
 }
 
-
+#ifdef __ICL
+extern "C"
+exception_disposition
+__cdecl ///\note actually the first arg is passed in EAX register on x86
+__CxxFrameHandler(
+                   /** ehfuncinfo * eax on x86 */
+                   exception_record *    er,       ///< thrown NT exception
+                   cxxregistration *     frame,    ///< tib::ExceptionList node
+                   nt::context *         ectx,     ///< not used on x86
+                   dispatcher_context *  dispatch  ///< not used on x86
+                   )
+{
+  const ehfuncinfo* /*const*/ ehfi = reinterpret_cast<const ehfuncinfo*>(get_eax());
+  return cxxframehandler(er, frame, ectx, dispatch, ehfi);
+}
+#endif
 ///\todo __EH_prolog for /Os
 
