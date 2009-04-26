@@ -287,7 +287,7 @@
 // lambda
 #define NTL__CXX_LAMBDA
 // rvalues
-//#define NTL__CXX_RV
+//#define NTL__CXX_RV // not supported yet o_0
 // template typedef
 //#define NTL__CXX_TT
 // variadic templates (implies rvalue references support)

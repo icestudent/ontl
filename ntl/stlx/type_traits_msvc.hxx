@@ -213,7 +213,9 @@ template <class T> struct is_floating_point
 : public integral_constant<bool, numeric_limits<typename remove_cv<T>::type>::is_iec559> {};
 
 template <class T> struct is_array      : public false_type {};
-template <class T> struct is_array<T[]> : public true_type {};
+template <class T> struct is_array<T[]> : public true_type  {};
+template <class T, size_t N>
+                   struct is_array<T[N]>: public true_type  {};
 
 template <class T> struct is_pointer                    : public false_type {};
 template <class T> struct is_pointer<T*>                : public true_type {};
@@ -326,9 +328,6 @@ struct is_function : public false_type {};
 #define NTL_TT_CC
 #include "tt_isfunc.inl"
 #undef  NTL_TT_CC
-#endif
-
-#ifdef _M_X64
 #endif
 
 template <class T> struct decay
@@ -534,6 +533,16 @@ struct common_type<T, U, void, void>
   static_assert(sizeof(T) > 0, "T shall be complete");
   static_assert(sizeof(T) > 0, "U shall be complete");
 
+#if defined NTL__CXX_TYPEOF && defined NTL__CXX_RV
+
+private:
+  static T&& __t();
+  static U&& __u();
+public:
+  typedef decltype(true ? __t() : __u()) type;
+
+#else
+
 private:
   typedef typename remove_cv<typename remove_reference<T>::type>::type rawT;
   typedef typename remove_cv<typename remove_reference<U>::type>::type rawU;
@@ -551,6 +560,7 @@ public:
         typename conditional<is_convertible<rawT,rawU>::value, rawU,
           typename conditional<is_convertible<rawU,rawT>::value, rawT, void>::type
                             >::type>::type>::type type;
+#endif // typeof
 };
 
 template<class T, class U, class V>

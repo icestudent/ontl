@@ -285,7 +285,8 @@ namespace std
       if(owns)
         m->unlock();
     }
-    
+
+#ifdef NTL__CXX_RV
     unique_lock(unique_lock&& u) __ntl_nothrow
       :m(), owns(false)
     {
@@ -302,7 +303,8 @@ namespace std
         u.owns = false;
       return *this;
     }
-    
+#endif
+
     // 30.3.3.2.2 locking
     void lock() __ntl_throws(system_error)
     {
@@ -340,7 +342,11 @@ namespace std
     }
     
     // 30.3.3.2.3 modifiers
+#ifdef NTL__CXX_RV
     void swap(unique_lock&& u) __ntl_nothrow
+#else
+    void swap(unique_lock& u) __ntl_nothrow
+#endif
     {
       std::swap(m, u.m);
       std::swap(owns, u.owns);

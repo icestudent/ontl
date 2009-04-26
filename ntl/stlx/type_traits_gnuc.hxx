@@ -305,7 +305,9 @@ template <class T> struct is_floating_point
 : public integral_constant<bool, numeric_limits<typename remove_cv<T>::type>::is_iec559> {};
 
 template <class T> struct is_array      : public false_type {};
-template <class T> struct is_array<T[]> : public true_type {};
+template <class T> struct is_array<T[]> : public true_type  {};
+template <class T, size_t N>
+                   struct is_array<T[N]>: public true_type  {};
 
 template <class T> struct is_pointer                    : public false_type {};
 template <class T> struct is_pointer<T*>                : public true_type {};

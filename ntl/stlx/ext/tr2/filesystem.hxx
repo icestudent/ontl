@@ -410,8 +410,9 @@ namespace std
           friend bool operator!=(const iterator& x, const iterator& y) { return !(x == y); }
 
         protected:
-          friend iterator basic_path::begin() const;
-          friend iterator basic_path::end() const;
+          friend class basic_path;
+          //friend iterator basic_path::begin() const;
+          //friend iterator basic_path::end() const;
 
           iterator(const string_type& p, bool start)
             :path(&p), pos(0), element(begin)

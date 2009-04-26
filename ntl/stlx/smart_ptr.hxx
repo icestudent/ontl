@@ -72,7 +72,7 @@ namespace std
   template <class T, class D>
   class unique_ptr
   {
-#if !defined(__BCPLUSPLUS__) && !defined(__GNUC__)
+#if defined(_MSC_VER) && !defined(__ICL)
     typedef typename const unique_ptr::T** unspecified_pointer_type;
 #else
     typedef const T** unspecified_pointer_type;
@@ -204,7 +204,7 @@ namespace std
   template <class T>
   class unique_ptr<T, default_delete<T> >
   {
-#if !defined(__BCPLUSPLUS__) && !defined(__GNUC__)
+#if defined(_MSC_VER) && !defined(__ICL)
     typedef typename const unique_ptr::T** unspecified_pointer_type;
 #else
     typedef const T** unspecified_pointer_type;
@@ -314,7 +314,7 @@ namespace std
   template <class T, class D>
   class unique_ptr<T[], D>
   {
-#if !defined(__BCPLUSPLUS__) && !defined(__GNUC__)
+#if defined(_MSC_VER) && !defined(__ICL)
     typedef typename const unique_ptr::T** unspecified_pointer_type;
 #else
     typedef const T** unspecified_pointer_type;
@@ -438,7 +438,7 @@ namespace std
   template <class T>
   class unique_ptr<T[], default_delete<T[]> >
   {
-#if !defined(__BCPLUSPLUS__) && !defined(__GNUC__)
+#if defined(_MSC_VER) && !defined(__ICL)
     typedef typename const unique_ptr::T** unspecified_pointer_type;
 #else
     typedef const T** unspecified_pointer_type;

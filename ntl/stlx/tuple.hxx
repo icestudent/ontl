@@ -596,29 +596,29 @@ namespace std
   }
 #else
   template<typename T1>
-  inline typename __::tmap<T1>::type make_tuple(const T1& p1)
+  inline typename __::tmap<const T1&>::type make_tuple(const T1& p1)
   {
-    return __::tmap<T1>::type (p1);
+    return __::tmap<const T1&>::type (p1);
   }
   template<typename T1, typename T2>
-  inline typename __::tmap<T1,T2>::type make_tuple(const T1& p1, const T2& p2)
+  inline typename __::tmap<const T1&,const T2&>::type make_tuple(const T1& p1, const T2& p2)
   {
-    return __::tmap<T1,T2>::type (p1,p2);
+    return __::tmap<const T1&,const T2&>::type (p1,p2);
   }
   template<typename T1, typename T2, typename T3>
-  inline typename __::tmap<T1,T2,T3>::type make_tuple(const T1& p1, const T2& p2, const T3& p3)
+  inline typename __::tmap<const T1&,const T2&,const T3&>::type make_tuple(const T1& p1, const T2& p2, const T3& p3)
   {
-    return __::tmap<T1,T2,T3>::type (p1,p2,p3);
+    return __::tmap<const T1&,const T2&,const T3&>::type (p1,p2,p3);
   }
   template<typename T1, typename T2, typename T3, typename T4>
-  inline typename __::tmap<T1,T2,T3>::type make_tuple(const T1& p1, const T2& p2, const T3& p3, const T4& p4)
+  inline typename __::tmap<const T1&,const T2&,const T3&,const T4&>::type make_tuple(const T1& p1, const T2& p2, const T3& p3, const T4& p4)
   {
-    return __::tmap<T1,T2,T3,T4>::type (p1,p2,p3,p4);
+    return __::tmap<const T1&,const T2&,const T3&,const T4&>::type (p1,p2,p3,p4);
   }
   template<typename T1, typename T2, typename T3, typename T4, typename T5>
-  inline typename __::tmap<T1,T2,T3>::type make_tuple(const T1& p1, const T2& p2, const T3& p3, const T4& p4, const T5& p5)
+  inline typename __::tmap<const T1&,const T2&,const T3&,const T5&>::type make_tuple(const T1& p1, const T2& p2, const T3& p3, const T4& p4, const T5& p5)
   {
-    return __::tmap<T1,T2,T3,T4,T5>::type (p1,p2,p3,p4,p5);
+    return __::tmap<const T1&,const T2&,const T3&,const T4&,const T5&>::type (p1,p2,p3,p4,p5);
   }
 #endif
 
