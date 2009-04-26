@@ -30,28 +30,45 @@
 
 #pragma region std::terminate
 /// RTL poiner to the current terminate_handler
-///\todo shall be an atomic type for safe multithreading
 std::terminate_handler __ntl_std_terminate_handler;
 
-/// Sets the current handler function for terminating exception processing.
-///\warning f shall not be a null pointer.
-///\return  The previous terminate_handler.
-std::terminate_handler
-  std::set_terminate(std::terminate_handler f ///< new handler
-                    ) __ntl_nothrow
+std::terminate_handler std::set_terminate(std::terminate_handler f) __ntl_nothrow
 {
-  const terminate_handler old = __ntl_std_terminate_handler;
-  __ntl_std_terminate_handler = f;
-  return old;
+  assert(f != nullptr);
+  terminate_handler old = f;
+  return ntl::atomic::generic_op::exchange(__ntl_std_terminate_handler, old);
 }
 
 void std::terminate()
 {
-  __ntl_std_terminate_handler();
+  if(__ntl_std_terminate_handler)
+    __ntl_std_terminate_handler();
+  else
+    std::abort();
 }
 
 #pragma endregion
 
+#pragma region std::unexpected
+/// RTL poiner to the current unexpected_handler
+std::unexpected_handler __ntl_std_unexpected_handler;
+
+std::unexpected_handler std::set_unexpected(std::unexpected_handler f) __ntl_nothrow
+{
+  assert(f != nullptr);
+  unexpected_handler old = f;
+  return ntl::atomic::generic_op::exchange(__ntl_std_unexpected_handler, old);
+}
+
+void std::unexpected()
+{
+  if(__ntl_std_unexpected_handler)
+    __ntl_std_unexpected_handler();
+  else
+    std::terminate();
+}
+
+#pragma endregion
 
 using namespace ntl;
 using namespace ntl::cxxruntime;

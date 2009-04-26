@@ -30,6 +30,9 @@ namespace
   typedef std::vector<vfv_t*> exit_funcs_t;
   static exit_funcs_t* exit_list = 0;
 
+  static vfv_t* quick_exit_list[128];
+  static volatile uint32_t quick_exit_count = 0;
+
   void initterm(vfv_t** from, vfv_t** to)
   {
     while(from < to){
@@ -55,6 +58,15 @@ namespace
       for(exit_funcs_t::const_iterator e = exit_list->cbegin(); e != exit_list->cend(); ++e)
         if(*e) (*e)();
       delete exit_list;
+    }else{
+      for(vfv_t** f = quick_exit_list; f < quick_exit_list+quick_exit_count; f++){
+        __ntl_try{
+          if(*f) (*f)();
+        }
+        __ntl_catch(...){
+          std::terminate();
+        }
+      }
     }
   }
 } // namespace
@@ -97,6 +109,22 @@ namespace ntl
 int _cdecl atexit(vfv_t func)
 {
   return onexit(func) ? 0 : -1;
+}
+
+int _cdecl std::at_quick_exit(vfv_t* f)
+{
+  const uint32_t idx = ntl::atomic::increment(quick_exit_count);
+  if(f && idx < _countof(quick_exit_list)){
+    quick_exit_list[idx] = f;
+    return 0;
+  }
+  return -1;
+}
+
+void _cdecl std::quick_exit(int status)
+{
+  doexit(0, true,true);
+  _Exit(status);
 }
 
 namespace ntl

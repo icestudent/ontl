@@ -315,6 +315,9 @@ using ::atexit;
 using ::exit;
 using ::_Exit;
 
+int  _cdecl at_quick_exit(vfv_t* f);
+void _cdecl quick_exit(int status);
+
 using ::getenv;
 using ::system;
 

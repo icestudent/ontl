@@ -45,33 +45,62 @@ class bad_exception : public exception
     virtual const char* what() const __ntl_nothrow { return "bad_exception"; }
 };
 
-  /// Type unexpected_handler [18.7.2.2 unexpected.handler]
+  /**
+   *	@brief Type unexpected_handler [18.7.2.2 unexpected.handler]
+   *  @details The type of a handler function to be called by unexpected() when a function attempts 
+   *  to throw an exception not listed in its exception-specification.
+   *  @note An unexpected_handler shall not return.
+   **/
   /// @note an unexpected_handler shall not return.
   typedef void (*unexpected_handler)();
 
-  /// set_unexpected [18.7.2.3 set.unexpected]
+  /**
+   *	@brief set_unexpected [18.7.2.3 set.unexpected]
+   *  @details Establishes the function designated by \c f as the current \c unexpected_handler.
+   *  @return The previous \c unexpected_handler.
+   **/
   unexpected_handler set_unexpected(unexpected_handler f) __ntl_nothrow;
 
-  /// unexpected [18.7.2.4 unexpected]
+  /**
+   *	@brief unexpected [18.7.2.4 unexpected]
+   *  @details Calls the \c unexpected_handler function in effect immediately after evaluating 
+   *  the \e throw-expression (18.7.2.2), if called by the implementation, or calls the current \c unexpected_handler, 
+   *  if called by the program.
+   **/
+  NTL__NORETURN
   void unexpected();
 
 
-  /// Type terminate_handler [18.7.3.1 terminate.handler]
+  /**
+   *	@brief Type terminate_handler [18.7.3.1 terminate.handler]
+   *  @details The type of a handler function to be called by terminate() when terminating exception processing.
+   **/
   typedef void (*terminate_handler)();
 
-  /// set_terminate [18.7.3.2 set.terminate]
+  /**
+   *	@brief set_terminate [18.7.3.2 set.terminate]
+   *  @details Establishes the function designated by \c f as the current handler function for terminating exception processing.
+   *  @return The previous \c terminate_handler.
+   **/
   terminate_handler set_terminate(terminate_handler f) __ntl_nothrow;
 
-  /// terminate [18.7.3.3 terminate]
-#ifndef __GNUC__
-  __declspec(noreturn)
-#else
+  /**
+   *	@brief terminate [18.7.3.3 terminate]
+   *  @details Calls the \c terminate_handler function in effect immediately after evaluating 
+   *  the throw-expression (18.7.3.1), if called by the implementation, or calls the current \c terminate_handler function,
+   *  if called by the program.
+   **/
   NTL__NORETURN
-#endif
   void terminate();
 
 
-  /// uncaught_exception [18.7.4 uncaught]
+  /**
+   *	@brief uncaught_exception [18.7.4 uncaught]
+   *  @details Returns \c true after completing evaluation of a \e throw-expression until either completing initialization
+   *  of the exception-declaration in the matching handler or entering unexpected() due to the throw; or
+   *  after entering terminate() for any reason other than an explicit call to terminate().
+   *  @note When uncaught_exception() is \c true, throwing an exception can result in a call of terminate()
+   **/
   bool uncaught_exception() __ntl_nothrow;
 
 

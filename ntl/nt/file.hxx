@@ -507,7 +507,7 @@ class file_handler : public handle, public device_traits<file_handler>
     __forceinline
     ntstatus
       create(
-        const std::wstring &        file_name,
+        const const_unicode_string& file_name,
         const creation_disposition  cd              = creation_disposition_default,
         const access_mask           desired_access  = access_mask_default,
         const share_mode            share           = share_mode_default,
@@ -519,8 +519,7 @@ class file_handler : public handle, public device_traits<file_handler>
         ) __ntl_nothrow
     {
       reset();
-      const const_unicode_string uname(file_name);
-      const object_attributes oa(uname);
+      const object_attributes oa(file_name);
       return NtCreateFile(this, desired_access, &oa, &iosb,
                     allocation_size, attr, share, cd, co, ea_buffer, ea_length);
     }
@@ -537,7 +536,20 @@ class file_handler : public handle, public device_traits<file_handler>
       return NtOpenFile(this, desired_access, &oa, &iosb, share, co);
     }
 
-    operator const void*() { return get(); }
+    ntstatus
+      open(
+        const const_unicode_string& file_name,
+        const access_mask           desired_access,
+        const share_mode            share,
+        const creation_options      co
+        ) __ntl_nothrow
+    {
+      reset();
+      const object_attributes oa(file_name);
+      return NtOpenFile(this, desired_access, &oa, &iosb, share, co);
+    }
+
+    //operator explicit_bool_type() const { return explicit_bool(get()); } 
 
     void close() { reset(); }
 

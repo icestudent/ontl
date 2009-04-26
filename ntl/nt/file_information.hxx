@@ -347,13 +347,14 @@ struct file_information<file_rename_information>:
 };
 
 ///\name  FileLinkInformation == 11
-struct file_link_information: file_rename_information,
-  private ntl::noncopyable
+#pragma warning(disable:4510 4610)
+struct file_link_information: file_rename_information
 {
   static const file_information_class info_class_type = FileLinkInformation;
 
   typedef std::unique_ptr<file_link_information> ptr;
 };
+#pragma warning(default:4510 4610)
 
 template<>
 struct file_information<file_link_information>:

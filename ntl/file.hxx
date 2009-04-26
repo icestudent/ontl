@@ -30,7 +30,8 @@ class basic_file : public traits
 
     inline basic_file() : f() {}
 
-    operator const void*() { return f.operator const void*(); }
+    operator explicit_bool_type() const { return f.operator explicit_bool_type(); } 
+    //operator const void*() { return f.operator const void*(); }
 
     template<typename objectT>
     explicit __forceinline

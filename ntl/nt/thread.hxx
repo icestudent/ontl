@@ -375,7 +375,7 @@ public:
   }
 
   __declspec(noreturn)
-  void exit_process(ntstatus Status)
+  static void exit_process(ntstatus Status)
   {
     RtlAcquirePebLock();
     __try{
