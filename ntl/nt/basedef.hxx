@@ -17,7 +17,7 @@
 #include "../basedef.hxx"
 #include "../stdlib.hxx"
 
-#ifdef __ICL
+//#ifdef __ICL
 
 extern "C" __declspec(selectany) std::uintptr_t __security_cookie = 
   #ifdef _M_X64
@@ -25,7 +25,7 @@ extern "C" __declspec(selectany) std::uintptr_t __security_cookie =
   #else
     0xBB40E64E;
   #endif
-#endif // icl
+//#endif // icl
 
 namespace ntl {
 

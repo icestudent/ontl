@@ -135,20 +135,6 @@ typedef fpos<mbstate_t/*char_traits<wchar_t>::state_type*/>  wstreampos;
 
 ///@}
 
-namespace __
-{
-  template<class charT, class traits>
-  struct ostream
-  {
-    typedef typename add_rvalue_reference<basic_ostream<charT,traits> >::type type;
-  };
-  template<class charT, class traits>
-  struct istream
-  {
-    typedef typename add_rvalue_reference<basic_istream<charT,traits> >::type type;
-  };
-}
-
 /**@} lib_input_output */
 
 }//namespace std

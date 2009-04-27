@@ -853,7 +853,7 @@ template<> class numeric_limits<char16_t>
 public:
   static const  bool  is_specialized    = true;
   static        T     min()         __ntl_nothrow { return 0; }
-  static        T     max()         __ntl_nothrow { return USHRT_MAX; }
+  static        T     max()         __ntl_nothrow { return ~(T)0; }
   static        T     lowest()      __ntl_nothrow { return 0; }
   static const  int   digits            = sizeof(T) * CHAR_BIT;
   static const  int   digits10          = digits * 301 / 1000;
@@ -885,7 +885,7 @@ public:
 
   ///\name Constant value extension due to constexpr absent
   static const  T     __min             = 0;
-  static const  T     __max             = USHRT_MAX;
+  static const  T     __max             = ~(T)0;
   static const  T     __lowest          = 0;
 }; //template class numeric_limits<char16_t>
 
@@ -896,7 +896,7 @@ template<> class numeric_limits<char32_t>
 public:
   static const  bool  is_specialized    = true;
   static        T     min()         __ntl_nothrow { return 0; }
-  static        T     max()         __ntl_nothrow { return ULONG_MAX; }
+  static        T     max()         __ntl_nothrow { return ~(T)0; }
   static        T     lowest()      __ntl_nothrow { return 0; }
   static const  int   digits            = sizeof(T) * CHAR_BIT;
   static const  int   digits10          = digits * 301 / 1000;
@@ -928,7 +928,7 @@ public:
 
   ///\name Constant value extension due to constexpr absent
   static const  T     __min             = 0;
-  static const  T     __max             = ULONG_MAX;
+  static const  T     __max             = ~(T)0;
   static const  T     __lowest          = 0;
 }; //template class numeric_limits<char32_t>
 

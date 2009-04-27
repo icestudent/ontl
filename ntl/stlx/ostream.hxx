@@ -54,7 +54,7 @@ class basic_ostream
       basic_ios<charT, traits>::init(sb);
     }
 
-#ifdef NTL__CXX
+#ifdef NTL__CXX_RV
     /// 5 Effects: Move constructs from the rvalue rhs. This is accomplished
     ///   by default constructing the base class and calling
     ///   basic_ios<charT, traits>::move(rhs) to initialize the base class.
@@ -451,27 +451,6 @@ inline basic_ostream<char, traits>& operator<<(basic_ostream<char, traits>& os, 
   return __::stream_writer<char,traits>::formatted_write(os, &c, 1);
 }
 
-#ifdef NTL__CXX_RV
-
-template<class charT, class traits>
-inline basic_ostream<charT, traits>& operator<<(basic_ostream<charT, traits>&& os, charT c)
-{
-  return __::stream_writer<charT,traits>::formatted_write(os, &c, 1);
-}
-template<class charT, class traits>
-inline basic_ostream<charT, traits>& operator<<(basic_ostream<charT, traits>&& os, char c)
-{
-  charT wc = os.widen(c);
-  return __::stream_writer<charT,traits>::formatted_write(os, &wc, 1);
-}
-template<class traits>
-inline basic_ostream<char, traits>& operator<<(basic_ostream<char, traits>&& os, char c)
-{
-  return __::stream_writer<charT,traits>::formatted_write(os, &c, 1);
-}
-
-#endif
-
 #if 0
 // doesn't works in vc10
 template<class charT, class traits>
@@ -531,7 +510,7 @@ inline basic_ostream<charT, traits>& operator<<(basic_ostream<charT, traits>& os
   return __::stream_writer<charT,traits>::formatted_write(os, s, traits::length(s), true);
 }
 
-#endif
+#endif // compile-time length specialization
 
 template<class charT, class traits>
 inline basic_ostream<charT, traits>& operator<<(basic_ostream<charT, traits>& os, const charT* s)
@@ -576,38 +555,10 @@ template<class traits>
 basic_ostream<char, traits>&
 operator<<(basic_ostream<char, traits>&, const unsigned char*);
 
-#ifdef NTL__CXX_RV
-template<class charT, class traits>
-inline basic_ostream<charT, traits>& operator<<(basic_ostream<charT, traits>&& os, const charT* s)
-{
-  assert(("s shall not be a null pointer",s));
-  if(s) os.write(s, traits::length(s));
-  return os;
-}
-template<class charT, class traits>
-inline basic_ostream<charT, traits>& operator<<(basic_ostream<charT, traits>&& os, const char* s)
-{
-  assert(("s shall not be a null pointer",s));
-  if(s){
-    size_t l = char_traits<char>::length(s);
-    while(l-- && os)
-      os.put(os.widen(*s++));
-  }
-  return os;
-}
-template<class traits>
-inline basic_ostream<char, traits>& operator<<(basic_ostream<char, traits>&& os, const char* s)
-{
-  assert(("s shall not be a null pointer",s));
-  if(s) os.write(s, char_traits<char>::length(s));
-  return os;
-}
-#endif
-
 ///\name Swap
 template <class charT, class traits>
 inline void swap(basic_ostream<charT, traits>& x, basic_ostream<charT, traits>& y)  { x.swap(y); }
-#ifdef NTL__CXX_RV
+#if defined NTL__CXX_RV && 0 // disabled in n2857
 template <class charT, class traits>
 inline void swap(basic_ostream<charT, traits>&& x, basic_ostream<charT, traits>& y) { x.swap(y); }
 template <class charT, class traits>
@@ -645,9 +596,18 @@ basic_ostream<charT, traits>&
   return os;
 }
 
+#ifdef NTL__CXX_RV
+/// 27.7.2.9 Rvalue stream insertion [ostream.rvalue]
+template <class charT, class traits, class T>
+inline basic_ostream<charT, traits>& operator<<(basic_ostream<charT, traits>&& os, const T& x)
+{
+  return os << x;
+}
+#endif
+
 ///\name  Inserters and extractors [21.3.7.9 string.io]
 template<class charT, class traits, class Allocator>
-basic_ostream<charT, traits>& operator<<(typename __::ostream<charT,traits>::type os, const basic_string<charT,traits,Allocator>& str)
+basic_ostream<charT, traits>& operator<<(basic_ostream<charT,traits>& os, const basic_string<charT,traits,Allocator>& str)
 {
   return __::stream_writer<charT,traits>::formatted_write(os, str.data(), str.size());
 }

@@ -1339,6 +1339,63 @@ class numpunct : public locale::facet
 
 template <class charT> class numpunct_byname;
 
+template <>
+class numpunct<wchar_t>:
+  public locale::facet
+{
+public:
+  typedef wchar_t                 char_type;
+  typedef basic_string<char_type> string_type;
+
+  explicit numpunct(size_t refs = 0)
+    :facet(refs)
+  {}
+
+  ///\name 22.2.3.1.1 numpunct members [facet.numpunct.members]
+
+  char_type decimal_point() const { return do_decimal_point(); }
+  char_type thousands_sep() const { return do_thousands_sep(); }
+  string grouping() const         { return do_grouping(); }
+  string_type truename() const    { return do_truename(); }
+  string_type falsename() const   { return do_falsename(); }
+
+  static locale::id id;
+
+protected:
+  ///\name 22.2.3.1.2 numpunct virtual functions [facet.numpunct.virtuals]
+  friend struct __::facets;
+  ~numpunct() // virtual
+  {}
+
+  /// Returns: A character for use as the decimal radix separator.
+  /// The required specializations return ’.’ or L’.’.
+  _NTL_LOC_VIRTUAL char_type do_decimal_point() const { return L'.'; }
+
+  /// 2 Returns: A character for use as the digit group separator.
+  /// The required specializations return ’,’ or L’,’.
+  _NTL_LOC_VIRTUAL char_type do_thousands_sep() const { return L','; }
+
+  /// 3 Returns: A basic_string<char> vec used as a vector of integer values,
+  ///   in which each element vec[i] represents the number of digits246)
+  ///   in the group at position i, starting with position 0 as the rightmost
+  ///   group. If vec.size() <= i, the number is the same as group (i-1);
+  ///   if (i<0 || vec[i]<=0 || vec[i]==CHAR_MAX), the size of the digit group
+  ///   is unlimited.
+  /// 4 The required specializations return the empty string, indicating no grouping.
+  _NTL_LOC_VIRTUAL string do_grouping() const { return ""; }
+
+  /// 5 Returns: A string representing the name of the boolean value true.
+  /// 6 In the base class implementation these names are "true" or L"true".
+  _NTL_LOC_VIRTUAL string_type do_truename() const { return L"true"; }
+
+  /// 5 Returns: A string representing the name of the boolean value false.
+  /// 6 In the base class implementation these names are "false" or L"false".
+  _NTL_LOC_VIRTUAL string_type do_falsename() const { return L"false"; }
+
+  ///\}
+};
+
+
 /** @} lib_locale_numpunct */
 
 /** \defgroup lib_locale_numeric 22.2.2 The numeric category [lib.category.numeric]

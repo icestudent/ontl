@@ -334,7 +334,7 @@ class basic_iostream
     : basic_istream<charT, traits>(sb), basic_ostream<charT, traits>(sb)
     {;}
 
-#ifdef NTL__CXX
+#ifdef NTL__CXX_RV
     /// 3 Effects: Move constructs from the rvalue rhs by constructing
     ///   the basic_istream base class with move(rhs).
     basic_iostream(basic_iostream&& rhs);
@@ -345,7 +345,7 @@ class basic_iostream
     /// 2 Remarks: Does not perform any operations on rdbuf().
     virtual ~basic_iostream() {;}
 
-#ifdef NTL__CXX
+#ifdef NTL__CXX_RV
     ///\name 27.6.1.5.3 basic_iostream assign and swap [iostream.assign]
 
     /// 1 Effects: swap(rhs).
@@ -359,15 +359,21 @@ class basic_iostream
 
 /// 3 Effects: x.swap(y).
 template <class charT, class traits>
-void swap(basic_iostream<charT, traits>& x, basic_iostream<charT, traits>& y);
+void swap(basic_iostream<charT, traits>& x, basic_iostream<charT, traits>& y)  { x.swap(y); }
 
-#ifdef NTL__CXX
+#if defined NTL__CXX_RV && 0 // disabled in N2857
 template <class charT, class traits>
-void swap(basic_iostream<charT, traits>&& x, basic_iostream<charT, traits>& y);
+void swap(basic_iostream<charT, traits>&& x, basic_iostream<charT, traits>& y) { x.swap(y); }
 template <class charT, class traits>
-void swap(basic_iostream<charT, traits>& x, basic_iostream<charT, traits>&& y);
+void swap(basic_iostream<charT, traits>& x, basic_iostream<charT, traits>&& y) { x.swap(y); }
+
+/// 27.7.1.6 Rvalue stream extraction [istream.rvalue]
+template <class charT, class traits, class T>
+inline basic_istream<charT, traits>& operator>>(basic_istream<charT, traits>&& is, T& x)
+{
+  return is >> x;
+}
 #endif
-
 /**@} lib_input_streams */
 /**@} lib_iostream_format */
 /**@} lib_input_output */

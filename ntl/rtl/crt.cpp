@@ -23,6 +23,7 @@ sec(".CRT$XCZ") vfv_t* __xc_z[]= {0};
 # include "../km/new.hxx"
 #else
 # include "../nt/new.hxx"
+# include "../nt/thread.hxx"
 #endif
 
 namespace
@@ -59,9 +60,10 @@ namespace
         if(*e) (*e)();
       delete exit_list;
     }else{
-      for(vfv_t** f = quick_exit_list; f < quick_exit_list+quick_exit_count; f++){
+      for(vfv_t** f = quick_exit_list+quick_exit_count; f >= quick_exit_list; --f){
         __ntl_try{
-          if(*f) (*f)();
+          assert(*f != 0); // we checked it at `at_quick_exit`
+          (*f)();
         }
         __ntl_catch(...){
           std::terminate();
@@ -105,7 +107,9 @@ namespace ntl
   }
 }
 
-//////////////////////////////////////////////////////////////////////////
+/************************************************************************/
+/* `exit` and `quick_exit`                                              */
+/************************************************************************/
 int _cdecl atexit(vfv_t func)
 {
   return onexit(func) ? 0 : -1;
@@ -115,30 +119,48 @@ int _cdecl std::at_quick_exit(vfv_t* f)
 {
   const uint32_t idx = ntl::atomic::increment(quick_exit_count);
   if(f && idx < _countof(quick_exit_list)){
+    // find, if `f` was already registered
+    for(vfv_t** p = quick_exit_list; p < quick_exit_list+quick_exit_count; ++p)
+      if(*p == f)
+        return 0;
+    // add to list
     quick_exit_list[idx] = f;
     return 0;
   }
   return -1;
 }
 
-void _cdecl std::quick_exit(int status)
+void NTL__CRTCALL exit(int status)
 {
-  doexit(0, true,true);
+  doexit(status, false, true);
   _Exit(status);
 }
 
-namespace ntl
+void _cdecl std::quick_exit(int status)
 {
-  extern "C" volatile std::new_handler __new_handler = 0;
+  doexit(status, true,true);
+  _Exit(status);
 }
 
-std::new_handler std::set_new_handler(std::new_handler new_p) __ntl_nothrow
+#ifndef NTL__SUBSYSTEM_KM
+void _cdecl _Exit(int code)
 {
-  std::new_handler prev = new_p;
-  return ntl::atomic::generic_op::exchange(ntl::__new_handler, prev);
+  using ntl::nt::status;
+  ntl::nt::user_thread::exit_process(code == EXIT_SUCCESS ? status::success : (code == EXIT_FAILURE ? status::unsuccessful : static_cast<ntl::nt::ntstatus>(code)) );
+}
+#endif
+
+/************************************************************************/
+/* `abort`                                                              */
+/************************************************************************/
+void _cdecl abort()
+{
+  ntl::nt::user_thread::exit_process(ntl::nt::status::unsuccessful);
 }
 
-//////////////////////////////////////////////////////////////////////////
+/************************************************************************/
+/* `purecall` handler                                                   */
+/************************************************************************/
 #ifdef _MSC_VER
 #include "../nt/debug.hxx" // for abort implementation
 extern "C" int _cdecl _purecall(void)
@@ -151,6 +173,47 @@ extern "C" int _cdecl _purecall(void)
   return 0;
 }
 #endif
+
+/************************************************************************/
+/* `new` handler                                                        */
+/************************************************************************/
+namespace ntl
+{
+  extern "C" volatile std::new_handler __new_handler = 0;
+}
+
+std::new_handler std::set_new_handler(std::new_handler new_p) __ntl_nothrow
+{
+  std::new_handler prev = new_p;
+  return ntl::atomic::generic_op::exchange(ntl::__new_handler, prev);
+}
+
+/************************************************************************/
+/* `terminate` handler                                                  */
+/************************************************************************/
+/// RTL poiner to the current terminate_handler
+//__declspec(selectany)
+std::terminate_handler __ntl_std_terminate_handler = 0;
+
+namespace std
+{
+  terminate_handler set_terminate(terminate_handler f) __ntl_nothrow
+  {
+    assert(f != nullptr);
+    terminate_handler old = f;
+    return ntl::atomic::generic_op::exchange(__ntl_std_terminate_handler, old);
+  }
+
+  void terminate()
+  {
+    if(__ntl_std_terminate_handler)
+      __ntl_std_terminate_handler();
+    else
+      abort();
+  }
+} // std
+
+
 
 //////////////////////////////////////////////////////////////////////////
 #if defined NTL__DEBUG || !defined NDEBUG

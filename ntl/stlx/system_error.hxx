@@ -365,12 +365,10 @@ private:
       {
         return error_condition(ev, *this);
       }
-
       bool equivalent(int code, const error_condition& condition) const __ntl_nothrow
       {
         return default_error_condition(code) == condition;
       }
-
       bool equivalent(const error_code& code, int condition) const __ntl_nothrow
       {
         return *this == code.category() && code.value() == condition;
@@ -396,13 +394,39 @@ private:
       {
         return default_error_condition(code) == condition;
       }
-
       bool equivalent(const error_code& code, int condition) const __ntl_nothrow
       {
         return *this == code.category() && code.value() == condition;
       }
     };
 
+    class iostream_error_category:
+      public error_category
+    {
+    public:
+      /** Returns a string naming the error category ("iostream") */
+      const char *name() const __ntl_nothrow { return "iostream"; }
+
+      virtual string message(int ev) const;
+
+      /**
+      *	If the argument \c ev corresponds to a POSIX \c errno value \c posv, 
+      *  the function shall return <tt> error_condition(posv, generic_category) </tt>.
+      *  Otherwise, the function shall return <tt> error_condition(ev, system_category) </tt>.
+      **/
+      error_condition default_error_condition(int ev) const __ntl_nothrow
+      {
+        return error_condition(ev, *this);
+      }
+      bool equivalent(int code, const error_condition& condition) const __ntl_nothrow
+      {
+        return default_error_condition(code) == condition;
+      }
+      bool equivalent(const error_code& code, int condition) const __ntl_nothrow
+      {
+        return *this == code.category() && code.value() == condition;
+      }
+    };
   }
   //////////////////////////////////////////////////////////////////////////
   /// 19.4.1.5 Error category objects [syserr.errcat.objects]

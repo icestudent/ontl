@@ -268,7 +268,7 @@ namespace std
         /** Returns the stored path, formatted according to the Native subsystem rules for file names */
         string_type file_string(bool normalize = true) const;
         /** Returns the stored path, formatted according to the Native subsystem rules for directory names (same as file_string()) */
-        string_type directory_string(bool normalize = true) const { return move(file_string(normalize)); }
+        string_type directory_string(bool normalize = true) const { return file_string(normalize); }
 
         /** Returns the stored path, formatted and encoded according to the Native subsystem rules for file names */
         external_string_type external_file_string(bool normalize = true) const
@@ -287,7 +287,7 @@ namespace std
           if(rel)
             return rel.path.get_string();
           else
-            return traits_type::to_external(*this, forward<string_type>(file_string(true)));
+            return traits_type::to_external(*this, file_string(true));
         }
         template<bool>
         external_string_type do_normalize(false_type) const
@@ -295,9 +295,9 @@ namespace std
           external_string_type xs = traits_type::to_external(*this, path_);
           ntl::nt::rtl::relative_name rel(xs.c_str());
           if(rel)
-            return move(rel.path.get_string());
+            return rel.path.get_string();
           else
-            return traits_type::to_external(*this, forward<string_type>(file_string(true)));
+            return traits_type::to_external(*this, file_string(true));
         }
       public:
 
@@ -649,7 +649,7 @@ namespace std
         if(normalize){
           do_normalize<true>(native, is_same<string_type,external_string_type>());
           if(!native.empty())
-            return native;
+            return move(native);
         }
 
         // prepend the NT prefixes if path has drive
@@ -1014,7 +1014,7 @@ namespace std
         for(external_string_type::iterator i = xs.begin(), iend = xs.end(); i != iend; ++i)
           if(*i == '/')
             *i = '\\';
-        return xs;
+        return move(xs);
       }
 
       path_traits::internal_string_type path_traits::to_internal(const path&, const path_traits::external_string_type& xs)
@@ -1034,7 +1034,7 @@ namespace std
         for(internal_string_type::iterator i = is.begin(), iend = is.end(); i != iend; ++i)
           if(*i == '\\')
             *i = '/';
-        return is;
+        return move(is);
       }
 
       #endif // __DOXYGEN__

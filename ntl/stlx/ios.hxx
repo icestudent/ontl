@@ -15,6 +15,7 @@
 #include "iosfwd.hxx"
 #include "stdexcept.hxx"
 #include "string.hxx"
+#include "system_error.hxx"
 
 namespace std {
 
@@ -26,6 +27,42 @@ typedef ptrdiff_t streamoff;
 typedef ssize_t   streamsize;
 ///@}
 
+///\name 27.5.5.5 Error reporting [error.reporting] (N2857)
+#ifdef NTL__CXX_ENUM
+
+enum class io_errc {
+  stream = 1
+};
+
+template<>
+struct is_error_code_enum<io_errc>: true_type{};
+
+#else
+
+__class_enum(io_errc)
+{
+  stream = 1
+};};
+
+template<>
+struct is_error_code_enum<io_errc::type>: true_type{};
+
+#endif
+
+
+extern const error_category& iostream_category;
+
+inline error_code make_error_code(io_errc e)
+{
+  return error_code(static_cast<int>(e), iostream_category);
+}
+
+inline error_condition make_error_condition(io_errc e)
+{
+  return error_condition(static_cast<int>(e), iostream_category);
+}
+///\}
+
 /// 27.4.2 Class ios_base [ios.base]
 class ios_base
 {
@@ -34,13 +71,22 @@ class ios_base
 
     ///\name 27.4.2.1 Types [ios.types]
 
-    /// 27.4.2.1.1 Class ios_base::failure [ios::failure]
-    class failure : public runtime_error
+    /**
+     *	@brief 27.5.2.1.1 Class ios_base::failure [ios::failure] (N2857)
+     *  @details The class failure defines the base class for the types of all objects thrown as exceptions, 
+     *  by functions in the iostreams library, to report errors detected during stream buffer operations.
+     **/
+    class failure:
+      public system_error
     {
-      public:
-        explicit failure(const string& msg) : runtime_error(msg) {}
-      private:
-        failure operator=(const failure&);
+    public:
+      explicit failure(const string& msg, const error_code& ec = io_errc::stream)
+        :system_error(ec, msg)
+      {}
+      explicit failure(const char* msg, const error_code& ec = io_errc::stream)
+        :system_error(ec, msg)
+      {}
+      //virtual const char* what() const throw();
     };
 
     /// 27.4.2.1.2 Type ios_base::fmtflags [ios::fmtflags]

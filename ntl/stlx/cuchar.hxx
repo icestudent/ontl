@@ -10,16 +10,20 @@
 #include "cstdint.hxx"
 #include "cwchar.hxx"
 
-#ifndef NTL__CXX_CHARS
-# define __STDC_UTF_16__ 1
-# define __STDC_UTF_32__ 0
-#else
-# pragma error todo
+#ifdef NTL__CXX_CHARS
+# ifdef __ICL
+#  define __STDC_UTF_16__ 1
+#  define __STDC_UTF_32__ 1
+# else
+#  pragma message("Note: following defines is compiler-dependent! Please, correct it!")
+#  define __STDC_UTF_16__ 1
+#  define __STDC_UTF_32__ 1
+# endif
 #endif
 
 namespace std {
 
-#ifndef NTL__CXX_CHARS
+#ifndef NTL__CXX_CHARS_
   typedef uint_least16_t char16_t;
   typedef uint_least32_t char32_t;
 #endif

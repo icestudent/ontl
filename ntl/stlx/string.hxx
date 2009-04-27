@@ -1459,16 +1459,16 @@ struct constructible_with_allocator_suffix<
 ///\name  Inserters and extractors [21.3.7.9 string.io]
 
 template<class charT, class traits, class Allocator>
-basic_istream<charT,traits>& operator>>(typename __::istream<charT,traits>::type is, basic_string<charT,traits,Allocator>& str);
+basic_istream<charT,traits>& operator>>(basic_istream<charT,traits>& is, basic_string<charT,traits,Allocator>& str);
 
 template<class charT, class traits, class Allocator>
-basic_ostream<charT, traits>& operator<<(typename __::ostream<charT,traits>::type os, const basic_string<charT,traits,Allocator>& str);
+basic_ostream<charT, traits>& operator<<(basic_ostream<charT,traits>& os, const basic_string<charT,traits,Allocator>& str);
 
 template<class charT, class traits, class Allocator>
-basic_istream<charT,traits>& getline(typename __::istream<charT,traits>::type is, basic_string<charT,traits,Allocator>& str, charT delim);
+basic_istream<charT,traits>& getline(basic_istream<charT,traits>& is, basic_string<charT,traits,Allocator>& str, charT delim);
 
 template<class charT, class traits, class Allocator>
-basic_istream<charT,traits>& getline(typename __::istream<charT,traits>::type is, basic_string<charT,traits,Allocator>& str);
+basic_istream<charT,traits>& getline(basic_istream<charT,traits>& is, basic_string<charT,traits,Allocator>& str);
 
 /** Specialization of basic_string for the \e char characters */
 typedef basic_string<char>    string;

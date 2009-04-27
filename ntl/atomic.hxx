@@ -8,6 +8,10 @@
 #ifndef NTL__ATOMIC
 #define NTL__ATOMIC
 
+#ifndef NTL__BASEDEF
+#include "basedef.hxx"
+#endif
+
 namespace ntl {
 
 #if defined(_MSC_VER)

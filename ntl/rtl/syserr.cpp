@@ -18,19 +18,21 @@ namespace
 {
   static const std::__::generic_error_category generic_category_instance;
   static const std::__::system_error_category system_category_instance;
+  static const std::__::iostream_error_category iostream_category_instance;
 }
 
 namespace std
 {
   extern const error_category& generic_category = generic_category_instance;
   extern const error_category& system_category = system_category_instance;
+  extern const error_category& iostream_category = iostream_category_instance;
 
   // TODO: implement generic error value mapping to the current subsystem error values
   string __::generic_error_category::message(int ev) const
   {
     char buf[32];
     strcpy(buf, "generic error code ");
-    _itoa(ev, buf+sizeof("generic error code ")-1, 10);
+    _itoa(ev, buf+sizeof("generic error code"), 10);
     return string(buf);
   }
 
@@ -39,7 +41,15 @@ namespace std
   {
     char buf[32];
     strcpy(buf, "system error code ");
-    _itoa(ev, buf+sizeof("system error code ")-1, 10);
+    _itoa(ev, buf+sizeof("system error code"), 10);
+    return string(buf);
+  }
+
+  string __::iostream_error_category::message(int ev) const
+  {
+    char buf[32];
+    strcpy(buf, "iostream error code ");
+    _itoa(ev, buf+sizeof("iostream error code"), 10);
     return string(buf);
   }
 

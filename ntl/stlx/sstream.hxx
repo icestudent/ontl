@@ -72,7 +72,7 @@ namespace std {
       set_ptrs();
     }
 
-  #ifdef NTL__CXX
+  #ifdef NTL__CXX_RV
     basic_stringbuf(basic_stringbuf&& rhs)
       :mode_(ios_base::in|ios_base::out)
     {
@@ -81,7 +81,7 @@ namespace std {
   #endif
 
     ///\name 27.7.1.2 Assign and swap:
-  #ifdef NTL__CXX
+  #ifdef NTL__CXX_RV
     basic_stringbuf& operator=(basic_stringbuf&& rhs)
     {
       swap(rhs); return *this;

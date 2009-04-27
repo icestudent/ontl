@@ -209,7 +209,7 @@ namespace std
     friend bool operator>=(id x, id y) { return x.tid_ >= y.tid_; }
 
     template<class charT, class traits>
-    friend basic_ostream<charT, traits>& operator<< (basic_ostream<charT, traits>& out, thread::id id)
+    friend basic_ostream<charT, traits>& operator<< (typename __::ostream<charT, traits>::type out, thread::id id)
     {
       return out << reinterpret_cast<uint32_t>(id.tid_);
     }

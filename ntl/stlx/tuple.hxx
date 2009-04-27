@@ -585,14 +585,14 @@ namespace std
     return __::tmap<T1,T2,T3>::type (forward<T1>(p1),forward<T2>(p2),forward<T3>(p3));
   }
   template<typename T1, typename T2, typename T3, typename T4>
-  inline typename __::tmap<T1,T2,T3>::type make_tuple(T1&& p1, T2&& p2, T3&& p3, T4&& p4)
+  inline typename __::tmap<T1,T2,T3,T4>::type make_tuple(T1&& p1, T2&& p2, T3&& p3, T4&& p4)
   {
-    return __::tmap<T1,T2,T3>::type (forward<T1>(p1),forward<T2>(p2),forward<T3>(p3),forward<T4>(p4));
+    return __::tmap<T1,T2,T3,T4>::type (forward<T1>(p1),forward<T2>(p2),forward<T3>(p3),forward<T4>(p4));
   }
   template<typename T1, typename T2, typename T3, typename T4, typename T5>
-  inline typename __::tmap<T1,T2,T3>::type make_tuple(T1&& p1, T2&& p2, T3&& p3, T4&& p4, T5&& p5)
+  inline typename __::tmap<T1,T2,T3,T4,T5>::type make_tuple(T1&& p1, T2&& p2, T3&& p3, T4&& p4, T5&& p5)
   {
-    return __::tmap<T1,T2,T3>::type (forward<T1>(p1),forward<T2>(p2),forward<T3>(p3),forward<T4>(p4),forward<T5>(p5));
+    return __::tmap<T1,T2,T3,T4,T5>::type (forward<T1>(p1),forward<T2>(p2),forward<T3>(p3),forward<T4>(p4),forward<T5>(p5));
   }
 #else
   template<typename T1>

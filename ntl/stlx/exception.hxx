@@ -67,7 +67,7 @@ class bad_exception : public exception
    *  the \e throw-expression (18.7.2.2), if called by the implementation, or calls the current \c unexpected_handler, 
    *  if called by the program.
    **/
-  NTL__NORETURN
+  __declspec(noreturn)
   void unexpected();
 
 
@@ -90,7 +90,7 @@ class bad_exception : public exception
    *  the throw-expression (18.7.3.1), if called by the implementation, or calls the current \c terminate_handler function,
    *  if called by the program.
    **/
-  NTL__NORETURN
+  __declspec(noreturn)
   void terminate();
 
 
@@ -146,6 +146,7 @@ class bad_exception : public exception
 #endif
 
   template <class E> void rethrow_if_nested(const E& e);
+
 
 /**@} lib_support_exception */
 /**@} lib_language_support */

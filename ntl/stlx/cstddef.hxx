@@ -160,7 +160,7 @@
 //#define NTL__CXX_ALIGNOF
 // auto
 #define NTL__CXX_AUTO
-// char16_t, char32_t
+// char16_t, char32_t (as a builtin types, not support u/U prefixes!)
 //#define NTL__CXX_CHARS
 // concepts, concept_map, requires
 //#define NTL__CXX_CONCEPT
@@ -258,7 +258,7 @@
 //#define NTL__CXX_ALIGNOF
 // auto
 #define NTL__CXX_AUTO
-// char16_t, char32_t
+// char16_t, char32_t. u/U literals supported with the /Qoption,cpp,"--uliterals" 
 //#define NTL__CXX_CHARS
 // concepts, concept_map, requires
 //#define NTL__CXX_CONCEPT
@@ -493,9 +493,9 @@ static_assert(sizeof(nullptr)==sizeof(void*), "3.9.1.10: sizeof(std::nullptr_t) 
 #endif
 
 #define __ntl_bitmask_type(bitmask, _func_spec)\
-  _func_spec bitmask operator&(bitmask x, bitmask y) { return bitwise_and(x, y); }\
-  _func_spec bitmask operator|(bitmask x, bitmask y) { return bitwise_or (x, y); }\
-  _func_spec bitmask operator^(bitmask x, bitmask y) { return bitwise_xor(x, y); }\
+  _func_spec bitmask operator&(bitmask x, bitmask y) { return ntl::bitwise_and(x, y); }\
+  _func_spec bitmask operator|(bitmask x, bitmask y) { return ntl::bitwise_or (x, y); }\
+  _func_spec bitmask operator^(bitmask x, bitmask y) { return ntl::bitwise_xor(x, y); }\
   _func_spec bitmask operator~(bitmask x) { return static_cast<bitmask>(~static_cast<unsigned>(x)); }\
   _func_spec bitmask& operator&=(bitmask& x, bitmask y) { x = x&y ; return x ; }\
   _func_spec bitmask& operator|=(bitmask& x, bitmask y) { x = x|y ; return x ; }\

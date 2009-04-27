@@ -28,27 +28,6 @@
   }
 #endif
 
-#pragma region std::terminate
-/// RTL poiner to the current terminate_handler
-std::terminate_handler __ntl_std_terminate_handler;
-
-std::terminate_handler std::set_terminate(std::terminate_handler f) __ntl_nothrow
-{
-  assert(f != nullptr);
-  terminate_handler old = f;
-  return ntl::atomic::generic_op::exchange(__ntl_std_terminate_handler, old);
-}
-
-void std::terminate()
-{
-  if(__ntl_std_terminate_handler)
-    __ntl_std_terminate_handler();
-  else
-    std::abort();
-}
-
-#pragma endregion
-
 #pragma region std::unexpected
 /// RTL poiner to the current unexpected_handler
 std::unexpected_handler __ntl_std_unexpected_handler;

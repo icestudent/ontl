@@ -69,7 +69,7 @@ namespace tree
           u.s.right= NULL;
         }
         node(node&& n)
-          :elem(std::move(n.elem)),
+          :elem(std::forward<T>(n.elem)),
           parent(n.parent), color(n.color)
         {
           u.s.left = n.u.s.left;

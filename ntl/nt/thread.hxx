@@ -351,8 +351,8 @@ public:
     return info ? info->ClientId.UniqueThread : 0;
   }
 
-  __declspec(noreturn)
-  static void exit(ntstatus Status)
+  static __declspec(noreturn)
+  void exit(ntstatus Status)
   {
 #ifndef NTL_SUPPRESS_IMPORT
     RtlExitUserThread(Status);
@@ -363,8 +363,8 @@ public:
 #endif
   }
 
-  __declspec(noreturn)
-  static void exitfree(ntstatus Status)
+  static __declspec(noreturn)
+  void exitfree(ntstatus Status)
   {
     FreeLibraryAndExitThread((legacy_handle) pe::image::this_module(), Status);
   }
@@ -374,8 +374,8 @@ public:
     return NtTerminateThread(get(), Status);
   }
 
-  __declspec(noreturn)
-  static void exit_process(ntstatus Status)
+  static __declspec(noreturn)
+  void exit_process(ntstatus Status)
   {
     RtlAcquirePebLock();
     __try{
