@@ -159,22 +159,6 @@ void _cdecl abort()
 }
 
 /************************************************************************/
-/* `purecall` handler                                                   */
-/************************************************************************/
-#ifdef _MSC_VER
-#include "../nt/debug.hxx" // for abort implementation
-extern "C" int _cdecl _purecall(void)
-{
-#pragma warning(disable:4127)
-  assert(!"pure virtual function called!");
-#pragma warning(default:4127)
-  debug_abort();
-  abort();
-  return 0;
-}
-#endif
-
-/************************************************************************/
 /* `new` handler                                                        */
 /************************************************************************/
 namespace ntl
@@ -191,8 +175,6 @@ std::new_handler std::set_new_handler(std::new_handler new_p) __ntl_nothrow
 /************************************************************************/
 /* `terminate` handler                                                  */
 /************************************************************************/
-/// RTL poiner to the current terminate_handler
-//__declspec(selectany)
 std::terminate_handler __ntl_std_terminate_handler = 0;
 
 namespace std
@@ -214,8 +196,23 @@ namespace std
 } // std
 
 
-
 //////////////////////////////////////////////////////////////////////////
+/************************************************************************/
+/* `purecall` handler                                                   */
+/************************************************************************/
+#ifdef _MSC_VER
+#include "../nt/debug.hxx" // for abort implementation
+extern "C" int _cdecl _purecall(void)
+{
+#pragma warning(disable:4127)
+  assert(!"pure virtual function called!");
+#pragma warning(default:4127)
+  debug_abort();
+  abort();
+  return 0;
+}
+#endif
+
 #if defined NTL__DEBUG || !defined NDEBUG
 extern "C" {
   char __assertion_failure_buf[4096];

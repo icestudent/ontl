@@ -11,6 +11,7 @@
 #include "win/application.hxx"
 #include "win/console.hxx"
 #include "nt/new.hxx"
+#include "nt/thread.hxx"
 
 #pragma comment(linker, "/subsystem:console")
 #pragma comment(linker, "/entry:ntl::_Consoleapp_entry")
@@ -28,10 +29,7 @@ namespace ntl {
 
 class consoleapp : public win::application<win::tchar_t>
 {
-  ///////////////////////////////////////////////////////////////////////////
   public:
-
-    //static //?
     __forceinline int main();
 
     typedef win::console console;
@@ -42,8 +40,10 @@ class consoleapp : public win::application<win::tchar_t>
   // this used to prevent linker error if CRT initialization isn't needed
   #ifdef _M_X64
   # pragma comment(linker, "/alternatename:__init_crt=__init_crt_stub")
+  # pragma comment(linker, "/alternatename:abort=__console_abort")
   #else
   # pragma comment(linker, "/alternatename:___init_crt=___init_crt_stub")
+  # pragma comment(linker, "/alternatename:_abort=___console_abort")
   #endif
   extern "C" inline void _cdecl __init_crt_stub(){}
 #endif
@@ -60,6 +60,17 @@ int _Consoleapp_entry()
   return app.main();
 }
 #pragma warning(pop)
+
+
+//////////////////////////////////////////////////////////////////////////
+namespace win {
+NTL__EXTERNAPI __declspec(noreturn) void __stdcall ExitProcess(ntl::nt::ntstatus);
+}
+
+extern"C" void _cdecl __console_abort()
+{
+  win::ExitProcess(ntl::nt::status::unsuccessful);
+}
 
 /**@} application */
 /**@} winapi_types_support */

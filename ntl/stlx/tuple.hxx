@@ -560,7 +560,7 @@ namespace std
   }
 
   /// "ignore" allows tuple positions to be ignored when using "tie".
-  __::swallow_assign const ignore = __::swallow_assign();
+  static __::swallow_assign const ignore = {};
 
   inline tuple<> make_tuple()
   {

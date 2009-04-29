@@ -310,6 +310,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\stlx\ext\hashtable.hxx"
+						>
+					</File>
+					<File
 						RelativePath=".\stlx\rbtree.hxx"
 						>
 					</File>

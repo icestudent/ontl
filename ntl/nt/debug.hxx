@@ -30,10 +30,11 @@ namespace ntl {
 
       enum level
       {
-        error = 0,
+        error   = 0,
         warning = 2,
         trace   = 3,
         info    = 4,
+        default = error
       };
     };
 
@@ -77,7 +78,7 @@ namespace ntl {
 # endif
 #endif
 
-    template <dpfltr::level DefaultLevel  = dpfltr::error,
+    template <dpfltr::level DefaultLevel  = dpfltr::default,
       dpfltr::type  Type          = dpfltr::ihvdriver>
     struct dbgprint
     {
@@ -245,21 +246,21 @@ namespace ntl {
     namespace dbg {
 
 #ifdef NTL_DBG_FILTER
-      const dbgprint<dpfltr::error>   error;
+      const dbgprint<dpfltr::default>   error;
       const dbgprint<dpfltr::warning> warning;
       const dbgprint<dpfltr::trace>   trace;
       const dbgprint<dpfltr::info>    info;
   #else
   #ifndef __BCPLUSPLUS__
-      const dbgprint<dpfltr::error>   error;
-      const dbgprint<dpfltr::error>   warning;
-      const dbgprint<dpfltr::error>   trace;
-      const dbgprint<dpfltr::error>   info;
+      const dbgprint<dpfltr::default>   error;
+      const dbgprint<dpfltr::default>   warning;
+      const dbgprint<dpfltr::default>   trace;
+      const dbgprint<dpfltr::default>   info;
   #else
-      const dbgprint<dpfltr::error>   error = {};
-      const dbgprint<dpfltr::error>   warning = {};
-      const dbgprint<dpfltr::error>   trace = {};
-      const dbgprint<dpfltr::error>   info = {};
+      const dbgprint<dpfltr::default>   error = {};
+      const dbgprint<dpfltr::default>   warning = {};
+      const dbgprint<dpfltr::default>   trace = {};
+      const dbgprint<dpfltr::default>   info = {};
   #endif
 #endif
 
