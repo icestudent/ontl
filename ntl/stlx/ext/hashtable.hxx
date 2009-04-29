@@ -63,7 +63,7 @@ namespace ntl
             :elem(forward<value_type>(elem)), hkey(h), next(), prev()
           {}
           node(node&& x)
-            :elem(move(x.elem)), hkey(x.h), next(x.next), prev(x.prev)
+            :elem(move(x.elem)), hkey(x.hkey), next(x.next), prev(x.prev)
           { 
             x.hkey = 0;
             x.prev = x.next = nullptr;
@@ -71,7 +71,7 @@ namespace ntl
         #endif
         protected:
           node(const node& n)
-            :elem(n.elem), hkey(n.hkey), next(x.next), prev(x.prev)
+            :elem(n.elem), hkey(n.hkey), next(n.next), prev(n.prev)
           {}
 
         public:
@@ -525,11 +525,19 @@ namespace ntl
           nalloc.deallocate(position.p,1);
           return iterator(next, position.b, position.be);
         }
+
         size_type erase(const key_type& k)
         {
-          const_iterator i =
-
+          const_iterator i = find(k);
+          if(i == cend())
+            return 0;
+          pair<iterator,iterator> range = equal_range(k);
+          size_type n = distance(range.first, range.second);
+          while(range.first != range.second)
+            erase(range.first);
+          return n;
         }
+
         iterator  erase(const_iterator first, const_iterator last)
         {
           while(first != last)
@@ -621,9 +629,6 @@ namespace ntl
         {
           return const_cast<hashtable*>(this)->equal_range(k);
         }
-
-        mapped_type& at(const key_type& k);
-        const mapped_type& at(const key_type& k) const;
 
         // bucket interface
         size_type bucket_count() const { return buckets_.second - buckets_.first; }
