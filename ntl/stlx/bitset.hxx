@@ -492,11 +492,24 @@ namespace std {
   }
 
   template <class charT, class traits, size_t N>
-  basic_istream<charT, traits>&
-    operator>>(typename __::istream<charT, traits>& is, bitset<N>::type x);
+  inline basic_istream<charT, traits>& operator>>(basic_istream<charT, traits>& is, bitset<N>& x)
+  {
+    basic_string<charT,traits> str;
+    str.reserve(N);
+    charT valid[2] = {is.widen('0'), is.widen('1')};
+    while(str.size() < N){
+      charT ch;
+      is >> ch;
+      if(!is || !(ch == valid[0] || ch == valid[1]))
+        break;
+      str.push_back(ch);
+    }
+    x = bitset<N>(str);
+    return is;
+  }
 
   template <class charT, class traits, size_t N>
-  inline basic_ostream<charT, traits>& operator<<(typename __::ostream<charT, traits>::type os, const bitset<N>& x)
+  inline basic_ostream<charT, traits>& operator<<(basic_ostream<charT, traits>& os, const bitset<N>& x)
   {
     return os << x.template to_string<charT,traits,allocator<char> >();
   }
