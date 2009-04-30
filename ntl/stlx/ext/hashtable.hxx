@@ -170,7 +170,7 @@ namespace std
               while(++b != be && !b->elems);
               p = b == be ? nullptr : b->elems;
             }else{
-              p = static_cast<node_type*>(p->next);
+              p = p->next;
             }
           }
 
@@ -186,10 +186,10 @@ namespace std
 
           void increment()
           {
-            if(p->next && static_cast<node_type*>(p->next)->hkey != p->hkey)
+            if(p->next && p->next->hkey != p->hkey)
               p = nullptr; // end of bucket
             else
-              p = static_cast<node_type*>(p->next);
+              p = p->next;
           }
 
           void decrement()
@@ -208,7 +208,7 @@ namespace std
           }
           iterator_impl(double_linked* p, bucket_type* b, bucket_type* end)
           {
-            this->p = static_cast<node_type*>(p);
+            this->p = p;
             this->b = b;
             this->be = end;
           }
@@ -271,7 +271,7 @@ namespace std
           }
           const_iterator_impl(double_linked* p, bucket_type* b, bucket_type* end)
           {
-            this->p = static_cast<node_type*>(p);
+            this->p = p;
             this->b = b;
             this->be = end;
           }
@@ -320,7 +320,7 @@ namespace std
           local_iterator_impl(){}
           local_iterator_impl(double_linked* p)
           {
-            this->p = static_cast<node_type*>(p);
+            this->p = p;
           }
 
           reference operator* () const { return p->elem; }
@@ -491,24 +491,18 @@ namespace std
 
           if(is_unique::value && b.elems){
             // allow only unique keys
-            if(b.hash == hkey)
-              return end();
-            else if(b.dirty){
+            if(b.hash == hkey || b.dirty){
               for(const node_type* p = b.elems; p; p = p->next)
-                if(p->hkey == hkey)
+                if(p->hkey == hkey && equal_(value2key(p->elem, is_map()), value2key(v, is_map())))
                   return end();
             }
           }
-
           // construct node(value, hash)
           node* p = nalloc.allocate(1);
           nalloc.construct(p, v, hkey);
 
           // если вставляемый элемент имеет тот же ключ, что и у подсказки, вставляем после подсказки? или перед?.
           // иначе вставляем в начало корзины
-
-          // NOTE: что делать, если хинт не принадлежит найденной корзине?
-          //b.size++;
 
           if(hint.p && hint.p->hkey == hkey){
             // link with the hint
@@ -679,7 +673,7 @@ namespace std
             e.be = buckets_.second;
           iterator i = e;
           if(e.b->dirty){
-            while(e.p->hkey == i.p->hkey && e.p)
+            while(e.p && e.p->hkey == i.p->hkey && equal_(value2key(e.p->elem, is_map()), value2key(i.p->elem, is_map())) )
               e.p = e.p->next;
           }else{
             e.p = nullptr;
