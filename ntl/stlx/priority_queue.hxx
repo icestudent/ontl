@@ -19,7 +19,7 @@ namespace std {
 /**\addtogroup  lib_sequence *********** 23.2 Sequence containers [sequences] *******************
  *@{*/
 
-/**\addtogroup  lib_container_adaptors *** 23.2.5 Container adaptors [container.adaptors] *********
+/**\addtogroup lib_container_adaptors  23.2.5 Container adaptors [container.adaptors]
  *@{*/
 
   /// Class template priority_queue [23.2.5.2 priority.queue]

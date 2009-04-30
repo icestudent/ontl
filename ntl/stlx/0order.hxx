@@ -40,9 +40,9 @@
 @{
 
 \addtogroup  lib_uniqueptr ********** 20.7.11 Class template unique_ptr (legacy) [unique.ptr]
-\addtogroup  lib_uniqueptr_rv ********** 20.7.11 Class template unique_ptr [unique.ptr]
-\addtogroup  lib_smartptr *************** 20.7.12 Smart pointers (legacy) [util.smartptr]
-\addtogroup  lib_smartptr_rv *************** 20.7.12 Smart pointers [util.smartptr]
+\addtogroup  lib_uniqueptr_rv ******* 20.7.11 Class template unique_ptr [unique.ptr]
+\addtogroup  lib_smartptr *********** 20.7.12 Smart pointers (legacy) [util.smartptr]
+\addtogroup  lib_smartptr_rv ******** 20.7.12 Smart pointers [util.smartptr]
 
 @}
 @}*/
@@ -54,6 +54,17 @@
 \defgroup lib_locale_categories   22.2 Standard locale categories [locale.categories]
 \defgroup lib_locale_stdcvt       22.3 Standard code conversion facets [locale.stdcvt]
 @}*/
+
+/**\defgroup  lib_containers *********** 23 Containers library [containers] ************
+*@{
+
+\defgroup lib_container_req       23.1 Container requirements [container.requirements]
+\defgroup lib_sequence            23.2 Sequence containers [sequences]
+\defgroup lib_associative         23.3 Associative containers [associative]
+\defgroup lib_unord               23.4 Unordered associative containers [unord]
+
+@}*/
+
 
   /**\defgroup threads      30 Thread support library [thread]
    *  

@@ -6,30 +6,63 @@
 #include "../utility.hxx"     // for pair
 #include "../initializer_list.hxx"
 
-namespace ntl
+namespace std
 {
   namespace ext
   {
     namespace hashtable
     {
-      using namespace std;
+      namespace __
+      {
+        template<class Key, class Value, bool IsMap>
+        struct container_policy;
 
-      template<class Key, class Value, class Hash = std::hash<Key>, class Pred = std::equal_to<Key>, class Allocator = std::allocator<std::pair<const Key,Value> > >
+        template<class Key, class Value>
+        struct container_policy<Key,Value,true>
+        {
+          typedef           pair<const Key, Value> value_type;
+          typedef           Key                    key_type;
+          typedef           Value                  mapped_type;
+        };
+
+        template<class Key, class Value>
+        struct container_policy<Key,Value,false>
+        {
+          typedef           Value                  value_type;
+          typedef           Key                    key_type;
+          typedef           Value                  mapped_type;
+        };
+      }
+
+      template<class Key, class Value, 
+              class Hash = std::hash<Key>,
+              class Pred = std::equal_to<Key>,
+              class Allocator = std::allocator<std::pair<const Key,Value> >,
+              bool IsMap = true,
+              bool IsUnique = true
+              >
       class chained_hashtable;
 
-      template<class Key, class Value, class Hash, class Pred, class Allocator>
-      class chained_hashtable
+      template<class Key, class Value, class Hash, class Pred, class Allocator, bool IsMap, bool IsUnique>
+      class chained_hashtable:
+        public __::container_policy<Key,Value,IsMap>
       {
-        typedef pair<const Key,Value> T;
         typedef chained_hashtable                     hashtable;
+        typedef __::container_policy<Key,Value,IsMap> policy;
 
-        typedef typename
-          Allocator::template rebind<T>::other        allocator;
+        typedef integral_constant<bool, IsMap>        is_map;
+        typedef integral_constant<bool, IsUnique>     is_unique;
 
+        typedef typename Allocator::template rebind<typename policy::value_type>::other allocator;
       public:
-        typedef           pair<const Key,Value>       value_type;
-        typedef           Key                         key_type;
-        typedef           value_type                  mapped_type;
+        /** default number of buckets */
+        static const typename allocator::size_type initial_count = 8;
+
+        ///\name types
+        // mapped_type is accessible from extern code
+        typedef typename policy::value_type           value_type;
+        typedef typename policy::key_type             key_type;
+
         typedef           Hash                        hasher;
         typedef           Pred                        key_equal;
         typedef           Allocator                   allocator_type;
@@ -40,6 +73,7 @@ namespace ntl
         typedef typename  allocator::const_reference  const_reference;
         typedef typename  allocator::size_type        size_type;
         typedef typename  allocator::difference_type  difference_type;
+        ///\}
 
       protected:
         // hash value type
@@ -73,6 +107,8 @@ namespace ntl
           node(const node& n)
             :elem(n.elem), hkey(n.hkey), next(n.next), prev(n.prev)
           {}
+        private:
+          node& operator=(const node&);
 
         public:
           void link(double_linked * prev, double_linked * next)
@@ -89,7 +125,8 @@ namespace ntl
 
           void link_prev(double_linked* prev)
           {
-            next->next = this; next->prev = this->prev;
+            prev->next = this;
+            prev->prev = this->prev;
             this->prev = prev;
           }
 
@@ -385,6 +422,7 @@ namespace ntl
         typedef const_local_iterator_impl             const_local_iterator;
 
       public:
+        ///\name Construct/copy/destroy
         explicit chained_hashtable(size_type n, const hasher& hf = hasher(), const key_equal& eql = key_equal(), const allocator_type& a = allocator_type())
           :nalloc(a), balloc(a), hash_(hf), equal_(eql), count_(0), max_factor(1.0f)
         {
@@ -394,20 +432,41 @@ namespace ntl
         {
           clear();
         }
-
-        chained_hashtable& operator=(const chained_hashtable& x)
+        chained_hashtable(const chained_hashtable& r)
+          :nalloc(r.nalloc), balloc(r.balloc), hash_(r.hash_), equal_(r.equal_), count_(0), max_factor(r.max_factor)
         {
-          clear();
-          copy_from(x.buckets_);
+          copy_from(r.buckets_);
+        }
+        chained_hashtable(const chained_hashtable& r, const allocator_type& a)
+          :nalloc(a), balloc(a), hash_(r.hash_), equal_(r.equal_), count_(0), max_factor(r.max_factor)
+        {
+          copy_from(r.buckets_);
+        }
+        chained_hashtable& operator=(const chained_hashtable& r)
+        {
+          chained_hashtable(r).swap(*this);
           return *this;
         }
-
-        // size and capacity
+#ifdef NTL__CXX_RV
+        chained_hashtable(chained_hashtable&& r)
+          :nalloc(std::move(r.a)), balloc(std::move(r.a)), hash_(std::move(r.hf)), equal_(std::move(r.eql)), buckets_(std::move(r.buckets)), count_(r.count_), max_factor(r.max_factor)
+        {
+          r.count_ = 0;
+          r.buckets_ = bucket_type();
+        }
+        chained_hashtable(chained_hashtable&& r, const allocator_type& a);
+        chained_hashtable& operator=(chained_hashtable&& r)
+        {
+          chained_hashtable(r).swap(*this);
+          return *this;
+        }
+#endif
+        ///\name size and capacity
         bool empty() const { return count_ == 0; }
         size_type size() const { return count_;  }
         size_type max_size() const { return nalloc.max_size(); }
 
-        // iterators
+        ///\name iterators
         iterator begin()
         {
           return count_ == 0 ? iterator() : iterator(head_, buckets_.second);
@@ -418,29 +477,29 @@ namespace ntl
         const_iterator end() const    { return const_iterator(); }
         const_iterator cend() const   { return const_iterator(); }
 
-        // modifiers
+        ///\name modifiers
         std::pair<iterator, bool> insert(const value_type& v)
         {
-          iterator i = find(v.first);
-          if(i == end()){
-            // insert new value
-            return make_pair(insert(cend(), v), true);
-          }else{
-            // replace old value
-        #ifdef NTL__CXX_RV
-            i->second = move(v.second);
-        #else
-            i.p = move_element<0>(i.p, v, std::has_trivial_assign<value_type>());
-        #endif
-          }
-          return make_pair(i, false);
+          iterator i = insert(cend(), v);
+          return make_pair(i, i != end());
         }
 
         iterator insert(const_iterator hint, const value_type& v)
         {
-          const hash_t hkey = hash_(v.first);
+          const hash_t hkey = hash_(value2key(v, is_map()));
           const size_type n = mapkey(hkey);
           bucket_type& b = buckets_.first[n];
+
+          if(is_unique::value && b.elems){
+            // allow only unique keys
+            if(b.hash == hkey)
+              return end();
+            else if(b.dirty){
+              for(const node_type* p = b.elems; p; p = p->next)
+                if(p->hkey == hkey)
+                  return end();
+            }
+          }
 
           // construct node(value, hash)
           node* p = nalloc.allocate(1);
@@ -531,6 +590,10 @@ namespace ntl
           const_iterator i = find(k);
           if(i == cend())
             return 0;
+          if(is_unique::value){
+            erase(i);
+            return 1;
+          }
           pair<iterator,iterator> range = equal_range(k);
           size_type n = distance(range.first, range.second);
           while(range.first != range.second)
@@ -562,11 +625,11 @@ namespace ntl
           std::swap(max_factor, x.max_factor);
         }
 
-        // observers
+        ///\name observers
         hasher hash_function()  const { return hash_;  }
         key_equal key_eq()      const { return equal_; }
 
-        // lookup
+        ///\name lookup
         iterator find(const key_type& k)
         {
           const size_type n = bucket(k);
@@ -574,7 +637,7 @@ namespace ntl
           if(b.size == 0)
             return end();
           for(local_iterator li = begin(n), lend = end(n); li != lend; ++li){
-            if(equal_(k, li.p->elem.first))
+            if(equal_(k, value2key(li.p->elem, is_map())))
               return iterator(li.p, &b, buckets_.second);
           }
           return end();
@@ -630,7 +693,7 @@ namespace ntl
           return const_cast<hashtable*>(this)->equal_range(k);
         }
 
-        // bucket interface
+        ///\name bucket interface
         size_type bucket_count() const { return buckets_.second - buckets_.first; }
         size_type max_bucket_count() const { return balloc.max_size(); }
 
@@ -677,7 +740,7 @@ namespace ntl
         }
         const_local_iterator cend(size_type n)  const { return end(n); }
 
-        // hash policy
+        ///\name hash policy
         float load_factor() const     { return float(count_) / bucket_count(); }
         float max_load_factor() const { return max_factor; }
         void max_load_factor(float z)
@@ -701,6 +764,7 @@ namespace ntl
           count_ = 0; // increased by following inserts
           copy_from(buckets);
         }
+        ///\}
 
       protected:
         void init_table(size_type n)
@@ -735,7 +799,6 @@ namespace ntl
           to->elem = v;
           return to;
         }
-
         template<bool> node_type* move_element(node_type* to, const value_type& v, false_type)
         {
           node_type* p = nalloc.allocate(1);
@@ -744,6 +807,15 @@ namespace ntl
           nalloc.destroy(to);
           nalloc.deallocate(to,1);
           return p;
+        }
+
+        template<class V> static const key_type& value2key(const V& x, true_type)
+        {
+          return x.first;
+        }
+        template<class V> static const key_type& value2key(const V& x, false_type)
+        {
+          return x;
         }
 
       protected:
@@ -775,8 +847,10 @@ namespace ntl
 
         node_allocator nalloc;
         bucket_allocator balloc;
+
         hasher hash_;
         key_equal equal_;
+
         size_type count_;
         float max_factor;
       };

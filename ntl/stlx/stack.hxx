@@ -24,7 +24,7 @@ namespace std {
 /**\addtogroup  lib_sequence *********** 23.2 Sequence containers [sequences] *******************
  *@{*/
 
-/**\defgroup  lib_container_adaptors *** 23.2.5 Container adaptors [container.adaptors] *********
+/**\addtogroup lib_container_adaptors  23.2.5 Container adaptors [container.adaptors]
  *@{*/
 
 /// Class template stack 23.2.5.3

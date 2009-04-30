@@ -12,7 +12,7 @@
 #include "iterator.hxx"
 #include "memory.hxx"
 
-#include "rbtree.hxx"
+#include "ext/rbtree.hxx"
 
 namespace std {
 
@@ -25,9 +25,9 @@ namespace std {
   /// Class template set [23.3.3]
   template <class Key, class Compare = less<Key>, class Allocator = allocator<Key> >
   class set:
-    public tree::rb_tree::rb_tree<Key, Compare, Allocator>
+    public std::ext::tree::rb_tree<Key, Compare, Allocator>
   {
-    typedef tree::rb_tree::rb_tree<Key, Compare, Allocator> tree_type;
+    typedef std::ext::tree::rb_tree<Key, Compare, Allocator> tree_type;
   public:
     // types:
     typedef Key                                   key_type;

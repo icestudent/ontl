@@ -12,16 +12,16 @@
 #include "functional.hxx"
 #include "memory.hxx"
 #include "utility.hxx"
-#include "rbtree.hxx"
+#include "ext/rbtree.hxx"
 
 namespace std {
 
 /**\defgroup  lib_containers *********** 23 Containers library [containers] ************
-  *@{ *    Components to organize collections of information
+  *@{    Components to organize collections of information
   **/
 
 /**\defgroup  lib_associative *********** 23.3 Associative containers [associative] ******
-  *@{ *    Provide an ability for fast retrieval of data based on keys.
+  *@{    Provide an ability for fast retrieval of data based on keys.
   **/
 
 /// [23.3.1 map]
@@ -85,11 +85,11 @@ template <class Key,
           class Compare = less<Key>,
           class Allocator = allocator<pair<const Key, T> > >
 class map:
-  protected tree::rb_tree::rb_tree<pair<const Key, T>, __::value_compare<Key, T, Compare, Allocator>, Allocator>
+  protected std::ext::tree::rb_tree<pair<const Key, T>, __::value_compare<Key, T, Compare, Allocator>, Allocator>
 {
   ///////////////////////////////////////////////////////////////////////////
   typedef __::value_compare<Key, T, Compare, Allocator>  value_compare;
-  typedef tree::rb_tree::rb_tree<pair<const Key, T>, value_compare, Allocator> tree_type;
+  typedef std::ext::tree::rb_tree<pair<const Key, T>, value_compare, Allocator> tree_type;
   typedef typename tree_type::node node;
   public:
 
@@ -229,18 +229,18 @@ public:
 
     T& at(const key_type& x) __ntl_throws(out_of_range)
     {
-      iterator iter = find(x);
-      if(iter == end())
-        __ntl_throw(out_of_range(__FUNCTION__));
-      return iter->second;
+      iterator i = find(x);
+      if(i == end())
+        __ntl_throw(out_of_range("specified key isn't exists in the map"));
+      return i->second;
     }
 
     const T& at(const key_type& x) const __ntl_throws(out_of_range)
     {
-      const_iterator iter = find(x);
-      if(iter == end())
-        __ntl_throw(out_of_range(__FUNCTION__));
-      return iter->second;
+      const_iterator i = const_cast<map*>(this)->find(x);
+      if(i == end())
+        __ntl_throw(out_of_range("specified key isn't exists in the map"));
+      return i->second;
     }
 
     // modifiers:
