@@ -86,8 +86,8 @@ namespace std
           double_linked* prev;
           double_linked* next;
 
-          value_type elem;
-          hash_t hkey;
+          hash_t         hkey;
+          value_type     elem;
 
           node(const value_type& elem, hash_t h)
             :elem(elem), hkey(h), next(), prev()
@@ -199,7 +199,7 @@ namespace std
         };
 
         struct iterator_impl:
-          std::iterator<bidirectional_iterator_tag, value_type, difference_type, pointer, reference>,
+          std::iterator<forward_iterator_tag, value_type, difference_type, pointer, reference>,
           base_iterator
         {
           iterator_impl()
@@ -226,23 +226,23 @@ namespace std
             increment();
             return *this;
           }
-          iterator_impl & operator--()
-          {
-            decrement();
-            return *this;
-          }
+          //iterator_impl & operator--()
+          //{
+          //  decrement();
+          //  return *this;
+          //}
           iterator_impl operator++(int)
           {
             iterator_impl tmp(*this);
             ++*this;
             return tmp;
           }
-          iterator_impl operator--(int)
-          {
-            iterator_impl tmp(*this);
-            --*this;
-            return tmp;
-          }
+          //iterator_impl operator--(int)
+          //{
+          //  iterator_impl tmp(*this);
+          //  --*this;
+          //  return tmp;
+          //}
 
           friend bool operator==(const iterator_impl& x, const iterator_impl& y)
           { return x.p == y.p; }
@@ -256,7 +256,7 @@ namespace std
         };
 
         struct const_iterator_impl:
-          std::iterator<bidirectional_iterator_tag, const value_type, difference_type, const_pointer, const_reference>,
+          std::iterator<forward_iterator_tag, const value_type, difference_type, const_pointer, const_reference>,
           base_iterator
         {
           const_iterator_impl()
@@ -283,23 +283,23 @@ namespace std
             increment();
             return *this;
           }
-          const_iterator_impl& operator--()
-          {
-            decrement();
-            return *this;
-          }
+          //const_iterator_impl& operator--()
+          //{
+          //  decrement();
+          //  return *this;
+          //}
           const_iterator_impl operator++(int)
           {
             const_iterator_impl tmp(*this);
             ++*this;
             return tmp;
           }
-          const_iterator_impl operator--(int)
-          {
-            const_iterator_impl tmp(*this);
-            --*this;
-            return tmp;
-          }
+          //const_iterator_impl operator--(int)
+          //{
+          //  const_iterator_impl tmp(*this);
+          //  --*this;
+          //  return tmp;
+          //}
 
           friend bool
             operator==(const const_iterator_impl& x, const const_iterator_impl& y)
@@ -314,7 +314,7 @@ namespace std
         };
 
         struct local_iterator_impl:
-          std::iterator<bidirectional_iterator_tag, value_type, difference_type, pointer, reference>,
+          std::iterator<forward_iterator_tag, value_type, difference_type, pointer, reference>,
           base_local_iterator
         {
           local_iterator_impl(){}
@@ -325,29 +325,28 @@ namespace std
 
           reference operator* () const { return p->elem; }
           pointer   operator->() const { return &p->elem; }
-          // TODO: iterate through elements only with the same hash value!
           local_iterator_impl & operator++()
           {
             increment();
             return *this;
           }
-          local_iterator_impl & operator--()
-          {
-            decrement();
-            return *this;
-          }
+          //local_iterator_impl & operator--()
+          //{
+          //  decrement();
+          //  return *this;
+          //}
           local_iterator_impl operator++(int)
           {
             local_iterator_impl tmp(*this);
             ++*this;
             return tmp;
           }
-          local_iterator_impl operator--(int)
-          {
-            local_iterator_impl tmp(*this);
-            --*this;
-            return tmp;
-          }
+          //local_iterator_impl operator--(int)
+          //{
+          //  local_iterator_impl tmp(*this);
+          //  --*this;
+          //  return tmp;
+          //}
 
           friend bool operator==(const local_iterator_impl& x, const local_iterator_impl& y)
           { return x.p == y.p; }
@@ -449,10 +448,10 @@ namespace std
         }
 #ifdef NTL__CXX_RV
         chained_hashtable(chained_hashtable&& r)
-          :nalloc(std::move(r.a)), balloc(std::move(r.a)), hash_(std::move(r.hf)), equal_(std::move(r.eql)), buckets_(std::move(r.buckets)), count_(r.count_), max_factor(r.max_factor)
+          :nalloc(std::move(r.nalloc)), balloc(std::move(r.balloc)), hash_(std::move(r.hash_)), equal_(std::move(r.equal_)), buckets_(std::move(r.buckets_)), count_(r.count_), max_factor(r.max_factor)
         {
           r.count_ = 0;
-          r.buckets_ = bucket_type();
+          r.buckets_ = table();
         }
         chained_hashtable(chained_hashtable&& r, const allocator_type& a);
         chained_hashtable& operator=(chained_hashtable&& r)
@@ -845,14 +844,14 @@ namespace std
         bucket_type* head_;
         table buckets_;
 
-        node_allocator nalloc;
-        bucket_allocator balloc;
+        size_type count_;
+        float max_factor;
 
         hasher hash_;
         key_equal equal_;
 
-        size_type count_;
-        float max_factor;
+        node_allocator nalloc;
+        bucket_allocator balloc;
       };
     }
   }

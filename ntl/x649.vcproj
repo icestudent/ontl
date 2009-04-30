@@ -307,11 +307,15 @@
 					Name=".ext"
 					>
 					<File
+						RelativePath=".\stlx\ext\fib.hxx"
+						>
+					</File>
+					<File
 						RelativePath=".\stlx\ext\hashtable.hxx"
 						>
 					</File>
 					<File
-						RelativePath=".\stlx\rbtree.hxx"
+						RelativePath=".\stlx\ext\rbtree.hxx"
 						>
 					</File>
 					<Filter
@@ -456,6 +460,14 @@
 					</File>
 					<File
 						RelativePath=".\stlx\string.hxx"
+						>
+					</File>
+					<File
+						RelativePath=".\stlx\unordered_map.hxx"
+						>
+					</File>
+					<File
+						RelativePath=".\stlx\unordered_set.hxx"
 						>
 					</File>
 					<File
