@@ -151,7 +151,7 @@ enum handle_attributes
 {
   handle_flag_none                = 0,
   handle_flag_inherit             = 1,
-  handle_flag_protect_from_close  = 2,
+  handle_flag_protect_from_close  = 2
 };
 
 static __forceinline

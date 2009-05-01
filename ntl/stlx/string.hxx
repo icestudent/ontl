@@ -555,7 +555,7 @@ public:
     basic_string& append(const charT * s)
     {
       // trade off the traits_type::length(s) call for possible reallocs
-      while ( !traits_type::eq(*s, charT()) ) push_back(*s++);
+      while ( !traits_type::eq(*s, zero_char) ) push_back(*s++);
       return *this;
     }
 
@@ -758,18 +758,16 @@ public:
     const charT* c_str() const // explicit
     {
       // ensure string is null-terminated
-      static const charT empty = 0;
       if(!str.capacity())
-        return &empty;
-      str.push_back(empty);
+        return &zero_char;
+      str.push_back(zero_char);
       str.pop_back();
       return str.begin();
     }
 
     const charT* data() const
     {
-      static const charT empty = 0;
-      return /*size()*/ capacity() ? begin() : &empty;
+      return /*size()*/ capacity() ? begin() : &zero_char;
     }
 
     allocator_type get_allocator() const { return str.get_allocator(); }
@@ -1105,7 +1103,7 @@ public:
         return static_cast<int>(size());
       const int r = traits_type::compare(begin(), s, size());
       // s may be longer than *this
-      return r != 0 ? r : traits_type::eq(s[size()], charT()) ? r : r - 1; // r == 0 here
+      return r != 0 ? r : traits_type::eq(s[size()], zero_char) ? r : r - 1; // r == 0 here
     }
 
     int compare(size_type pos, size_type n, const charT* s) const

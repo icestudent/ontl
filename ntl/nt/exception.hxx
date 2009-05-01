@@ -1945,10 +1945,10 @@ next_try:;
             if ( tb->trylow <= cs && cs <= tb->tryhigh )
               for ( int c = 0; c < tb->ncatches; ++c ){ // iterate through catch blocks
                 ehandler* eh = &tb->catchsym[c];
-                const char* catch_block_name = eh->typeinfo->name();
+                //const char* catch_block_name = eh->typeinfo->name();
 
                 for ( unsigned i = 0; i < ti->catchabletypearray->size; ++i ){  // iterate through list of possibly casts of the thrown object
-                  const char* thrown_cast_name = ti->catchabletypearray->type[i]->typeinfo->name();
+                  //const char* thrown_cast_name = ti->catchabletypearray->type[i]->typeinfo->name();
 
                   if(eh->type_match(ti->catchabletypearray->type[i], ti, dispatch)) // catch block <=> cast type of the thrown object
                   {

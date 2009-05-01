@@ -182,7 +182,7 @@ ntstatus __stdcall
     );
 
 NTL__EXTERNAPI
-__declspec(noreturn)
+//__declspec(noreturn)
 ntstatus __stdcall
   NtTerminateProcess(
     legacy_handle       ProcessHandle,

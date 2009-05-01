@@ -37,7 +37,11 @@
 # pragma warning(disable:4514)// unreferenced inline function has been removed
 # pragma warning(disable:4480)// nonstandard extension used: specifying underlying type for enum 'enum'
 # ifdef __ICL
+#  pragma warning(disable:271)  // [remark] trailing comma is nonstandard
+#  pragma warning(disable:304)  // [remark] access control not specified ("access" by default)
+#  pragma warning(disable:874)  // [remark] support for placement delete is disabled
 #  pragma warning(disable:981)  // [remark] operands are evaluated in unspecified order (http://software.intel.com/en-us/articles/cdiag981/)
+#  pragma warning(disable:1599) // [remark] declaration hides variable "var"
 #  pragma warning(disable:2268) // [remark] the declaration of the copy assignment operator for "type1s" has been suppressed because that of "type2" was suppressed
 #  pragma warning(disable:2270) // [remark] the declaration of the copy assignment operator for "type1" has been suppressed because that of "type2" is inaccessible
 # else

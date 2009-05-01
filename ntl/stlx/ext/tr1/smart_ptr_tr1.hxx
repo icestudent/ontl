@@ -79,12 +79,16 @@ namespace std
         {
           deleter(p);
         }
-        const void* get_deleter(const type_info& ti) const __ntl_nothrow
-        {
-          return typeid(D) == ti ? reinterpret_cast<const void*>(&deleter) : nullptr;
-        }
+        const void* get_deleter(const type_info& ti) const __ntl_nothrow;
       };
 
+  #if STLX__USE_RTTI
+      template<class T, class D>
+      inline const void* shared_ptr_deleter<T,D>::get_deleter(const type_info& ti) const __ntl_nothrow;
+      {
+        return typeid(D) == ti ? reinterpret_cast<const void*>(&deleter) : nullptr;
+      }
+  #endif
       struct shared_cast_static{};
       struct shared_cast_dynamic{};
       struct shared_cast_const{};
@@ -376,9 +380,9 @@ namespace std
     template<class D, class T> 
     inline D* get_deleter(shared_ptr<T> const& p)
     {
-      return !p.empty() ? reinterpret_cast<D*>(p.ptr->get_deleter(typeid(D))) : nullptr;
+      return !p.empty() ? reinterpret_cast<D*>(p.ptr->get_deleter(__ntl_typeid(D))) : nullptr;
     }
-    
+
     // [2.2.4] Class template weak_ptr
     /**
      *	@brief Class template weak_ptr [2.2.4 tr.util.smartptr.weak]

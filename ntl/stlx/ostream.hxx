@@ -249,7 +249,6 @@ class basic_ostream
     {
       return put_impl(p);
     }
-
     ///\name  27.6.2.5.3 basic_ostream::operator<< [lib.ostream.inserters]
 
     basic_ostream<charT, traits>&
@@ -596,13 +595,15 @@ basic_ostream<charT, traits>&
   return os;
 }
 
-#ifdef NTL__CXX_RV
+#if defined NTL__CXX_RV && 0 // VC10, gcc doesn't requires this
+
 /// 27.7.2.9 Rvalue stream insertion [ostream.rvalue]
-template <class charT, class traits, class T>
+template <class charT, class traits, typename T>
 inline basic_ostream<charT, traits>& operator<<(basic_ostream<charT, traits>&& os, const T& x)
 {
   return os << x;
 }
+
 #endif
 
 ///\name  Inserters and extractors [21.3.7.9 string.io]

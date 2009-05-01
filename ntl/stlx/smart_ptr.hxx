@@ -776,7 +776,11 @@ namespace std
         }
         const void* get_deleter(const type_info& ti) const __ntl_nothrow
         {
-          return typeid(D) == ti ? reinterpret_cast<const void*>(&deleter) : nullptr;
+        #if STLX__USE_RTTI
+            return typeid(D) == ti ? reinterpret_cast<const void*>(&deleter) : nullptr;
+        #else
+            return reinterpret_cast<const void*>(&deleter);
+        #endif
         }
       };
 
@@ -1208,7 +1212,7 @@ namespace std
     template<class D, class T> 
     inline D* get_deleter(shared_ptr<T> const& p)
     {
-      return !p.empty() ? (D*)p.shared->get_deleter(typeid(D)) : nullptr;
+      return !p.empty() ? (D*)p.shared->get_deleter(__ntl_typeid(D)) : nullptr;
     }
     //////////////////////////////////////////////////////////////////////////
     

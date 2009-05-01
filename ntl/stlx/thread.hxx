@@ -66,11 +66,11 @@ namespace std
     template<class F, class Args = tuple<> >
     struct thread_params: thread_params_base
     {
-      std::func::v1::function<void, Args> fn;
+      std::func::detail::function<void, Args> fn;
       Args args;
 
       explicit thread_params(F f, const Args& a)
-        :fn(f), args(a)
+        :fn(forward<F>(f)), args(a)
       {}
 
       void run()
@@ -135,6 +135,7 @@ namespace std
   #else
     template <class F, class A1> thread(F f, A1 a1);
     template <class F, class A1, class A2> thread(F f, A1 a1, A2 a2);
+    template <class F, class A1, class A2, class A3> thread(F f, A1 a1, A2 a2, A3 a3);
   #endif
 
   #ifdef NTL__CXX_RV
@@ -371,9 +372,32 @@ namespace std
   }
 
 #ifdef NTL__CXX_RV
-  thread(thread&&);
-  thread& operator=(thread&&);
-  void swap(thread&&) __ntl_nothrow;
+  inline thread::thread(thread&& r)
+    :h(), tid(), cleanup()
+  {
+    swap(r);
+  }
+
+  inline thread& thread::operator=(thread&& r)
+  {
+    error_code ec;
+    if(joinable())
+      detach(ec);
+    swap(r);
+  }
+
+  inline void thread::swap(thread&& r) __ntl_nothrow
+  {
+    volatile native_handle_type h0 = h, t0 = tid;
+    volatile uint32_t* c0 = cleanup;
+    h = r.h,
+      tid = r.tid,
+      cleanup = r.cleanup;
+    r.h = h0,
+      r.tid = t0,
+      r.cleanup = c0;
+  }
+
 #else
   inline thread::thread(const thread& r)
     :h(), tid(),cleanup()
@@ -445,6 +469,14 @@ namespace std
     start(tp);
   }
 
+  template <class F, class A1, class A2, class A3>
+  inline thread::thread(F f, A1 a1, A2 a2, A3 a3)
+    :h(),tid(),cleanup()
+  {
+    typedef __::thread_params<F, tuple<A1,A2,A3> > tparams;
+    tparams* tp = new tparams(f, std::move(make_tuple(a1,a2,a3)));
+    start(tp);
+  }
 
   //////////////////////////////////////////////////////////////////////////
 

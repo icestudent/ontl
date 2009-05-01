@@ -37,7 +37,7 @@ enum float_denorm_style
 {
   denorm_indeterminate  = -1,
   denorm_absent         = 0,
-  denorm_present        = 1,
+  denorm_present        = 1
 };
 
 /// Class template numeric_limits [18.2.1.1 lib.numeric.limits]

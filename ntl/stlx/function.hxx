@@ -109,12 +109,12 @@ namespace std
           explicit functor_caller(F f)
             :f(f)
           {}
-          virtual caller* clone() const { return new functor_caller(f); }
+          virtual caller<R,Args>* clone() const { return new functor_caller(f); }
           virtual R operator()() const
           {
             return f();
           }
-          const type_info& target_type() const { return typeid(F); }
+          const type_info& target_type() const { return __ntl_typeid(F); }
           virtual void* target() { return reinterpret_cast<void*>(&f); }
         private:
           F f;
@@ -127,12 +127,12 @@ namespace std
           explicit functor_caller(F f)
             :f(f)
           {}
-          virtual caller* clone() const { return new functor_caller(f); }
+          virtual caller<R,Args>* clone() const { return new functor_caller(f); }
           virtual R operator()(typename __::arg_t<0, Args>::type a1) const
           {
             return f(a1);
           }
-          const type_info& target_type() const { return typeid(F); }
+          const type_info& target_type() const { return __ntl_typeid(F); }
           virtual void* target() { return reinterpret_cast<void*>(&f); }
         private:
           F f;
@@ -145,12 +145,12 @@ namespace std
           explicit functor_caller(F f)
             :f(f)
           {}
-          virtual caller* clone() const { return new functor_caller(f); }
+          virtual caller<R,Args>* clone() const { return new functor_caller(f); }
           virtual R operator()(typename __::arg_t<0, Args>::type a1, typename __::arg_t<1, Args>::type a2) const
           {
             return f(a1,a2);
           }
-          const type_info& target_type() const { return typeid(F); }
+          const type_info& target_type() const { return __ntl_typeid(F); }
           virtual void* target() { return reinterpret_cast<void*>(&f); }
         private:
           F f;
@@ -169,13 +169,13 @@ namespace std
           explicit memfun_caller(MemFn f)
             :pmf(f)
           {}
-          virtual caller* clone() const { return new memfun_caller(pmf); }
+          virtual caller<R,Args>* clone() const { return new memfun_caller(pmf); }
 
           virtual R operator()(typename __::arg_t<0, Args>::type obj) const
           {
             return call(is_pointer<typename __::arg_t<0, Args>::type>(), obj);
           }
-          const type_info& target_type() const { return typeid(MemFn); }
+          const type_info& target_type() const { return __ntl_typeid(MemFn); }
           virtual void* target() { return reinterpret_cast<void*>(&pmf); }
         protected:
           template<class T>
@@ -193,13 +193,13 @@ namespace std
           explicit memfun_caller(MemFn f)
             :pmf(f)
           {}
-          virtual caller* clone() const { return new memfun_caller(pmf); }
+          virtual caller<R,Args>* clone() const { return new memfun_caller(pmf); }
 
           virtual R operator()(typename __::arg_t<0, Args>::type obj, typename __::arg_t<1, Args>::type a1) const
           {
             return call(is_pointer<typename __::arg_t<0, Args>::type>(), obj, a1);
           }
-          const type_info& target_type() const { return typeid(MemFn); }
+          const type_info& target_type() const { return __ntl_typeid(MemFn); }
           virtual void* target() { return reinterpret_cast<void*>(&pmf); }
         protected:
           template<class T>
@@ -223,12 +223,12 @@ namespace std
           explicit refwrap_caller(reference_wrapper<F> f)
             :f(f)
           {}
-          virtual caller* clone() const { return new refwrap_caller(f); }
+          virtual caller<R,Args>* clone() const { return new refwrap_caller(f); }
           virtual R operator()() const
           {
             return f();
           }
-          const type_info& target_type() const { return typeid(F); }
+          const type_info& target_type() const { return __ntl_typeid(F); }
           virtual void* target() { return reinterpret_cast<void*>(& f.get() ); }
         private:
           reference_wrapper<F> f;
@@ -241,12 +241,12 @@ namespace std
           explicit refwrap_caller(reference_wrapper<F> f)
             :f(f)
           {}
-          virtual caller* clone() const { return new refwrap_caller(f); }
+          virtual caller<R,Args>* clone() const { return new refwrap_caller(f); }
           virtual R operator()(typename __::arg_t<0, Args>::type a1) const
           {
             return f(a1);
           }
-          const type_info& target_type() const { return typeid(F); }
+          const type_info& target_type() const { return __ntl_typeid(F); }
           virtual void* target() { return reinterpret_cast<void*>(& f.get() ); }
         private:
           reference_wrapper<F> f;
@@ -304,7 +304,8 @@ namespace std
       public:
         enum { 
           /** arguments count */
-          arity = tuple_size<Args>::value };
+          arity = tuple_size<Args>::value
+        };
 
         // allocator-aware:
         //template<class A> function(allocator_arg_t, const A&);
@@ -331,22 +332,6 @@ namespace std
           clear();
         }
 
-        /** Constructs function wrapper from copy of callable \c f */
-        template<typename Fn>
-        explicit function(Fn f, typename enable_if<!is_member_function_pointer<Fn>::value>::type* = 0)
-        {
-          caller = new impl::functor_caller<Fn, result_type, Args>(f);
-        }
-
-        /** Constructs member function wrapper from \c f */
-        template<typename MemFn>
-        explicit function(MemFn f, typename enable_if<is_member_function_pointer<MemFn>::value>::type* = 0)
-        {
-          // NOTE: targets a copy of mem_fn(f) if f is a pointer to member function
-          // hz, what this means
-          caller = new impl::memfun_caller<MemFn, R, Args>(f);
-        }
-
         /** Constructs function wrapper from reference to callable object */
         template<typename F>
         explicit function(reference_wrapper<F> rf)
@@ -364,6 +349,29 @@ namespace std
         }
 
     #ifdef NTL__CXX_RV
+        ///** Constructs function wrapper from copy of callable \c f */
+        //template<typename F>
+        //explicit function(const F& f)
+        //  :caller()
+        //{
+        //  assign_impl(f, is_member_function_pointer<F>());
+        //}
+
+        /** Constructs function wrapper from callable \c f */
+        template<typename F>
+        explicit function(F&& f)
+          :caller()
+        {
+          assign_impl(forward<F>(f), is_member_function_pointer<F>());
+        }
+
+        /** Moves \c f to this wrapper */
+        template<class F> function& operator=(F&& f)
+        {
+          function(forward<F>(f)).swap(*this);
+          return *this;
+        }
+
         /** Constructs function wrapper from \r target */
         function(function&& r)
           :caller()
@@ -379,23 +387,40 @@ namespace std
           if(r.caller)
             std::swap(caller, r.caller);
         }
-        /** Constructs function wrapper from callable \c f */
-        template<class F> function(F&& f);
 
-        /** Moves \c f to this wrapper */
-        template<class F> function& operator=(F&& f)
+    #else
+        /** Constructs function wrapper from copy of callable \c f */
+        template<typename F>
+        explicit function(const F& f)
+          :caller()
         {
-          function(f).swap(*this);
-          return *this;
+          assign_impl(f, is_member_function_pointer<F>());
         }
-    #endif
+
+        ///** Constructs function wrapper from copy of callable \c f */
+        //template<typename F>
+        //explicit function(F& f)
+        //  :caller()
+        //{
+        //  assign_impl(f, is_member_function_pointer<F>());
+        //}
 
         /** Copies \c f to this wrapper */
-        template<class F> function& operator=(F f) 
+        template<class F> function& operator=(const F& f) 
         {
-          function(f).swap(*this);
+          clear();
+          assign_impl(f, is_member_function_pointer<F>());
           return *this;
         }
+
+        ///** Copies \c f to this wrapper */
+        //template<class F> function& operator=(F& f)
+        //{
+        //  clear();
+        //  assign_impl(f, is_member_function_pointer<F>());
+        //  return *this;
+        //}
+    #endif
 
         /** Takes referenced callable to this wrapper */
         template<class F> function& operator=(reference_wrapper<F> rf) __ntl_nothrow
@@ -442,11 +467,10 @@ namespace std
 
         /** Assigns this object with callable \c f */
         template<class F, class A>
-        void assign(F f, const A&)
+        void assign(F f, const A& a)
         {
-          function(f).swap(*this);
+          function(allocator_arg, f, a).swap(*this);
         }
-
 
     #if STLX__USE_RTTI
         // 20.6.15.2.5, function target access:
@@ -479,10 +503,40 @@ namespace std
           }
         }
         /// \endcond
+
+        template<class MemFn> inline void assign_impl(MemFn f, true_type)
+        {
+          if(f) caller = new impl::memfun_caller<MemFn, R, Args>(f);
+        }
+    #ifndef NTL__CXX_RV
+        template<class Fn> inline void assign_impl(const Fn& f, false_type)
+        {
+          if(check_ptr(f, is_pointer<Fn>()))
+            caller = new impl::functor_caller<Fn, result_type, Args>(f);
+        }
+        //template<class Fn> inline void assign_impl(Fn& f, false_type)
+        //{
+        //  caller = new impl::functor_caller<Fn, result_type, Args>(f);
+        //}
+    #else
+        template<class Fn> inline void assign_impl(Fn&& f, false_type)
+        {
+          if(check_ptr(f, is_pointer<Fn>()))
+            caller = new impl::functor_caller<Fn, result_type, Args>(forward<Fn>(f));
+        }
+    #endif
+
+        /** Checks pointer if it is */
+        template<class F> inline bool check_ptr(const F& f, true_type) {  return f != nullptr; }
+        /** Check pointer stub for nonpointer callables */
+        template<class F> inline bool check_ptr(const F& f, false_type){  return true; }
+
       private:
         impl::caller<result_type, Args>* caller;
       };
     } // namespace v1
+
+    namespace detail = v1;
 
     /************************************************************************/
     /* Function interface wrapper                                           */
@@ -498,7 +552,7 @@ namespace std
     public:
       template<typename F>
       explicit function(F f)
-        :base(f)
+        :base(forward<F>(f))
       {}
       explicit function() __ntl_nothrow {}
       function(nullptr_t) __ntl_nothrow {}
@@ -518,7 +572,7 @@ namespace std
     public:
       template<typename F>
       explicit function(F f)
-        :base(f)
+        :base(forward<F>(f))
       {}
       explicit function() __ntl_nothrow {}
       function(nullptr_t) __ntl_nothrow {}
@@ -538,7 +592,7 @@ namespace std
     public:
       template<typename F>
       explicit function(F f)
-        :base(f)
+        :base(forward<F>(f))
       {}
       explicit function() __ntl_nothrow {}
       function(nullptr_t) __ntl_nothrow {}

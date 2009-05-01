@@ -237,21 +237,21 @@ namespace std
 
     /// duration arithmetic
     template <class Rep, class Period>
-    duration<Rep, Period>
+    inline duration<Rep, Period>
       operator+ (const duration<Rep, Period>& lhs, const duration<Rep, Period>& rhs)
     {
       return duration<Rep, Period>(lhs) += rhs;
     }
 
     template <class Rep, class Period>
-    duration<Rep, Period>
+    inline duration<Rep, Period>
       operator- (const duration<Rep, Period>& lhs, const duration<Rep, Period>& rhs)
     {
       return duration<Rep, Period>(lhs) -= rhs;
     }
 
     template <class Rep1, class Period1, class Rep2, class Period2>
-    typename common_type<duration<Rep1, Period1>, duration<Rep2, Period2> >::type
+    inline typename common_type<duration<Rep1, Period1>, duration<Rep2, Period2> >::type
       operator+ (const duration<Rep1, Period1>& lhs, const duration<Rep2, Period2>& rhs)
     {
       typedef typename common_type<duration<Rep1, Period1>, duration<Rep2, Period2> >::type CD;
@@ -259,7 +259,7 @@ namespace std
     }
 
     template <class Rep1, class Period1, class Rep2, class Period2>
-    typename common_type<duration<Rep1, Period1>, duration<Rep2, Period2> >::type
+    inline typename common_type<duration<Rep1, Period1>, duration<Rep2, Period2> >::type
       operator- (const duration<Rep1, Period1>& lhs, const duration<Rep2, Period2>& rhs)
     {
       typedef typename common_type<duration<Rep1, Period1>, duration<Rep2, Period2> >::type CD;
@@ -267,7 +267,7 @@ namespace std
     }
 
     template <class Rep1, class Period, class Rep2>
-    duration<typename common_type<Rep1, Rep2>::type, Period>
+    inline duration<typename common_type<Rep1, Rep2>::type, Period>
       operator* (const duration<Rep1, Period>& d, const Rep2& s)
     {
       // TODO: CR existence diagnostics
@@ -276,7 +276,7 @@ namespace std
     }
 
     template <class Rep1, class Period, class Rep2>
-    duration<typename common_type<Rep1, Rep2>::type, Period>
+    inline duration<typename common_type<Rep1, Rep2>::type, Period>
       operator* (const Rep1& s, const duration<Rep2, Period>& d)
     {
       // TODO: CR existence diagnostics
@@ -284,14 +284,14 @@ namespace std
     }
 
     template <class Rep1, class Period, class Rep2>
-    duration<typename common_type<Rep1, Rep2>::type, Period>
+    inline duration<typename common_type<Rep1, Rep2>::type, Period>
       operator/ (const duration<Rep1, Period>& d, const Rep2& s)
     {
       return duration<typename common_type<Rep1, Rep2>::type, Period>(d) /= s;
     }
 
     template <class Rep1, class Period1, class Rep2, class Period2>
-    typename common_type<Rep1, Rep2>::type
+    inline typename common_type<Rep1, Rep2>::type
       operator/ (const duration<Rep1, Period1>& lhs, const duration<Rep2, Period2>& rhs)
     {
       typedef typename common_type<duration<Rep1, Period1>, duration<Rep2, Period2> >::type CD;
@@ -301,39 +301,39 @@ namespace std
 
     /// duration comparisons
     template <class Rep1, class Period1, class Rep2, class Period2>
-    bool operator==(const duration<Rep1, Period1>& lhs, const duration<Rep2, Period2>& rhs)
+    inline bool operator==(const duration<Rep1, Period1>& lhs, const duration<Rep2, Period2>& rhs)
     {
       typedef typename common_type<const duration<Rep1, Period1>, const duration<Rep2, Period2> >::type CT;
       return CT(lhs).count() == CT(rhs).count();
     }
 
     template <class Rep1, class Period1, class Rep2, class Period2>
-    bool operator!=(const duration<Rep1, Period1>& lhs, const duration<Rep2, Period2>& rhs)
+    inline bool operator!=(const duration<Rep1, Period1>& lhs, const duration<Rep2, Period2>& rhs)
     {
       return !(lhs == rhs);
     }
 
     template <class Rep1, class Period1, class Rep2, class Period2>
-    bool operator< (const duration<Rep1, Period1>& lhs, const duration<Rep2, Period2>& rhs)
+    inline bool operator< (const duration<Rep1, Period1>& lhs, const duration<Rep2, Period2>& rhs)
     {
       typedef typename common_type<const duration<Rep1, Period1>, const duration<Rep2, Period2> >::type CT;
       return CT(lhs).count() < CT(rhs).count();
     }
 
     template <class Rep1, class Period1, class Rep2, class Period2>
-    bool operator<=(const duration<Rep1, Period1>& lhs, const duration<Rep2, Period2>& rhs)
+    inline bool operator<=(const duration<Rep1, Period1>& lhs, const duration<Rep2, Period2>& rhs)
     {
       return !(rhs < lhs);
     }
 
     template <class Rep1, class Period1, class Rep2, class Period2>
-    bool operator> (const duration<Rep1, Period1>& lhs, const duration<Rep2, Period2>& rhs)
+    inline bool operator> (const duration<Rep1, Period1>& lhs, const duration<Rep2, Period2>& rhs)
     {
       return rhs < lhs;
     }
 
     template <class Rep1, class Period1, class Rep2, class Period2>
-    bool operator>=(const duration<Rep1, Period1>& lhs, const duration<Rep2, Period2>& rhs)
+    inline bool operator>=(const duration<Rep1, Period1>& lhs, const duration<Rep2, Period2>& rhs)
     {
       return !(lhs < rhs);
     }
@@ -466,7 +466,7 @@ namespace std
 
     /// time_point arithmetic
     template <class Clock, class Duration1, class Rep2, class Period2>
-    time_point<Clock, typename common_type<Duration1, duration<Rep2, Period2> >::type>
+    inline time_point<Clock, typename common_type<Duration1, duration<Rep2, Period2> >::type>
       operator+ (const time_point<Clock, Duration1>& lhs, const duration<Rep2, Period2>& rhs)
     {
       typedef time_point<Clock, typename common_type<Duration1, duration<Rep2, Period2> >::type> CT;
@@ -474,21 +474,21 @@ namespace std
     }
 
     template <class Rep1, class Period1, class Clock, class Duration2>
-    time_point<Clock, typename common_type<duration<Rep1, Period1>, Duration2>::type>
+    inline time_point<Clock, typename common_type<duration<Rep1, Period1>, Duration2>::type>
       operator+ (const duration<Rep1, Period1>& lhs, const time_point<Clock, Duration2>& rhs)
     {
       return rhs + lhs;
     }
 
     template <class Clock, class Duration1, class Rep2, class Period2>
-    time_point<Clock, typename common_type<Duration1, duration<Rep2, Period2> >::type>
+    inline time_point<Clock, typename common_type<Duration1, duration<Rep2, Period2> >::type>
       operator- (const time_point<Clock, Duration1>& lhs, const duration<Rep2, Period2>& rhs)
     {
       return lhs + (-rhs);
     }
 
     template <class Clock, class Duration1, class Duration2>
-    typename common_type<Duration1, Duration2>::type
+    inline typename common_type<Duration1, Duration2>::type
       operator- (const time_point<Clock, Duration1>& lhs, const time_point<Clock, Duration2>& rhs)
     {
       return lhs.time_since_epoch() - rhs.time_since_epoch();
@@ -497,37 +497,37 @@ namespace std
 
     /// time_point comparisons
     template <class Clock, class Duration1, class Duration2>
-    bool operator==(const time_point<Clock, Duration1>& lhs, const time_point<Clock, Duration2>& rhs)
+    inline bool operator==(const time_point<Clock, Duration1>& lhs, const time_point<Clock, Duration2>& rhs)
     {
       return lhs.time_since_epoch() == rhs.time_since_epoch();
     }
 
     template <class Clock, class Duration1, class Duration2>
-    bool operator!=(const time_point<Clock, Duration1>& lhs, const time_point<Clock, Duration2>& rhs)
+    inline bool operator!=(const time_point<Clock, Duration1>& lhs, const time_point<Clock, Duration2>& rhs)
     {
       return !(lhs == rhs);
     }
 
     template <class Clock, class Duration1, class Duration2>
-    bool operator< (const time_point<Clock, Duration1>& lhs, const time_point<Clock, Duration2>& rhs)
+    inline bool operator< (const time_point<Clock, Duration1>& lhs, const time_point<Clock, Duration2>& rhs)
     {
       return lhs.time_since_epoch() < rhs.time_since_epoch();
     }
 
     template <class Clock, class Duration1, class Duration2>
-    bool operator<=(const time_point<Clock, Duration1>& lhs, const time_point<Clock, Duration2>& rhs)
+    inline bool operator<=(const time_point<Clock, Duration1>& lhs, const time_point<Clock, Duration2>& rhs)
     {
       return !(rhs < lhs);
     }
 
     template <class Clock, class Duration1, class Duration2>
-    bool operator> (const time_point<Clock, Duration1>& lhs, const time_point<Clock, Duration2>& rhs)
+    inline bool operator> (const time_point<Clock, Duration1>& lhs, const time_point<Clock, Duration2>& rhs)
     {
       return rhs < lhs;
     }
 
     template <class Clock, class Duration1, class Duration2>
-    bool operator>=(const time_point<Clock, Duration1>& lhs, const time_point<Clock, Duration2>& rhs)
+    inline bool operator>=(const time_point<Clock, Duration1>& lhs, const time_point<Clock, Duration2>& rhs)
     {
       return !(lhs < rhs);
     }
@@ -538,7 +538,7 @@ namespace std
      *  @note \e Requires: ToDuration shall be an instance of duration.
      **/
     template <class ToDuration, class Clock, class Duration>
-    time_point<Clock, ToDuration> time_point_cast(const time_point<Clock, Duration>& t)
+    inline time_point<Clock, ToDuration> time_point_cast(const time_point<Clock, Duration>& t)
     {
       return time_point<Clock, ToDuration>(duration_cast<ToDuration>(t.time_since_epoch()));
     }

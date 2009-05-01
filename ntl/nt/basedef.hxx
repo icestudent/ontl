@@ -36,7 +36,7 @@ namespace ntl {
         low          =  0,    // Lowest thread priority level
         low_realtime = 16,    // Lowest realtime priority level
         high         = 31,    // Highest thread priority level
-        maximum      = 32,    // Number of thread priority levels
+        maximum      = 32     // Number of thread priority levels
       };
     }
     typedef uintptr_t kaffinity;

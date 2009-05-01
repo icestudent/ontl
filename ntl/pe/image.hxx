@@ -1035,7 +1035,7 @@ next_entry:;
             secrel    = 0x0B,
             token     = 0x0C,
             secrel7   = 0x0D,
-            rel32     = 0x14,
+            rel32     = 0x14
           };
         };
 

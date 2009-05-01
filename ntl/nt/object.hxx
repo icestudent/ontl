@@ -33,7 +33,7 @@ struct object_attributes
       openlink            = 0x00000100L,
       kernel_handle       = 0x00000200L,
       force_access_check  = 0x00000400L,
-      valid_attributes    = 0x000007F2L,
+      valid_attributes    = 0x000007F2L
     };
 
     friend attributes operator | (attributes m, attributes m2)
