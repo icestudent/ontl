@@ -33,6 +33,12 @@
 
 namespace std
 {
+/**\addtogroup  lib_utilities ********** 20 General utilities library [utilities]
+ *@{*/
+/**\addtogroup  lib_function_objects ***** 20.6 Function objects [function.objects]
+ *@{*/
+/**\addtogroup  lib_bind ***************** 20.6.11 Function template bind [bind]
+ *@{*/
 
 // 20.6.11.1.4 Placeholders [func.bind.place]
 namespace placeholders
@@ -109,18 +115,27 @@ NTL_SPP_LOOP(1, 5, NTL_DEFINE_PLACEHOLDER, not_used)
 
 } // namespace placeholders
 
-// 20.6.11.1.2 Class template is_placeholder [func.bind.isplace]
+/**
+ *	20.6.11.1.2 Class template is_placeholder [func.bind.isplace]
+ *
+ *  is_placeholder can be used to detect the standard placeholders \c _1, \c _2, and so on. 
+ *  bind uses is_placeholder to detect placeholders. Users may specialize this template to indicate a placeholder type.
+ *
+ *  \c value is \e J if T is the type of <tt>std::placeholders::_</tt><i>J</i>, 0 otherwise.
+ **/
 template <class T>
 struct is_placeholder
   : integral_constant<int, 0>
 {};
 
+/** is_placeholder template specialization for placeholders */
 template <size_t N>
 struct is_placeholder<placeholders::__::placeholder_t<N> >
   : integral_constant<int, N>
 {};
 
+/**@} lib_bind */
+/**@} lib_function_objects */
+/**@} lib_utilities */
 } // namespace std
-
-
 #endif // !NTL_PLACEHOLDERS_HXX

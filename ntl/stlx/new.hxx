@@ -24,13 +24,13 @@ SizeType __ntl_grow_heap_block_size(const SizeType  size)
 
 namespace std {
 
-  /**\addtogroup  lib_language_support *** 18 Language support library [language.support] ******
+  /**\addtogroup  lib_language_support *** 18 Language support library [language.support]
  *@{*/
 
-/**\defgroup  lib_support_dynamic ****** 18.5 Dynamic memory management [support.dynamic] ***
+/**\defgroup  lib_support_dynamic ****** 18.5 Dynamic memory management [support.dynamic]
  *@{*/
 
-/**\defgroup  lib_alloc_errors ********* 18.5.2 Storage allocation errors [alloc.errors] *
+/**\defgroup  lib_alloc_errors ********* 18.5.2 Storage allocation errors [alloc.errors]
  *@{*/
 
 /// Class bad_alloc [18.5.2.1 lib.bad.alloc]

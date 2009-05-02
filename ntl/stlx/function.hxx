@@ -10,19 +10,18 @@
 #include "exception.hxx"
 #include "type_traits.hxx"
 #include "tuple.hxx"
+
 #include "mem_fn.hxx"
+#include "fn_caller.hxx"
 
 namespace std
 {
  /**\addtogroup  lib_utilities ************ 20 General utilities library [utilities]
-  *@{
-  **/
+  *@{*/
  /**\addtogroup  lib_function_objects ***** 20.6 Function objects [function.objects]
-  *@{
-  **/
+  *@{*/
  /**\defgroup lib_func_wrap *************** 20.6.15 Polymorphic function wrappers [func.wrap]
-  *@{
-  **/
+  *@{*/
 
   /**
    *	An exception of type \c bad_function_call is thrown by \c function::operator() (20.6.15.2.4) when the function wrapper object has no target.
@@ -268,7 +267,6 @@ namespace std
         template<class R, class Args>
         struct args_callee
         {
-
           typedef caller<R, Args> caller;
 
           static R call(caller& f, Args& args, int2type<0>)

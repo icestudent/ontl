@@ -14,7 +14,7 @@
 
 namespace std {
 
-/**\addtogroup  lib_iterators ********** 24 Iterators library [iterators] *************
+/**\addtogroup  lib_iterators ********** 24 Iterators library [iterators]
  *
  *    Components that C++ programs may use to perform iterations over
  *    \link lib_containers containers\endlink,
@@ -25,7 +25,7 @@ namespace std {
 
 // primitives [24.3]
 
-/**\addtogroup  lib_std_iterator_tags ** 24.3.3 Standard iterator tags [std.iterator.tags] ****
+/**\addtogroup  lib_std_iterator_tags ** 24.3.3 Standard iterator tags [std.iterator.tags]
  *@{*/
 struct input_iterator_tag                                             {};
 struct output_iterator_tag                                            {};
@@ -34,7 +34,7 @@ struct bidirectional_iterator_tag : public forward_iterator_tag       {};
 struct random_access_iterator_tag : public bidirectional_iterator_tag {};
 /**@}*/
 
-/**\addtogroup lib_std_iterator_traits ** 24.3.1 Iterator traits [iterator.traits] ****
+/**\addtogroup lib_std_iterator_traits ** 24.3.1 Iterator traits [iterator.traits]
   *@{*/
 template<class Iterator>
 struct iterator_traits
@@ -67,7 +67,7 @@ struct iterator_traits<const T*>
 };
 /**@}*/
 
-/**\addtogroup lib_std_iterator ** 24.3.2 Basic iterator [iterator.basic] ****
+/**\addtogroup lib_std_iterator ** 24.3.2 Basic iterator [iterator.basic]
  *@{*/
 template<class Category, class T, class Distance = ptrdiff_t,
          class Pointer = T*, class Reference = T&>
@@ -81,7 +81,7 @@ struct iterator
 };
 /**@}*/
 
-/**\addtogroup lib_std_iterator_operations ** 24.3.4 Iterator operations [iterator.operations] ****
+/**\addtogroup lib_std_iterator_operations ** 24.3.4 Iterator operations [iterator.operations]
 *@{*/
 namespace __
 {

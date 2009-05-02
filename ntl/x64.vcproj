@@ -372,6 +372,30 @@
 							RelativePath=".\stlx\ext\ttl\typelist.hxx"
 							>
 						</File>
+						<Filter
+							Name="pp"
+							>
+							<File
+								RelativePath=".\stlx\ext\pp\config.hxx"
+								>
+							</File>
+							<File
+								RelativePath=".\stlx\ext\pp\macro_counter.hxx"
+								>
+							</File>
+							<File
+								RelativePath=".\stlx\ext\pp\macro_misc.hxx"
+								>
+							</File>
+							<File
+								RelativePath=".\stlx\ext\pp\macro_params.hxx"
+								>
+							</File>
+							<File
+								RelativePath=".\stlx\ext\pp\macro_repeat.hxx"
+								>
+							</File>
+						</Filter>
 					</Filter>
 					<Filter
 						Name="tr1"
@@ -614,15 +638,7 @@
 						>
 					</File>
 					<File
-						RelativePath=".\stlx\mem_fn.hxx"
-						>
-					</File>
-					<File
 						RelativePath=".\stlx\memory.hxx"
-						>
-					</File>
-					<File
-						RelativePath=".\stlx\placeholders.hxx"
 						>
 					</File>
 					<File
@@ -630,23 +646,7 @@
 						>
 					</File>
 					<File
-						RelativePath=".\stlx\result_of.hxx"
-						>
-					</File>
-					<File
 						RelativePath=".\stlx\smart_ptr.hxx"
-						>
-					</File>
-					<File
-						RelativePath=".\stlx\tt_isfunc.inl"
-						>
-					</File>
-					<File
-						RelativePath=".\stlx\tt_isfuncc.inl"
-						>
-					</File>
-					<File
-						RelativePath=".\stlx\tt_ismemptr.inl"
 						>
 					</File>
 					<File
@@ -681,16 +681,52 @@
 						RelativePath=".\stlx\utility.hxx"
 						>
 					</File>
+					<Filter
+						Name="functional"
+						>
+						<File
+							RelativePath=".\stlx\bind.hxx"
+							>
+						</File>
+						<File
+							RelativePath=".\stlx\fn_caller.hxx"
+							>
+						</File>
+						<File
+							RelativePath=".\stlx\function.hxx"
+							>
+						</File>
+						<File
+							RelativePath=".\stlx\mem_fn.hxx"
+							>
+						</File>
+						<File
+							RelativePath=".\stlx\placeholders.hxx"
+							>
+						</File>
+						<File
+							RelativePath=".\stlx\result_of.hxx"
+							>
+						</File>
+						<File
+							RelativePath=".\stlx\tt_isfunc.inl"
+							>
+						</File>
+						<File
+							RelativePath=".\stlx\tt_isfuncc.inl"
+							>
+						</File>
+						<File
+							RelativePath=".\stlx\tt_ismemptr.inl"
+							>
+						</File>
+					</Filter>
 				</Filter>
 				<Filter
 					Name="algo"
 					>
 					<File
 						RelativePath=".\stlx\algorithm.hxx"
-						>
-					</File>
-					<File
-						RelativePath=".\stlx\function.hxx"
 						>
 					</File>
 					<File

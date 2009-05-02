@@ -32,18 +32,20 @@ extern "C" uint8_t _rotl8(uint8_t value, uint8_t shift);
 extern "C" uint16_t _rotl16(uint16_t value, uint8_t shift);
 extern "C" uint32_t _lrotl(uint32_t value, uint8_t shift);
 extern "C" uint64_t _rotl64(uint64_t value, uint8_t shift);
-#pragma intrinsic(_rotl8, _rotl16, _lrotl, _rotl64)
 
 extern "C" uint8_t _rotr8(uint8_t value, uint8_t shift);
 extern "C" uint16_t _rotr16(uint16_t value, uint8_t shift);
 extern "C" uint32_t _lrotr(uint32_t value, uint8_t shift);
 extern "C" uint64_t _rotr64(uint64_t value, uint8_t shift);
-#pragma intrinsic(_rotr8, _rotr16, _lrotr, _rotr64)
 
 extern "C" uint16_t _byteswap_ushort (uint16_t value);
 extern "C" uint32_t _byteswap_ulong (uint32_t value);
 extern "C" uint64_t _byteswap_uint64(uint64_t value);
+#ifndef __ICL
+#pragma intrinsic(_rotr8, _rotr16, _lrotr, _rotr64)
+#pragma intrinsic(_rotl8, _rotl16, _lrotl, _rotl64)
 #pragma intrinsic(_byteswap_ushort, _byteswap_ulong, _byteswap_uint64)
+#endif
 
 }//namespace intrinsic
 

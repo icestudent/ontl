@@ -643,11 +643,19 @@
 					Name="utility"
 					>
 					<File
+						RelativePath=".\stlx\fn_caller.hxx"
+						>
+					</File>
+					<File
 						RelativePath=".\stlx\initializer_list.hxx"
 						>
 					</File>
 					<File
 						RelativePath=".\stlx\mem_fn.hxx"
+						>
+					</File>
+					<File
+						RelativePath=".\stlx\mem_fn_rv.hxx"
 						>
 					</File>
 					<File

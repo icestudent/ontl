@@ -18,12 +18,12 @@
 
 
 namespace std {
-/**\addtogroup  lib_input_output ******* 27 Input/output library [input.output] **********
+/**\addtogroup  lib_input_output ******* 27 Input/output library [input.output]
  *@{*/
 
 /**\ingroup std_depr
  *@{*/
-/**\defgroup  str_strstreams ********** D.7 Strings streams [depr.str.strstreams] ***************
+/**\defgroup  str_strstreams ********** D.7 Strings streams [depr.str.strstreams]
  *@{*/
 
 /// D.7.1 Class strstreambuf [depr.strstreambuf]

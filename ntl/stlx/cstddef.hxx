@@ -42,6 +42,7 @@
 #  pragma warning(disable:874)  // [remark] support for placement delete is disabled
 #  pragma warning(disable:981)  // [remark] operands are evaluated in unspecified order (http://software.intel.com/en-us/articles/cdiag981/)
 #  pragma warning(disable:1599) // [remark] declaration hides variable "var"
+#  pragma warning(disable:1879) // [warning] unimplemented pragma ignored (but supported)
 #  pragma warning(disable:2268) // [remark] the declaration of the copy assignment operator for "type1s" has been suppressed because that of "type2" was suppressed
 #  pragma warning(disable:2270) // [remark] the declaration of the copy assignment operator for "type1" has been suppressed because that of "type2" is inaccessible
 # else
@@ -406,7 +407,7 @@
 
 namespace std {
 
-/**\defgroup  lib_language_support ***** 18 Language support library [language.support] ******
+/**\defgroup  lib_language_support ***** 18 Language support library [language.support]
  *@{*/
 
 #ifdef _MSC_VER
@@ -422,7 +423,7 @@ namespace std {
   typedef struct {} max_align_t;
 #endif
 
-/**\defgroup  lib_support_types ******** 18.1 Types [support.types] ***********************
+/**\defgroup  lib_support_types ******** 18.1 Types [support.types]
  *@{*/
 
 #ifdef NTL__CXX_NULLPTR

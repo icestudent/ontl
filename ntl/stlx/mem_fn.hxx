@@ -7,20 +7,22 @@
 #ifndef NTL_MEMFN_HXX
 #define NTL_MEMFN_HXX
 
+#ifdef NTL__CXX_RV
+# include "mem_fn_rv.hxx"
+#else 
+
 #include "type_traits.hxx"
 #include "tuple.hxx"
+#include "fn_caller.hxx"
 
 namespace std
 {
  /**\addtogroup  lib_utilities ************ 20 General utilities library [utilities]
-  *@{
-  **/
+  *@{*/
  /**\addtogroup  lib_function_objects ***** 20.6 Function objects [function.objects]
-  *@{
-  **/
-  /**\defgroup  lib_member_function_adaptors 20.6.14 Member function adaptors [func.memfn]
-  *@{
-  */
+  *@{*/
+ /**\defgroup  lib_member_function_adaptors 20.6.14 Member function adaptors [func.memfn]
+  *@{*/
 
 
   template<typename R, class T>
@@ -49,8 +51,25 @@ namespace std
     {
       return obj->*pm;
     }
-
-    // TODO: work with smart pointers
+    template<class U>
+    result_type& operator()(U& obj) const
+    {
+      return call(obj,&obj);
+    }
+    template<class U>
+    const result_type& operator()(const U& obj) const
+    {
+      return call(obj,&obj);
+    }
+  private:
+    template<class U>
+    result_type& call(U& obj, const volatile T*) const { return obj.*pm; }
+    template<class U>
+    result_type& call(U& obj, const volatile void*) const { return (*obj).*pm; }
+    template<class U>
+    const result_type& call(const U& obj, const volatile T*) const { return obj.*pm; }
+    template<class U>
+    const result_type& call(const U& obj, const volatile void*) const { return (*obj).*pm; }
   };
 
   template<typename R, class T>
@@ -91,6 +110,7 @@ namespace std
       :pmf(f)
     {}
 
+#if 0
     result_type operator()(T& obj) const
     {
       static_assert(tuple_size<Args>::value == 0, "wrong count of arguments");
@@ -103,7 +123,6 @@ namespace std
       return (obj->*pmf)();
     }
 
-#if 1
     result_type operator()(T& obj, typename __::arg_t<0, Args>::type a1) const
     {
       static_assert(tuple_size<Args>::value == 1, "wrong count of arguments");
@@ -165,12 +184,35 @@ namespace std
     }
 
 #else
-    // TODO: work with smart pointers
-    // TODO: write invoke with macros
+    template<typename U>
+    result_type operator()(U& obj) const
+    {
+      static_assert(tuple_size<Args>::value == 0, "wrong count of arguments");
+      return func::invoke<result_type>(pmf, tuple<U&>(obj));
+    }
+    template<typename U>
+    result_type operator()(const U& obj) const
+    {
+      static_assert(tuple_size<Args>::value == 0, "wrong count of arguments");
+      return func::invoke<result_type>(pmf, tuple<const U&>(obj));
+    }
+
+    template<typename U>
+    result_type operator()(U& obj, typename __::arg_t<0, Args>::type a1) const
+    {
+      static_assert(tuple_size<Args>::value == 1, "wrong count of arguments");
+      return func::invoke<result_type>(pmf, tuple<U&, typename __::arg_t<0, Args>::type>(obj, a1));
+    }
+    template<typename U>
+    result_type operator()(const U& obj, typename __::arg_t<0, Args>::type a1) const
+    {
+      static_assert(tuple_size<Args>::value == 1, "wrong count of arguments");
+      return func::invoke<result_type>(pmf, tuple<const U&, typename __::arg_t<0, Args>::type>(obj, a1));
+    }
 #endif
   };
 
-#if 1
+#if 1 && !defined __DOXYGEN__
 
   // ARGC == 0
 #define NTL_DEFINE_MEMFN0(cv) \
@@ -248,5 +290,5 @@ namespace std
   /**@} lib_function_objects */
   /**@} lib_utilities */
 }
-
+#endif // RV
 #endif // NTL_MEMFN_HXX

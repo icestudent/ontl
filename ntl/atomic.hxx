@@ -63,6 +63,7 @@ namespace intrinsic
     void*   __cdecl _InterlockedExchangePointer(void* volatile* Target, void* Value);
   }
 
+#ifndef __ICL
 #pragma intrinsic(_InterlockedAnd, _InterlockedAnd8, _InterlockedAnd16, _InterlockedOr, _InterlockedOr8, _InterlockedOr16, _InterlockedXor, _InterlockedXor8, _InterlockedXor16)
 #pragma intrinsic(_InterlockedIncrement, _InterlockedIncrement16, _InterlockedDecrement, _InterlockedDecrement16, _InterlockedExchange, _InterlockedExchangeAdd)
 #pragma intrinsic(_InterlockedCompareExchange, _InterlockedCompareExchange16, _InterlockedCompareExchange64)
@@ -73,6 +74,7 @@ namespace intrinsic
 #pragma intrinsic(_InterlockedCompareExchange128, _InterlockedCompare64Exchange128)
 #endif
 #endif
+#endif // icl
 
   extern "C" {
   // compiler intrinsics
@@ -102,10 +104,12 @@ namespace intrinsic
 #endif
   }
 
+#ifndef __ICL
 #pragma intrinsic(_ReadBarrier, _WriteBarrier, _ReadWriteBarrier, _mm_lfence, _mm_mfence, _mm_sfence, _mm_pause)
 
 #ifdef _M_X64
 # pragma intrinsic(__faststorefence)
+#endif
 #endif
 
 }//namespace intrinsic

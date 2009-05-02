@@ -17,9 +17,9 @@
 
 namespace std {
 
-/**\addtogroup  lib_utilities *** 20 General utilities library [utilities] **
+/**\addtogroup  lib_utilities *** 20 General utilities library [utilities]
  *@{*/
-/**\addtogroup  lib_date_time *** 20.9 Date and time functions [date.time] **
+/**\addtogroup  lib_date_time *** 20.9 Date and time functions [date.time]
  *@{*/
 
 #ifndef __GNUC__

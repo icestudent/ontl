@@ -10,13 +10,14 @@
 
 #include "iterator.hxx"
 #include "stdexcept.hxx"
+#include "tuple.hxx"
 
 namespace std {
 
-/**\addtogroup  lib_containers ********* 23 Containers library [containers] ************
+/**\addtogroup  lib_containers ********* 23 Containers library [containers]
  *@{*/
 
-/**\addtogroup  lib_sequence *********** 23.2 Sequence containers [sequences] *******************
+/**\addtogroup  lib_sequence *********** 23.2 Sequence containers [sequences]
  *@{*/
 
   /**
@@ -165,6 +166,35 @@ template <class T, size_t N> inline bool operator>= (const array<T,N>& x, const 
 template <class T, size_t N > inline void swap(array<T,N>& x, array<T,N>& y) { x.swap(y); }
 
 ///@}
+
+//////////////////////////////////////////////////////////////////////////
+///\name  Tuple interface to class template array [23.2.1.6]
+
+template <class T, size_t N> 
+struct tuple_size<array<T, N> >: integral_constant<size_t, N>
+{};
+
+template <size_t I, class T, size_t N>
+struct tuple_element<I, array<T, N> >
+{
+  static_assert(I < N, "I out of bounds");
+  typedef T type;
+};
+
+template <size_t I, class T, size_t N>
+inline T& get(array<T, N>& a)
+{
+  static_assert(I < N, "I out of bounds");
+  return a[I];
+}
+
+template <size_t I, class T, size_t N>
+inline const T& get(const array<T, N>& a)
+{
+  static_assert(I < N, "I out of bounds");
+  return a[I];
+}
+
 /**@} lib_sequence */
 /**@} lib_containers */
 

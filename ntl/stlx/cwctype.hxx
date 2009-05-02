@@ -15,7 +15,7 @@ typedef wchar_t  wctrans_t;
 
 namespace std
 {
-/**\addtogroup  lib_strings ************ 21 Strings library [strings] ****************
+/**\addtogroup  lib_strings ************ 21 Strings library [strings]
  *@{*/
 /**\addtogroup  lib_c_strings ********** 21.5 Null-terminated sequence utilities [c.strings]
  *@{*/

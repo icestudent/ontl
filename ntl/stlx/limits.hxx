@@ -17,9 +17,9 @@
 
 namespace std {
 
-  /**\addtogroup  lib_language_support *** 18 Language support library [language.support] ******
+  /**\addtogroup  lib_language_support *** 18 Language support library [language.support]
  *@{*/
-/**\addtogroup  lib_support_limits ***** 18.2 Implementation properties [support.limits] ***
+/**\addtogroup  lib_support_limits ***** 18.2 Implementation properties [support.limits]
  *@{*/
 
 /// Type float_round_style [18.2.1.3 lib.round.style]

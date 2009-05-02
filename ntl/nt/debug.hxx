@@ -38,7 +38,7 @@ namespace ntl {
       };
     };
 
-   NTL__EXTERNAPI
+    NTL__EXTERNAPI
       ntstatus
       DbgPrint(
       const char  Format[],
@@ -86,61 +86,61 @@ namespace ntl {
 
       void printf(const char msg[]) const
       {
-      #ifdef NTL__DEBUG_2K
+#ifdef NTL__DEBUG_2K
         KdPrint((msg));
-      #else
+#else
         KdPrintEx((type, DefaultLevel, msg));
-      #endif
+#endif
       }
 
       template <typename T>
       void printf(const char format[], T arg) const
       {
-      #ifdef NTL__DEBUG_2K
+#ifdef NTL__DEBUG_2K
         KdPrint((format, arg));
-      #else
+#else
         KdPrintEx((type, DefaultLevel, format, arg));
-      #endif
+#endif
       }
 
       template <typename T1, typename T2>
       void printf(const char format[], T1 arg1, T2 arg2) const
       {
-      #ifdef NTL__DEBUG_2K
+#ifdef NTL__DEBUG_2K
         KdPrint((format, arg1, arg2));
-      #else
+#else
         KdPrintEx((type, DefaultLevel, format, arg1, arg2));
-      #endif
+#endif
       }
 
       template <typename T1, typename T2, typename T3>
       void printf(const char format[], T1 arg1, T2 arg2, T3 arg3) const
       {
-      #ifdef NTL__DEBUG_2K
+#ifdef NTL__DEBUG_2K
         KdPrint((format, arg1, arg2, arg3));
-      #else
+#else
         KdPrintEx((type, DefaultLevel, format, arg1, arg2, arg3));
-      #endif
+#endif
       }
 
       template <typename T1, typename T2, typename T3, typename T4>
       void printf(const char format[], T1 arg1, T2 arg2, T3 arg3, T4 arg4) const
       {
-      #ifdef NTL__DEBUG_2K
+#ifdef NTL__DEBUG_2K
         KdPrint((format, arg1, arg2, arg3, arg4));
-      #else
+#else
         KdPrintEx((type, DefaultLevel, format, arg1, arg2, arg3, arg4));
-      #endif
+#endif
       }
 
       template <typename T1, typename T2, typename T3, typename T4, typename T5>
       void printf(const char format[], T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5) const
       {
-      #ifdef NTL__DEBUG_2K
+#ifdef NTL__DEBUG_2K
         KdPrint((format, arg1, arg2, arg3, arg4, arg5));
-      #else
+#else
         KdPrintEx((type, DefaultLevel, format, arg1, arg2, arg3, arg4, arg5));
-      #endif
+#endif
       }
 
       void operator()(const char msg[]) const
@@ -226,17 +226,21 @@ namespace ntl {
 
   } // namespace nt
   namespace intrinsic {
-    extern "C" void __cdecl __debugbreak();
-    
-    #ifdef _MSC_VER
-    # pragma intrinsic(__debugbreak)
-    #endif
+#ifndef __ICL
+    extern "C" void __debugbreak();
+
+#ifdef _MSC_VER
+# pragma intrinsic(__debugbreak)
+#endif
+#endif
 
     static __forceinline
       void debugbreak()
     {
-      intrinsic::__debugbreak();
+      __debugbreak();
     }
+
+
 
   }//namespace intrinsic
   namespace nt {

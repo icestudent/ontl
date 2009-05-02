@@ -20,9 +20,7 @@
 
 namespace std
 {
- /**\defgroup  lib_utilities *** 20 General utilities library [utilities]
-  *
-  *    Components used by other elements of the Standard C + + library.
+ /**\addtogroup  lib_utilities *** 20 General utilities library [utilities]
   *@{
   **/
 

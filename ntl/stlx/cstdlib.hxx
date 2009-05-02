@@ -284,10 +284,10 @@ namespace ntl
 
 namespace std {
 
-/**\addtogroup  lib_language_support *** 18 Language support library [language.support] ******
+/**\addtogroup  lib_language_support *** 18 Language support library [language.support]
  *@{*/
 
-/**\addtogroup  lib_general_utilities ** C Library filees [c.files  ] *******
+/**\addtogroup  lib_general_utilities ** C Library filees [c.files  ]
  *@{*/
 
 using ::atof;

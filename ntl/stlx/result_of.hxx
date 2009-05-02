@@ -39,11 +39,9 @@
 namespace std
 {
  /**\addtogroup  lib_utilities ************ 20 General utilities library [utilities]
-  *@{
-  **/
+  *@{*/
  /**\addtogroup  lib_function_objects ***** 20.6 Function objects [function.objects]
-  *@{
-  **/
+  *@{*/
 
 /**\defgroup lib_func_ret ***************** 20.6.04 Function object return types [func.ret]
  *  Function return type detector
@@ -67,6 +65,7 @@ namespace std
     { \
     enum { arity = n }; \
     typedef ResultType type; \
+    NTL_SPP_IF(n)(typedef T1 first_argument_type;)\
     }; \
     template < \
     class ResultType NTL_SPP_COMMA_IF(n) \
@@ -76,6 +75,7 @@ namespace std
     { \
     enum { arity = n }; \
     typedef ResultType type; \
+    NTL_SPP_IF(n)(typedef T1 first_argument_type;)\
     }; \
     template < \
     class ResultType NTL_SPP_COMMA_IF(n) \
@@ -85,6 +85,7 @@ namespace std
     { \
     enum { arity = n }; \
     typedef ResultType type; \
+    NTL_SPP_IF(n)(typedef T1 first_argument_type;)\
     }; \
     template < \
     class ResultType, \
@@ -95,6 +96,8 @@ namespace std
     { \
     enum { arity = n }; \
     typedef ResultType type; \
+    typedef ClassType object_type; \
+    NTL_SPP_IF(n)(typedef ClassType first_argument_type;)\
     }; \
     template < \
     class ResultType, \
@@ -105,6 +108,8 @@ namespace std
     { \
     enum { arity = n }; \
     typedef ResultType type; \
+    typedef ClassType object_type; \
+    NTL_SPP_IF(n)(typedef ClassType first_argument_type;)\
     }
 
     NTL_DEFINE_RESULT_OF_FUNCTION_TYPE(0);

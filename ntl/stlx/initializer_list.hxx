@@ -14,7 +14,7 @@
 
 namespace std
 {
-  /**\addtogroup  lib_language_support *** 18 Language support library [language.support] ******
+  /**\addtogroup  lib_language_support *** 18 Language support library [language.support]
    *@{*/
 
   /**\defgroup  lib_support_initlist ***** 18.8 Initializer lists [support.initlist]

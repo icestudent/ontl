@@ -17,6 +17,7 @@
 #include "iterator.hxx"
 #include "memory.hxx"
 #include "vector.hxx"
+#include "functional.hxx"
 
 #include "new.hxx"
 

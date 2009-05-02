@@ -22,11 +22,11 @@
 
 namespace std {
 
-/**\defgroup  lib_containers *********** 23 Containers library [containers] ************
+/**\defgroup  lib_containers *********** 23 Containers library [containers]
  *@{    Components to organize collections of information
  */
 
-/**\defgroup  lib_sequence ************* 23.2 Sequence containers [sequences] *******************
+/**\defgroup  lib_sequence ************* 23.2 Sequence containers [sequences]
  *@{    Containers that organizes a finite %set of objects,
  *    all of the same type, into a strictly linear arrangement.
  */

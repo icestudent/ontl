@@ -18,10 +18,10 @@ namespace std
 {
   /**\addtogroup  lib_utilities ********** 20 General utilities library [utilities]
    *@{*/
-  /**\addtogroup  lib_memory ************* 20.7 Memory [memory] **********************
+  /**\addtogroup  lib_memory ************* 20.7 Memory [memory]
    *@{*/
 
-  /**\addtogroup  lib_uniqueptr ********** 20.7.11 Class template unique_ptr (legacy) [unique.ptr] ***
+  /**\addtogroup  lib_uniqueptr ********** 20.7.11 Class template unique_ptr (legacy) [unique.ptr]
    *@{*/
 
 
@@ -699,7 +699,7 @@ namespace std
   ///\}
   /*@} lib_uniqueptr */
 
- /**\defgroup  lib_smartptr *************** 20.7.12 Smart pointers (legacy) [util.smartptr] *
+ /**\defgroup  lib_smartptr *************** 20.7.12 Smart pointers (legacy) [util.smartptr]
    *@{*/
 
   template<class X> class auto_ptr;

@@ -11,7 +11,7 @@ namespace std
 {
   /**\addtogroup  lib_utilities ********** 20 General utilities library [utilities]
   *@{*/
-  /**\addtogroup  lib_memory *************** 20.7 Memory [memory] **********************
+  /**\addtogroup  lib_memory *************** 20.7 Memory [memory]
   *@{*/
 
   /// Draft Technical Report on C++ Library Extensions [N1836]
@@ -84,7 +84,7 @@ namespace std
 
   #if STLX__USE_RTTI
       template<class T, class D>
-      inline const void* shared_ptr_deleter<T,D>::get_deleter(const type_info& ti) const __ntl_nothrow;
+      inline const void* shared_ptr_deleter<T,D>::get_deleter(const type_info& ti) const __ntl_nothrow
       {
         return typeid(D) == ti ? reinterpret_cast<const void*>(&deleter) : nullptr;
       }

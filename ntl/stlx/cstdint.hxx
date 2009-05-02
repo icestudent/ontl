@@ -12,7 +12,7 @@
 
 namespace std {
 
-/**\addtogroup  lib_language_support *** 18 Language support library [language.support] ******
+/**\addtogroup  lib_language_support *** 18 Language support library [language.support]
  *@{*/
 /** \defgroup   lib_cstdint 18.3 Integer types [cstdint]
  *
@@ -70,7 +70,7 @@ typedef uint64_t  uintmax_t;
 
 /**@} lib_cstdint */
 
-/**\addtogroup  lib_support_limits ***** 18.2 Implementation properties [support.limits] ***
+/**\addtogroup  lib_support_limits ***** 18.2 Implementation properties [support.limits]
  *@{*/
 
 ///\name  Limits of exact-width integer types 7.18.2.1

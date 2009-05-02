@@ -7,15 +7,16 @@
 #ifndef NTL__STLX_TUPLE
 #define NTL__STLX_TUPLE
 
-#include "array.hxx" // for tuple array access
+#define TTL_MAX_TEMPLATE_PARAMS 5
+
+//#include "array.hxx" // for tuple array access
 #include "ext/ttl/typelist.hxx"
+#include "utility.hxx" // for tuple pair access
 
 namespace std
 {
 
-/**\defgroup  lib_utilities *** 20 General utilities library [utilities]
- *
- *    Components used by other elements of the Standard C + + library.
+/**\addtogroup  lib_utilities *** 20 General utilities library [utilities]
  *@{
  */
 
@@ -365,12 +366,57 @@ namespace std
       }
     };
 
+#define NTL_TUPLE_GET(n,aux) tail.
+#ifndef NTL__CXX_RV
+#define NTL_TUPLE_MAKEGET(N,cv) static __forceinline R get(cv T& t, int2type<N>) { return t.\
+  TTL_REPEAT(N, NTL_TUPLE_GET, NTL_TUPLE_GET, 0)\
+  head; }
+
+    template<typename R, size_t N>
+    struct field2
+    {
+      template<class T>
+      static __forceinline R get(const T& t) { return getter<T>::get(t, int2type<N>()); }
+      template<class T>
+      static __forceinline R get(T& t) { return getter<T>::get(t, int2type<N>()); }
+    private:
+      template<class T>
+      struct getter
+      {
+        static __forceinline R get(const T& t, int2type<0>) { return t.head; }
+        TTL_REPEAT_NEST(TTL_MAX_TEMPLATE_PARAMS,NTL_TUPLE_MAKEGET,NTL_TUPLE_MAKEGET,const);
+
+        static __forceinline R get(T& t, int2type<0>) { return t.head; }
+        TTL_REPEAT_NEST(TTL_MAX_TEMPLATE_PARAMS,NTL_TUPLE_MAKEGET,NTL_TUPLE_MAKEGET,);
+      };
+    };
+#else
+    template<typename R, size_t N>
+    struct field2
+    {
+      template<class T>
+      static __forceinline R get(T&& t) { return getter<T>::get(forward<T>(t), int2type<N>()); }
+    private:
+      template<class T>
+      struct getter
+      {
+        static __forceinline R get(T&& t, int2type<0>) { return t.head; }
+
+#define NTL_TUPLE_MAKEGET(N,cv) static __forceinline R get(T&& t, int2type<N>) { return t.\
+  TTL_REPEAT(N, NTL_TUPLE_GET, NTL_TUPLE_GET, 0)\
+  head; }
+        TTL_REPEAT_NEST(TTL_MAX_TEMPLATE_PARAMS,NTL_TUPLE_MAKEGET,NTL_TUPLE_MAKEGET,const);
+      };
+    };
+#endif
+#undef NTL_TUPLE_GET
+#undef NTL_TUPLE_MAKEGET
+
     template<typename T>
     struct is_tuple: false_type{};
     template<typename T1, typename T2, typename T3, typename T4, typename T5>
     struct is_tuple<tuple<T1,T2,T3,T4,T5> >: true_type{};
   }
-
 
   template<typename T1, typename T2, typename T3, typename T4, typename T5>
   class tuple:
@@ -416,7 +462,9 @@ namespace std
     template<typename U1, typename U2, typename U3, typename U4, typename U5>
     tuple(const tuple<U1,U2,U3,U4,U5>& r)
       :base(r)
-    {}
+    {
+      static_assert((types::length == tuple<U1,U2,U3,U4,U5>::types::length), "incompatible number of types");
+    }
 
     tuple& operator=(const tuple& r)
     {
@@ -428,6 +476,7 @@ namespace std
     template<typename U1, typename U2, typename U3, typename U4, typename U5>
     tuple& operator=(const tuple<U1,U2,U3,U4,U5>& r)
     {
+      static_assert((types::length == tuple<U1,U2,U3,U4,U5>::types::length), "incompatible number of types");
       base::operator=(r);
       return *this;
     }
@@ -477,12 +526,15 @@ namespace std
     template<typename U1, typename U2, typename U3, typename U4, typename U5>
     tuple(tuple<U1,U2,U3,U4,U5>&& r)
       :base(move(r))
-    {}
+    {
+      static_assert((types::length == tuple<U1,U2,U3,U4,U5>::types::length), "incompatible number of types");
+    }
 
     // template <class... UTypes> tuple& operator=(tuple<UTypes...>&&);
     template<typename U1, typename U2, typename U3, typename U4, typename U5>
     tuple& operator=(tuple<U1,U2,U3,U4,U5>&& r)
     {
+      static_assert((types::length == tuple<U1,U2,U3,U4,U5>::types::length), "incompatible number of types");
       base::operator=(r);
       return *this;
     }
@@ -521,6 +573,8 @@ namespace std
   }; // class tuple
 
   // make tuple
+  template <class T> class reference_wrapper;
+
   namespace __
   {
     struct swallow_assign
@@ -650,6 +704,114 @@ namespace std
     return tuple<T1&,T2&,T3&,T4&,T5&> (p1,p2,p3,p4,p5);
   }
 
+  // tuple_cat
+  namespace __
+  {
+    template<class Tuple1, class Tuple2> struct tuple_glue;
+
+    template<class H = meta::empty_type, class T = meta::empty_type> struct tlist { typedef H head; typedef T tail; };
+    
+    template<class TL, class A>
+    struct tappend { typedef tlist<TL,A> type; };
+
+    template<class A>
+    struct tappend<tlist<meta::empty_type,meta::empty_type>, A> { typedef tlist<A> type; };
+
+    template<class H, class A>
+    struct tappend<tlist<H,meta::empty_type>, A> { typedef tlist<H, A> type; };
+
+    template<class H, class T>
+    struct tappend<tlist<H,T>, meta::empty_type> { typedef tlist<H,T> type; };
+
+    template<class TL> struct tlength { enum { value = 1 + tlength<typename TL::tail>::value }; };
+    template<> struct tlength<meta::empty_type> { enum { value = 0 }; };
+
+    template<size_t I, class TL> struct tget { typedef typename tget<I-1,typename TL::tail>::type type; };
+    template<class TL> struct tget<0,TL> { typedef typename TL::head type; };
+
+
+    template<class types, size_t i, size_t len> struct flt 
+    {
+      typedef typename ttl::meta::get<types, i>::type ct;
+      static const bool stop = is_same<ct,meta::empty_type>::value;
+      typedef typename tappend<ct, typename conditional<stop, meta::empty_type, typename flt<types,i+1,len>::type>::type>::type type;
+    };
+    template<class types, size_t len> struct flt<types,len,len> { typedef meta::empty_type type; };
+
+    template<class types, size_t len = ttl::meta::length<types>::value> struct filter 
+    {
+      typedef typename flt<types, 0, len>::type result;
+    };
+
+    template<class TL, size_t len = tlength<TL>::value> struct tl2tup;
+    template<class TL> struct tl2tup<TL,0> { typedef tuple<> type; };
+    template<class TL> struct tl2tup<TL,1> { typedef tuple<typename tget<0,TL>::type> type; };
+    template<class TL> struct tl2tup<TL,2> { typedef tuple<typename tget<0,TL>::type, typename tget<1,TL>::type> type; };
+    template<class TL> struct tl2tup<TL,3> { typedef tuple<typename tget<0,TL>::type, typename tget<1,TL>::type, typename tget<2,TL>::type> type; };
+    template<class TL> struct tl2tup<TL,4> { typedef tuple<typename tget<0,TL>::type, typename tget<1,TL>::type, typename tget<2,TL>::type, typename tget<3,TL>::type> type; };
+    template<class TL> struct tl2tup<TL,5> { typedef tuple<typename tget<0,TL>::type, typename tget<1,TL>::type, typename tget<2,TL>::type, typename tget<3,TL>::type, typename tget<4,TL>::type> type; };
+
+    template<
+      typename T1, typename T2, typename T3, typename T4, typename T5,
+      typename U1, typename U2, typename U3, typename U4, typename U5
+            >
+    struct tuple_glue<tuple<T1,T2,T3,T4,T5>, tuple<U1,U2,U3,U4,U5> >
+    {
+      typedef tuple<T1,T2,T3,T4,T5> tup1;
+      typedef tuple<U1,U2,U3,U4,U5> tup2;
+
+      typedef typename filter<typename tup1::types>::result filtered1;
+      typedef typename filter<typename tup2::types>::result filtered2;
+      typedef typename tappend<filtered1,filtered2>::type filtered;
+      typedef typename tl2tup<filtered>::type result;
+    };
+
+    template<class Tuple>
+    struct sget
+    {
+      template<size_t I>
+      struct rt
+      {
+        typedef typename ttl::meta::get<typename Tuple::types, I>::type found_type;
+        typedef typename mktraits<found_type>::type type;
+      };
+
+      template<size_t I, class T1, class T2>
+      static typename rt<I>::type v(const T1& t1, const T2& t2)
+      {
+        static const bool e1 = I >= T1::types::length;
+        static const size_t J = e1 ? (I - T1::types::length) : I;
+        static const bool e2 = J >= T2::types::length;
+        static const bool none = e1 && e2;
+
+        typedef meta::int2type<none ? 0 : !e1 ? 1 : 2> w; // 0 - out of range, 1 - t1, 2 - t2
+        return get<J, typename rt<I>::type> (t1,t2,w());
+      }
+
+    private:
+      typedef meta::int2type<0> ignore;
+      typedef meta::int2type<1> left;
+      typedef meta::int2type<2> right;
+
+      template<size_t I, class R, class T1, class T2>
+      static R get(const T1&, const T2&, ignore) { return meta::empty_type(); }
+
+      template<size_t I, class R, class T1, class T2>
+      static R get(const T1& t1, const T2&, left){ return field2<R,I>::get(t1); }
+
+      template<size_t I, class R, class T1, class T2>
+      static R get(const T1&, const T2& t2, right){return field2<R,I>::get(t2); }
+    };
+  }
+
+  template<class Tuple1, class Tuple2>
+  typename __::tuple_glue<Tuple1,Tuple2>::result tuple_cat(const Tuple1& t1, const Tuple2& t2)
+  {
+    using __::sget;
+    typedef typename __::tuple_glue<Tuple1,Tuple2>::result R;
+    return R(sget<R>::v<0>(t1,t2), sget<R>::v<1>(t1,t2));
+  }
+
 
   // tuple size
   // TUPLE_EXT:
@@ -670,14 +832,6 @@ namespace std
   // get(tuple<>)
   namespace __
   {
-    template<size_t I, class Tuple>
-    struct tuple_return
-    {
-      typedef typename ttl::meta::get<typename Tuple::types, I>::type found_type;
-      typedef typename traits<found_type>::return_type type;
-      typedef typename traits<typename add_const<found_type>::type>::return_type ctype;
-    };
-
     template<class T1, class T2>
     struct tuple_pair
     {
@@ -698,6 +852,13 @@ namespace std
         return p.second;
       }
     };
+    template<size_t I, class Tuple>
+    struct tuple_return
+    {
+      typedef typename ttl::meta::get<typename Tuple::types, I>::type found_type;
+      typedef typename traits<found_type>::return_type type;
+      typedef typename traits<typename add_const<found_type>::type>::return_type ctype;
+    };
   }
 
   // TUPLE_EXT:
@@ -705,56 +866,56 @@ namespace std
   inline typename __::tuple_return<I, tuple<T1> >::type get(tuple<T1>& t)
   {
     typedef typename __::tuple_return<I, tuple<T1> >::type RT;
-    return __::field<RT, I>::get(t);
+    return __::field2<RT, I>::get(t);
   }
 
   template<size_t I, typename T1>
   inline typename __::tuple_return<I, tuple<T1> >::ctype get(const tuple<T1>& t)
   {
     typedef typename __::tuple_return<I, tuple<T1> >::ctype RT;
-    return __::field<RT, I>::get(t);
+    return __::field2<RT, I>::get(t);
   }
 
   template<size_t I, typename T1, typename T2>
   inline typename __::tuple_return<I, tuple<T1,T2> >::type get(tuple<T1,T2>& t)
   {
     typedef typename __::tuple_return<I, tuple<T1,T2> >::type RT;
-    return __::field<RT, I>::get(t);
+    return __::field2<RT, I>::get(t);
   }
 
   template<size_t I, typename T1, typename T2>
   inline typename __::tuple_return<I, tuple<T1,T2> >::ctype get(const tuple<T1,T2>& t)
   {
     typedef typename __::tuple_return<I, tuple<T1,T2> >::ctype RT;
-    return __::field<RT, I>::get(t);
+    return __::field2<RT, I>::get(t);
   }
 
   template<size_t I, typename T1, typename T2, typename T3>
   inline typename __::tuple_return<I, tuple<T1,T2,T3> >::type get(tuple<T1,T2,T3>& t)
   {
     typedef typename __::tuple_return<I, tuple<T1,T2,T3> >::type RT;
-    return __::field<RT, I>::get(t);
+    return __::field2<RT, I>::get(t);
   }
 
   template<size_t I, typename T1, typename T2, typename T3>
   inline typename __::tuple_return<I, tuple<T1,T2,T3> >::ctype get(const tuple<T1,T2,T3>& t)
   {
     typedef typename __::tuple_return<I, tuple<T1,T2,T3> >::ctype RT;
-    return __::field<RT, I>::get(t);
+    return __::field2<RT, I>::get(t);
   }
 
   template<size_t I, typename T1, typename T2, typename T3, typename T4>
   inline typename __::tuple_return<I, tuple<T1,T2,T3,T4> >::ctype get(const tuple<T1,T2,T3,T4>& t)
   {
     typedef typename __::tuple_return<I, tuple<T1,T2,T3,T4> >::ctype RT;
-    return __::field<RT, I>::get(t);
+    return __::field2<RT, I>::get(t);
   }
 
   template<size_t I, typename T1, typename T2, typename T3, typename T4, typename T5>
   inline typename __::tuple_return<I, tuple<T1,T2,T3,T4,T5> >::ctype get(const tuple<T1,T2,T3,T4,T5>& t)
   {
     typedef typename __::tuple_return<I, tuple<T1,T2,T3,T4,T5> >::ctype RT;
-    return __::field<RT, I>::get(t);
+    return __::field2<RT, I>::get(t);
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -773,48 +934,18 @@ namespace std
   struct tuple_element<1, std::pair<T1, T2> > { typedef T2 type; };
 
   template<size_t I, class T1, class T2>
-  typename tuple_element<I, std::pair<T1, T2> >::type& get(std::pair<T1, T2>& p)
+  inline typename tuple_element<I, std::pair<T1, T2> >::type& get(std::pair<T1, T2>& p)
   {
     static_assert(I < 2, "I out of bounds");
     return __::tuple_pair<T1, T2>::get(p, ttl::meta::int2type<I>());
   }
 
   template<size_t I, class T1, class T2> 
-  const typename tuple_element<I, std::pair<T1, T2> >::type& get(const std::pair<T1, T2>& p)
+  inline const typename tuple_element<I, std::pair<T1, T2> >::type& get(const std::pair<T1, T2>& p)
   {
     static_assert(I < 2, "I out of bounds");
     return __::tuple_pair<T1, T2>::get(p, ttl::meta::int2type<I>());
   }
-
-
-  //////////////////////////////////////////////////////////////////////////
-  ///\name  Tuple interface to class template array [23.2.1.6]
-
-  template <class T, size_t N> 
-  struct tuple_size<array<T, N> >: integral_constant<size_t, N>
-  {};
-
-  template <size_t I, class T, size_t N>
-  struct tuple_element<I, array<T, N> >
-  {
-    static_assert(I < N, "I out of bounds");
-    typedef T type;
-  };
-
-  template <size_t I, class T, size_t N>
-  T& get(array<T, N>& a)
-  {
-    static_assert(I < N, "I out of bounds");
-    return a[I];
-  }
-
-  template <size_t I, class T, size_t N>
-  const T& get(const array<T, N>& a)
-  {
-    static_assert(I < N, "I out of bounds");
-    return a[I];
-  }
-
 
  /**@} lib_tuple */
  /**@} lib_utilities */

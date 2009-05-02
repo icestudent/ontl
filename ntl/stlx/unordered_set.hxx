@@ -16,7 +16,7 @@
 
 namespace std {
 
-/**\defgroup  lib_containers *********** 23 Containers library [containers] ************
+/**\defgroup  lib_containers *********** 23 Containers library [containers]
   *@{    Components to organize collections of information
   **/
 

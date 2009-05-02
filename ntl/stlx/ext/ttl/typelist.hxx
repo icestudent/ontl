@@ -13,7 +13,7 @@
 
 #include "../pp/config.hxx"
 #include "data_holder.hxx"
-#include "exception.hxx"
+//#include "exception.hxx"
 #include "../pp/macro_params.hxx"
 
 #include "../../type_traits.hxx"
@@ -29,14 +29,6 @@ namespace ttl
     struct int2type
     {
       enum { value = v };
-    };
-
-    struct exception:
-      ttl::exception
-    {
-      exception()
-        :ttl::exception("typelist error") 
-      {}
     };
 
     //internal implementation
@@ -95,7 +87,7 @@ namespace ttl
       TTL_REPEAT( TTL_MAX_TYPELIST_PARAMS, TTL_META_TYPELIST_GET, TTL_META_TYPELIST_GET, type )
 
 #undef TTL_META_TYPELIST_GET
-    };
+    }
 
     template < TTL_TPARAMS_DEF(TTL_MAX_TYPELIST_PARAMS, empty_type) >
     struct typelist
@@ -104,7 +96,7 @@ namespace ttl
 
         typedef impl::typelist_traits< TTL_ARGS(TTL_MAX_TYPELIST_PARAMS) > list_traits;
 
-      enum{ length = list_traits::length };
+      enum { length = list_traits::length };
       typedef typename list_traits::largest_type largest_type;
     };
 
@@ -123,46 +115,6 @@ namespace ttl
       typedef typename impl::get<L,N>::type type;
       enum{ index = N };
     };
-
-    //template< typename L, int N >
-    //struct get<L,N,false>
-    //{
-    //  static_assertindex is out of range
-    //};
-
-    ////////////////////////////////////////////////////////////
-    //	run-time type switch
-    template <typename L, int N = 0, bool Stop=(N==length<L>::value) >
-    struct type_switch;
-
-    template <typename L, int N, bool Stop> 
-    struct type_switch
-    {
-      template< typename F >
-      void operator()( size_t i, F& f )
-      {
-        if( i == N ) 
-        {
-          f.operator()<typename impl::get<L,N>::type>();
-        }
-        else
-        {
-          type_switch<L, N+1> next;
-          next(i, f);
-        }
-      }
-    };
-
-    template <typename L, int N> 
-    struct type_switch<L, N, true>
-    {
-      template< typename F >
-      void operator()( size_t i, F& f )
-      {
-        throw meta::exception();
-      }
-    };
-
 
     //////////////////////////////////////////////////////////////
     template<typename T, typename U>
@@ -235,7 +187,7 @@ namespace ttl
       enum { index = -1 };
     };
 
-  };
-};
+  }
+}
 
 #endif //__typelist__hpp

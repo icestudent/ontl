@@ -13,6 +13,7 @@
 #include "cuchar.hxx"
 #include "iterator.hxx" // for iterator_traits which used by fnv hash
 #include "typeinfo.hxx" // for hash<type_index>
+#include "fn_caller.hxx"
 
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -21,15 +22,12 @@
 
 namespace std 
 {
-
 /**\addtogroup  lib_utilities ********** 20 General utilities library [utilities]
  *@{*/
 
-/**\defgroup  lib_function_objects ***** 20.6 Function objects [function.objects]
- *
- *    Function objects are objects with an operator() defined
- *@{
- */
+/**\addtogroup  lib_function_objects *** 20.6 Function objects [function.objects]
+ *  Function objects are objects with an \c operator() defined
+ *@{*/
 
 /**\defgroup  lib_func_def ************* 20.6.01 Definitions [func.def]
  *
@@ -81,11 +79,9 @@ namespace std
  **/
 
 #pragma region lib_base
-/**\defgroup  lib_base ***************** 20.6.03 Base [base] **********************
- *
- *    provided to simplify the typedefs of the argument and result types
- *@{
- */
+/**\defgroup  lib_base ***************** 20.6.03 Base [base]
+ *  provided to simplify the typedefs of the argument and result types
+ *@{*/
 
 template <class Arg, class Result>
 struct unary_function
@@ -102,17 +98,13 @@ struct binary_function
   typedef Result  result_type;
 };
 
-/**@} lib_base
- */
+/**@} lib_base */
 #pragma endregion
 
 #pragma region lib_refwrap
-/**\defgroup  lib_refwrap ************** 20.6.05 Class template reference_wrapper [refwrap] *******
- *
- *    reference_wrapper<T> is a CopyConstructible and Assignable wrapper
- *    around a reference to an object of type T.
- *@{
- */
+/**\defgroup  lib_refwrap ************** 20.6.05 Class template reference_wrapper [refwrap]
+ *    reference_wrapper<T> is a CopyConstructible and Assignable wrapper around a reference to an object of type T.
+ *@{*/
 
 namespace __
 {
@@ -308,6 +300,19 @@ class reference_wrapper:
       return get()(t1);
     }
 #else
+#if 1
+    typename result_of<T()>::type operator()() const { return func::invoke<typename result_of<T()>::type>(get(), make_tuple()); }
+    template<class A1>
+    typename result_of<T(A1)>::type operator()(A1& a1) const { return func::invoke<typename result_of<T(A1)>::type>(get(), make_tuple(a1)); }
+    template<class A1, class A2>
+    typename result_of<T(A1,A2)>::type operator()(A1& a1, A2& a2) const { return func::invoke<typename result_of<T(A1,A2)>::type>(get(), make_tuple(a1, a2)); }
+    template<class A1, class A2, class A3>
+    typename result_of<T(A1,A2,A3)>::type operator()(A1& a1, A2& a2, A3& a3) const { return func::invoke<typename result_of<T(A1,A2,A3)>::type>(get(), make_tuple(a1, a2, a3)); }
+    template<class A1, class A2, class A3, class A4>
+    typename result_of<T(A1,A2,A3,A4)>::type operator()(A1& a1, A2& a2, A3& a3, A4& a4) const { return func::invoke<typename result_of<T(A1,A2,A3,A4)>::type>(get(), make_tuple(a1, a2, a3, a4)); }
+    template<class A1, class A2, class A3, class A4, class A5>
+    typename result_of<T(A1,A2,A3,A4,A5)>::type operator()(A1& a1, A2& a2, A3& a3, A4& a4, A5& a5) const { return func::invoke<typename result_of<T(A1,A2,A3,A4,A5)>::type>(get(), make_tuple(a1, a2, a3, a4, a5)); }
+#else
     typename result_of<T()>::type operator()() const { return get()(); }
     template<class A1>
     typename result_of<T(A1)>::type operator()(A1& a1) const { return get()(a1); }
@@ -319,6 +324,7 @@ class reference_wrapper:
     typename result_of<T(A1,A2,A3,A4)>::type operator()(A1& a1, A2& a2, A3& a3, A4& a4) const { return get()(a1, a2, a3, a4); }
     template<class A1, class A2, class A3, class A4, class A5>
     typename result_of<T(A1,A2,A3,A4,A5)>::type operator()(A1& a1, A2& a2, A3& a3, A4& a4, A5& a5) const { return get()(a1, a2, a3, a4, a5); }
+#endif
 #endif
 
   ///////////////////////////////////////////////////////////////////////////
@@ -367,17 +373,14 @@ inline reference_wrapper<const T> cref(reference_wrapper<T> x) __ntl_nothrow
   return reference_wrapper<const T>(x.get());
 }
 
-/**@} lib_refwrap
- */
+/**@} lib_refwrap */
 #pragma endregion
 
 #pragma region lib_arithmetic_operations
 
-/**\defgroup  lib_arithmetic_operations *** 20.6.06 Arithmetic operations [arithmetic.operations] ****
- *
+/**\defgroup  lib_arithmetic_operations *** 20.6.06 Arithmetic operations [arithmetic.operations]
  *    functors for all of the arithmetic operators
- *@{
- */
+ *@{*/
 
 template <class T>
 struct plus : binary_function<T, T, T>
@@ -415,16 +418,13 @@ struct negate : unary_function<T, T>
   T operator()(const T& x) const { return - x; }
 };
 
-/**@} lib_arithmetic_operations
- */
+/**@} lib_arithmetic_operations */
 #pragma endregion
 
 #pragma region lib_comparsions
-/**\defgroup  lib_comparisons ********** 20.6.07 Comparisons [comparisons] ***************
- *
+/**\defgroup  lib_comparisons ********** 20.6.07 Comparisons [comparisons]
  *   functors for all of the comparison operators
- *@{
- */
+ *@{*/
 
 template <class T>
 struct equal_to : binary_function<T, T, bool>
@@ -462,16 +462,14 @@ struct less_equal : binary_function<T, T, bool>
   bool operator()(const T& x, const T& y) const { return x <= y; }
 };
 
-/**@} lib_comparisons
- */
+/**@} lib_comparisons */
 #pragma endregion
 
 #pragma region lib_logical_operations
-/**\defgroup  lib_logical_operations *** 20.6.08 Logical operations [logical.operations] ********
+/**\defgroup  lib_logical_operations *** 20.6.08 Logical operations [logical.operations]
  *
  *   functors for all of the logical operators
- *@{
- */
+ *@{*/
 
 template <class T>
 struct logical_and : binary_function<T, T, bool>
@@ -491,16 +489,14 @@ struct logical_not : unary_function<T, bool>
   bool operator()(const T& x) const { return ! x; }
 };
 
-/**@} lib_logical_operations
- */
+/**@} lib_logical_operations */
 #pragma endregion
 
 #pragma region lib_bitwise_operations
-/**\defgroup  lib_bitwise_operations *** 20.6.09 Bitwise operations [bitwise.operations] *********
+/**\defgroup  lib_bitwise_operations *** 20.6.09 Bitwise operations [bitwise.operations]
  *
  *   functors for all of the bitwise operators in the language
- *@{
- **/
+ *@{**/
 
 template <class T> struct bit_and : binary_function<T,T,T>
 {
@@ -525,16 +521,14 @@ template <class T> struct bit_xor : binary_function<T,T,T>
     return x ^ y;
   }
 };
-/**@} lib_bitwise_operations
- */
+/**@} lib_bitwise_operations */
 #pragma endregion
 
 #pragma region lib_negators
-/**\defgroup  lib_negators ************* 20.6.10 Negators [negators] ******************
+/**\defgroup  lib_negators ************* 20.6.10 Negators [negators]
  *
  *   negators take a predicate and return its complement
- *@{
- */
+ *@{*/
 
 template <class Predicate>
 class unary_negate
@@ -583,46 +577,15 @@ binary_negate<Predicate> not2(const Predicate& pred)
   return binary_negate<Predicate>(pred);
 }
 
-/**@} lib_negators
- */
-#pragma endregion
-
-#pragma region lib_bind
-/**\defgroup  lib_bind ***************** 20.6.11 Function template bind [bind] *****************
- *
- *   The template function bind returns an object that binds a function object passed as an argument to additional arguments.
- *@{
- */
-#ifdef NTL__CXX_VT
-
-template<class T> struct is_bind_expression;
-template<class T> struct is_placeholder;
-
-template<class Fn, class... Types>
-unspecified bind(Fn, Types...);
-template<class R, class Fn, class... Types>
-unspecified bind(Fn, Types...);
-
-namespace placeholders {
-  // M is the implementation-defined number of placeholders
-  extern unspecified _1;
-  extern unspecified _2;
-  extern unspecified _M;
-}
-
-#endif // NTL__CXX_VT
-
-/**@} lib_bind
-  **/
+/**@} lib_negators */
 #pragma endregion
 
 #pragma region lib_binders
 /**\ingroup std_depr
  *@{*/
 
-/**\defgroup  lib_binders ************** D.8 Binders [depr.lib.binders] ******************
- *@{
- */
+/**\defgroup  lib_binders ************** D.8 Binders [depr.lib.binders]
+ *@{*/
 
 /// D8.1 Class template binder1st [depr.lib.binder.1st]
 template <class Operation>
@@ -694,15 +657,14 @@ binder2nd<Operation>
   return binder2nd<Operation>(op, typename Operation::second_argument_type(x));
 }
 
-/**@} lib_binders
- */
+/**@} lib_binders */
 /**@} std_depr */
 #pragma endregion
 
 #pragma region lib_adaptors
 /**\defgroup  lib_function_pointer_adaptors 20.6.12 Adaptors for pointers to functions [function.pointer.adaptors]
- *@{
- */
+ *  Allow pointers to (unary and binary) functions to work with function adaptors
+ *@{*/
 
 template <class Arg, class Result>
 class pointer_to_unary_function : public unary_function<Arg, Result>
@@ -737,14 +699,13 @@ pointer_to_binary_function<Arg1, Arg2, Result>
   return pointer_to_binary_function<Arg1,Arg2,Result>(f);
 }
 
-/**@} lib_function_pointer_adaptors
- */
+/**@} lib_function_pointer_adaptors */
 #pragma endregion
 
 #pragma region lib_member_pointer_adaptors
 /**\defgroup  lib_member_pointer_adaptors 20.6.13 Adaptors for pointers to members [member.pointer.adaptors]
- *@{
- */
+ *  The purpose of the following is to provide the same facilities for pointer to members as those provided for pointers to functions in 20.6.12.
+ *@{*/
 
 template <class Result, class T>
 class mem_fun_t : public unary_function<T*, Result>
@@ -881,20 +842,15 @@ const_mem_fun1_ref_t<Result, T, A>
   return const_mem_fun1_ref_t<Result, T, A>(f);
 }
 
-/**@} lib_member_pointer_adaptors
- */
+/**@} lib_member_pointer_adaptors */
 #pragma endregion
 
 
 #pragma region unord.hash
-// 20.6.16 Class template hash [unord.hash]
-/**\defgroup  lib_hash 20.6.16 Class template hash [unord.hash]
+/**\addtogroup  lib_hash 20.6.16 Class template hash [unord.hash]
  *
- * The unordered associative containers defied in clause 23.4 use specializations of hash as the default
- * hash function.
- *
- *@{
- */
+ * The unordered associative containers defied in clause 23.4 use specializations of hash as the default %hash function.
+ *@{*/
 // 20.6.16, hash function base template:
 template <class T> struct hash;
 
@@ -1072,8 +1028,7 @@ namespace __
 
 // TODO: floating point hash function implementation
 
-/**@} lib_hash
- */
+/**@} lib_hash */
 #pragma endregion
 
 #pragma region func.reference_closure
@@ -1121,9 +1076,7 @@ bool operator!=(nullptr_t, const reference_closure<R (ArgTypes...)>&);
 #pragma endregion
 
 /**@} lib_function_objects */
-
 /**@} lib_utilities */
-
 }//namespace std
 
 #ifdef _MSC_VER

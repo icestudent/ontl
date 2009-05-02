@@ -393,14 +393,13 @@ namespace ntl {
 
       }; // struct nt_headers
 
-      image::data_directory * get_data_directory(data_directory::entry entry)
+      data_directory * get_data_directory(data_directory::entry entry)
       {
         nt_headers * const nth = get_nt_headers();
         return nth->is_valid() ? nth->data_directory(entry) : 0;
       }
 
-      const image::data_directory *
-        get_data_directory(data_directory::entry entry) const
+      const data_directory * get_data_directory(data_directory::entry entry) const
       {
         const nt_headers * const nth = get_nt_headers();
         return nth->is_valid() ? nth->data_directory(entry) : 0;

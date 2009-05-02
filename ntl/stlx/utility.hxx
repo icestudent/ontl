@@ -9,7 +9,6 @@
 #define NTL__STLX_UTILITY
 
 #include "type_traits.hxx"
-#include "functional.hxx"
 
 /// Standard Template Library
 namespace std 
@@ -23,10 +22,8 @@ namespace std
  **/
 
 /**\defgroup  lib_utilities *** 20 General utilities library [utilities]
- *
- *    Components used by other elements of the Standard C + + library.
  *@{
- */
+ **/
 
 /**\defgroup  lib_utility ***** 20.2 Utility components [utility]
  *
@@ -281,6 +278,9 @@ template<class T1, class T2> inline void swap(pair<T1, T2>& x, pair<T1, T2>&& y)
 ///@}
 
 #ifdef NTL__CXX_RV
+template<typename T>
+class reference_wrapper;
+
 namespace __
 {
   template<class T>
@@ -303,17 +303,14 @@ namespace __
 }
 
 template<class T1, class T2>
-inline
-typename __::pair_result<T1, T2>::type
-make_pair(T1&& x, T2&& y)
+inline typename __::pair_result<T1, T2>::type make_pair(T1&& x, T2&& y)
 {
-  return __::pair_result<T1, T2>::type( forward<T1>(x), forward<T2>(y) );
+  return __::pair_result<T1, T2>::type(forward<T1>(x), forward<T2>(y));
 }
+
 #else
 template<class T1, class T2>
-inline
-pair<T1, T2>
-  make_pair(T1 x, T2 y)
+inline pair<T1, T2> make_pair(T1 x, T2 y)
 {
   return pair<T1, T2>( x, y );
 }
