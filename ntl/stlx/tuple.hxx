@@ -712,9 +712,6 @@ namespace std
     // list
     template<class H = meta::empty_type, class T = meta::empty_type> struct tlist { typedef H head; typedef T tail; };
     
-    // append
-    //template<template<class H, class T> tlist, class A> struct tappend;
-
     // A + B = tlist<A,B>
     template<class A, class B> struct tappend/*<A,B>*/ { typedef tlist<A,B> type; };
 
@@ -739,11 +736,13 @@ namespace std
     struct tappend<tlist<H,T>, meta::empty_type> { typedef tlist<H,T> type; };
 
     // length
-    template<class TL> struct tlength { enum { value = 1 + tlength<typename TL::tail>::value }; };
+    template<class TL> struct tlength;
+    template<class H, class T> struct tlength<tlist<H,T> > { enum { value = 1 + tlength<T>::value }; };
     template<> struct tlength<meta::empty_type> { enum { value = 0 }; };
 
-    template<size_t I, class TL> struct tget { typedef typename tget<I-1,typename TL::tail>::type type; };
-    template<class TL> struct tget<0,TL> { typedef typename TL::head type; };
+    template<size_t I, class TL> struct tget;
+    template<size_t I, class H, class T> struct tget<I, tlist<H,T> > { typedef typename tget<I-1,T>::type type; };
+    template<class H, class T> struct tget<0,tlist<H,T> > { typedef H type; };
 
 
     // filter
@@ -783,8 +782,6 @@ namespace std
       typedef typename filter<typename tup2::types>::result filtered2;
       typedef typename tappend<filtered1,filtered2>::type filtered;
       typedef typename tl2tup<filtered>::type result;
-      //typedef void result;
-      //SHOWT(filtered);
     };
 
     template<class Tuple>
