@@ -709,20 +709,36 @@ namespace std
   {
     template<class Tuple1, class Tuple2> struct tuple_glue;
 
+    // list
     template<class H = meta::empty_type, class T = meta::empty_type> struct tlist { typedef H head; typedef T tail; };
     
-    template<class TL, class A>
-    struct tappend { typedef tlist<TL,A> type; };
+    // append
+    //template<template<class H, class T> tlist, class A> struct tappend;
 
+    // A + B = tlist<A,B>
+    template<class A, class B> struct tappend/*<A,B>*/ { typedef tlist<A,B> type; };
+
+    // tlist<> + tlist<1,2> = tlist<1,2>
+    template<class H,class T> struct tappend<tlist<>, tlist<H,T> > { typedef tlist<H,T> type; };
+    
+
+    // tlist<1,2> + A
+    template<class H, class T, class A>
+    struct tappend<tlist<H,T>,A> { typedef tlist<tlist<H,T>,A> type; };
+
+    // tlist<> + A
     template<class A>
     struct tappend<tlist<meta::empty_type,meta::empty_type>, A> { typedef tlist<A> type; };
 
+    // tlist<1> + A
     template<class H, class A>
     struct tappend<tlist<H,meta::empty_type>, A> { typedef tlist<H, A> type; };
 
+    // tlist<1,2> + null
     template<class H, class T>
     struct tappend<tlist<H,T>, meta::empty_type> { typedef tlist<H,T> type; };
 
+    // length
     template<class TL> struct tlength { enum { value = 1 + tlength<typename TL::tail>::value }; };
     template<> struct tlength<meta::empty_type> { enum { value = 0 }; };
 
@@ -730,6 +746,7 @@ namespace std
     template<class TL> struct tget<0,TL> { typedef typename TL::head type; };
 
 
+    // filter
     template<class types, size_t i, size_t len> struct flt 
     {
       typedef typename ttl::meta::get<types, i>::type ct;
@@ -738,10 +755,12 @@ namespace std
     };
     template<class types, size_t len> struct flt<types,len,len> { typedef meta::empty_type type; };
 
+    // filtering
     template<class types, size_t len = ttl::meta::length<types>::value> struct filter 
     {
       typedef typename flt<types, 0, len>::type result;
     };
+    template<class types> struct filter<types,0> { typedef tlist<> result; };
 
     template<class TL, size_t len = tlength<TL>::value> struct tl2tup;
     template<class TL> struct tl2tup<TL,0> { typedef tuple<> type; };
@@ -764,6 +783,8 @@ namespace std
       typedef typename filter<typename tup2::types>::result filtered2;
       typedef typename tappend<filtered1,filtered2>::type filtered;
       typedef typename tl2tup<filtered>::type result;
+      //typedef void result;
+      //SHOWT(filtered);
     };
 
     template<class Tuple>
