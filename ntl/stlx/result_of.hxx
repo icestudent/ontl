@@ -35,6 +35,7 @@
 
 #include "type_traits.hxx"
 #include "spp/args.hxx"
+#include "tuple.hxx"
 
 namespace std
 {
@@ -191,6 +192,8 @@ namespace std
     {};
 
 
+    // NOTE: weak_type used to eliminate the incorrect instantiations, such as result_of_function_type<F>::type where F is not function ((is_func && is_memfunc) == false)
+    typedef type2type<void> weak_void;
     /**
      *  @brief result_of implementation
      *
@@ -207,28 +210,20 @@ namespace std
      *     -# Otherwise, the nested type \c type is a synonym for <tt>typename F::result<F(T1, T2, ..., TN)>::type</tt>.[12]
      *   <sub>[12] That is, if \c F defines a nested template named \c result, \c result_of uses that template; if \c F doesn't define that template, it's an error.</sub>
      *  -# Otherwise, the program is ill-formed.
-     *
-     *  @note Note that the FunctionCallType is always in form F(Args...)!
      **/
-    template <class FunctionCallType>
+    template <class F, size_t N = 0, class T1 = void>
     struct result_of_impl
     {
-      typedef typename result_of_function_type<FunctionCallType>::type F;
-      static const size_t N = result_of_function_type<FunctionCallType>::arity;
-
       static const bool is_func = is_function<typename remove_cv<F>::type>::value 
         || is_function<typename remove_pointer<typename remove_cv<F>::type>::type>::value
         || is_function<typename remove_reference<typename remove_cv<F>::type>::type>::value;
 
       static const bool is_memfunc = is_member_function_pointer<F>::value; // NOTE: is it can be ref or ptr qualified? Seems no.
 
-      // extension for "STL extensions" book, if provided one argument only (object)
-      static const bool is_memptr = is_member_object_pointer<F>::value;
+      static const bool is_memptr = is_member_object_pointer<F>::value && !is_member_function_pointer<F>::value;
 
       static const bool has_result_type = has_nested_result_type<F>::value;
 
-      // NOTE: weak_type used to eliminate the incorrect instantiations, such as result_of_function_type<F>::type where F is not function ((is_func && is_memfunc) == false)
-      struct weak_void { typedef void type; };
 
       // TODO: weak the "typename F::template result<FunctionCallType>" type (e.g. put it into separate template with conditional instantiation)
 #if 0
@@ -248,7 +243,7 @@ namespace std
         conditional<is_func || is_memfunc,
           result_of_function_type<typename remove_cv<F>::type>,
           typename conditional<is_memptr && N == 1,
-          result_of_memptr<typename extract_first_arg<FunctionCallType>,F>,
+          result_of_memptr<type2type<T1>,F>,
             typename conditional<has_result_type,
               result_of_with_nested_result_type<F>,
               weak_void
@@ -258,6 +253,30 @@ namespace std
 
       typedef typename weak_type::type type;
 #endif
+    };
+
+    template <class FunctionCallType>
+    class result_of
+    {
+      typedef __::result_of_function_type<FunctionCallType> F;
+      typedef typename conditional<F::arity == 1, __::extract_first_arg<FunctionCallType>, __::weak_void>::type weak_T1;
+      typedef __::result_of_impl<typename F::type, F::arity, typename weak_T1::type> result;
+    public:
+      static const size_t arity = F::arity;
+      typedef typename result::type type;
+    };
+
+    template<class F, class Args>
+    struct result_of_va
+    {
+      template<class Args, size_t Length> struct result;
+      template<class Args> struct result<Args,0> { typedef result_of<F()> type; };
+      template<class Args> struct result<Args,1> { typedef result_of<F(typename tuple_element<0,Args>::type)> type; };
+      template<class Args> struct result<Args,2> { typedef result_of<F(typename tuple_element<0,Args>::type, typename tuple_element<1,Args>::type)> type; };
+      template<class Args> struct result<Args,3> { typedef result_of<F(typename tuple_element<0,Args>::type, typename tuple_element<1,Args>::type, typename tuple_element<2,Args>::type)> type; };
+      typedef typename result<Args, Args::types::length>::type weak_type;
+      typedef typename weak_type::type type;
+      static const size_t arity = weak_type::arity;
     };
 
   } // namespace __
@@ -287,8 +306,8 @@ namespace std
    *  @todo weak the <tt>typename F::template result<FunctionCallType></tt> type
    **/
   template <class FunctionCallType>
-  class result_of:
-    public __::result_of_impl<FunctionCallType>
+  class result_of: 
+    public __::result_of<FunctionCallType>
   {};
 
 /**@} lib_func_ret         */

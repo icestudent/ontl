@@ -306,7 +306,7 @@
 					Name=".ext"
 					>
 					<File
-						RelativePath=".\stlx\fib.hxx"
+						RelativePath=".\stlx\ext\fib.hxx"
 						>
 					</File>
 					<File
@@ -315,6 +315,10 @@
 					</File>
 					<File
 						RelativePath=".\stlx\ext\rbtree.hxx"
+						>
+					</File>
+					<File
+						RelativePath=".\stlx\ext\typelist.hxx"
 						>
 					</File>
 					<Filter

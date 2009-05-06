@@ -12,6 +12,9 @@
 //#include "array.hxx" // for tuple array access
 #include "ext/ttl/typelist.hxx"
 #include "utility.hxx" // for tuple pair access
+#include "ext/typelist.hxx"
+
+static_assert((std::is_same<ttl::meta::empty_type, ntl::meta::empty_type>::value), "brb");
 
 namespace std
 {
@@ -707,67 +710,34 @@ namespace std
   // tuple_cat
   namespace __
   {
+    namespace nmeta = ntl::meta;
     template<class Tuple1, class Tuple2> struct tuple_glue;
 
-    // list
-    template<class H = meta::empty_type, class T = meta::empty_type> struct tlist { typedef H head; typedef T tail; };
-    
-    // A + B = tlist<A,B>
-    template<class A, class B> struct tappend/*<A,B>*/ { typedef tlist<A,B> type; };
-
-    // tlist<> + tlist<1,2> = tlist<1,2>
-    template<class H,class T> struct tappend<tlist<>, tlist<H,T> > { typedef tlist<H,T> type; };
-    
-
-    // tlist<1,2> + A
-    template<class H, class T, class A>
-    struct tappend<tlist<H,T>,A> { typedef tlist<tlist<H,T>,A> type; };
-
-    // tlist<> + A
-    template<class A>
-    struct tappend<tlist<meta::empty_type,meta::empty_type>, A> { typedef tlist<A> type; };
-
-    // tlist<1> + A
-    template<class H, class A>
-    struct tappend<tlist<H,meta::empty_type>, A> { typedef tlist<H, A> type; };
-
-    // tlist<1,2> + null
-    template<class H, class T>
-    struct tappend<tlist<H,T>, meta::empty_type> { typedef tlist<H,T> type; };
-
-    // length
-    template<class TL> struct tlength;
-    template<class H, class T> struct tlength<tlist<H,T> > { enum { value = 1 + tlength<T>::value }; };
-    template<> struct tlength<meta::empty_type> { enum { value = 0 }; };
-
-    template<size_t I, class TL> struct tget;
-    template<size_t I, class H, class T> struct tget<I, tlist<H,T> > { typedef typename tget<I-1,T>::type type; };
-    template<class H, class T> struct tget<0,tlist<H,T> > { typedef H type; };
-
-
-    // filter
-    template<class types, size_t i, size_t len> struct flt 
+    template<template<size_t,typename> class handler, class types, size_t len = types::length, size_t i = 0> struct tup2tl_do
     {
       typedef typename ttl::meta::get<types, i>::type ct;
-      static const bool stop = is_same<ct,meta::empty_type>::value;
-      typedef typename tappend<ct, typename conditional<stop, meta::empty_type, typename flt<types,i+1,len>::type>::type>::type type;
-    };
-    template<class types, size_t len> struct flt<types,len,len> { typedef meta::empty_type type; };
+      static const bool stop = is_same<ct,meta::empty_type>::value || handler<i,ct>::stop;
 
-    // filtering
-    template<class types, size_t len = ttl::meta::length<types>::value> struct filter 
+      typedef typename conditional<stop, meta::empty_type, typename tup2tl_do<handler,types,len,i+1>::type>::type next;
+      typedef typename conditional<stop, meta::empty_type, nmeta::tlist<typename handler<i,ct>::type, next> >::type type;
+    };
+    template<template<size_t,typename> class handler, class types, size_t len> struct tup2tl_do<handler,types,len,len> { typedef meta::empty_type type; };
+
+    template<template<size_t,typename> class handler, class types, size_t len = types::length> 
+    struct tup2tl
     {
-      typedef typename flt<types, 0, len>::type result;
+      typedef typename tup2tl_do<handler,types,len>::type result;
     };
-    template<class types> struct filter<types,0> { typedef tlist<> result; };
+    template<template<size_t,typename> class handler, class types> struct tup2tl<handler,types,0> { typedef nmeta::tlist<> result; };
 
-    template<class TL, size_t len = tlength<TL>::value> struct tl2tup;
+    // tlist 2 tuple
+    template<class TL, size_t len = nmeta::tl::length<TL>::value> struct tl2tup;
     template<class TL> struct tl2tup<TL,0> { typedef tuple<> type; };
-    template<class TL> struct tl2tup<TL,1> { typedef tuple<typename tget<0,TL>::type> type; };
-    template<class TL> struct tl2tup<TL,2> { typedef tuple<typename tget<0,TL>::type, typename tget<1,TL>::type> type; };
-    template<class TL> struct tl2tup<TL,3> { typedef tuple<typename tget<0,TL>::type, typename tget<1,TL>::type, typename tget<2,TL>::type> type; };
-    template<class TL> struct tl2tup<TL,4> { typedef tuple<typename tget<0,TL>::type, typename tget<1,TL>::type, typename tget<2,TL>::type, typename tget<3,TL>::type> type; };
-    template<class TL> struct tl2tup<TL,5> { typedef tuple<typename tget<0,TL>::type, typename tget<1,TL>::type, typename tget<2,TL>::type, typename tget<3,TL>::type, typename tget<4,TL>::type> type; };
+    template<class TL> struct tl2tup<TL,1> { typedef tuple<typename nmeta::tl::get<0,TL>::type> type; };
+    template<class TL> struct tl2tup<TL,2> { typedef tuple<typename nmeta::tl::get<0,TL>::type, typename nmeta::tl::get<1,TL>::type> type; };
+    template<class TL> struct tl2tup<TL,3> { typedef tuple<typename nmeta::tl::get<0,TL>::type, typename nmeta::tl::get<1,TL>::type, typename nmeta::tl::get<2,TL>::type> type; };
+    template<class TL> struct tl2tup<TL,4> { typedef tuple<typename nmeta::tl::get<0,TL>::type, typename nmeta::tl::get<1,TL>::type, typename nmeta::tl::get<2,TL>::type, typename nmeta::tl::get<3,TL>::type> type; };
+    template<class TL> struct tl2tup<TL,5> { typedef tuple<typename nmeta::tl::get<0,TL>::type, typename nmeta::tl::get<1,TL>::type, typename nmeta::tl::get<2,TL>::type, typename nmeta::tl::get<3,TL>::type, typename nmeta::tl::get<4,TL>::type> type; };
 
     template<
       typename T1, typename T2, typename T3, typename T4, typename T5,
@@ -778,20 +748,23 @@ namespace std
       typedef tuple<T1,T2,T3,T4,T5> tup1;
       typedef tuple<U1,U2,U3,U4,U5> tup2;
 
-      typedef typename filter<typename tup1::types>::result filtered1;
-      typedef typename filter<typename tup2::types>::result filtered2;
-      typedef typename tappend<filtered1,filtered2>::type filtered;
+      typedef typename tup2tl<nmeta::tl::skip_handler, typename tup1::types>::result filtered1;
+      typedef typename tup2tl<nmeta::tl::skip_handler, typename tup2::types>::result filtered2;
+      typedef typename nmeta::tl::append<filtered1,filtered2>::type filtered;
       typedef typename tl2tup<filtered>::type result;
+      //SHOWT(result);
     };
 
+    struct weak_empty { typedef meta::empty_type type; };
     template<class Tuple>
     struct sget
     {
+      template<size_t I, bool = (I < Tuple::types::length)> struct rt2 { typedef typename mktraits<typename ttl::meta::get<typename Tuple::types, I>::type>::type type; };
+      template<size_t I> struct rt2<I,false> { typedef meta::empty_type type; };
       template<size_t I>
       struct rt
       {
-        typedef typename ttl::meta::get<typename Tuple::types, I>::type found_type;
-        typedef typename mktraits<found_type>::type type;
+        typedef typename rt2<I>::type type;
       };
 
       template<size_t I, class T1, class T2>
@@ -827,7 +800,7 @@ namespace std
   {
     using __::sget;
     typedef typename __::tuple_glue<Tuple1,Tuple2>::result R;
-    return R(sget<R>::v<0>(t1,t2), sget<R>::v<1>(t1,t2));
+    return R(sget<R>::v<0>(t1,t2), sget<R>::v<1>(t1,t2), sget<R>::v<2>(t1,t2), sget<R>::v<3>(t1,t2), sget<R>::v<4>(t1,t2));
   }
 
 
