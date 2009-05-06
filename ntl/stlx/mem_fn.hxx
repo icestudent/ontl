@@ -209,6 +209,19 @@ namespace std
       static_assert(tuple_size<Args>::value == 1, "wrong count of arguments");
       return func::invoke<result_type>(pmf, tuple<const U&, typename __::arg_t<0, Args>::type>(obj, a1));
     }
+
+    template<typename U>
+    result_type operator()(U& obj, typename __::arg_t<0, Args>::type a1, typename __::arg_t<1, Args>::type a2) const
+    {
+      static_assert(tuple_size<Args>::value == 2, "wrong count of arguments");
+      return func::invoke<result_type>(pmf, tuple<U&, typename __::arg_t<0, Args>::type, typename __::arg_t<1, Args>::type>(obj, a1, a2));
+    }
+    template<typename U>
+    result_type operator()(const U& obj, typename __::arg_t<0, Args>::type a1, typename __::arg_t<1, Args>::type a2) const
+    {
+      static_assert(tuple_size<Args>::value == 2, "wrong count of arguments");
+      return func::invoke<result_type>(pmf, tuple<const U&, typename __::arg_t<0, Args>::type, typename __::arg_t<1, Args>::type>(obj, a1, a2));
+    }
 #endif
   };
 

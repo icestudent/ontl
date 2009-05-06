@@ -25,8 +25,7 @@ namespace std
 
 /**\defgroup  lib_tuple ******* 20.4 Tuples [tuple]
  *
- *   Tuple library that provides a tuple type as the class template tuple that can
- *   be instantiated with any number of arguments.
+ *   Tuple library that provides a tuple type as the class template tuple that can be instantiated with any number of arguments.
  *@{
  */
 
@@ -378,10 +377,25 @@ namespace std
     template<typename R, size_t N>
     struct field2
     {
+      // strict get
       template<class T>
       static __forceinline R get(const T& t) { return getter<T>::get(t, int2type<N>()); }
       template<class T>
       static __forceinline R get(T& t) { return getter<T>::get(t, int2type<N>()); }
+
+      // non-strict get
+      template<class T>
+      static __forceinline R sget(const T& t) { return sget(t, integral_constant<bool, (N < T::types::length)>()); }
+      template<class T>
+      static __forceinline R sget(const T& t, true_type) { return getter<T>::get(t, int2type<N>()); }
+      template<class T>
+      static __forceinline R sget(const T&, false_type) { static const meta::empty_type et; return et; }
+      template<class T>
+      static __forceinline R sget(T& t) { return sget(t, integral_constant<bool, (N < T::types::length)>()); }
+      template<class T>
+      static __forceinline R sget(T& t, true_type) { return getter<T>::get(t, int2type<N>()); }
+      template<class T>
+      static __forceinline R sget(T&, false_type) { static const meta::empty_type et; return et; }
     private:
       template<class T>
       struct getter
@@ -575,7 +589,7 @@ namespace std
 #endif
   }; // class tuple
 
-  // make tuple
+  ///\name 20.4.1.3, tuple creation functions:
   template <class T> class reference_wrapper;
 
   namespace __
@@ -804,6 +818,7 @@ namespace std
   }
 
 
+  ///\name 20.4.1.4, tuple helper classes:
   // tuple size
   // TUPLE_EXT:
   template<typename T1, typename T2, typename T3, typename T4, typename T5>
@@ -820,6 +835,7 @@ namespace std
     typedef typename ttl::meta::get<typename tuple_t::types, I>::type type;
   };
 
+  ///\name 20.4.1.5, element access:
   // get(tuple<>)
   namespace __
   {
@@ -849,6 +865,27 @@ namespace std
       typedef typename ttl::meta::get<typename Tuple::types, I>::type found_type;
       typedef typename traits<found_type>::return_type type;
       typedef typename traits<typename add_const<found_type>::type>::return_type ctype;
+    };
+
+    template<size_t I, class Tuple>
+    struct tuple_sreturn
+    {
+    private:
+      struct empty { typedef meta::empty_type& type; typedef const meta::empty_type& ctype; };
+      static const bool ok = (I < Tuple::types::length);
+      typedef typename conditional<ok, tuple_return<I,Tuple>, empty>::type rt;
+    public:
+      typedef typename rt::type  type;
+      typedef typename rt::ctype ctype;
+    };
+
+    template<class Tuple> struct sret
+    {
+      template<size_t I> 
+      static typename tuple_sreturn<I,Tuple>::ctype get(const Tuple& t)
+      {
+        return field2<typename tuple_sreturn<I,Tuple>::ctype, I>::sget(t);
+      }
     };
   }
 
@@ -909,6 +946,75 @@ namespace std
     return __::field2<RT, I>::get(t);
   }
 
+#ifdef STLX_ENABLE_TUPLE_RELATIONS
+  ///\name 20.4.1.6, relational operators:
+  inline bool operator== (const tuple<>&, const tuple<>&) {  return true; }
+  inline bool operator!= (const tuple<>&, const tuple<>&) {  return false; }
+  inline bool operator<  (const tuple<>&, const tuple<>&) {  return false; }
+  inline bool operator>  (const tuple<>&, const tuple<>&) {  return false; }
+  inline bool operator<= (const tuple<>&, const tuple<>&) {  return true; }
+  inline bool operator>= (const tuple<>&, const tuple<>&) {  return true; }
+
+  template<
+    typename T1, typename T2, typename T3, typename T4, typename T5,
+    typename U1, typename U2, typename U3, typename U4, typename U5
+          >
+  inline bool operator== (const tuple<T1,T2,T3,T4,T5>& x, const tuple<U1,U2,U3,U4,U5>& y)
+  {
+    typedef __::sret<tuple<T1,T2,T3,T4,T5> > ret1;
+    typedef __::sret<tuple<U1,U2,U3,U4,U5> > ret2;
+    typedef __::tuple_sreturn<1, tuple<T1,T2,T3,T4,T5> > rt;
+    return ret1::get<0>(x) == ret2::get<0>(y) && ret1::get<1>(x) == ret2::get<1>(y) && ret1::get<2>(x) == ret2::get<2>(y) && ret1::get<3>(x) == ret2::get<3>(y) && ret1::get<4>(x) == ret2::get<4>(y);
+  }
+
+  template<
+    typename T1, typename T2, typename T3, typename T4, typename T5,
+    typename U1, typename U2, typename U3, typename U4, typename U5
+          >
+  inline bool operator!= (const tuple<T1,T2,T3,T4,T5>& x, const tuple<U1,U2,U3,U4,U5>& y)
+  {
+    return rel_ops::operator!= (x,y);
+  }
+
+  template<
+    typename T1, typename T2, typename T3, typename T4, typename T5,
+    typename U1, typename U2, typename U3, typename U4, typename U5
+          >
+  inline bool operator< (const tuple<T1,T2,T3,T4,T5>& x, const tuple<U1,U2,U3,U4,U5>& y)
+  {
+    typedef __::sret<tuple<T1,T2,T3,T4,T5> > ret1;
+    typedef __::sret<tuple<U1,U2,U3,U4,U5> > ret2;
+    return ret1::get<0>(x) < ret2::get<0>(y) && ret1::get<1>(x) < ret2::get<1>(y) && ret1::get<2>(x) < ret2::get<2>(y) && ret1::get<3>(x) < ret2::get<3>(y) && ret1::get<4>(x) < ret2::get<4>(y);
+  }
+
+  template<
+    typename T1, typename T2, typename T3, typename T4, typename T5,
+    typename U1, typename U2, typename U3, typename U4, typename U5
+          >
+  inline bool operator> (const tuple<T1,T2,T3,T4,T5>& x, const tuple<U1,U2,U3,U4,U5>& y)
+  {
+    return rel_ops::operator>(x,y);
+  }
+
+  template<
+    typename T1, typename T2, typename T3, typename T4, typename T5,
+    typename U1, typename U2, typename U3, typename U4, typename U5
+          >
+  inline bool operator<= (const tuple<T1,T2,T3,T4,T5>& x, const tuple<U1,U2,U3,U4,U5>& y)
+  {
+    return rel_ops::operator<=(x,y);
+  }
+
+  template<
+    typename T1, typename T2, typename T3, typename T4, typename T5,
+    typename U1, typename U2, typename U3, typename U4, typename U5
+          >
+  inline bool operator>= (const tuple<T1,T2,T3,T4,T5>& x, const tuple<U1,U2,U3,U4,U5>& y)
+  {
+    return rel_ops::operator>=(x,y);
+  }
+
+#endif
   //////////////////////////////////////////////////////////////////////////
   ///\name  Tuple interface to Pairs [20.2.3/27]
 
@@ -937,6 +1043,7 @@ namespace std
     static_assert(I < 2, "I out of bounds");
     return __::tuple_pair<T1, T2>::get(p, ttl::meta::int2type<I>());
   }
+  ///\}
 
  /**@} lib_tuple */
  /**@} lib_utilities */

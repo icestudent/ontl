@@ -31,6 +31,32 @@ namespace ttl
       enum { value = v };
     };
 
+    //namespace meta_rel_ops
+    //{
+      inline bool operator== (const ttl::meta::empty_type&, const ttl::meta::empty_type&) {  return true; }
+      inline bool operator!= (const ttl::meta::empty_type&, const ttl::meta::empty_type&) {  return false; }
+      inline bool operator<  (const ttl::meta::empty_type&, const ttl::meta::empty_type&) {  return false; }
+      inline bool operator>  (const ttl::meta::empty_type&, const ttl::meta::empty_type&) {  return false; }
+      inline bool operator<= (const ttl::meta::empty_type&, const ttl::meta::empty_type&) {  return true; }
+      inline bool operator>= (const ttl::meta::empty_type&, const ttl::meta::empty_type&) {  return true; }
+
+      template<typename T> inline bool operator== (const T&, const ttl::meta::empty_type&) {  return false; }
+      template<typename T> inline bool operator!= (const T&, const ttl::meta::empty_type&) {  return true; }
+      template<typename T> inline bool operator<  (const T&, const ttl::meta::empty_type&) {  return false; }
+      template<typename T> inline bool operator>  (const T&, const ttl::meta::empty_type&) {  return false; }
+      template<typename T> inline bool operator<= (const T&, const ttl::meta::empty_type&) {  return false; }
+      template<typename T> inline bool operator>= (const T&, const ttl::meta::empty_type&) {  return false; }
+
+      template<typename T> inline bool operator== (const ttl::meta::empty_type&, const T&) {  return false; }
+      template<typename T> inline bool operator!= (const ttl::meta::empty_type&, const T&) {  return true; }
+      template<typename T> inline bool operator<  (const ttl::meta::empty_type&, const T&) {  return false; }
+      template<typename T> inline bool operator>  (const ttl::meta::empty_type&, const T&) {  return false; }
+      template<typename T> inline bool operator<= (const ttl::meta::empty_type&, const T&) {  return false; }
+      template<typename T> inline bool operator>= (const ttl::meta::empty_type&, const T&) {  return false; }
+    //}
+
+    //using namespace meta_rel_ops;
+
     //internal implementation
     namespace impl
     {

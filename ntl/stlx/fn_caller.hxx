@@ -91,6 +91,8 @@ namespace std
       static R call_memfun(F f, Obj& obj, Args&     , int2type<1>) { return (obj.*f)(); }
       template<class Obj>
       static R call_memfun(F f, Obj& obj, Args& args, int2type<2>) { return (obj.*f)(get<1>(args)); }
+      template<class Obj>
+      static R call_memfun(F f, Obj& obj, Args& args, int2type<3>) { return (obj.*f)(get<1>(args), get<2>(args)); }
     private:
       template<bool IsRef>
       static R callf(F f, Args& args, int2type<fn_unk>, bool_type<IsRef>)
