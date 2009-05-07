@@ -10,10 +10,12 @@
 
 #include "chrono.hxx"
 #include "system_error.hxx"
+#include "fn_caller.hxx"
 
 #ifndef NTL__SUBSYSTEM_KM
 # include "../nt/mutex.hxx"
 #endif
+
 
 namespace std
 {
@@ -437,17 +439,18 @@ namespace std
    *
    *  The class once_flag is an opaque data structure that call_once uses to initialize data without causing a data race or deadlock.
    **/
-  struct once_flag 
+  struct once_flag
   {
     /** Constructs an object of type once_flag */
     constexpr once_flag()
       :inited_(false), locked_(unlocked)
     {}
 
-    struct lock
+    /** Internal lock \internal */
+    struct lock:
+      private noncopyable
     {
-      inline
-      lock(once_flag& flag)
+      inline lock(once_flag& flag)
         :flag_(flag)
       {
         flag_.enter();
@@ -500,64 +503,6 @@ namespace std
   void call_once(once_flag& flag, Callable func, Args&&... args);
 #else
 
-  // because we still don't have a variadic templates, we have to write all this code :-\ 
-  namespace __
-  {
-    template<bool member_function>
-    struct call_once_impl
-    {
-      template<class Callable, class Arg1>
-      static inline void call_once(Callable func, Arg1 arg1)
-      {
-        func(arg1);
-      }
-      template<class Callable, class Arg1, class Arg2>
-      static inline void call_once(Callable func, Arg1 arg1, Arg2 arg2)
-      {
-        func(arg1, arg2);
-      }
-      template<class Callable, class Arg1, class Arg2, class Arg3>
-      static inline void call_once(Callable func, Arg1 arg1, Arg2 arg2, Arg3 arg3)
-      {
-        func(arg1, arg2, arg3);
-      }
-    };
-    template<>
-    struct call_once_impl<true>
-    {
-      template<class Callable, class T>
-      static inline void call_once(Callable mem_fun, T* obj)
-      {
-        (obj->*mem_fun)();
-      }
-      template<class Callable, class T>
-      static inline void call_once(Callable mem_fun, T obj)
-      {
-        (obj.*mem_fun)();
-      }
-      template<class Callable, class T, class Arg1>
-      static inline void call_once(Callable mem_fun, T* obj, Arg1 arg1)
-      {
-        (obj->*mem_fun)(arg1);
-      }
-      template<class Callable, class T, class Arg1>
-      static inline void call_once(Callable mem_fun, T obj, Arg1 arg1)
-      {
-        (obj.*mem_fun)(arg1);
-      }
-      template<class Callable, class T, class Arg1, class Arg2>
-      static inline void call_once(Callable mem_fun, T* obj, Arg1 arg1, Arg2 arg2)
-      {
-        (obj->*mem_fun)(arg1, arg2);
-      }
-      template<class Callable, class T, class Arg1, class Arg2>
-      static inline void call_once(Callable mem_fun, T obj, Arg1 arg1, Arg2 arg2)
-      {
-        (obj.*mem_fun)(arg1, arg2);
-      }
-    };
-  }
-
   // 30.3.5.2 Function call_once [thread.once.callonce]
   template<class Callable>
   void call_once(once_flag& flag, Callable func)
@@ -574,40 +519,40 @@ namespace std
   }
 
   template<class Callable, class Arg1>
-  void call_once(once_flag& flag, Callable func, Arg1 arg1)
+  void call_once(once_flag& flag, Callable func, Arg1 a1)
   {
     if(flag.ready())
       return;
 
     once_flag::lock lock(flag);
     if(!flag.ready()){
-      __::call_once_impl<std::is_member_function_pointer<Callable>::value>::call_once(func, arg1);
+      __::func::invoker<Callable>::invoke(func, a1);
       flag.set_ready();
     }
   }
 
   template<class Callable, class Arg1, class Arg2>
-  void call_once(once_flag& flag, Callable func, Arg1 arg1, Arg2 arg2)
+  void call_once(once_flag& flag, Callable func, Arg1 a1, Arg2 a2)
   {
     if(flag.ready())
       return;
 
     once_flag::lock lock(flag);
     if(!flag.ready()){
-      __::call_once_impl<std::is_member_function_pointer<Callable>::value>::call_once(func, arg1, arg2);
+      __::func::invoker<Callable>::invoke(func, a1,a2);
       flag.set_ready();
     }
   }
 
   template<class Callable, class Arg1, class Arg2, class Arg3>
-  void call_once(once_flag& flag, Callable func, Arg1 arg1, Arg2 arg2, Arg1 arg3)
+  void call_once(once_flag& flag, Callable func, Arg1 a1, Arg2 a2, Arg1 a3)
   {
     if(flag.ready())
       return;
 
     once_flag::lock lock(flag);
     if(!flag.ready()){
-      __::call_once_impl<std::is_member_function_pointer<Callable>::value>::call_once(func, arg1, arg2, arg3);
+      __::func::invoker<Callable>::invoke(func, a1,a2,a3);
       flag.set_ready();
     }
   }

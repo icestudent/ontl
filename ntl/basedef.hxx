@@ -42,7 +42,7 @@ using std::ptrdiff_t;
 /// raw data representation
 typedef std::vector<uint8_t, std::allocator<uint8_t> > raw_data;
 
-namespace __
+namespace __unspecified
 {
   struct noncopyable
   {
@@ -50,13 +50,13 @@ namespace __
     noncopyable(){}
     ~noncopyable(){}
   private:
-    noncopyable(const noncopyable&);
-    const noncopyable& operator=(const noncopyable&);
+    noncopyable(const noncopyable&) __deleted;
+    const noncopyable& operator=(const noncopyable&) __deleted;
   };
 }
 
 /// Base class to deny copying of derived classes.
-typedef __::noncopyable noncopyable;
+typedef __unspecified::noncopyable noncopyable;
 
 /// Type helper for the template specialization for functions 
 template<typename T>

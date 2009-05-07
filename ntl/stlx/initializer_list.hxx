@@ -25,10 +25,23 @@ namespace std
   class initializer_list
   {
   public:
-    initializer_list();
-    size_t size() const;
+    typedef size_t    size_type;
+    typedef       E   value_type;
+    typedef const E&  reference;
+    typedef const E&  const_reference;
+    typedef const E*  iterator;
+    typedef const E*  const_iterator;
+
+#ifndef NTL__CXX_IL
+    size_t   size()  const { return 0; }
     const E* begin() const { return nullptr; }
-    const E* end() const { return nullptr; }
+    const E* end()   const { return nullptr; }
+#else
+    size_t   size()  const;
+    const E* begin() const;
+    const E* end()   const;
+    initializer_list();
+#endif
   };
 
   /** @} lib_support_initlist */

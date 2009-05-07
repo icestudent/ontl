@@ -8,13 +8,12 @@
 #define NTL__STLX_TUPLE
 
 #define TTL_MAX_TEMPLATE_PARAMS 5
+#define STLX_ENABLE_TUPLE_RELATIONS
 
 //#include "array.hxx" // for tuple array access
 #include "ext/ttl/typelist.hxx"
 #include "utility.hxx" // for tuple pair access
 #include "ext/typelist.hxx"
-
-static_assert((std::is_same<ttl::meta::empty_type, ntl::meta::empty_type>::value), "brb");
 
 namespace std
 {
@@ -146,28 +145,28 @@ namespace std
     struct data_wrapper
     {};
 
-    template<typename Typelist, size_t Idx, bool Stop = (Idx > meta::length<Typelist>::value) >
+    template<typename Typelist, size_t Idx, bool = (Idx < Typelist::length) >
     struct tuple_param
     {
-      typedef typename traits<typename meta::get<Typelist,Idx-1>::type>::param_type type;
+      typedef typename traits<typename meta::get<Typelist,Idx>::type>::param_type type;
     };
 
     template<typename Typelist, size_t Idx>
-    struct tuple_param<Typelist, Idx, true>
+    struct tuple_param<Typelist, Idx, false>
     {
       typedef meta::empty_type type;
     };
 
 #ifdef NTL__CXX_RV
 
-    template<class Types, size_t i, bool = (i >= meta::length<Types>::value)>
+    template<class Types, size_t i, bool = (i < Types::length)>
     struct rparam
     {
       typedef typename meta::get<Types,i>::type ft, type;
     };
 
     template<class Types, size_t i>
-    struct rparam<Types, i, true> { typedef meta::empty_type type; };
+    struct rparam<Types, i, false> { typedef meta::empty_type type; };
 
 #endif
     struct rvtag {};
@@ -184,25 +183,31 @@ namespace std
       typename traits<head_t>::stored_type head;
       tail_t tail;
 
+    protected:
+      typedef typename tuple_param<types, Idx+0>::type ltype1;
+      typedef typename tuple_param<types, Idx+1>::type ltype2;
+      typedef typename tuple_param<types, Idx+2>::type ltype3;
+      typedef typename tuple_param<types, Idx+3>::type ltype4;
+      typedef typename tuple_param<types, Idx+4>::type ltype5;
     public:
       tuples()
         :head(), tail()
       {}
 
       // TUPLE_EXT:
-      explicit tuples(typename tuple_param<types, Idx+1>::type p1)
+      explicit tuples(ltype1 p1)
         :head(p1), tail()
       {}
-      explicit tuples(typename tuple_param<types, Idx+1>::type p1, typename tuple_param<types, Idx+2>::type p2)
+      explicit tuples(ltype1 p1, ltype2 p2)
         :head(p1), tail(p2)
       {}
-      explicit tuples(typename tuple_param<types, Idx+1>::type p1, typename tuple_param<types, Idx+2>::type p2, typename tuple_param<types, Idx+3>::type p3)
+      explicit tuples(ltype1 p1, ltype2 p2, ltype3 p3)
         :head(p1), tail(p2, p3)
       {}
-      explicit tuples(typename tuple_param<types, Idx+1>::type p1, typename tuple_param<types, Idx+2>::type p2, typename tuple_param<types, Idx+3>::type p3, typename tuple_param<types, Idx+4>::type p4)
+      explicit tuples(ltype1 p1, ltype2 p2, ltype3 p3, ltype4 p4)
         :head(p1), tail(p2, p3, p4)
       {}
-      explicit tuples(typename tuple_param<types, Idx+1>::type p1, typename tuple_param<types, Idx+2>::type p2, typename tuple_param<types, Idx+3>::type p3, typename tuple_param<types, Idx+4>::type p4, typename tuple_param<types, Idx+5>::type p5)
+      explicit tuples(ltype1 p1, ltype2 p2, ltype3 p3, ltype4 p4, ltype5 p5)
         :head(p1), tail(p2, p3, p4, p5)
       {}
 
@@ -235,26 +240,28 @@ namespace std
 
 #ifdef NTL__CXX_RV
       // TUPLE_EXT:
-      typedef typename rparam<types,Idx+0>::type type1;
-      typedef typename rparam<types,Idx+1>::type type2;
-      typedef typename rparam<types,Idx+2>::type type3;
-      typedef typename rparam<types,Idx+3>::type type4;
-      typedef typename rparam<types,Idx+4>::type type5;
+    protected:
+      typedef typename rparam<types,Idx+0>::type rtype1;
+      typedef typename rparam<types,Idx+1>::type rtype2;
+      typedef typename rparam<types,Idx+2>::type rtype3;
+      typedef typename rparam<types,Idx+3>::type rtype4;
+      typedef typename rparam<types,Idx+4>::type rtype5;
 
-      tuples(rvtag, type1&& p1)
-        :head(forward<type1>(p1))
+    public:
+      tuples(rvtag, rtype1&& p1)
+        :head(forward<rtype1>(p1))
       {}
-      tuples(rvtag, type1&& p1, type2&& p2)
-        :head(forward<type1>(p1)), tail(rvtag(), p2)
+      tuples(rvtag, rtype1&& p1, rtype2&& p2)
+        :head(forward<rtype1>(p1)), tail(rvtag(), forward<rtype2>(p2))
       {}
-      tuples(rvtag, type1&& p1, type2&& p2, type3&& p3)
-        :head(forward<type1>(p1)), tail(rvtag(), p2, p3)
+      tuples(rvtag, rtype1&& p1, rtype2&& p2, rtype3&& p3)
+        :head(forward<rtype1>(p1)), tail(rvtag(), forward<rtype2>(p2), forward<rtype3>(p3))
       {}
-      tuples(rvtag, type1&& p1, type2&& p2, type3&& p3, type4&& p4)
-        :head(forward<type1>(p1)), tail(rvtag(), p2, p3, p4)
+      tuples(rvtag, rtype1&& p1, rtype2&& p2, rtype3&& p3, rtype4&& p4)
+        :head(forward<rtype1>(p1)), tail(rvtag(), forward<rtype2>(p2), forward<rtype3>(p3), forward<rtype4>(p4))
       {}
-      tuples(rvtag, type1&& p1, type2&& p2, type3&& p3, type4&& p4, type5&& p5)
-        :head(forward<type1>(p1)), tail(rvtag(), p2, p3, p4, p5)
+      tuples(rvtag, rtype1&& p1, rtype2&& p2, rtype3&& p3, rtype4&& p4, rtype5&& p5)
+        :head(forward<rtype1>(p1)), tail(rvtag(), forward<rtype2>(p2), forward<rtype3>(p3), forward<rtype4>(p4), forward<rtype5>(p5))
       {}
 
       template<typename U1, typename U2, typename U3, typename U4, typename U5>
@@ -335,6 +342,18 @@ namespace std
       {}
       explicit tuples(meta::empty_type, meta::empty_type, meta::empty_type, meta::empty_type, meta::empty_type)
       {}
+#ifdef NTL__CXX_RV
+      explicit tuples(rvtag, meta::empty_type)
+      {}
+      explicit tuples(rvtag, meta::empty_type, meta::empty_type)
+      {}
+      explicit tuples(rvtag, meta::empty_type, meta::empty_type, meta::empty_type)
+      {}
+      explicit tuples(rvtag, meta::empty_type, meta::empty_type, meta::empty_type, meta::empty_type)
+      {}
+      explicit tuples(rvtag, meta::empty_type, meta::empty_type, meta::empty_type, meta::empty_type, meta::empty_type)
+      {}
+#endif
     }; // tuples
 
 
@@ -369,10 +388,8 @@ namespace std
     };
 
 #define NTL_TUPLE_GET(n,aux) tail.
-#ifndef NTL__CXX_RV
-#define NTL_TUPLE_MAKEGET(N,cv) static __forceinline R get(cv T& t, int2type<N>) { return t.\
-  TTL_REPEAT(N, NTL_TUPLE_GET, NTL_TUPLE_GET, 0)\
-  head; }
+
+#ifndef NTL__CXX_RV_DEPRECATED__
 
     template<typename R, size_t N>
     struct field2
@@ -385,13 +402,13 @@ namespace std
 
       // non-strict get
       template<class T>
-      static __forceinline R sget(const T& t) { return sget(t, integral_constant<bool, (N < T::types::length)>()); }
+      static __forceinline R sget(const T& t) { return sget(t, bool_type<(N < T::types::length)>()); }
       template<class T>
       static __forceinline R sget(const T& t, true_type) { return getter<T>::get(t, int2type<N>()); }
       template<class T>
       static __forceinline R sget(const T&, false_type) { static const meta::empty_type et; return et; }
       template<class T>
-      static __forceinline R sget(T& t) { return sget(t, integral_constant<bool, (N < T::types::length)>()); }
+      static __forceinline R sget(T& t) { return sget(t, bool_type<(N < T::types::length)>()); }
       template<class T>
       static __forceinline R sget(T& t, true_type) { return getter<T>::get(t, int2type<N>()); }
       template<class T>
@@ -400,6 +417,10 @@ namespace std
       template<class T>
       struct getter
       {
+#define NTL_TUPLE_MAKEGET(N,cv) static __forceinline R get(cv T& t, int2type<N>) { return t.\
+  TTL_REPEAT(N, NTL_TUPLE_GET, NTL_TUPLE_GET, 0)\
+  head; }
+
         static __forceinline R get(const T& t, int2type<0>) { return t.head; }
         TTL_REPEAT_NEST(TTL_MAX_TEMPLATE_PARAMS,NTL_TUPLE_MAKEGET,NTL_TUPLE_MAKEGET,const);
 
@@ -413,6 +434,13 @@ namespace std
     {
       template<class T>
       static __forceinline R get(T&& t) { return getter<T>::get(forward<T>(t), int2type<N>()); }
+
+      template<class T>
+      static __forceinline R sget(T&& t) { return sget(forward<T>(t), bool_type<(N < T::types::length)>()); }
+      template<class T>
+      static __forceinline R sget(T&& t, true_type) { return getter<T>::get(forward<T>(t), int2type<N>()); }
+      template<class T>
+      static __forceinline R sget(T&&, false_type) { static const meta::empty_type et; return et; }
     private:
       template<class T>
       struct getter
@@ -441,29 +469,42 @@ namespace std
   {
   public:
     typedef ttl::meta::typelist<T1,T2,T3,T4,T5> types;
-  private:
+  public:
     typedef __::rvtag rvtag;
     typedef __::tuples<types> base;
     typedef tuple<T1,T2,T3,T4,T5>   this_t;
 
+    typedef typename __::tuple_param<types,0>::type ltype1;
+    typedef typename __::tuple_param<types,1>::type ltype2;
+    typedef typename __::tuple_param<types,2>::type ltype3;
+    typedef typename __::tuple_param<types,3>::type ltype4;
+    typedef typename __::tuple_param<types,4>::type ltype5;
+    
+#ifdef NTL__CXX_RV
+    typedef typename __::rparam<types,0>::type rtype1;
+    typedef typename __::rparam<types,1>::type rtype2;
+    typedef typename __::rparam<types,2>::type rtype3;
+    typedef typename __::rparam<types,3>::type rtype4;
+    typedef typename __::rparam<types,4>::type rtype5;
+#endif
   public:
     tuple()
     {}
 
     // explicit tuple(const Types&...);
-    explicit tuple(typename __::tuple_param<types,1>::type p1)
+    explicit tuple(ltype1 p1)
       :base(p1)
     {}
-    explicit tuple(typename __::tuple_param<types,1>::type p1, typename __::tuple_param<types,2>::type p2)
+    explicit tuple(ltype1 p1, ltype2 p2)
       :base(p1, p2)
     {}
-    explicit tuple(typename __::tuple_param<types,1>::type p1, typename __::tuple_param<types,2>::type p2, typename __::tuple_param<types,3>::type p3)
+    explicit tuple(ltype1 p1, ltype2 p2, ltype3 p3)
       :base(p1, p2, p3)
     {}
-    explicit tuple(typename __::tuple_param<types,1>::type p1, typename __::tuple_param<types,2>::type p2, typename __::tuple_param<types,3>::type p3, typename __::tuple_param<types,4>::type p4)
+    explicit tuple(ltype1 p1, ltype2 p2, ltype3 p3, ltype4 p4)
       :base(p1, p2, p3, p4)
     {}
-    explicit tuple(typename __::tuple_param<types,1>::type p1, typename __::tuple_param<types,2>::type p2, typename __::tuple_param<types,3>::type p3, typename __::tuple_param<types,4>::type p4, typename __::tuple_param<types,5>::type p5)
+    explicit tuple(ltype1 p1, ltype2 p2, ltype3 p3, ltype4 p4, ltype5 p5)
       :base(p1, p2, p3, p4, p5)
     {}
 
@@ -602,15 +643,15 @@ namespace std
     };
 
     template<typename T>
-    struct is_refwrap
+    struct is_refwrap: 
+      integral_constant<bool, false>
     {
-      static const bool value = false;
       typedef T type;
     };
     template<typename T>
-    struct is_refwrap<reference_wrapper<T> >
+    struct is_refwrap<reference_wrapper<T> >:
+      integral_constant<bool, true>
     {
-      static const bool value = true;
       typedef T type;
     };
 
@@ -789,14 +830,14 @@ namespace std
         static const bool e2 = J >= T2::types::length;
         static const bool none = e1 && e2;
 
-        typedef meta::int2type<none ? 0 : !e1 ? 1 : 2> w; // 0 - out of range, 1 - t1, 2 - t2
+        typedef int2type<none ? 0 : !e1 ? 1 : 2> w; // 0 - out of range, 1 - t1, 2 - t2
         return get<J, typename rt<I>::type> (t1,t2,w());
       }
 
     private:
-      typedef meta::int2type<0> ignore;
-      typedef meta::int2type<1> left;
-      typedef meta::int2type<2> right;
+      typedef int2type<0> ignore;
+      typedef int2type<1> left;
+      typedef int2type<2> right;
 
       template<size_t I, class R, class T1, class T2>
       static R get(const T1&, const T2&, ignore) { return meta::empty_type(); }
@@ -812,9 +853,10 @@ namespace std
   template<class Tuple1, class Tuple2>
   typename __::tuple_glue<Tuple1,Tuple2>::result tuple_cat(const Tuple1& t1, const Tuple2& t2)
   {
-    using __::sget;
     typedef typename __::tuple_glue<Tuple1,Tuple2>::result R;
-    return R(sget<R>::v<0>(t1,t2), sget<R>::v<1>(t1,t2), sget<R>::v<2>(t1,t2), sget<R>::v<3>(t1,t2), sget<R>::v<4>(t1,t2));
+    typedef __::sget<R> sget;
+    R z(sget::v<0>(t1,t2), sget::v<1>(t1,t2), sget::v<2>(t1,t2), sget::v<3>(t1,t2), sget::v<4>(t1,t2));
+    return R();
   }
 
 
@@ -882,69 +924,29 @@ namespace std
     template<class Tuple> struct sret
     {
       template<size_t I> 
-      static typename tuple_sreturn<I,Tuple>::ctype get(const Tuple& t)
-      {
-        return field2<typename tuple_sreturn<I,Tuple>::ctype, I>::sget(t);
-      }
+      static typename tuple_sreturn<I,Tuple>::ctype get(const Tuple& t) { return field2<typename tuple_sreturn<I,Tuple>::ctype, I>::sget(t); }
+      template<size_t I> 
+      static typename tuple_sreturn<I,Tuple>::ctype get(Tuple& t) { return field2<typename tuple_sreturn<I,Tuple>::ctype, I>::sget(t); }
     };
   }
 
   // TUPLE_EXT:
-  template<size_t I, typename T1>
-  inline typename __::tuple_return<I, tuple<T1> >::type get(tuple<T1>& t)
+  template<size_t I, typename T1, typename T2, typename T3, typename T4, typename T5>
+  inline typename __::tuple_return<I, tuple<T1,T2,T3,T4,T5> >::ctype get(const tuple<T1,T2,T3,T4,T5>& t)
   {
-    typedef typename __::tuple_return<I, tuple<T1> >::type RT;
-    return __::field2<RT, I>::get(t);
-  }
-
-  template<size_t I, typename T1>
-  inline typename __::tuple_return<I, tuple<T1> >::ctype get(const tuple<T1>& t)
-  {
-    typedef typename __::tuple_return<I, tuple<T1> >::ctype RT;
-    return __::field2<RT, I>::get(t);
-  }
-
-  template<size_t I, typename T1, typename T2>
-  inline typename __::tuple_return<I, tuple<T1,T2> >::type get(tuple<T1,T2>& t)
-  {
-    typedef typename __::tuple_return<I, tuple<T1,T2> >::type RT;
-    return __::field2<RT, I>::get(t);
-  }
-
-  template<size_t I, typename T1, typename T2>
-  inline typename __::tuple_return<I, tuple<T1,T2> >::ctype get(const tuple<T1,T2>& t)
-  {
-    typedef typename __::tuple_return<I, tuple<T1,T2> >::ctype RT;
-    return __::field2<RT, I>::get(t);
-  }
-
-  template<size_t I, typename T1, typename T2, typename T3>
-  inline typename __::tuple_return<I, tuple<T1,T2,T3> >::type get(tuple<T1,T2,T3>& t)
-  {
-    typedef typename __::tuple_return<I, tuple<T1,T2,T3> >::type RT;
-    return __::field2<RT, I>::get(t);
-  }
-
-  template<size_t I, typename T1, typename T2, typename T3>
-  inline typename __::tuple_return<I, tuple<T1,T2,T3> >::ctype get(const tuple<T1,T2,T3>& t)
-  {
-    typedef typename __::tuple_return<I, tuple<T1,T2,T3> >::ctype RT;
-    return __::field2<RT, I>::get(t);
-  }
-
-  template<size_t I, typename T1, typename T2, typename T3, typename T4>
-  inline typename __::tuple_return<I, tuple<T1,T2,T3,T4> >::ctype get(const tuple<T1,T2,T3,T4>& t)
-  {
-    typedef typename __::tuple_return<I, tuple<T1,T2,T3,T4> >::ctype RT;
+    static_assert((I < tuple_size<tuple<T1,T2,T3,T4,T5> >::value), "I is out of bounds");
+    typedef typename __::tuple_return<I, tuple<T1,T2,T3,T4,T5> >::ctype RT;
     return __::field2<RT, I>::get(t);
   }
 
   template<size_t I, typename T1, typename T2, typename T3, typename T4, typename T5>
-  inline typename __::tuple_return<I, tuple<T1,T2,T3,T4,T5> >::ctype get(const tuple<T1,T2,T3,T4,T5>& t)
+  inline typename __::tuple_return<I, tuple<T1,T2,T3,T4,T5> >::type get(tuple<T1,T2,T3,T4,T5>& t)
   {
-    typedef typename __::tuple_return<I, tuple<T1,T2,T3,T4,T5> >::ctype RT;
+    static_assert((I < tuple_size<tuple<T1,T2,T3,T4,T5> >::value), "I is out of bounds");
+    typedef typename __::tuple_return<I, tuple<T1,T2,T3,T4,T5> >::type RT;
     return __::field2<RT, I>::get(t);
   }
+
 
 #ifdef STLX_ENABLE_TUPLE_RELATIONS
   ///\name 20.4.1.6, relational operators:

@@ -42,18 +42,6 @@ namespace __
 {
   // sfinae support
 
-  template<typename T>
-  struct type2type
-  {
-    typedef T type;
-  };
-
-  template<size_t v>
-  struct int2type
-  {
-    enum { value = v };
-  };
-
   struct sfinae_small { char x; };
   struct sfinae_big   { char x[2]; };
 
@@ -85,6 +73,19 @@ namespace __
 
 namespace std {
 namespace __ {
+
+  template<typename T>
+  struct type2type
+  {
+    typedef T type;
+  };
+
+  template<size_t v>
+  struct int2type: integral_constant<size_t, v>{};
+
+  template<int  i> struct index_type: integral_constant<int, i>{};
+  template<bool b> struct bool_type : integral_constant<bool,b>{};
+
 
 struct check_meta_rel
 {

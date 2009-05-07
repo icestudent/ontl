@@ -13,15 +13,12 @@
 
 namespace std
 {
-  namespace func
+  namespace __ { namespace func
   {
-    using ttl::meta::int2type;
-
-    template<bool Cond> struct bool_type: integral_constant<bool, Cond>{};
-
     template<class F, class Args, typename R>
     struct fn_caller
     {
+    private:
       enum { fn_unk, fn_memfun, fn_memptr };
 
       template<class F> struct result_of_memptr: false_type{};
@@ -51,6 +48,7 @@ namespace std
         static const bool value = is_conv;
       };
 
+    public:
       static R call(F f, const Args& args)
       {
         // (t1.*f)()  if f is memfun and t1 is object or reference or reference to derived (1)
@@ -67,43 +65,43 @@ namespace std
 
         //static const bool is_ptr = sizeof(check::check_ptr<check::T>(*get<0>(args))) == sizeof(__::sfinae_passed_tag);
 
-        return callf(f, const_cast<Args&>(args), int2type<is_memfun|is_memptr*2>(), bool_type<is_ref>());
+        return callf(f, const_cast<Args&>(args), index_type<is_memfun|is_memptr*2>(), bool_type<is_ref>());
       }
     private:
-      static R callf(F f, Args& args, int2type<fn_memptr>, true_type)
+      static R callf(F f, Args& args, index_type<fn_memptr>, true_type)
       {
         return get<0>(args).*f;
       }
-      static R callf(F f, Args& args, int2type<fn_memptr>, false_type)
+      static R callf(F f, Args& args, index_type<fn_memptr>, false_type)
       {
         return (*get<0>(args)).*f;
       }
-      static R callf(F f, Args& args, int2type<fn_memfun>, true_type)
+      static R callf(F f, Args& args, index_type<fn_memfun>, true_type)
       {
-        return call_memfun<__::result_of_function_type<F>::object_type>(f, get<0>(args), args, int2type<tuple_size<Args>::value>());
+        return call_memfun<__::result_of_function_type<F>::object_type>(f, get<0>(args), args, index_type<tuple_size<Args>::value>());
       }
-      static R callf(F f, Args& args, int2type<fn_memfun>, false_type)
+      static R callf(F f, Args& args, index_type<fn_memfun>, false_type)
       {
-        return call_memfun<__::result_of_function_type<F>::object_type>(f, *get<0>(args), args, int2type<tuple_size<Args>::value>());
+        return call_memfun<__::result_of_function_type<F>::object_type>(f, *get<0>(args), args, index_type<tuple_size<Args>::value>());
       }
 
       template<class Obj>
-      static R call_memfun(F f, Obj& obj, Args&     , int2type<1>) { return (obj.*f)(); }
+      static R call_memfun(F f, Obj& obj, Args&     , index_type<1>) { return (obj.*f)(); }
       template<class Obj>
-      static R call_memfun(F f, Obj& obj, Args& args, int2type<2>) { return (obj.*f)(get<1>(args)); }
+      static R call_memfun(F f, Obj& obj, Args& args, index_type<2>) { return (obj.*f)(get<1>(args)); }
       template<class Obj>
-      static R call_memfun(F f, Obj& obj, Args& args, int2type<3>) { return (obj.*f)(get<1>(args), get<2>(args)); }
+      static R call_memfun(F f, Obj& obj, Args& args, index_type<3>) { return (obj.*f)(get<1>(args), get<2>(args)); }
     private:
       template<bool IsRef>
-      static R callf(F f, Args& args, int2type<fn_unk>, bool_type<IsRef>)
+      static R callf(F f, Args& args, index_type<fn_unk>, bool_type<IsRef>)
       {
-        return call_fun(f, args, int2type<tuple_size<Args>::value>());
+        return call_fun(f, args, index_type<tuple_size<Args>::value>());
       }
 
-      static R call_fun(F f, Args&     , int2type<0>) { return f(); }
-      static R call_fun(F f, Args& args, int2type<1>) { return f(get<0>(args)); }
-      static R call_fun(F f, Args& args, int2type<2>) { return f(get<0>(args), get<1>(args)); }
-      static R call_fun(F f, Args& args, int2type<3>) { return f(get<0>(args), get<1>(args), get<2>(args)); }
+      static R call_fun(F f, Args&     , index_type<0>) { return f(); }
+      static R call_fun(F f, Args& args, index_type<1>) { return f(get<0>(args)); }
+      static R call_fun(F f, Args& args, index_type<2>) { return f(get<0>(args), get<1>(args)); }
+      static R call_fun(F f, Args& args, index_type<3>) { return f(get<0>(args), get<1>(args), get<2>(args)); }
     };
 
 
@@ -112,7 +110,41 @@ namespace std
     {
       return fn_caller<F,Args,R>::call(f,args);
     }
-  }
-}
 
+    /// Invoke arguments type set creation
+    #define FUNARGS(...) typename __::tmap<__VA_ARGS__>::type
+
+    template<typename F, typename R = void>
+    struct invoker
+    {
+      static inline R invoke(F f)
+      {
+        typedef FUNARGS() Args;
+        return fn_caller<F,Args,R>::call(f,Args());
+      }
+
+      template<class A1>
+      static inline R invoke(F f, A1 a1)
+      {
+        typedef FUNARGS(A1) Args;
+        return fn_caller<F,Args,R>::call(f,Args(a1));
+      }
+
+      template<class A1, class A2>
+      static inline R invoke(F f, A1 a1, A2 a2)
+      {
+        typedef FUNARGS(A1,A2) Args;
+        return fn_caller<F,Args,R>::call(f,Args(a1,a2));
+      }
+
+      template<class A1, class A2, class A3>
+      static inline R invoke(F f, A1 a1, A2 a2, A3 a3)
+      {
+        typedef FUNARGS(A1,A2,A3) Args;
+        return fn_caller<F,Args,R>::call(f,Args(a1,a2,a3));
+      }
+    };
+  } // func
+  } // __
+} // std
 #endif // NTL__STLX_FNCALLER

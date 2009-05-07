@@ -10,12 +10,21 @@
 
 #include "iterator.hxx"
 #include "utility.hxx"
+#include "initializer_list.hxx"
 
-namespace std {
+namespace std
+{
+///\name 25.1, non-modifying sequence operations:
+template <class InputIterator, class Predicate>
+inline bool all_of(InputIterator first, InputIterator last, Predicate pred);
 
-// 25.1, non-modifying sequence operations:
+template <class InputIterator, class Predicate>
+inline bool any_of(InputIterator first, InputIterator last, Predicate pred);
 
-/// 25.1.1 For each [alg.foreach]
+template <class InputIterator, class Predicate>
+inline bool none_of(InputIterator first, InputIterator last, Predicate pred);
+
+
 template<class InputIterator, class Function>
 __forceinline
 Function
@@ -25,7 +34,7 @@ Function
   return f;
 }
 
-/// 25.1.2 Find [alg.find]
+
 template<class InputIterator, class T>
 __forceinline
 InputIterator
@@ -35,7 +44,7 @@ InputIterator
   return first;
 }
 
-/// 25.1.2 Find [alg.find]
+
 template<class InputIterator, class Predicate>
 __forceinline
 InputIterator
@@ -45,14 +54,20 @@ InputIterator
   return first;
 }
 
-/// 25.1.3 Find End [alg.find.end]
+template<class InputIterator, class Predicate>
+InputIterator find_if_not(InputIterator first, InputIterator last,
+                          Predicate pred);
+template<class InputIterator, class Predicate>
+InputIterator find_if_not(InputIterator first, InputIterator last,
+                          Predicate pred);
+
 template<class ForwardIterator1, class ForwardIterator2>
 __forceinline
 ForwardIterator1
   find_end(ForwardIterator1 first1, ForwardIterator1 last1,
            ForwardIterator2 first2, ForwardIterator2 last2);
 
-/// 25.1.3 Find End [alg.find.end]
+
 template<class ForwardIterator1, class ForwardIterator2, class BinaryPredicate>
 __forceinline
 ForwardIterator1
@@ -60,7 +75,7 @@ ForwardIterator1
            ForwardIterator2 first2, ForwardIterator2 last2,
            BinaryPredicate pred);
 
-/// 25.1.4 Find First [alg.find.first.of]
+
 template<class ForwardIterator1, class ForwardIterator2>
 __forceinline
 ForwardIterator1
@@ -73,7 +88,7 @@ ForwardIterator1
   return first1;  // here first1 == last1
 }
 
-/// 25.1.4 Find First [alg.find.first.of]
+
 template<class ForwardIterator1, class ForwardIterator2, class BinaryPredicate>
 __forceinline
 ForwardIterator1
@@ -87,7 +102,7 @@ ForwardIterator1
   return first1;  // here first1 == last1
 }
 
-/// 25.1.5 Adjacent find [alg.adjacent.find]
+
 template<class ForwardIterator>
 __forceinline
 ForwardIterator
@@ -104,7 +119,7 @@ ForwardIterator
   }
 }
 
-/// 25.1.5 Adjacent find [alg.adjacent.find]
+
 template<class ForwardIterator, class BinaryPredicate>
 __forceinline
 ForwardIterator
@@ -121,7 +136,7 @@ ForwardIterator
   }
 }
 
-/// 25.1.6 Count [alg.count]
+
 template<class InputIterator, class T>
 __forceinline
 typename iterator_traits<InputIterator>::difference_type
@@ -133,7 +148,7 @@ typename iterator_traits<InputIterator>::difference_type
   return count;
 }
 
-/// 25.1.6 Count [alg.count]
+
 template<class InputIterator, class Predicate>
 __forceinline
 typename iterator_traits<InputIterator>::difference_type
@@ -145,7 +160,7 @@ typename iterator_traits<InputIterator>::difference_type
   return count;
 }
 
-/// 25.1.7 Mismatch [mismatch]
+
 template<class InputIterator1, class InputIterator2>
 __forceinline
 pair<InputIterator1, InputIterator2>
@@ -159,7 +174,7 @@ pair<InputIterator1, InputIterator2>
   return pair<InputIterator1, InputIterator2>(first1, first2);
 }
 
-/// 25.1.7 Mismatch [mismatch]
+
 template
 <class InputIterator1, class InputIterator2, class BinaryPredicate>
 __forceinline
@@ -175,7 +190,7 @@ pair<InputIterator1, InputIterator2>
   return pair<InputIterator1, InputIterator2>(first1, first2);
 }
 
-/// 25.1.8 Equal [alg.equal]
+
 template<class InputIterator1, class InputIterator2>
 __forceinline
 bool
@@ -186,7 +201,7 @@ bool
   return true;
 }
 
-/// 25.1.8 Equal [alg.equal]
+
 template
 <class InputIterator1, class InputIterator2, class BinaryPredicate>
 __forceinline
@@ -199,7 +214,7 @@ bool
   return true;
 }
 
-/// 25.1.9 Search [alg.search]
+
 template<class ForwardIterator1, class ForwardIterator2>
 __forceinline
 ForwardIterator1
@@ -224,7 +239,7 @@ ForwardIterator1
   }
 }
 
-/// 25.1.9 Search [alg.search]
+
 template<class ForwardIterator1, class ForwardIterator2, class BinaryPredicate>
 __forceinline
 ForwardIterator1
@@ -248,7 +263,7 @@ ForwardIterator1
   }
 }
 
-/// 25.1.9 Search [alg.search]
+
 template<class ForwardIterator, class Size, class T>
 __forceinline
 ForwardIterator
@@ -271,7 +286,7 @@ ForwardIterator
   }
 }
 
-/// 25.1.9 Search [alg.search]
+
 template<class ForwardIterator, class Size, class T, class BinaryPredicate>
 __forceinline
 ForwardIterator
@@ -294,9 +309,9 @@ ForwardIterator
   }
 }
 
-// 25.2, modifying sequence operations:
+///\name 25.2, modifying sequence operations:
 
-/// 25.2.1 Copy [alg.copy]
+
 template<class InputIterator, class OutputIterator>
 __forceinline
 OutputIterator
@@ -360,7 +375,7 @@ BidirectionalIterator2
   return result;
 }
 
-/// 25.2.1 Copy [alg.move]
+
 template<class InputIterator, class OutputIterator>
 inline OutputIterator move(InputIterator first, InputIterator last, OutputIterator result)
 {
@@ -382,11 +397,9 @@ inline BidirectionalIterator2
   return result;
 }
 
-/// 25.2.2 Swap [alg.swap]
+
 template<class T>
-inline
-void
-  swap(T& a, T& b)
+inline void swap(T& a, T& b)
 {
 #ifndef NTL__CXX_RV
   T temp( a );
@@ -399,7 +412,7 @@ void
 #endif
 }
 
-/// 25.2.2 Swap [alg.swap]
+
 template<class ForwardIterator1, class ForwardIterator2>
 __forceinline
 ForwardIterator2
@@ -411,7 +424,7 @@ ForwardIterator2
   return first2;
 }
 
-/// 25.2.2 Swap [alg.swap]
+
 template<class ForwardIterator1, class ForwardIterator2>
 __forceinline
 void
@@ -420,7 +433,7 @@ void
   swap(*a, *b);
 }
 
-/// 25.2.3 Transform [alg.transform]
+
 template<class InputIterator, class OutputIterator, class UnaryOperation>
 __forceinline
 OutputIterator
@@ -432,7 +445,7 @@ OutputIterator
   return result;
 }
 
-/// 25.2.3 Transform [alg.transform]
+
 template<class InputIterator1, class InputIterator2, class OutputIterator,
          class BinaryOperation>
 __forceinline
@@ -446,7 +459,7 @@ OutputIterator
   return result;
 }
 
-/// 25.2.4 Replace [alg.replace]
+
 template<class ForwardIterator, class T>
 __forceinline
 void
@@ -457,7 +470,7 @@ void
     if ( *first == old_value ) *first = new_value;
 }
 
-/// 25.2.4 Replace [alg.replace]
+
 template<class ForwardIterator, class Predicate, class T>
 __forceinline
 void
@@ -468,7 +481,7 @@ void
     if ( pred(*first) != false ) *first = new_value;
 }
 
-/// 25.2.4 Replace [alg.replace]
+
 template<class InputIterator, class OutputIterator, class T>
 __forceinline
 OutputIterator
@@ -479,7 +492,7 @@ OutputIterator
     if ( *result == old_value ) *result = new_value;
 }
 
-/// 25.2.4 Replace [alg.replace]
+
 template<class Iterator, class OutputIterator, class Predicate, class T>
 __forceinline
 OutputIterator
@@ -492,7 +505,7 @@ OutputIterator
 
 namespace __
 {
-  /// 25.2.5 Fill [alg.fill]
+  
   template<class OutputIterator, class Size, class T>
   __forceinline OutputIterator fill_n(OutputIterator first, Size n, const T& value)
   {
@@ -501,7 +514,7 @@ namespace __
   }
 }
 
-/// 25.2.5 Fill [alg.fill]
+
 template<class ForwardIterator, class T>
 __forceinline
 void
@@ -510,7 +523,7 @@ void
   for ( ; first != last; ++first ) *first = value;
 }
 
-/// 25.2.5 Fill [alg.fill]
+
 template<class OutputIterator, class Size, class T>
 __forceinline
 void
@@ -519,7 +532,7 @@ void
   for ( ; n--; ++first ) *first = value;
 }
 
-/// 25.2.6 Generate [alg.generate]
+
 template<class ForwardIterator, class Generator>
 __forceinline
 void
@@ -528,7 +541,7 @@ void
   for ( ; first != last; ++first ) *first = gen();
 }
 
-/// 25.2.6 Generate [alg.generate]
+
 template<class OutputIterator, class Size, class Generator>
 __forceinline
 void
@@ -537,7 +550,6 @@ void
   for ( ; n--; ++first ) *first = gen();
 }
 
-/// 25.2.7 Remove [alg.remove]
 template<class InputIterator, class OutputIterator, class T>
 __forceinline
 OutputIterator
@@ -553,7 +565,7 @@ OutputIterator
   return result;
 }
 
-/// 25.2.7 Remove [alg.remove]
+
 template<class InputIterator, class OutputIterator, class Predicate>
 __forceinline
 OutputIterator
@@ -569,7 +581,7 @@ OutputIterator
   return result;
 }
 
-/// 25.2.7 Remove [alg.remove]
+
 template<class ForwardIterator, class T>
 __forceinline
 ForwardIterator
@@ -581,7 +593,7 @@ ForwardIterator
   return i;
 }
 
-/// 25.2.7 Remove [alg.remove]
+
 template<class ForwardIterator, class Predicate>
 __forceinline
 ForwardIterator
@@ -593,7 +605,7 @@ ForwardIterator
   return i;
 }
 
-/// 25.2.8 Unique [alg.unique]
+
 template<class InputIterator, class OutputIterator>
 __forceinline
 OutputIterator
@@ -608,7 +620,7 @@ OutputIterator
   return result;
 }
 
-/// 25.2.8 Unique [alg.unique]
+
 template<class InputIterator, class OutputIterator, class BinaryPredicate>
 __forceinline
 OutputIterator
@@ -624,7 +636,7 @@ OutputIterator
   return result;
 }
 
-/// 25.2.8 Unique [alg.unique]
+
 template<class ForwardIterator>
 __forceinline
 ForwardIterator
@@ -634,7 +646,7 @@ ForwardIterator
   return unique_copy(first, last, first);
 }
 
-/// 25.2.8 Unique [alg.unique]
+
 template<class ForwardIterator, class BinaryPredicate>
 __forceinline
 ForwardIterator
@@ -644,7 +656,7 @@ ForwardIterator
   return unique_copy(first, last, first, pred);
 }
 
-/// 25.2.9 Reverse [alg.reverse]
+
 template<class BidirectionalIterator>
 __forceinline
 void
@@ -655,7 +667,7 @@ void
       iter_swap(first, last);
 }
 
-/// 25.2.9 Reverse [alg.reverse]
+
 template<class BidirectionalIterator, class OutputIterator>
 __forceinline
 OutputIterator
@@ -667,7 +679,7 @@ OutputIterator
   return result;
 }
 
-/// 25.2.10 Rotate [alg.rotate]
+
 template<class ForwardIterator>
 inline
 void
@@ -705,7 +717,10 @@ void
                  RandomAccessIterator last,
                  UniformRandomNumberGenerator& g);
 
-// 25.2.12, partitions:
+///\name 25.2.13, partitions:
+template <class InputIterator, class Predicate>
+bool is_partitioned(InputIterator first, InputIterator last, Predicate pred);
+
 template<class BidirectionalIterator, class Predicate>
 inline
 BidirectionalIterator
@@ -717,9 +732,20 @@ inline
 BidirectionalIterator
   stable_partition(BidirectionalIterator first, BidirectionalIterator last,
                    Predicate pred);
+template <class InputIterator, class OutputIterator1,
+class OutputIterator2, class Predicate>
+  pair<OutputIterator1, OutputIterator2>
+  partition_copy(InputIterator first, InputIterator last,
+  OutputIterator1 out_true, OutputIterator2 out_false,
+  Predicate pred);
 
-// 25.3, sorting and related operations:
-// 25.3.1, sorting:
+template<class ForwardIterator, class Predicate>
+ForwardIterator partition_point(ForwardIterator first,
+                                ForwardIterator last,
+                                Predicate pred);
+
+///\name 25.3, sorting and related operations:
+///\name 25.3.1, sorting:
 template<class RandomAccessIterator>
 inline
 void
@@ -768,7 +794,17 @@ RandomAccessIterator
                     RandomAccessIterator result_last,
                     Compare comp);
 
-/// 25.3.2 Nth element [alg.nth.element]
+template<class ForwardIterator>
+bool is_sorted(ForwardIterator first, ForwardIterator last);
+template<class ForwardIterator, class Compare>
+bool is_sorted(ForwardIterator first, ForwardIterator last,
+               Compare comp);
+template<class ForwardIterator>
+ForwardIterator is_sorted_until(ForwardIterator first, ForwardIterator last);
+template<class ForwardIterator, class Compare>
+ForwardIterator is_sorted_until(ForwardIterator first, ForwardIterator last,
+                                Compare comp);
+
 template<class RandomAccessIterator>
 inline
 void
@@ -781,7 +817,7 @@ void
   nth_element(RandomAccessIterator first, RandomAccessIterator nth,
               RandomAccessIterator last, Compare comp);
 
-// 25.3.3, binary search:
+///\name 25.3.3, binary search:
 template<class ForwardIterator, class T>
 inline
 ForwardIterator
@@ -826,7 +862,7 @@ bool
   binary_search(ForwardIterator first, ForwardIterator last,
                 const T& value, Compare comp);
 
-// 25.3.4, merge:
+///\name 25.3.4, merge:
 template<class InputIterator1, class InputIterator2, class OutputIterator>
 inline
 OutputIterator
@@ -854,7 +890,7 @@ void
   inplace_merge(BidirectionalIterator first, BidirectionalIterator middle,
                 BidirectionalIterator last, Compare comp);
 
-// 25.3.5, set operations:
+///\name 25.3.5, set operations on sorted structures:
 template<class InputIterator1, class InputIterator2>
 inline
 bool
@@ -927,7 +963,7 @@ OutputIterator
                            InputIterator2 first2, InputIterator2 last2,
                            OutputIterator result, Compare comp);
 
-// 25.3.6, heap operations:
+///\name 25.3.6, heap operations:
 template<class RandomAccessIterator>
 inline
 void
@@ -968,8 +1004,17 @@ inline
 void
   sort_heap(RandomAccessIterator first, RandomAccessIterator last, Compare comp);
 
-/// 25.3.7, minimum and maximum:
+template<class RandomAccessIterator>
+bool is_heap(RandomAccessIterator first, RandomAccessIterator last);
+template<class RandomAccessIterator, class Compare>
+bool is_heap(RandomAccessIterator first, RandomAccessIterator last, Compare comp);
+template<class RandomAccessIterator>
+RandomAccessIterator is_heap_until(RandomAccessIterator first, RandomAccessIterator last);
+template<class RandomAccessIterator, class Compare>
+RandomAccessIterator is_heap_until(RandomAccessIterator first, RandomAccessIterator last,
+                                   Compare comp);
 
+///\name 25.3.7 Minimum and maximum [alg.min.max]
 #ifdef min
 #undef min
 #endif
@@ -979,36 +1024,90 @@ void
 #endif
 
 template<class T>
-__forceinline
-const T&
-  min(const T& a, const T& b)
+__forceinline const T& min(const T& a, const T& b)
 {
   return ( b < a ) ? b : a;
 }
 
 template<class T, class Compare>
-__forceinline
-const T&
-  min(const T& a, const T& b, Compare comp)
+__forceinline const T& min(const T& a, const T& b, Compare comp)
 {
   return comp(b, a) ? b : a;
 }
 
+#ifdef NTL__CXX_VT
+template<class T, class... Args>
+const T& min(const T& a, const Args&... args);
+template<class T, class Compare>
+const T& min(const T& a, const T& b, Compare comp);
+template<class T, class U, class... Args>
+const T& min(const T& a, const U& b, const Args&... args);
+#endif
+
+template<class T>
+T min(initializer_list<T> t);
+
+template<class T, class Compare>
+T min(initializer_list<T> t, Compare comp);
+
 template<class T>
 __forceinline
-const T&
-  max(const T& a, const T& b)
+const T& max(const T& a, const T& b)
 {
   return ( a < b ) ? b : a;
 }
 
 template<class T, class Compare>
-__forceinline
-const T&
-  max(const T& a, const T& b, Compare comp)
+__forceinline const T& max(const T& a, const T& b, Compare comp)
 {
   return comp(a, b) ? b : a;
 }
+
+#ifdef NTL__CXX_VT
+template<class T, class... Args>
+const T& max(const T& a, const Args&... args);
+template<class T, class Compare>
+const T& max(const T& a, const T& b, Compare comp);
+template<class T, class U, class... Args>
+const T& max(const T& a, const U& b, const Args&... args);
+#endif
+
+template <class T>
+T max(initializer_list<T> t);
+
+template<class T, class Compare>
+T max(initializer_list<T> t, Compare comp);
+
+/**	\return <tt>pair<const T&, const T&>(b, a)</tt> if \p b is smaller than \p a, and <tt>pair<const T&, constT&>(a, b)</tt> otherwise. */
+template<class T> 
+inline pair<const T&, const T&> minmax(const T& a, const T& b)
+{
+  typedef pair<const T&,const T&> pair;
+  return b < a ? pair(a,b) : pair(b,a);
+}
+
+/**	\return <tt>pair<const T&, const T&>(b, a)</tt> if \p b is smaller than \p a, and <tt>pair<const T&, constT&>(a, b)</tt> otherwise. */
+template<class T, class Compare>
+inline pair<const T&, const T&> minmax(const T& a, const T& b, Compare comp)
+{
+  typedef pair<const T&,const T&> pair;
+  return comp(b,a) ? pair(a,b) : pair(b,a);
+}
+
+template<class T>
+pair<const T&, const T&> minmax(initializer_list<T> t);
+
+template<class T, class Compare>
+pair<const T&, const T&> minmax(initializer_list<T> t, Compare comp);
+
+#ifdef NTL__CXX_VT
+template<class T, class... Args>
+pair<const T&, const T&> minmax(const T& a, const Args&... args);
+template<class T, class Compare>
+pair<const T&, const T&> minmax(const T& a, const T& b, Compare comp);
+template<class T, class U, class... Args>
+pair<const T&, const T&> minmax(const T& a, const U& b, const Args&... args);
+#endif
 
 template<class ForwardIterator>
 inline
@@ -1030,11 +1129,17 @@ inline
 ForwardIterator
   max_element(ForwardIterator first, ForwardIterator last, Compare comp);
 
-/// 25.3.8 Lexicographical comparison [alg.lex.comparison]
+template<class ForwardIterator>
+pair<ForwardIterator, ForwardIterator>
+minmax_element(ForwardIterator first, ForwardIterator last);
+template<class ForwardIterator, class Compare>
+pair<ForwardIterator, ForwardIterator>
+minmax_element(ForwardIterator first, ForwardIterator last, Compare comp);
+
+
+///\name 25.3.8 Lexicographical comparison [alg.lex.comparison]
 template<class InputIterator1, class InputIterator2>
-__forceinline
-bool
-  lexicographical_compare(InputIterator1 first1, InputIterator1 last1,
+__forceinline bool lexicographical_compare(InputIterator1 first1, InputIterator1 last1,
                           InputIterator2 first2, InputIterator2 last2)
 {
   for ( ; first1 != last1; ++first1, ++first2 )
@@ -1046,11 +1151,9 @@ bool
   return first2 != last2;
 }
 
-/// 25.3.8 Lexicographical comparison [alg.lex.comparison]
+
 template<class InputIterator1, class InputIterator2, class Compare>
-__forceinline
-bool
-  lexicographical_compare(InputIterator1 first1, InputIterator1 last1,
+__forceinline bool lexicographical_compare(InputIterator1 first1, InputIterator1 last1,
                           InputIterator2 first2, InputIterator2 last2,
                           Compare comp)
 {
@@ -1063,7 +1166,7 @@ bool
   return first2 != last2;
 }
 
-// 25.3.9, permutations
+///\name 25.3.9 Permutation generators [alg.permutation.generators]
 template<class BidirectionalIterator>
 inline
 bool
@@ -1088,7 +1191,7 @@ bool
 
 }//namespace std
 
-#endif//#ifndef NTL__STLX_ALGORITHM
+#endif // NTL__STLX_ALGORITHM
 
 // This file is derived from HP STL and STLPort:
 /*

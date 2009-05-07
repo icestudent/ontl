@@ -58,7 +58,7 @@ bool operator>=(const T & x, const T & y) { return !(x < y); }
 #pragma endregion
 
 #pragma region forward
-/// 20.2.2 forward/move helpers [forward]
+///\name 20.2.2 forward/move helpers [forward]
 #ifdef NTL__CXX_RV
   template <class T>
   struct identity
@@ -106,10 +106,11 @@ bool operator>=(const T & x, const T & y) { return !(x < y); }
   template<class T>
   inline void swap(T& a, T& b);
 
-/// Pairs [20.2.3 pairs]
+///\name Pairs [20.2.3 pairs]
+
 #pragma warning(push)
-// assignment operator could not be generated if either T is const
-#pragma warning(disable:4512)
+#pragma warning(disable:4512) // assignment operator could not be generated if either T is const
+
 template<class T1, class T2>
 struct pair
 {
@@ -219,8 +220,6 @@ template <class T1, class T2>
 struct constructible_with_allocator_prefix<pair<T1, T2> >: true_type {};
 
 ///\name  Comparisons
-///@{
-
 template<class T1, class T2>
 inline
 bool
@@ -270,13 +269,13 @@ bool
   return !(x < y);
 }
 
-template<class T1, class T2> inline void swap(pair<T1, T2>& x, pair<T1, T2>& y) { x.swap(y); }
+template<class T1, class T2> inline void swap(pair<T1, T2>&  x, pair<T1, T2>&  y) { x.swap(y); }
 #ifdef NTL__CXX_RV
-template<class T1, class T2> inline void swap(pair<T1, T2>&& x, pair<T1, T2>& y) { x.swap(y); }
-template<class T1, class T2> inline void swap(pair<T1, T2>& x, pair<T1, T2>&& y) { x.swap(y); }
+template<class T1, class T2> inline void swap(pair<T1, T2>&& x, pair<T1, T2>&  y) { x.swap(y); }
+template<class T1, class T2> inline void swap(pair<T1, T2>&  x, pair<T1, T2>&& y) { x.swap(y); }
 #endif
-///@}
 
+///\name Make pair
 #ifdef NTL__CXX_RV
 template<typename T>
 class reference_wrapper;
@@ -309,13 +308,38 @@ inline typename __::pair_result<T1, T2>::type make_pair(T1&& x, T2&& y)
 }
 
 #else
+
 template<class T1, class T2>
 inline pair<T1, T2> make_pair(T1 x, T2 y)
 {
   return pair<T1, T2>( x, y );
 }
-#endif
+
+#endif // RV
+
 #pragma endregion
+
+///\name 20.2.x.1 class noncopyable [utility.noncopyable] 
+namespace __ { namespace unspecified
+{
+  struct noncopyable
+  {
+  protected:
+    noncopyable(){}
+    ~noncopyable(){}
+  private:
+    noncopyable(const noncopyable&) __deleted;
+    const noncopyable& operator=(const noncopyable&) __deleted;
+  };
+}}
+
+/**
+ *	@brief 20.2.x.1 class noncopyable [utility.noncopyable] 
+ *  @details Class noncopyable is provided to simplify creation of classes that inhibit copy semantics.
+ **/
+typedef __::unspecified::noncopyable noncopyable;
+
+///\}
 
 /**@} lib_utility */
 /**@} lib_utilities */

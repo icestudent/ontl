@@ -290,42 +290,17 @@ class reference_wrapper:
       return *ptr;
     }
 
-#ifdef NTL__CXX_VT
-    // invocation
-    template <class T1, class T2, ..., class TN>
-    typename result_of<T(T1, T2, ..., TN)>::type
-      operator() (T1&, T2&, ..., TN&) const
-    {
-    // Returns: INVOKE (get(), a1, a2, ..., aN). ([3.3])
-      return get()(t1);
-    }
-#else
-#if 1
-    typename result_of<T()>::type operator()() const { return func::invoke<typename result_of<T()>::type>(get(), make_tuple()); }
+    typename result_of<T()>::type operator()() const { return __::func::invoke<typename result_of<T()>::type>(get(), make_tuple()); }
     template<class A1>
-    typename result_of<T(A1)>::type operator()(A1& a1) const { return func::invoke<typename result_of<T(A1)>::type>(get(), make_tuple(a1)); }
+    typename result_of<T(A1)>::type operator()(A1& a1) const { return __::func::invoke<typename result_of<T(A1)>::type>(get(), make_tuple(a1)); }
     template<class A1, class A2>
-    typename result_of<T(A1,A2)>::type operator()(A1& a1, A2& a2) const { return func::invoke<typename result_of<T(A1,A2)>::type>(get(), make_tuple(a1, a2)); }
+    typename result_of<T(A1,A2)>::type operator()(A1& a1, A2& a2) const { return __::func::invoke<typename result_of<T(A1,A2)>::type>(get(), make_tuple(a1, a2)); }
     template<class A1, class A2, class A3>
-    typename result_of<T(A1,A2,A3)>::type operator()(A1& a1, A2& a2, A3& a3) const { return func::invoke<typename result_of<T(A1,A2,A3)>::type>(get(), make_tuple(a1, a2, a3)); }
+    typename result_of<T(A1,A2,A3)>::type operator()(A1& a1, A2& a2, A3& a3) const { return __::func::invoke<typename result_of<T(A1,A2,A3)>::type>(get(), make_tuple(a1, a2, a3)); }
     template<class A1, class A2, class A3, class A4>
-    typename result_of<T(A1,A2,A3,A4)>::type operator()(A1& a1, A2& a2, A3& a3, A4& a4) const { return func::invoke<typename result_of<T(A1,A2,A3,A4)>::type>(get(), make_tuple(a1, a2, a3, a4)); }
+    typename result_of<T(A1,A2,A3,A4)>::type operator()(A1& a1, A2& a2, A3& a3, A4& a4) const { return __::func::invoke<typename result_of<T(A1,A2,A3,A4)>::type>(get(), make_tuple(a1, a2, a3, a4)); }
     template<class A1, class A2, class A3, class A4, class A5>
-    typename result_of<T(A1,A2,A3,A4,A5)>::type operator()(A1& a1, A2& a2, A3& a3, A4& a4, A5& a5) const { return func::invoke<typename result_of<T(A1,A2,A3,A4,A5)>::type>(get(), make_tuple(a1, a2, a3, a4, a5)); }
-#else
-    typename result_of<T()>::type operator()() const { return get()(); }
-    template<class A1>
-    typename result_of<T(A1)>::type operator()(A1& a1) const { return get()(a1); }
-    template<class A1, class A2>
-    typename result_of<T(A1,A2)>::type operator()(A1& a1, A2& a2) const { return get()(a1, a2); }
-    template<class A1, class A2, class A3>
-    typename result_of<T(A1,A2,A3)>::type operator()(A1& a1, A2& a2, A3& a3) const { return get()(a1, a2, a3); }
-    template<class A1, class A2, class A3, class A4>
-    typename result_of<T(A1,A2,A3,A4)>::type operator()(A1& a1, A2& a2, A3& a3, A4& a4) const { return get()(a1, a2, a3, a4); }
-    template<class A1, class A2, class A3, class A4, class A5>
-    typename result_of<T(A1,A2,A3,A4,A5)>::type operator()(A1& a1, A2& a2, A3& a3, A4& a4, A5& a5) const { return get()(a1, a2, a3, a4, a5); }
-#endif
-#endif
+    typename result_of<T(A1,A2,A3,A4,A5)>::type operator()(A1& a1, A2& a2, A3& a3, A4& a4, A5& a5) const { return __::func::invoke<typename result_of<T(A1,A2,A3,A4,A5)>::type>(get(), make_tuple(a1, a2, a3, a4, a5)); }
 
   ///////////////////////////////////////////////////////////////////////////
   private:
@@ -1029,50 +1004,6 @@ namespace __
 // TODO: floating point hash function implementation
 
 /**@} lib_hash */
-#pragma endregion
-
-#pragma region func.reference_closure
-
-template<class> class reference_closure;
-
-#ifdef NTL__CXX_VT
-
-template<class R, class... ArgTypes >
-class reference_closure<R (ArgTypes...)>
-{
-public:
-  typedef R result_type;
-  typedef T1 argument_type; // if sizeof...(ArgTypes) == 1 and ArgTypes contains T1
-  typedef T1 first_argument_type; // if sizeof...(ArgTypes) == 2 and ArgTypes contains T1, T2
-  typedef T2 second_argument_type; // if sizeof...(ArgTypes) == 2 and ArgTypes contains T1, T2
-
-  // 20.6.17.1, construct/copy/destroy:
-  reference_closure() = default;
-  reference_closure(const reference_closure&) = default;
-  constexpr reference_closure(nullptr_t);
-  reference_closure& operator=(const reference_closure&) = delete;
-  reference_closure& operator=(nullptr_t);
-  ~reference_closure() = default;
-  // 20.6.17.2, observer:
-  explicit operator bool() const;
-  // 20.6.17.3, invocation:
-  R operator()(ArgTypes...) const;
-};
-
-// 20.6.17.4, comparisons:
-template <class R, class... ArgTypes>
-bool operator==(const reference_closure<R (ArgTypes...)>&, nullptr_t);
-
-template <class R, class... ArgTypes>
-bool operator==(nullptr_t, const reference_closure<R (ArgTypes...)>&);
-
-template <class R, class... ArgTypes>
-bool operator!=(const reference_closure<R(ArgTypes...)>&, nullptr_t);
-
-template <class R, class... ArgTypes>
-bool operator!=(nullptr_t, const reference_closure<R (ArgTypes...)>&);
-
-#endif
 #pragma endregion
 
 /**@} lib_function_objects */

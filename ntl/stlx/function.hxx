@@ -35,9 +35,8 @@ namespace std
     const char* what() const __ntl_nothrow { return "bad_function_call"; }
   };
 
-  /// Polymorphic function wrappers
-  namespace func
-  {
+  namespace __ { namespace func {
+
     /// function<> implementation
     /// \version 1
     /// \internal
@@ -52,6 +51,7 @@ namespace std
         /************************************************************************/
         /* Base Caller                                                          */
         /************************************************************************/
+#if 0
         template<class R, class Args, size_t Argc = tuple_size<Args>::value>
         struct caller;
 
@@ -250,6 +250,7 @@ namespace std
         private:
           reference_wrapper<F> f;
         };
+#endif
 
         //////////////////////////////////////////////////////////////////////////
         template<typename R, class Args, size_t Argc = tuple_size<Args>::value>
@@ -262,28 +263,44 @@ namespace std
         struct fun_arity<R,Args,2>: binary_function<typename tuple_element<0, Args>::type, typename tuple_element<1, Args>::type, R>{};
 
         //////////////////////////////////////////////////////////////////////////
-        using ttl::meta::int2type;
 
-        template<class R, class Args>
-        struct args_callee
+        template<typename R, class Args>
+        struct caller
         {
-          typedef caller<R, Args> caller;
-
-          static R call(caller& f, Args& args, int2type<0>)
-          {
-            return f();
-          }
-          static R call(caller& f, Args& args, int2type<1>)
-          {
-            return f(get<0>(args));
-          }
-          static R call(caller& f, Args& args, int2type<2>)
-          {
-            return f(get<0>(args), get<1>(args));
-          }
+          virtual R operator()(const Args&) const = 0;
+          virtual caller* clone() const = 0;
+          virtual ~caller(){}
+          virtual const type_info& target_type() const = 0;
+          virtual void* target() = 0;
         };
-      } // namespace impl
 
+        template<typename R, class F, class Args>
+        struct fun_caller:
+          caller<R,Args>
+        {
+          explicit fun_caller(const F& f)
+            :f(f)
+          {}
+
+          R operator()(const Args& args) const
+          {
+            return fn_caller<F,Args,R>::call(f, args);
+          }
+          caller<R,Args>* clone() const
+          {
+            return new fun_caller(f);
+          }
+          const type_info& target_type() const { return target_type<false>(__::is_refwrap<F>()); }
+          void* target() { return target<false>(__::is_refwrap<F>()); }
+        protected:
+          template<bool> const type_info& target_type(false_type) const { return __ntl_typeid(f); }
+          template<bool> const type_info& target_type(true_type)  const { return __ntl_typeid(f.get()); }
+          template<bool> void* target(false_type) { return reinterpret_cast<void*>(&f); }
+          template<bool> void* target(true_type)  { return reinterpret_cast<void*>(&f.get()); }
+        private:
+          F f;
+        };
+      }
 
 
       /************************************************************************/
@@ -298,7 +315,7 @@ namespace std
         impl::fun_arity<R, Args>
       {
       protected:
-        typedef int                   nullptr_t;
+        typedef int nullptr_t;
       public:
         enum { 
           /** arguments count */
@@ -334,7 +351,7 @@ namespace std
         template<typename F>
         explicit function(reference_wrapper<F> rf)
         {
-          caller = new impl::refwrap_caller<F, R, Args>(rf);
+          caller = new impl::fun_caller<R, reference_wrapper<F>, Args>(rf);
         }
 
         /** Copies \c r target */
@@ -360,7 +377,7 @@ namespace std
         explicit function(F&& f)
           :caller()
         {
-          assign_impl(forward<F>(f), is_member_function_pointer<F>());
+          assign_impl(forward<F>(f));
         }
 
         /** Moves \c f to this wrapper */
@@ -392,7 +409,7 @@ namespace std
         explicit function(const F& f)
           :caller()
         {
-          assign_impl(f, is_member_function_pointer<F>());
+          assign_impl(f);
         }
 
         ///** Constructs function wrapper from copy of callable \c f */
@@ -407,7 +424,7 @@ namespace std
         template<class F> function& operator=(const F& f) 
         {
           clear();
-          assign_impl(f, is_member_function_pointer<F>());
+          assign_impl(f);
           return *this;
         }
 
@@ -431,18 +448,17 @@ namespace std
         result_type operator()(Args& args) const __ntl_nothrow
         {
           if(!caller) __ntl_throw(bad_function_call());
-
-          return v1::impl::args_callee<R, Args>::call(*caller, args, ttl::meta::int2type<arity>());
+          return (*caller)(args);
         }
 
         result_type operator()() const __ntl_throws(bad_function_call)
-        { if(!caller) __ntl_throw(bad_function_call()); return (*caller)(); }
+        { if(!caller) __ntl_throw(bad_function_call()); return (*caller)(Args()); }
 
         result_type operator()(typename __::arg_t<0, Args>::type a1) const __ntl_throws(bad_function_call)
-        { if(!caller) __ntl_throw(bad_function_call()); return (*caller)(a1); }
+        { if(!caller) __ntl_throw(bad_function_call()); return (*caller)(Args(a1)); }
 
         result_type operator()(typename __::arg_t<0, Args>::type a1, typename __::arg_t<1, Args>::type a2) const __ntl_throws(bad_function_call)
-        { if(!caller) __ntl_throw(bad_function_call()); return (*caller)(a1,a2); }
+        { if(!caller) __ntl_throw(bad_function_call()); return (*caller)(Args(a1,a2)); }
 
 
         // 20.6.15.2.3 function capacity
@@ -488,7 +504,7 @@ namespace std
         /** Returns pointer to constant target if T is type of the target or null pointer otherwise */
         template <typename T> const T* target() const __ntl_nothrow
         {
-          return caller && typeid(T) == target_type() ? reinterpret_cast<T*>(caller->target()) : nullptr;
+          return caller && typeid(T) == target_type() ? reinterpret_cast<const T*>(caller->target()) : nullptr;
         }
     #endif
       protected:
@@ -502,25 +518,21 @@ namespace std
         }
         /// \endcond
 
-        template<class MemFn> inline void assign_impl(MemFn f, true_type)
-        {
-          if(f) caller = new impl::memfun_caller<MemFn, R, Args>(f);
-        }
     #ifndef NTL__CXX_RV
-        template<class Fn> inline void assign_impl(const Fn& f, false_type)
+        template<class Fn> inline void assign_impl(const Fn& f)
         {
           if(check_ptr(f, is_pointer<Fn>()))
-            caller = new impl::functor_caller<Fn, result_type, Args>(f);
+            caller = new impl::fun_caller<result_type, Fn, Args>(f);
         }
-        //template<class Fn> inline void assign_impl(Fn& f, false_type)
+        //template<class Fn> inline void assign_impl(Fn& f)
         //{
         //  caller = new impl::functor_caller<Fn, result_type, Args>(f);
         //}
     #else
-        template<class Fn> inline void assign_impl(Fn&& f, false_type)
+        template<class Fn> inline void assign_impl(Fn&& f)
         {
           if(check_ptr(f, is_pointer<Fn>()))
-            caller = new impl::functor_caller<Fn, result_type, Args>(forward<Fn>(f));
+            caller = new impl::fun_caller<result_type, Fn, Args>(forward<Fn>(f));
         }
     #endif
 
@@ -533,8 +545,9 @@ namespace std
         impl::caller<result_type, Args>* caller;
       };
     } // namespace v1
-
     namespace detail = v1;
+    } // func
+  } // __
 
     /************************************************************************/
     /* Function interface wrapper                                           */
@@ -544,9 +557,9 @@ namespace std
     /** function<> specialization for 0 arguments. \sa v1::function */
     template<class R>
     class function<R()>: 
-      public v1::function<R>
+      public __::func::detail::function<R>
     {
-      typedef v1::function<R> base;
+      typedef __::func::detail::function<R> base;
     public:
       template<typename F>
       explicit function(F f)
@@ -564,9 +577,9 @@ namespace std
     /** function<> specialization for 1 argument */
     template<class R, class A1>
     class function<R(A1)>:
-      public v1::function<R, tuple<A1> >
+      public __::func::detail::function<R, FUNARGS(A1)>
     {
-      typedef v1::function<R, tuple<A1> > base;
+      typedef __::func::detail::function<R, FUNARGS(A1)> base;
     public:
       template<typename F>
       explicit function(F f)
@@ -584,9 +597,9 @@ namespace std
     /** function<> specialization for 2 arguments */
     template<class R, class A1, class A2>
     class function<R(A1, A2)>: 
-      public v1::function<R, tuple<A1,A2> >
+      public __::func::detail::function<R, FUNARGS(A1,A2)>
     {
-      typedef v1::function<R, tuple<A1, A2> > base;
+      typedef __::func::detail::function<R, FUNARGS(A1,A2)> base;
     public:
       template<typename F>
       explicit function(F f)
@@ -600,10 +613,6 @@ namespace std
       function& operator=(nullptr_t) { clear(); return *this; }
       template<class F> function& operator=(F f) { base::operator=(f); return *this; }
     };
-
-  } // namespace func
-
-  using namespace func;
 
   /**@} lib_func_wrap        */
   /**@} lib_function_objects */

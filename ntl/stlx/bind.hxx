@@ -45,7 +45,6 @@ namespace std
       namespace tl = ntl::meta::tl;
       using ntl::meta::tlist;
 
-      template<size_t i> struct index: integral_constant<int, i>{};
       template<size_t i> struct flag : integral_constant<int, i>{};
 
       template<class Bunch, class Args>
@@ -61,7 +60,7 @@ namespace std
         {
           typedef typename get_bound_type<I>::type B;
           static const int N = is_placeholder<B>::value;
-          static_assert(N == 0 || (N-1 < static_cast<int>(ArgsSize)), "Placeholder's index is out of bounds.");
+          static_assert(N == 0 || (N-1 < static_cast<int>(ArgsSize)), "Placeholder's index_type is out of bounds.");
           typedef typename conditional<(N > 0), get_arg_type<N-1>, get_bound_type<I> >::type weak_type;
           typedef typename weak_type::type type;
         };
@@ -90,17 +89,17 @@ namespace std
         typedef typename tup2tl<argtype_handler, typename Bunch::types>::result bound_types;
       protected:
         template<typename R, size_t I, int N>
-        static R arg(const Bunch&, const Args& args, index<N>)
+        static R arg(const Bunch&, const Args& args, index_type<N>)
         {
           return field2<R,N-1>::get(args);
         }
         template<typename R, size_t I>
-        static R arg(const Bunch& bunch, const Args&, index<0>)
+        static R arg(const Bunch& bunch, const Args&, index_type<0>)
         {
           return field2<R,I>::get(bunch);
         }
         template<typename R, size_t I>
-        static R arg(const Bunch&, const Args&, index<-1>)
+        static R arg(const Bunch&, const Args&, index_type<-1>)
         {
           return empty_type();
         }
@@ -108,7 +107,7 @@ namespace std
         static typename argtype<I>::type get(const Bunch& b, const Args& a)
         {
           typedef typename argtype<I>::type R;
-          return arg<typename argtype<I>::type,I>(b,a,index<argtype<I>::N>());
+          return arg<typename argtype<I>::type,I>(b,a,index_type<argtype<I>::N>());
         }
       public:
         typedef typename tl2tup<bound_types>::type tuple_type;
@@ -125,7 +124,7 @@ namespace std
     {
       template<class A1 = empty_type, class A2 = empty_type> struct R
       {
-        typedef tuple<A1,A2> Args;
+        typedef FUNARGS(A1,A2) Args;
         typedef typename conditional<relaxed, type2type<Result>, result_of_impl<F> >::type weak_type;
         typedef typename weak_type::type type;
       };
@@ -165,10 +164,10 @@ namespace std
 
     template<class F, class A1 = empty_type, class A2 = empty_type>
     struct binder
-    {typedef bind_t<empty_type, F, tuple<A1,A2> > type; };
+    {typedef bind_t<empty_type, F, FUNARGS(A1,A2)> type; };
     template<typename R, class F, class A1 = empty_type, class A2 = empty_type>
     struct nbinder
-    {typedef bind_t<R, F, tuple<A1,A2>, true> type; };
+    {typedef bind_t<R, F, FUNARGS(A1,A2), true> type; };
   } // __
 
   template<typename R, class F, class Args, bool relaxed>
@@ -178,21 +177,21 @@ namespace std
   template<class F>
   typename __::binder<F>::type bind(F f)
   {
-    return typename __::binder<F>::type(f, tuple<>());
+    return typename __::binder<F>::type(f, FUNARGS()());
   }
 
   // 1 argument
   template<class F, class A1>
   typename __::binder<F, A1>::type bind(F f, A1 a1)
   {
-    return typename __::binder<F, A1>::type(f, tuple<A1>(a1));
+    return typename __::binder<F, A1>::type(f, FUNARGS(A1)(a1));
   }
 
   // 2 arguments
   template<class F, class A1, class A2>
   typename __::binder<F, A1,A2>::type bind(F f, A1 a1, A2 a2)
   {
-    return typename __::binder<F, A1,A2>::type(f, tuple<A1,A2>(a1,a2));
+    return typename __::binder<F, A1,A2>::type(f, FUNARGS(A1,A2)(a1,a2));
   }
 
   // non-strict bind()
@@ -201,21 +200,21 @@ namespace std
   template<typename R, class F>
   typename __::nbinder<R,F>::type bind(F f)
   {
-    return typename __::nbinder<R,F>::type(f, tuple<>());
+    return typename __::nbinder<R,F>::type(f, FUNARGS()());
   }
 
   // 1 argument
   template<typename R, class F, class A1>
   typename __::nbinder<R,F, A1>::type bind(F f, A1 a1)
   {
-    return typename __::nbinder<R,F, A1>::type(f, tuple<A1>(a1));
+    return typename __::nbinder<R,F, A1>::type(f, FUNARGS(A1)(a1));
   }
 
   // 2 arguments
   template<typename R, class F, class A1, class A2>
   typename __::nbinder<R,F, A1,A2>::type bind(F f, A1 a1, A2 a2)
   {
-    return typename __::nbinder<R,F, A1,A2>::type(f, tuple<A1,A2>(a1,a2));
+    return typename __::nbinder<R,F, A1,A2>::type(f, FUNARGS(A1,A2)(a1,a2));
   }
 
   /**@} lib_bind */

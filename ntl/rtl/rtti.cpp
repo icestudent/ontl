@@ -142,7 +142,7 @@ namespace ntl { namespace cxxruntime
     T* operator()(T* obj) const
     {
       ptrdiff_t off = 0;
-      if(vbtable_offset >= 0){
+      if(static_cast<int>(vbtable_offset) >= 0){
         // *(ptrdiff_t*)((char*)*(ptrdiff_t*)((char*)pThis + RetOff) + pmd.vdisp);
         off = vbtable_offset + *reinterpret_cast<const ptrdiff_t*>(*reinterpret_cast<const ptrdiff_t*>(ptr::padd(obj, vbtable_offset)) + vdisp_offset);
       }

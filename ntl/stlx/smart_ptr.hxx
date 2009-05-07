@@ -719,7 +719,7 @@ namespace std
     namespace __
     {
       struct shared_ptr_base:
-        private ntl::noncopyable
+        private std::noncopyable
       {
         long use_count, weak_count;
 

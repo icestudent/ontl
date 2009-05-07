@@ -66,7 +66,7 @@ namespace std
     template<class F, class Args = tuple<> >
     struct thread_params: thread_params_base
     {
-      std::func::detail::function<void, Args> fn;
+      std::__::func::detail::function<void, Args> fn;
       Args args;
 
       explicit thread_params(F f, const Args& a)
@@ -455,7 +455,7 @@ namespace std
   inline thread::thread(F f, A1 a1)
     :h(),tid(),cleanup()
   {
-    typedef __::thread_params<F, tuple<A1> > tparams;
+    typedef __::thread_params<F, FUNARGS(A1) > tparams;
     tparams* tp = new tparams(f, std::move(make_tuple(a1)));
     start(tp);
   }
@@ -464,7 +464,7 @@ namespace std
   inline thread::thread(F f, A1 a1, A2 a2)
     :h(),tid(),cleanup()
   {
-    typedef __::thread_params<F, tuple<A1,A2> > tparams;
+    typedef __::thread_params<F, FUNARGS(A1,A2)> tparams;
     tparams* tp = new tparams(f, std::move(make_tuple(a1,a2)));
     start(tp);
   }
@@ -473,7 +473,7 @@ namespace std
   inline thread::thread(F f, A1 a1, A2 a2, A3 a3)
     :h(),tid(),cleanup()
   {
-    typedef __::thread_params<F, tuple<A1,A2,A3> > tparams;
+    typedef __::thread_params<F, FUNARGS(A1,A2,A3)> tparams;
     tparams* tp = new tparams(f, std::move(make_tuple(a1,a2,a3)));
     start(tp);
   }

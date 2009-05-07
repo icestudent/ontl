@@ -47,7 +47,7 @@ namespace __
 {
 
 template <size_t N>
-struct placeholder_t : integral_constant<size_t, N>
+struct placeholder_t: integral_constant<size_t, N>
 {};
 
 #ifndef NTL_DONT_AVOID_EXTERN
@@ -71,15 +71,6 @@ struct placeholder_t : integral_constant<size_t, N>
 //  function_in_another_dll() would wrongly returns false.
 //
 
-// !fr3@K!  Fixture template to to avoid "extern".
-template <size_t N>
-struct placeholder_fixture
-{
-  static placeholder_t<N> instance;
-};
-
-template <size_t N>
-placeholder_t<N> placeholder_fixture<N>::instance;
 
 #endif // !NTL_DONT_AVOID_EXTERN
 
@@ -88,7 +79,7 @@ placeholder_t<N> placeholder_fixture<N>::instance;
 #ifndef NTL_DONT_AVOID_EXTERN
 
 #define NTL_DEFINE_PLACEHOLDER(n, not_used) \
-  __::placeholder_t<n>& NTL_SPP_CAT(_, n) = __::placeholder_fixture<n>::instance;
+  static const __::placeholder_t<n> NTL_SPP_CAT(_, n);
 
 #else
 
@@ -102,7 +93,7 @@ placeholder_t<N> placeholder_fixture<N>::instance;
 // !fr3@K!
 // When NTL_DONT_AVOID_EXTERN is NOT defined (default):
 //   __::placeholder_t<1>& _1 = __::placeholder_fixture<1>::instance;
-//   __::placeholder_t<1>& _2 = __::placeholder_fixture<2>::instance;
+//   __::placeholder_t<2>& _2 = __::placeholder_fixture<2>::instance;
 //   ...
 //
 // When NTL_DONT_AVOID_EXTERN is defined:

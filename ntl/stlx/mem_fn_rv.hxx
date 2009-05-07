@@ -76,8 +76,8 @@ namespace std
   template<typename U> \
   result_type operator()(U&& obj TTL_REPEAT(n, NTL_DEFINE_MEMFNARG, NTL_DEFINE_MEMFNARG, aux)) const \
   { \
-  static_assert(tuple_size<Args>::value == n, "wrong count of arguments"); \
-  return func::invoke<result_type>(pmf, tuple<U&& TTL_REPEAT(n, NTL_DEFINE_MEMFNARGT, NTL_DEFINE_MEMFNARGT, aux)>(obj, NTL_SPP_NEST( NTL_SPP_ARGS(1,n,a) ) )); \
+    static_assert(tuple_size<Args>::value == n, "wrong count of arguments"); \
+    return __::func::invoke<result_type>(pmf, typename __::tmap<U&& TTL_REPEAT(n, NTL_DEFINE_MEMFNARGT, NTL_DEFINE_MEMFNARGT, aux)>::type(obj, NTL_SPP_NEST( NTL_SPP_ARGS(1,n,a) ) )); \
   } 
 #endif
 
@@ -95,14 +95,14 @@ namespace std
     result_type operator()(U&& obj) const
     {
       static_assert(tuple_size<Args>::value == 0, "wrong count of arguments");
-      return func::invoke<result_type>(pmf, tuple<U&&>(obj));
+      return func::invoke<result_type>(pmf, typename __::tmap<U&&>::type(obj));
     }
 #if 0
     template<typename U>
     result_type operator()(U&& obj, typename __::arg_t<0, Args>::type a1) const
     {
       static_assert(tuple_size<Args>::value == 1, "wrong count of arguments");
-      return func::invoke<result_type>(pmf, tuple<U&&, typename __::arg_t<0, Args>::type>(obj, a1));
+      return func::invoke<result_type>(pmf, typename __::tmap<U&&, typename __::arg_t<0, Args>::type>::type(obj, a1));
     }
 #else
     TTL_REPEAT_NEST(TTL_MAX_TEMPLATE_PARAMS,NTL_DEFINE_MEMFNOP,NTL_DEFINE_MEMFNOP,)
@@ -122,9 +122,9 @@ namespace std
   // ARGC == n
 #define NTL_DEFINE_MEMFN(cv, n) \
   template<typename R, class T, NTL_SPP_ARGS(1, n, typename A)> \
-  mem_fn_t<R, cv T, R(T::*)(NTL_SPP_ARGS(1,n,A)) cv, tuple<NTL_SPP_ARGS(1,n,A)> > mem_fn( R (T::* pm)(NTL_SPP_ARGS(1,n,A)) cv ) __ntl_nothrow \
+  mem_fn_t<R, cv T, R(T::*)(NTL_SPP_ARGS(1,n,A)) cv, typename __::tmap<NTL_SPP_ARGS(1,n,A)>::type> mem_fn( R (T::* pm)(NTL_SPP_ARGS(1,n,A)) cv ) __ntl_nothrow \
   { \
-    return mem_fn_t<R, cv T, R(T::*)(NTL_SPP_ARGS(1,n,A)) cv, tuple<NTL_SPP_ARGS(1,n,A)> > (pm); \
+    return mem_fn_t<R, cv T, R(T::*)(NTL_SPP_ARGS(1,n,A)) cv, typename __::tmap<NTL_SPP_ARGS(1,n,A)>::type> (pm); \
   }
 
   NTL_DEFINE_MEMFN0(NTL__EMPTY);
@@ -177,9 +177,9 @@ namespace std
   mem_fn_t<R, const volatile T, R(T::*)()const volatile> mem_fn( R (T::* pm)() const volatile) __ntl_nothrow;
 
   template<typename R, class T, class A1>
-  mem_fn_t<R, T, R(T::*)(A1), tuple<A1> > mem_fn( R (T::* pm)(A1) ) __ntl_nothrow
+  mem_fn_t<R, T, R(T::*)(A1), typename __::tmap<A1>::type> mem_fn( R (T::* pm)(A1) ) __ntl_nothrow
   {
-    return mem_fn_t<R, T, R(T::*)(A1), tuple<A1> >(pm);
+    return mem_fn_t<R, T, R(T::*)(A1), typename __::tmap<A1>::type>(pm);
   }
 
 #endif
