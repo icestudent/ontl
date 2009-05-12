@@ -1,7 +1,9 @@
 #ifndef NTL__STDINT
 #define NTL__STDINT
 
-#include "cstdint"
+#ifndef NTL__STLX_CSTDINT
+#include "stlx/cstdint.hxx"
+#endif
 
 using std::int8_t;
 using std::uint8_t;

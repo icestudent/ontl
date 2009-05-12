@@ -10,7 +10,6 @@
 
 #include "iterator.hxx"
 #include "memory.hxx"
-#include "type_traits.hxx"
 
 namespace std {
 

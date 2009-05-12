@@ -9,8 +9,7 @@
 #ifndef NTL__HANDLE
 #define NTL__HANDLE
 
-//#include <functional>
-#include "cstdint"
+#include "stlx/cstdint.hxx"
 #include "stlx/excptdef.hxx"
 #include "stlx/cstddef.hxx"
 

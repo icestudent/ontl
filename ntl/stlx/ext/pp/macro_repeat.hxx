@@ -11,7 +11,6 @@
 #ifndef __ttl_macro_repeat__hpp
 #define __ttl_macro_repeat__hpp
 
-#include "macro_misc.hxx"
 #include "macro_counter.hxx"
 
 

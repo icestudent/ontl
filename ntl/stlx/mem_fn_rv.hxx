@@ -7,8 +7,6 @@
 #ifndef NTL_MEMFN_RV
 #define NTL_MEMFN_RV
 
-#include "type_traits.hxx"
-#include "tuple.hxx"
 #include "fn_caller.hxx"
 
 namespace std

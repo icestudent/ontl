@@ -22,9 +22,11 @@
 #define _NTL_LOC_VIRTUAL /**/virtual/**/
 #endif
 
-#include "string.hxx"
+#ifndef NTL__STLX_STDEXCEPT_FWD
+#include "stdexcept_fwd.hxx"
+#endif
+
 #include "cwctype.hxx"
-#include "stdexcept.hxx"
 
 #include "../nt/string.hxx"
 

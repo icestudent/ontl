@@ -10,11 +10,8 @@
 #ifndef NTL__STLX_IOS
 #define NTL__STLX_IOS
 
-#include "cstddef.hxx"
 #include "cstdio.hxx"
 #include "iosfwd.hxx"
-#include "stdexcept.hxx"
-#include "string.hxx"
 #include "system_error.hxx"
 
 namespace std {

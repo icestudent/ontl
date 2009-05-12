@@ -9,11 +9,15 @@
 #ifndef NTL__STLX_STDEXCEPT
 #define NTL__STLX_STDEXCEPT
 
-#include "typeinfo.hxx"
-#include "exception.hxx"
+#ifndef NTL__STLX_STRING
 #include "string.hxx"
+#endif
+#ifndef NTL__STLX_STDEXCEPT_FWD
+#include "stdexcept_fwd.hxx"
+#endif
 
-namespace std {
+namespace std
+{
 
 /// 19.1.1 Class logic_error [logic.error]
 class logic_error : public exception
@@ -98,6 +102,15 @@ class underflow_error : public runtime_error
     explicit underflow_error(const string& what_arg) : runtime_error(what_arg) {}
     explicit underflow_error(const char* what_arg )  : runtime_error(what_arg) {}
 };
+
+
+///\name raise exceptions halpers
+inline void __throw_out_of_range(const char* msg)
+{
+  __ntl_throw(out_of_range(msg));
+  (void)msg;
+}
+///\}
 
 }//namespace std
 

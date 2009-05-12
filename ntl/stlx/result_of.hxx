@@ -33,7 +33,10 @@
 #ifndef NTL_RESULT_OF_HXX
 #define NTL_RESULT_OF_HXX
 
+#ifndef NTL__STLX_TYPE_TRAITS
 #include "type_traits.hxx"
+#endif
+
 #include "spp/args.hxx"
 #include "tuple.hxx"
 

@@ -9,14 +9,13 @@
 #define NTL__NT_STRING
 
 #include "basedef.hxx"
-#include "../stdexcept"
-#include "../string"
-#include "../type_traits"
-#include "../basedef.hxx"
-#include "../stlx/cstdint.hxx"
+#ifndef NTL__STLX_STDEXCEPT
+#include "../stlx/stdexcept.hxx"
+#endif
 #include "../stlx/array.hxx"
+#ifndef NTL__STLX_FUNCTIONAL
 #include "../stlx/functional.hxx"
-
+#endif
 
 namespace ntl {
 namespace nt {

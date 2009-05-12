@@ -8,8 +8,12 @@
 #ifndef NTL__BASEDEF
 #define NTL__BASEDEF
 
-#include "cstddef"
-#include "cstdint"
+#ifndef NTL__STLX_CSTDDEF
+#include "stlx/cstddef.hxx"
+#endif
+#ifndef NTL__STLX_CSTDINT
+#include "stlx/cstdint.hxx"
+#endif
 
 // std::vector forward declaration
 namespace std {

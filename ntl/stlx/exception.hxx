@@ -8,7 +8,9 @@
 #ifndef NTL__STLX_EXCEPTION
 #define NTL__STLX_EXCEPTION
 
+#ifndef NTL__STLX_EXCPTDEF
 #include "excptdef.hxx"
+#endif
 
 #ifdef _MSC_VER
 //C++ exception specification ignored except to indicate a function is not __declspec(nothrow)

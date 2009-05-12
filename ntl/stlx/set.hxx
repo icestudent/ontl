@@ -9,9 +9,6 @@
 #define NTL__STLX_SET
 
 #include "algorithm.hxx"
-#include "iterator.hxx"
-#include "memory.hxx"
-
 #include "ext/rbtree.hxx"
 
 namespace std {

@@ -4,13 +4,18 @@
  *
  ****************************************************************************
  */
-
-#include "cstddef.hxx"
-#include "limits.hxx"
-#include "type_traits_fwd.hxx"
-
 #ifndef NTL__STLX_TYPE_TRAITS
 #define NTL__STLX_TYPE_TRAITS
+
+#ifndef NTL__STLX_CSTDDEF
+#include "cstddef.hxx"
+#endif
+
+#ifndef NTL__STLX_LIMITS
+#include "limits.hxx" // for is_integral
+#endif
+#include "type_traits_fwd.hxx"
+
 
 #if 1
 #define _CHECK_TRAIT(X) static_assert((X), "Traits check failed on '" #X "'")

@@ -7,10 +7,12 @@
 #ifndef NTL__STLX_BIND
 #define NTL__STLX_BIND
 
-#include "result_of.hxx"
 #include "placeholders.hxx"
-#include "tuple.hxx"
 #include "fn_caller.hxx"
+
+#ifndef NTL_RESULT_OF_HXX
+#include "result_of.hxx"
+#endif
 
 namespace std
 {

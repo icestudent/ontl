@@ -10,7 +10,6 @@
 #define NTL__NT_HANDLE
 
 #include "../handle.hxx"
-#include "../stdlib.hxx"
 #include "basedef.hxx"
 
 namespace ntl {

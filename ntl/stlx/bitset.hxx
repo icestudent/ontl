@@ -9,9 +9,10 @@
 #define NTL__STLX_BITSET
 
 #include "cstddef.hxx"
-#include "string.hxx"
-#include "stdexcept.hxx"
-#include "iosfwd.hxx"
+#include "stdexcept.hxx" // for string and exceptions
+#ifndef NTL__STLX_IOSFWD
+#include "iosfwd.hxx"    // for ios
+#endif
 
 namespace std {
 

@@ -212,11 +212,3 @@ extern "C" int _cdecl _purecall(void)
   return 0;
 }
 #endif
-
-#if defined NTL__DEBUG || !defined NDEBUG
-extern "C" {
-  char __assertion_failure_buf[4096];
-  const char* __assertion_failure = __assertion_failure_buf;
-  unsigned   __assertion_failure_at_line;
-}
-#endif

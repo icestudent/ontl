@@ -27,7 +27,9 @@
 #ifndef NTL_SPP_CONTROL_HXX
 #define NTL_SPP_CONTROL_HXX
 
+#ifndef NTL_SPP_UTILITY_HXX
 #include "utility.hxx"
+#endif
 
 // !fr3@K!
 // === implementation detail ===

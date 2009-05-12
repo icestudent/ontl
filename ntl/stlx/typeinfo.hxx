@@ -36,8 +36,12 @@
   #endif
 #endif
 
+#ifndef NTL__STLX_CSTRING
 #include "cstring.hxx" // for std::strcmp
+#endif
+#ifndef NTL__STLX_EXCEPTION
 #include "exception.hxx"
+#endif
 
 #pragma warning(push)
 #pragma warning(disable:4820) // '3' bytes padding added after data member 'type_info::mname'
@@ -163,7 +167,8 @@ private:
 };
 
 /// 18.7.3 Class bad_cast [bad.cast] (N2857)
-class bad_cast: public exception
+class bad_cast:
+  public exception
 {
 public:
   bad_cast() __ntl_nothrow
@@ -182,7 +187,9 @@ public:
 };
 
 /// 18.7.4 Class bad_typeid [bad.typeid] (N2857)
-class bad_typeid: public exception {
+class bad_typeid:
+  public exception
+{
 public:
   bad_typeid() __ntl_nothrow
   {}

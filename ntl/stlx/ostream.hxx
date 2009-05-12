@@ -9,9 +9,12 @@
 #define NTL__STLX_OSTREAM
 
 #include "ios.hxx"
+#ifndef NTL__STLX_ITERATOR
 #include "iterator.hxx"
+#endif
+#ifndef NTL__STLX_LOCALE
 #include "locale.hxx"
-#include "string.hxx"
+#endif
 
 namespace std {
 

@@ -7,8 +7,6 @@
 #ifndef NTL__STLX_FNCALLER
 #define NTL__STLX_FNCALLER
 
-#include "type_traits.hxx"
-#include "tuple.hxx"
 #include "result_of.hxx"
 
 namespace std

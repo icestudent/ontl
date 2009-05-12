@@ -7,10 +7,15 @@
 #ifndef NTL__STLX_SYSTEM_ERROR
 #define NTL__STLX_SYSTEM_ERROR
 
+#ifndef NTL__STLX_TYPE_TRAITS
 #include "type_traits.hxx"
+#endif
+#ifndef NTL__STLX_STDEXCEPT
 #include "stdexcept.hxx"
-#include "string.hxx"
+#endif
+#ifndef NTL__STLX_IOSFWD
 #include "iosfwd.hxx"
+#endif
 
 namespace std 
 {

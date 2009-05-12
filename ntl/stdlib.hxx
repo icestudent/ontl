@@ -8,7 +8,7 @@
 #ifndef NTL__STDLIB
 #define NTL__STDLIB
 
-#include "cstdlib"
+#include "stlx/cstdlib.hxx"
 #include "stdint.h"
 #include "atomic.hxx"
 

@@ -16,8 +16,6 @@
 //#include "exception.hxx"
 #include "../pp/macro_params.hxx"
 
-#include "../../type_traits.hxx"
-
 namespace ttl
 {
   namespace meta

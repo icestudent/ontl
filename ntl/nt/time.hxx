@@ -8,7 +8,6 @@
 #ifndef NTL__NT_TIME
 #define NTL__NT_TIME
 
-#include "../stdint.h"
 #include "basedef.hxx"
 #include "shared_data.hxx"
 

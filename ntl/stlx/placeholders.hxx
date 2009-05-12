@@ -27,9 +27,12 @@
 #ifndef NTL_PLACEHOLDERS_HXX
 #define NTL_PLACEHOLDERS_HXX
 
+#ifndef NTL__STLX_TYPE_TRAITS
 #include "type_traits.hxx"
+#endif
+#ifndef NTL_SPP_LOOP_HXX
 #include "spp/loop.hxx"
-#include "spp/utility.hxx"
+#endif
 
 namespace std
 {

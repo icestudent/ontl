@@ -10,10 +10,11 @@
 #define TTL_MAX_TEMPLATE_PARAMS 5
 #define STLX_ENABLE_TUPLE_RELATIONS
 
-//#include "array.hxx" // for tuple array access
-#include "ext/ttl/typelist.hxx"
-#include "utility.hxx" // for tuple pair access
 #include "ext/typelist.hxx"
+
+#ifndef NTL__STLX_UTILITY
+#include "utility.hxx" // for tuple pair access
+#endif
 
 namespace std
 {

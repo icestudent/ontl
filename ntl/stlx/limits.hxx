@@ -8,12 +8,18 @@
 #ifndef NTL__STLX_LIMITS
 #define NTL__STLX_LIMITS
 
+#ifndef NTL__STLX_CSTDDEF
 #include "cstddef.hxx"
+#endif
+
+#ifndef NTL__STLX_CSTDINT
 #include "cstdint.hxx"
-#include "climits.hxx"
+#endif
 #include "cfloat.hxx"
 
+#ifndef NTL__STLX_EXCPTDEF
 #include "excptdef.hxx"
+#endif
 
 namespace std {
 

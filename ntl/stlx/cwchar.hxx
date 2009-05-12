@@ -8,10 +8,10 @@
 #ifndef NTL__STLX_CWCHAR
 #define NTL__STLX_CWCHAR
 
-#include "cstddef.hxx"
-#include "cassert.hxx"
-#include "cstdarg.hxx"
+#ifndef NTL__STLX_CSTRING
 #include "cstring.hxx"
+#endif
+#include "cstdarg.hxx"
 
 #ifndef WCHAR_MIN
 #define WCHAR_MIN   0
@@ -74,8 +74,8 @@ namespace std {
 __forceinline
 wchar_t* NTL__CRTCALL wcscpy(wchar_t* dst, const wchar_t* src)
 {
-  _Assert(dst);
-  _Assert(src);
+  assert(dst);
+  assert(src);
   while ( (*dst++ = *src++) != 0 ) {/**/}
   return dst;
 }
@@ -83,8 +83,8 @@ wchar_t* NTL__CRTCALL wcscpy(wchar_t* dst, const wchar_t* src)
 __forceinline
 wchar_t* NTL__CRTCALL wcsncpy(wchar_t* dst, const wchar_t* src, size_t n)
 {
-  _Assert(dst);
-  _Assert(src);
+  assert(dst);
+  assert(src);
   while (n && (*dst++ = *src++) != 0)
     n--;
   if(n)
@@ -114,8 +114,8 @@ NTL__EXTERNAPI wchar_t* NTL__CRTIMP wcsncat(wchar_t* __restrict s1, const wchar_
 __forceinline
 int NTL__CRTCALL wcscmp(const wchar_t*s1, const wchar_t*s2)
 {
-  _Assert(s1);
-  _Assert(s2);
+  assert(s1);
+  assert(s2);
   for ( ; ; ++s1, ++s2 ) if ( *s1 != *s2 || !*s1 ) return *s1 - *s2;
 }
 
@@ -124,8 +124,8 @@ int NTL__CRTCALL wcscoll(const wchar_t*s1, const wchar_t*s2);
 __forceinline
 int NTL__CRTCALL wcsncmp(const wchar_t* s1, const wchar_t* s2, size_t n)
 {
-  _Assert(s1);
-  _Assert(s2);
+  assert(s1);
+  assert(s2);
   for ( ; n; --n, ++s1, ++s2 ) if ( *s1 != *s2 || !*s1 ) return *s1 - *s2;
   return static_cast<int>(n); // n == 0
 }
@@ -160,7 +160,7 @@ wchar_t* NTL__CRTCALL wmemchr(const wchar_t*s, wchar_t c, size_t n);
 __forceinline
 size_t NTL__CRTCALL wcslen(const wchar_t* const s)
 {
-  _Assert(s);
+  assert(s);
   size_t count = 0;
   while ( s[count] ) count++;
   return count;

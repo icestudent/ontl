@@ -8,7 +8,9 @@
 #ifndef NTL__STLX_UTILITY
 #define NTL__STLX_UTILITY
 
+#ifndef NTL__STLX_TYPE_TRAITS
 #include "type_traits.hxx"
+#endif
 
 /// Standard Template Library
 namespace std 

@@ -9,11 +9,9 @@
 
 #include "memory.hxx"
 #include "utility.hxx"
-#include "type_traits.hxx"
 
 #include "../basedef.hxx"
 #include "../linked_ptr.hxx"
-#include "../stdlib.hxx"
 
 namespace std
 {

@@ -8,11 +8,18 @@
 #ifndef NTL__STLX_ITERATOR
 #define NTL__STLX_ITERATOR
 
-#include "exception.hxx"
+#ifndef NTL__STLX_CSTDDEF
+#include "cstddef.hxx"
+#endif
+#ifndef NTL__STLX_IOSFWD
 #include "iosfwd.hxx"
-#include "type_traits.hxx"
+#endif
+#ifndef NTL__STLX_EXCPTDEF
+#include "excptdef.hxx"
+#endif
 
-namespace std {
+namespace std
+{
 
 /**\addtogroup  lib_iterators ********** 24 Iterators library [iterators]
  *
@@ -107,7 +114,7 @@ void
   advance(BidirectionalIterator& i, Distance n,
             const bidirectional_iterator_tag &)
 {
-  if ( 0 < n ) __advance(i, n, forward_iterator_tag());
+  if ( 0 < n ) advance(i, n, forward_iterator_tag());
   else  for ( ; n < 0; ++n ) --i;
 }
 

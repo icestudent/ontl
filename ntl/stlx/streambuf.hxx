@@ -8,7 +8,6 @@
 #ifndef NTL__STLX_STREAMBUF
 #define NTL__STLX_STREAMBUF
 
-#include "iosfwd.hxx"
 #include "locale.hxx"
 
 #ifdef _MSC_VER
@@ -303,7 +302,7 @@ class basic_streambuf
     {
       ///\note The public members of basic_streambuf call this virtual function
       ///      only if gptr() is null or gptr() >= egptr()
-      _Assert(!gptr() || gptr() >= egptr());
+      assert(!gptr() || gptr() >= egptr());
       //  Default behavior: Returns traits::eof().
       return traits_type::eof();
     }
@@ -325,7 +324,7 @@ class basic_streambuf
       ///      only when gptr() is null, gptr() == eback(),
       ///      or traits::eq(traits::to_char_type(c ),gptr()[-1]) returns false.
       ///      Other calls shall also satisfy that constraint.
-      _Assert(!gptr() || gptr() >= eback()
+      assert(!gptr() || gptr() >= eback()
           || !traits_type::eq(traits_type::to_char_type(c),gnext[-1]));
       (void)(c);
       //  Default behavior: Returns traits::eof().

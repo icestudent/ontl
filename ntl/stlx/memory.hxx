@@ -8,14 +8,23 @@
 #ifndef NTL__STLX_MEMORY
 #define NTL__STLX_MEMORY
 
+#ifndef NTL__STLX_CSTDDEF
 #include "cstddef.hxx"
-#include "exception.hxx"
-#include "iterator.hxx"
-#include "type_traits.hxx"
+#endif
 
+#ifndef NTL__STLX_ITERATOR
+#include "iterator.hxx"         // for raw_storage_iterator<>
+#endif
+
+#ifndef NTL__STLX_INITLIST
 #include "initializer_list.hxx"
+#endif
 
 #include "new.hxx"
+
+#ifndef NTL__STLX_TYPE_TRAITS
+#include "type_traits.hxx"
+#endif
 
 namespace std {
 

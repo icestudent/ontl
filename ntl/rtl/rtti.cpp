@@ -425,7 +425,7 @@ extern "C" void* __cdecl __RTtypeid(void* object) __ntl_throws(...)
     return (void*)&locator.type.type;
 #else
     const pe::image* pe;
-    if(!locator.type || !(pe = pe::image::base_from(object))){
+    if(!locator.type || !(pe = pe::image::base_from(object), pe)){
       __ntl_throw(std::bad_typeid(/*"A typeid of bad pointer attempted"*/));
     #if STLX__USE_EXCEPTIONS == 0
       return nullptr;
@@ -442,7 +442,9 @@ extern "C" void* __cdecl __RTtypeid(void* object) __ntl_throws(...)
   }
 }
 
-extern "C" void* __cdecl __RTDynamicCast(void* object, int32_t vfdelta, void* srctype, void* desttype, int isreference)
+#include "../stlx/stdexcept.hxx"
+
+extern "C" void* __cdecl __RTDynamicCast(void* object, int32_t vfdelta, void* srctype, void* desttype, int isreference) 
 {
   if(!object)
     return NULL;

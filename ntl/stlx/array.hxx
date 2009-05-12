@@ -8,11 +8,15 @@
 #ifndef NTL__STLX_ARRAY
 #define NTL__STLX_ARRAY
 
+#ifndef NTL__STLX_ITERATOR
 #include "iterator.hxx"
-#include "stdexcept.hxx"
+#endif
+#include "stdexcept_fwd.hxx"
+
 #include "tuple.hxx"
 
-namespace std {
+namespace std
+{
 
 /**\addtogroup  lib_containers ********* 23 Containers library [containers]
  *@{*/
@@ -126,7 +130,7 @@ struct array
 
     void __check_bounds(size_type n) const __ntl_throws(out_of_range)
     {
-      if ( n > size() ) __ntl_throw (out_of_range());
+      if ( n > size() ) __throw_out_of_range();
     }
 
 };//struct array
@@ -165,8 +169,6 @@ template <class T, size_t N> inline bool operator>= (const array<T,N>& x, const 
 ///\name  Array specialized algorithms [6.2.2.2]
 template <class T, size_t N > inline void swap(array<T,N>& x, array<T,N>& y) { x.swap(y); }
 
-///@}
-
 //////////////////////////////////////////////////////////////////////////
 ///\name  Tuple interface to class template array [23.2.1.6]
 
@@ -194,6 +196,7 @@ inline const T& get(const array<T, N>& a)
   static_assert(I < N, "I out of bounds");
   return a[I];
 }
+///\}
 
 /**@} lib_sequence */
 /**@} lib_containers */

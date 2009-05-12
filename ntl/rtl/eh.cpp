@@ -89,13 +89,15 @@ ntl::cxxruntime::cxxframehandler(
       bool unwinded = false;
       if(er->ExceptionFlags & nt::exception::target_unwind){
         if(er->islongjump()){
+          __debugbreak();
           ehstate_t state = ehfi->state_from_ip(dispatch, (void*)ectx->Rip);
           if(state < -1 || state >= ehfi->unwindtable_size)
-            std::terminate();
+            ntl::nt::exception::inconsistency();
           // __FrameUnwindToState
           eframe->unwind(dispatch, ehfi, state);
           unwinded = true;
         }else if(er->isconsolidate()){
+          __debugbreak();
           ehstate_t state = static_cast<ehstate_t>(er->ExceptionInformation[3]);
           if(state < -1 || state >= ehfi->unwindtable_size)
             __debugbreak();
@@ -189,7 +191,7 @@ extern "C" generic_function_t* __CxxCallCatchBlock(exception_record* ehrec)
   // original record
   cxxrecord* cxxer = reinterpret_cast<cxxrecord*>(ehrec->ExceptionInformation[6]);
   cxxregistration* eframe = reinterpret_cast<cxxregistration*>(ehrec->ExceptionInformation[1]);
-  generic_function_t* ret;
+  generic_function_t* ret = 0;
   bool fail = false;
   cxxregistration::frame_info frame(cxxer->get_object());
 
@@ -199,8 +201,8 @@ extern "C" generic_function_t* __CxxCallCatchBlock(exception_record* ehrec)
   if(recursive){
     tmpER = _getptd()->prevER;
     _getptd()->curexception.ExceptionRecord = tmpER;
-
   }
+
   __try{
     __try{
       ret = _CallSettingFrame(handler, eframe, 0x100);
@@ -235,7 +237,7 @@ extern "C" generic_function_t* __CxxCallCatchBlock(exception_record* ehrec)
   ep = &_getptd()->curexception;
   *ep = saved_exception;
 
-  *reinterpret_cast<uintptr_t*>(eframe->fp.FramePointers + reinterpret_cast<ehfuncinfo*>(ehrec->ExceptionInformation[5])->unwindhelp) = -2;
+  *reinterpret_cast<intptr_t*>(eframe->fp.FramePointers + reinterpret_cast<ehfuncinfo*>(ehrec->ExceptionInformation[5])->unwindhelp) = -2;
   return ret;
 }
 
@@ -245,7 +247,7 @@ extern "C" generic_function_t* __CxxCallCatchBlock(exception_record* ehrec)
 /// 15.1/1  Throwing an exception transfers control to a handler
 ///         An object is passed and the type of that object determines which
 ///         handlers can catch it.
-///\note    MSVC's throw; statement sets both pointers to nulls.
+///\note    MSVC's `throw;` statement sets both pointers to nulls.
 #ifdef __ICL
 typedef ntl::cxxruntime::throwinfo _s__ThrowInfo;
 #endif
@@ -330,3 +332,8 @@ __CxxFrameHandler(
 #endif
 ///\todo __EH_prolog for /Os
 
+void ntl::nt::exception::inconsistency()
+{
+  __debugbreak();
+  std::abort();
+}

@@ -9,9 +9,10 @@
 #define NTL__STLX_CHRONO
 
 #include "ctime.hxx"
-#include "type_traits.hxx"
-#include "limits.hxx"
 #include "ratio.hxx"
+#ifndef NTL__STLX_LIMITS
+#include "limits.hxx"
+#endif
 
 namespace std
 {

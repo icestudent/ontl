@@ -4,7 +4,6 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__STLX_CSTDINT
 #define NTL__STLX_CSTDINT
 
@@ -160,7 +159,5 @@ typedef uint64_t  uintmax_t;
 
 /**@} lib_support_limits */
 /**@} lib_language_support */
-
 }//namespace std
-
 #endif//#ifndef NTL__STLX_CSTDINT

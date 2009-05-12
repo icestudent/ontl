@@ -27,7 +27,9 @@
 #ifndef NTL_SPP_LOOP_HXX
 #define NTL_SPP_LOOP_HXX
 
+#ifndef NTL_SPP_UTILITY_HXX
 #include "utility.hxx"
+#endif
 #include "math.hxx"
 
 // !fr3@K!

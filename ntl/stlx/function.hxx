@@ -8,11 +8,11 @@
 #define NTL__STLX_FUNCTION
 
 #include "exception.hxx"
-#include "type_traits.hxx"
-#include "tuple.hxx"
 
 #include "mem_fn.hxx"
+#ifndef NTL__STLX_FNCALLER
 #include "fn_caller.hxx"
+#endif
 
 namespace std
 {

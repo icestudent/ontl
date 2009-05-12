@@ -8,9 +8,7 @@
 #ifndef NTL__STLX_FORWARDLIST
 #define NTL__STLX_FORWARDLIST
 
-#include "iterator.hxx"
 #include "memory.hxx"
-#include "type_traits.hxx"
 
 #include "../linked_list.hxx"
 

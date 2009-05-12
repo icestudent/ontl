@@ -8,10 +8,7 @@
 #ifndef NTL__STLX_UNORDERED_MAP
 #define NTL__STLX_UNORDERED_MAP
 
-#include "stdexcept.hxx"
-#include "functional.hxx"
-#include "memory.hxx"
-#include "utility.hxx"
+#include "stdexcept_fwd.hxx"
 #include "ext/hashtable.hxx"
 
 namespace std {
@@ -247,7 +244,7 @@ namespace std {
     {
       iterator i = find(k);
       if(i == end())
-        __ntl_throw(out_of_range("specified key isn't exists in the hash map"));
+        __throw_out_of_range("specified key isn't exists in the hash map");
       return i->second;
     }
 
@@ -256,7 +253,7 @@ namespace std {
     {
       const_iterator i = find(k);
       if(i == end())
-        __ntl_throw(out_of_range("specified key isn't exists in the hash map"));
+        __throw_out_of_range("specified key isn't exists in the hash map");
       return i->second;
     }
 

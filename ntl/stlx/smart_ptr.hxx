@@ -12,7 +12,6 @@
 
 #include "../basedef.hxx"
 #include "../linked_ptr.hxx"
-#include "../stdlib.hxx"
 
 namespace std
 {

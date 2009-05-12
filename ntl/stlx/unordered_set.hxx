@@ -8,10 +8,7 @@
 #ifndef NTL__STLX_UNORDERED_SET
 #define NTL__STLX_UNORDERED_SET
 
-#include "stdexcept.hxx"
-#include "functional.hxx"
-#include "memory.hxx"
-#include "utility.hxx"
+#include "stdexcept_fwd.hxx"
 #include "ext/hashtable.hxx"
 
 namespace std {

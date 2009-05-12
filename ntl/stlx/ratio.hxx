@@ -8,8 +8,9 @@
 #ifndef NTL__STLX_RATIO
 #define NTL__STLX_RATIO
 
+#ifndef NTL__STLX_TYPE_TRAITS
 #include "type_traits.hxx"
-#include "climits.hxx" // for RATIO_MAX, RATIO_MIN
+#endif
 
 namespace std
 {

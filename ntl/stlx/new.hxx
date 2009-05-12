@@ -8,7 +8,10 @@
 #ifndef NTL__STLX_NEW
 #define NTL__STLX_NEW
 
+#ifndef NTL__STLX_CSTDDEF
 #include "cstddef.hxx"
+#endif
+
 #include "exception.hxx"
 
 /// calculates the new size of a reallocating heap block.

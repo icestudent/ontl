@@ -9,9 +9,7 @@
 #define NTL__STLX_VECTOR
 
 #include "algorithm.hxx"
-#include "iterator.hxx"
 #include "memory.hxx"
-#include "type_traits.hxx"
 
 #ifdef _MSC_VER
 # pragma warning(push)

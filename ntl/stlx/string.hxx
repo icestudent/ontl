@@ -8,18 +8,12 @@
 #ifndef NTL__STLX_STRING
 #define NTL__STLX_STRING
 
-#include "cwchar.hxx"
 #include "cuchar.hxx"
+#ifndef NTL__STLX_IOSFWD
 #include "iosfwd.hxx"
-/* */
-#include "cstring.hxx"
-#include "algorithm.hxx"
-#include "iterator.hxx"
-#include "memory.hxx"
+#endif
 #include "vector.hxx"
-#include "functional.hxx"
-
-#include "new.hxx"
+#include "functional.hxx" // for hash<>
 
 #ifndef EOF // should be moved to "stdio.hxx" ?
 # define EOF -1
@@ -514,13 +508,13 @@ public:
 
     /// 5 Requires: !empty()
     /// 6 Effects: Equivalent to operator[](0).
-    const charT& front() const { _Assert(!empty()); return operator[](0); }
-    charT& front()             { _Assert(!empty()); return operator[](0); }
+    const charT& front() const { assert(!empty()); return operator[](0); }
+    charT& front()             { assert(!empty()); return operator[](0); }
 
     /// 7 Requires: !empty()
     /// 8 Effects: Equivalent to operator[](size() - 1).
-    const charT& back() const { _Assert(!empty()); return operator[](size() - 1); }
-    charT& back() { _Assert(!empty()); return operator[](size() - 1); }
+    const charT& back() const { assert(!empty()); return operator[](size() - 1); }
+    charT& back() { assert(!empty()); return operator[](size() - 1); }
 
     /// 21.3.6 basic_string modifiers [string.modifiers]
 
@@ -1210,7 +1204,7 @@ public:
 
     static const charT* assert_ptr(const charT* const p)
     {
-      _Assert(p);
+      assert(p);
       return p;
     }
 

@@ -8,7 +8,9 @@
 #ifndef NTL__STLX_CSTDIO
 #define NTL__STLX_CSTDIO
 
+#ifndef NTL__STLX_CSTDDEF
 #include "cstddef.hxx"
+#endif
 #include "cstdarg.hxx"
 //using std::va_list;
 

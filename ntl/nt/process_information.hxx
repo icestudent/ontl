@@ -8,8 +8,6 @@
 #ifndef NTL__NT_PROCESS_INFORMATION
 #define NTL__NT_PROCESS_INFORMATION
 
-#include "basedef.hxx"
-#include "handle.hxx"
 #include "teb.hxx"
 
 #include "../stlx/type_traits.hxx"

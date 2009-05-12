@@ -8,7 +8,9 @@
 #ifndef NTL__STLX_CSTDLIB
 #define NTL__STLX_CSTDLIB
 
+#ifndef NTL__STLX_CSTDINT
 #include "cstddef.hxx"
+#endif
 #include "cassert.hxx"
 
 extern "C"

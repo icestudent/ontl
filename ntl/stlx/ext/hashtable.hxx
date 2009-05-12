@@ -4,7 +4,7 @@
 #include "../memory.hxx"      // for allocator
 #include "../functional.hxx"  // for hash & predicates
 #include "../utility.hxx"     // for pair
-#include "../initializer_list.hxx"
+#include "../algorithm.hxx"   // for swap<>
 
 namespace std
 {
@@ -317,7 +317,10 @@ namespace std
           std::iterator<forward_iterator_tag, value_type, difference_type, pointer, reference>,
           base_local_iterator
         {
-          local_iterator_impl(){}
+          local_iterator_impl()
+          {
+            p = nullptr;
+          }
           local_iterator_impl(double_linked* p)
           {
             this->p = p;
@@ -364,14 +367,16 @@ namespace std
           base_local_iterator
         {
           const_local_iterator_impl()
-          {}
+          {
+            p = nullptr;
+          }
           const_local_iterator_impl(const local_iterator_impl& i)
           {
             p = i.p;
           }
           const_local_iterator_impl(const double_linked* p)
           {
-            p = static_cast<const node_type*>(p);
+            this->p = const_cast<node_type*>(p);
           }
 
           const_reference operator* () const { return p->elem; }
@@ -608,14 +613,18 @@ namespace std
 
         void swap(hashtable& x)
         {
-          std::swap(head_,    x.head_);
-          std::swap(buckets_, x.buckets_);
-          std::swap(nalloc,   x.nalloc);
-          std::swap(balloc,   x.balloc);
-          std::swap(hash_,    x.hash_);
-          std::swap(equal_,   x.equal_);
-          std::swap(count_,   x.count_);
-          std::swap(max_factor, x.max_factor);
+          if(this == &x)
+            return;
+
+          using std::swap;
+          swap(head_,    x.head_);
+          swap(buckets_, x.buckets_);
+          swap(nalloc,   x.nalloc);
+          swap(balloc,   x.balloc);
+          swap(hash_,    x.hash_);
+          swap(equal_,   x.equal_);
+          swap(count_,   x.count_);
+          swap(max_factor, x.max_factor);
         }
 
         ///\name observers

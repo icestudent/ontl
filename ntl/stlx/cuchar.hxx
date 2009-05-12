@@ -7,7 +7,10 @@
 #ifndef NTL__STLX_CUCHAR
 #define NTL__STLX_CUCHAR
 
+#ifndef NTL__STLX_CSTDINT
 #include "cstdint.hxx"
+#endif
+
 #include "cwchar.hxx"
 
 #ifdef NTL__CXX_CHARS

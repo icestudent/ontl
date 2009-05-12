@@ -346,6 +346,8 @@ class exception
       inline void raise() const;
     };
 
+    static void inconsistency();
+
 #ifdef _M_IX86
     /// SEH record
     struct registration
@@ -899,7 +901,7 @@ namespace cxxruntime {
     // unwind map
     unwindtable*    unwindtable;
     // try block count in this function
-    uint32_t        tryblocktable_size;
+    ehstate_t       tryblocktable_size;
     // try block table
     tryblock*       tryblocktable;
     // IP-to-state map size
@@ -968,14 +970,14 @@ namespace cxxruntime {
       return r;
     }
 
-    tryblock::ranges get_try_ranges3(int depth, ehstate_t state, const dispatcher_context* const dispatch, bool& found) const
+    tryblock::ranges get_try_ranges3(int /*depth*/, ehstate_t state, const dispatcher_context* const dispatch, bool& found) const
     {
       ehstate_t cs = state_from_control(dispatch);
       if(tryblocktable_size == 0)
-        std::terminate();
+        nt::exception::inconsistency();
       found = true;
       const tryblock* tbe = 0;
-      uint32_t i, start = -1, end = -1;
+      ehstate_t i, start = -1, end = -1;
       for(i = tryblocktable_size; i > 0; i--){
         const tryblock* tb = &tryblocktable[i-1];
         if(cs <= tb->tryhigh)
@@ -1128,8 +1130,8 @@ namespace cxxruntime {
       // what this stuff is about to do?
       const ehstate_t cs = ehfi->unwindtable_size <= 0x80 ?
         static_cast<int8_t>(this->state) : this->state;
-      _Assert( cs > -1 );
-      _Assert( cs < ehfi->unwindtable_size );
+      assert( cs > -1 );
+      assert( cs < ehfi->unwindtable_size );
       return cs;
     }
 
@@ -1146,7 +1148,7 @@ namespace cxxruntime {
     {
       uintptr_t frame;
       const_cast<cxxregistration*>(this)->establisherframe(ehfi, dispatch, reinterpret_cast<frame_pointers*>(&frame));
-      ehstate_t etb1 = *reinterpret_cast<ehstate_t*>( frame + ehfi->unwindhelp + 4 );
+      //ehstate_t etb1 = *reinterpret_cast<ehstate_t*>( frame + ehfi->unwindhelp + 4 );
       ehstate_t etb  = framepointers(fp,ehfi)->MemoryStoreFp; // *(eframe+unwindhelp+4)
       return etb;
     }
@@ -1170,7 +1172,7 @@ namespace cxxruntime {
     // __SetState
     void current_state(const ehfuncinfo* const ehfi, uintptr_t fp, ehstate_t state)
     {
-      ehstate_t old = framepointers(fp,ehfi)->MemoryStackFp;
+      //ehstate_t old = framepointers(fp,ehfi)->MemoryStackFp;
       framepointers(fp,ehfi)->MemoryStackFp = state;
     }
 
@@ -1213,7 +1215,7 @@ namespace cxxruntime {
       {
         frame_info* head = info_;
         if(this != head)
-          std::terminate();
+          nt::exception::inconsistency();
         do{
           if(head == this){
             info_ = next;
@@ -1270,13 +1272,13 @@ namespace cxxruntime {
 #endif // _M_X64
 
     /// 15.2/3  If a destructor called during stack unwinding exits with an exception,
-    ///         std::terminate is called.
+    ///         nt::exception::inconsistency is called.
     static exception_filter unwindfilter(ntstatus code)
     {
       switch ( code )
       {
       case exception_record::cxxmagic:
-        std::terminate();
+        nt::exception::inconsistency();
       case exception_record::commagic:
         /**/
       default:
@@ -1319,6 +1321,7 @@ namespace cxxruntime {
       establisherframe(ehfi, dispatch, &frame);
       if(to_state == -1){
         // __FrameUnwindToEmptyState
+        //__debugbreak();
         ehstate_t state = ehfi->state_from_control(dispatch);
         const tryblock* tb = ehfi->catch_try_block(state);
         to_state = tb ? tb->tryhigh : -1;
@@ -1335,14 +1338,15 @@ namespace cxxruntime {
             current_state(ehfi, frame.FramePointers, uestate);
             callsettingframe(action, this);
           }
-          cs &= 0x30; // ??
+          //cs &= 0x30; // ??
+          cs = uestate;
         }
         __except(unwindfilter(_exception_status())){
           cs = uestate;
         }
       }
       if(cs != -1 && cs > to_state)
-        std::terminate();
+        nt::exception::inconsistency();
       current_state(ehfi, frame.FramePointers, cs);
 
 #endif // _M_X64
@@ -1403,8 +1407,8 @@ namespace cxxruntime {
     /// destruct the exception object if it has a destructor
     void destruct_eobject(bool cannotthrow = true) const
     {
-      _Assert(ExceptionCode == cxxmagic);
-      _Assert(get_throwinfo());
+      assert(ExceptionCode == cxxmagic);
+      assert(get_throwinfo());
 #ifndef _M_X64
       eobject::dtor_ptr const exception_dtor = get_throwinfo()->exception_dtor;
       if ( exception_dtor )
@@ -1415,7 +1419,7 @@ namespace cxxruntime {
         }
         __except(cannotthrow ? exception_execute_handler : exception_continue_search)
         {
-          std::terminate();
+          nt::exception::inconsistency();
         }
       }
 #else
@@ -1426,7 +1430,7 @@ namespace cxxruntime {
           return;
         }
         __except(cannotthrow ? exception_execute_handler : exception_continue_search){
-          std::terminate();
+          nt::exception::inconsistency();
         }
       }
 #endif
@@ -1622,7 +1626,7 @@ namespace cxxruntime {
       }
       __except(exception_execute_handler)
       {
-        std::terminate();
+        nt::exception::inconsistency();
       }
 #else // _M_X64
       (void)dispatch;
@@ -1665,7 +1669,7 @@ namespace cxxruntime {
       }
       __except(exception_execute_handler)
       {
-        std::terminate();
+        nt::exception::inconsistency();
       }
 #endif
     }
@@ -1729,7 +1733,7 @@ namespace cxxruntime {
     bool is_inexceptionSpec(const f108_t* ptd108, const dispatcher_context* const dispatch) const
     {
       if(!ptd108)
-        std::terminate();
+        nt::exception::inconsistency();
 
       const throwinfo* const ti = get_throwinfo();
       const ehandler* handlers = dispatch->va<const ehandler*>(ptd108->second);
@@ -1796,7 +1800,7 @@ namespace cxxruntime {
 
       assert(cs >= -1 && cs < ehfi->unwindtable_size);
       if(cs < -1 || cs >= ehfi->unwindtable_size)
-        std::terminate();
+        nt::exception::inconsistency();
 
       bool catched = false;
       bool isRethrow = false;
@@ -1815,7 +1819,7 @@ namespace cxxruntime {
         ctx = _getptd()->curexception.ContextRecord;
 
         if(iscxx() && !get_throwinfo())
-          std::terminate();
+          nt::exception::inconsistency();
 
         f108_t* ptd_108 = 0;
         if(ptd_108){
@@ -1831,7 +1835,7 @@ namespace cxxruntime {
         //  swap(ptd.field_108, f108);
         //  if(!IsInExceptionSpec(pair<count, ehandlers_rva>* &f108, dispatch)){
         //    if(!Is_bad_exception_allowed)
-        //      std::terminate();
+        //      nt::exception::inconsistency();
         //    __DestructExceptionObject(erec, true);
         //    throw std::bad_exception();
         //  }
@@ -1842,7 +1846,7 @@ namespace cxxruntime {
       // not cxx: is_cxx2
       bool is_cxx = is_msvc(true);
       if(is_cxx){
-        __debugbreak();
+        //__debugbreak();
         if(ehfi->tryblocktable_size){
           // _GetRangeOfTrysToCheck
           ehstate_t state = ehfi->state_from_control(dispatch);
@@ -1899,7 +1903,7 @@ next_try:;
         }
       }else if(ehfi->tryblocktable_size){
         if(recursive)
-          std::terminate();
+          nt::exception::inconsistency();
         // FindHandlerForForeignException
         // _GetRangeOfTrysToCheck
         const tryblock::ranges ranges = ehfi->get_try_ranges(trylevel, cs);
@@ -1987,7 +1991,7 @@ next_try: ;
           }
         }
       }else {
-        std::terminate();
+        nt::exception::inconsistency();
       }
 #endif
     }

@@ -9,11 +9,7 @@
 #define NTL__STLX_LIST
 
 #include "algorithm.hxx"
-#include "iterator.hxx"
 #include "memory.hxx"
-//#include "stdexcept.hxx"
-#include "type_traits.hxx"
-
 
 #ifdef _MSC_VER
 #pragma warning(push)

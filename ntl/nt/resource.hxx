@@ -7,7 +7,6 @@
 #ifndef NTL__NT_RESOURCE
 #define NTL__NT_RESOURCE
 
-#include "basedef.hxx"
 #include "handle.hxx"
 #include "../stlx/chrono.hxx"
 

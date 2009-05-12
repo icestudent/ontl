@@ -8,8 +8,12 @@
 #ifndef NTL__LINKED_LIST
 #define NTL__LINKED_LIST
 
+#ifndef NTL__STLX_ITERATOR
 #include "stlx/iterator.hxx"
+#endif
+#ifndef NTL__STLX_TYPE_TRAITS
 #include "stlx/type_traits.hxx"
+#endif
 #include "stlx/algorithm.hxx"
 
 namespace ntl {

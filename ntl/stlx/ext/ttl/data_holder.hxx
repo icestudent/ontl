@@ -11,7 +11,10 @@
 #ifndef __ttl_impl_data_holder__hpp
 #define __ttl_impl_data_holder__hpp
 
+#ifndef NTL__STLX_TYPE_TRAITS
 #include "../../type_traits.hxx"
+#endif
+
 #pragma warning(disable: 4512) // assignment operator could not be generated
 
 namespace ttl

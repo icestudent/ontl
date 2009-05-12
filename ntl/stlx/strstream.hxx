@@ -11,7 +11,6 @@
 #define NTL__STLX_STRSTREAM
 
 #include "string.hxx"
-#include "iosfwd.hxx"
 #include "streambuf.hxx"
 #include "istream.hxx"
 #include "ostream.hxx"

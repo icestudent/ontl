@@ -8,8 +8,6 @@
 #ifndef NTL__STLX_IOSTREAM
 #define NTL__STLX_IOSTREAM
 
-#include "iosfwd.hxx"
-#include "ios.hxx"
 #include "streambuf.hxx"
 #include "istream.hxx"
 #include "ostream.hxx"

@@ -28,8 +28,9 @@
 #define NTL_SPP_ARGS_HXX
 
 #include "control.hxx"
+#ifndef NTL_SPP_LOOP_HXX
 #include "loop.hxx"
-#include "math.hxx"
+#endif
 
 // !fr3@K!
 // === implementation detail ===

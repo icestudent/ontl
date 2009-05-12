@@ -11,8 +11,6 @@
 # include "mem_fn_rv.hxx"
 #else 
 
-#include "type_traits.hxx"
-#include "tuple.hxx"
 #include "fn_caller.hxx"
 
 namespace std

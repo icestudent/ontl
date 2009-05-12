@@ -8,9 +8,15 @@
 #ifndef NTL__STLX_ALGORITHM
 #define NTL__STLX_ALGORITHM
 
+#ifndef NTL__STLX_ITERATOR
 #include "iterator.hxx"
+#endif
+#ifndef NTL__STLX_UTILITY
 #include "utility.hxx"
+#endif
+#ifndef NTL__STLX_INITLIST
 #include "initializer_list.hxx"
+#endif
 
 namespace std
 {

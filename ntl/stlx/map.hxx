@@ -8,10 +8,7 @@
 #ifndef NTL__STLX_MAP
 #define NTL__STLX_MAP
 
-#include "stdexcept.hxx"
-#include "functional.hxx"
-#include "memory.hxx"
-#include "utility.hxx"
+#include "stdexcept_fwd.hxx"
 #include "ext/rbtree.hxx"
 
 namespace std {
@@ -231,7 +228,7 @@ public:
     {
       iterator i = find(x);
       if(i == end())
-        __ntl_throw(out_of_range("specified key isn't exists in the map"));
+        __throw_out_of_range("specified key isn't exists in the map");
       return i->second;
     }
 
@@ -239,7 +236,7 @@ public:
     {
       const_iterator i = const_cast<map*>(this)->find(x);
       if(i == end())
-        __ntl_throw(out_of_range("specified key isn't exists in the map"));
+        __throw_out_of_range("specified key isn't exists in the map");
       return i->second;
     }
 
