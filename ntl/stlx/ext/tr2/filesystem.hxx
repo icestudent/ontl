@@ -34,7 +34,7 @@ namespace std
     /**\defgroup tr2 Technical Report 2 on C++ Library Extensions
      *@{*/
 
-    /// sys namespace
+    /// System namespace
     namespace sys {
       /// Filesystem Library
       namespace filesystem

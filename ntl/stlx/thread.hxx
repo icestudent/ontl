@@ -352,7 +352,6 @@ namespace std
     tid = 0;
   }
 
-  // noinline :-\..
   inline uint32_t __stdcall thread::start_routine(void* Parm)
   {
     __::thread_params_base* tp = reinterpret_cast<__::thread_params_base*>(Parm);

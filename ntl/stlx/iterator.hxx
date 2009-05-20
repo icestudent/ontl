@@ -212,7 +212,6 @@ InputIterator
  *@{*/
 
 /// 24.4.1 Reverse iterators [lib.reverse.iterators]
-/// @todo  Enable the random-access members by-request through SFINAE
 template <class Iterator>
 class reverse_iterator
 : public iterator<typename iterator_traits<Iterator>::iterator_category,
@@ -231,7 +230,7 @@ class reverse_iterator
     reverse_iterator() {}
     explicit reverse_iterator(Iterator x) : current(x) {}
     template <class U>
-    reverse_iterator(const reverse_iterator<U>& u) : current(u.base()) {}
+    reverse_iterator(const reverse_iterator<U>& u) : current(u.current) {}
 
     Iterator  base()        const { return current; }
     reference operator*()   const { Iterator tmp = current; return *--tmp; } ///\warning see N2588 24.4.1.3.4/2
@@ -275,45 +274,50 @@ class reverse_iterator
   friend
     bool operator==(const reverse_iterator<Iterator>& x,
                     const reverse_iterator<Iterator2>& y)
-      { return x.base() == y.base(); }
+      { return x.current == y.current; }
 
   template<typename Iterator2>
   friend
     bool operator!=(const reverse_iterator<Iterator>& x,
                     const reverse_iterator<Iterator2>& y)
-      { return x.base() != y.base(); }
+      { return x.current != y.current; }
 
   template<typename Iterator2>
   friend
     bool operator< (const reverse_iterator<Iterator>& x,
                     const reverse_iterator<Iterator2>& y)
-      { return x.base() > y.base(); }
+      { return x.current > y.current; }
 
   template<typename Iterator2>
   friend
     bool operator> (const reverse_iterator<Iterator>& x,
                     const reverse_iterator<Iterator2>& y)
-      { return x.base() < y.base(); }
+      { return x.current < y.current; }
 
   template<typename Iterator2>
   friend
     bool operator>=(const reverse_iterator<Iterator>& x,
                     const reverse_iterator<Iterator2>& y)
-      { return x.base() <= y.base(); }
+      { return x.current <= y.current; }
 
   template<typename Iterator2>
   friend
     bool operator<=(const reverse_iterator<Iterator>& x,
                     const reverse_iterator<Iterator2>& y)
-      { return x.base() >= y.base(); }
+      { return x.current >= y.current; }
 
+#ifdef NTL__CXX_TYPEOF
+  template<typename Iterator2>
+  friend auto operator-(const reverse_iterator<Iterator>& x, const reverse_iterator<Iterator2>& y) -> decltype(y.current-x.current)
+  { return y.current - x.current; }
+#else
   template<typename Iterator2>
   friend
     typename reverse_iterator<Iterator>::difference_type
       operator-(const reverse_iterator<Iterator>& x,
                 const reverse_iterator<Iterator2>& y)
-      { return y.base() - x.base(); }
-
+      { return y.current - x.current; }
+#endif
   friend inline
     reverse_iterator<Iterator>
       operator+(typename reverse_iterator<Iterator>::difference_type n,
@@ -454,6 +458,93 @@ insert_iterator<Container>
 {
   return insert_iterator<Container>( x, typename Container::iterator( i ) );
 }
+
+/// 24.4.3.1 Class template move_iterator [move.iterator]
+#ifdef NTL__CXX_RV
+template <class Iterator>
+class move_iterator
+{
+public:
+  typedef Iterator iterator_type;
+  typedef Iterator pointer;
+  typedef typename iterator_traits<Iterator>::difference_type   difference_type;
+  typedef typename iterator_traits<Iterator>::value_type        value_type;
+  typedef typename iterator_traits<Iterator>::iterator_category iterator_category;
+  typedef value_type&& reference;
+
+  move_iterator()
+    :current()
+  {}
+
+  explicit move_iterator(Iterator i)
+    :current(i)
+  {}
+
+  template <class U> move_iterator(const move_iterator<U>& u)
+    :current(u.current)
+  {}
+  template <class U> move_iterator& operator=(const move_iterator<U>& u)
+  {
+    current = u.current;
+    return *this;
+  }
+  iterator_type base() const { return current; }
+  reference operator*() const{ return *current;}
+  pointer operator->() const { return current; }
+  move_iterator& operator++(){ ++current; return *this; }
+  move_iterator operator++(int){ move_iterator tmp = *this; ++current; return tmp; }
+  move_iterator& operator--(){ --current; return *this; }
+  move_iterator operator--(int){ move_iterator tmp = *this; --current; return tmp; }
+  move_iterator operator+(difference_type n) const { return move_iterator(current+n); }
+  move_iterator& operator+=(difference_type n)     { current += n; return *this; }
+  move_iterator operator-(difference_type n) const { return move_iterator(current-n); }
+  move_iterator& operator-=(difference_type n)     { current -= n; return *this; }
+  reference operator[](difference_type n) const    { return current[n]; }
+
+  template<typename Iterator2>
+  friend bool operator==(const move_iterator<Iterator>& x, const move_iterator<Iterator2>& y)
+  { return x.current == y.current; }
+
+  template<typename Iterator2>
+  friend bool operator!=(const move_iterator<Iterator>& x, const move_iterator<Iterator2>& y)
+  { return x.current != y.current; }
+
+  template<typename Iterator2>
+  friend bool operator< (const move_iterator<Iterator>& x, const move_iterator<Iterator2>& y)
+  { return x.current < y.current; }
+
+  template<typename Iterator2>
+  friend bool operator> (const move_iterator<Iterator>& x, const move_iterator<Iterator2>& y)
+  { return x.current > y.current; }
+
+  template<typename Iterator2>
+  friend bool operator>=(const move_iterator<Iterator>& x, const move_iterator<Iterator2>& y)
+  { return x.current >= y.current; }
+
+  template<typename Iterator2>
+  friend bool operator<=(const move_iterator<Iterator>& x, const move_iterator<Iterator2>& y)
+  { return x.current <= y.current; }
+
+#ifdef NTL__CXX_TYPEOF
+  template<typename Iterator2>
+  friend auto operator-(const move_iterator<Iterator>& x, const move_iterator<Iterator2>& y) -> decltype(y.current-x.current)
+  { return y.current - x.current; }
+#else
+  template<typename Iterator2>
+  friend typename move_iterator<Iterator>::difference_type operator-(const move_iterator<Iterator>& x, const move_iterator<Iterator2>& y)
+  { return y.current - x.current; }
+#endif
+  friend inline move_iterator<Iterator> operator+(typename move_iterator<Iterator>::difference_type n, const move_iterator<Iterator>& x)
+  {
+    return move_iterator(x.current + n);
+  }
+
+private:
+  Iterator current;
+};
+
+#endif // move iterator
+
 /**@}*/
 
 

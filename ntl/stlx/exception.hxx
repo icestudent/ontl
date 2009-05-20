@@ -8,8 +8,12 @@
 #ifndef NTL__STLX_EXCEPTION
 #define NTL__STLX_EXCEPTION
 
+#ifndef NTL__STLX_CSTDDEF
+# include "cstddef.hxx"
+#endif
+
 #ifndef NTL__STLX_EXCPTDEF
-#include "excptdef.hxx"
+# include "excptdef.hxx"
 #endif
 
 #ifdef _MSC_VER
@@ -105,10 +109,24 @@ class bad_exception : public exception
    **/
   bool uncaught_exception() __ntl_nothrow;
 
+  namespace __
+  {
+    struct exception_ptr
+    {
+      operator explicit_bool_type() const { return explicit_bool(false); }
+    };
+
+    inline bool operator==(const exception_ptr&  , const exception_ptr&  ) { return false; }
+    inline bool operator!=(const exception_ptr& x, const exception_ptr& y) { return !(x == y); }
+    //bool operator==(const exception_ptr&  , const nullptr_t&  ) { return false; }
+    //bool operator!=(const exception_ptr& x, const nullptr_t& y) { return !(x == y); }
+    //bool operator==(const nullptr_t&  , const exception_ptr&  ) { return false; }
+    //bool operator!=(const nullptr_t& x, const exception_ptr& y) { return !(x == y); }
+  }
 
   /// Exception Propagation [18.7.5 propagation]
   ///
-  typedef struct __exception_ptr { } exception_ptr;
+  using __::exception_ptr;
 
   exception_ptr current_exception();
 
@@ -148,6 +166,12 @@ class bad_exception : public exception
 #endif
 
   template <class E> void rethrow_if_nested(const E& e);
+
+#if !STLX__USE_EXCEPTIONS
+  inline exception_ptr current_exception() { return exception_ptr(); }
+
+  inline void rethrow_exception(exception_ptr){}
+#endif
 
 
 /**@} lib_support_exception */

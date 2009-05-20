@@ -276,7 +276,8 @@ namespace std
 
         template<typename R, class F, class Args>
         struct fun_caller:
-          caller<R,Args>
+          caller<R,Args>,
+          noncopyable
         {
           explicit fun_caller(const F& f)
             :f(f)
@@ -377,7 +378,7 @@ namespace std
         explicit function(F&& f)
           :caller()
         {
-          assign_impl(forward<F>(f));
+          assign_impl<F>(forward<F>(f));
         }
 
         /** Moves \c f to this wrapper */
@@ -409,7 +410,7 @@ namespace std
         explicit function(const F& f)
           :caller()
         {
-          assign_impl(f);
+          assign_impl<F>(f);
         }
 
         ///** Constructs function wrapper from copy of callable \c f */
@@ -424,7 +425,7 @@ namespace std
         template<class F> function& operator=(const F& f) 
         {
           clear();
-          assign_impl(f);
+          assign_impl<F>(f);
           return *this;
         }
 
@@ -445,7 +446,7 @@ namespace std
         }
 
         // 20.6.15.2.4, function invocation:
-        result_type operator()(Args& args) const __ntl_nothrow
+        result_type operator()(const Args& args) const __ntl_nothrow
         {
           if(!caller) __ntl_throw(bad_function_call());
           return (*caller)(args);
@@ -531,15 +532,16 @@ namespace std
     #else
         template<class Fn> inline void assign_impl(Fn&& f)
         {
-          if(check_ptr(f, is_pointer<Fn>()))
-            caller = new impl::fun_caller<result_type, Fn, Args>(forward<Fn>(f));
+          static_assert(!is_reference<Fn>::value, "reference to reference isn't allowed");
+          if(check_ptr(f, is_pointer<typename remove_reference<Fn>::type>()))
+            caller = new impl::fun_caller<result_type, typename remove_reference<Fn>::type, Args>(forward<Fn>(f));
         }
     #endif
 
         /** Checks pointer if it is */
-        template<class F> inline bool check_ptr(const F& f, true_type) {  return f != nullptr; }
+        template<class F> inline bool check_ptr(const F& f, true_type){ return f != nullptr; }
         /** Check pointer stub for nonpointer callables */
-        template<class F> inline bool check_ptr(const F& f, false_type){  return true; }
+        template<class F> inline bool check_ptr(const F&,  false_type){ return true; }
 
       private:
         impl::caller<result_type, Args>* caller;
@@ -571,7 +573,7 @@ namespace std
         :base(static_cast<base&>(r)){}
       function& operator=(function& r) { base::operator=(static_cast<base&>(r)); return *this; }
       function& operator=(nullptr_t) { clear(); return *this; }
-      template<class F> function& operator=(F f) { base::operator=(f); return *this; }
+      template<class F> function& operator=(F f) { base::operator=(forward<F>(f)); return *this; }
     };
 
     /** function<> specialization for 1 argument */
@@ -591,7 +593,7 @@ namespace std
         :base(static_cast<base&>(r)){}
       function& operator=(function& r) { base::operator=(static_cast<base&>(r)); return *this; }
       function& operator=(nullptr_t) { clear(); return *this; }
-      template<class F> function& operator=(F f) { base::operator=(f); return *this; }
+      template<class F> function& operator=(F f) { base::operator=(forward<F>(f)); return *this; }
     };
 
     /** function<> specialization for 2 arguments */
@@ -611,7 +613,7 @@ namespace std
         :base(static_cast<base&>(r)){}
       function& operator=(function& r) { base::operator=(static_cast<base&>(r)); return *this; }
       function& operator=(nullptr_t) { clear(); return *this; }
-      template<class F> function& operator=(F f) { base::operator=(f); return *this; }
+      template<class F> function& operator=(F f) { base::operator=(forward<F>(f)); return *this; }
     };
 
   /**@} lib_func_wrap        */

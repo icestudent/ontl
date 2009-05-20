@@ -172,7 +172,7 @@
 // constexpr
 //#define NTL__CXX_CONSTEXPR
 // decltype (typeof)
-//#define NTL__CXX_TYPEOF
+#define NTL__CXX_TYPEOF
 // class enum
 //#define NTL__CXX_ENUM
 // nullptr
@@ -545,8 +545,8 @@ char (*__countof_helper(T(&array)[N]))[N];
 
 namespace ntl
 {
-  struct explicit_bool_t { int _; };
-  typedef int explicit_bool_t::*  explicit_bool_type;
+  struct explicit_bool_t { void _(){} };
+  typedef void (explicit_bool_t::* explicit_bool_type)(); // pointer-to-member function instead of pointer-to-member because the pointer to second form have -1 base and 0/NULL is valid value.
 
   template<typename T>
   __forceinline

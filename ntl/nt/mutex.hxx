@@ -12,6 +12,8 @@
 namespace ntl {
   namespace nt {
 
+#pragma warning(disable:4127) // conditional expression is constant
+
     /// STL default base mutex object
     /// In NT subsystem implemented as futex.
     template<bool recursive>
@@ -84,7 +86,7 @@ namespace ntl {
       base_mutex& operator=(const base_mutex&) __deleted;
     };
 
-
+#pragma warning(default:4127)
   }
 }
 #endif // NTL__NT_MUTEX

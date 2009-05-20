@@ -12,6 +12,8 @@
 
 #include "../basedef.hxx"
 #include "../linked_ptr.hxx"
+#include "functional.hxx"
+#include "reference_wrapper.hxx"
 
 namespace std
 {

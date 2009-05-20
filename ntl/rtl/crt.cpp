@@ -5,16 +5,32 @@
 
 #pragma region section_attributes
 #pragma comment(linker, "/merge:.CRT=.rdata")
+#define sec(x) __declspec(allocate(x))
 
+#pragma data_seg(push)
+
+/* c++ initializers */
 #pragma section(".CRT$XCA",long,read)
 #pragma section(".CRT$XCZ",long,read)
 
-/* c++ initializers */
-#define sec(x) __declspec(allocate(x))
+/* c++ terminators */
+#pragma section(".CRT$XPA",long,read)
+#pragma section(".CRT$XPZ",long,read)
+
+/* termination */
+#pragma section(".CRT$XTA",long,read)
+#pragma section(".CRT$XTZ",long,read)
+
 sec(".CRT$XCA") vfv_t* __xc_a[]= {0};
 sec(".CRT$XCZ") vfv_t* __xc_z[]= {0};
-#undef sec
 
+sec(".CRT$XPA") vfv_t* __xp_a[]= {0};
+sec(".CRT$XPZ") vfv_t* __xp_z[]= {0};
+
+sec(".CRT$XTA") vfv_t* __xt_a[]= {0};
+sec(".CRT$XTZ") vfv_t* __xt_z[]= {0};
+#undef sec
+#pragma data_seg(pop)
 #pragma endregion
 
 #include "../stlx/vector.hxx"
@@ -94,8 +110,10 @@ namespace ntl
 
       // init static objects
       exit_list = new exit_funcs_t();
-      exit_list->reserve(static_cast<size_t>(__xc_z - __xc_a));
+      exit_list->reserve(static_cast<size_t>((__xc_z-__xc_a) + (__xp_z-__xp_a) + (__xt_z-__xt_a)));
       initterm(__xc_a, __xc_z);
+      initterm(__xp_a, __xp_z);
+      initterm(__xt_a, __xt_z);
 
       // init io streams
       __check_iostreams_stub();

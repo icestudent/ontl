@@ -14,11 +14,14 @@ const std::native_error::native_error_category& std::native_error::native_catego
 
 #endif // subsystem nt
 
+#include "../stlx/future.hxx"
+
 namespace
 {
   static const std::__::generic_error_category generic_category_instance;
   static const std::__::system_error_category system_category_instance;
   static const std::__::iostream_error_category iostream_category_instance;
+  static const std::__::future_error_category future_category_instance;
 }
 
 namespace std
@@ -26,6 +29,7 @@ namespace std
   extern const error_category& generic_category = generic_category_instance;
   extern const error_category& system_category = system_category_instance;
   extern const error_category& iostream_category = iostream_category_instance;
+  extern const error_category& future_category = future_category_instance;
 
   // TODO: implement generic error value mapping to the current subsystem error values
   string __::generic_error_category::message(int ev) const

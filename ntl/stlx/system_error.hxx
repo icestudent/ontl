@@ -32,7 +32,9 @@ namespace std
   class error_condition;
   class system_error;
 
+  /** \hideinitializer */
   extern const error_category& system_category;
+  /** \hideinitializer */
   extern const error_category& generic_category;
 
   template<class T>
@@ -262,9 +264,11 @@ private:
           }
           msg = move(tmp);
         }
+        #pragma warning(disable:4127)
         __ntl_catch(...) {
           return runtime_error::what();
         }
+        #pragma warning(default:4127)
       }
       return msg.c_str();
     }
@@ -454,7 +458,7 @@ private:
 
   /** Returns a null reference that can be used as a default function argument to signify an exception should be thrown when an error is detected ([semantics.throws]). 
     Dereferencing the returned reference results in undefined behavior. */
-  inline error_code& throws()
+  __forceinline error_code& throws()
   {
     static error_code* tec = 0;
     return *tec;

@@ -61,7 +61,7 @@ namespace intrinsic
     uint8_t __cdecl _InterlockedCompareExchange128(volatile uint64_t *, uint64_t, uint64_t, uint64_t*);
     int64_t __cdecl _InterlockedCompare64Exchange128(uint64_t volatile* Destination, uint64_t ExchangeHigh, uint64_t ExchangeLow, uint64_t Comperand);
     void*   __cdecl _InterlockedExchangePointer(void* volatile* Target, void* Value);
-  }
+  } // extern "C"
 
 #ifndef __ICL
 #pragma intrinsic(_InterlockedAnd, _InterlockedAnd8, _InterlockedAnd16, _InterlockedOr, _InterlockedOr8, _InterlockedOr16, _InterlockedXor, _InterlockedXor8, _InterlockedXor16)
@@ -70,10 +70,10 @@ namespace intrinsic
 #ifdef _M_X64
 #pragma intrinsic(_InterlockedAnd64, _InterlockedOr64, _InterlockedXor64, _InterlockedIncrement64, _InterlockedDecrement64, _InterlockedExchange64, _InterlockedExchangeAdd64)
 #pragma intrinsic(_InterlockedCompareExchangePointer, _InterlockedExchangePointer)
-#if _MSC_VER >= 1600
-#pragma intrinsic(_InterlockedCompareExchange128, _InterlockedCompare64Exchange128)
-#endif
-#endif
+//#if _MSC_VER >= 1600
+//#pragma intrinsic(_InterlockedCompareExchange128, _InterlockedCompare64Exchange128)
+//#endif // vc10
+#endif // x64
 #endif // icl
 
   extern "C" {
@@ -102,7 +102,8 @@ namespace intrinsic
   /** Guarantees that every preceding store is globally visible before any subsequent store. */
   void __cdecl __faststorefence();
 #endif
-  }
+
+  } // extern "C"
 
 #ifndef __ICL
 #pragma intrinsic(_ReadBarrier, _WriteBarrier, _ReadWriteBarrier, _mm_lfence, _mm_mfence, _mm_sfence, _mm_pause)
@@ -489,11 +490,7 @@ namespace atomic {
   }
 
 
-  static inline void* exchange(void* volatile & dest, void* src)
-  {
-    return reinterpret_cast<void*>(exchange(reinterpret_cast<volatile uintptr_t&>(dest), reinterpret_cast<uintptr_t>(src)));
-  }
-
+  //////////////////////////////////////////////////////////////////////////
   struct generic_op
   {
   private:
@@ -791,7 +788,64 @@ class atomic_exec<Lock, void>
 
 };
 
+#if !defined(_M_X64) && !defined(__ICL)
+namespace intrinsic
+{
+  extern "C"
+  {
+    inline int64_t __cdecl _InterlockedAnd64(volatile uint64_t * dest, uint64_t mask)
+    {
+      const int64_t old = static_cast<int64_t>(*dest);
+      while(_InterlockedExchange64(dest, old&mask) == old);
+      return *dest;
+    }
+    inline int64_t __cdecl _InterlockedOr64(volatile uint64_t * dest, uint64_t mask)
+    {
+      const int64_t old = static_cast<int64_t>(*dest);
+      while(_InterlockedExchange64(dest, old|mask) == old);
+      return *dest;
+    }
+    inline int64_t __cdecl _InterlockedXor64(volatile uint64_t * dest, uint64_t mask)
+    {
+      const int64_t old = static_cast<int64_t>(*dest);
+      while(_InterlockedExchange64(dest, old^mask) == old);
+      return *dest;
+    }
 
+    inline int64_t __cdecl _InterlockedExchange64(volatile uint64_t * dest, uint64_t val)
+    {
+      __asm 
+      {
+        mov esi,[dest];
+        mov ecx,dword ptr [val+4];
+        mov ebx,dword ptr [val];
+cas_loop:
+        lock cmpxchg8b [esi];
+        jnz cas_loop
+      }
+      return *dest;
+    }
+
+    inline int64_t __cdecl _InterlockedExchangeAdd64(volatile uint64_t * dest, uint64_t val)
+    {
+      __asm 
+      {
+        mov esi,[dest];
+        mov eax,[esi];
+        mov edx,[esi+4];
+cas_loop:
+        mov ebx,dword ptr [val];
+        mov ecx,dword ptr [val+4];
+        add ebx,eax;
+        adc ecx,edx;
+        lock cmpxchg8b [esi];
+        jne cas_loop;
+      }
+      return *dest;
+    }
+  }
+}
+#endif // x86
 
 }//namespace ntl
 
