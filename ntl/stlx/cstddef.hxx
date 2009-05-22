@@ -172,7 +172,9 @@
 // constexpr
 //#define NTL__CXX_CONSTEXPR
 // decltype (typeof)
-#define NTL__CXX_TYPEOF
+#if _MSC_FULL_VER >= 160020506 // beta1
+# define NTL__CXX_TYPEOF
+#endif
 // class enum
 //#define NTL__CXX_ENUM
 // nullptr

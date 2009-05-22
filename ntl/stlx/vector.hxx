@@ -110,9 +110,9 @@ class vector
         array_allocator.construct(end_++, forward<value_type>(T()));
     }
 
-    explicit vector(size_type n,
-                    const T& value,
-                    const Allocator& a  = Allocator())
+    vector(size_type n,
+           const T& value,
+           const Allocator& a  = Allocator())
     : array_allocator(a)
     {
       capacity_ = n;
@@ -350,6 +350,9 @@ class vector
     reference       back()        __ntl_nothrow { return *(end() - 1); }
     const_reference back()  const __ntl_nothrow { return *(end() - 1); }
 
+    ///\name data access [23.2.6.3]
+    pointer       data()        __ntl_nothrow { return begin_; }
+    const_pointer data() const  __ntl_nothrow { return begin_; }
     ///@}
 
   private:
@@ -442,7 +445,7 @@ class vector
 
   public:
 
-    ///\name  modifiers [23.2.6.3]
+    ///\name  modifiers [23.2.6.4]
 
     #ifdef NTL__CXX_VT
     template <class... Args> void emplace_back(Args&&... args);

@@ -533,11 +533,15 @@ struct common_type<T, U, void, void>
   static_assert(sizeof(T) > 0, "T shall be complete");
   static_assert(sizeof(T) > 0, "U shall be complete");
 
-#if defined NTL__CXX_TYPEOF && defined NTL__CXX_RV
-
+#ifdef NTL__CXX_TYPEOF
 private:
+#ifdef NTL__CXX_RV
   static T&& __t();
   static U&& __u();
+#else
+  static T& __t();
+  static U& __u();
+#endif
 public:
   typedef decltype(true ? __t() : __u()) type;
 
