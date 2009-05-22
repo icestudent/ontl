@@ -1288,7 +1288,18 @@ PREDEFINED             = __ntl_try=try \
                          __ntl_nothrow=throw() \
                          __DOXYGEN__ \
                          constexpr= \
-                         __declspec(x)=
+                         __declspec(x)= \
+                         NTL__CXX_RV \
+                         STLX__USE_RTTI=1 \
+                         __in= \
+                         __in_opt= \
+                         __inout= \
+                         __inout_opt= \
+                         __out= \
+                         __out_opt= \
+                         __optional= \
+                         __reserved= \
+                         __deref_out=
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then 
 # this tag can be used to specify a list of macro names that should be expanded. 

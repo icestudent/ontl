@@ -42,6 +42,7 @@ namespace km {
 #endif
 
 // shared with nt declarations
+using nt::guid;
 using nt::slist_header;
 using nt::single_list_entry;
 using nt::slist_entry;
@@ -72,6 +73,8 @@ using nt::no_access;
 
 
 // forward declarations
+struct eprocess;
+struct ethread;
 struct kthread;
 struct mdl;
 struct kevent;

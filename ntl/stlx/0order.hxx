@@ -66,7 +66,7 @@
 \defgroup lib_locale_stdcvt       22.3 Standard code conversion facets [locale.stdcvt]
 @}*/
 
-/**\defgroup  lib_containers *********** 23 Containers library [containers]
+/**\defgroup  lib_containers **** 23 Containers library [containers]
 *@{
 
 \defgroup lib_container_req       23.1 Container requirements [container.requirements]
@@ -76,14 +76,12 @@
 
 @}*/
 
+/**\defgroup threads      30 Thread support library [thread]
+@{
 
-  /**\defgroup threads      30 Thread support library [thread]
-   *  
-   *  The following subclauses describe components to create and manage threads (1.10), perform mutual exclusion, 
-   *  and communicate conditions between threads.
-*@{
 \defgroup  thread_thread    30.2 Threads [thread.threads]
 \defgroup  thread_mutex     30.3 Mutual exclusion [thread.mutex]
 \defgroup  thread_condition 30.4 Condition variables [thread.condition]
 \defgroup  thread_futures   30.5 Futures [futures]
-*@}*/
+
+@}*/

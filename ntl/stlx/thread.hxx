@@ -39,7 +39,7 @@ namespace std
    *  @{
    **/
 
-  /// 30.2.2 Namespace this_thread [thread.thread.this]
+  /// 30.2.2 Namespace %this_thread [thread.thread.this]
   namespace this_thread
   {}
 
@@ -81,7 +81,7 @@ namespace std
   }
 
   /**
-   *	@brief thread class
+   *	@brief %thread class
    *
    *  The class thread provides a mechanism to create a new %thread of execution, to join with a %thread (i.e. wait
    *  for a %thread to complete), and to perform other operations that manage and query the state of a %thread.

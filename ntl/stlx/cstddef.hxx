@@ -56,14 +56,24 @@
 # define __assume(X)
 #endif
 
-#define __optional
+///\name SAL macroses
+#ifndef __in
+# define __in
+# define __in_opt
+# define __inout
+# define __inout_opt
+# define __out
+# define __out_opt
+# define __optional
+# define __reserved
+# define __deref_out
+# define __deref_out_opt
+#endif
+///\}
 
-#if defined(_MSC_VER) && _MSC_VER >= 1400
-//#define __thiscall __thiscall
-//#define __restrict __restrict
-#else
-#define __restrict
-#define __thiscall
+#if !(defined(_MSC_VER) && _MSC_VER >= 1400)
+# define __restrict
+# define __thiscall
 #endif
 
 #if defined(_MSC_VER)

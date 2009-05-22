@@ -1600,7 +1600,8 @@ void __stdcall
 }//namspace km
 }//namespace ntl
 
-
-#pragma comment(lib,    "ndis.lib")
+#ifndef NTL__NO_AUTOLINK
+# pragma comment(lib,    "ndis.lib")
+#endif
 
 #endif//#ifndef NTL__KM_NDIS

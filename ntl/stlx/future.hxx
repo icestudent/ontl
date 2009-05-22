@@ -31,8 +31,8 @@ namespace std
    *
    *	@defgroup thread_futures 30.5 Futures [futures]
    *
-   *  Describes components that a C++ program can use to retrieve in one thread the result
-   *  (value or exception) from a function that has run in another thread.
+   *  Describes components that a C++ program can use to retrieve in one %thread the result
+   *  (value or exception) from a function that has run in another %thread.
    *
    *  @{
    **/
@@ -416,7 +416,7 @@ namespace std
     unique_future& operator=(const unique_future& rhs) __deleted;
 
     typedef typename __::future_result<R>::type result_type;
-    typedef unique_ptr<__::future_data<R> > unique_ptr;
+    typedef unique_ptr<__::future_data<R> > unique_data_ptr;
   public:
     /** Move constructs a unique_future object whose associated state is the same as the state of \p x before. */
     unique_future(unique_future&& x)
@@ -486,7 +486,7 @@ namespace std
   protected:
     friend class __::promise<R>;
     ///\cond __
-    explicit unique_future(unique_ptr&& p)
+    explicit unique_future(unique_data_ptr&& p)
       :data(move(p))
     {}
 
@@ -503,7 +503,7 @@ namespace std
     }
     ///\endcond
   private:
-    unique_ptr data;
+    unique_data_ptr data;
   };
 
 
@@ -603,7 +603,7 @@ namespace std
 
       typedef __::future_result<R> feature_result;
       typedef typename feature_result::type result_type;
-      typedef unique_ptr<__::future_data<R> > unique_ptr;
+      typedef unique_ptr<__::future_data<R> > unique_data_ptr;
     public:
       promise()
       {}
@@ -653,7 +653,7 @@ namespace std
             __ntl_throw(future_error(e));
           else
             ec = e;
-          return unique_future<R>(unique_ptr());
+          return unique_future<R>(unique_data_ptr());
         }
         retrieved = true;
         check();
@@ -681,10 +681,10 @@ namespace std
           data.reset(new __::future_data<R>);
       }
     protected:
-      unique_ptr data;
+      unique_data_ptr data;
       atomic_uint retrieved;
+      ///\endcond
     };
-    ///\endcond
   }
 
   /**
@@ -696,9 +696,7 @@ namespace std
    *  This allows the result to be %set from a callback invoked from code that has no knowledge of the promise or its associated \e futures.
    **/
 
-  /**
-   *	@brief 30.5.6 Class template promise [futures.promise]
-   **/
+  /**	30.5.6 Class template promise, default interface [futures.promise] */
   template<class R> class promise:
     public __::promise<R>
   {
@@ -751,7 +749,7 @@ namespace std
     template<class R, class Args = tuple<> >
     class packaged_task
     {
-      typedef unique_ptr<__::future_data<R> > unique_ptr;
+      typedef unique_ptr<__::future_data<R> > unique_data_ptr;
 
       // no copy
       packaged_task(packaged_task&) __deleted;
@@ -821,7 +819,6 @@ namespace std
 
     protected:
       ///\cond __
-      /// execution
       void call(const Args& args)
       {
         //thread t(&packaged_task::call_thunk, this, args);

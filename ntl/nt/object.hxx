@@ -11,7 +11,7 @@
 #include "basedef.hxx"
 #include "string.hxx"
 #include "handle.hxx"
-
+#include "device_traits.hxx"
 
 namespace ntl {
 namespace nt {

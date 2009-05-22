@@ -11,7 +11,9 @@
 #include "windef.hxx"
 #include "../nt/service.hxx"
 
-#pragma comment(lib, "advapi32") // from PSDK
+#ifndef NTL__NO_AUTOLINK
+# pragma comment(lib, "advapi32") // from PSDK
+#endif
 
 //#pragma warning(disable:4061)// enumerator in switch of enum is not explicitly handled by a case label
 //#pragma warning(disable:4127)// conditional expression is constant

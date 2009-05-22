@@ -18,7 +18,9 @@ namespace win {
 /**\addtogroup  winapi_types_support *** Win32 API support library **********
  *@{*/
 
-#pragma comment(lib,    "kernel32.lib")
+#ifndef NTL__NO_AUTOLINK
+# pragma comment(lib,    "kernel32.lib")
+#endif
 
 
 NTL__EXTERNAPI

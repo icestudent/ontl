@@ -17,15 +17,12 @@
 #include "../basedef.hxx"
 #include "../stdlib.hxx"
 
-//#ifdef __ICL
-
 extern "C" __declspec(selectany) std::uintptr_t __security_cookie = 
   #ifdef _M_X64
     0x00002B992DDFA232;
   #else
     0xBB40E64E;
   #endif
-//#endif // icl
 
 namespace ntl {
 
@@ -52,6 +49,8 @@ namespace ntl {
 
     /**\addtogroup  native_types_support *** NT Types support library ***********
     *@{*/
+
+    typedef __s_GUID guid, guid_t;
 
     struct list_entry
     {

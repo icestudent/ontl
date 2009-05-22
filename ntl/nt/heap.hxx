@@ -11,7 +11,9 @@
 #include "basedef.hxx"
 #include "peb.hxx"
 
-#pragma comment(lib, "ntdll.lib")
+#ifndef NTL__NO_AUTOLINK
+# pragma comment(lib, "ntdll.lib")
+#endif
 
 namespace ntl {
 namespace nt {

@@ -48,211 +48,6 @@ namespace std
       {
         using ttl::meta::empty_type;
 
-        /************************************************************************/
-        /* Base Caller                                                          */
-        /************************************************************************/
-#if 0
-        template<class R, class Args, size_t Argc = tuple_size<Args>::value>
-        struct caller;
-
-        template<class R, class Args>
-        struct caller<R,Args,0>
-        {
-          virtual R operator()() const = 0;
-          virtual caller* clone() const = 0;
-          virtual ~caller(){}
-          virtual const type_info& target_type() const = 0;
-          virtual void* target() = 0;
-        };
-
-        template<class R, class Args>
-        struct caller<R,Args,1>
-        {
-          virtual R operator()(typename __::arg_t<0, Args>::type) const = 0;
-          virtual caller* clone() const = 0;
-          virtual ~caller(){}
-          virtual const type_info& target_type() const = 0;
-          virtual void* target() = 0;
-        };
-
-        template<class R, class Args>
-        struct caller<R,Args,2>
-        {
-          virtual R operator()(typename __::arg_t<0, Args>::type, typename __::arg_t<1, Args>::type) const = 0;
-          virtual caller* clone() const = 0;
-          virtual ~caller(){}
-          virtual const type_info& target_type() const = 0;
-          virtual void* target() = 0;
-        };
-
-        template<class R, class Args>
-        struct caller<R,Args,3>
-        {
-          virtual R operator()(typename __::arg_t<0, Args>::type, typename __::arg_t<1, Args>::type, typename __::arg_t<2, Args>::type) const = 0;
-          virtual caller* clone() const = 0;
-          virtual ~caller(){}
-          virtual const type_info& target_type() const = 0;
-          virtual void* target() = 0;
-        };
-
-        /************************************************************************/
-        /* Functor caller                                                       */
-        /************************************************************************/
-        template<class F, class R, class Args, size_t Argc = tuple_size<Args>::value>
-        struct functor_caller;
-
-        template<class F, class R, class Args>
-        struct functor_caller<F,R,Args,0>:
-          caller<R,Args>
-        {
-          explicit functor_caller(F f)
-            :f(f)
-          {}
-          virtual caller<R,Args>* clone() const { return new functor_caller(f); }
-          virtual R operator()() const
-          {
-            return f();
-          }
-          const type_info& target_type() const { return __ntl_typeid(F); }
-          virtual void* target() { return reinterpret_cast<void*>(&f); }
-        private:
-          F f;
-        };
-
-        template<class F, class R, class Args>
-        struct functor_caller<F,R,Args,1>
-          :caller<R,Args>
-        {
-          explicit functor_caller(F f)
-            :f(f)
-          {}
-          virtual caller<R,Args>* clone() const { return new functor_caller(f); }
-          virtual R operator()(typename __::arg_t<0, Args>::type a1) const
-          {
-            return f(a1);
-          }
-          const type_info& target_type() const { return __ntl_typeid(F); }
-          virtual void* target() { return reinterpret_cast<void*>(&f); }
-        private:
-          F f;
-        };
-
-        template<class F, class R, class Args>
-        struct functor_caller<F,R,Args,2>
-          :caller<R,Args>
-        {
-          explicit functor_caller(F f)
-            :f(f)
-          {}
-          virtual caller<R,Args>* clone() const { return new functor_caller(f); }
-          virtual R operator()(typename __::arg_t<0, Args>::type a1, typename __::arg_t<1, Args>::type a2) const
-          {
-            return f(a1,a2);
-          }
-          const type_info& target_type() const { return __ntl_typeid(F); }
-          virtual void* target() { return reinterpret_cast<void*>(&f); }
-        private:
-          F f;
-        };
-
-        /************************************************************************/
-        /* Member function caller                                               */
-        /************************************************************************/
-        template<class MemFn, class R, class Args, size_t Argc = tuple_size<Args>::value>
-        struct memfun_caller;
-
-        template<class MemFn, class R, class Args>
-        struct memfun_caller<MemFn, R, Args, 1>
-          :caller<R,Args>
-        {
-          explicit memfun_caller(MemFn f)
-            :pmf(f)
-          {}
-          virtual caller<R,Args>* clone() const { return new memfun_caller(pmf); }
-
-          virtual R operator()(typename __::arg_t<0, Args>::type obj) const
-          {
-            return call(is_pointer<typename __::arg_t<0, Args>::type>(), obj);
-          }
-          const type_info& target_type() const { return __ntl_typeid(MemFn); }
-          virtual void* target() { return reinterpret_cast<void*>(&pmf); }
-        protected:
-          template<class T>
-          R call(false_type, T& obj) const { return (obj.*pmf)(); }
-          template<class T>
-          R call(true_type , T  obj) const { return (obj->*pmf)();}
-        private:
-          MemFn pmf;
-        };
-
-        template<class MemFn, class R, class Args>
-        struct memfun_caller<MemFn, R, Args, 2>
-          :caller<R,Args>
-        {
-          explicit memfun_caller(MemFn f)
-            :pmf(f)
-          {}
-          virtual caller<R,Args>* clone() const { return new memfun_caller(pmf); }
-
-          virtual R operator()(typename __::arg_t<0, Args>::type obj, typename __::arg_t<1, Args>::type a1) const
-          {
-            return call(is_pointer<typename __::arg_t<0, Args>::type>(), obj, a1);
-          }
-          const type_info& target_type() const { return __ntl_typeid(MemFn); }
-          virtual void* target() { return reinterpret_cast<void*>(&pmf); }
-        protected:
-          template<class T>
-          R call(false_type, T& obj, typename __::arg_t<1, Args>::type a1) const { return (obj. *pmf)(a1); }
-          template<class T>
-          R call(true_type , T  obj, typename __::arg_t<1, Args>::type a1) const { return (obj->*pmf)(a1);}
-        private:
-          MemFn pmf;
-        };
-
-        /************************************************************************/
-        /* Refwrap caller                                                       */
-        /************************************************************************/
-        template<class F, class R, class Args, size_t Argc = tuple_size<Args>::value>
-        struct refwrap_caller;
-
-        template<class F, class R, class Args>
-        struct refwrap_caller<F,R,Args,0>:
-          caller<R,Args>
-        {
-          explicit refwrap_caller(reference_wrapper<F> f)
-            :f(f)
-          {}
-          virtual caller<R,Args>* clone() const { return new refwrap_caller(f); }
-          virtual R operator()() const
-          {
-            return f();
-          }
-          const type_info& target_type() const { return __ntl_typeid(F); }
-          virtual void* target() { return reinterpret_cast<void*>(& f.get() ); }
-        private:
-          reference_wrapper<F> f;
-        };
-
-        template<class F, class R, class Args>
-        struct refwrap_caller<F,R,Args,1>
-          :caller<R,Args>
-        {
-          explicit refwrap_caller(reference_wrapper<F> f)
-            :f(f)
-          {}
-          virtual caller<R,Args>* clone() const { return new refwrap_caller(f); }
-          virtual R operator()(typename __::arg_t<0, Args>::type a1) const
-          {
-            return f(a1);
-          }
-          const type_info& target_type() const { return __ntl_typeid(F); }
-          virtual void* target() { return reinterpret_cast<void*>(& f.get() ); }
-        private:
-          reference_wrapper<F> f;
-        };
-#endif
-
-        //////////////////////////////////////////////////////////////////////////
         template<typename R, class Args, size_t Argc = tuple_size<Args>::value>
         struct fun_arity { typedef R result_type; };
 
@@ -263,7 +58,9 @@ namespace std
         struct fun_arity<R,Args,2>: binary_function<typename tuple_element<0, Args>::type, typename tuple_element<1, Args>::type, R>{};
 
         //////////////////////////////////////////////////////////////////////////
-
+        /************************************************************************/
+        /* Base Caller                                                          */
+        /************************************************************************/
         template<typename R, class Args>
         struct caller
         {
@@ -274,6 +71,9 @@ namespace std
           virtual void* target() = 0;
         };
 
+        /************************************************************************/
+        /* Caller                                                               */
+        /************************************************************************/
         template<typename R, class F, class Args>
         struct fun_caller:
           caller<R,Args>,
@@ -323,6 +123,7 @@ namespace std
           arity = tuple_size<Args>::value
         };
 
+        ///\name 20.6.15.2.1, construct/copy/destroy:
         // allocator-aware:
         //template<class A> function(allocator_arg_t, const A&);
         //template<class A> function(allocator_arg_t, const A&, unspecified-null-pointer-type );
@@ -388,7 +189,7 @@ namespace std
           return *this;
         }
 
-        /** Constructs function wrapper from \r target */
+        /** Constructs function wrapper from target of \c r */
         function(function&& r)
           :caller()
         {
@@ -445,7 +246,7 @@ namespace std
           return *this;
         }
 
-        // 20.6.15.2.4, function invocation:
+        ///\name 20.6.15.2.4, function invocation:
         result_type operator()(const Args& args) const __ntl_nothrow
         {
           if(!caller) __ntl_throw(bad_function_call());
@@ -462,13 +263,13 @@ namespace std
         { if(!caller) __ntl_throw(bad_function_call()); return (*caller)(Args(a1,a2)); }
 
 
-        // 20.6.15.2.3 function capacity
+        ///\name 20.6.15.2.3 function capacity
 
         /** Returns true if this has target */
         operator __::explicit_bool_type() const __ntl_nothrow { return __::explicit_bool(caller); }
 
 
-        // 20.6.15.2.2, function modifiers:
+        ///\name 20.6.15.2.2, function modifiers:
 
         /** Swaps this target with the target of \c r */
     #ifdef NTL__CXX_RV
@@ -488,7 +289,7 @@ namespace std
         }
 
     #if STLX__USE_RTTI
-        // 20.6.15.2.5, function target access:
+        ///\name 20.6.15.2.5, function target access:
 
         /** Returns type info of the target if exists; otherwise returns <tt>typeid(void)</tt> */
         const std::type_info& target_type() const __ntl_nothrow
@@ -508,8 +309,9 @@ namespace std
           return caller && typeid(T) == target_type() ? reinterpret_cast<const T*>(caller->target()) : nullptr;
         }
     #endif
+        ///\}
       protected:
-        /// \cond __
+        ///\cond __
         inline void clear()
         {
           if(caller){
@@ -517,7 +319,7 @@ namespace std
             caller = nullptr;
           }
         }
-        /// \endcond
+        ///\endcond
 
     #ifndef NTL__CXX_RV
         template<class Fn> inline void assign_impl(const Fn& f)

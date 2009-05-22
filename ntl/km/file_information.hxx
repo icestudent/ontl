@@ -47,7 +47,7 @@ NTL__EXTERNAPI io_set_information_file_t   IoSetInformation;
 
 using nt::file_basic_information;
 using nt::file_standard_information;
-using nt::file_name_information;
+//using nt::file_name_information;
 using nt::file_rename_information;
 using nt::file_disposition_information;
 using nt::file_end_of_file_information;
@@ -73,37 +73,48 @@ struct file_information
 };
 
 
-template<>
-struct file_information<file_rename_information>
+
+namespace __
 {
-    file_information(
-      legacy_handle                   file_handle,
-      const file_rename_information & info) __ntl_nothrow
-    : status_(_set(file_handle, &info,
-              sizeof(info) + info.FileNameLength - sizeof(wchar_t)))
-    {/**/}
-
+  template<class info_class>
+  struct file_rename_information_impl
+  {
     operator bool() const { return nt::success(status_); }
-
     operator ntstatus() const { return status_; }
 
-    static __forceinline
-    ntstatus
-      _set(
-        legacy_handle   file_handle,
-        const void *    info,
-        unsigned long   info_length
-        )
+    file_rename_information_impl(legacy_handle file_handle, const const_unicode_string& new_name, bool replace_if_exists, legacy_handle root_directory)
     {
-      io_status_block iosb;
-      return ZwSetInformationFile(file_handle, &iosb, info, info_length,
-                                  file_rename_information::info_class_type);
+      info_class::ptr p(static_cast<info_class*>(info_class::alloc(new_name, replace_if_exists, root_directory).release()));
+      status_ = p 
+        ? _set(file_handle, p.get(), sizeof(info_class)+p->FileNameLength-sizeof(wchar_t))
+        : status::insufficient_resources;
     }
 
-  private:
-    ntstatus    status_;
-};
+    static __forceinline
+      ntstatus
+      _set(
+      legacy_handle   file_handle,
+      const void *    info,
+      unsigned long   info_length
+      )
+    {
+      io_status_block iosb;
+      return NtSetInformationFile(file_handle, &iosb, info, info_length, info_class::info_class_type);
+    }
 
+  protected:
+    ntstatus    status_;
+  };
+}
+
+template<>
+struct file_information<file_rename_information>:
+  __::file_rename_information_impl<file_rename_information>
+{
+  file_information(legacy_handle file_handle, const const_unicode_string& new_name, bool replace_if_exists, legacy_handle root_directory = legacy_handle())
+    :file_rename_information_impl(file_handle, new_name, replace_if_exists, root_directory)
+  {}
+};
 
 ///}
 

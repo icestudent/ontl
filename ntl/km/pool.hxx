@@ -14,8 +14,9 @@
 #define NTL__POOL_TAG 'LTN_'  // _NTL
 #endif
 
-//#pragma comment(linker, "/subsystem:native,5.10")
-#pragma comment(lib,    "ntoskrnl.lib")
+#ifndef NTL__NO_AUTOLINK
+# pragma comment(lib,    "ntoskrnl.lib")
+#endif
 
 namespace ntl {
 namespace km {

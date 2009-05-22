@@ -847,10 +847,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\km\ndis.hxx"
-					>
-				</File>
-				<File
 					RelativePath=".\km\new.hxx"
 					>
 				</File>
@@ -879,10 +875,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\km\tdi.hxx"
-					>
-				</File>
-				<File
 					RelativePath=".\km\thread.hxx"
 					>
 				</File>
@@ -890,6 +882,22 @@
 					RelativePath=".\km\time.hxx"
 					>
 				</File>
+				<Filter
+					Name="net"
+					>
+					<File
+						RelativePath=".\km\ndis.hxx"
+						>
+					</File>
+					<File
+						RelativePath=".\km\tdi.hxx"
+						>
+					</File>
+					<File
+						RelativePath=".\km\winsock.hxx"
+						>
+					</File>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="nt"

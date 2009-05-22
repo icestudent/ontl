@@ -928,10 +928,10 @@ namespace std
 
   public:
     ///\name Operations on %atomic types
-    /** @copydoc atomic_address::store() */
+    /** @copydoc __atomic_v1::base<void*, true>::store() */
     void store(T* value, memory_order mo = memory_order_seq_cst) volatile { atomic_address::store(value, mo); }
 
-    /** @copydoc atomic_address::load() */
+    /** @copydoc __atomic_v1::base<void*, true>::load() */
     T* load(memory_order mo = memory_order_seq_cst) const volatile { return reinterpret_cast<T*>(atomic_address::load(mo)); }
 
     /** Returns load(); */
@@ -940,21 +940,21 @@ namespace std
     /** Stores and returns \p value. */
     T* operator=(T* value) volatile { this->store(value); return value; }
     
-    /** @copydoc atomic_address::exchange() */
+    /** @copydoc __atomic_v1::base<void*, true>::exchange() */
     T* exchange(T* value, memory_order mo = memory_order_seq_cst) volatile { return reinterpret_cast<T*>(atomic_address::exchange(value,mo)); }
-    /** @copydoc atomic_address::compare_exchange_strong() */
+    /** @copydoc __atomic_v1::base<void*, true>::compare_exchange_strong() */
     bool compare_exchange_weak(T*& expected, T* desired, memory_order success_order, memory_order failure_order) volatile { return atomic_address::compare_exchange_weak(expected, desired, success_order, failure_order); }
-    /** @copydoc atomic_address::compare_exchange_strong() */
+    /** @copydoc __atomic_v1::base<void*, true>::compare_exchange_strong() */
     bool compare_exchange_strong(T*& expected, T* desired, memory_order success_order, memory_order failure_order) volatile { return atomic_address::compare_exchange_strong(expected, desired, success_order, failure_order); }
-    /** @copydoc atomic_address::compare_exchange_strong() */
+    /** @copydoc __atomic_v1::base<void*, true>::compare_exchange_strong() */
     bool compare_exchange_weak(T*&, T*, memory_order mo = memory_order_seq_cst) volatile { return atomic_address::compare_exchange_weak(expected, desired, mo); }
-    /** @copydoc atomic_address::compare_exchange_strong() */
+    /** @copydoc __atomic_v1::base<void*, true>::compare_exchange_strong() */
     bool compare_exchange_strong(T*&, T*, memory_order mo = memory_order_seq_cst) volatile { return atomic_address::compare_exchange_strong(expected, desired, mo); }
 
     ///\name arithmetic computations
-    /** @copydoc atomic_address::fetch_add() */
+    /** @copydoc __atomic_v1::base<void*, true>::fetch_add() */
     T* fetch_add(ptrdiff_t offset, memory_order mo = memory_order_seq_cst) volatile { return reinterpret_cast<T*>(atomic_address::fetch_add(offset,mo)); }
-    /** @copydoc atomic_address::fetch_sub() */
+    /** @copydoc __atomic_v1::base<void*, true>::fetch_sub() */
     T* fetch_sub(ptrdiff_t offset, memory_order mo = memory_order_seq_cst) volatile { return reinterpret_cast<T*>(atomic_address::fetch_sub(offset,mo)); }
 
     ///\name operator arithmetic computations
