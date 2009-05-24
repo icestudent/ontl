@@ -674,6 +674,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\stlx\stdexcept_fwd.hxx"
+						>
+					</File>
+					<File
 						RelativePath=".\stlx\tuple.hxx"
 						>
 					</File>
@@ -726,6 +730,10 @@
 						</File>
 						<File
 							RelativePath=".\stlx\placeholders.hxx"
+							>
+						</File>
+						<File
+							RelativePath=".\stlx\reference_wrapper.hxx"
 							>
 						</File>
 						<File

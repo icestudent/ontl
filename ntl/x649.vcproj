@@ -409,6 +409,26 @@
 							RelativePath=".\stlx\ext\tr2\fs_operations.hxx"
 							>
 						</File>
+						<Filter
+							Name="network"
+							>
+							<File
+								RelativePath=".\stlx\ext\tr2\buffer.hxx"
+								>
+							</File>
+							<File
+								RelativePath=".\stlx\ext\tr2\io_service.hxx"
+								>
+							</File>
+							<File
+								RelativePath=".\stlx\ext\tr2\network.hxx"
+								>
+							</File>
+							<File
+								RelativePath=".\stlx\ext\tr2\timer.hxx"
+								>
+							</File>
+						</Filter>
 					</Filter>
 					<Filter
 						Name="tr1"
@@ -718,10 +738,6 @@
 							>
 						</File>
 						<File
-							RelativePath=".\stlx\function_vt.hxx"
-							>
-						</File>
-						<File
 							RelativePath=".\stlx\mem_fn.hxx"
 							>
 						</File>
@@ -797,6 +813,10 @@
 				</File>
 				<File
 					RelativePath=".\km\basedef.hxx"
+					>
+				</File>
+				<File
+					RelativePath=".\km\dbgstream.hxx"
 					>
 				</File>
 				<File
@@ -876,10 +896,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\km\ndis.hxx"
-					>
-				</File>
-				<File
 					RelativePath=".\km\new.hxx"
 					>
 				</File>
@@ -896,6 +912,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\km\process_information.hxx"
+					>
+				</File>
+				<File
 					RelativePath=".\km\registry.hxx"
 					>
 				</File>
@@ -908,10 +928,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\km\tdi.hxx"
-					>
-				</File>
-				<File
 					RelativePath=".\km\thread.hxx"
 					>
 				</File>
@@ -919,6 +935,22 @@
 					RelativePath=".\km\time.hxx"
 					>
 				</File>
+				<Filter
+					Name="net"
+					>
+					<File
+						RelativePath=".\km\ndis.hxx"
+						>
+					</File>
+					<File
+						RelativePath=".\km\tdi.hxx"
+						>
+					</File>
+					<File
+						RelativePath=".\km\winsock.hxx"
+						>
+					</File>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="nt"
@@ -937,6 +969,10 @@
 				</File>
 				<File
 					RelativePath=".\nt\csr.hxx"
+					>
+				</File>
+				<File
+					RelativePath=".\nt\dbgstream.hxx"
 					>
 				</File>
 				<File
