@@ -266,9 +266,22 @@ __forceinline wchar_t __fastcall widen(char c)
 
 ///\name String case mapping conversion
 NTL__EXTERNAPI wchar_t __stdcall RtlUpcaseUnicodeChar(wchar_t);
-NTL__EXTERNAPI wchar_t __stdcall RtlDowncaseUnicodeChar(wchar_t);
 NTL__EXTERNAPI ntstatus __stdcall RtlUpcaseUnicodeString(unicode_string& DestinationString, const_unicode_string const& SourceString, bool AllocateDestination);
+NTL__EXTERNAPI ntstatus __stdcall RtlDowncaseUnicodeString(unicode_string& DestinationString, const_unicode_string const& SourceString, bool AllocateDestination);
 NTL__EXTERNAPI void __stdcall RtlUpperString(ansi_string& DestinationString, const_ansi_string const& SourceString);
+
+#ifndef NTL__SUBSYSTEM_KM
+NTL__EXTERNAPI wchar_t __stdcall RtlDowncaseUnicodeChar(wchar_t);
+#else
+extern "C" inline wchar_t __stdcall RtlDowncaseUnicodeChar(wchar_t c)
+{
+  wchar_t dc = c + 'a'-'A';
+  unicode_string udc(&dc,1);
+  const const_unicode_string uc(&c,1);
+  RtlDowncaseUnicodeString(udc, uc, false);
+  return dc;
+}
+#endif
 
 
 ///\name String comparation

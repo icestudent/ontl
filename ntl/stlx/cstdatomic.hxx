@@ -700,7 +700,7 @@ namespace std
     public __atomic_v1::integral<integral_t> \
   { \
     constexpr atomic_ ## itype(){ val = 0; } \
-    explicit constexpr atomic_ ## itype(type value) \
+    /*explicit*/ constexpr atomic_ ## itype(type value) \
     { val = value; } \
     integral_t operator= (integral_t value) { store(value); return value; } \
   private: \

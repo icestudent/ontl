@@ -18,7 +18,7 @@ namespace km {
 /**\addtogroup  system_information ********* System Information *************
  *@{*/
 
-
+using nt::system_basic_information;
 using nt::system_thread_information;
 using nt::system_process_information;
 using nt::system_processes;

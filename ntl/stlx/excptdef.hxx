@@ -33,14 +33,14 @@
   #define __ntl_catch     catch
   #define __ntl_throw(X)  throw X
   #define __ntl_rethrow   throw
-  #define __ntl_throws    throw
+  #define __ntl_throws(...) throw(__VA_ARGS__)
   #define __ntl_nothrow   throw()
 
 #elif STLX__USE_EXCEPTIONS == 2
   // SEH exceptions
 
-  template<class O>
-  inline void __ntl_seh_throw_impl(const O&){}
+  template<class E>
+  inline void __ntl_seh_throw_impl(const E&){}
 
   #define __ntl_try       __try
   #define __ntl_catch     __except(1)

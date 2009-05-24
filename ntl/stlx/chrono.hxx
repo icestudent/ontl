@@ -120,7 +120,7 @@ namespace std
       typedef Period period;
 
     public:
-      // 20.8.3.1 construct/copy/destroy
+      ///\name 20.8.3.1 construct/copy/destroy
       duration()
         :rep_(duration_values<rep>::zero())
       {}
@@ -158,11 +158,11 @@ namespace std
         rep_ = d.rep_; return *this;
       }
 
-      // 20.8.3.2 observer
+      ///\name 20.8.3.2 observer
       rep count() const { return rep_; }
 
 
-      // 20.8.3.3 arithmetic
+      ///\name 20.8.3.3 arithmetic
       duration operator+() const
       {
         return *this;
@@ -216,7 +216,7 @@ namespace std
       }
 
 
-      // 20.8.3.4 special values
+      ///\name 20.8.3.4 special values
       static const duration zero()
       {
         return duration(duration_values<rep>::zero());
@@ -231,12 +231,13 @@ namespace std
       {
         return duration(duration_values<rep>::max());
       }
+      ///\}
     private:
       rep rep_;
     };
 
 
-    /// duration arithmetic
+    ///\name duration arithmetic
     template <class Rep, class Period>
     inline duration<Rep, Period>
       operator+ (const duration<Rep, Period>& lhs, const duration<Rep, Period>& rhs)
@@ -300,7 +301,7 @@ namespace std
     }
 
 
-    /// duration comparisons
+    ///\name duration comparisons
     template <class Rep1, class Period1, class Rep2, class Period2>
     inline bool operator==(const duration<Rep1, Period1>& lhs, const duration<Rep2, Period2>& rhs)
     {
@@ -338,6 +339,7 @@ namespace std
     {
       return !(lhs < rhs);
     }
+    ///\}
 
     namespace __ {
 
@@ -393,7 +395,7 @@ namespace std
      *  in the widest possible representation and only converted to the destination representation at the final step.
      **/
     template <class ToDuration, class Rep, class Period>
-    ToDuration duration_cast(const duration<Rep, Period>& d)
+    inline ToDuration duration_cast(const duration<Rep, Period>& d)
     {
       typedef typename ratio_divide<Period, typename ToDuration::period>::type    CF;
       typedef typename common_type<typename ToDuration::rep, Rep, intmax_t>::type CR;
@@ -430,7 +432,7 @@ namespace std
       typedef typename duration::rep rep;
       typedef typename duration::period period;
     public:
-      // 20.8.4.1 Construct
+      ///\name 20.8.4.1 Construct
       time_point()
       {}
 
@@ -443,10 +445,10 @@ namespace std
         :d(static_cast<duration>(t.time_since_epoch()))
       {}
 
-      // 20.8.4.2 observer
+      ///\name 20.8.4.2 observer
       duration time_since_epoch() const { return d; }
 
-      // 20.8.4.3 arithmetic
+      ///\name 20.8.4.3 arithmetic
       time_point& operator+=(const duration& d)
       {
         this->d += d; return *this;
@@ -457,15 +459,16 @@ namespace std
         this->d -= d; return *this;
       }
 
-      // 20.8.4.4 special values
+      ///\name 20.8.4.4 special values
       static constexpr time_point min() { return time_point(duration::min()); }
       static constexpr time_point max() { return time_point(duration::max()); }
+      ///\}
     private:
       duration d;
     };
 
 
-    /// time_point arithmetic
+    ///\name time_point arithmetic
     template <class Clock, class Duration1, class Rep2, class Period2>
     inline time_point<Clock, typename common_type<Duration1, duration<Rep2, Period2> >::type>
       operator+ (const time_point<Clock, Duration1>& lhs, const duration<Rep2, Period2>& rhs)
@@ -496,7 +499,7 @@ namespace std
     }
 
 
-    /// time_point comparisons
+    ///\name time_point comparisons
     template <class Clock, class Duration1, class Duration2>
     inline bool operator==(const time_point<Clock, Duration1>& lhs, const time_point<Clock, Duration2>& rhs)
     {
@@ -532,6 +535,7 @@ namespace std
     {
       return !(lhs < rhs);
     }
+    ///\}
 
 
     /**
@@ -648,7 +652,6 @@ namespace std
       static time_point now();
     };
 #else
-    class monotonic_clock;
     class high_resolution_clock;
 #endif
 

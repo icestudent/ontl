@@ -16,6 +16,7 @@
 # include "../nt/mutex.hxx"
 #endif
 
+#include "../atomic.hxx"
 
 namespace std
 {
@@ -481,8 +482,8 @@ namespace std
      **/
     void enter()
     {
-      while(ntl::atomic::compare_exchange(locked_, locked, unlocked) == locked)
-        ntl::nt::NtDelayExecution(false, -1);
+      for(ntl::atomic::backoff b; ntl::atomic::compare_exchange(locked_, locked, unlocked) == locked;)
+        b.pause();
     }
     /** Releases object's ownership */
     inline void exit()

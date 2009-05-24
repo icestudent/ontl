@@ -24,8 +24,8 @@ namespace ntl {
 
     namespace priority_boost
     {
-#if 0
-      enum Increment {
+#if 1
+      enum Increment: int8_t {
         event_increment = 1,
         io_no_increment = 0,
         io_cd_rom_increment = 1,
@@ -120,6 +120,19 @@ namespace ntl {
         bool InvokeOnError,
         bool InvokeOnCancel
         );
+
+
+    NTL__EXTERNAPI
+    irp * __stdcall
+      IoAllocateIrp(
+        uint32_t  StackSize,  ///\note original type is char
+        bool      ChargeQuota
+        );
+
+    NTL__EXTERNAPI
+    void __stdcall IoFreeIrp(irp* Irp);
+
+    NTL__EXTERNAPI void __stdcall IoReuseIrp(irp* Irp, ntstatus Iostatus);
 
 
 #if defined(_M_IX86)
@@ -432,6 +445,11 @@ namespace ntl {
         IofCompleteRequest(this, PriorityBoost);
       }
 
+      void reuse(ntstatus IoStatus = status::success)
+      {
+        IoReuseIrp(this, IoStatus);
+      }
+
       void * operator new(std::size_t, uint8_t StackSize, bool ChargeQuota = false) __ntl_nothrow
       {
         return allocate(StackSize, ChargeQuota);
@@ -450,26 +468,12 @@ namespace ntl {
 
     typedef irp::flags::type irp_flags;
 
-    NTL__EXTERNAPI
-      irp * __stdcall
-      IoAllocateIrp(
-      uint32_t  StackSize,  ///\note original type is char
-      bool      ChargeQuota
-      );
-
-    NTL__EXTERNAPI
-      void __stdcall
-      IoFreeIrp(
-      irp * Irp
-      );
-
-    irp *
-      irp::allocate(uint8_t StackSize, bool ChargeQuota)
+    inline irp * irp::allocate(uint8_t StackSize, bool ChargeQuota)
     {
       return IoAllocateIrp(StackSize, ChargeQuota);
     }
 
-    void irp::free(irp * p)
+    inline void irp::free(irp* p)
     {
       IoFreeIrp(p);
     }

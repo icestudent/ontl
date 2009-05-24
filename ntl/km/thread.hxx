@@ -4,7 +4,6 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__KM_THREAD
 #define NTL__KM_THREAD
 
@@ -17,6 +16,8 @@
 #include "../nt/context.hxx"
 #include "time.hxx"
 #include "../stlx/chrono.hxx"
+
+#include "process_information.hxx"
 
 namespace ntl {
 namespace km {
@@ -32,19 +33,11 @@ struct kqueue;
 struct kthread;
 struct kgate;
 
-NTL__EXTERNAPI
-kthread * __stdcall
-  KeGetCurrentThread();
+NTL__EXTERNAPI kthread * __stdcall KeGetCurrentThread();
 
 ///\note XP+ only, use KeGetCurrentThread instead
-NTL__EXTERNAPI
-kthread * __stdcall
-  PsGetCurrentThread();
-
-NTL__EXTERNAPI
-kthread * __stdcall
-  PsGetCurrentThreadId();
-
+NTL__EXTERNAPI kthread * __stdcall PsGetCurrentThread();
+NTL__EXTERNAPI legacy_handle __stdcall PsGetCurrentThreadId();
 
 NTL__EXTERNAPI
 ntstatus __stdcall
@@ -990,13 +983,13 @@ void __stdcall
     );
 
 
-class system_tread;
+class system_thread;
 
 }//namspace km
 
 
 template<>
-struct device_traits<km::system_tread> : private device_traits<>
+struct device_traits<km::system_thread> : private device_traits<>
 {
   enum access_mask
   {
@@ -1038,7 +1031,7 @@ ntstatus __stdcall
     );
 
 
-class system_tread : public handle, public device_traits<system_tread>
+class system_thread : public handle, public device_traits<system_thread>
 {
   ////////////////////////////////////////////////////////////////////////////
   public:
@@ -1046,7 +1039,7 @@ class system_tread : public handle, public device_traits<system_tread>
     typedef kstart_routine_t start_routine_t;
 
     explicit
-    system_tread(
+    system_thread(
         start_routine_t *   start_routine,
         void *              start_context   = 0,
         object_attributes * oa              = 0,
@@ -1079,6 +1072,27 @@ class system_tread : public handle, public device_traits<system_tread>
       PsTerminateSystemThread(st);
     }
 
+    legacy_handle get_id() const
+    {
+      thread_information<thread_basic_information> info(get());
+      return info ? info->ClientId.UniqueThread : 0;
+    }
+
+    bool alive() const
+    {
+      return exitstatus() == status::still_active;
+    }
+
+    ntstatus exitstatus () const
+    {
+      return exitstatus(get());
+    }
+
+    static ntstatus exitstatus(legacy_handle thread_handle)
+    {
+      thread_information<thread_basic_information> info(thread_handle);
+      return info ? info->ExitStatus : info;
+    }
 };//
 
 

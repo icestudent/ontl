@@ -8,35 +8,30 @@
 #ifndef NTL__CPU
 #define NTL__CPU
 
-
 namespace ntl {
-namespace cpu {
 
-#if defined(_MSC_VER)
-  #ifdef _M_IX86
+  /// Compiler intrinsics \internal
+  namespace intrinsic {
+    extern "C" void __cdecl _mm_pause();
+    #pragma intrinsic(_mm_pause)
+  }
 
-    static inline void pause() { __asm { pause } }
-
-  #else // ! _M_IX86
-} // cpu
-namespace intrinsic {
-  extern "C" void __cdecl _mm_pause();
-  #pragma intrinsic(_mm_pause)
-}
-namespace cpu {
+  /// CPU functions
+  namespace cpu
+  {
+    /** The execution of the next instruction is delayed an implementation specific amount of time. */
     static inline void pause() { intrinsic::_mm_pause(); }
-  #endif
 
-    static unsigned current();
+    /** Delay execution for \p delay units */
+    static inline void pause(unsigned int delay)
+    {
+      while(delay--)
+        intrinsic::_mm_pause();
+    }
 
-#elif defined(__GNUC__)
-// TODO: pause()
-    static inline void pause() {}
-#else
-# error unsupported compiler
+#ifdef NTL__NT_BASEDEF
+    static inline void yield() { ntl::nt::ZwYieldExecution(); }
 #endif
-
-}//namespace cpu
-}//namespace ntl
-
-#endif//#ifndef NTL__CPU
+  } // cpu
+} // ntl
+#endif // NTL__CPU

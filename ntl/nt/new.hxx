@@ -28,6 +28,13 @@ namespace ntl
 #endif
 }
 
+extern "C" void _cdecl abort();
+
+namespace std
+{
+  using ::abort;
+}
+
 ///\name  Single-object forms
 
 __forceinline

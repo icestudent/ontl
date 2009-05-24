@@ -8,9 +8,11 @@
 #ifndef NTL__ATOMIC
 #define NTL__ATOMIC
 
-#ifndef NTL__BASEDEF
-#include "basedef.hxx"
+#ifndef NTL__NT_BASEDEF
+# include "nt/basedef.hxx"
 #endif
+
+#include "cpu.hxx"
 
 namespace ntl {
 
@@ -111,7 +113,7 @@ namespace intrinsic
 #ifdef _M_X64
 # pragma intrinsic(__faststorefence)
 #endif
-#endif
+#endif // icl
 
 }//namespace intrinsic
 
@@ -640,7 +642,7 @@ namespace atomic {
 
 
 #else
-
+ // unimplemented stubs
 namespace atomic {
 
 static inline
@@ -703,6 +705,42 @@ struct atomic_t
   private: unsigned long volatile value;
 };//struct atomic_t
 
+namespace atomic
+{
+  /**
+   *	@brief    Atomic backoff helper
+   *  @details  Class that implements exponential backoff.
+   *  @author   Intel Corp.
+   *  @note     Idea taken from T.B.B.
+   **/
+  class backoff
+  {
+    // values in \c pause units
+    static const unsigned maximum = 16;
+    unsigned current;
+  public:
+    constexpr backoff()
+      :current(1)
+    {}
+
+    /** Pause or yield execution */
+    void pause()
+    {
+      if(current < maximum){
+        cpu::pause(current);
+        current *= 2;
+      }else{
+        cpu::yield();
+      }
+    }
+
+    /** Resets the counter */
+    void reset()
+    {
+      current = 1;
+    }
+  };
+} // atomic
 
 template <class Lock, class T = void>
 class atomic_exec;

@@ -9,13 +9,16 @@
 #define NTL__KM_BASEDEF
 
 #ifndef NTL__SUBSYSTEM_KM
-#define NTL__SUBSYSTEM_KM
+# define NTL__SUBSYSTEM_KM
 #endif
+#undef  NTL__SUBSYSTEM_NS
+#define NTL__SUBSYSTEM_NS ntl::km
 
 #include "../nt/basedef.hxx"
 #include "../stdlib.hxx"
 #include "../nt/exception.hxx"
 #include "../nt/string.hxx"
+#include "../atomic.hxx"
 
 namespace ntl {
 
@@ -365,15 +368,8 @@ bool get_version(uint32_t& major_version, uint32_t& minor_version)
   return PsGetVersion(&major_version, &minor_version, 0, 0);
 }
 
-NTL__EXTERNAPI
-ntstatus __stdcall
-  ZwYieldExecution();
-
-static inline
-ntstatus yield_execution()
-{
-  return ZwYieldExecution();
-}
+using nt::ZwYieldExecution;
+using nt::yield_execution;
 
 
 NTL__EXTERNAPI

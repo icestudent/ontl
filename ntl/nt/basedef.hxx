@@ -12,6 +12,9 @@
 #ifdef _MSC_VER
 # define NTL__SUBSYSTEM_NT
 #endif
+#ifndef NTL__SUBSYSTEM_NS
+# define NTL__SUBSYSTEM_NS ntl::nt
+#endif
 
 #include "status.hxx"
 #include "../basedef.hxx"
@@ -230,6 +233,13 @@ namespace ntl {
       DllThreadAttach,
       DllThreadDetach
     };};
+
+NTL__EXTERNAPI ntstatus __stdcall ZwYieldExecution();
+
+static inline ntstatus yield_execution()
+{
+  return ZwYieldExecution();
+}
 
 // system_time::type
 typedef int64_t systime_t;

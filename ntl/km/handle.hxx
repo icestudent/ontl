@@ -20,6 +20,7 @@ using nt::legacy_handle;
 using nt::duplicate_options;
 using nt::handle_attributes;
 using nt::kwait_reason;
+using nt::infinite_timeout;
 
 NTL__EXTERNAPI
 ntstatus __stdcall

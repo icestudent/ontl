@@ -2,6 +2,8 @@
 
 #include "../stlx/cstdlib.hxx"
 #include "../nt/exception.hxx"
+#include "../atomic.hxx"
+
 
 #pragma region section_attributes
 #pragma comment(linker, "/merge:.CRT=.rdata")
@@ -161,7 +163,7 @@ void _cdecl std::quick_exit(int status)
 }
 
 #ifndef NTL__SUBSYSTEM_KM
-void _cdecl _Exit(int code)
+void NTL__CRTCALL _Exit(int code)
 {
   using ntl::nt::status;
   ntl::nt::user_thread::exit_process(code == EXIT_SUCCESS ? status::success : (code == EXIT_FAILURE ? status::unsuccessful : static_cast<ntl::nt::ntstatus>(code)) );
@@ -171,11 +173,12 @@ void _cdecl _Exit(int code)
 /************************************************************************/
 /* `abort`                                                              */
 /************************************************************************/
+#ifndef NTL__SUBSYSTEM_KM
 void _cdecl abort()
 {
   ntl::nt::user_thread::exit_process(ntl::nt::status::unsuccessful);
 }
-
+#endif
 /************************************************************************/
 /* `new` handler                                                        */
 /************************************************************************/

@@ -8,17 +8,10 @@
 # include "../nt/new.hxx"
 #endif
 
-static void __init_iostream_objects(bool init);
+static void _cdecl __init_iostream_objects(bool init);
 
-#ifndef NTL__SUBSYSTEM_KM
 namespace std
 {
-  typedef ntl::win::console_buffer<char>    buffer_n;
-  typedef ntl::win::console_buffer<wchar_t> buffer_w;
-
-  buffer_n coutb(0), cerrb(0), clogb(0);
-  buffer_w woutb(0), werrb(0), wlogb(0);
-
   ostream  cout(nullptr);
   ostream  cerr(nullptr);
   ostream  clog(nullptr);
@@ -34,11 +27,18 @@ namespace std
   {
     __init_iostream_objects(false);
   }
-}
+} // std
 
+#ifndef NTL__SUBSYSTEM_KM
 
 namespace
 {
+  typedef ntl::win::console_buffer<char>    buffer_n;
+  typedef ntl::win::console_buffer<wchar_t> buffer_w;
+
+  buffer_n coutb(0), cerrb(0), clogb(0);
+  buffer_w woutb(0), werrb(0), wlogb(0);
+
   void init_iostream_objects()
   {
     using namespace std;
@@ -75,7 +75,6 @@ namespace
   }
 
 }
-#endif
 
 static void destroy_iostream_objects()
 {
@@ -117,3 +116,14 @@ void _cdecl __init_iostream_objects(bool init)
       destroy_iostream_objects();
   }
 }
+#else // km
+
+extern "C" void _cdecl __check_iostream_objects()
+{
+}
+
+void _cdecl __init_iostream_objects(bool)
+{
+}
+
+#endif

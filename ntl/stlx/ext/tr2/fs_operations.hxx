@@ -252,7 +252,7 @@ namespace std
         inline bool equivalent(const Path1& p1, const Path2& p2, error_code& ec) __ntl_nothrow
         {
           static_assert((is_same<typename Path1::external_string_type,typename Path2::external_string_type>::value), "must be same type");
-          if(ec == throws())
+          if(&ec == &throws())
             return equivalent(p1,p2);
 
           // check paths
@@ -284,10 +284,10 @@ namespace std
           ntstatus st = RtlSetCurrentDirectory_U(const_unicode_string(p.external_file_string()));
           if(!success(st)){
             error_code e = make_error_code(st);
-            if(ec == throws())
+            if(&ec == &throws())
               __ntl_throw(basic_filesystem_error<Path>("Failed to set the current path", p, e));
             else ec = e;
-          }else if(ec != throws())
+          }else if(&ec != &throws())
             ec.clear();
         }
 
@@ -310,11 +310,11 @@ namespace std
             size = static_cast<uintmax_t>(fbi.EndOfFile);
           }else{
             error_code e = make_error_code(st);
-            if(ec == throws())
+            if(&ec == &throws())
               __ntl_throw(basic_filesystem_error<Path>("Can't get file size", p, e));
             else
               ec = e;
-          }else if(ec != throws())
+          }else if(&ec != &throws())
             ec.clear();
           return size;
         }
@@ -326,7 +326,7 @@ namespace std
         template <class Path> inline std::time_t last_write_time(const Path& p, error_code& ec = throws())
         {
           using namespace ntl::nt;
-          if(ec != throws())
+          if(&ec != &throws())
             ec.clear();
           time_t val = 0;
           file_basic_information fbi;
@@ -335,7 +335,7 @@ namespace std
             val = ntime2ctime(fbi.LastWriteTime);
           }else{
             error_code e = make_error_code(st);
-            if(ec == throws())
+            if(&ec == &throws())
               __ntl_throw(basic_filesystem_error<Path>("Can't get file time", p, e));
             else
               ec = e;
@@ -360,11 +360,11 @@ namespace std
           }
           if(!success(st)){
             error_code e = make_error_code(st);
-            if(ec == throws())
+            if(&ec == &throws())
               __ntl_throw(basic_filesystem_error<Path>("Can't set file time", p, e));
             else
               ec = e;
-          }else if(ec != throws())
+          }else if(&ec != &throws())
             ec.clear();
         }
 
@@ -380,11 +380,11 @@ namespace std
             file::directory_file|file::open_for_backup_intent|file::synchronous_io_nonalert, file_attribute::normal);
           if(!success(st) && st != status::object_name_collision){
             error_code e = make_error_code(st);
-            if(ec != throws())
+            if(&ec != &throws())
               ec = e;
             else
               __ntl_throw(basic_filesystem_error<Path>("Failed to create directory", dp, e));
-          }else if(ec != throws())
+          }else if(&ec != &throws())
             ec.clear();
           return success(st);
         }
@@ -471,11 +471,11 @@ namespace std
           using namespace ntl::nt;
           ntstatus st = NtDeleteFile(const_unicode_string(p.external_file_string()));
           if(success(st)){
-            if(ec != throws())
+            if(&ec != &throws())
               ec.clear();
           }else{
             error_code e = make_error_code(st);
-            if(ec != throws())
+            if(&ec != &throws())
               ec = e;
             else
               __ntl_throw(basic_filesystem_error<Path>("Failed to remove object", p, e));
@@ -491,7 +491,7 @@ namespace std
         inline void rename(const Path1& from_p, const Path2& to_p, error_code& ec = throws())
         {
           static_assert((is_same<typename Path1::external_string_type, typename Path2::external_string_type>::value), "Must be the same type");
-          if(ec != throws())
+          if(&ec != &throws())
             ec.clear();
           
           // If from_p and to_p resolve to the same file, no action is taken
@@ -507,7 +507,7 @@ namespace std
             st = f.rename(const_unicode_string(to));
           if(!success(st)){
             error_code e = make_error_code(st);
-            if(ec == throws())
+            if(&ec == &throws())
               __ntl_throw(basic_filesystem_error<Path>("Can't rename file", p, e));
             else
               ec = e;

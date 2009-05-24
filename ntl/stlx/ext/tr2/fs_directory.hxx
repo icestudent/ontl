@@ -134,7 +134,7 @@ namespace std
                 st = lst;
               else
                 st = filesystem::status(p, ec);
-            }else if(ec != throws())
+            }else if(&ec != &throws())
               ec.clear();
             return st;
           }
@@ -144,7 +144,7 @@ namespace std
           {
             if(!status_known(lst))
               lst = symlink_status(p, ec);
-            else if(ec != throws())
+            else if(&ec != &throws())
               ec.clear();
             return lst;
           }
@@ -209,7 +209,7 @@ namespace std
           {
             error_code e;
             ReadDirectory(dp, e);
-            if(ec != throws())
+            if(&ec != &throws())
               ec = e;
           }
           basic_directory_iterator(const basic_directory_iterator& r) __ntl_nothrow
@@ -239,7 +239,7 @@ namespace std
           {
             error_code e;
             ReadDirectory(dp, e);
-            if(ec != throws())
+            if(&ec != &throws())
               ec = e;
           }
           basic_directory_iterator(basic_directory_iterator&& r) __ntl_nothrow
@@ -459,7 +459,7 @@ namespace std
             error_code e;
             basic_directory_iterator it(dp, e);
             if(e){
-              if(ec != throws())
+              if(&ec != &throws())
                 ec = e;
             }else{
               depth.push(move(it));
@@ -482,7 +482,7 @@ namespace std
             error_code e;
             basic_directory_iterator it(forward<Path>(dp), e);
             if(e){
-              if(ec != throws())
+              if(&ec != &throws())
                 ec = e;
             }else{
               depth.push(move(it));

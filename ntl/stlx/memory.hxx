@@ -603,7 +603,7 @@ namespace __
 
 
 template <class Alloc, class T, class... Args>
-void construct_element(Alloc& alloc, T& r, Args&&... args)
+inline void construct_element(Alloc& alloc, T& r, Args&&... args)
 {
   typedef typename
     __select_or<is_scoped_allocator<Alloc>::value == false, uses_allocator<T, Alloc::inner_allocator_type>::value == false,
@@ -613,6 +613,28 @@ void construct_element(Alloc& alloc, T& r, Args&&... args)
           constructible_with_allocator_suffix<T, Alloc::inner_allocator_type, Args...>::value> policy;
   policy::construct_element(alloc, r, args...);
 }
+#else
+
+// either inner or scoped allocator isn't supported yet
+
+template <class Alloc, class T>
+inline void construct_element(Alloc& alloc, T& r) { alloc.contruct(r); }
+
+#ifdef NTL__CXX_RV
+
+template <class Alloc, class T, class A1>
+inline void construct_element(Alloc& alloc, T& r, A1&& a1) { alloc.contruct(r, forward<A1>(a1)); }
+template <class Alloc, class T, class A1, class A2>
+inline void construct_element(Alloc& alloc, T& r, A1&& a1, A2&& a2) { alloc.contruct(r, forward<A1>(a1), forward<A2>(a2)); }
+template <class Alloc, class T, class A1, class A2, class A3>
+inline void construct_element(Alloc& alloc, T& r, A1&& a1, A2&& a2, A3&& a3) { alloc.contruct(r, forward<A1>(a1), forward<A2>(a2), forward<A3>(a3)); }
+template <class Alloc, class T, class A1, class A2, class A3, class A4>
+inline void construct_element(Alloc& alloc, T& r, A1&& a1, A2&& a2, A3&& a3, A4&& a4) { alloc.contruct(r, forward<A1>(a1), forward<A2>(a2), forward<A3>(a3), forward<A4>(a4)); }
+template <class Alloc, class T, class A1, class A2, class A3, class A4, class A5>
+inline void construct_element(Alloc& alloc, T& r, A1&& a1, A2&& a2, A3&& a3, A4&& a4, A5&& a5) { alloc.contruct(r, forward<A1>(a1), forward<A2>(a2), forward<A3>(a3), forward<A4>(a4), forward<A5>(a5)); }
+
+
+#endif // cxx rv
 #endif
 
 ///\name  20.7.10 Specialized algorithms [specialized.algorithms]
