@@ -4,7 +4,6 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__NT_EVENT
 #define NTL__NT_EVENT
 
@@ -41,8 +40,8 @@ namespace ntl {
     NTL__EXTERNAPI
       ntstatus __stdcall
       NtClearEvent(
-      legacy_handle       EventHandle
-      );
+        legacy_handle       EventHandle
+        );
 
     typedef ntstatus __stdcall control_event_t(
       legacy_handle       EventHandle,
@@ -256,34 +255,31 @@ namespace ntl {
       }
 
       /** Sets the state of an event object to signaled. */
-      bool set()
+      bool set() volatile
       {
         return success(last_status_ = NtSetEvent(get(), 0));
       }
 
       /** Sets the state of an event object to nonsignaled. */
-      bool reset()
+      bool reset() volatile
       {
         return success(last_status_ = NtClearEvent(get()));
       }
 
       /** Sets the event object to the signaled state and then resets it to the nonsignaled state after releasing the appropriate number of waiting threads */
-      bool pulse()
+      bool pulse() volatile
       {
         return success(last_status_ = NtPulseEvent(get(), 0));
       }
 
       /** Returns the current event object's state */
-      bool is_ready() const
+      bool is_ready() const volatile
       {
-        typedef std::ratio_multiply<std::ratio<100>, std::nano>::type systime_unit;
-        typedef std::chrono::duration<systime_t, systime_unit> system_duration;
-
         return success(last_status_ = wait_for(system_duration(0), false));
       }
 
       /** Returns event object's type */
-      event_type type() const
+      event_type type() const volatile
       {
         event_basic_information info;
         last_status_ = NtQueryEvent(get(), EventBasicInformation, &info, sizeof(info), NULL);
@@ -298,11 +294,8 @@ namespace ntl {
        *	@return Status of operation
        **/
       template <class Clock, class Duration>
-      ntstatus wait_until(const std::chrono::time_point<Clock, Duration>& abs_time, bool alertable = true) const
+      ntstatus wait_until(const std::chrono::time_point<Clock, Duration>& abs_time, bool alertable = true) const volatile
       {
-        typedef std::ratio_multiply<std::ratio<100>, std::nano>::type systime_unit;
-        typedef std::chrono::duration<systime_t, systime_unit> system_duration;
-
         return last_status_ = NtWaitForSingleObject(get(), alertable, std::chrono::duration_cast<system_duration>(abs_time.time_since_epoch()).count());
       }
 
@@ -314,12 +307,9 @@ namespace ntl {
        *	@return Status of operation
        **/
       template <class Rep, class Period>
-      ntstatus wait_for(const std::chrono::duration<Rep, Period>& rel_time, bool alertable = true) const
+      ntstatus wait_for(const std::chrono::duration<Rep, Period>& rel_time, bool alertable = true) const volatile
       {
-        typedef std::ratio_multiply<std::ratio<100>, std::nano>::type systime_unit;
-        typedef std::chrono::duration<systime_t, systime_unit> system_duration;
-
-        return last_status_ = NtWaitForSingleObject(get(), alertable, -1i64 * std::chrono::duration_cast<system_duration>(rel_time).count());
+        return last_status_ = NtWaitForSingleObject(get(), alertable, -1i64*std::chrono::duration_cast<system_duration>(rel_time).count());
       }
 
       /**
@@ -327,15 +317,14 @@ namespace ntl {
        *	@param[in] alertable specifies if the wait is alertable 
        *	@return Status of operation
        **/
-      ntstatus wait(bool alertable = true) const
+      ntstatus wait(bool alertable = true) const volatile
       {
         return last_status_ = NtWaitForSingleObject(get(), alertable, system_time::infinite());
       }
 
-      ntstatus last_status() const { return last_status_; }
+      ntstatus last_status() const volatile { return last_status_; }
     private:
-      mutable ntstatus last_status_;
-
+      mutable volatile ntstatus last_status_;
     };
 
   }// namespace nt

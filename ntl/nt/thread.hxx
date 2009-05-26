@@ -318,7 +318,7 @@ public:
   template <class Rep, class Period>
   ntstatus wait_for(const std::chrono::duration<Rep, Period>& rel_time, bool alertable = true) const volatile
   {
-    return NtWaitForSingleObject(get(), alertable, -1i64 * std::chrono::duration_cast<system_duration>(rel_time).count());
+    return NtWaitForSingleObject(get(), alertable, -1i64*std::chrono::duration_cast<system_duration>(rel_time).count());
   }
 
   ntstatus wait(bool alertable = true) const volatile
@@ -439,7 +439,7 @@ public:
   template <class Rep, class Period>
   static inline void sleep_for(const std::chrono::duration<Rep, Period>& rel_time, bool alertable = false)
   {
-    NtDelayExecution(alertable, -1i64 * std::chrono::duration_cast<system_duration>(rel_time).count());
+    NtDelayExecution(alertable, -1i64*std::chrono::duration_cast<system_duration>(rel_time).count());
   }
 
  } // namespace nt

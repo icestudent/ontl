@@ -4,16 +4,15 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__STLX_STACK
 #define NTL__STLX_STACK
 
-#if 0//def - what macro???
-#include "deque.hxx"
-#define STLX__STACK_CONTAINER deque<T>  // standard behavior
+#if 0
+# include "deque.hxx"
+# define STLX__STACK_CONTAINER deque<T>  // standard behavior
 #else
-#include "vector.hxx"
-#define STLX__STACK_CONTAINER vector<T> // faster
+# include "vector.hxx"
+# define STLX__STACK_CONTAINER vector<T> // faster
 #endif
 
 namespace std {
@@ -110,13 +109,13 @@ class stack
 };//class stack
 
 template <class T, class Container>
-void swap(stack<T,Container>& x, stack<T,Container>& y)  { x.swap(y); }
+inline void swap(stack<T,Container>& x, stack<T,Container>& y)  { x.swap(y); }
 
 #ifdef NTL__CXX_RV
 template <class T, class Allocator>
-void swap(stack<T,Allocator>&& x, stack<T,Allocator>&  y){ x.swap(y); }
+inline void swap(stack<T,Allocator>&& x, stack<T,Allocator>&  y){ x.swap(y); }
 template <class T, class Allocator>
-void swap(stack<T,Allocator>& x,  stack<T,Allocator>&& y){ x.swap(y); }
+inline void swap(stack<T,Allocator>& x,  stack<T,Allocator>&& y){ x.swap(y); }
 #endif
 
 
@@ -130,11 +129,7 @@ struct constructible_with_allocator_suffix<stack<T, Container> >
 
 
 /**@} lib_container_adaptors */
-
 /**@} lib_sequence */
-
 /**@} lib_containers */
-
 }//namespace std
-
 #endif//#ifndef NTL__STLX_STACK

@@ -1105,7 +1105,7 @@ static inline void sleep_until(const std::chrono::time_point<Clock, Duration>& a
 template <class Rep, class Period>
 static inline void sleep_for(const std::chrono::duration<Rep, Period>& rel_time, bool alertable = false)
 {
-  KeDelayExecutionThread(KernelMode, alertable, -1i64 * std::chrono::duration_cast<system_duration>(rel_time).count());
+  KeDelayExecutionThread(KernelMode, alertable, -1i64*std::chrono::duration_cast<system_duration>(rel_time).count());
 }
 
 template <class Rep, class Period>

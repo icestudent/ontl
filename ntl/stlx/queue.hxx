@@ -4,7 +4,6 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__STLX_QUEUE
 #define NTL__STLX_QUEUE
 
@@ -32,15 +31,22 @@ namespace std {
     typedef typename Container::const_reference const_reference;
     typedef typename Container::size_type       size_type;
   public:
-    explicit queue(const Container&);
+    explicit queue(const Container& c)
+      :c(c)
+    {}
     
     #ifdef NTL__CXX_RV
-    explicit queue(Container&& = Container());
-    queue(queue&& q) : c(std::move(q.c)) {}
+    explicit queue(Container&& c = Container())
+      :c(move(c))
+    {}
+    queue(queue&& q)
+      :c(move(q.c))
+    {}
     #endif
 
     template <class Alloc>
     explicit queue(const Alloc&);
+
     template <class Alloc>
     queue(const Container&, const Alloc&);
     
@@ -53,26 +59,26 @@ namespace std {
 
     
     #ifdef NTL__CXX_RV
-    queue& operator=(queue&& q) { c = std::move(q.c); return *this; }
+    queue& operator=(queue&& q) { c = move(q.c); return *this; }
     #else
-    queue& operator=(const queue& q);
+    queue& operator=(queue& q) { c.swap(q.c); return *this; }
     #endif
 
     bool empty() const { return c.empty(); }
     size_type size() const { return c.size(); }
     reference front() { return c.front(); }
-
-    const_reference front() const { return c.front(); }
     reference back() { return c.back(); }
+    const_reference front() const { return c.front(); }
     const_reference back() const { return c.back(); }
 
     
     #ifdef NTL__CXX_RV
-    void push(value_type&& x) { c.push_back(std::move(x)); }
+    void push(value_type&& x) { c.push_back(move(x)); }
     #endif
+
     #ifdef NTL__CXX_VT
     template <class... Args>
-    void emplace(Args&&... args);
+    void emplace(Args&&... args) { c.emplace_back(forward<Args>(args)...); }
     #endif
 
     void push(const value_type& x) { c.push_back(x); }
@@ -84,57 +90,45 @@ namespace std {
     void swap(queue& q)  { c.swap(q.c); }
     #endif
 
+    friend inline bool operator==(const queue<T, Container>& x, const queue<T, Container>& y) { return x.c == y.c; }
+    friend inline bool operator< (const queue<T, Container>& x, const queue<T, Container>& y) { return x.c < y.c; }
+
   protected:
     Container c;
   };
 
   template <class T, class Container>
-  bool operator==(const queue<T, Container>& x, const queue<T, Container>& y);
-  template <class T, class Container>
-  bool operator< (const queue<T, Container>& x, const queue<T, Container>& y);
-  template <class T, class Container>
-  bool operator!=(const queue<T, Container>& x, const queue<T, Container>& y)
+  inline bool operator!=(const queue<T, Container>& x, const queue<T, Container>& y)
   {
     return rel_ops::operator !=(x, y);
   }
 
   template <class T, class Container>
-  bool operator> (const queue<T, Container>& x, const queue<T, Container>& y)
+  inline bool operator> (const queue<T, Container>& x, const queue<T, Container>& y)
   {
     return rel_ops::operator >(x, y);
   }
 
   template <class T, class Container>
-  bool operator>=(const queue<T, Container>& x, const queue<T, Container>& y)
+  inline bool operator>=(const queue<T, Container>& x, const queue<T, Container>& y)
   {
     return rel_ops::operator >=(x, y);
   }
 
   template <class T, class Container>
-  bool operator<=(const queue<T, Container>& x, const queue<T, Container>& y)
+  inline bool operator<=(const queue<T, Container>& x, const queue<T, Container>& y)
   {
     return rel_ops::operator <=(x, y);
   }
 
   template <class T, class Container>
-  void swap(queue<T, Container>& x, queue<T, Container>& y)
-  {
-    x.swap(y);
-  }
+  inline void swap(queue<T, Container>& x, queue<T, Container>& y)  { x.swap(y); }
   
   #ifdef NTL__CXX_RV
   template <class T, class Container>
-  void swap(queue<T, Container>&& x, queue<T, Container>& y)
-  {
-    x.swap(y);
-  }
-
+  inline void swap(queue<T, Container>&& x, queue<T, Container>& y) { x.swap(y); }
   template <class T, class Container>
-  void swap(queue<T, Container>& x, queue<T, Container>&& y)
-  {
-    x.swap(y);
-  }
-
+  inline void swap(queue<T, Container>& x, queue<T, Container>&& y) { x.swap(y); }
   #endif
   
   
@@ -150,5 +144,4 @@ namespace std {
   /**@} lib_sequence */
   /**@} lib_containers */
 }//namespace std
-
 #endif //#ifndef NTL__STLX_QUEUE

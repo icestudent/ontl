@@ -1,15 +1,15 @@
 /**\file*********************************************************************
-*                                                                     \brief
-*  NT Types support library
-*
-****************************************************************************
-*/
+ *                                                                     \brief
+ *  NT Types support library
+ *
+ ****************************************************************************
+ */
 
 #ifndef NTL__NT_BASEDEF
 #define NTL__NT_BASEDEF
 
-// VC compiler always under NT and for NT
-#ifdef _MSC_VER
+// VC compiler always under NT and for NT (if not for KM)
+#if defined _MSC_VER && !defined(NTL__SUBSYSTEM_KM)
 # define NTL__SUBSYSTEM_NT
 #endif
 #ifndef NTL__SUBSYSTEM_NS
@@ -173,11 +173,13 @@ namespace ntl {
     };
 
 
+    #pragma warning(disable:4201) // nameless union
     struct io_status_block
     {
       union { ntstatus  Status; void * Pointer; };
       uintptr_t Information;
     };
+    #pragma warning(default:4201)
 
 
     typedef

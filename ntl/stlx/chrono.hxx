@@ -94,9 +94,9 @@ namespace std
      *  units of seconds. It is expressed as a rational constant using the template \ñ ratio.
      *
      *  @note \e Requires: \c Rep shall be an arithmetic type or a class emulating an arithmetic type.
-     *  If a program instantiates duration with a duration type for the template argument Rep a diagnostic is required.
-     *  \par \e Requires: Period shall be a specialization of ratio, diagnostic required.
-     *  \par \e Requires: Period::num shall be positive, diagnostic required.
+     *  If a program instantiates duration with a duration type for the template argument \c Rep a diagnostic is required.
+     *  \par \e Requires: \c Period shall be a specialization of ratio, diagnostic required.
+     *  \par \e Requires: \c Period::num shall be positive, diagnostic required.
      *  \par \e Requires: Members of duration shall not throw exceptions other than those thrown by the indicated operations
      *  on their representations.
      *  @todo constexpr
@@ -709,5 +709,14 @@ namespace std
   } // namespace chrono
 
 } // namespace std
+
+namespace ntl { namespace nt {
+  typedef int64_t systime_t;
+
+  /// System time unit
+  typedef std::ratio_multiply<std::ratio<100>, std::nano>::type       systime_unit;
+  /// Duration of the system time
+  typedef std::chrono::duration<systime_t, systime_unit>              system_duration;
+}}
 
 #endif // NTL__STLX_CHRONO

@@ -595,7 +595,6 @@ namespace std {
     single_linked head;
 
     node_allocator_type node_allocator;
-
   };
 
 

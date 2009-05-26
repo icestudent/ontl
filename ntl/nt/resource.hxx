@@ -13,9 +13,6 @@
 namespace ntl {
   namespace nt {
 
-    typedef std::ratio_multiply<std::ratio<100>, std::nano>::type systime_unit;
-    typedef std::chrono::duration<systime_t, systime_unit>        system_duration;
-
     namespace rtl
     {
       // critical section
@@ -262,7 +259,7 @@ namespace ntl {
        // wait
        ntstatus st;
        systime_t period = timeout;
-       systime_t const interval = std::chrono::duration_cast<system_duration>( std::chrono::milliseconds(50)).count();
+       systime_t const interval = -1i64*std::chrono::duration_cast<system_duration>( std::chrono::milliseconds(50)).count();
        do{
          st = NtDelayExecution(alertable, interval);
          period -= interval;
@@ -299,7 +296,7 @@ namespace ntl {
      template <class Rep, class Period>
      ntstatus wait_for(const std::chrono::duration<Rep, Period>& rel_time, bool explicit_wait = true, bool alertable = true)
      {
-       return wait(-1i64 * std::chrono::duration_cast<system_duration>(rel_time).count(), explicit_wait, alertable);
+       return wait(-1i64*std::chrono::duration_cast<system_duration>(rel_time).count(), explicit_wait, alertable);
      }
 
      /** Sets spin count */

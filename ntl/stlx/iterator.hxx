@@ -154,6 +154,7 @@ typename iterator_traits<BidirectionalIterator>::difference_type
            const BidirectionalIterator& last,
            const bidirectional_iterator_tag &)
 {
+  // NOTE: is it required? bidirectional_iterator_tag is convertible to the forward_iterator_tag
   return distance(first, last, forward_iterator_tag());
 }
 

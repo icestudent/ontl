@@ -12,6 +12,7 @@
 #include "win/console.hxx"
 #include "nt/new.hxx"
 #include "nt/thread.hxx"
+#include <cstdlib>
 
 #pragma comment(linker, "/subsystem:console")
 #pragma comment(linker, "/entry:ntl::_Consoleapp_entry")

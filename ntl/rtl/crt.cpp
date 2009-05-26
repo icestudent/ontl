@@ -46,10 +46,11 @@ sec(".CRT$XTZ") vfv_t* __xt_z[]= {0};
 
 namespace
 {
-  typedef std::vector<vfv_t*> exit_funcs_t;
-  static exit_funcs_t* exit_list = 0;
+  static const size_t exit_list_max = 1024*4;
+  static vfv_t* exit_list[exit_list_max];
+  static volatile uint32_t exit_list_count = 0;
 
-  static vfv_t* quick_exit_list[128];
+  static vfv_t* quick_exit_list[exit_list_max];
   static volatile uint32_t quick_exit_count = 0;
 
   void initterm(vfv_t** from, vfv_t** to)
@@ -63,10 +64,10 @@ namespace
 
   vfv_t* onexit(vfv_t* func)
   {
-    if(exit_list){
-      if(func)
-        exit_list->push_back(func);
-      return func;
+    if(func){
+      uint32_t idx = ntl::atomic::increment(exit_list_count);
+      if(idx < _countof(exit_list))
+        return exit_list[idx] = func;
     }
     return 0;
   }
@@ -74,9 +75,15 @@ namespace
   void doexit(int /*code*/, int quick, int /*retcaller*/)
   {
     if(!quick){
-      for(exit_funcs_t::const_iterator e = exit_list->cbegin(); e != exit_list->cend(); ++e)
-        if(*e) (*e)();
-      delete exit_list;
+      for(vfv_t** f = exit_list+exit_list_count; f >= exit_list; --f){
+        __ntl_try {
+          assert(*f != 0);
+          (*f)();
+        }
+        __ntl_catch(...){
+          std::terminate();
+        }
+      }
     }else{
       for(vfv_t** f = quick_exit_list+quick_exit_count; f >= quick_exit_list; --f){
         __ntl_try{
@@ -111,8 +118,6 @@ namespace ntl
       #endif
 
       // init static objects
-      exit_list = new exit_funcs_t();
-      exit_list->reserve(static_cast<size_t>((__xc_z-__xc_a) + (__xp_z-__xp_a) + (__xt_z-__xt_a)));
       initterm(__xc_a, __xc_z);
       initterm(__xp_a, __xp_z);
       initterm(__xt_a, __xt_z);
@@ -130,12 +135,12 @@ namespace ntl
 /************************************************************************/
 /* `exit` and `quick_exit`                                              */
 /************************************************************************/
-int _cdecl atexit(vfv_t func)
+extern "C" int _cdecl atexit(vfv_t func)
 {
   return onexit(func) ? 0 : -1;
 }
 
-int _cdecl std::at_quick_exit(vfv_t* f)
+extern "C" int _cdecl at_quick_exit(vfv_t* f)
 {
   const uint32_t idx = ntl::atomic::increment(quick_exit_count);
   if(f && idx < _countof(quick_exit_list)){
@@ -156,7 +161,7 @@ void NTL__CRTCALL exit(int status)
   _Exit(status);
 }
 
-void _cdecl std::quick_exit(int status)
+void NTL__CRTCALL quick_exit(int status)
 {
   doexit(status, true,true);
   _Exit(status);

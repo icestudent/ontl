@@ -855,6 +855,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\km\iocp.hxx"
+					>
+				</File>
+				<File
 					RelativePath=".\km\ioctl.hxx"
 					>
 				</File>
@@ -984,6 +988,10 @@
 				</File>
 				<File
 					RelativePath=".\nt\heap.hxx"
+					>
+				</File>
+				<File
+					RelativePath=".\nt\iocp.hxx"
 					>
 				</File>
 				<File

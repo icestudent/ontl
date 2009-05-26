@@ -350,6 +350,27 @@ namespace __
     return copy(first, first+n, result);
   }
 
+  template<class InputIterator, class OutputIterator>
+  inline OutputIterator move(InputIterator first, InputIterator last, OutputIterator result, false_type)
+  {
+    while ( first != last )
+    {
+      *result = std::move(*first);
+      ++result;
+      ++first;
+    }
+    return result;
+  }
+
+  template<class InputRandomIterator, class OutputRandomIterator>
+  inline OutputRandomIterator move(InputRandomIterator first, InputRandomIterator last, OutputRandomIterator result, true_type)
+  {
+    memmove(result, first, last - first);
+    return result + (last - first);
+  }
+
+
+
 }
 template<class InputIterator, class Size, class OutputIterator>
 inline OutputIterator
@@ -385,13 +406,12 @@ BidirectionalIterator2
 template<class InputIterator, class OutputIterator>
 inline OutputIterator move(InputIterator first, InputIterator last, OutputIterator result)
 {
-  while ( first != last )
-  {
-    *result = move(*first);
-    ++result;
-    ++first;
-  }
-  return result;
+  typedef typename iterator_traits<InputIterator>::iterator_category itype;
+  typedef typename iterator_traits<OutputIterator>::iterator_category otype;
+  typedef typename iterator_traits<InputIterator>::value_type src_type;
+  typedef typename iterator_traits<OutputIterator>::value_type dest_type;
+  // if iterators is random-access and value types memmoveable, just move it
+  return __::move(first, last, result, __::bool_type<is_same<itype, otype>::value && has_trivial_copy_constructor<src_type>::value && has_trivial_copy_constructor<dest_type>::value>());
 }
 
 template<class BidirectionalIterator1, class BidirectionalIterator2>

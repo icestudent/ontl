@@ -117,15 +117,18 @@ NTL__CRTCALL
 void _cdecl abort();
 
 /// 7.20.4.2 The atexit function
-int __cdecl atexit(vfv_t func);
+int _cdecl atexit(vfv_t* func);
 
 #define EXIT_SUCCESS  0
 #define EXIT_FAILURE  1
 
 /// 7.20.4.3 The exit function
-void
-NTL__CRTCALL
-  exit(int status);
+void NTL__CRTCALL exit(int status);
+
+int _cdecl at_quick_exit(vfv_t* f);
+
+void NTL__CRTCALL quick_exit(int status);
+
 
 /// 7.20.4.5 The getenv function
 char *
@@ -281,7 +284,7 @@ namespace ntl
       __init_crt(false);
     }
   };
-}
+} // ntl
 
 
 namespace std {
@@ -312,13 +315,13 @@ using ::free;
 using ::malloc;
 using ::realloc;
 
-using ::abort;
-using ::atexit;
-using ::exit;
-using ::_Exit;
 
-int  _cdecl at_quick_exit(vfv_t* f);
-void _cdecl quick_exit(int status);
+using ::abort;
+using ::exit;
+using ::quick_exit;
+using ::atexit;
+using ::at_quick_exit;
+
 
 using ::getenv;
 using ::system;
