@@ -450,7 +450,7 @@ namespace std {
     typedef false_type no_dtor;
 
     // capacity helpers
-    size_type capacity_factor(size_type n) const { if(n == 0) n = 1; return n*2; }//(n + 4) * 2; }
+    size_type capacity_factor(size_type n) const { /*if(n == 0) n = 1; return n*2; }*/ return (n + 4) * 2; }
     size_type capacity() const 
     {
       size_type c = (right - left) + capL + capR;
