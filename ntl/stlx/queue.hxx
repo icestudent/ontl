@@ -45,16 +45,24 @@ namespace std {
     #endif
 
     template <class Alloc>
-    explicit queue(const Alloc&);
+    explicit queue(const Alloc& a)
+      :c(a)
+    {}
 
     template <class Alloc>
-    queue(const Container&, const Alloc&);
+    queue(const Container& c, const Alloc& a)
+      :c(c, a)
+    {}
     
     #ifdef NTL__CXX_RV
     template <class Alloc>
-    queue(Container&&, const Alloc&);
+    queue(Container&& c, const Alloc& a)
+      :c(move(c),a)
+    {}
     template <class Alloc>
-    queue(queue&&, const Alloc&);
+    queue(queue&& c, const Alloc& a)
+      :c(move(c.c),a)
+    {}
     #endif
 
     

@@ -4,7 +4,6 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__STLX_PRIORITYQUEUE
 #define NTL__STLX_PRIORITYQUEUE
 

@@ -1,1 +1,2 @@
 #include "stlx/queue.hxx"
+#include "stlx/priority_queue.hxx"

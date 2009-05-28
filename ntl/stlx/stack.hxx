@@ -46,21 +46,30 @@ class stack
       :c(forward<Container>(c))
     {}
     #else
-    explicit stack(const Container& c = Container()):
-    c(c)
+    explicit stack(const Container& c = Container())
+      :c(c)
     {}
     #endif
 
     template <class Alloc>
-    explicit stack(const Alloc&);
+    explicit stack(const Alloc& a)
+      :c(a)
+    {}
+
     template <class Alloc>
-    stack(const Container&, const Alloc&);
+    stack(const Container& c, const Alloc& a)
+      :c(c,a)
+    {}
     
     #ifdef NTL__CXX_RV
     template <class Alloc>
-    stack(Container&&, const Alloc&);
+    stack(Container&& c, const Alloc& a)
+      :c(forward<Container>(c), a)
+    {}
     template <class Alloc>
-    stack(stack&&, const Alloc&);
+    stack(stack&& s, const Alloc& a)
+      :c(forward<Container>(s.c), a)
+    {}
     #endif
 
     bool              empty() const             { return c.empty(); }
