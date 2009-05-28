@@ -109,7 +109,9 @@ namespace std {
       :base(forward<base>(r))
     {}
 
-    unordered_map(unordered_map&& r, const Allocator& a);
+    unordered_map(unordered_map&& r, const Allocator& a)
+      :base(forward<base>(r), a)
+    {}
     
     /** Transfers the contents of unordered_map */
     unordered_map& operator=(unordered_map&& r)
@@ -366,7 +368,9 @@ namespace std {
       :base(forward<base>(r))
     {}
 
-    unordered_multimap(unordered_multimap&& r, const Allocator& a);
+    unordered_multimap(unordered_multimap&& r, const Allocator& a)
+      :base(forward<base>(r), a)
+    {}
     
     /** Transfers the contents of unordered_multimap */
     unordered_multimap& operator=(unordered_multimap&& r)

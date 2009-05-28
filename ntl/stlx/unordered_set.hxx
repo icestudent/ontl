@@ -104,7 +104,9 @@ namespace std {
       :base(forward<base>(r))
     {}
 
-    unordered_set(unordered_set&& r, const Allocator& a);
+    unordered_set(unordered_set&& r, const Allocator& a)
+      :base(forward<base>(r), a)
+    {}
     
     /** Transfers the contents of unordered_set */
     unordered_set& operator=(unordered_set&& r)
@@ -330,7 +332,10 @@ namespace std {
       :base(forward<base>(r))
     {}
 
-    unordered_multiset(unordered_multiset&& r, const Allocator& a);
+    unordered_multiset(unordered_multiset&& r, const Allocator& a)
+      :base(forward<base>(r), a)
+    {}
+
     
     /** Transfers the contents of unordered_multiset */
     unordered_multiset& operator=(unordered_multiset&& r)

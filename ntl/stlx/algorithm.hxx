@@ -18,6 +18,8 @@
 #include "initializer_list.hxx"
 #endif
 
+#include "cstring.hxx"
+
 namespace std
 {
 ///\name 25.1, non-modifying sequence operations:
@@ -365,10 +367,28 @@ namespace __
   template<class InputRandomIterator, class OutputRandomIterator>
   inline OutputRandomIterator move(InputRandomIterator first, InputRandomIterator last, OutputRandomIterator result, true_type)
   {
-    memmove(result, first, last - first);
+    memmove(result, first, (last - first)*sizeof(typename iterator_traits<InputRandomIterator>::value_type));
     return result + (last - first);
   }
 
+  template<class I, class O = I>
+  struct is_memmoveable_check
+  {
+    typedef typename iterator_traits<I>::iterator_category itype;
+    typedef typename iterator_traits<O>::iterator_category otype;
+    typedef typename iterator_traits<I>::value_type src_type;
+    typedef typename iterator_traits<O>::value_type dest_type;
+
+    // if iterators is pointers and value types memmoveable, just move it
+    typedef bool_type<is_pointer<I>::value && is_pointer<O>::value> ptrs;
+    static const bool same = is_same<typename remove_cv<src_type>::type, typename remove_cv<dest_type>::type>::value;
+    static const bool value = ptrs::value && same && has_trivial_copy_constructor<dest_type>::value;
+  };
+
+  template<class I, class O>
+  struct is_memmoveable:
+    integral_constant<bool, is_memmoveable_check<I,O>::value>
+  {};
 
 
 }
@@ -396,31 +416,26 @@ template<class BidirectionalIterator1, class BidirectionalIterator2>
 __forceinline
 BidirectionalIterator2
   copy_backward(BidirectionalIterator1 first, BidirectionalIterator1 last,
-                BidirectionalIterator2 result)
+                BidirectionalIterator2 result_last)
 {
-  while ( first != last ) *--result = *--first;
-  return result;
+  while ( first != last ) *--result_last = *--last;
+  return result_last;
 }
 
 
 template<class InputIterator, class OutputIterator>
 inline OutputIterator move(InputIterator first, InputIterator last, OutputIterator result)
 {
-  typedef typename iterator_traits<InputIterator>::iterator_category itype;
-  typedef typename iterator_traits<OutputIterator>::iterator_category otype;
-  typedef typename iterator_traits<InputIterator>::value_type src_type;
-  typedef typename iterator_traits<OutputIterator>::value_type dest_type;
-  // if iterators is random-access and value types memmoveable, just move it
-  return __::move(first, last, result, __::bool_type<is_same<itype, otype>::value && has_trivial_copy_constructor<src_type>::value && has_trivial_copy_constructor<dest_type>::value>());
+  return __::move<InputIterator,OutputIterator>(first, last, result, __::is_memmoveable<InputIterator,OutputIterator>());
 }
 
 template<class BidirectionalIterator1, class BidirectionalIterator2>
 inline BidirectionalIterator2
   move_backward(BidirectionalIterator1 first, BidirectionalIterator1 last,
-                BidirectionalIterator2 result)
+                BidirectionalIterator2 result_last)
 {
-  while ( first != last ) *--result = move(*--first);
-  return result;
+  while ( first != last ) *--result_last = move(*--last);
+  return result_last;
 }
 
 

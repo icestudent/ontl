@@ -35,13 +35,13 @@ class vector
 {
     template <class, class, class> friend class basic_string;
 
+    typedef typename
+      Allocator::template rebind<T>::other        allocator;
   ///////////////////////////////////////////////////////////////////////////
   public:
 
     typedef           T                           value_type;
     typedef Allocator                             allocator_type;
-    typedef typename
-      Allocator::template rebind<T>::other        allocator;
     typedef typename  allocator::pointer          pointer;
     typedef typename  allocator::const_pointer    const_pointer;
     typedef typename  allocator::reference        reference;
@@ -75,23 +75,22 @@ class vector
       end_ = i;
     }
 
-    template <class ForwardIterator>
-    void vector__disp(ForwardIterator first, ForwardIterator last,
-                      const false_type&)
+    template <class InputIterator>
+    void vector__disp(InputIterator first, InputIterator last, input_iterator_tag)
     {
-      ///\todo specialize for InputIterator category
+      while(first != last){
+        push_back(*first);
+        ++first;
+      }
+    }
+
+    template <class ForwardIterator>
+    void vector__disp(ForwardIterator first, ForwardIterator last, forward_iterator_tag)
+    {
       // distance SHOULD be allways positive
       capacity_ = static_cast<size_type>(distance(first, last));
       begin_ = array_allocator.allocate(capacity_);
       construct(first, capacity_);
-    }
-
-    template <class IntegralType>
-    void vector__disp(IntegralType n, IntegralType x, const true_type&)
-    {
-      capacity_ = static_cast<size_type>(n);
-      begin_ = array_allocator.allocate(capacity_);
-      construct(static_cast<size_type>(n), static_cast<value_type>(x));
     }
 
   public:
@@ -123,10 +122,10 @@ class vector
     template <class InputIterator>
     vector(InputIterator first,
            InputIterator last,
-           const Allocator& a = Allocator())
+           const Allocator& a = Allocator(), typename enable_if<!is_integral<InputIterator>::value>::type* =0)
     : array_allocator(a)
     {
-      vector__disp(first, last, is_integral<InputIterator>::type());
+      vector__disp(first, last, typename iterator_traits<InputIterator>::iterator_category());
     }
 
     __forceinline
@@ -182,7 +181,7 @@ class vector
     vector(initializer_list<T> il, const Allocator& a = Allocator())
       :array_allocator(a)
     {
-      vector__disp(il.begin(), il.end(), false_type());
+      construct(il.begin(), il.size());
     }
 
     __forceinline
@@ -220,9 +219,9 @@ class vector
     }
 
     template <class InputIterator>
-    void assign(InputIterator first, InputIterator last)
+    void assign(InputIterator first, InputIterator last, typename enable_if<!is_integral<InputIterator>::value>::type* =0)
     {
-      assign__disp(first, last, is_integral<InputIterator>::type());
+      assign__disp(first, last, typename iterator_traits<InputIterator>::iterator_category());
     }
 
     void assign(size_type n, const T& u)
@@ -239,7 +238,7 @@ class vector
 
     void assign(initializer_list<T> il)
     {
-      assign__disp(il.begin(), il.end(), false_type());
+      assign__disp(il.begin(), il.end(), forward_iterator_tag());
     }
 
     allocator_type get_allocator() const  { return static_cast<allocator_type>(array_allocator); }
@@ -249,8 +248,17 @@ class vector
   private:
 
     template <class InputIterator>
-    void assign__disp(InputIterator first, InputIterator last,
-                      const false_type&)
+    void assign__disp(InputIterator first, InputIterator last, input_iterator_tag)
+    {
+      clear();
+      while(first != last){
+        push_back(*first);
+        ++first;
+      }
+    }
+
+    template <class InputIterator>
+    void assign__disp(InputIterator first, InputIterator last, forward_iterator_tag)
     {
       clear();
       // distance SHOULD be allways positive
@@ -263,12 +271,6 @@ class vector
         begin_= array_allocator.allocate(n);
       }
       construct(first, n);
-    }
-
-    template <class IntegralType>
-    void assign__disp(IntegralType n, IntegralType x, const true_type&)
-    {
-      assign(static_cast<size_type>(n), static_cast<value_type>(x));
     }
 
   public:
@@ -545,7 +547,9 @@ class vector
           std::copy
         #endif
         (last_, end(), first_);
-        while(end_ != last_)
+        if(no_dtor::value)
+          end_ = const_cast<pointer>(last);
+        else while(end_ != last_)
           array_allocator.destroy(--end_);
       }
       return first_;
@@ -568,7 +572,8 @@ class vector
     {
       difference_type n = end_ - begin_;
       end_ = begin_;
-      while ( n ) array_allocator.destroy(begin_ + --n);
+      if(!no_dtor::value)
+        while ( n ) array_allocator.destroy(begin_ + --n);
     }
 
     ///@}
@@ -603,6 +608,8 @@ class vector
     size_type capacity_;
 
     mutable allocator array_allocator;
+
+    typedef __::bool_type<is_pod<T>::value || has_trivial_destructor<T>::value> no_dtor;
 
     // "stdexcept.hxx" includes this header
     // hack: MSVC doesn't look inside function body

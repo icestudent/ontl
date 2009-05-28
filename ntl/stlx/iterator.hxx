@@ -275,49 +275,49 @@ class reverse_iterator
   friend
     bool operator==(const reverse_iterator<Iterator>& x,
                     const reverse_iterator<Iterator2>& y)
-      { return x.current == y.current; }
+      { return x.current == y.base(); }
 
   template<typename Iterator2>
   friend
     bool operator!=(const reverse_iterator<Iterator>& x,
                     const reverse_iterator<Iterator2>& y)
-      { return x.current != y.current; }
+      { return x.current != y.base(); }
 
   template<typename Iterator2>
   friend
     bool operator< (const reverse_iterator<Iterator>& x,
                     const reverse_iterator<Iterator2>& y)
-      { return x.current > y.current; }
+      { return x.current > y.base(); }
 
   template<typename Iterator2>
   friend
     bool operator> (const reverse_iterator<Iterator>& x,
                     const reverse_iterator<Iterator2>& y)
-      { return x.current < y.current; }
+      { return x.current < y.base(); }
 
   template<typename Iterator2>
   friend
     bool operator>=(const reverse_iterator<Iterator>& x,
                     const reverse_iterator<Iterator2>& y)
-      { return x.current <= y.current; }
+      { return x.current <= y.base(); }
 
   template<typename Iterator2>
   friend
     bool operator<=(const reverse_iterator<Iterator>& x,
                     const reverse_iterator<Iterator2>& y)
-      { return x.current >= y.current; }
+      { return x.current >= y.base(); }
 
 #ifdef NTL__CXX_TYPEOF
   template<typename Iterator2>
   friend auto operator-(const reverse_iterator<Iterator>& x, const reverse_iterator<Iterator2>& y) -> decltype(y.current-x.current)
-  { return y.current - x.current; }
+  { return y.base() - x.current; }
 #else
   template<typename Iterator2>
   friend
     typename reverse_iterator<Iterator>::difference_type
       operator-(const reverse_iterator<Iterator>& x,
                 const reverse_iterator<Iterator2>& y)
-      { return y.current - x.current; }
+      { return y.base() - x.current; }
 #endif
   friend inline
     reverse_iterator<Iterator>
@@ -543,6 +543,12 @@ public:
 private:
   Iterator current;
 };
+
+template <class Iterator>
+inline move_iterator<Iterator> make_move_iterator(const Iterator& i)
+{
+  return move_iterator<Iterator>(i);
+}
 
 #endif // move iterator
 

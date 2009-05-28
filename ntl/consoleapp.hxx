@@ -37,6 +37,8 @@ class consoleapp : public win::application<win::tchar_t>
 
 };
 
+extern"C" void _cdecl __console_abort();
+
 #ifdef _MSC_VER
   // this used to prevent linker error if CRT initialization isn't needed
   #ifdef _M_X64
@@ -54,7 +56,8 @@ class consoleapp : public win::application<win::tchar_t>
 int _Consoleapp_entry()
 {
   #ifdef _MSC_VER
-  __init_crt_stub(); // dummy reference to the stub
+  __init_crt_stub();
+  static void* volatile ref2 = __console_abort;
   #endif
   crt_initializer __crt;
   consoleapp app;

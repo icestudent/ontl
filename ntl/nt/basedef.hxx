@@ -344,6 +344,12 @@ ntstatus __stdcall
     uint32_t* FinalUncompressedSize
     );
 
+NTL__EXTERNAPI
+  uint32_t __stdcall RtlUniform(uint32_t* Seed);
+
+NTL__EXTERNAPI
+  uint32_t __stdcall RtlRandom(uint32_t* Seed);
+
 
   }//namespace nt
 }//namespace ntl

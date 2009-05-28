@@ -291,4 +291,6 @@ extern "C" inline void _cdecl debug_abort()
   ntl::intrinsic::debugbreak();
 }
 
+//static const void* __dummyref = reinterpret_cast<const void*>(debug_abort);
+
 #endif // NTL__NT_DEBUG

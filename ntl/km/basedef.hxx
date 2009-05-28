@@ -649,7 +649,7 @@ static const size_t pool_small_lists = 32;
       );
 
     NTL__EXTERNAPI
-      bool
+      bool __stdcall
       ExAcquireResourceSharedLite (
       eresource* Resource,
       bool Wait
@@ -657,14 +657,14 @@ static const size_t pool_small_lists = 32;
 
 #if (NTDDI_VERSION >= NTDDI_LONGHORN || NTDDI_VERSION >= NTDDI_WS03SP1)
     NTL__EXTERNAPI
-      void*
+      void* __stdcall
       ExEnterCriticalRegionAndAcquireResourceShared (
       eresource* Resource
       );
 #endif
 
     NTL__EXTERNAPI
-      bool
+      bool __stdcall
       ExAcquireResourceExclusiveLite (
       eresource* Resource,
       bool Wait
@@ -672,21 +672,21 @@ static const size_t pool_small_lists = 32;
 
 #if (NTDDI_VERSION >= NTDDI_LONGHORN || NTDDI_VERSION >= NTDDI_WS03SP1)
     NTL__EXTERNAPI
-      void*
+      void* __stdcall
       ExEnterCriticalRegionAndAcquireResourceExclusive (
       eresource* Resource
       );
 #endif
 
     NTL__EXTERNAPI
-      bool
+      bool __stdcall
       ExAcquireSharedStarveExclusive(
       eresource* Resource,
       bool Wait
       );
 
     NTL__EXTERNAPI
-      bool
+      bool __stdcall
       ExAcquireSharedWaitForExclusive(
       eresource* Resource,
       bool Wait
@@ -694,7 +694,7 @@ static const size_t pool_small_lists = 32;
 
 #if (NTDDI_VERSION >= NTDDI_LONGHORN || NTDDI_VERSION >= NTDDI_WS03SP1)
     NTL__EXTERNAPI
-      void*
+      void* __stdcall
       ExEnterCriticalRegionAndAcquireSharedWaitForExclusive (
       eresource* Resource
       );
@@ -710,7 +710,11 @@ static const size_t pool_small_lists = 32;
 #if PRAGMA_DEPRECATED_DDK
 #pragma deprecated(ExReleaseResource)       // Use ExReleaseResourceLite
 #endif
-#define ExReleaseResource(R) (ExReleaseResourceLite(R))
+    __forceinline
+      void ExReleaseResource(eresource* R)
+    {
+      ExReleaseResourceLite(R);
+    }
 
     NTL__EXTERNAPI
       void
@@ -778,16 +782,15 @@ static const size_t pool_small_lists = 32;
       eresource* Resource
       );
 
-#define ExIsResourceAcquiredLite ExIsResourceAcquiredSharedLite
+    __forceinline
+    uint32_t ExIsResourceAcquiredLite (eresource* Resource)
+    {
+      return ExIsResourceAcquiredSharedLite(Resource);
+    }
 
+    using nt::RtlRandom;
+    using nt::RtlUniform;
 
-    NTL__EXTERNAPI
-      uint32_t __stdcall
-      RtlUniform(uint32_t* Seed);
-
-    NTL__EXTERNAPI
-      uint32_t __stdcall
-      RtlRandom(uint32_t* Seed);
 
 
 }//namespace km

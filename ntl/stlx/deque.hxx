@@ -42,10 +42,10 @@ namespace std {
   public:
     ///\name 23.2.2.1 construct/copy/destroy:
     explicit deque(const Allocator& a = Allocator())
-      :alloc(a), left(), right(), capL(), capR()
+      :alloc(a), left(), right(), capL(), capR(), base_(), cap_()
     {}
     explicit deque(size_type n)
-      :alloc(), left(), right(), capL(), capR()
+      :alloc(), left(), right(), capL(), capR(), base_(), cap_()
     {
       if(n){
         reserve(n);
@@ -55,8 +55,8 @@ namespace std {
       }
     }
 
-    explicit deque(size_type n, const T& value, const Allocator& a = Allocator())
-      :alloc(a), left(), right(), capL(), capR()
+    deque(size_type n, const T& value, const Allocator& a = Allocator())
+      :alloc(a), left(), right(), capL(), capR(), base_(), cap_()
     {
       if(n){
         reserve(n);
@@ -67,37 +67,50 @@ namespace std {
     }
 
     template <class InputIterator>
-    deque(InputIterator first, InputIterator last, const Allocator& a = Allocator())
-      :alloc(a), left(), right(), capL(), capR()
+    deque(InputIterator first, InputIterator last, const Allocator& a = Allocator(), typename enable_if<!is_integral<InputIterator>::value>::type* =0)
+      :alloc(a), left(), right(), capL(), capR(), base_(), cap_()
     {
-      assign(first, last);
+      assign(first, last, typename iterator_traits<InputIterator>::iterator_category());
     }
 
     deque(const deque<T,Allocator>& x)
-      :alloc(x.alloc), left(), right(), capL(), capR()
+      :alloc(x.alloc), left(), right(), capL(), capR(), base_(), cap_()
     {
       assign(x.cbegin(), x.cend());
     }
 
     deque(const deque& x, const Allocator& a)
-      :alloc(a), left(), right(), capL(), capR()
+      :alloc(a), left(), right(), capL(), capR(), base_(), cap_()
     {
       assign(x.cbegin(), x.cend());
     }
     
     deque(initializer_list<T> il, const Allocator& a = Allocator())
-      :alloc(a), left(), right(), capL(), capR()
+      :alloc(a), left(), right(), capL(), capR(), base_(), cap_()
     {
-      assign(il.begin(), il.end());
+      assign(il.begin(), il.end(), forward_iterator_tag());
     }
 
     #ifdef NTL__CXX_RV
     deque(deque&& x)
-      :alloc(), left(), right(), capL(), capR()
+      :alloc(), left(), right(), capL(), capR(), base_(), cap_()
     {
-      swap(x);
+      swap(move(x));
     }
-    deque(deque&& x, const Allocator& a);
+    deque(deque&& x, const Allocator& a)
+      :alloc(a), left(), right(), capL(), capR(), base_(), cap_()
+    {
+      if(x.get_allocator() == a){
+        swap(move(x));
+      }else{
+        // move elements using the array_allocator
+        // TODO: reserve(x.size())
+        reserve(x.size());
+        right = std::uninitialized_move(x.begin(), x.end(), right);
+        capR -= x.size();
+        x.clear();
+      }
+    }
     #endif
 
     ~deque()
@@ -107,29 +120,33 @@ namespace std {
     
     deque& operator=(initializer_list<T> il)
     {
-      dispose();
-      assign(il.begin(), il.end());
+      //dispose();
+      assign(il.begin(), il.end(), forward_iterator_tag());
       return *this;
     }
 
     deque<T,Allocator>& operator=(const deque<T,Allocator>& x)
     {
-      dispose();
-      assign(x.cbegin(), x.cend());
+      if(&x != this){
+        //dispose();
+        assign(x.cbegin(), x.cend());
+      }
       return *this;
     }
     
     #ifdef NTL__CXX_RV
     deque<T,Allocator>& operator=(deque<T,Allocator>&& x)
     {
-      dispose();
-      swap(x);
+      if(&x != this){
+        dispose();
+        swap(x);
+      }
       return *this;
     }
     #endif
     
     template <class InputIterator>
-    void assign(InputIterator first, InputIterator last)
+    void assign(InputIterator first, InputIterator last, typename enable_if<!is_integral<InputIterator>::value>::type* =0)
     {
       assign(first, last, typename iterator_traits<InputIterator>::iterator_category());
     }
@@ -146,21 +163,22 @@ namespace std {
         // adjust pointers to place elements
         // after clear they are in the middle
         const size_type d = n/2;
-        left -= d; capL -= d; capR -= d;
+        left -= d; capL -= d;
+        capR -= d + (n&1);
         right = left;
       }
       while(n--)
         alloc.construct(right++, t);
+      validate();
     }
 
     void assign(initializer_list<T> il)
     {
-      assign(il.begin(), il.end());
+      assign(il.begin(), il.end(), forward_iterator_tag());
     }
     
     allocator_type get_allocator() const { return alloc; }
 
-    
     ///\name iterators:
     iterator        begin()                 { return left; }
     const_iterator  begin() const           { return left; }
@@ -190,29 +208,34 @@ namespace std {
       return;
     #else
       const size_type len = size();
-      if(len){
-        if(sz < len)
-          erase(left+sz, right);
-        else if(sz > size())
-          insert_n(right, sz-len, forward<value_type>(value_type()));
+      if(sz < len)
+        erase(left+sz, right);
+      else if(sz > len){
+        sz -= len;
+        if(sz > capR)
+          reallocate(sz/*-capR*/);
+        capR -= sz;
+        while(sz--)
+          alloc.construct(right++, forward<value_type>(value_type()));
+        validate();
       }
     #endif
     }
     void resize(size_type sz, const T& c)
     {
       const size_type len = size();
-      if(len){
-        if(sz < len)
-          erase(left+sz, right);
-        else if(sz > size())
-          insert(right, sz-len, c);
-      }
+      if(sz < len)
+        erase(left+sz, right);
+      else if(sz > len)
+        insert(right, sz-len, c);
+      validate();
     }
 
     void shrink_to_fit()
     {
       if(!empty() && size() > can_shrink)
         reallocate();
+      validate();
     }
     
     bool empty() const { return left == right; }
@@ -252,6 +275,7 @@ namespace std {
       else if(!capL)
         relocate(false);
       alloc.construct(--left, forward<value_type>(x)); --capL;
+      validate();
     }
     void push_back(T&& x)
     {
@@ -260,6 +284,7 @@ namespace std {
       else if(!capR)
         relocate(true);
       alloc.construct(right++, forward<value_type>(x)); --capR;
+      validate();
     }
     #endif
 
@@ -270,6 +295,7 @@ namespace std {
       else if(!capL)
         relocate(false);
       alloc.construct(--left, x); --capL;
+      validate();
     }
 
     void push_back(const T& x)
@@ -279,17 +305,20 @@ namespace std {
       else if(!capR)
         relocate(true);
       alloc.construct(right++, x); --capR;
+      validate();
     }
 
     void pop_front()
     {
       if(!empty())
         alloc.destroy(left++), ++capL;
+      validate();
     }
     void pop_back()
     {
       if(!empty())
         alloc.destroy(--right), ++capR;
+      validate();
     }
 
     #ifdef NTL__CXX_RV
@@ -302,7 +331,7 @@ namespace std {
       }
       pointer pos = insert_impl(position);
       alloc.construct(pos, forward<value_type>(x));
-      --capR;
+      validate();
       return pos;
     }
     #endif
@@ -316,32 +345,33 @@ namespace std {
       }
       pointer pos = insert_impl(position);
       alloc.construct(pos, x);
-      --capR;
+      validate();
       return pos;
     }
 
     void insert(const_iterator position, size_type n, const T& x)
     {
       assert(position >= left && position <= right);
+      const ptrdiff_t diff = position-left;
       if(n > capR)
-        reallocate(n);
-      pointer pos = const_cast<pointer>(position);
-      move_backward(pos, right, pos+n); // shift right
+        reallocate(n/*-capR*/); // invalidates iterators
+      pointer pos = left + diff;
+      move_backward(pos, right, pos+n+(right-pos)); // shift right
       capR -= n; right += n;
       while(n--)
         alloc.construct(pos++, x);
+      validate();
+    }
+
+    template <class InputIterator>
+    void insert(const_iterator position, InputIterator first, InputIterator last, typename enable_if<!is_integral<InputIterator>::value>::type* =0)
+    {
+      insert(position, first, last, typename iterator_traits<InputIterator>::iterator_category());
     }
 
     void insert(const_iterator position, initializer_list<T> il)
     {
       insert(position, il.begin(), il.end());
-    }
-
-    template <class InputIterator>
-    void insert(const_iterator position, InputIterator first, InputIterator last)
-    {
-      assert(position >= left && position <= right);
-      insert(position, first, last, typename iterator_traits<InputIterator>::iterator_category());
     }
 
     iterator erase(const_iterator position)
@@ -359,6 +389,7 @@ namespace std {
         move(pos+1, right, pos);
         --right, ++capR;
       }
+      validate();
       return pos;
     }
 
@@ -369,9 +400,20 @@ namespace std {
         // clear all
         return erase_all(no_dtor());
       }else{
-        while(first != last)
-          first = erase(first);
-        return const_cast<pointer>(last);
+        if(first != last){
+          pointer l = const_cast<pointer>(last), f = const_cast<pointer>(first);
+          if(l == right)
+            l = f;
+          else
+            l = move(l, right, f);  // move left tailing elements, l points to remainder
+          capR += right-l;
+          if(no_dtor::value)
+            right = l;
+          else while(right != l)     // destroy reminder
+            alloc.destroy(--right);
+          validate();
+        }
+        return const_cast<pointer>(first);
       }
     }
 
@@ -381,13 +423,17 @@ namespace std {
     void swap(deque<T,Allocator>& x)
     #endif
     {
-      pointer l = left, r = right;
-      size_type cl = capL, cr = capR;
-      left = x.left, right = x.right;
-      capL = x.capL, capR = x.capR;
-      x.left = l, x.right = r;
-      x.capL = cl, x.capR = cr;
-      std::swap(alloc, x.alloc);
+      if(this != &x){
+        pointer l = left, r = right;
+        size_type cl = capL, cr = capR;
+        left = x.left, right = x.right;
+        capL = x.capL, capR = x.capR;
+        x.left = l, x.right = r;
+        x.capL = cl, x.capR = cr;
+        std::swap(alloc, x.alloc);
+        std::swap(base_, x.base_);
+        std::swap(cap_,  x.cap_);
+      }
     }
 
     void clear()
@@ -400,29 +446,47 @@ namespace std {
     // we can fast relocate if type is pod
     static const bool can_fast_relocate = 0 && has_trivial_copy_constructor<T>::value;
     static const size_type can_shrink = 32;
-    typedef has_trivial_destructor<T> no_dtor;
+    //typedef __::bool_type<is_pod<T>::value || has_trivial_destructor<T>::value> no_dtor;
+    typedef false_type no_dtor;
 
     // capacity helpers
-    size_type capacity_factor(size_type n) const { return (n + 4) * 2; }
-    size_type capacity() const { return (right - left) + capL + capR; }
+    size_type capacity_factor(size_type n) const { if(n == 0) n = 1; return n*2; }//(n + 4) * 2; }
+    size_type capacity() const 
+    {
+      size_type c = (right - left) + capL + capR;
+      assert(c == cap_);
+      return cap_;
+    }
     bool can_relocate(size_type n) const { return n > capacity_factor(size()); }
 
+    void validate()
+    {
+      capacity();
+      base();
+    }
     // allocate memory
     void reserve(size_type n = 0)
     { // pre: container must be cleared
-      const size_type cap = capacity_factor(n);
-      pointer p = alloc.allocate(cap);
+      const size_type cap = cap_ = capacity_factor(n);
+      pointer p = base_ = alloc.allocate(cap);
       //if(!p) return;
       pointer middle = p + cap/2;
       right = left = middle - n/2;
       capL = left - p; capR = cap - capL;
+      validate();
       // post: left & right points to the new uninitialized element (or in the middle if n == 0)
     }
 
-    pointer base() const { return left - capL; }
+    pointer base() const 
+    {
+      pointer b = left - capL;
+      assert(!b || b == base_);
+      return base_;
+    }
 
     void relocate(bool is_right)
     {
+      validate();
       // param: which side needed a space
       if(can_fast_relocate){
         // TODO: define offset to relocate
@@ -438,11 +502,18 @@ namespace std {
 
     void reallocate(size_type n = 0)
     {
-      pointer l = left, r = right, p = left - capL;
-      const size_type c = max(capacity(), n);
+      validate();
+      pointer l = left, r = right, p = base();
+      const size_type cap = capacity(), c = max(capacity(), n);
       reserve(c);
-      right = move(l, r, right);
-      alloc.deallocate(p, c);
+      validate();
+      if(r-l){
+        right = uninitialized_move(l, r, right);
+        capR -= r - l;
+      }
+      if(p)
+        alloc.deallocate(p, cap);
+      validate();
     }
 
     iterator erase_all(true_type)
@@ -452,6 +523,7 @@ namespace std {
       const size_type cap = capacity();
       right = left = p + cap/2;
       capL = left - p; capR = cap - capL;
+      validate();
       return right;
     }
 
@@ -465,8 +537,13 @@ namespace std {
 
     void dispose()
     {
-      clear();
-      alloc.deallocate(base(), capacity());
+      if(base()){
+        if(!empty())
+          clear();
+        alloc.deallocate(base(), capacity());
+        left = right = base_ = nullptr;
+        capL = capR = cap_ = 0;
+      }
     }
 
     template <class InputIterator>
@@ -483,11 +560,15 @@ namespace std {
         // adjust pointers to place elements
         // after clear they are in the middle
         const size_type d = n/2;
-        left -= d; capL -= d; capR -= d;
+        left -= d; capL -= d;
+        capR -= d + (n&1); // +1 if odd
         right = left;
       }
-      while(first != last)
-        alloc.construct(right++, *first++);
+      while(first != last){
+        alloc.construct(right++, *first);
+        ++first;
+      }
+      validate();
     }
     template <class InputIterator>
     void assign(InputIterator first, InputIterator last, input_iterator_tag)
@@ -495,15 +576,20 @@ namespace std {
       clear();
       while(first != last)
         push_back(*first++);
+      validate();
     }
 
     pointer insert_impl(const_iterator position)
     {
+      const ptrdiff_t diff = position - left;
       if(empty() || !capR)
-        reserve(size());
-      pointer pos = const_cast<pointer>(position);
-      move_backward(pos, right++, pos+1); // shift right
+        reallocate(size());
+      validate();
+      pointer pos = left+diff;
+      move_backward(pos, right, pos+1+(right-pos)); // shift right
+      ++right;
       --capR;
+      validate();
       return pos;
     }
 
@@ -530,12 +616,13 @@ namespace std {
       iterator pos = const_cast<iterator>(position);
       while(first != last)
         pos = insert(pos, *first++);
+      validate();
     }
 
 
   private:
-    pointer left, right;
-    size_type capL, capR;
+    pointer left, right, base_;
+    size_type capL, capR, cap_;
     allocator alloc;
   };
 

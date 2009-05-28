@@ -23,6 +23,7 @@ namespace intrinsic
 // MSDN prototypes these as having long parameters, however
 // it says: The sign is ignored.
   extern "C" {
+    uint64_t __cdecl __rdtsc();
     
     // interlocked intrinsics
 
@@ -65,7 +66,10 @@ namespace intrinsic
     void*   __cdecl _InterlockedExchangePointer(void* volatile* Target, void* Value);
   } // extern "C"
 
+  __forceinline uint64_t rdtsc() { return __rdtsc(); }
+
 #ifndef __ICL
+#pragma intrinsic(__rdtsc)
 #pragma intrinsic(_InterlockedAnd, _InterlockedAnd8, _InterlockedAnd16, _InterlockedOr, _InterlockedOr8, _InterlockedOr16, _InterlockedXor, _InterlockedXor8, _InterlockedXor16)
 #pragma intrinsic(_InterlockedIncrement, _InterlockedIncrement16, _InterlockedDecrement, _InterlockedDecrement16, _InterlockedExchange, _InterlockedExchangeAdd)
 #pragma intrinsic(_InterlockedCompareExchange, _InterlockedCompareExchange16, _InterlockedCompareExchange64)

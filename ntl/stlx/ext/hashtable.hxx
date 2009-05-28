@@ -448,7 +448,8 @@ namespace std
         }
         chained_hashtable& operator=(const chained_hashtable& r)
         {
-          chained_hashtable(r).swap(*this);
+          if(this != &r)
+            chained_hashtable(r).swap(*this);
           return *this;
         }
 #ifdef NTL__CXX_RV
@@ -458,10 +459,21 @@ namespace std
           r.count_ = 0;
           r.buckets_ = table();
         }
-        chained_hashtable(chained_hashtable&& r, const allocator_type& a);
+        chained_hashtable(chained_hashtable&& r, const allocator_type& a)
+          :nalloc(a), balloc(a), hash_(r.hash_), equal_(r.equal_), count_(0), max_factor(r.max_factor)
+        {
+          if(r.nalloc == nalloc){
+            swap(r);
+          }else{
+            // move elements using the array_allocator
+            copy_from(r.buckets_);
+            r.clear();
+          }
+        }
         chained_hashtable& operator=(chained_hashtable&& r)
         {
-          chained_hashtable(r).swap(*this);
+          if(this != &r)
+            chained_hashtable(r).swap(*this);
           return *this;
         }
 #endif

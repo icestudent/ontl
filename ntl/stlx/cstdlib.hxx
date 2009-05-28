@@ -9,9 +9,13 @@
 #define NTL__STLX_CSTDLIB
 
 #ifndef NTL__STLX_CSTDINT
-#include "cstddef.hxx"
+# include "cstddef.hxx"
 #endif
 #include "cassert.hxx"
+
+#ifndef NTL__ATOMIC
+# include "../atomic.hxx"
+#endif
 
 extern "C"
 {
@@ -67,21 +71,30 @@ wchar_t* _cdecl
 
 ///\name  7.20.2 Pseudo-random sequence generation functions
 
+__declspec(selectany) std::uint32_t __ntl_rand_seed = 0;
+
 /// 7.20.2.1 The rand function
-int
-NTL__CRTCALL
-  rand(void);
+inline int NTL__CRTCALL rand(void)
+{
+  ntl::atomic::compare_exchange(__ntl_rand_seed, static_cast<uint32_t>(ntl::intrinsic::rdtsc()), 0); // init seed if 0
+  std::uint32_t seed = __ntl_rand_seed;
+  ntl::intrinsic::_ReadBarrier();
+  std::uint32_t val = ntl::nt::RtlRandom(&seed);
+  ntl::atomic::exchange(__ntl_rand_seed, seed); // store new seed back. rand() is not atomic function, but it doesn't matter
+  return val;
+}
 
 #ifndef RAND_MAX
-#define RAND_MAX 0x7fff
+#define RAND_MAX 0xffffffff // LONG_MAX
 #endif
 
 //STATIC_ASSERT(RAND_MAX <= INT_MAX);
 
 /// 7.20.2.2 The srand function
-void
-NTL__CRTCALL
-  srand(unsigned int seed);
+inline void NTL__CRTCALL srand(unsigned int seed)
+{
+  ntl::atomic::exchange(__ntl_rand_seed, seed);
+}
 
 
 ///\name  7.20.3 Memory management functions

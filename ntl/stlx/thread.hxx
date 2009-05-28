@@ -392,7 +392,7 @@ namespace std
 
 #ifdef NTL__CXX_RV
   inline thread::thread(thread&& r)
-    :h(), tid(), cleanup()
+    :h(), tid()
   {
     swap(r);
   }

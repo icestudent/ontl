@@ -8,9 +8,7 @@
 #ifndef NTL__STDLIB
 #define NTL__STDLIB
 
-//#include "stlx/cstdlib.hxx"
 #include "stdint.h"
-//#include "atomic.hxx"
 
 namespace ntl {
 

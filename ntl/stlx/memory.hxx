@@ -642,10 +642,7 @@ inline void construct_element(Alloc& alloc, T& r, A1&& a1, A2&& a2, A3&& a3, A4&
 /// 20.7.10.1 uninitialized_copy [uninitialized.copy]
 template <class InputIterator, class ForwardIterator>
 __forceinline
-ForwardIterator
-  uninitialized_copy(InputIterator    first,
-                     InputIterator    last,
-                     ForwardIterator  result)
+ForwardIterator uninitialized_copy(InputIterator first, InputIterator last, ForwardIterator result)
 {
   typedef typename iterator_traits<ForwardIterator>::value_type value_type;
   for ( ; first != last; ++result, ++first )
@@ -658,11 +655,51 @@ ForwardIterator
   return result;
 }
 
+template <class InputIterator, class Size, class ForwardIterator>
+__forceinline
+ForwardIterator uninitialized_copy_n(InputIterator first, Size n,
+                                     ForwardIterator result)
+{
+  typedef typename iterator_traits<ForwardIterator>::value_type value_type;
+  for(; n--; ++result, ++first){
+    __assume(&*result);
+    new (static_cast<void*>(&*result)) value_type(*first);
+  }
+  return result;
+}
+
+template <class InputIterator, class ForwardIterator>
+__forceinline
+ForwardIterator uninitialized_move(InputIterator first, InputIterator last, ForwardIterator result)
+{
+  typedef typename iterator_traits<ForwardIterator>::value_type value_type;
+  for ( ; first != last; ++result, ++first )
+  {
+    __assume(&*result);
+    new (static_cast<void*>(&*result)) value_type(move(*first));
+    ///@todo delete on exceptions
+  }
+  ///@todo separate function for scalar types ?
+  return result;
+}
+
+template <class InputIterator, class Size, class ForwardIterator>
+__forceinline
+ForwardIterator uninitialized_move_n(InputIterator first, Size n,
+                                     ForwardIterator result)
+{
+  typedef typename iterator_traits<ForwardIterator>::value_type value_type;
+  for(; n--; ++result, ++first){
+    __assume(&*result);
+    new (static_cast<void*>(&*result)) value_type(move(*first));
+  }
+  return result;
+}
+
 /// 20.7.10.2 uninitialized_fill [uninitialized.fill]
 template <class ForwardIterator, class T>
 __forceinline
-void
-  uninitialized_fill(ForwardIterator first, ForwardIterator last, const T& x)
+void uninitialized_fill(ForwardIterator first, ForwardIterator last, const T& x)
 {
   typedef typename iterator_traits<ForwardIterator>::value_type value_type;
   for ( ; first != last; ++first )
@@ -677,8 +714,7 @@ void
 /// 20.7.10.3 uninitialized_fill_n [uninitialized.fill.n]
 template <class ForwardIterator, class Size, class T>
 __forceinline
-void
-  uninitialized_fill_n(ForwardIterator first, Size n, const T& x)
+void uninitialized_fill_n(ForwardIterator first, Size n, const T& x)
 {
   typedef typename iterator_traits<ForwardIterator>::value_type value_type;
   for ( ; n--; ++first )
