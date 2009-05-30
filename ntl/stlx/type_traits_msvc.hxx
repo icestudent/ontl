@@ -539,8 +539,8 @@ private:
   static T&& __t();
   static U&& __u();
 #else
-  static T& __t();
-  static U& __u();
+  static T __t();
+  static U __u();
 #endif
 public:
   typedef decltype(true ? __t() : __u()) type;

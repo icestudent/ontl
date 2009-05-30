@@ -52,7 +52,15 @@ namespace ntl {
 
     /**\addtogroup  native_types_support *** NT Types support library ***********
     *@{*/
-
+  #ifdef __ICL
+    struct __s_GUID
+    {
+      unsigned long Data1;
+      unsigned short Data2;
+      unsigned short Data3;
+      unsigned char Data4[8];
+    };
+  #endif
     typedef __s_GUID guid, guid_t;
 
     struct list_entry

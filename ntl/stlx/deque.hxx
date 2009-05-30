@@ -106,7 +106,7 @@ namespace std {
         // move elements using the array_allocator
         // TODO: reserve(x.size())
         reserve(x.size());
-        right = std::uninitialized_move(x.begin(), x.end(), right);
+        right = uninitialized_move(x.begin(), x.end(), right);
         capR -= x.size();
         x.clear();
       }
@@ -617,6 +617,13 @@ namespace std {
       while(first != last)
         pos = insert(pos, *first++);
       validate();
+    }
+
+    pointer uninitialized_move(pointer first, pointer last, pointer result)
+    {
+      while(first != last)
+        alloc.construct(result++, move(*first++));
+      return result;
     }
 
 

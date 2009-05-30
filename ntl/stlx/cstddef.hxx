@@ -232,6 +232,8 @@
 //#define NTL__CXX_CONSTEXPR
 // decltype (typeof)
 #define NTL__CXX_TYPEOF
+// auto func()->typeid
+#define NTL__CXX_DECLTYPE
 // class enum
 #define NTL__CXX_ENUM
 // nullptr
@@ -283,6 +285,8 @@
 //#define NTL__CXX_CONSTEXPR
 // decltype (typeof)
 #define NTL__CXX_TYPEOF
+// no "New function declarator syntax" (N2541)
+//#define NTL__CXX_DECLTYPE
 // class enum
 //#define NTL__CXX_ENUM
 // nullptr

@@ -7,7 +7,7 @@
 #ifndef NTL_MEMFN_RV
 #define NTL_MEMFN_RV
 
-#include "fn_caller.hxx"
+#include "fn_caller_rv.hxx"
 
 namespace std
 {

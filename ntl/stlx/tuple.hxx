@@ -240,6 +240,7 @@ namespace std
       }
 
 #ifdef NTL__CXX_RV
+#if 0
       // TUPLE_EXT:
     protected:
       typedef typename rparam<types,Idx+0>::type rtype1;
@@ -264,6 +265,28 @@ namespace std
       tuples(rvtag, rtype1&& p1, rtype2&& p2, rtype3&& p3, rtype4&& p4, rtype5&& p5)
         :head(forward<rtype1>(p1)), tail(rvtag(), forward<rtype2>(p2), forward<rtype3>(p3), forward<rtype4>(p4), forward<rtype5>(p5))
       {}
+#else
+      template<typename U1>
+      tuples(rvtag, U1&& p1)
+        :head(forward<U1>(p1))
+      {}
+      template<typename U1, typename U2>
+      tuples(rvtag, U1&& p1, U2&& p2)
+        :head(forward<U1>(p1)), tail(rvtag(), forward<U2>(p2))
+      {}
+      template<typename U1, typename U2, typename U3>
+      tuples(rvtag, U1&& p1, U2&& p2, U3&& p3)
+        :head(forward<U1>(p1)), tail(rvtag(), forward<U2>(p2), forward<U3>(p3))
+      {}
+      template<typename U1, typename U2, typename U3, typename U4>
+      tuples(rvtag, U1&& p1, U2&& p2, U3&& p3, U4&& p4)
+        :head(forward<U1>(p1)), tail(rvtag(), forward<U2>(p2), forward<U3>(p3), forward<U4>(p4))
+      {}
+      template<typename U1, typename U2, typename U3, typename U4, typename U5>
+      tuples(rvtag, U1&& p1, U2&& p2, U3&& p3, U4&& p4, U5&& p5)
+        :head(forward<U1>(p1)), tail(rvtag(), forward<U2>(p2), forward<U3>(p3), forward<U4>(p4), forward<U5>(p5))
+      {}
+#endif
 
       template<typename U1, typename U2, typename U3, typename U4, typename U5>
       tuples(tuples<meta::typelist<U1,U2,U3,U4,U5>, Idx>&& r)

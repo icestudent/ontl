@@ -33,23 +33,19 @@ namespace std {
     typedef typename Container::const_reference const_reference;
     typedef typename Container::size_type       size_type;
   public:
-    priority_queue(const Compare& x, const Container&);
-    template <class InputIterator>
-    priority_queue(InputIterator first, InputIterator last, const Compare& x, const Container&);
-    
-    #ifdef NTL__CXX_RV
+  #ifdef NTL__CXX_RV
     explicit priority_queue(const Compare& x = Compare(), Container&& = Container());
     template <class InputIterator>
     priority_queue(InputIterator first, InputIterator last, const Compare& x = Compare(), Container&& = Container());
     priority_queue(priority_queue&&);
     priority_queue& operator=(priority_queue&&);
-    #else
+  #else
     explicit priority_queue(const Compare& x = Compare(), const Container& c = Container());
     template <class InputIterator>
     priority_queue(InputIterator first, InputIterator last, const Compare& x = Compare(), const Container& c = Container());
     priority_queue(const priority_queue&);
     priority_queue& operator= (const priority_queue&);
-    #endif
+  #endif
 
     template <class Alloc>
     explicit priority_queue(const Alloc&);
@@ -58,12 +54,12 @@ namespace std {
     template <class Alloc>
     priority_queue(const Compare&, const Container&, const Alloc&);
     
-    #ifdef NTL__CXX_RV
+  #ifdef NTL__CXX_RV
     template <class Alloc>
     priority_queue(const Compare&, Container&&, const Alloc&);
     template <class Alloc>
     priority_queue(priority_queue&&, const Alloc&);
-    #endif
+  #endif
 
     bool empty() const { return c.empty(); }
     size_type size() const { return c.size(); }
@@ -72,20 +68,24 @@ namespace std {
     void push(const value_type& x);
     void pop();
     
-    #ifdef NTL__CXX_RV
+  #ifdef NTL__CXX_RV
     void push(value_type&& x);
-    #endif
-    #ifdef NTL__CXX_VT
+  #endif
+  #ifdef NTL__CXX_VT
     template <class... Args>
     void emplace(Args&&... args);
-    #endif
+  #endif
 
     
-    #ifdef NTL__CXX_RV
-    void swap(priority_queue&&);
-    #else
-    void swap(priority_queue&);
-    #endif
+  #ifdef NTL__CXX_RV
+    void swap(priority_queue&& x)
+  #else
+    void swap(priority_queue& x)
+  #endif
+    {
+      c.swap(x.c);
+      std::swap(comp, x.comp);
+    }
 
   protected:
     Container c;

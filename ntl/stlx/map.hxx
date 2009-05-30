@@ -151,7 +151,9 @@ public:
     {}
 
 #ifdef NTL__CXX_RV
-    map(map&&, const Allocator&);
+    map(map&& x, const Allocator& a)
+      :val_comp_(x.val_comp_), tree_type(val_comp_, a)
+    {}
 #endif
 
     map(initializer_list<value_type> il, const Compare comp = Compare(), const Allocator& a = Allocator())
@@ -401,7 +403,7 @@ void swap(map<Key,T, Compare, Allocator>& x, map<Key,T, Compare, Allocator>&& y)
 
 template <class Key, class T, class Compare, class Allocator>
 struct constructible_with_allocator_suffix< map<Key, T, Compare, Allocator> >
-  :true_type
+  :false_type
 {};
 
 /// [23.3.2 multimap]
@@ -446,7 +448,7 @@ void swap(multimap<Key,T,Compare,Allocator& x,
 template <class Key, class T, class Compare, class Allocator>
 struct constructible_with_allocator_suffix<
   multimap<Key, T, Compare, Allocator> >
-  : true_type { };
+  : false_type { };
 
 #endif
 ///@}

@@ -307,7 +307,7 @@ class reverse_iterator
                     const reverse_iterator<Iterator2>& y)
       { return x.current >= y.base(); }
 
-#ifdef NTL__CXX_TYPEOF
+#ifdef NTL__CXX_DECLTYPE
   template<typename Iterator2>
   friend auto operator-(const reverse_iterator<Iterator>& x, const reverse_iterator<Iterator2>& y) -> decltype(y.current-x.current)
   { return y.base() - x.current; }

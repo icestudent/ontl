@@ -730,7 +730,15 @@
 							>
 						</File>
 						<File
+							RelativePath=".\stlx\bind_rv.hxx"
+							>
+						</File>
+						<File
 							RelativePath=".\stlx\fn_caller.hxx"
+							>
+						</File>
+						<File
+							RelativePath=".\stlx\fn_caller_rv.hxx"
 							>
 						</File>
 						<File

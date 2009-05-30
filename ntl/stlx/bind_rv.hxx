@@ -4,15 +4,10 @@
  *
  ****************************************************************************
  */
-#if !defined(NTL__STLX_BIND)
-#define NTL__STLX_BIND
+#ifndef NTL__STLX_BIND_RV
+#define NTL__STLX_BIND_RV
 
-#include "placeholders.hxx"
-
-#ifdef NTL__CXX_RV
-# include "bind_rv.hxx"
-#else
-#include "fn_caller.hxx"
+#include "fn_caller_rv.hxx"
 
 namespace std
 {
@@ -132,8 +127,8 @@ namespace std
       };
 
     public:
-      bind_t(F f, const BunchArgs& args)
-        :f(f), bunch(args)
+      bind_t(F f, BunchArgs&& args)
+        :f(f), bunch(move(args))
       {}
       typename R<>::type operator()() const
       {
@@ -143,20 +138,20 @@ namespace std
         return func::invoke<typename R::type>(f,bindargs::result(bunch,Args()));
       }
       template<class A1>
-      typename R<A1>::type  operator()(A1 a1) const
+      typename R<A1>::type  operator()(A1&& a1) const
       {
         typedef R<A1> R;
         typedef typename R::Args Args;
         typedef binds::bindargs<BunchArgs, Args> bindargs;
-        return func::invoke<typename R::type>(f,bindargs::result(bunch,Args(a1)));
+        return func::invoke<typename R::type>(f,bindargs::result(bunch,Args(forward<A1>(a1))));
       }
       template<class A1, class A2>
-      typename R<A1,A2>::type  operator()(A1 a1, A2 a2) const
+      typename R<A1,A2>::type  operator()(A1&& a1, A2&& a2) const
       {
         typedef R<A1,A2> R;
         typedef typename R::Args Args;
         typedef binds::bindargs<BunchArgs, Args> bindargs;
-        return func::invoke<typename R::type>(f,bindargs::result(bunch,Args(a1,a2)));
+        return func::invoke<typename R::type>(f,bindargs::result(bunch,Args(forward<A1>(a1),forward<A2>(a2))));
       }
     private:
       F f;
@@ -178,21 +173,21 @@ namespace std
   template<class F>
   typename __::binder<F>::type bind(F f)
   {
-    return typename __::binder<F>::type(f, move(FUNARGS()()));
+    return typename __::binder<F>::type(f, FUNARGS()());
   }
 
   // 1 argument
   template<class F, class A1>
-  typename __::binder<F, A1>::type bind(F f, A1 a1)
+  typename __::binder<F, A1>::type bind(F f, A1&& a1)
   {
-    return typename __::binder<F, A1>::type(f, move(FUNARGS(A1)(a1)));
+    return typename __::binder<F, A1>::type(f, FUNARGS(A1)(forward<A1>(a1)));
   }
 
   // 2 arguments
   template<class F, class A1, class A2>
-  typename __::binder<F, A1,A2>::type bind(F f, A1 a1, A2 a2)
+  typename __::binder<F, A1,A2>::type bind(F f, A1&& a1, A2&& a2)
   {
-    return typename __::binder<F, A1,A2>::type(f, move(FUNARGS(A1,A2)(a1,a2)));
+    return typename __::binder<F, A1,A2>::type(f, FUNARGS(A1,A2)(forward<A1>(a1),forward<A2>(a2)));
   }
 
   // non-strict bind()
@@ -201,27 +196,25 @@ namespace std
   template<typename R, class F>
   typename __::nbinder<R,F>::type bind(F f)
   {
-    return typename __::nbinder<R,F>::type(f, move(FUNARGS()()));
+    return typename __::nbinder<R,F>::type(f, FUNARGS()());
   }
 
   // 1 argument
   template<typename R, class F, class A1>
-  typename __::nbinder<R,F, A1>::type bind(F f, A1 a1)
+  typename __::nbinder<R,F, A1>::type bind(F f, A1&& a1)
   {
-    return typename __::nbinder<R,F, A1>::type(f, move(FUNARGS(A1)(a1)));
+    return typename __::nbinder<R,F, A1>::type(f, FUNARGS(A1)(forward<A1>(a1)));
   }
 
   // 2 arguments
   template<typename R, class F, class A1, class A2>
-  typename __::nbinder<R,F, A1,A2>::type bind(F f, A1 a1, A2 a2)
+  typename __::nbinder<R,F, A1,A2>::type bind(F f, A1&& a1, A2&& a2)
   {
-    return typename __::nbinder<R,F, A1,A2>::type(f, move(FUNARGS(A1,A2)(a1,a2)));
+    return typename __::nbinder<R,F, A1,A2>::type(f, FUNARGS(A1,A2)(forward<A1>(a1),forward<A2>(a2)));
   }
 
   /**@} lib_bind */
   /**@} lib_function_objects */
   /**@} lib_utilities */
 } // std
-#endif // rv
-#endif // NTL__STLX_BIND
-
+#endif // NTL__STLX_BIND_RV

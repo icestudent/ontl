@@ -4,14 +4,12 @@
  *
  ****************************************************************************
  */
-#ifndef NTL__STLX_FNCALLER
-#define NTL__STLX_FNCALLER
+#ifndef NTL__STLX_FNCALLER_RV
+#define NTL__STLX_FNCALLER_RV
 
-#include "result_of.hxx"
-
-#ifdef NTL__CXX_RV
-# include "fn_caller_rv.hxx"
-#else
+#ifndef NTL_RESULT_OF_HXX
+# include "result_of.hxx"
+#endif
 
 namespace std
 {
@@ -149,5 +147,4 @@ namespace std
   } // func
   } // __
 } // std
-#endif // rv
-#endif // NTL__STLX_FNCALLER
+#endif // NTL__STLX_FNCALLER_RV

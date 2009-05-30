@@ -630,7 +630,7 @@ void swap(list<T,Allocator>& x, list<T,Allocator>&& y) { x.swap(y); }
 
 template <class T, class Alloc>
 struct constructible_with_allocator_suffix<list<T, Alloc> >
-  : true_type { };
+  : false_type { };
 
 ///@}
 /**@} lib_sequence */
