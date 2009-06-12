@@ -520,10 +520,28 @@ struct ksemaphore
 
 struct work_queue_item
 {
+  enum type {
+    CriticalWorkQueue,
+    DelayedWorkQueue,
+    HyperCriticalWorkQueue,
+    MaximumWorkQueue
+  };
+
+  typedef void __stdcall routine_t(void*);
+
   list_entry  List;
-  void     (* WorkerRoutine)(void*);
+  routine_t * WorkerRoutine;
   void      * Parameter;
 };
+
+inline void ExInitializeWorkItem(work_queue_item& WorkItem, work_queue_item::routine_t* Routine, void* Context = 0)
+{
+  WorkItem.List.Flink = nullptr;
+  WorkItem.Parameter = Context;
+  WorkItem.WorkerRoutine = Routine;
+}
+
+NTL__EXTERNAPI void __stdcall ExQueueWorkItem(work_queue_item& WorkItem, work_queue_item::type QueueType);
 
 //
 //  executive resource data structures.
@@ -700,13 +718,21 @@ static const size_t pool_small_lists = 32;
       );
 #endif
 
+
+
+    NTL__EXTERNAPI
+      void
+      __fastcall
+      ExReleaseResourceLite(
+      eresource* Resource
+      );
+
     //
     //  void
     //  ExReleaseResource(
     //      IN eresource* Resource
     //      );
     //
-
 #if PRAGMA_DEPRECATED_DDK
 #pragma deprecated(ExReleaseResource)       // Use ExReleaseResourceLite
 #endif
@@ -715,13 +741,6 @@ static const size_t pool_small_lists = 32;
     {
       ExReleaseResourceLite(R);
     }
-
-    NTL__EXTERNAPI
-      void
-      __fastcall
-      ExReleaseResourceLite(
-      eresource* Resource
-      );
 
 #if (NTDDI_VERSION >= NTDDI_LONGHORN || NTDDI_VERSION >= NTDDI_WS03SP1)
     NTL__EXTERNAPI
@@ -791,7 +810,13 @@ static const size_t pool_small_lists = 32;
     using nt::RtlRandom;
     using nt::RtlUniform;
 
+    NTL__EXTERNAPI void __stdcall KeBugCheckEx(uint32_t BugCheckCode, uintptr_t Param1, uintptr_t Param2, uintptr_t Param3, uintptr_t Param4);
 
+    NTL__EXTERNAPI void __stdcall KeBugCheck(uint32_t BugCheckCode);
+
+
+    namespace harderror = nt::harderror;
+    NTL__EXTERNAPI harderror::raise_hard_error_t ExRaiseHardError;
 
 }//namespace km
 }//namespace ntl

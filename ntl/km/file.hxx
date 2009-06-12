@@ -231,7 +231,7 @@ class file_handler : public handle, public device_traits<file_handler>
       return file_info;
     }
 
-    ntstatus rename(const const_unicode_string& new_name, bool replace_if_exists)
+    ntstatus rename(const const_unicode_string& new_name, bool replace_if_exists = true)
     {
       file_information<file_rename_information> file_info(get(), new_name, replace_if_exists);
       return file_info;

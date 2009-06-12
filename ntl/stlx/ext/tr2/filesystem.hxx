@@ -12,7 +12,10 @@
 #include "../../system_error.hxx"
 #include "../../algorithm.hxx"
 #include "../../ctime.hxx"
+
+#ifndef NTL_NO_LOCALES
 #include "../../locale.hxx"
+#endif
 
 #include "../../type_traits.hxx"
 
@@ -183,6 +186,17 @@ namespace std
           operator /=(forward<string_type>(s));
         }
 #endif
+        /// NTL extension
+        basic_path(const ntl::nt::native_string<value_type>& s)
+        {
+          append(s.data(), s.length());
+        }
+
+        basic_path(const ntl::nt::native_string<const value_type>& s)
+        {
+          append(s.data(), s.length());
+        }
+
         template <class InputIterator>
         basic_path(InputIterator first, InputIterator last)
         {
@@ -498,7 +512,7 @@ namespace std
 
       #pragma region basic_path non-member operators
 
-      ///\name basic_path non-member operators (basic_path comparsion)
+      ///\name basic_path non-member operators (basic_path comparison)
       /** Swaps two path objects */
       template<class String, class Traits>
       inline void swap(basic_path<String, Traits> & lhs, basic_path<String, Traits> & rhs) { lhs.swap(rhs); }
@@ -552,8 +566,9 @@ namespace std
       template<class String, class Traits> inline basic_path<String, Traits> operator/(const basic_path<String, Traits>& a, typename basic_path<String, Traits>::string_type::value_type* b) { return a /= basic_path<String, Traits>(b); }
     #endif
       ///\}
-      #pragma endregion 
+      #pragma endregion
 
+#ifndef NTL_NO_IOSTREAMS
       /** Prints basic_path to the %stream */
       template<class Path>
       inline basic_ostream<typename Path::string_type::value_type, typename Path::string_type::traits_type> &
@@ -572,7 +587,7 @@ namespace std
         ph = str;
         return is;
       }
-
+#endif
 
       /**
        *	@brief Class template basic_filesystem_error
@@ -658,11 +673,24 @@ namespace std
         native.resize(abs*4 + path_.size() + unc*2); // '\??\' + (?unc 'UNC\' - '//') + path
 
         if(abs || unc){
+#ifndef NTL_NO_LOCALES
           const ctype<value_type>& ct = use_facet<ctype<value_type> >(locale::classic());
           if(abs)
             ct.widen(ntprefix, ntprefix+4, native.begin());
           if(unc)
             ct.widen(uncprefix, uncprefix+4, native.begin()+4*abs);
+#else
+          static const wchar_t *wntprefix = L"\\??\\", *wuncprefix = L"UNC\\";
+          const void *ntp, *unp;
+          if(sizeof(value_type) == 1)
+            ntp = ntprefix, unp = uncprefix;
+          else
+            ntp = wntprefix, unp = wuncprefix;
+          if(abs)
+            memcpy(native.begin(), ntp, 4*sizeof(value_type));
+          if(unc)
+            memcpy(native.begin()+4, unp, 4*sizeof(value_type));
+#endif
         }
 
         // convert separators

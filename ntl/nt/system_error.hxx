@@ -14,7 +14,7 @@
 #include "peb.hxx"
 
 namespace ntl { namespace nt {
-  static std::string strerror(ntstatus Status);
+  std::string strerror(ntstatus Status);
 }}
 
 namespace std
@@ -136,37 +136,45 @@ namespace ntl { namespace nt {
       uint32_t* ReturnLength
       );
 
-  static std::string strerror(ntstatus Status)
+#ifndef NTL__SUBSYSTEM_KM
+  namespace __
+  {
+    inline const message_resource_entry* find_mre(ntstatus Status)
+    {
+      static const uint32_t error_mid_not_found = 317;
+
+      uint32_t errcode = RtlNtStatusToDosError(Status);
+      if(errcode == error_mid_not_found)
+        return nullptr;
+
+      static const pe::image* kernel = 0;
+      if(!kernel){
+        peb::find_dll find_kernel(&peb::instance());
+        kernel = find_kernel("kernel32.dll");
+      }
+      if(!kernel)
+        return nullptr;
+
+      static const uint32_t rt_messagetable = 11,
+        lang_system_default = 0x800,
+        lang_user_default = 0x400;
+
+      message_resource_entry* mre = nullptr;
+      RtlFindMessage(kernel, rt_messagetable, lang_system_default, errcode, &mre);
+      return mre;
+    }
+  }
+
+  inline std::string strerror(ntstatus Status)
   {
     std::string re("");
-
-    static const uint32_t error_mid_not_found = 317;
-
-    uint32_t errcode = RtlNtStatusToDosError(Status);
-    if(errcode == error_mid_not_found)
-      return re;
-
-    static const pe::image* kernel = 0;
-    if(!kernel){
-      peb::find_dll find_kernel(&peb::instance());
-      kernel = find_kernel("kernel32.dll");
-    }
-    if(!kernel)
-      return re;
-
-    static const uint32_t rt_messagetable = 11,
-      lang_system_default = 0x800,
-      lang_user_default = 0x400;
-
-    message_resource_entry* mre = nullptr;
-    ntstatus st = RtlFindMessage(kernel, rt_messagetable, lang_system_default, errcode, &mre);
-    if(success(st)){
+    const message_resource_entry* mre = __::find_mre(Status);
+    if(mre){
       if(mre->IsUnicode){
         const_unicode_string cus((const wchar_t*)mre->Text, mre->Length);
         re.resize(mre->Length+1);
         ansi_string as(re);
-        st = RtlUnicodeStringToAnsiString(as, cus, false);
-        if(success(st))
+        if(success(RtlUnicodeStringToAnsiString(as, cus, false)))
           re.resize(std::char_traits<char>::length(as.data()));
         else
           re.clear();
@@ -176,6 +184,45 @@ namespace ntl { namespace nt {
     }
     return re;
   }
+
+  inline std::wstring wstrerror(ntstatus Status)
+  {
+    std::wstring re(L"");
+    const message_resource_entry* mre = __::find_mre(Status);
+    if(mre){
+      if(!mre->IsUnicode){
+        const_ansi_string cas((const char*)mre->Text, mre->Length);
+        re.resize(mre->Length+1);
+        unicode_string us(re);
+        if(success(RtlAnsiStringToUnicodeString(us, cas, false)))
+          re.resize(std::char_traits<wchar_t>::length(us.data()));
+        else
+          re.clear();
+      }else{
+        re.assign((const wchar_t*)mre->Text, mre->Length);
+      }
+    }
+    return re;
+  }
+#else
+
+  inline std::string strerror(ntstatus Status)
+  {
+    char buf[32];
+    std::strcpy(buf, "native error code ");
+    _itoa(Status, buf+sizeof("native error code"), 10);
+    return std::string(buf);
+  }
+
+  inline std::wstring wstrerror(ntstatus Status)
+  {
+    wchar_t buf[32];
+    std::wcscpy(buf, L"native error code ");
+    _itow(Status, buf+sizeof("native error code"), 10);
+    return std::wstring(buf);
+  }
+
+#endif
 
 }} 
 

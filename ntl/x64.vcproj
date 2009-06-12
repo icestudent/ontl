@@ -306,6 +306,10 @@
 					Name=".ext"
 					>
 					<File
+						RelativePath=".\stlx\ext\circular_buffer.hxx"
+						>
+					</File>
+					<File
 						RelativePath=".\stlx\ext\fib.hxx"
 						>
 					</File>
@@ -908,6 +912,10 @@
 				</File>
 				<File
 					RelativePath=".\km\string.hxx"
+					>
+				</File>
+				<File
+					RelativePath=".\km\system_error.hxx"
 					>
 				</File>
 				<File

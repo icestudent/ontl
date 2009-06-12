@@ -91,6 +91,9 @@ NTL__EXTERNAPI
 ntstatus __stdcall NtQueryFullAttributesFile(const object_attributes& ObjectAttributes, file_network_open_information& FileInformation);
 
 NTL__EXTERNAPI
+ntstatus __stdcall ZwQueryFullAttributesFile(const object_attributes& ObjectAttributes, file_network_open_information& FileInformation);
+
+NTL__EXTERNAPI
 ntstatus __stdcall NtDeleteFile(const object_attributes& ObjectAttributes);
 
 //////////////////////////////////////////////////////////////////////////

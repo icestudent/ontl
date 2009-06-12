@@ -94,6 +94,12 @@ enum file_information_class
   FileProcessIdsUsingFileInformation,
   FileNormalizedNameInformation,
   FileNetworkPhysicalNameInformation,
+  FileIdGlobalTxDirectoryInformation,
+  FileIsRemoteDeviceInformation,
+  FileAttributeCacheInformation,
+  FileNumaNodeInformation,
+  FileStandardLinkInformation,
+  FileRemoteProtocolInformation,
   FileMaximumInformation
 }; // enum file_information_class
 
@@ -519,6 +525,12 @@ enum fs_information_class {
   FileFsControlInformation,
   FileFsQuotaQueryInformation,
   FileFsQuotaSetInformation,
+
+  FileFsFullSizeInformation = 7,
+  FileFsObjectIdInformation,
+  FileFsDriverPathInformation,
+  FileFsVolumeFlagsInformation,
+
   FileFsMaximumInformation
 };
 
@@ -536,9 +548,7 @@ NTL__EXTERNAPI set_information_file_t NtSetVolumeInformationFile;
 
 template<class InformationClass>
 struct volume_information:
-  public file_information_base <InformationClass,
-  NtQueryVolumeInformationFile,
-  NtSetVolumeInformationFile>
+  public file_information_base <InformationClass, NtQueryVolumeInformationFile, NtSetVolumeInformationFile>
 {
   volume_information(legacy_handle file_handle) __ntl_nothrow
     : file_information_base<InformationClass, NtQueryVolumeInformationFile, NtSetVolumeInformationFile>(file_handle)

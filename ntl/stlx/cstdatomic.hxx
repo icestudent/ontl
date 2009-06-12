@@ -205,7 +205,7 @@ namespace std
        *	@brief Atomically, compares the value pointed to by \c this for equality with that in \p expected, and if \c true, 
        *  replaces the value pointed to by this with \p desired, and if \c false, updates the value in \p expected with the value pointed to by \c this.
        *
-       *  Further, if the comparison is \c true, memory is affected according to the value of \p success, and if the comparsion is \c false, 
+       *  Further, if the comparison is \c true, memory is affected according to the value of \p success, and if the comparison is \c false, 
        *  memory is affected according to the value of \p failure. When only one memory_order argument is supplied, the value of \p success is \p order, 
        *  and the value of \p failure is \p order except that a value of \c memory_order_acq_rel shall be replaced by the value \c memory_order_acquire 
        *  and a value of \c memory_order_release shall be replaced by the value \c memory_order_relaxed. 
@@ -360,7 +360,7 @@ namespace std
       *	@brief Atomically, compares the value pointed to by \c this for equality with that in \p expected, and if \c true, 
       *  replaces the value pointed to by this with \p desired, and if \c false, updates the value in \p expected with the value pointed to by \c this.
       *
-      *  Further, if the comparison is \c true, memory is affected according to the value of \p success, and if the comparsion is \c false, 
+      *  Further, if the comparison is \c true, memory is affected according to the value of \p success, and if the comparison is \c false, 
       *  memory is affected according to the value of \p failure. When only one memory_order argument is supplied, the value of \p success is \p order, 
       *  and the value of \p failure is \p order except that a value of \c memory_order_acq_rel shall be replaced by the value \c memory_order_acquire 
       *  and a value of \c memory_order_release shall be replaced by the value \c memory_order_relaxed. 

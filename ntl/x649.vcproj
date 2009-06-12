@@ -451,6 +451,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\stlx\ext\circular_buffer.hxx"
+						>
+					</File>
+					<File
 						RelativePath=".\stlx\deque.hxx"
 						>
 					</File>

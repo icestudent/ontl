@@ -358,6 +358,51 @@ NTL__EXTERNAPI
 NTL__EXTERNAPI
   uint32_t __stdcall RtlRandom(uint32_t* Seed);
 
+namespace harderror
+{
+  namespace response
+  {
+    enum type {
+      ReturnToCaller,
+      NotHandled,
+      Abort,
+      Cancel,
+      Ignore,
+      No,
+      Ok,
+      Retry,
+      Yes
+    };
+  }
+
+  namespace option
+  {
+    enum type {
+      AbortRetryIgnore,
+      Ok,
+      OkCancel,
+      RetryCancel,
+      YesNo,
+      YesNoCancel,
+      ShutdownSystem
+    };
+  }
+
+  typedef response::type responses;
+  typedef option::type   options;
+
+  typedef ntstatus __stdcall raise_hard_error_t(
+    ntstatus    ErrorStatus,
+    uint32_t    NumberOfParameters,
+    uint32_t    UnicodeStringParameterMask,
+    uintptr_t*  Parameters,
+    options     ValidResponseOptions,
+    responses&  Response
+    );
+
+} // harderror
+
+NTL__EXTERNAPI harderror::raise_hard_error_t NtRaiseHardError;
 
   }//namespace nt
 }//namespace ntl

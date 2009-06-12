@@ -19,6 +19,7 @@ namespace km {
 /**\addtogroup  file_information ********* File Information ***************
  *@{*/
 
+using nt::file_attribute;
 
 using nt::file_information_class;
 
@@ -52,6 +53,7 @@ using nt::file_rename_information;
 using nt::file_disposition_information;
 using nt::file_end_of_file_information;
 using nt::file_network_open_information;
+using nt::file_internal_information;
 
 template<class InformationClass>
 struct file_information
@@ -119,6 +121,81 @@ struct file_information<file_rename_information>:
 ///}
 
 /**@} file_information */
+
+NTL__EXTERNAPI query_information_file_t ZwQueryVolumeInformationFile;
+NTL__EXTERNAPI set_information_file_t ZwSetVolumeInformationFile;
+
+using nt::fs_information_class;
+
+template<class InformationClass>
+struct volume_information:
+  public nt::file_information_base <InformationClass, ZwQueryVolumeInformationFile, ZwSetVolumeInformationFile>
+{
+  volume_information(legacy_handle file_handle) __ntl_nothrow
+    :file_information_base<InformationClass, ZwQueryVolumeInformationFile, ZwSetVolumeInformationFile>(file_handle)
+  {}
+
+  volume_information(legacy_handle file_handle, const InformationClass& info) __ntl_nothrow
+    :file_information_base<InformationClass, NtQueryVolumeInformationFile, NtSetVolumeInformationFile>(file_handle, info)
+  {}
+};
+
+using nt::file_fs_volume_information;
+using nt::file_fs_label_information;
+using nt::file_fs_size_information;
+using nt::file_fs_device_information;
+using nt::file_fs_attribute_information;
+using nt::file_fs_control_information;
+
+//using nt::volume_information<nt::file_fs_volume_information>;
+template<>
+struct volume_information<file_fs_volume_information>
+{
+  typedef file_fs_volume_information info_class;
+
+  explicit volume_information(legacy_handle volume_handle, bool with_label = true)
+  {
+    // length of the label is 34 characters long max
+    for(uint32_t length = sizeof(info_class)+sizeof(wchar_t)*34; ptr.reset(new char[length]), ptr; length*= 2)
+    {
+      status_ = query(volume_handle, ptr.get(), length);
+      if(status_ == status::success){
+        break;
+      }else if(status_ != status::buffer_overflow){
+        ptr.reset();
+        break;
+      }else if(!with_label && status_ == status::buffer_overflow){
+        break;
+      }
+    }
+  }
+
+  const info_class* operator->() const { return data(); }
+  info_class* operator->() { return data(); }
+
+  info_class* data() { return reinterpret_cast<info_class*>(ptr.get()); }
+  const info_class* data() const { return reinterpret_cast<const info_class*>(ptr.get()); }
+  operator const void*() const { return ptr.get(); }
+
+  operator bool() const { return nt::success(status_); }
+  operator ntstatus() const { return status_; }
+
+  static __forceinline
+    ntstatus query(
+    legacy_handle volume_handle,
+    void*     volume_information,
+    uint32_t  volume_information_length
+    )
+  {
+    io_status_block iosb;
+    return NtQueryVolumeInformationFile(volume_handle, &iosb,
+      volume_information, volume_information_length, info_class::info_class_type);
+  }
+private:
+  std::unique_ptr<char[]> ptr;
+  ntstatus status_;
+};
+
 
 }//namespace km
 }//namespace ntl

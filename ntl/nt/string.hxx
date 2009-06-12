@@ -107,10 +107,21 @@ class native_string
 
     ///\name  native_string connversions
 
-    std::basic_string<value_type>
-      get_string() const
+    std::basic_string<value_type> get_string() const
     {
       return std::basic_string<value_type>(begin(), size());
+    }
+
+    template<class CustomAllocator>
+    std::basic_string<value_type, traits_type, CustomAllocator> get_string() const
+    {
+      return std::basic_string<value_type, traits_type, CustomAllocator>(begin(), size());
+    }
+
+    template<template <typename> class CustomAllocator>
+    std::basic_string<value_type, traits_type, CustomAllocator<value_type>> get_string() const
+    {
+      return std::basic_string<value_type, traits_type, CustomAllocator<value_type>>(begin(), size());
     }
 
 #ifndef __ICL

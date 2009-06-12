@@ -14,6 +14,8 @@
 //   in the synopsis of other headers but it is well-formed to include
 //   both <iosfwd> and one or more of the other headers.
 
+typedef int mbstate_t; // fwd
+
 namespace std {
 
 /**\defgroup  lib_input_output ********* 27 Input/output library [input.output]
@@ -27,6 +29,7 @@ template<>            struct char_traits<char>;
 template<>            struct char_traits<wchar_t>;
 
 template<class T>     class allocator;
+class locale;
 
 /// 2 The class template specialization basic_ios<charT,traits> serves as
 ///   a virtual base class for the class templates
@@ -125,8 +128,6 @@ typedef basic_fstream<wchar_t>        wfstream;
 /// 8 Specializations of the class template fpos are used for specifying
 ///   file position information.
 template <class state> class fpos;
-
-typedef int mbstate_t;
 
 ///\name  These types are used for positioning streams specialized on char, char16_t, char32_t and wchar_t respectively. (9)
 typedef fpos<mbstate_t/*char_traits<char>::state_type*/>     streampos;

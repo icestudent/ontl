@@ -527,6 +527,8 @@ CsrSetPriorityClass(
     uint32_t* PriorityClass
     );
 
+  void some_nt_func0();
+  void some_nt_func(ntstatus);
   }
 }
 

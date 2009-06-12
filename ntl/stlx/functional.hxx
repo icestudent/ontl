@@ -151,7 +151,7 @@ struct negate : unary_function<T, T>
 /**@} lib_arithmetic_operations */
 #pragma endregion
 
-#pragma region lib_comparsions
+#pragma region lib_comparisons
 /**\defgroup  lib_comparisons ********** 20.6.07 Comparisons [comparisons]
  *   functors for all of the comparison operators
  *@{*/

@@ -1,9 +1,12 @@
-#include "../nt/basedef.hxx"
+#ifdef NTL__SUBSYSTEM_KM
+# include "../km/basedef.hxx"
+#else
+# include "../nt/basedef.hxx"
+#endif
 #include "../stlx/system_error.hxx"
 #include "../stlx/cstdlib.hxx"
 
 // NT system error support
-#if defined(NTL__SUBSYSTEM_NT) && !defined(NTL__SUBSYSTEM_KM)
 
 # include "../nt/system_error.hxx"
 namespace
@@ -11,8 +14,6 @@ namespace
   static const std::native_error::native_error_category native_category_instance;
 }
 const std::native_error::native_error_category& std::native_error::native_category = native_category_instance;
-
-#endif // subsystem nt
 
 #ifdef NTL__CXX_RV
 #include "../stlx/future.hxx"

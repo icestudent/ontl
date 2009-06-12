@@ -548,7 +548,7 @@ class vector
         #endif
         (last_, end(), first_);
         if(no_dtor::value)
-          end_ = const_cast<pointer>(last);
+          end_ = const_cast<pointer>(last_);
         else while(end_ != last_)
           array_allocator.destroy(--end_);
       }

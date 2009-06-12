@@ -65,7 +65,7 @@ namespace
   vfv_t* onexit(vfv_t* func)
   {
     if(func){
-      uint32_t idx = ntl::atomic::increment(exit_list_count);
+      uint32_t idx = ntl::atomic::exchange_add(exit_list_count,1);
       if(idx < _countof(exit_list))
         return exit_list[idx] = func;
     }
@@ -75,7 +75,7 @@ namespace
   void doexit(int /*code*/, int quick, int /*retcaller*/)
   {
     if(!quick){
-      for(vfv_t** f = exit_list+exit_list_count; f >= exit_list; --f){
+      for(vfv_t** f = exit_list+exit_list_count-1; f >= exit_list; --f){
         __ntl_try {
           assert(*f != 0);
           (*f)();
@@ -85,7 +85,7 @@ namespace
         }
       }
     }else{
-      for(vfv_t** f = quick_exit_list+quick_exit_count; f >= quick_exit_list; --f){
+      for(vfv_t** f = quick_exit_list+quick_exit_count-1; f >= quick_exit_list; --f){
         __ntl_try{
           assert(*f != 0); // we checked it at `at_quick_exit`
           (*f)();
@@ -142,7 +142,7 @@ extern "C" int _cdecl atexit(vfv_t func)
 
 extern "C" int _cdecl at_quick_exit(vfv_t* f)
 {
-  const uint32_t idx = ntl::atomic::increment(quick_exit_count);
+  const uint32_t idx = ntl::atomic::exchange_add(quick_exit_count, 1);
   if(f && idx < _countof(quick_exit_list)){
     // find, if `f` was already registered
     for(vfv_t** p = quick_exit_list; p < quick_exit_list+quick_exit_count; ++p)
