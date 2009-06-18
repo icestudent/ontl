@@ -32,8 +32,12 @@ using std::uint_fast32_t;
 using std::int_fast64_t;
 using std::uint_fast64_t;
 
+#ifndef _INTPTR_T_DEFINED
 using std::intptr_t;
+#endif
+#ifndef _UINTPTR_T_DEFINED
 using std::uintptr_t;
+#endif
 
 using std::intmax_t;
 using std::uintmax_t;
