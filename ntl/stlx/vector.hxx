@@ -540,17 +540,15 @@ class vector
       // 1[000]2
       iterator first_ = &const_cast<value_type&>(*first), last_ = &const_cast<value_type&>(*last);
       if(first_ != last_){
-        last_ =
+        // destroy objects to be erased
+        if ( !no_dtor::value )
+          for ( iterator i = last_; i != first_;  ) array_allocator.destroy(--i);
+
         #ifdef NTL__CXX_RV
-          std::move
+        end_ = std::move(last_, end(), first_);
         #else
-          std::copy
+        end_ = std::copy(last_, end(), first_);
         #endif
-        (last_, end(), first_);
-        if(no_dtor::value)
-          end_ = const_cast<pointer>(last_);
-        else while(end_ != last_)
-          array_allocator.destroy(--end_);
       }
       return first_;
 #endif
