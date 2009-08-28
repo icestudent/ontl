@@ -290,7 +290,7 @@ class key : public handle, public device_traits<key>
       return *this;
     }
 
-    operator const void*() { return get(); }
+    // inherited operator const void*() { return get(); }
 
     bool erase()
     {
@@ -480,11 +480,15 @@ class key : public handle, public device_traits<key>
                         value.size() * sizeof(const_unicode_string::value_type)));
     }
 
+    ///\note There is no need to to specify reg_sz since std::wstring is
+    /// implicitly convertable to const_unicode_string (as const wchar_t[] does).
+    /// Otherwise, there is `ambiguous call to overloaded function' with
+    /// set(L"value_name", L"value");
     bool
       set(
         const const_unicode_string &  value_name,
         const std::wstring &          value,
-        value_type                    type        = reg_sz)
+        value_type                    type        /*= reg_sz*/)
     {
       return nt::success(set(value_name, type, value.begin(),
                               (uint32_t)(value.size() * sizeof(std::wstring::value_type))));

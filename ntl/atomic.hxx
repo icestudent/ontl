@@ -165,6 +165,7 @@ namespace atomic {
     return intrinsic::_InterlockedDecrement64(&val);
   }
 
+  ///\warning These bellow are keywords (see 2.11/2) and incompatible with /Za
   static inline
     bool and(volatile bool & val, bool mask)
   {

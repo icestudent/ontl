@@ -70,7 +70,7 @@ class native_string
 
  friend class native_string;
 
-#if 0
+#if 0 // issue13 fix
     native_string(const native_string<value_type>& str)
     : length_(str.length_),
       maximum_length_(str.maximum_length_),
@@ -124,6 +124,7 @@ class native_string
       return std::basic_string<value_type, traits_type, CustomAllocator<value_type>>(begin(), size());
     }
 
+///\warning this solves issue13
 #ifndef __ICL
     operator
       const native_string<typename std::add_const<charT>::type, traits>&() const

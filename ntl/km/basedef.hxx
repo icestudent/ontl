@@ -380,7 +380,7 @@ ntstatus __stdcall
     const systime_t&  Interval
     );
 
-
+#if 0
 template<times::type TimeResolution>
 static inline
 ntstatus sleep(
@@ -402,15 +402,18 @@ ntstatus sleep(
   const systime_t interval = int64_t(-1) * times::milliseconds * ms;
   return KeDelayExecutionThread(wait_mode, alertable, interval);
 }
+#endif
 
 NTL__EXTERNAPI void __stdcall KeStallExecutionProcessor(uint32_t MicroSeconds);
 
+#if 0
 template<times::type TimeResolution>
 static inline 
   void stall_execution(uint32_t time)
 {
   KeStallExecutionProcessor(TimeResolution * time / times::microseconds);
 }
+#endif
 
 NTL__EXTERNAPI
 kirql_t __fastcall

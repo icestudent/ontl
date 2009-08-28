@@ -105,6 +105,16 @@ namespace km {
 
 class file_handler : public handle, public device_traits<file_handler>
 {
+  void __test_create()
+  {
+    assert(!"do not run");
+    create(L" ");
+    create(const_unicode_string(L" "));// Ok to init object_attributes with a temp string
+    //create(object_attributes(L" "));// may not construct object_attributes with temp string
+    create(object_attributes(const_unicode_string(L" ")));//should not compile
+    create(std::wstring(L" "));
+  }
+  
   ////////////////////////////////////////////////////////////////////////////
   public:
 
@@ -130,7 +140,7 @@ class file_handler : public handle, public device_traits<file_handler>
     __forceinline
     ntstatus
       create(
-        const const_unicode_string& file_name,
+        const std::wstring &        file_name,
         const creation_disposition  cd              = creation_disposition_default,
         const access_mask           desired_access  = access_mask_default,
         const share_mode            share           = share_mode_default,
@@ -142,7 +152,8 @@ class file_handler : public handle, public device_traits<file_handler>
         ) __ntl_nothrow
     {
       reset();
-      const object_attributes oa(file_name);
+      const const_unicode_string uname(file_name);
+      const object_attributes oa(uname);
       return ZwCreateFile(this, desired_access, &oa, &iosb,
                     allocation_size, attr, share, cd, co, ea_buffer, ea_length);
     }

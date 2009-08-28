@@ -70,6 +70,22 @@ struct object_attributes:
 
 private:
 
+  void __test_create()
+  {
+    assert(!"do not run");
+    //shall not compile to dissallow storing the pointer to a temp const_unicode_string 
+    //object_attributes a1(L" ");
+    const_unicode_string cus(L" ");
+    object_attributes a2(cus);
+    //unicode_string us(L" ");   
+    const_unicode_string us(L" ");
+    object_attributes a3(cus);
+    std::wstring ws(L" ");
+    //object_attributes a40(unicode_string(ws));
+    unicode_string cus2(ws);
+    object_attributes a4(cus2);
+  }
+
   //object_attributes(const object_attributes &);
   const object_attributes & operator=(const object_attributes &);
 

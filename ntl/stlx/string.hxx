@@ -1484,7 +1484,7 @@ namespace __
   struct string_hash<basic_string<charT, traits, Allocator> >: unary_function<basic_string<charT, traits, Allocator>, size_t>
   {
     /// string hash calculation
-    inline size_t operator()(const argument_type& str) const __ntl_nothrow
+    inline size_t operator()(const typename unary_function::argument_type& str) const __ntl_nothrow
     {
       return FNVHash()(str.data(), str.length()*sizeof(charT));
     }

@@ -646,10 +646,26 @@ static inline uint32_t current_processor()
 }
 
 /// Common KTHREAD region
-struct kthread32
+struct kthread
 {
   /* 0x00 */  dispatcher_header Header;
   /* 0x10 */  list_entry        MutantListHead;
+
+  static
+  kthread * get_current()
+  {
+#ifndef NTL_SUPPRESS_IMPORT
+    return KeGetCurrentThread();
+#else
+    return *reinterpret_cast<kthread**>(/*__readfsdword(0x124)*/0xFFDFF124);
+#endif
+  }
+};
+
+struct kthread32 : kthread
+{
+//  /* 0x00 */  dispatcher_header Header;
+//  /* 0x10 */  list_entry        MutantListHead;
   /* 0x18 */  void *            InitialStack;
   /* 0x1c */  void *            StackLimit;
   /* 0x20 */  nt::tib *         Teb;
@@ -664,16 +680,6 @@ struct kthread32
   /* 0x33 */  int8_t            Priority;
   /* 0x34 */  kapc_state        ApcState;
   /* 0x4c */  uint32_t          ContextSwitches;
-
-  static
-  kthread * get_current()
-  {
-#ifndef NTL_SUPPRESS_IMPORT
-    return KeGetCurrentThread();
-#else
-    return *reinterpret_cast<kthread**>(/*__readfsdword(0x124)*/0xFFDFF124);
-#endif
-  }
 
 };
 //STATIC_ASSERT(sizeof(kthread) == 0x50);
@@ -1097,19 +1103,24 @@ class system_thread : public handle, public device_traits<system_thread>
 
 
 template <class Clock, class Duration>
-static inline void sleep_until(const std::chrono::time_point<Clock, Duration>& abs_time, bool alertable = false)
+static __forceinline ///\note force inline to compute duration_cast at CT and avoid _allmul call
+void sleep_until(const std::chrono::time_point<Clock, Duration>& abs_time, bool alertable = false)
 {
+  using namespace ntl::nt;//nt::system_duration
   KeDelayExecutionThread(KernelMode, alertable, std::chrono::duration_cast<system_duration>(abs_time.time_since_epoch()).count());
 }
 
 template <class Rep, class Period>
-static inline void sleep_for(const std::chrono::duration<Rep, Period>& rel_time, bool alertable = false)
+static __forceinline
+void sleep_for(const std::chrono::duration<Rep, Period>& rel_time, bool alertable = false)
 {
-  KeDelayExecutionThread(KernelMode, alertable, -1i64*std::chrono::duration_cast<system_duration>(rel_time).count());
+  using namespace ntl::nt;//nt::system_duration
+  KeDelayExecutionThread(KernelMode, alertable, systime_t(0)-std::chrono::duration_cast<system_duration>(rel_time).count());
 }
 
 template <class Rep, class Period>
-static inline void stall_execution(const std::chrono::duration<Rep, Period>& time)
+static __forceinline
+void stall_execution(const std::chrono::duration<Rep, Period>& time)
 {
   KeStallExecutionProcessor(static_cast<uint32_t>(std::chrono::duration_cast<std::chrono::microseconds>(time).count()));
 }

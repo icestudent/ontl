@@ -9,6 +9,7 @@
 
 #include "basedef.hxx"
 #include "../nt/virtualmem.hxx"
+#include "event.hxx" // for kguarded_mutex
 
 namespace ntl {
   namespace km {
@@ -865,7 +866,7 @@ namespace ntl {
       mmmod_writer_listhead* PagingListHead;
       list_entry* CurrentList;
       struct mmpaging_file *PagingFile;
-      file_object* File;
+      struct file_object* File;
       control_area* ControlArea;
       eresource* FileResource;
       mdl Mdl;

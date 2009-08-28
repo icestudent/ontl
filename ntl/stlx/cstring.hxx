@@ -45,8 +45,8 @@ namespace std
 
 
 ///\name Copying functions
-#ifndef _MSC_VER
-namespace __ {
+
+namespace ext {
 __forceinline
 void *
   memcpy(void * const dst, const void * const src, size_t n)
@@ -59,6 +59,7 @@ void *
   return d;
 } }
 
+#ifndef _MSC_VER
 __forceinline
 void *
 NTL__CRTCALL
@@ -66,12 +67,12 @@ NTL__CRTCALL
 {
   assert(dst);
   assert(src);
-  __::memcpy(dst, src, n);
+  ext::memcpy(dst, src, n);
   return dst;
 }
 #endif
 
-namespace __ {
+namespace ext {
 __forceinline
 void *
   memcpybw(void * const dst, const void * const src, size_t n)
@@ -92,11 +93,10 @@ NTL__CRTCALL
   assert(dst);
   assert(src);
   return ( reinterpret_cast<char*>(dst) < reinterpret_cast<const char*>(src) )
-     ? memcpy(dst, src, n) : __::memcpybw(dst, src, n);
+     ? memcpy(dst, src, n) : ext::memcpybw(dst, src, n);
 }
 
-#ifndef _MSC_VER
-namespace __ {
+namespace ext {
   __forceinline
     char *
     strcpy(char * dst, const char * src)
@@ -107,6 +107,7 @@ namespace __ {
     return dst;
   } }
 
+#ifndef _MSC_VER
 __forceinline
 char *
 NTL__CRTCALL
@@ -114,7 +115,7 @@ strcpy(char * const dst, const char * const src)
 {
   assert(dst);
   assert(src);
-  __::strcpy(dst, src);
+  ext::strcpy(dst, src);
   return dst;
 }
 
@@ -133,8 +134,7 @@ char* NTL__CRTCALL strncpy(char* dst, const char* src, size_t n)
 }
 
 ///\name Concatenation functions
-#ifndef _MSC_VER
-namespace __ {
+namespace ext {
 __forceinline
 char *
   strcat(char * dst, const char * src)
@@ -146,6 +146,7 @@ char *
   return dst;
 } }
 
+#ifndef _MSC_VER
 __forceinline
 char *
 NTL__CRTCALL
@@ -153,7 +154,7 @@ NTL__CRTCALL
 {
   assert(dst);
   assert(src);
-  __::strcat(dst, src);
+  ext::strcat(dst, src);
   return dst;
 }
 
@@ -253,8 +254,7 @@ NTL__EXTERNAPI char * NTL__CRTIMP strstr(const char *s1, const char *s2);
 char * NTL__CRTCALL strtok(char * __restrict s1, const char * __restrict s2);
 
 ///\name Miscellaneous functions
-#ifndef _MSC_VER
-namespace __ {
+namespace ext {
 __forceinline
 void *
   memset(void * const s, int c, size_t n)
@@ -266,6 +266,7 @@ void *
   return p;
 } }
 
+#ifndef _MSC_VER
 __forceinline
 void *
 NTL__CRTCALL
@@ -295,6 +296,7 @@ inline char* NTL__CRTCALL strdup(const char* s)
 {
   if(!s)
     return nullptr;
+  ///\warning using delete p; is UB.
   char* const p = new char[strlen(s)];
   return p ? strcpy(p, s) : p;
 }
