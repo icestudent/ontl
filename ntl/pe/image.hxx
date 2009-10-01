@@ -11,6 +11,7 @@
 #include "../stdlib.hxx"
 #include "../basedef.hxx"
 #include "../nt/basedef.hxx"
+#include "../nt/peb.hxx"
 #include "../cstring"
 
 namespace ntl {
@@ -991,6 +992,8 @@ next_entry:;
         }
         return true;
       }
+
+      bool bind_import() { return bind_import(nt::peb::find_dll()); }
 
 
       ///\name  Relocations

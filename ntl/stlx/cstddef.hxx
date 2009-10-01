@@ -59,14 +59,32 @@
 ///\name SAL macroses
 #ifndef __in
 # define __in
+#endif
+#ifndef __inout
 # define __in_opt
+#endif
+#ifndef __inout
 # define __inout
+#endif
+#ifndef __inout_opt
 # define __inout_opt
+#endif
+#ifndef __out
 # define __out
+#endif
+#ifndef __out_opt
 # define __out_opt
+#endif
+#ifndef __optional
 # define __optional
+#endif
+#ifndef __reserved
 # define __reserved
+#endif
+#ifndef __deref_out
 # define __deref_out
+#endif
+#ifndef __deref_out_opt
 # define __deref_out_opt
 #endif
 ///\}

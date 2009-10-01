@@ -10,11 +10,11 @@
 
 #include "basedef.hxx"
 #include "string.hxx"
-#include "../pe/image.hxx"
 #include "teb.hxx"
 
 
 namespace ntl {
+namespace pe { class image; }
 namespace nt {
 
 #pragma warning(push)
@@ -133,6 +133,7 @@ struct ldr_data_table_entry
       if (head)
         for (list_entry * it = head->begin(); it != head->end(); it = it->next)
         {
+          ///\warning this crap works for InLoadOrderLinks only
           const ldr_data_table_entry * const entry =
             reinterpret_cast<ldr_data_table_entry *>(it);
           if(!entry->BaseDllName.size())
@@ -177,6 +178,8 @@ struct peb
 
   struct find_dll
   {
+    find_dll() : peb(&peb::instance()) {} ///\warning should not compile for KM
+
     find_dll(nt::peb * peb) : peb(peb) {}
 
     nt::peb * peb;
