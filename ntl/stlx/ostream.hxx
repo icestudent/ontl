@@ -118,7 +118,7 @@ class basic_ostream
         ~sentry()
         {
           //if ( (os.flags() & ios_base::unitbuf) && !uncaught_exception() )
-          if ( (os.flags() & ios_base::unitbuf) && !os.rdstate() & ios_base::badbit )
+          if ( (os.flags() & ios_base::unitbuf) && !(os.rdstate() & ios_base::badbit) )
             os.flush();
         }
 
@@ -128,7 +128,6 @@ class basic_ostream
 
         basic_ostream<charT, traits>& os;
         bool ok;
-
 
         sentry(const sentry&); // not defined
         sentry& operator=(const sentry&); // not defined
