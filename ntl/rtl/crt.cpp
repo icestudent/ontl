@@ -98,13 +98,6 @@ namespace
   }
 } // namespace
 
-extern "C" void _cdecl __check_iostream_objects();
-extern "C" inline void _cdecl __check_iostreams_stub(){}
-#ifdef _M_X64
-# pragma comment(linker, "/alternatename:__check_iostream_objects=__check_iostreams_stub")
-#else
-# pragma comment(linker, "/alternatename:___check_iostream_objects=___check_iostreams_stub")
-#endif
 
 namespace ntl
 {
@@ -122,9 +115,6 @@ namespace ntl
       initterm(__xp_a, __xp_z);
       initterm(__xt_a, __xt_z);
 
-      // init io streams
-      __check_iostreams_stub();
-      __check_iostream_objects();
     }else{
       // free static objects
       doexit(0,false,true);

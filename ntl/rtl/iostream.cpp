@@ -10,25 +10,6 @@
 
 static void _cdecl __init_iostream_objects(bool init);
 
-namespace std
-{
-  ostream  cout(nullptr);
-  ostream  cerr(nullptr);
-  ostream  clog(nullptr);
-  wostream wcout(nullptr);
-  wostream wcerr(nullptr);
-  wostream wclog(nullptr);
-
-  ios_base::Init::Init()
-  {
-    __init_iostream_objects(true);
-  }
-  ios_base::Init::~Init()
-  {
-    __init_iostream_objects(false);
-  }
-} // std
-
 #ifndef NTL__SUBSYSTEM_KM
 
 namespace
@@ -100,12 +81,6 @@ static void destroy_iostream_objects()
 
 static int32_t _iostreams_init_count = 0;
 
-extern "C" void _cdecl __check_iostream_objects()
-{
-  if(_iostreams_init_count) // if iostreams were initialized early
-    init_iostream_objects();
-}
-
 void _cdecl __init_iostream_objects(bool init)
 {
   if(init){
@@ -118,12 +93,33 @@ void _cdecl __init_iostream_objects(bool init)
 }
 #else // km
 
-extern "C" void _cdecl __check_iostream_objects()
-{
-}
-
 void _cdecl __init_iostream_objects(bool)
 {
 }
 
-#endif
+#endif//km
+
+namespace std
+{
+  ostream  cout(nullptr);
+  ostream  cerr(nullptr);
+  ostream  clog(nullptr);
+  wostream wcout(nullptr);
+  wostream wcerr(nullptr);
+  wostream wclog(nullptr);
+
+  ios_base::Init::Init()
+  {
+    __init_iostream_objects(true);
+  }
+  ios_base::Init::~Init()
+  {
+    __init_iostream_objects(false);
+  }
+} // std
+
+namespace
+{
+  std::ios_base::Init __init_oistream_objects;
+}
+

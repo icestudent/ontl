@@ -28,12 +28,6 @@ extern wostream wcout;
 extern wostream wcerr;
 extern wostream wclog;
 
-namespace
-{
-  std::ostream::Init __init_ostream;
-  std::wostream::Init __init_wostream;
-}
-
 ///@}
 /**@} lib_input_output */
 
