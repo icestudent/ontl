@@ -702,6 +702,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\stlx\typeindex.hxx"
+						>
+					</File>
+					<File
 						RelativePath=".\stlx\typeinfo.hxx"
 						>
 					</File>

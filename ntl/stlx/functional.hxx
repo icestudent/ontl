@@ -666,24 +666,6 @@ NTL_HASH_IMPL(char32_t);
 #endif
 #undef NTL_HASH_IMPL
 
-/**
- *	@brief 18.7.2.3 Template specialization hash&lt;type_index&gt; [type.index.templ] (N2857)
- *  @ingroup lib_support_rtti
- **/
-template<>
-struct hash<type_index>:
-  unary_function<type_index, size_t>
-{
-  typedef size_t result_type;
-  typedef type_index argument_type;
-
-  size_t operator()(const type_index& index) const
-  {
-    return index.hash_code();
-  }
-};
-
-
 namespace __
 {
   /**

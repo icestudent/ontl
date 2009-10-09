@@ -20,8 +20,8 @@ namespace std
   namespace chrono
   {
     /**\addtogroup  lib_utilities *** 20 General utilities library [utilities]
-    *@{
-    **/
+     *@{
+     **/
     /**\defgroup  lib_chrono ***** 20.8 Time utilities [time]
      *
      *   This subclause describes the chrono library that provides generally useful time utilities.

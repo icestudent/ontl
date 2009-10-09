@@ -131,40 +131,11 @@ namespace std
 {
 /**\addtogroup  lib_language_support *** 18 Language support library [language.support]
  * @{ */
-/**\addtogroup  lib_support_rtti ******* 18.6 Type identification [support.rtti]
+/**\addtogroup  lib_support_rtti ******* 18.7 Type identification [support.rtti]
  * @{ */
 
-/// 18.7.1 Class type_info [type.info] (N2857)
+/// 18.7.1 Class type_info [type.info] (N2960)
 using ::type_info;
-
-/**
- *	@brief 18.7.2 Class type_index [type.index] (N2857)
- *  @details The class type_index provides a simple wrapper for type_info which can be used as an index type in
- *  associative containers and in unordered associative containers.
- **/
-class type_index
-{
-public:
-  /** Constructs type_index object which holds the type_info object */
-  type_index(const type_info& rhs)
-    :target(&rhs)
-  {}
-  ///\name Comparsion operators
-  bool operator==(const type_index& rhs) const  { return *target == *rhs.target; }
-  bool operator!=(const type_index& rhs) const  { return *target != *rhs.target; }
-  bool operator< (const type_index& rhs) const  { return target->before(*rhs.target); }
-  bool operator<= (const type_index& rhs)const  { return !rhs.target->before(*target); }
-  bool operator> (const type_index& rhs) const  { return rhs.target->before(*rhs.target); }
-  bool operator>= (const type_index& rhs)const  { return !target->before(*rhs.target); }
-  ///\}
-
-  /** Returns the hash value of the stored type_info object */
-  size_t hash_code() const __ntl_nothrow { return target->hash_code(); }
-  /** Returns the type name of the stored type_info object */
-  const char* name() const __ntl_nothrow { return target->name(); }
-private:
-  const type_info* target;
-};
 
 /// 18.7.3 Class bad_cast [bad.cast] (N2857)
 class bad_cast:

@@ -8,6 +8,7 @@
 #define NTL__STLX_REFWRAP
 
 #include "fn_caller.hxx"
+#include "functional.hxx"
 
 namespace std
 {
