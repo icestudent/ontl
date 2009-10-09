@@ -9,7 +9,7 @@
 
 #include "result_of.hxx"
 
-#ifdef NTL__CXX_RV
+#ifdef NTL__CXX_RV__WORKS // doesn't works yet
 # include "fn_caller_rv.hxx"
 #else
 

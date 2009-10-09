@@ -368,20 +368,23 @@
 // syntax:
 // explicit delete/default function definition
 #define NTL__CXX_EF
-// explicit conversion operators
-//#define NTL__CXX_EXPLICITOP
 // extern templates
 #define NTL__CXX_EXTPL
 // initializer lists
 #define NTL__CXX_IL
-// lambda
-//#define NTL__CXX_LAMBDA
 // rvalues
 #define NTL__CXX_RV
 // template typedef
 //#define NTL__CXX_TT
 // variadic templates (implies rvalue references support)
 #define NTL__CXX_VT
+
+#if((__GNUC__*10+__GNUC_MINOR__) >= 45)
+  // explicit conversion operators
+# define NTL__CXX_EXPLICITOP	// 4.5
+  // lambda
+# define NTL__CXX_LAMBDA		// 4.5
+#endif // gcc 4.5+
 
 #endif // _MSC_VER
 

@@ -4,12 +4,12 @@
  *
  ****************************************************************************
  */
-#if !defined(NTL__STLX_BIND)
+#ifndef NTL__STLX_BIND
 #define NTL__STLX_BIND
 
 #include "placeholders.hxx"
 
-#ifdef NTL__CXX_RV
+#ifdef NTL__CXX_RV__WORKS // doesn't works yet
 # include "bind_rv.hxx"
 #else
 #include "fn_caller.hxx"
@@ -224,4 +224,3 @@ namespace std
 } // std
 #endif // rv
 #endif // NTL__STLX_BIND
-

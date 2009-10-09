@@ -204,11 +204,11 @@ class file_handler : public handle, public device_traits<file_handler>
         legacy_handle     completion_event  = legacy_handle(),
         io_apc_routine *  apc_routine       = 0,
         const void *      apc_context       = 0,
-        const uint32_t *  key               = 0
-        ) __ntl_nothrow
+        const uint32_t *  blocking_key      = 0
+        ) const __ntl_nothrow
     {
       return ZwReadFile(get(), completion_event, apc_routine, apc_context,
-                        &iosb, out_buf, out_size, offset, key);
+                          &iosb, out_buf, out_size, offset, blocking_key);
     }
 
     ntstatus
@@ -219,16 +219,14 @@ class file_handler : public handle, public device_traits<file_handler>
         legacy_handle     completion_event  = legacy_handle(),
         io_apc_routine *  apc_routine       = 0,
         const void *      apc_context       = 0,
-        const uint32_t *  key               = 0
+        const uint32_t *  blocking_key      = 0
         ) __ntl_nothrow
     {
       return ZwWriteFile(get(), completion_event, apc_routine, apc_context,
-                          &iosb, in_buf, in_size, offset, key);
+                          &iosb, in_buf, in_size, offset, blocking_key);
     }
 
-
-    int64_t
-      size() const
+    size_type size() const
     {
       file_information<file_standard_information> file_info(get());
       return file_info ? file_info.data()->size() : 0;
@@ -242,9 +240,42 @@ class file_handler : public handle, public device_traits<file_handler>
       return file_info;
     }
 
+    size_type tell() const
+    {
+      file_information<file_position_information> file_info(get());
+      return file_info ? file_info.data()->CurrentByteOffset : 0;
+    }
+
+    enum Origin { file_begin, file_current, file_end };
+    ntstatus seek(const size_type& offset, Origin origin)
+    {
+      file_position_information fi = {offset};
+      if(origin != file_begin){
+        if(origin == file_current){
+          file_information<file_position_information> file_info(get());
+          if(!file_info)
+            return file_info;
+          fi.CurrentByteOffset += file_info.data()->CurrentByteOffset;
+        }else if(origin == file_end){
+          file_information<file_standard_information> file_info(get());
+          if(!file_info)
+            return file_info;
+          fi.CurrentByteOffset += file_info.data()->EndOfFile;
+        }
+      }
+      file_information<file_position_information> file_info(get(), fi);
+      return file_info;
+    }
+
     ntstatus rename(const const_unicode_string& new_name, bool replace_if_exists = true)
     {
       file_information<file_rename_information> file_info(get(), new_name, replace_if_exists);
+      return file_info;
+    }
+
+    ntstatus link(const const_unicode_string& name, bool replace_if_exists = false)
+    {
+      file_information<file_link_information> file_info(get(), name, replace_if_exists);
       return file_info;
     }
 
