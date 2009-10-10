@@ -68,21 +68,20 @@ namespace std
       }
     };
 
-    extern const native_error_category& native_category;
-    
-    inline const native_error_category& get_native_category()
+    inline const native_error_category& native_category()
     {
-      return native_category;
+      static const native_error_category native_category_;
+      return native_category_;
     }
 
     inline error_code make_error_code(native_error::ntstatus st)
     {
-      return error_code(static_cast<int>(st), native_error::native_category);
+      return error_code(static_cast<int>(st), native_error::native_category());
     }
 
     inline error_condition make_error_condition(native_error::ntstatus st)
     {
-      return error_condition(static_cast<int>(st), native_error::native_category);
+      return error_condition(static_cast<int>(st), native_error::native_category());
     }
   }
 

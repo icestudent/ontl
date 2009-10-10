@@ -125,17 +125,17 @@ namespace std
     }
   };
 
-  /** future_category points to a statically initialized object of a type derived from class error_category. \hideinitializer */
-  extern const error_category& future_category;
+  /** future_category points to a statically initialized object of a type derived from class error_category. */
+  const error_category& future_category();
 
   inline constexpr error_code make_error_code(future_errc e)
   {
-    return error_code(static_cast<int>(e), future_category);
+    return error_code(static_cast<int>(e), future_category());
   }
 
   inline constexpr error_condition make_error_condition(future_errc e)
   {
-    return error_condition(static_cast<int>(e), future_category);
+    return error_condition(static_cast<int>(e), future_category());
   }
 
   ///\name 30.5.7 Allocator templates [futures.allocators]
@@ -173,7 +173,7 @@ namespace std
 
       virtual string message(int ev) const
       {
-        static const char* strings[] = 
+        static const char* const strings[] = 
         {
           "broken_promise",
           "future_already_retrieved",
@@ -184,8 +184,16 @@ namespace std
         return ev >= future_errc::broken_promise && ev < future_errc::__maximum_errc ? strings[ev] : "unknown error code";
       }
     };
+  }
 
+  inline const error_category& future_category()
+  {
+    static const __::future_error_categrory cat;
+    return cat;
+  }
 
+  namespace __
+  {
     template<typename R>
     struct future_result
     {

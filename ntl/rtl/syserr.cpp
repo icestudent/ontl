@@ -9,11 +9,6 @@
 // NT system error support
 
 # include "../nt/system_error.hxx"
-namespace
-{
-  static const std::native_error::native_error_category native_category_instance;
-}
-const std::native_error::native_error_category& std::native_error::native_category = native_category_instance;
 
 #ifdef NTL__CXX_RV
 #include "../stlx/future.hxx"
@@ -21,24 +16,11 @@ const std::native_error::native_error_category& std::native_error::native_catego
 
 namespace
 {
-  static const std::__::generic_error_category generic_category_instance;
-  static const std::__::system_error_category system_category_instance;
   static const std::__::iostream_error_category iostream_category_instance;
-#ifdef NTL__CXX_RV
-  static const std::__::future_error_category future_category_instance;
-#endif
 }
 
 namespace std
 {
-  extern const error_category& generic_category = generic_category_instance;
-  extern const error_category& system_category = system_category_instance;
-  extern const error_category& iostream_category = iostream_category_instance;
-#ifdef NTL__CXX_RV
-  extern const error_category& future_category = future_category_instance;
-#endif
-
-
   // TODO: implement generic error value mapping to the current subsystem error values
   string __::generic_error_category::message(int ev) const
   {
@@ -68,6 +50,6 @@ namespace std
   // TODO: detect posix errno
   error_condition __::system_error_category::default_error_condition(int ev) const __ntl_nothrow
   {
-    return error_condition(ev, system_category);
+    return error_condition(ev, system_category());
   }
 }

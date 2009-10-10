@@ -1,6 +1,6 @@
 /**\file*********************************************************************
  *                                                                     \brief
- *  19.4 System error support [syserr]
+ *  19.4 System error support [syserr] (N2960)
  *
  ****************************************************************************
  */
@@ -32,10 +32,9 @@ namespace std
   class error_condition;
   class system_error;
 
-  /** \hideinitializer */
-  extern const error_category& system_category;
-  /** \hideinitializer */
-  extern const error_category& generic_category;
+  const error_category& generic_category();
+  const error_category& system_category();
+
 
   template<class T>
   struct is_error_code_enum: public false_type {};
@@ -106,7 +105,7 @@ namespace std
   public:
     // 19.4.2.2 constructors:
     error_code() __ntl_nothrow
-      :v(0), c(&system_category)
+      :v(0), c(&system_category())
     {}
     error_code(int val, const error_category& cat) __ntl_nothrow
       :v(val), c(&cat)
@@ -132,7 +131,7 @@ namespace std
 
     void clear()
     {
-      v = 0, c = &system_category;
+      v = 0, c = &system_category();
     }
 
     // 19.4.2.4 observers:
@@ -170,7 +169,7 @@ private:
   public:
     // 19.4.3.2 constructors:
     error_condition() __ntl_nothrow
-      :v(0), c(&generic_category)
+      :v(0), c(&generic_category())
     {}
     
     error_condition(int val, const error_category& cat) __ntl_nothrow
@@ -197,7 +196,7 @@ private:
 
     void clear() __ntl_nothrow
     {
-      v = 0, c = &generic_category;
+      v = 0, c = &generic_category();
     }
 
     // 19.4.3.4 observers:
@@ -440,17 +439,25 @@ private:
   //////////////////////////////////////////////////////////////////////////
   /// 19.4.1.5 Error category objects [syserr.errcat.objects]
   /** Returns a reference to an object of a type derived from class error_category. */
-  inline const error_category& get_generic_category()
+  inline const error_category& generic_category()
   {
-    return generic_category;
+    static const __::generic_error_category instance;
+    return instance;
   }
-  //static const error_category& generic_category = get_generic_category();
 
-  inline const error_category& get_system_category()
+  /** Returns a reference to an object of a type derived from class error_category. */
+  inline const error_category& system_category()
   {
-    return system_category;
+    static const __::system_error_category instance;
+    return instance;
   }
-  //static const error_category& system_category = get_system_category();
+
+  /** Returns a reference to an object of a type derived from class error_category. */
+  inline const error_category& iostream_category()
+  {
+    static const __::iostream_error_category instance;
+    return instance;
+  }
 
   //////////////////////////////////////////////////////////////////////////
   /// N2838 (http://open-std.org/jtc1/sc22/wg21/docs/papers/2009/n2838.html)

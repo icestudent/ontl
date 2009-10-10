@@ -46,9 +46,6 @@ struct is_error_code_enum<io_errc::type>: true_type{};
 
 #endif
 
-/** \hideinitializer */
-extern const error_category& iostream_category;
-
 inline error_code make_error_code(io_errc e)
 {
   return error_code(static_cast<int>(e), iostream_category);
