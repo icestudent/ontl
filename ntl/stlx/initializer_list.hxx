@@ -29,6 +29,7 @@ namespace std
     typedef       E   value_type;
     typedef const E&  reference;
     typedef const E&  const_reference;
+
     typedef const E*  iterator;
     typedef const E*  const_iterator;
 
@@ -43,6 +44,11 @@ namespace std
     initializer_list();
 #endif
   };
+
+  ///\name 18.9.3 Initializer list range access [support.initlist.range]
+  template<class E> inline const E* begin(initializer_list<E> il) { return il.begin(); }
+  template<class E> inline const E* end  (initializer_list<E> il) { return il.end();   }
+  ///\}
 
   /** @} lib_support_initlist */
   /** @} lib_language_support */

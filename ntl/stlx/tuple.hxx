@@ -1071,6 +1071,14 @@ namespace std
   }
   ///\}
 
+  ///\name 20.5.2.10 tuple range access [tuple.range]
+  /** @note Is only two-types tuple can be here? */
+  template <class InputIterator>
+  inline InputIterator begin(const std::tuple<InputIterator, InputIterator>& t) { return get<0>(t); }
+  template <class InputIterator>
+  inline InputIterator end(const std::tuple<InputIterator, InputIterator>& t)   { return get<1>(t); }
+  ///\}
+
  /**@} lib_tuple */
  /**@} lib_utilities */
 

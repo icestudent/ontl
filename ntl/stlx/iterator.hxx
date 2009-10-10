@@ -751,6 +751,22 @@ class ostreambuf_iterator
 };
 /**@}*/
 
+///\name 24.6.5 range access [iterator.range]
+// NOTE: available when any of the containers header are included.
+
+#ifdef NTL__CXX_TYPEOF
+  template <class C> inline auto begin(C& c) -> decltype(c.begin());
+  template <class C> inline auto begin(const C& c) -> decltype(c.begin());
+  template <class C> inline auto end(C& c) -> decltype(c.end());
+  template <class C> inline auto end(const C& c) -> decltype(c.end());
+#else
+  template <class C> inline typename C::iterator        begin(C& c)       { return c.begin(); }
+  template <class C> inline typename C::const_iterator  begin(const C& c) { return c.begin(); }
+  template <class C> inline typename C::iterator        end(C& c)         { return c.end();   }
+  template <class C> inline typename C::const_iterator  end(const C& c)   { return c.end();   }
+#endif
+///\}
+
 /**@} lib_iterators */
 
 }//namespace std

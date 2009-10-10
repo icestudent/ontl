@@ -319,6 +319,13 @@ inline pair<T1, T2> make_pair(T1 x, T2 y)
 
 #endif // RV
 
+///\name 20.3.5 pair range access [pair.range]
+template <class InputIterator>
+inline InputIterator begin(const std::pair<InputIterator, InputIterator>& p) { return p.first; }
+template <class InputIterator>
+inline InputIterator end(const std::pair<InputIterator, InputIterator>& p)   { return p.second;}
+///\}
+
 #pragma endregion
 
 ///\name 20.2.x.1 class noncopyable [utility.noncopyable] 
