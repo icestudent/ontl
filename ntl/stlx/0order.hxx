@@ -7,15 +7,15 @@
 
 /**\defgroup lib_language_support 18 Language support library [language.support]
 @{
-\defgroup lib_support_types     18.1 Types [support.types]
-\defgroup lib_support_limits    18.2 Implementation properties [support.limits]
-\defgroup lib_cstdint           18.3 Integer types [cstdint]
-\defgroup lib_support_start_term 18.4 Start and termination [support.start.term]
-\defgroup lib_support_dynamic   18.5 Dynamic memory management [support.dynamic]
-\defgroup lib_support_rtti      18.6 Type identification [support.rtti]
-\defgroup lib_support_exception 18.7 Exception handling [support.exception]
-\defgroup lib_support_initlist  18.8 Initializer lists [support.initlist]
-\defgroup lib_support_runtime   18.9 Other runtime support [support.runtime]
+\defgroup lib_support_types       18.2 Types [support.types]
+\defgroup lib_support_limits      18.3 Implementation properties [support.limits]
+\defgroup lib_cstdint             18.4 Integer types [cstdint]
+\defgroup lib_support_start_term  18.5 Start and termination [support.start.term]
+\defgroup lib_support_dynamic     18.6 Dynamic memory management [support.dynamic]
+\defgroup lib_support_rtti        18.7 Type identification [support.rtti]
+\defgroup lib_support_exception   18.8 Exception handling [support.exception]
+\defgroup lib_support_initlist    18.9 Initializer lists [support.initlist]
+\defgroup lib_support_runtime     18.10 Other runtime support [support.runtime]
 @} */
 
 

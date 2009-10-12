@@ -109,6 +109,13 @@ void __cdecl
 __forceinline
 void* __cdecl operator new[](std::size_t size) throw(std::bad_alloc)
 {
+  // NOTE: 5.3.4/7 (N2960)
+/***
+  If the value of that expression is such that the size of the allocated object
+  would exceed the implementation-defined limit, no storage is obtained 
+  and the new-expression terminates by throwing an exception of a type 
+  that would match a handler (15.3) of type std::bad_array_new_length (18.6.2.2).
+ ***/
   return operator new(size);
 }
 

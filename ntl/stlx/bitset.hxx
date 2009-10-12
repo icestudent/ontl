@@ -1,6 +1,6 @@
 /**\file*********************************************************************
  *                                                                     \brief
- *  Class template bitset [23.3.5 template.bitset]
+ *  Class template bitset [20.3.7 template.bitset]
  *
  ****************************************************************************
  */
@@ -16,13 +16,13 @@
 
 namespace std {
 
-  /**\addtogroup  lib_containers ********* 23 Containers library [containers]
+  /**\addtogroup  lib_utilities *** 20 General utilities library [utilities]
   *@{*/
 
-  /**\addtogroup  lib_associative *********** 23.3 Associative containers [associative]
+  /**\addtogroup  lib_utility ***** 20.3 Utility components [utility]
   *@{*/
 
-  /// Class template bitset [23.3.5 template.bitset]
+  /// Class template bitset [20.3.7 template.bitset]
   template<size_t N>
   class bitset
   {
@@ -72,7 +72,7 @@ namespace std {
       const size_t pos_;
     };
 
-    /// @name constructors [23.3.5.1]
+    /// @name constructors [20.3.7.1]
     constexpr bitset()
     {
       reset();
@@ -96,43 +96,44 @@ namespace std {
       const basic_string<charT,traits,Allocator>& str,
       typename basic_string<charT,traits,Allocator>::size_type pos = 0,
       typename basic_string<charT,traits,Allocator>::size_type n =
-      basic_string<charT,traits,Allocator>::npos
+      basic_string<charT,traits,Allocator>::npos,
+      charT zero = charT('0'), charT one = charT('1')
       ) __ntl_throws(out_of_range, invalid_argument)
     {
       typedef basic_string<charT,traits,Allocator> string_type;
 
-      // 23.3.5.1.4
+      // 20.3.7.1/4
       if(pos > str.size())
         __ntl_throw(out_of_range("pos > str.size()"));
 
-      // 23.3.5.1.5
+      // 20.3.7.1/5
       const unsigned rlen = static_cast<unsigned>(min(n, str.size()-pos));
 
-      // 23.3.5.1.7
+      // 20.3.7.1/7
       if(rlen < elements_count_*element_size_)
         reset();
 
       const unsigned count = min(rlen, static_cast<unsigned>(N));
       for(unsigned i = 0, rpos = static_cast<unsigned>(pos) + count - 1; i < count; ++i, --rpos){
         const typename traits::char_type c = str[rpos];
-        // 23.3.5.1.5.2
-        if(!(c == '0' || c == '1'))
+        // 20.3.7.1/5.2
+        if(!(c == zero || c == one))
           __ntl_throw(invalid_argument("str"));
 
         storage_type xval = storage_[i/element_size_];
         const unsigned mod = i & element_mod_;
         xval &= ~(native_one_ << mod);
       #ifndef _M_X64
-        xval |= ((c == '1') << mod);
+        xval |= ((c == one) << mod);
       #else
-        if(c == '1')
+        if(c == one)
           xval |= 1ui64 << mod;
       #endif
         storage_[i/element_size_] = xval;
       }
     }
 
-    /// @name bitset operations [23.3.5.2]
+    /// @name bitset operations [20.3.7.2]
     bitset<N>& operator&=(const bitset<N>& rhs)
     {
       for(unsigned i = 0; i < elements_count_; ++i)
@@ -281,23 +282,23 @@ namespace std {
     }
 
     template <class charT, class traits, class Allocator>
-    basic_string<charT, traits, Allocator> to_string() const
+    basic_string<charT, traits, Allocator> to_string(charT zero = charT('0'), charT one = charT('1')) const
     {
-      return to_stringT<charT, traits, Allocator>();
+      return to_stringT<charT, traits, Allocator>(zero, one);
     }
     template <class charT, class traits>
-    basic_string<charT, traits, allocator<charT> > to_string() const
+    basic_string<charT, traits, allocator<charT> > to_string(charT zero = charT('0'), charT one = charT('1')) const
     {
-      return to_stringT<charT, traits, allocator<charT> >();
+      return to_stringT<charT, traits, allocator<charT> >(zero, one);
     }
     template <class charT>
-    basic_string<charT, char_traits<charT>, allocator<charT> > to_string() const
+    basic_string<charT, char_traits<charT>, allocator<charT> > to_string(charT zero = charT('0'), charT one = charT('1')) const
     {
-      return to_stringT<charT, char_traits<charT>, allocator<charT> >();
+      return to_stringT<charT, char_traits<charT>, allocator<charT> >(zero, one);
     }
     basic_string<char, char_traits<char>, allocator<char> > to_string() const
     {
-      return to_stringT<char, char_traits<char>, allocator<char> >();
+      return to_stringT<char, char_traits<char>, allocator<char> >('0', '1');
     }
 
     size_t count() const
@@ -375,7 +376,7 @@ namespace std {
     }
 
     template <class charT, class traits, class Allocator>
-    basic_string<charT, traits, Allocator> to_stringT() const
+    basic_string<charT, traits, Allocator> to_stringT(charT zero, charT one) const
     {
       basic_string<charT, traits, Allocator> str;
       str.resize(N);
@@ -384,7 +385,7 @@ namespace std {
         const storage_type xval = storage_[word];
         const size_t count = min((size_t)rpos+1, celement_size_);
         for(unsigned bit = 0; bit < count; ++bit){
-          str[rpos-bit] = static_cast<charT>('0' + ((xval & (native_one_ << bit)) != 0));
+          str[rpos-bit] = static_cast<charT>(((xval & (native_one_ << bit)) != 0) ? one : zero);
         }
       }
       return str;
@@ -473,7 +474,7 @@ namespace std {
   };
 
 
-  // 23.3.5.3 bitset operators:
+  // 20.3.7.3 bitset operators:
   template <size_t N>
   bitset<N> operator&(const bitset<N>& lhs, const bitset<N>& rhs)
   {
@@ -516,9 +517,7 @@ namespace std {
   }
 
   ///@}
-  /**@} lib_associative */
-  /**@} lib_containers */
-
+  /**@} lib_utility */
+  /**@} lib_utilities */
 } // namespace std
-
 #endif // NTL__STLX_BITSET

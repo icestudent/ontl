@@ -48,12 +48,12 @@ struct is_error_code_enum<io_errc::type>: true_type{};
 
 inline error_code make_error_code(io_errc e)
 {
-  return error_code(static_cast<int>(e), iostream_category);
+  return error_code(static_cast<int>(e), iostream_category());
 }
 
 inline error_condition make_error_condition(io_errc e)
 {
-  return error_condition(static_cast<int>(e), iostream_category);
+  return error_condition(static_cast<int>(e), iostream_category());
 }
 ///\}
 
