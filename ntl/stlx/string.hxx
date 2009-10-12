@@ -21,7 +21,7 @@
 
 namespace std {
 
-typedef ptrdiff_t streamoff;
+typedef int64_t streamoff;
 
 /**\defgroup  lib_strings ************* 21 Strings library [strings]
  *@{*/

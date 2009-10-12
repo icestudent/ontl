@@ -45,14 +45,18 @@ class basic_istream : virtual public basic_ios<charT, traits>
       basic_ios::init(sb);
     }
 
-    //basic_istream(basic_istream&& rhs);
+#ifdef NTL__CXX_RV
+    basic_istream(basic_istream&& rhs);
+#endif
 
     virtual ~basic_istream() {/**/}
 
     // 27.6.1.1.2 Class basic_istream assign and swap [istream.assign]
 
-    //basic_istream& operator=(basic_istream&& rhs);
-    //void swap(basic_istream&& rhs);
+#ifdef NTL__CXX_RV
+    basic_istream& operator=(basic_istream&& rhs);
+    void swap(basic_istream& rhs);
+#endif
 
     // 27.6.1.1.3 Class basic_istream::sentry [istream::sentry]
     class sentry
@@ -352,7 +356,7 @@ class basic_iostream
     basic_iostream& operator=(basic_iostream&& rhs);
 
     /// 2 Effects: Calls basic_istream<charT, traits>::swap(rhs).
-    void swap(basic_iostream&& rhs);
+    void swap(basic_iostream& rhs);
 #endif
     ///\}
 };
@@ -361,7 +365,7 @@ class basic_iostream
 template <class charT, class traits>
 void swap(basic_iostream<charT, traits>& x, basic_iostream<charT, traits>& y)  { x.swap(y); }
 
-#if defined NTL__CXX_RV && 0 // disabled in N2857
+#if defined NTL__CXX_RV && 0 // disabled in N2857+
 template <class charT, class traits>
 void swap(basic_iostream<charT, traits>&& x, basic_iostream<charT, traits>& y) { x.swap(y); }
 template <class charT, class traits>

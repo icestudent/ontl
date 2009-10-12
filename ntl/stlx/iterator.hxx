@@ -232,9 +232,16 @@ class reverse_iterator
     explicit reverse_iterator(Iterator x) : current(x) {}
     template <class U>
     reverse_iterator(const reverse_iterator<U>& u) : current(u.current) {}
+    template <class U>
+    reverse_iterator& operator=(const reverse_iterator<U>& u)
+    {
+      current = u.current;
+      return *this;
+    }
 
     Iterator  base()        const { return current; }
-    reference operator*()   const { Iterator tmp = current; return *--tmp; } ///\warning see N2588 24.4.1.3.4/2
+    ///\warning see N2960 24.5.1.2.4: This operation must use an auxiliary member variable rather than a temporary variable to avoid returning a reference that persists beyond the lifetime of its associated iterator.
+    reference operator*()   const { Iterator tmp = current; return *--tmp; }
     pointer   operator->()  const { return &(operator*()); }
 
     reverse_iterator& operator++()  { --current; return *this; }
@@ -490,7 +497,7 @@ public:
     return *this;
   }
   iterator_type base() const { return current; }
-  reference operator*() const{ return *current;}
+  reference operator*() const{ return std::move(*current); }
   pointer operator->() const { return current; }
   move_iterator& operator++(){ ++current; return *this; }
   move_iterator operator++(int){ move_iterator tmp = *this; ++current; return tmp; }
@@ -500,7 +507,7 @@ public:
   move_iterator& operator+=(difference_type n)     { current += n; return *this; }
   move_iterator operator-(difference_type n) const { return move_iterator(current-n); }
   move_iterator& operator-=(difference_type n)     { current -= n; return *this; }
-  reference operator[](difference_type n) const    { return current[n]; }
+  reference operator[](difference_type n) const    { return std::move(current[n]); }
 
   template<typename Iterator2>
   friend bool operator==(const move_iterator<Iterator>& x, const move_iterator<Iterator2>& y)

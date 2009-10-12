@@ -80,10 +80,8 @@ class basic_ostream
       swap(rhs);
       return *this;
     }
-    void swap(basic_ostream&& x)
-#else
-    void swap(basic_ostream& x)
 #endif
+    void swap(basic_ostream& x)
     {
       if(this != &x)
         basic_ios::swap(x);
@@ -559,7 +557,7 @@ operator<<(basic_ostream<char, traits>&, const unsigned char*);
 ///\name Swap
 template <class charT, class traits>
 inline void swap(basic_ostream<charT, traits>& x, basic_ostream<charT, traits>& y)  { x.swap(y); }
-#if defined NTL__CXX_RV && 0 // disabled in n2857
+#if defined NTL__CXX_RV && 0 // disabled in n2857+
 template <class charT, class traits>
 inline void swap(basic_ostream<charT, traits>&& x, basic_ostream<charT, traits>& y) { x.swap(y); }
 template <class charT, class traits>

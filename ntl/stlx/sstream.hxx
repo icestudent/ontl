@@ -88,7 +88,7 @@ namespace std {
     }
   #endif
 
-    void swap(rvalue rhs)
+    void swap(basic_stringbuf& rhs)
     {
       basic_streambuf.swap(rhs);
       str_.swap(rhs.str_); // a bit quickly
@@ -206,7 +206,7 @@ namespace std {
     }
   #endif
     
-    void swap(rvalue rhs)
+    void swap(basic_istringstream& rhs)
     {
       basic_istream::swap(rhs);
       sb.swap(rhs.sb);
@@ -272,7 +272,7 @@ namespace std {
       swap(rhs); return *this;
     }
   #endif
-    void swap(rvalue rhs)
+    void swap(basic_ostringstream& rhs)
     {
       basic_ostream::swap(rhs);
       sb.swap(rhs.sb);
@@ -336,7 +336,7 @@ namespace std {
     basic_stringstream& operator=(basic_stringstream&& rhs);
   #endif
 
-    void swap(rvalue rhs);
+    void swap(basic_stringstream& rhs);
 
     ///\name Members:
     basic_stringbuf<charT,traits,Allocator>* rdbuf() const { return &sb_; }
@@ -358,7 +358,7 @@ namespace std {
   template <class charT, class traits, class Allocator>
   inline void swap(basic_stringstream<charT, traits, Allocator>& x, basic_stringstream<charT, traits, Allocator>& y) { x.swap(y); }
 
-#ifdef NTL__CXX_RV
+#ifdef NTL__CXX_RV && 0 // disabled in N2857+
   template <class charT, class traits, class Allocator>
   inline void swap(basic_stringbuf<charT, traits, Allocator>&& x, basic_stringbuf<charT, traits, Allocator>& y) { x.swap(y); }
   template <class charT, class traits, class Allocator>

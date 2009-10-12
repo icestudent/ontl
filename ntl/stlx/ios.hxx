@@ -20,7 +20,7 @@ namespace std {
  *@{*/
 
 ///\name  27.4.1 Types [stream.types]
-typedef ptrdiff_t streamoff;
+typedef int64_t   streamoff;
 typedef ssize_t   streamsize;
 ///@}
 

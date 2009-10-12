@@ -529,9 +529,9 @@ namespace std
     shared_future(const shared_future& x)
       :data(x.data)
     {}
-    //shared_future(unique_future<R>&& x)
-    //  :data(move(x.data))
-    //{}
+    shared_future(unique_future<R>&& x)
+      :data(move(x.data))
+    {}
     ~shared_future()
     {}
 

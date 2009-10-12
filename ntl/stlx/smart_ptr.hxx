@@ -53,6 +53,8 @@ namespace std
       static_assert(sizeof(T) > 0, "incomplete type of T is not allowed");
       ::delete[] ptr;
     }
+  private:
+    template <class U> void operator()(U*) const __deleted;
   };
 
 #ifdef STLX__SMARTPTR_WITH_N
@@ -172,7 +174,7 @@ namespace std
     }
 
     __forceinline
-      void reset(pointer p = 0) __ntl_nothrow
+    void reset(pointer p = 0) __ntl_nothrow
     {
       if ( get() && get() != p ) get_deleter()(get());
       set(p);
@@ -196,6 +198,8 @@ namespace std
 #endif
 
     void set(T * p) { ptr = p; }
+
+    template<class U> void reset(U) __deleted;
 
   };//template class unique_ptr
 

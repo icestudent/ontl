@@ -25,7 +25,8 @@
 #include "type_traits.hxx"
 #endif
 
-namespace std {
+namespace std
+{
 
 /**\addtogroup  lib_utilities ********** 20 General utilities library [utilities]
  *@{*/
