@@ -15,7 +15,8 @@
 #pragma warning(disable:4820) // X bytes padding added...
 #endif
 
-namespace std {
+namespace std
+{
 
 /**\addtogroup  lib_input_output ******* 27 Input/output library [input.output]
  *@{*/
@@ -35,9 +36,7 @@ class basic_streambuf
 {
   ///////////////////////////////////////////////////////////////////////////
   public:
-
     ///\name Types:
-
     typedef charT                     char_type;
     typedef typename traits::int_type int_type;
     typedef typename traits::pos_type pos_type;
@@ -73,11 +72,7 @@ class basic_streambuf
       return *this;
     }
 
-  #ifdef NTL__CXX_RV
-    void swap(basic_streambuf&& rhs)
-  #else
-    void swap(basic_streambuf&  rhs)
-  #endif
+    void swap(basic_streambuf& rhs)
     {
       if(this == &rhs)
         return;
@@ -209,10 +204,10 @@ class basic_streambuf
 
     ///\name  27.5.2.3.2 Get area access [streambuf.get.area]
 
-    char_type* eback() const  { return gbeg; }
+    char_type* eback() const  { return gbeg;  }
     char_type* gptr()  const  { return gnext; }
-    char_type* egptr() const  { return gend; }
-    void gbump(int n)         { gnext += n; }
+    char_type* egptr() const  { return gend;  }
+    void gbump(int n)         { gnext += n;   }
 
     void setg(char_type* gbeg, char_type* gnext, char_type* gend)
     {
@@ -221,10 +216,10 @@ class basic_streambuf
 
     ///\name  27.5.2.3.3 Put area access [streambuf.put.area]
 
-    char_type* pbase() const { return pbeg; }
-    char_type* pptr()  const { return pnext; }
-    char_type* epptr() const { return pend; }
-    void pbump(int n)        { pnext += n; }
+    char_type* pbase() const { return pbeg;   }
+    char_type* pptr()  const { return pnext;  }
+    char_type* epptr() const { return pend;   }
+    void pbump(int n)        { pnext += n;    }
 
     void setp(char_type* pbeg, char_type* pend)
     {
@@ -266,6 +261,7 @@ class basic_streambuf
 
     virtual int sync()
     {
+      // Default behavior: Returns zero.
       return 0;
     }
 
@@ -273,6 +269,7 @@ class basic_streambuf
 
     virtual streamsize showmanyc()
     {
+      // Default behavior: Returns zero.
       return 0;
     }
 
@@ -372,12 +369,14 @@ class basic_streambuf
   ///////////////////////////////////////////////////////////////////////////
   //private:
 
-    char_type * gbeg;
-    char_type * gend;
-    char_type * gnext;
-    char_type * pbeg;
-    char_type * pend;
-    char_type * pnext;
+    char_type * gbeg; // read:  start
+    char_type * gend; //        end
+    char_type * gnext;//        pos
+
+    char_type * pbeg; // write: start
+    char_type * pend; //        end
+    char_type * pnext;//        pos
+
   #if STLX__CONFORMING_LOCALE
     locale      l;
   #endif

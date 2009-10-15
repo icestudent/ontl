@@ -183,6 +183,7 @@ protected:
     }
     return static_cast<int>(size);
   }
+
   virtual int_type overflow(int_type c)
   {
     const bool eofc = traits_type::eq_int_type(c, traits_type::eof());

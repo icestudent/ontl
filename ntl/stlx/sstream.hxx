@@ -90,7 +90,7 @@ namespace std {
 
     void swap(basic_stringbuf& rhs)
     {
-      basic_streambuf.swap(rhs);
+      basic_streambuf::swap(rhs);
       str_.swap(rhs.str_); // a bit quickly
       std::swap(mode_, rhs.mode_);
     }
@@ -98,10 +98,18 @@ namespace std {
     ///\name 27.7.1.3 Get and set:
     basic_string<charT,traits,Allocator> str() const 
     { 
-      const char_type * const beg = mode & ios_base::out ? this->pbase()
-        : mode & ios_base::in ? this->eback() : 0;
-      const char_type * const end = mode & ios_base::out ? this->pptr()
-        : mode & ios_base::in ? this->egptr() : 0;
+      // NOTE: update to the specification:
+      /*
+       * If the basic_stringbuf was created only in input mode, the resultant basic_string
+      contains the character sequence in the range [eback(),egptr()).
+       * If the basic_stringbuf was created with which & ios_base::out being true 
+      then the resultant basic_string contains the character sequence in the range [pbase(),high_mark), 
+      where high_mark represents the position one past the highest initialized character in the buffer.
+       */
+      const char_type * const beg = mode_ & ios_base::out ? this->pbase()
+        : mode_ & ios_base::in ? this->eback() : 0;
+      const char_type * const end = mode_ & ios_base::out ? this->pptr()
+        : mode_ & ios_base::in ? this->egptr() : 0;
       return basic_string<charT,traits,Allocator>(beg, end);
     }
 
@@ -118,6 +126,7 @@ namespace std {
       return this->gptr() < this->egptr()
         ? traits::to_int_type(*this->gptr()) : traits::eof();
     }
+
     virtual int_type pbackfail(int_type c = traits::eof())
     {
       // backup sequence
@@ -135,9 +144,94 @@ namespace std {
       return traits::eof();
     }
 
-    virtual int_type overflow (int_type c = traits::eof());
-    virtual pos_type seekoff(off_type off, ios_base::seekdir way, ios_base::openmode which = ios_base::in | ios_base::out);
-    virtual pos_type seekpos(pos_type sp, ios_base::openmode which = ios_base::in | ios_base::out);
+    virtual int_type overflow (int_type c = traits::eof())
+    {
+      const int_type eof = traits::eof();
+      if(traits::eq_int_type(c, eof))
+        return eof;
+
+      if(!(mode_ & ios_base::out))
+        return eof;
+
+      const char_type cc = traits::to_char_type(c);
+      if(pptr() < epptr()){
+        *pptr() = cc;
+        pbump(1);
+      }else{
+        const bool may_reallocate = str_.size() == str_.capacity();
+        const ptrdiff_t pp = gptr() - eback(), gp = pptr() - pbase();
+
+        str_.push_back(cc); // may reallocate buffer
+        
+        if(may_reallocate){
+          set_ptrs();
+          pbump(pp);
+          if(mode_ & ios_base::in)
+            gbump(gp);
+        }
+      }
+      return c;
+    }
+
+    virtual pos_type seekoff(off_type off, ios_base::seekdir way, ios_base::openmode which = ios_base::in | ios_base::out)
+    {
+      pos_type re = pos_type(off_type(-1));
+      bool in = (which & mode_ & ios_base::in) != 0,
+        out = (which & mode_ & ios_base::out) != 0;
+      in &= !(which & ios_base::out);
+      out&= !(which & ios_base::in);
+      const bool both = in && out && way != ios_base::cur;
+
+      const char_type* const beg = in ? eback() : pbase();
+      if((beg || !off) && (in || out || both)){
+        // updage egptr
+        char_type* const pp = pptr();
+        if(pp && pp > egptr()){
+          if(mode_ & ios_base::in)
+            setg(eback(), gptr(), pp);
+          else
+            setg(pp,pp,pp);
+        }
+
+        off_type newoff = off;
+        if(way == ios_base::cur)
+          newoff += gptr() - beg;
+        else if(way == ios_base::end)
+          newoff += egptr() - beg;
+
+        if((in || both) && newoff >= 0 && egptr()-beg >= newoff){
+          gbump((beg+newoff)-gptr());
+          re = pos_type(newoff);
+        }
+        if((out || both) && newoff >= 0 && egptr()-beg >= newoff){
+          pbump((beg+newoff)-pptr());
+          re = pos_type(newoff);
+        }
+      }
+      return re;
+    }
+
+    virtual pos_type seekpos(pos_type sp, ios_base::openmode which = ios_base::in | ios_base::out)
+    {
+      const bool in = (which & ios_base::in) != 0, out = (which & ios_base::out) != 0;
+      bool ok = false;
+      if(sp != -1 && (in || out)){
+        ok = true;
+        if(in){
+          if(sp >= 0 && sp < (egptr()-eback()))
+            gbump(static_cast<int>( eback() - gptr() + sp ));
+          else
+            ok = false;
+        }
+        if(out){
+          if(sp >= 0 && sp < (epptr()-pbase()))
+            pbump(static_cast<int>(  pbase() - pptr() + sp));
+          else
+            ok = false;
+        }
+      }
+      return ok ? sp : pos_type(off_type(-1));
+    }
 
     ///\}
 
@@ -145,14 +239,14 @@ namespace std {
     /// set stream poiners according to mode. \see str.
     void set_ptrs()
     {
-      if ( mode & ios_base::out )
+      if ( mode_ & ios_base::out )
       {
-        if(s.empty())
-          s.resize(16); // 16 characters by default
-        this->setp(s.begin(), s.end());
+        if(str_.empty())
+          str_.resize(16); // 16 characters by default
+        this->setp(str_.begin(), str_.end());
       }
-      if ( mode & ios_base::in )
-        this->setg(s.begin(), s.begin(), s.end());      
+      if ( mode_ & ios_base::in )
+        this->setg(str_.begin(), str_.begin(), str_.end());      
     }
   private:
     string str_;
@@ -219,7 +313,7 @@ namespace std {
     }
 
     basic_string<charT,traits,Allocator> str() const { return sb.str(); }
-    void str(const basic_string<charT,traits,Allocator>& s) { sb.str(s) }
+    void str(const basic_string<charT,traits,Allocator>& s) { sb.str(s); }
 
     ///\}
   private:
@@ -336,10 +430,13 @@ namespace std {
     basic_stringstream& operator=(basic_stringstream&& rhs);
   #endif
 
-    void swap(basic_stringstream& rhs);
+    void swap(basic_stringstream& rhs)
+    {
+      std::swap(sb_, rhs.sb_);
+    }
 
     ///\name Members:
-    basic_stringbuf<charT,traits,Allocator>* rdbuf() const { return &sb_; }
+    basic_stringbuf<charT,traits,Allocator>* rdbuf() const { return const_cast<basic_stringbuf<charT,traits,Allocator>*>(&sb_); }
     basic_string<charT,traits,Allocator> str() const { return sb_.str(); }
     void str(const basic_string<charT,traits,Allocator>& str) { sb_.str(str); }
     ///\}
@@ -350,15 +447,15 @@ namespace std {
 
   ///\name Swap functions
   template <class charT, class traits, class Allocator>
-  inline void swap(basic_stringbuf<charT, traits, Allocator>& x, basic_stringbuf<charT, traits, Allocator>& y) { x.swap(y); }
+  inline void swap(basic_stringbuf    <charT, traits, Allocator>& x, basic_stringbuf    <charT, traits, Allocator>& y) { x.swap(y); }
   template <class charT, class traits, class Allocator>
   inline void swap(basic_istringstream<charT, traits, Allocator>& x, basic_istringstream<charT, traits, Allocator>& y) { x.swap(y); }
   template <class charT, class traits, class Allocator>
   inline void swap(basic_ostringstream<charT, traits, Allocator>& x, basic_ostringstream<charT, traits, Allocator>& y) { x.swap(y); }
   template <class charT, class traits, class Allocator>
-  inline void swap(basic_stringstream<charT, traits, Allocator>& x, basic_stringstream<charT, traits, Allocator>& y) { x.swap(y); }
+  inline void swap(basic_stringstream <charT, traits, Allocator>& x, basic_stringstream <charT, traits, Allocator>& y) { x.swap(y); }
 
-#ifdef NTL__CXX_RV && 0 // disabled in N2857+
+#ifdef NTL__CXX_RV__0 // disabled in N2857+
   template <class charT, class traits, class Allocator>
   inline void swap(basic_stringbuf<charT, traits, Allocator>&& x, basic_stringbuf<charT, traits, Allocator>& y) { x.swap(y); }
   template <class charT, class traits, class Allocator>

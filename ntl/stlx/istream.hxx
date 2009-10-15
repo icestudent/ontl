@@ -8,10 +8,10 @@
 #ifndef NTL__STLX_ISTREAM
 #define NTL__STLX_ISTREAM
 
-#include "ios.hxx"
 #include "ostream.hxx"
 
-namespace std {
+namespace std
+{
 
 /**\addtogroup  lib_input_output ******* 27 Input/output library [input.output]
  *@{*/
@@ -26,7 +26,7 @@ namespace std {
 template <class charT, class traits /*= char_traits<charT>*/ >
 class basic_istream : virtual public basic_ios<charT, traits>
 {
-    typedef basic_ios<charT, traits>  this_base;
+    typedef basic_ios<charT, traits> this_base;
 
   ///////////////////////////////////////////////////////////////////////////
   public:
@@ -46,7 +46,12 @@ class basic_istream : virtual public basic_ios<charT, traits>
     }
 
 #ifdef NTL__CXX_RV
-    basic_istream(basic_istream&& rhs);
+    basic_istream(basic_istream&& rhs)
+      :ccount(0)
+    {
+      basic_ios::move(rhs);
+      swap(ccount, rhs.ccount);
+    }
 #endif
 
     virtual ~basic_istream() {/**/}
@@ -54,85 +59,185 @@ class basic_istream : virtual public basic_ios<charT, traits>
     // 27.6.1.1.2 Class basic_istream assign and swap [istream.assign]
 
 #ifdef NTL__CXX_RV
-    basic_istream& operator=(basic_istream&& rhs);
-    void swap(basic_istream& rhs);
+    basic_istream& operator=(basic_istream&& rhs)
+    {
+      swap(rhs); return *this;
+    }
 #endif
+
+    void swap(basic_istream& rhs)
+    {
+      if(this != &rhs){
+        using std::swap;
+        basic_ios::swap(rhs);
+        swap(ccount, rhs.ccount);
+      }
+    }
+
 
     // 27.6.1.1.3 Class basic_istream::sentry [istream::sentry]
     class sentry
     {
-        typedef traits traits_type;
+      typedef traits traits_type;
+    public:
+      // constructor for formated input
+      //explicit sentry(basic_istream& is);// bool noskipws = false
 
-      public:
-
-        // constructor for formated input
-        explicit sentry(basic_istream& is);// bool noskipws = false
-
-        // constructor for unformated input
-        explicit sentry(basic_istream& is, bool noskipws)
-        //: is(is)
+      // constructor for un/formated input
+      explicit sentry(basic_istream& is, bool noskipws = false)
+        : ok_(false)
+      {
+        if ( is.good() )
         {
-          (noskipws);
-          assert(noskipws == true);
-          if ( is.good() )
-          {
-            if ( is.tie() ) is.tie()->flush();
+          if ( is.tie() ) is.tie()->flush();
+
+          if(noskipws == false && is.flags() & ios_base::skipws){
+            // formatted input, discard all input spaces
+            basic_streambuf<char_type, traits_type>* buf = is.rdbuf();
+            const ctype<char_type>& l = use_facet<ctype<char_type> >(is.getloc());
+            const int_type eof = traits_type::eof();
+            int_type c = buf->sgetc(); 
+            while(!traits_type::eq_int_type(c, eof) && l.is(ctype_base::space, traits_type::to_char_type(c)))
+              c = buf->snextc();
+
+            if(traits_type::eq_int_type(c, eof))
+              is.setstate(ios_base::eofbit|ios_base::failbit);  // can throw
           }
-          ok_ = is.good();
         }
+        ok_ = is.good();
+      }
 
-        ~sentry() {/**/}
+      ~sentry() {/**/}
 
-        operator bool() const { return ok_; }
+#ifdef NTL__CXX_EXPLICITOP
+      explicit
+#endif
+      operator bool() const { return ok_; }
 
-      private:
+    private:
+      bool ok_;
 
-        //basic_istream<charT, traits>& is;
-        bool ok_;
-
-        sentry(const sentry&); // not defined
-        sentry& operator=(const sentry&); // not defined
-
+      sentry(const sentry&) __deleted;
+      sentry& operator=(const sentry&) __deleted;
     };
 
     // 27.6.1.2 Formatted input functions [istream.formatted]
 
     ///\name 27.6.1.2.2 Arithmetic Extractors [istream.formatted.arithmetic]
-    basic_istream<charT,traits>& operator>>(bool& n );
-    basic_istream<charT,traits>& operator>>(short& n );
-    basic_istream<charT,traits>& operator>>(unsigned short& n );
-    basic_istream<charT,traits>& operator>>(int& n );
-    basic_istream<charT,traits>& operator>>(unsigned int& n );
-    basic_istream<charT,traits>& operator>>(long& n );
-    basic_istream<charT,traits>& operator>>(unsigned long& n );
-    basic_istream<charT,traits>& operator>>(long long& n );
-    basic_istream<charT,traits>& operator>>(unsigned long long& n );
-    basic_istream<charT,traits>& operator>>(float& f );
-    basic_istream<charT,traits>& operator>>(double& f );
-    basic_istream<charT,traits>& operator>>(long double& f );
-    basic_istream<charT,traits>& operator>>(void*& p );
+    basic_istream<charT,traits>& operator>>(bool& n)          { return get_impl(n); }
+    basic_istream<charT,traits>& operator>>(short& n)         { return get_impl_signed(n); }
+    basic_istream<charT,traits>& operator>>(unsigned short& n){ return get_impl(n); }
+    basic_istream<charT,traits>& operator>>(int& n)           { return get_impl_signed(n); }
+    basic_istream<charT,traits>& operator>>(unsigned int& n)  { return get_impl(n); }
+    basic_istream<charT,traits>& operator>>(long& n)          { return get_impl(n); }
+    basic_istream<charT,traits>& operator>>(unsigned long& n) { return get_impl(n); }
+    basic_istream<charT,traits>& operator>>(long long& n)     { return get_impl(n); }
+    basic_istream<charT,traits>& operator>>(unsigned long long& n)  { return get_impl(n); }
+    basic_istream<charT,traits>& operator>>(float& f)         { return get_impl(f); }
+    basic_istream<charT,traits>& operator>>(double& f)        { return get_impl(f); }
+    basic_istream<charT,traits>& operator>>(long double& f)   { return get_impl(f); }
+    basic_istream<charT,traits>& operator>>(void*& p)         { return get_impl(p); }
+
+
+  protected:
+    template<typename ValueT>
+    basic_istream<charT,traits>& get_impl(ValueT& value)
+    {
+      const sentry ok(*this);
+      ios_base::iostate state = rdstate();
+      if(ok)
+        __ntl_try
+      {
+        typedef istreambuf_iterator<charT> iterator;
+        typedef num_get<charT, iterator> facet_t;
+        use_facet<facet_t>(getloc()).get(iterator(*this), iterator(), *this, state, value);
+      }
+      __ntl_catch(...){
+        state |= ios_base::badbit;
+      }
+      if(state != ios_base::goodbit)
+        setstate(state);
+      return *this;
+    }
+    template<typename ValueT>
+    basic_istream<charT,traits>& get_impl_signed(ValueT& n)
+    {
+      const sentry ok(*this);
+      ios_base::iostate state = rdstate();
+      if(ok)
+        __ntl_try
+      {
+        typedef istreambuf_iterator<charT> iterator;
+        typedef num_get<charT, iterator> facet_t;
+
+        long value;
+        use_facet<facet_t>(getloc()).get(iterator(*this), iterator(), *this, state, value);
+
+        if(state == ios_base::goodbit){
+          typedef numeric_limits<ValueT> lim;
+          if(!(value < lim::__min || value > lim::__max))
+            n = static_cast<ValueT>(value);
+          else {
+            state |= ios_base::failbit;
+            value = value < lim::__min ? lim::__min : lim::__max;
+          }
+        }
+      }
+      __ntl_catch(...){
+        state |= ios_base::badbit;
+      }
+      if(state != ios_base::goodbit)
+        setstate(state);
+      return *this;
+    }
+  public:
 
     ///\name 27.6.1.2.3 basic_istream::operator>> [istream::extractors]
-    basic_istream<charT, traits>&
-      operator>>(basic_istream<charT,traits>&(*pf)(basic_istream<charT,traits>&))
+    basic_istream<charT, traits>& operator>>(basic_istream<charT,traits>&(*pf)(basic_istream<charT,traits>&))
     {
       return pf(*this);
     }
 
-    basic_istream<charT, traits>&
-      operator>>(basic_ios<charT,traits>& (*pf)(basic_ios<charT,traits>&))
+    basic_istream<charT, traits>& operator>>(basic_ios<charT,traits>& (*pf)(basic_ios<charT,traits>&))
     {
-      return pf(*this);
+      pf(*this); return *this;
     }
 
-    basic_istream<charT, traits>&
-      operator>>(ios_base& (*pf)(ios_base&))
+    basic_istream<charT, traits>& operator>>(ios_base& (*pf)(ios_base&))
     {
-      return pf(*this);
+      pf(*this); return *this;
     }
 
-    basic_istream<charT, traits>&
-      operator>>(basic_streambuf<char_type, traits>* sb);
+    basic_istream<charT, traits>& operator>>(basic_streambuf<char_type, traits>* sb)
+    {
+      const sentry ok(*this, true);
+      ios_base::iostate state = sb ? ios_base::goodbit : ios_base::failbit;
+      streamsize n = 0;
+      if (ok && sb)
+      __ntl_try
+      {
+        basic_streambuf<char_type, traits_type>* buf = rdbuf();
+        const int_type eof = traits_type::eof();
+        int_type c = buf->sgetc();
+        while(!traits_type::eq_int_type(c, eof)){
+          if(traits_type::eq_int_type(sb->sputc(traits_type::to_char_type(c)), eof))
+            break;
+          ++n;
+        }
+        if(traits_type::eq_int_type(c, eof))
+          state |= ios_base::eofbit;
+      }
+      __ntl_catch(...)
+      {
+        state |= ios_base::badbit;
+        // If it inserted no characters because it caught an exception thrown while extracting characters from
+        // *this and failbit is on in exceptions() (27.5.4.3), then the caught exception is rethrown.
+      }
+      if(!n)
+        state |= ios_base::failbit;
+      this->setstate(state);
+      return *this;
+    }
 
     ///\todo non-member operator>>
 
@@ -157,7 +262,8 @@ class basic_istream : virtual public basic_ios<charT, traits>
         __ntl_catch(...)
         {
           state |= ios_base::badbit;
-//          if ( this->exceptions() & ios_base::badbit ) __ntl_rethrow;
+          // NOTE: why this is commented?
+          //if ( this->exceptions() & ios_base::badbit ) __ntl_rethrow;
         }
       this->setstate(state);
       return c;
@@ -183,27 +289,30 @@ class basic_istream : virtual public basic_ios<charT, traits>
       const sentry ok(*this, true);
       ios_base::iostate state = ios_base::goodbit;
       if ( ok )
-        __ntl_try
+      __ntl_try
+      {
+        const int_type eof = traits_type::eof();
+        basic_streambuf<char_type, traits_type>* buf = rdbuf();
+        while ( 0 < --n )
         {
-          while ( 0 < --n )
+          //s[1] = char_type();
+          const int_type c = buf->sbumpc();
+          if ( traits_type::eq_int_type(eof, c) )
           {
-            s[1] = char_type();
-            const int_type c = this->rdbuf()->sbumpc();
-            if ( traits_type::eq_int_type(traits_type::eof(), c) )
-            {
-              state |= ios_base::eofbit;
-              break;
-            }
-            if ( traits_type::eq(delim, traits_type::to_char_type(c)) )
-              break;
-            *s++ = traits_type::to_char_type(c);
-            ++ccount;
+            state |= ios_base::eofbit;
+            break;
           }
+          if ( traits_type::eq(delim, traits_type::to_char_type(c)) )
+            break;
+          *s++ = traits_type::to_char_type(c);
+          ++ccount;
         }
-        __ntl_catch(...)
-        {
-          state |= ios_base::badbit;
-        }
+      }
+      __ntl_catch(...)
+      {
+        state |= ios_base::badbit;
+      }
+      if ( n > 0 ) *s = char_type();
       this->setstate(state | ccount ? state : ios_base::failbit);
       return *this;
     }
@@ -221,16 +330,17 @@ class basic_istream : virtual public basic_ios<charT, traits>
       if ( ok )
         __ntl_try
         {
-          for ( const int_type c = this->rdbuf()->sgetc(); ; c = this->rdbuf()->snextc() )
+          basic_streambuf<char_type, traits_type>* buf = rdbuf();
+          for (int_type c = buf->sgetc(), eof = traits_type::eof(); ; c = buf->snextc() )
           {
-            if ( traits_type::eq_int_type(traits_type::eof(), c) )
+            if ( traits_type::eq_int_type(eof, c) )
             {
               state |= ios_base::eofbit;
               break;
             }
             if ( traits_type::eq(delim, traits_type::to_char_type(c)) )
               break;
-            if ( traits_type::eq_int_type(traits_type::eof(), dest.sputc(traits_type::to_char_type(c))) )
+            if ( traits_type::eq_int_type(eof, dest.sputc(traits_type::to_char_type(c))) )
               break;
             ++ccount;
           }
@@ -245,24 +355,85 @@ class basic_istream : virtual public basic_ios<charT, traits>
 
     basic_istream<charT,traits>& getline(char_type* s, streamsize n)
     {
-      return getline(s, this_base::widen('\n'));
+      return getline(s, n, this_base::widen('\n'));
     }
 
     basic_istream<charT,traits>& getline(char_type* s, streamsize n, char_type delim)
-    ;
-
-    basic_istream<charT,traits>& ignore(streamsize n = 1, int_type delim = traits::eof());
-
-    int_type peek()
     {
       ccount = 0;
       const sentry ok(*this, true);
       ios_base::iostate state = ios_base::goodbit;
+      if (ok && n > 0)
+      __ntl_try
+      {
+        basic_streambuf<char_type, traits_type>* buf = rdbuf();
+        const int_type eof = traits_type::eof(), d = traits_type::to_int_type(delim);
+        int_type c;
+
+        while(ccount+1 < n){ // space for null-terminator
+          c = buf->sbumpc();
+          if(traits_type::eq_int_type(c, eof) || traits_type::eq_int_type(c, d))
+            break;
+          *s++ = traits_type::to_char_type(c);
+          ++ccount;
+        } 
+        
+        if(traits_type::eq_int_type(c, eof))
+          state |= ios_base::eofbit;
+        else if(traits_type::eq_int_type(c, d))
+          ++ccount;
+        else //if(n <= 1)
+          state |= ios_base::failbit; // line too long
+      }
+      __ntl_catch(...)
+      {
+        state |= ios_base::badbit;
+      }
+      if(n > 0)
+        *s = char_type();
+      if(!ccount)
+        state |= ios_base::failbit;
+      this->setstate(state);
+      return *this;
+    }
+
+    basic_istream<charT,traits>& ignore(streamsize n = 1, int_type delim = traits::eof())
+    {
+      ccount = 0;
+      const sentry ok(*this, true);
+      ios_base::iostate state = ios_base::goodbit;
+      if (ok && n > 0 && n != numeric_limits<streamsize>::__max)
+      __ntl_try
+      {
+        basic_streambuf<char_type, traits_type>* buf = rdbuf();
+        const int_type eof = traits_type::eof();
+        int_type c;
+        do{
+          c = buf->sbumpc();
+          if(traits_type::eq_int_type(c, eof) || traits_type::eq_int_type(c, delim))
+            break;
+        } while(++ccount, --n);
+        if(traits_type::eq_int_type(c, eof))
+          state |= ios_base::eofbit;
+      }
+      __ntl_catch(...)
+      {
+        state |= ios_base::badbit;
+      }
+      this->setstate(state);
+      return *this;
+    }
+
+    int_type peek()
+    {
+      ccount = 0;
       int_type c = traits_type::eof();
+      const sentry ok(*this, true);
+      ios_base::iostate state = ios_base::goodbit;
       if ( ok )
         __ntl_try
         {
-          c = this->rdbuf()->sbumpc();
+          c = this->rdbuf()->sgetc();
           if ( traits_type::eq_int_type(traits_type::eof(), c) )
             state |= ios_base::eofbit;
         }
@@ -274,24 +445,245 @@ class basic_istream : virtual public basic_ios<charT, traits>
       return c;
     }
 
-    basic_istream<charT,traits>& read(char_type* s, streamsize n);
-    streamsize readsome(char_type* s, streamsize n);
-    basic_istream<charT,traits>& putback(char_type c);
-    basic_istream<charT,traits>& unget();
-    int sync();
-    pos_type tellg();
-    basic_istream<charT,traits>& seekg(pos_type);
-    basic_istream<charT,traits>& seekg(off_type, ios_base::seekdir);
+    basic_istream<charT,traits>& read(char_type* s, streamsize n)
+    {
+      ccount = 0;
+      const sentry ok(*this, true);
+      ios_base::iostate state = ok ? ios_base::goodbit : ios_base::failbit;
+      if (ok && n > 0)
+      __ntl_try
+      {
+        ccount = rdbuf()->sgetn(s, n);
+        if(ccount != n)
+          state |= ios_base::eofbit|ios_base::failbit;
+      }
+      __ntl_catch(...)
+      {
+        state |= ios_base::badbit;
+      }
+      this->setstate(state);
+      return *this;
+    }
+
+    streamsize readsome(char_type* s, streamsize n)
+    {
+      ccount = 0;
+      const sentry ok(*this, true);
+      ios_base::iostate state = ok ? ios_base::goodbit : ios_base::failbit;
+      if (ok && n > 0)
+      __ntl_try
+      {
+        const streamsize avail = rdbuf()->in_avail();
+        if(avail == -1)
+          state |= ios_base::eofbit;
+        else if(avail > 0)
+          ccount = rdbuf()->sgetn(s, min(avail, n));
+      }
+      __ntl_catch(...)
+      {
+        state |= ios_base::badbit;
+      }
+      this->setstate(state);
+      return ccount;
+    }
+
+    basic_istream<charT,traits>& putback(char_type c)
+    {
+      ccount = 0;
+      const sentry ok(*this, true);
+      ios_base::iostate state = ok ? ios_base::goodbit : ios_base::failbit;
+      if (ok)
+      __ntl_try
+      {
+        basic_streambuf<char_type, traits_type>* buf = rdbuf();
+        if(!buf || traits_type::eq_int_type(buf->sputbackc(c), traits_type::eof()))
+          state |= ios_base::badbit;
+      }
+      __ntl_catch(...)
+      {
+        state |= ios_base::badbit;
+      }
+      this->setstate(state);
+      return *this;
+    }
+
+    basic_istream<charT,traits>& unget()
+    {
+      ccount = 0;
+      const sentry ok(*this, true);
+      ios_base::iostate state = ok ? ios_base::goodbit : ios_base::failbit;
+      if (ok)
+      __ntl_try
+      {
+        basic_streambuf<char_type, traits_type>* buf = rdbuf();
+        if(!buf || traits_type::eq_int_type(buf->sungetc(), traits_type::eof()))
+          state |= ios_base::badbit;
+      }
+      __ntl_catch(...)
+      {
+        state |= ios_base::badbit;
+      }
+      this->setstate(state);
+      return *this;
+    }
+
+    int sync()
+    {
+      int re = -1;
+      const sentry ok(*this, true);
+      ios_base::iostate state = ios_base::goodbit;
+      if (ok)
+      __ntl_try
+      {
+        basic_streambuf<char_type, traits_type>* buf = rdbuf();
+        if(buf){
+          if(buf->pubsync() == -1)
+            state |= ios_base::badbit;
+          else
+            re = 0;
+        }
+      }
+      __ntl_catch(...)
+      {
+        state |= ios_base::badbit;
+      }
+      this->setstate(state);
+      return re;
+    }
+
+    pos_type tellg()
+    {
+      pos_type re = pos_type(-1);
+      const sentry ok(*this, true);
+      ios_base::iostate state = ios_base::goodbit;
+      if(!fail())
+      __ntl_try{
+        re = rdbuf()->pubseekoff(0, ios_base::cur, ios_base::in);
+      }
+      __ntl_catch(...){
+        state |= ios_base::badbit;
+      }
+      if(state)
+        setstate(state);
+      return re;
+    }
+
+    basic_istream<charT,traits>& seekg(pos_type pos)
+    {
+      const sentry ok(*this, true);
+      ios_base::iostate state = ios_base::goodbit;
+      if(!fail())
+      __ntl_try{
+        if(rdbuf()->pubseekpos(pos, ios_base::in) == pos_type(off_type(-1)))
+          state |= ios_base::failbit;
+      }
+      __ntl_catch(...){
+        state |= ios_base::badbit;
+      }
+      if(state)
+        setstate(state);
+      return *this;
+    }
+
+    basic_istream<charT,traits>& seekg(off_type off, ios_base::seekdir dir)
+    {
+      const sentry ok(*this, true);
+      ios_base::iostate state = ios_base::goodbit;
+      if(!fail())
+      __ntl_try{
+        // NOTE: is error checking required here?
+        if(rdbuf()->pubseekoff(off, dir, ios_base::in) == pos_type(off_type(-1)))
+          state |= ios_base::failbit;
+      }
+      __ntl_catch(...){
+        state |= ios_base::badbit;
+      }
+      if(state)
+        setstate(state);
+      return *this;
+    }
 
   ///////////////////////////////////////////////////////////////////////////
   private:
-
     streamsize ccount;
 
-    basic_istream(const basic_istream&);
-    basic_istream& operator=(const basic_istream&);
-
+    basic_istream(const basic_istream&) __deleted;
+    basic_istream& operator=(const basic_istream&) __deleted;
 };
+
+///\name 27.7.1.2.3 character extraction templates [istream::extractors]
+
+template<class charT, class traits>
+inline basic_istream<charT,traits>& operator>>(basic_istream<charT,traits>& is, charT* s)
+{
+  //*s = charT(); // NOTE: should we always store the null character before any operation?
+
+  const basic_istream<charT,traits>::sentry ok(is, true);
+  ios_base::iostate state = ios_base::goodbit;
+  streamsize ccount = 0;
+  if(ok)
+  __ntl_try
+  {
+    const ctype<charT>& ct = use_facet< ctype<charT> >(is.getloc());
+    const traits::int_type eof = traits::eof();
+    const streamsize max = (is.width() > 0 ? is.width() : numeric_limits<streamsize>::__max) - 1;
+    basic_streambuf<charT, traits>* sb = is.rdbuf();
+
+    traits::int_type c = sb->sgetc();
+    while(ccount < max && !traits::eq_int_type(c, eof)){
+      const charT cc = traits::to_char_type(c);
+      if(ct.is(ctype_base::space, cc))
+        break;
+      *s++ = cc;
+      ++ccount;
+      c = sb->snextc();
+    }
+    if(traits::eq_int_type(c, eof))
+      state |= ios_base::eofbit;
+  }
+  __ntl_catch(...){
+    state |= ios_base::badbit;
+  }
+  *s = charT();
+  is.width(0);
+  if(!ccount)
+    state |= ios_base::failbit;
+  return is.setstate(state), is;
+}
+
+template<class traits>
+basic_istream<char, traits>& operator>>(basic_istream<char, traits>&,   signed char*);
+template<class traits>
+basic_istream<char, traits>& operator>>(basic_istream<char, traits>&, unsigned char*);
+
+template<class charT, class traits>
+inline basic_istream<charT,traits>& operator>>(basic_istream<charT,traits>& is, charT& c)
+{
+  const basic_istream<charT,traits>::sentry ok(is, true);
+  ios_base::iostate state = ios_base::goodbit;
+  if(ok)
+  __ntl_try
+  {
+    const traits::int_type ic = is.rdbuf()->sbumpc();
+    if(!traits::eq_int_type(ic, traits::eof()))
+      c = traits::to_char_type(ic);
+    else
+      state |= ios_base::eofbit|ios_base::failbit;
+  }
+  __ntl_catch(...){
+    state |= ios_base::badbit;
+  }
+  return is.setstate(state), is;
+}
+
+template<class traits>
+basic_istream<char, traits>& operator>>(basic_istream<char, traits>& is,   signed char& c);
+template<class traits>
+basic_istream<char, traits>& operator>>(basic_istream<char, traits>& is, unsigned char& c);
+///\}
+
+template <class charT, class traits>
+inline void swap(basic_istream<charT, traits>& x, basic_istream<charT, traits>& y) { x.swap(y); }
 
 
 /// 27.6.1.4 Standard basic_istream manipulators [istream.manip]
@@ -306,21 +698,40 @@ class basic_istream : virtual public basic_ios<charT, traits>
 ///   sets eofbit, but not failbit.
 /// 2 Returns: is.
 template <class charT, class traits>
-basic_istream<charT,traits>&
-  ws(basic_istream<charT,traits>& is);
+inline basic_istream<charT,traits>& ws(basic_istream<charT,traits>& is)
+{
+  const basic_istream<charT,traits>::sentry ok(is, true);
+  ios_base::iostate state = ios_base::goodbit;
+  if(ok)
+  __ntl_try{
+    const ctype<charT>& ct = use_facet< ctype<charT> >(is.getloc());
+    const traits::int_type eof = traits::eof();
+
+    basic_streambuf<charT, traits>* sb = is.rdbuf();
+    traits::int_type c = sb->sgetc();
+    while(!traits::eq_int_type(c, eof) && ct.is(ctype_base::space, traits::to_char_type(c)))
+      c = sb->snextc();
+    if(traits::eq_int_type(c, eof))
+      state |= ios_base::eofbit;
+  }
+  __ntl_catch(...){
+    state |= ios_base::badbit;
+  }
+  is.setstate(state);
+  return is;
+}
 
 
 /// 27.6.1.5 Class template basic_iostream [iostreamclass].
 /// 1 The class basic_iostream inherits a number of functions that allow
 ///   reading input and writing output to sequences controlled by a stream buffer.
 template <class charT, class traits /*= char_traits<charT>*/ >
-class basic_iostream
-: public basic_istream<charT, traits>, public basic_ostream<charT, traits>
+class basic_iostream:
+  public basic_istream<charT, traits>,
+  public basic_ostream<charT, traits>
 {
   public:
-
     ///\name Types
-
     typedef charT char_type;
     typedef typename traits::int_type int_type;
     typedef typename traits::pos_type pos_type;
@@ -331,33 +742,41 @@ class basic_iostream
 
     /// 1 Effects: Constructs an object of class basic_iostream, assigning
     ///   initial values to the base classes by calling
-    ///   basic_istream<charT,traits>(sb) (27.6.1.1)
-    ///   and basic_ostream<charT,traits>(sb) (27.6.2.1)
-    /// 2 Postcondition: rdbuf()==sb and gcount()==0.
+    ///   <tt>basic_istream<charT,traits>(sb)</tt> (27.6.1.1)
+    ///   and <tt>basic_ostream<charT,traits>(sb)</tt> (27.6.2.1)
+    /// 2 Postcondition: <tt>rdbuf()==sb</tt> and <tt>gcount()==0</tt>.
     explicit basic_iostream(basic_streambuf<charT,traits>* sb)
     : basic_istream<charT, traits>(sb), basic_ostream<charT, traits>(sb)
     {;}
 
 #ifdef NTL__CXX_RV
-    /// 3 Effects: Move constructs from the rvalue rhs by constructing
-    ///   the basic_istream base class with move(rhs).
-    basic_iostream(basic_iostream&& rhs);
+    /// 3 Effects: Move constructs from the rvalue \p rhs by constructing
+    ///   the basic_istream base class with <tt>move(rhs)</tt>.
+    basic_iostream(basic_iostream&& rhs)
+      :basic_istream(move(rhs))
+    {}
 #endif
 
     ///\name 27.6.1.5.2 basic_iostream destructor [iostream.dest]
     /// 1 Effects: Destroys an object of class basic_iostream.
-    /// 2 Remarks: Does not perform any operations on rdbuf().
+    /// 2 Remarks: Does not perform any operations on \c rdbuf().
     virtual ~basic_iostream() {;}
 
 #ifdef NTL__CXX_RV
     ///\name 27.6.1.5.3 basic_iostream assign and swap [iostream.assign]
 
     /// 1 Effects: swap(rhs).
-    basic_iostream& operator=(basic_iostream&& rhs);
-
-    /// 2 Effects: Calls basic_istream<charT, traits>::swap(rhs).
-    void swap(basic_iostream& rhs);
+    basic_iostream& operator=(basic_iostream&& rhs)
+    {
+      swap(rhs); return *this;
+    }
 #endif
+
+    /// 2 Effects: Calls <tt>basic_istream<charT, traits>::swap(rhs)</tt>.
+    void swap(basic_iostream& rhs)
+    {
+      basic_istream::swap(rhs);
+    }
     ///\}
 };
 
@@ -365,7 +784,7 @@ class basic_iostream
 template <class charT, class traits>
 void swap(basic_iostream<charT, traits>& x, basic_iostream<charT, traits>& y)  { x.swap(y); }
 
-#if defined NTL__CXX_RV && 0 // disabled in N2857+
+#ifdef NTL__CXX_RV__0 // disabled in N2857+
 template <class charT, class traits>
 void swap(basic_iostream<charT, traits>&& x, basic_iostream<charT, traits>& y) { x.swap(y); }
 template <class charT, class traits>

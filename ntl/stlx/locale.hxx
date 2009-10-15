@@ -19,7 +19,7 @@
 #if STLX__CONFORMING_LOCALE
 #define _NTL_LOC_VIRTUAL virtual
 #else
-#define _NTL_LOC_VIRTUAL /**/virtual/**/
+#define _NTL_LOC_VIRTUAL /**virtual/**/
 #endif
 
 #ifndef NTL__STLX_STDEXCEPT_FWD
@@ -81,7 +81,10 @@ class locale
     class id
     {
       public:
-        id();
+        id()
+#if !STLX__CONFORMING_LOCALE
+        {}
+#endif
       private:
         void operator=(const id&) __deleted;
         id(const id&) __deleted;
@@ -435,7 +438,9 @@ class ctype : public locale::facet, public ctype_base
 
     typedef charT char_type;
 
-    explicit ctype(size_t refs = 0);
+    explicit ctype(size_t refs = 0)
+      :facet(refs)
+    {}
 
     ///\name 22.2.1.1.1 ctype members [locale.ctype.members]
 
@@ -491,7 +496,7 @@ class ctype : public locale::facet, public ctype_base
     char narrow(charT c, char dfault) const { return do_narrow(c,dfault); }
 
     /** Applies the simplest reasonable transformation from a sequence of \c charT values to the corresponding \c char values. */
-    const charT* narrow(const charT* low, const charT*, char dfault, char* to) const
+    const charT* narrow(const charT* low, const charT* high, char dfault, char* to) const
     {
       return do_narrow(low, high, dfault, to);
     }
@@ -503,20 +508,21 @@ class ctype : public locale::facet, public ctype_base
 
     ///\name 22.2.1.1.2 ctype virtual functions [locale.ctype.virtuals]
 
-    ~ctype(); //virtual
+    ~ctype() //virtual
+    {}
 
-    virtual bool do_is(mask m, charT c) const;
-    virtual const charT* do_is(const charT* low, const charT* high, mask* vec) const;
-    virtual const charT* do_scan_is(mask m, const charT* low, const charT* high) const;
-    virtual const charT* do_scan_not(mask m, const charT* low, const charT* high) const;
-    virtual charT do_toupper(charT) const;
-    virtual const charT* do_toupper(charT* low, const charT* high) const;
-    virtual charT do_tolower(charT) const;
-    virtual const charT* do_tolower(charT* low, const charT* high) const;
-    virtual charT do_widen(char) const;
-    virtual const char* do_widen(const char* low, const char* high, charT* dest) const;
-    virtual char do_narrow(charT, char dfault) const;
-    virtual const charT* do_narrow(const charT* low, const charT* high, char dfault, char* dest) const;
+    _NTL_LOC_VIRTUAL bool do_is(mask m, charT c) const;
+    _NTL_LOC_VIRTUAL const charT* do_is(const charT* low, const charT* high, mask* vec) const;
+    _NTL_LOC_VIRTUAL const charT* do_scan_is(mask m, const charT* low, const charT* high) const;
+    _NTL_LOC_VIRTUAL const charT* do_scan_not(mask m, const charT* low, const charT* high) const;
+    _NTL_LOC_VIRTUAL charT do_toupper(charT) const;
+    _NTL_LOC_VIRTUAL const charT* do_toupper(charT* low, const charT* high) const;
+    _NTL_LOC_VIRTUAL charT do_tolower(charT) const;
+    _NTL_LOC_VIRTUAL const charT* do_tolower(charT* low, const charT* high) const;
+    _NTL_LOC_VIRTUAL charT do_widen(char) const;
+    _NTL_LOC_VIRTUAL const char* do_widen(const char* low, const char* high, charT* dest) const;
+    _NTL_LOC_VIRTUAL char do_narrow(charT, char dfault) const;
+    _NTL_LOC_VIRTUAL const charT* do_narrow(const charT* low, const charT* high, char dfault, char* dest) const;
     ///\}
 };// class ctype
 #ifdef __ICL
@@ -532,18 +538,18 @@ class ctype_byname : public ctype<charT>
     explicit ctype_byname(const char*, size_t refs = 0);
   protected:
     ~ctype_byname(); // virtual
-    virtual bool do_is(mask m, charT c) const;
-    virtual const charT* do_is(const charT* low, const charT* high, mask* vec) const;
-    virtual const charT* do_scan_is(mask m, const charT* low, const charT* high) const;
-    virtual const charT* do_scan_not(mask m, const charT* low, const charT* high) const;
-    virtual charT do_toupper(charT) const;
-    virtual const charT* do_toupper(charT* low, const charT* high) const;
-    virtual charT do_tolower(charT) const;
-    virtual const charT* do_tolower(charT* low, const charT* high) const;
-    virtual charT do_widen(char) const;
-    virtual const char* do_widen(const char* low, const char* high, charT* dest) const;
-    virtual char do_narrow(charT, char dfault) const;
-    virtual const charT* do_narrow(const charT* low, const charT* high, char dfault, char* dest) const;
+    _NTL_LOC_VIRTUAL bool do_is(mask m, charT c) const;
+    _NTL_LOC_VIRTUAL const charT* do_is(const charT* low, const charT* high, mask* vec) const;
+    _NTL_LOC_VIRTUAL const charT* do_scan_is(mask m, const charT* low, const charT* high) const;
+    _NTL_LOC_VIRTUAL const charT* do_scan_not(mask m, const charT* low, const charT* high) const;
+    _NTL_LOC_VIRTUAL charT do_toupper(charT) const;
+    _NTL_LOC_VIRTUAL const charT* do_toupper(charT* low, const charT* high) const;
+    _NTL_LOC_VIRTUAL charT do_tolower(charT) const;
+    _NTL_LOC_VIRTUAL const charT* do_tolower(charT* low, const charT* high) const;
+    _NTL_LOC_VIRTUAL charT do_widen(char) const;
+    _NTL_LOC_VIRTUAL const char* do_widen(const char* low, const char* high, charT* dest) const;
+    _NTL_LOC_VIRTUAL char do_narrow(charT, char dfault) const;
+    _NTL_LOC_VIRTUAL const charT* do_narrow(const charT* low, const charT* high, char dfault, char* dest) const;
 };
 
 #ifdef __ICL
@@ -734,15 +740,15 @@ template <> class ctype_byname<char>
   public:
     explicit ctype_byname(const char*, size_t refs = 0);
   protected:
-    virtual ~ctype_byname(); // virtual
-    virtual char do_toupper(char c) const;
-    virtual const char* do_toupper(char* low, const char* high) const;
-    virtual char do_tolower(char c) const;
-    virtual const char* do_tolower(char* low, const char* high) const;
-    virtual char do_widen(char c) const;
-    virtual const char* do_widen(const char* low, const char* high, char* to) const;
-    virtual char do_narrow(char c, char dfault) const;
-    virtual const char* do_narrow(const char* low, const char* high, char dfault, char* to) const;
+    _NTL_LOC_VIRTUAL ~ctype_byname(); // virtual
+    _NTL_LOC_VIRTUAL char do_toupper(char c) const;
+    _NTL_LOC_VIRTUAL const char* do_toupper(char* low, const char* high) const;
+    _NTL_LOC_VIRTUAL char do_tolower(char c) const;
+    _NTL_LOC_VIRTUAL const char* do_tolower(char* low, const char* high) const;
+    _NTL_LOC_VIRTUAL char do_widen(char c) const;
+    _NTL_LOC_VIRTUAL const char* do_widen(const char* low, const char* high, char* to) const;
+    _NTL_LOC_VIRTUAL char do_narrow(char c, char dfault) const;
+    _NTL_LOC_VIRTUAL const char* do_narrow(const char* low, const char* high, char dfault, char* to) const;
   private:
     ctype_byname(const ctype_byname&) __deleted;
     void operator=(const ctype_byname&) __deleted;
@@ -1413,32 +1419,228 @@ class num_get : public locale::facet
     typedef charT         char_type;
     typedef InputIterator iter_type;
 
-    explicit num_get(size_t refs = 0);
-    iter_type get(iter_type in, iter_type end, ios_base&, ios_base::iostate& err, bool& v) const;
-    iter_type get(iter_type in, iter_type end, ios_base&, ios_base::iostate& err, long& v) const;
-    iter_type get(iter_type in, iter_type end, ios_base&, ios_base::iostate& err, unsigned short& v) const;
-    iter_type get(iter_type in, iter_type end, ios_base&, ios_base::iostate& err, unsigned int& v) const;
-    iter_type get(iter_type in, iter_type end, ios_base&, ios_base::iostate& err, unsigned long& v) const;
-    iter_type get(iter_type in, iter_type end, ios_base&, ios_base::iostate& err, float& v) const;
-    iter_type get(iter_type in, iter_type end, ios_base&, ios_base::iostate& err, double& v) const;
-    iter_type get(iter_type in, iter_type end, ios_base&, ios_base::iostate& err, long double& v) const;
-    iter_type get(iter_type in, iter_type end, ios_base&, ios_base::iostate& err, void*& v) const;
+    explicit num_get(size_t refs = 0)
+      :facet(refs)
+    {}
+    ///\name 22.4.2.1.1 num_get members [facet.num.get.members]
+    /// 1 Returns: do_get(in, end, f, err, v).
+    iter_type get(iter_type in, iter_type end, ios_base& f, ios_base::iostate& err, bool& v) const              { return do_get(in,end,f,err,v); }
+    iter_type get(iter_type in, iter_type end, ios_base& f, ios_base::iostate& err, long& v) const              { return do_get(in,end,f,err,v); }
+    iter_type get(iter_type in, iter_type end, ios_base& f, ios_base::iostate& err, long long& v) const         { return do_get(in,end,f,err,v); }
+    iter_type get(iter_type in, iter_type end, ios_base& f, ios_base::iostate& err, unsigned short& v) const    { return do_get(in,end,f,err,v); }
+    iter_type get(iter_type in, iter_type end, ios_base& f, ios_base::iostate& err, unsigned int& v) const      { return do_get(in,end,f,err,v); }
+    iter_type get(iter_type in, iter_type end, ios_base& f, ios_base::iostate& err, unsigned long& v) const     { return do_get(in,end,f,err,v); }
+    iter_type get(iter_type in, iter_type end, ios_base& f, ios_base::iostate& err, unsigned long long& v) const{ return do_get(in,end,f,err,v); }
+    iter_type get(iter_type in, iter_type end, ios_base& f, ios_base::iostate& err, float& v) const             { return do_get(in,end,f,err,v); }
+    iter_type get(iter_type in, iter_type end, ios_base& f, ios_base::iostate& err, double& v) const            { return do_get(in,end,f,err,v); }
+    iter_type get(iter_type in, iter_type end, ios_base& f, ios_base::iostate& err, long double& v) const       { return do_get(in,end,f,err,v); }
+    iter_type get(iter_type in, iter_type end, ios_base& f, ios_base::iostate& err, void*& v) const             { return do_get(in,end,f,err,v); }
+    ///\}
+
     static locale::id id;
 
   ///////////////////////////////////////////////////////////////////////////
   protected:
 
-    ~num_get(); //virtual
+    ~num_get() //virtual
+    {}
 
-    virtual iter_type do_get(iter_type, iter_type, ios_base&, ios_base::iostate& err, bool& v) const;
-    virtual iter_type do_get(iter_type, iter_type, ios_base&, ios_base::iostate& err, long& v) const;
-    virtual iter_type do_get(iter_type, iter_type, ios_base&, ios_base::iostate& err, unsigned short& v) const;
-    virtual iter_type do_get(iter_type, iter_type, ios_base&, ios_base::iostate& err, unsigned int& v) const;
-    virtual iter_type do_get(iter_type, iter_type, ios_base&, ios_base::iostate& err, unsigned long& v) const;
-    virtual iter_type do_get(iter_type, iter_type, ios_base&, ios_base::iostate& err, float& v) const;
-    virtual iter_type do_get(iter_type, iter_type, ios_base&, ios_base::iostate& err, double& v) const;
-    virtual iter_type do_get(iter_type, iter_type, ios_base&, ios_base::iostate& err, long double& v) const;
-    virtual iter_type do_get(iter_type, iter_type, ios_base&, ios_base::iostate& err, void*& v) const;
+    ///\name 22.4.2.1.2 num_get virtual functions [facet.num.get.virtuals]
+    _NTL_LOC_VIRTUAL iter_type do_get(iter_type in, iter_type end, ios_base& str, ios_base::iostate& err, bool& v) const
+    {
+      if(in == end){
+        err |= ios_base::eofbit;
+        return in;
+      }
+
+      if(!(str.flags() & ios_base::boolalpha)){
+
+        // integral bool
+        unsigned value = get_int<unsigned long, signed long>(in,end,str,err, numeric_limits<bool>::__max, numeric_limits<bool>::__min);
+        v = value != 0;
+        if(value > 1)
+          err |= ios_base::failbit;
+      }else{
+        // textual bool
+        v = false;
+        err = ios_base::goodbit;
+        const numpunct<char_type>& np = use_facet< numpunct<char_type> >(str.getloc());
+        const numpunct<char_type>::string_type t = np.truename(), f = np.falsename();
+        size_t i = 0, e1 = t.length(), e2 = f.length();
+        unsigned nt = 0, nf = 0; // not true, not false
+        do{
+          const char_type c = *in;
+          if(in == end)
+            break;
+
+          if(i == e1 && !nt){ // its a true
+            v = true;
+            break;
+          }else if(i == e2 && !nf) // its a false
+            break;
+
+          if(!nt && !(i < e1 && t[i] == c)) // end of truename or not 'true'
+            nt = true;
+          if(!nf && !(i < e2 && f[i] == c)) // end of falsename or not 'false'
+            nf = true;
+        }while(++i, ++in, !(nt && nf));
+        if(nt && nf)
+          err |= ios_base::failbit;
+      }
+      return in;
+    }
+    _NTL_LOC_VIRTUAL iter_type do_get(iter_type in, iter_type end, ios_base& f, ios_base::iostate& err, long& v) const
+    {
+      unsigned long value = get_int<unsigned long, signed long>(in,end,f,err, numeric_limits<long>::__max, numeric_limits<long>::__min);
+      v = static_cast<long>(value);
+      return in;
+    }
+    _NTL_LOC_VIRTUAL iter_type do_get(iter_type in, iter_type end, ios_base& f, ios_base::iostate& err, long long& v) const
+    {
+      unsigned long long value = get_int<unsigned long long, signed long long>(in,end,f,err, numeric_limits<long long>::__max, numeric_limits<long long>::__min);
+      v = static_cast<long long>(value);
+      return in;
+    }
+    _NTL_LOC_VIRTUAL iter_type do_get(iter_type in, iter_type end, ios_base& f, ios_base::iostate& err, unsigned short& v) const
+    {
+      unsigned value = get_int<unsigned long, signed long>(in,end,f,err, numeric_limits<unsigned short>::__max, numeric_limits<unsigned short>::__min);
+      v = static_cast<unsigned short>(value);
+      return in;
+    }
+    _NTL_LOC_VIRTUAL iter_type do_get(iter_type in, iter_type end, ios_base& f, ios_base::iostate& err, unsigned int& v) const
+    {
+      v = get_int<unsigned long, signed long>(in,end,f,err, numeric_limits<unsigned int>::__max, numeric_limits<unsigned int>::__min);
+      return in;
+    }
+    _NTL_LOC_VIRTUAL iter_type do_get(iter_type in, iter_type end, ios_base& f, ios_base::iostate& err, unsigned long& v) const
+    {
+      v = get_int<unsigned long, signed long>(in,end,f,err, numeric_limits<unsigned long>::__max, numeric_limits<unsigned long>::__min);
+      return in;
+    }
+    _NTL_LOC_VIRTUAL iter_type do_get(iter_type in, iter_type end, ios_base& f, ios_base::iostate& err, unsigned long long& v) const
+    {
+      v = get_int<unsigned long long, signed long long>(in,end,f,err, numeric_limits<unsigned long long>::__max, numeric_limits<unsigned long long>::__min);
+      return in;
+    }
+    _NTL_LOC_VIRTUAL iter_type do_get(iter_type in, iter_type end, ios_base& f, ios_base::iostate& err, float& v) const
+    {
+      return in;
+    }
+    _NTL_LOC_VIRTUAL iter_type do_get(iter_type in, iter_type end, ios_base& f, ios_base::iostate& err, double& v) const
+    {
+      return in;
+    }
+    _NTL_LOC_VIRTUAL iter_type do_get(iter_type in, iter_type end, ios_base& f, ios_base::iostate& err, long double& v) const
+    {
+      return in;
+    }
+    _NTL_LOC_VIRTUAL iter_type do_get(iter_type in, iter_type end, ios_base& f, ios_base::iostate& err, void*& v) const
+    {
+      // turn on hexadecimal mode for parsing pointer value
+      const ios_base::fmtflags prev_base = (f.flags() & ios_base::basefield);
+      f.setf(ios_base::hex, ios_base::basefield);
+
+      uintptr_t value = get_int<uintptr_t, intptr_t>(in,end,f,err, numeric_limits<uintptr_t>::__max, numeric_limits<uintptr_t>::__min);
+      v =reinterpret_cast<void*>(value);
+      f.setf(prev_base, ios_base::basefield);  // restore previous base flag
+      return in;
+    }
+    ///\}
+private:
+  template<typename storage_type, typename signed_storage_type> // this function will instantiated only tro times: for 64bit and all other types
+  static storage_type get_int(iter_type in, iter_type end, ios_base& str, ios_base::iostate& err, storage_type max_val, signed_storage_type min_val)
+  {
+    if(in == end){
+      err |= ios_base::eofbit;
+      return 0;
+    }
+
+    // initialization
+    const numpunct<char_type>& np = use_facet< numpunct<char_type> >(str.getloc());
+    const ctype<char_type>& ct = use_facet< ctype<char_type> >(str.getloc());
+
+    const ios_base::fmtflags flags = str .flags();
+    const ios_base::fmtflags basefield = (flags & ios_base::basefield);
+
+    const char_type thousands_sep = np.thousands_sep();
+    const size_t group_width = np.grouping().length();
+
+    const unsigned base = basefield == ios_base::oct ? 8 : basefield == ios_base::hex ? 16 : 10, rem = static_cast<unsigned>(max_val % base);
+    const ctype_base::mask base_mask = base == 16 ? ctype_base::xdigit : ctype_base::digit;
+
+    // parse state
+    bool minus = false, sign_extracted = false, prefix_extracted = false, overflow = false;
+
+    storage_type value = 0, max_base_val = max_val / base;
+
+    // NOTE: may be bad/fail bit on format error?
+    static const ios_base::iostate bad_format = ios_base::failbit;
+
+    size_t ic = 0; // number of digits extracted
+    do{
+      char_type c = *in;
+      if(in == end)
+        break;
+
+      if(base != 16 && value != 0 && group_width > 0 && c == thousands_sep) // skip group separator in the middle of digits (only in octal or decimal base)
+        continue;
+
+      if(c == '-' || c == '+'){
+        if(sign_extracted)
+          break;
+        sign_extracted = true;
+        minus = c == '-';
+        continue;
+      }
+
+      // skip prefix
+      if(!prefix_extracted && c == '0'){
+        ++ic;
+        continue;
+      }
+
+      if(base == 16 && (c == 'x' || c == 'X')){
+        if(prefix_extracted)
+          break;
+        continue;
+      }
+      prefix_extracted = true;
+
+      // check is it a valid digit
+      if(!ct.is(base_mask, c))
+        break;
+      if(base == 8 && c == '9')
+        break;
+
+      // its a valid character, use it
+      unsigned digit;
+      if(ct.is(ctype_base::alpha, c))
+        digit = ct.toupper(c) - 'A' + 10;
+      else
+        digit = c - '0';
+      if(digit >= base)
+        break;
+
+      ++ic;
+      if(value < max_base_val || (value == max_base_val && digit <= rem))
+        value = value * base + digit;
+      else{
+        overflow = true;
+        break;
+      }
+    }while(++in, true);
+
+    if(overflow)
+      value = minus ? min_val : max_val;
+    else if(minus)
+      value = static_cast<storage_type>( -static_cast<signed_storage_type>(value) );
+
+    if(ic == 0)
+      err |= bad_format;
+    if(in == end)
+      err |= ios_base::eofbit;
+    return value;
+  }
 };
 
 /// 22.2.2.2 Class template num_put [lib.locale.nm.put].
@@ -1458,7 +1660,7 @@ class num_put : public locale::facet
     {}
 
     ///\name 22.2.2.2.1 num_put members [facet.num.put.members]
-    /// 1 Returns: do_put(out, str, fill, val).
+    /// 1 Returns: do_put(out, f, fill, val).
 
     iter_type put(iter_type s, ios_base& f, char_type fill, bool v) const
     {
@@ -1492,6 +1694,7 @@ class num_put : public locale::facet
     {
       return do_put(s, f, fill, v);
     }
+    ///\}
 
     static locale::id id;
 
@@ -1509,7 +1712,7 @@ class num_put : public locale::facet
     ///   string_type s = val ? use_facet<ctype<charT> >(loc).truename()
     ///                   : use_facet<ctype<charT> >(loc).falsename();
     ///   and then inserts each character c of s into out via *out++ = c and returns out.
-    virtual iter_type
+    _NTL_LOC_VIRTUAL iter_type
       do_put(iter_type out, ios_base& str, char_type fill, bool val) const
     {
       if ( !(str.flags() & ios_base::boolalpha) )
@@ -1519,30 +1722,37 @@ class num_put : public locale::facet
       return copy(s.begin(), s.end(), out);
     }
 
-    virtual iter_type do_put(iter_type out, ios_base& str, char_type fill, long v) const
+    _NTL_LOC_VIRTUAL iter_type do_put(iter_type out, ios_base& str, char_type fill, long v) const
     {
       return put_int(out, str, fill, v, true);
     }
-    virtual iter_type do_put(iter_type out, ios_base& str, char_type fill, unsigned long v) const
+    _NTL_LOC_VIRTUAL iter_type do_put(iter_type out, ios_base& str, char_type fill, unsigned long v) const
     {
       return put_int(out, str, fill, v, false);
     }
-    virtual iter_type do_put(iter_type out, ios_base&, char_type, double) const
+    _NTL_LOC_VIRTUAL iter_type do_put(iter_type out, ios_base& str, char_type fill, long long v) const
+    {
+      return put_int(out, str, fill, v, true);
+    }
+    _NTL_LOC_VIRTUAL iter_type do_put(iter_type out, ios_base& str, char_type fill, unsigned long long v) const
+    {
+      return put_int(out, str, fill, v, false);
+    }
+    _NTL_LOC_VIRTUAL iter_type do_put(iter_type out, ios_base&, char_type, double) const
     {
       return out;
     }
-    virtual iter_type do_put(iter_type out, ios_base&, char_type, long double) const
+    _NTL_LOC_VIRTUAL iter_type do_put(iter_type out, ios_base&, char_type, long double) const
     {
       return out;
     }
-    virtual iter_type do_put(iter_type out, ios_base& str, char_type fill, const void* v) const
+    _NTL_LOC_VIRTUAL iter_type do_put(iter_type out, ios_base& str, char_type fill, const void* v) const
     {
       return put_int(out,str,fill,reinterpret_cast<unsigned long long>(v), false, sizeof(void*) > sizeof(long), true);
     }
-
     ///\}
   private:
-    iter_type put_int(iter_type out, ios_base& str, char_type fill, unsigned long long v, bool is_signed, bool is_long = false, bool is_pointer = false) const
+    static iter_type put_int(iter_type out, ios_base& str, char_type fill, unsigned long long v, bool is_signed, bool is_long = false, bool is_pointer = false)
     {
       const ios_base::fmtflags flags = str.flags();
       const ios_base::fmtflags adjust = flags & ios_base::adjustfield;
@@ -1663,9 +1873,9 @@ protected:
   ~collate()
   {}
 
-  virtual int do_compare(const charT* low1, const charT* high1, const charT* low2, const charT* high2) const;
-  virtual string_type do_transform(const charT* low, const charT* high) const;
-  virtual long do_hash (const charT* low, const charT* high) const;
+  _NTL_LOC_VIRTUAL int do_compare(const charT* low1, const charT* high1, const charT* low2, const charT* high2) const;
+  _NTL_LOC_VIRTUAL string_type do_transform(const charT* low, const charT* high) const;
+  _NTL_LOC_VIRTUAL long do_hash (const charT* low, const charT* high) const;
 };
 
 template <class charT> class collate_byname;
@@ -1736,11 +1946,15 @@ namespace __
 
     //////////////////////////////////////////////////////////////////////////
     // use_facet
-    template<class charT, class OutputIterator>
-    static const num_put<charT, OutputIterator>& get_facet(const locale&, type2type<num_put<charT, OutputIterator> >/*, typename enable_if<is_same<charT,char>::value>::type* =0*/)
+    template<class charT, class InputIterator>
+    static const num_get<charT, InputIterator>& get_facet(const locale&, type2type<num_get<charT, InputIterator> >)
     {
-      //static const num_put<charT, OutputIterator> facet;
-      //return facet;
+      return *static_storage<num_get<charT,InputIterator> >::get_object();
+    }
+
+    template<class charT, class OutputIterator>
+    static const num_put<charT, OutputIterator>& get_facet(const locale&, type2type<num_put<charT, OutputIterator> >)
+    {
       return *static_storage<num_put<charT,OutputIterator> >::get_object();
     }
 
@@ -1803,6 +2017,21 @@ bool has_facet(const locale&) __ntl_nothrow
 {
   return __::facets::has_facet<Facet>::value;
 }
+
+// @note: locale id globals to suppress the C4661
+__declspec(selectany)
+std::locale::id std::ctype<char>::id;
+__declspec(selectany)
+std::locale::id std::ctype<wchar_t>::id;
+__declspec(selectany)
+std::locale::id std::num_get<char>::id;
+__declspec(selectany)
+std::locale::id std::num_get<wchar_t>::id;
+__declspec(selectany)
+std::locale::id std::num_put<char>::id;
+__declspec(selectany)
+std::locale::id std::num_put<wchar_t>::id;
+
 
 #endif // STLX__CONFORMING_LOCALE
 

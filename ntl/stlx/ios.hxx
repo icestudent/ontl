@@ -456,10 +456,9 @@ class basic_ios : public ios_base
     {
       swap(x);
     }
-    void swap(basic_ios&& x)
-  #else
-    void swap(basic_ios& x)
   #endif
+
+    void swap(basic_ios& x)
     {
       if(this == &x)
         return;

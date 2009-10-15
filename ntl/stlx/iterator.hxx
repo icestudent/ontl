@@ -703,10 +703,10 @@ class istreambuf_iterator
 
     proxy operator++(int) { return proxy( sbuf_->sbumpc(), sbuf_ ); }
 
-    bool equal(istreambuf_iterator& b) const
+    bool equal(const istreambuf_iterator& b) const
     {
-      return ( ! sbuf_ && ! b.sbuf_ )
-        || traits::not_eof(sbuf_->sgetc()) && traits::not_eof(b.sbuf_->sgetc());
+      return sbuf_ && b.sbuf_ ? traits::not_eof(sbuf_->sgetc()) && traits::not_eof(b.sbuf_->sgetc())
+        : sbuf_ == b.sbuf_;
     }
 
   friend

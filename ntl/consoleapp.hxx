@@ -52,7 +52,7 @@ extern"C" void _cdecl __console_abort();
 #endif
 
 #pragma warning(push)
-#pragma warning(disable:4714)//function 'int __thiscall ntl::consoleapp::main(void)' marked as __forceinline not inlined
+#pragma warning(disable:4714 4702)//function 'int __thiscall ntl::consoleapp::main(void)' marked as __forceinline not inlined; unreachable code
 int _Consoleapp_entry()
 {
   #ifdef _MSC_VER
@@ -62,6 +62,9 @@ int _Consoleapp_entry()
   crt_initializer __crt;
   consoleapp app;
   return app.main();
+
+  // for explicit instantiation to eliminate annoyed including "nt/new.hxx"
+  new char, new char[0], new (std::nothrow) char, new(std::nothrow) char[0];
 }
 #pragma warning(pop)
 
