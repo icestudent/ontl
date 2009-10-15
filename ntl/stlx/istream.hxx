@@ -155,8 +155,7 @@ class basic_istream : virtual public basic_ios<charT, traits>
       __ntl_catch(...){
         state |= ios_base::badbit;
       }
-      if(state != ios_base::goodbit)
-        setstate(state);
+      if(state) setstate(state);
       return *this;
     }
     template<typename ValueT>
@@ -186,8 +185,7 @@ class basic_istream : virtual public basic_ios<charT, traits>
       __ntl_catch(...){
         state |= ios_base::badbit;
       }
-      if(state != ios_base::goodbit)
-        setstate(state);
+      if(state) setstate(state);
       return *this;
     }
   public:
@@ -249,23 +247,23 @@ class basic_istream : virtual public basic_ios<charT, traits>
     {
       ccount = 0;
       const sentry ok(*this, true);
-      ios_base::iostate state = ios_base::goodbit;
+      ios_base::iostate state = ok ? ios_base::goodbit : ios_base::failbit;
       int_type c = traits_type::eof();
-      if ( ok )
-        __ntl_try
-        {
-          c = this->rdbuf()->sbumpc();
-          if ( traits_type::eq_int_type(traits_type::eof(), c) )
-            state |= ios_base::eofbit | ios_base::failbit;
-          else ++ccount;
-        }
-        __ntl_catch(...)
-        {
-          state |= ios_base::badbit;
-          // NOTE: why this is commented?
-          //if ( this->exceptions() & ios_base::badbit ) __ntl_rethrow;
-        }
-      this->setstate(state);
+      if (ok)
+      __ntl_try
+      {
+        c = this->rdbuf()->sbumpc();
+        if ( traits_type::eq_int_type(traits_type::eof(), c) )
+          state |= ios_base::eofbit | ios_base::failbit;
+        else ++ccount;
+      }
+      __ntl_catch(...)
+      {
+        state |= ios_base::badbit;
+        // NOTE: why this is commented?
+        //if ( this->exceptions() & ios_base::badbit ) __ntl_rethrow;
+      }
+      if(state) this->setstate(state);
       return c;
     }
 
@@ -285,34 +283,32 @@ class basic_istream : virtual public basic_ios<charT, traits>
     basic_istream<charT,traits>& get(char_type* s, streamsize n, char_type delim)
     {
       ccount = 0;
-      if ( n > 0 ) *s = char_type();
+      /* unformatted input functions taking a character array of non-zero size as an argument 
+         shall also store a null character in the first location of the array. */
+      *s = char_type();
       const sentry ok(*this, true);
       ios_base::iostate state = ios_base::goodbit;
-      if ( ok )
-      __ntl_try
-      {
-        const int_type eof = traits_type::eof();
-        basic_streambuf<char_type, traits_type>* buf = rdbuf();
-        while ( 0 < --n )
+      if (ok){ // && n > 0?
+        __ntl_try
         {
-          //s[1] = char_type();
-          const int_type c = buf->sbumpc();
-          if ( traits_type::eq_int_type(eof, c) )
-          {
-            state |= ios_base::eofbit;
-            break;
+          const int_type eof = traits_type::eof();
+          basic_streambuf<char_type, traits_type>* buf = rdbuf();
+          for(int_type c = buf->sgetc(); 0 < --n; c = buf->snextc()){
+            if(traits_type::eq_int_type(eof, c))
+            {state |= ios_base::eofbit; break;}
+            const char_type cc = traits_type::to_char_type(c);
+            if(traits_type::eq(delim, cc))
+              break;
+            *s++ = cc;
+            ++ccount;
           }
-          if ( traits_type::eq(delim, traits_type::to_char_type(c)) )
-            break;
-          *s++ = traits_type::to_char_type(c);
-          ++ccount;
         }
+        __ntl_catch(...)
+        {
+          state |= ios_base::badbit;
+        }
+        if ( n > 0 ) *s = char_type();
       }
-      __ntl_catch(...)
-      {
-        state |= ios_base::badbit;
-      }
-      if ( n > 0 ) *s = char_type();
       this->setstate(state | ccount ? state : ios_base::failbit);
       return *this;
     }
@@ -327,28 +323,29 @@ class basic_istream : virtual public basic_ios<charT, traits>
       ccount = 0;
       const sentry ok(*this, true);
       ios_base::iostate state = ios_base::goodbit;
-      if ( ok )
+      if (ok)
         __ntl_try
+      {
+        basic_streambuf<char_type, traits_type>* buf = rdbuf();
+        for (int_type c = buf->sgetc(), eof = traits_type::eof(); ; c = buf->snextc() )
         {
-          basic_streambuf<char_type, traits_type>* buf = rdbuf();
-          for (int_type c = buf->sgetc(), eof = traits_type::eof(); ; c = buf->snextc() )
+          if ( traits_type::eq_int_type(eof, c) )
           {
-            if ( traits_type::eq_int_type(eof, c) )
-            {
-              state |= ios_base::eofbit;
-              break;
-            }
-            if ( traits_type::eq(delim, traits_type::to_char_type(c)) )
-              break;
-            if ( traits_type::eq_int_type(eof, dest.sputc(traits_type::to_char_type(c))) )
-              break;
-            ++ccount;
+            state |= ios_base::eofbit;
+            break;
           }
+          const char_type cc = traits_type::to_char_type(c);
+          if (traits_type::eq(delim, cc))
+            break;
+          if ( traits_type::eq_int_type(eof, dest.sputc(cc)) )
+            break;
+          ++ccount;
         }
-        __ntl_catch(...)
-        {
-          break;
-        }
+      }
+      __ntl_catch(...)
+      {
+        state |= ios_base::badbit;
+      }
       this->setstate(state | ccount ? state : ios_base::failbit);
       return *this;
     }
@@ -361,39 +358,41 @@ class basic_istream : virtual public basic_ios<charT, traits>
     basic_istream<charT,traits>& getline(char_type* s, streamsize n, char_type delim)
     {
       ccount = 0;
+      *s = char_type();
       const sentry ok(*this, true);
       ios_base::iostate state = ios_base::goodbit;
-      if (ok && n > 0)
-      __ntl_try
-      {
-        basic_streambuf<char_type, traits_type>* buf = rdbuf();
-        const int_type eof = traits_type::eof(), d = traits_type::to_int_type(delim);
-        int_type c;
+      if(ok && n > 0){
+        __ntl_try
+        {
+          basic_streambuf<char_type, traits_type>* buf = rdbuf();
+          const int_type eof = traits_type::eof(), d = traits_type::to_int_type(delim);
+          int_type c;
 
-        while(ccount+1 < n){ // space for null-terminator
-          c = buf->sbumpc();
-          if(traits_type::eq_int_type(c, eof) || traits_type::eq_int_type(c, d))
-            break;
-          *s++ = traits_type::to_char_type(c);
-          ++ccount;
-        } 
-        
-        if(traits_type::eq_int_type(c, eof))
-          state |= ios_base::eofbit;
-        else if(traits_type::eq_int_type(c, d))
-          ++ccount;
-        else //if(n <= 1)
-          state |= ios_base::failbit; // line too long
+          while(ccount+1 < n){ // space for null-terminator
+            c = buf->sbumpc();
+            if(traits_type::eq_int_type(c, eof) || traits_type::eq_int_type(c, d))
+              break;
+            *s++ = traits_type::to_char_type(c);
+            ++ccount;
+          } 
+
+          if(traits_type::eq_int_type(c, eof))
+            state |= ios_base::eofbit;
+          else if(traits_type::eq_int_type(c, d))
+            ++ccount;
+          else //if(n <= 1)
+            state |= ios_base::failbit; // line too long
+        }
+        __ntl_catch(...)
+        {
+          state |= ios_base::badbit;
+        }
+        if(n > 0)
+          *s = char_type();
       }
-      __ntl_catch(...)
-      {
-        state |= ios_base::badbit;
-      }
-      if(n > 0)
-        *s = char_type();
       if(!ccount)
         state |= ios_base::failbit;
-      this->setstate(state);
+      if(state) this->setstate(state);
       return *this;
     }
 
@@ -401,26 +400,29 @@ class basic_istream : virtual public basic_ios<charT, traits>
     {
       ccount = 0;
       const sentry ok(*this, true);
-      ios_base::iostate state = ios_base::goodbit;
-      if (ok && n > 0 && n != numeric_limits<streamsize>::__max)
-      __ntl_try
-      {
-        basic_streambuf<char_type, traits_type>* buf = rdbuf();
-        const int_type eof = traits_type::eof();
-        int_type c;
-        do{
-          c = buf->sbumpc();
-          if(traits_type::eq_int_type(c, eof) || traits_type::eq_int_type(c, delim))
-            break;
-        } while(++ccount, --n);
-        if(traits_type::eq_int_type(c, eof))
-          state |= ios_base::eofbit;
+      if (ok && n > 0 && n != numeric_limits<streamsize>::__max){
+        ios_base::iostate state = ios_base::goodbit;
+        __ntl_try
+        {
+          basic_streambuf<char_type, traits_type>* buf = rdbuf();
+          const int_type eof = traits_type::eof();
+          int_type c;
+          do{
+            c = buf->sbumpc();
+            if(traits_type::eq_int_type(c, eof) || traits_type::eq_int_type(c, delim))
+              break;
+          } while(++ccount, --n);
+          if(traits_type::eq_int_type(c, eof))
+            state |= ios_base::eofbit;
+          else
+            ++ccount;
+        }
+        __ntl_catch(...)
+        {
+          state |= ios_base::badbit;
+        }
+        if(state) this->setstate(state);
       }
-      __ntl_catch(...)
-      {
-        state |= ios_base::badbit;
-      }
-      this->setstate(state);
       return *this;
     }
 
@@ -429,8 +431,8 @@ class basic_istream : virtual public basic_ios<charT, traits>
       ccount = 0;
       int_type c = traits_type::eof();
       const sentry ok(*this, true);
-      ios_base::iostate state = ios_base::goodbit;
-      if ( ok )
+      if (ok){
+        ios_base::iostate state = ios_base::goodbit;
         __ntl_try
         {
           c = this->rdbuf()->sgetc();
@@ -441,7 +443,8 @@ class basic_istream : virtual public basic_ios<charT, traits>
         {
           state |= ios_base::badbit;
         }
-      this->setstate(state);
+        if(state) this->setstate(state);
+      }
       return c;
     }
 
@@ -461,7 +464,7 @@ class basic_istream : virtual public basic_ios<charT, traits>
       {
         state |= ios_base::badbit;
       }
-      this->setstate(state);
+      if(state) this->setstate(state);
       return *this;
     }
 
@@ -483,7 +486,7 @@ class basic_istream : virtual public basic_ios<charT, traits>
       {
         state |= ios_base::badbit;
       }
-      this->setstate(state);
+      if(state) this->setstate(state);
       return ccount;
     }
 
@@ -503,7 +506,7 @@ class basic_istream : virtual public basic_ios<charT, traits>
       {
         state |= ios_base::badbit;
       }
-      this->setstate(state);
+      if(state) this->setstate(state);
       return *this;
     }
 
@@ -523,7 +526,7 @@ class basic_istream : virtual public basic_ios<charT, traits>
       {
         state |= ios_base::badbit;
       }
-      this->setstate(state);
+      if(state) this->setstate(state);
       return *this;
     }
 
@@ -531,23 +534,24 @@ class basic_istream : virtual public basic_ios<charT, traits>
     {
       int re = -1;
       const sentry ok(*this, true);
-      ios_base::iostate state = ios_base::goodbit;
-      if (ok)
-      __ntl_try
-      {
-        basic_streambuf<char_type, traits_type>* buf = rdbuf();
-        if(buf){
-          if(buf->pubsync() == -1)
-            state |= ios_base::badbit;
-          else
-            re = 0;
+      if (ok){
+        ios_base::iostate state = ios_base::goodbit;
+        __ntl_try
+        {
+          basic_streambuf<char_type, traits_type>* buf = rdbuf();
+          if(buf){
+            if(buf->pubsync() == -1)
+              state |= ios_base::badbit;
+            else
+              re = 0;
+          }
         }
+        __ntl_catch(...)
+        {
+          state |= ios_base::badbit;
+        }
+        if(state) this->setstate(state);
       }
-      __ntl_catch(...)
-      {
-        state |= ios_base::badbit;
-      }
-      this->setstate(state);
       return re;
     }
 
@@ -555,51 +559,51 @@ class basic_istream : virtual public basic_ios<charT, traits>
     {
       pos_type re = pos_type(-1);
       const sentry ok(*this, true);
-      ios_base::iostate state = ios_base::goodbit;
-      if(!fail())
-      __ntl_try{
-        re = rdbuf()->pubseekoff(0, ios_base::cur, ios_base::in);
+      if(!fail()){
+        ios_base::iostate state = ios_base::goodbit;
+        __ntl_try{
+          re = rdbuf()->pubseekoff(0, ios_base::cur, ios_base::in);
+        }
+        __ntl_catch(...){
+          state |= ios_base::badbit;
+        }
+        this->setstate(state);
       }
-      __ntl_catch(...){
-        state |= ios_base::badbit;
-      }
-      if(state)
-        setstate(state);
       return re;
     }
 
     basic_istream<charT,traits>& seekg(pos_type pos)
     {
       const sentry ok(*this, true);
-      ios_base::iostate state = ios_base::goodbit;
-      if(!fail())
-      __ntl_try{
-        if(rdbuf()->pubseekpos(pos, ios_base::in) == pos_type(off_type(-1)))
-          state |= ios_base::failbit;
+      if(!fail()){
+        ios_base::iostate state = ios_base::goodbit;
+        __ntl_try{
+          if(rdbuf()->pubseekpos(pos, ios_base::in) == pos_type(off_type(-1)))
+            state |= ios_base::failbit;
+        }
+        __ntl_catch(...){
+          state |= ios_base::badbit;
+        }
+        this->setstate(state);
       }
-      __ntl_catch(...){
-        state |= ios_base::badbit;
-      }
-      if(state)
-        setstate(state);
       return *this;
     }
 
     basic_istream<charT,traits>& seekg(off_type off, ios_base::seekdir dir)
     {
       const sentry ok(*this, true);
-      ios_base::iostate state = ios_base::goodbit;
-      if(!fail())
-      __ntl_try{
-        // NOTE: is error checking required here?
-        if(rdbuf()->pubseekoff(off, dir, ios_base::in) == pos_type(off_type(-1)))
-          state |= ios_base::failbit;
+      if(!fail()){
+        ios_base::iostate state = ios_base::goodbit;
+        __ntl_try{
+          // NOTE: is error checking required here?
+          if(rdbuf()->pubseekoff(off, dir, ios_base::in) == pos_type(off_type(-1)))
+            state |= ios_base::failbit;
+        }
+        __ntl_catch(...){
+          state |= ios_base::badbit;
+        }
+        this->setstate(state);
       }
-      __ntl_catch(...){
-        state |= ios_base::badbit;
-      }
-      if(state)
-        setstate(state);
       return *this;
     }
 
@@ -717,7 +721,7 @@ inline basic_istream<charT,traits>& ws(basic_istream<charT,traits>& is)
   __ntl_catch(...){
     state |= ios_base::badbit;
   }
-  is.setstate(state);
+  if(state) is.setstate(state);
   return is;
 }
 
