@@ -314,6 +314,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\stlx\ext\numeric_conversions.hxx"
+						>
+					</File>
+					<File
 						RelativePath=".\stlx\ext\rbtree.hxx"
 						>
 					</File>

@@ -10,10 +10,17 @@
 
 #include "cuchar.hxx"
 #ifndef NTL__STLX_IOSFWD
-#include "iosfwd.hxx"
+# include "iosfwd.hxx"
 #endif
-#include "vector.hxx"
+#ifndef NTL__STLX_VECTOR
+# include "vector.hxx"
+#endif
+#ifndef NTL__STLX_FUNCTIONAL
 #include "functional.hxx" // for hash<>
+#endif
+#ifndef NTL__EXT_NUMERIC_CONVERSIONS
+# include "ext/numeric_conversions.hxx"
+#endif
 
 #ifndef EOF // should be moved to "stdio.hxx" ?
 # define EOF -1
@@ -1483,6 +1490,143 @@ long double stold(const wstring& str, size_t *idx = 0);
 wstring to_wstring(long long val);
 wstring to_wstring(unsigned long long val);
 wstring to_wstring(long double val);
+
+namespace __
+{
+  template<typename T>
+  inline T stoi(const char* str, size_t length, size_t* idx, int base)
+  {
+    size_t l;
+    typedef typename conditional<(sizeof(T) > sizeof(long)), unsigned long long, unsigned long>::type storage_type;
+    storage_type value;
+    ntl::numeric::convresult re = ntl::numeric::str2num<storage_type, typename make_signed<storage_type>::type>(value, str, length, base, numeric_limits<T>::__max, numeric_limits<T>::__min, &l);
+    if(idx) *idx = l;
+    if(re <= ntl::numeric::conv_result::bad_format)
+      __ntl_throw(invalid_argument("stoi: no conversion could be performed"));
+    else if(re == ntl::numeric::conv_result::overflow)
+      __ntl_throw(out_of_range("stoi: converted value is outside the range of representable values"));
+    return static_cast<T>(value);
+  }
+}
+
+inline int stoi(const string& str, size_t *idx, int base)
+{
+  return __::stoi<int>(str.c_str(), str.length(), idx, base);
+}
+
+inline long stol(const string& str, size_t *idx, int base)
+{
+  return __::stoi<long>(str.c_str(), str.length(), idx, base);
+}
+
+inline unsigned long stoul(const string& str, size_t *idx, int base)
+{
+  return __::stoi<unsigned long>(str.c_str(), str.length(), idx, base);
+}
+
+inline long long stoll(const string& str, size_t *idx, int base)
+{
+  return __::stoi<long long>(str.c_str(), str.length(), idx, base);
+}
+
+inline unsigned long long stoull(const string& str, size_t *idx, int base)
+{
+  return __::stoi<unsigned long long>(str.c_str(), str.length(), idx, base);
+}
+
+inline int stoi(const wstring& str, size_t *idx, int base)
+{
+  char buf[ntl::numeric::max_number_size];
+  const wchar_t* p = str.c_str();
+  const size_t len = min(str.length(), ntl::numeric::max_number_size);
+  for(size_t i = 0; i != len; i++, p++)
+    buf[i] = static_cast<char>(*p);
+  return __::stoi<int>(buf, len, idx, base);
+}
+
+inline long stol(const wstring& str, size_t *idx, int base)
+{
+  char buf[ntl::numeric::max_number_size];
+  const wchar_t* p = str.c_str();
+  const size_t len = min(str.length(), ntl::numeric::max_number_size);
+  for(size_t i = 0; i != len; i++, p++)
+    buf[i] = static_cast<char>(*p);
+  return __::stoi<long>(buf, len, idx, base);
+}
+
+inline unsigned long stoul(const wstring& str, size_t *idx, int base)
+{
+  char buf[ntl::numeric::max_number_size];
+  const wchar_t* p = str.c_str();
+  const size_t len = min(str.length(), ntl::numeric::max_number_size);
+  for(size_t i = 0; i != len; i++, p++)
+    buf[i] = static_cast<char>(*p);
+  return __::stoi<unsigned long>(buf, len, idx, base);
+}
+
+inline long long stoll(const wstring& str, size_t *idx, int base)
+{
+  char buf[ntl::numeric::max_number_size];
+  const wchar_t* p = str.c_str();
+  const size_t len = min(str.length(), ntl::numeric::max_number_size);
+  for(size_t i = 0; i != len; i++, p++)
+    buf[i] = static_cast<char>(*p);
+  return __::stoi<long long>(buf, len, idx, base);
+}
+
+inline unsigned long long stoull(const wstring& str, size_t *idx, int base)
+{
+  char buf[ntl::numeric::max_number_size];
+  const wchar_t* p = str.c_str();
+  const size_t len = min(str.length(), ntl::numeric::max_number_size);
+  for(size_t i = 0; i != len; i++, p++)
+    buf[i] = static_cast<char>(*p);
+  return __::stoi<unsigned long long>(buf, len, idx, base);
+}
+
+
+//////////////////////////////////////////////////////////////////////////
+inline string to_string(long long val)
+{
+  string s(ntl::numeric::max_number_size, '\0');
+  size_t len;
+  ntl::numeric::itoa(val, s.begin(), s.size(), 10, &len);
+  s.resize(len);
+  return s;
+}
+
+inline string to_string(unsigned long long val)
+{
+  string s(ntl::numeric::max_number_size, '\0');
+  size_t len;
+  ntl::numeric::itoa(val, s.begin(), s.size(), 10, &len);
+  s.resize(len);
+  return s;
+}
+
+inline wstring to_wstring(long long val)
+{
+  wstring s(ntl::numeric::max_number_size, '\0');
+  size_t len;
+  ntl::numeric::itow(val, s.begin(), s.size(), 10, &len);
+  s.resize(len);
+  return s;
+}
+
+inline wstring to_wstring(unsigned long long val)
+{
+  wstring s(ntl::numeric::max_number_size, '\0');
+  size_t len;
+  ntl::numeric::itow(val, s.begin(), s.size(), 10, &len);
+  s.resize(len);
+  return s;
+}
+
+// eliminate to_string(-1) ambiguity
+inline string to_string(int val) { return to_string(static_cast<long long>(val)); }
+inline string to_string(unsigned int val) { return to_string(static_cast<unsigned long long>(val)); }
+inline wstring to_wstring(int val) { return to_wstring(static_cast<long long>(val)); }
+inline wstring to_wstring(unsigned int val) { return to_wstring(static_cast<unsigned long long>(val)); }
 
 //////////////////////////////////////////////////////////////////////////
 //hash specializations for basic_string:

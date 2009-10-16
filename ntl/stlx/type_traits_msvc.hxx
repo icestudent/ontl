@@ -70,8 +70,91 @@ template <class T> struct add_rvalue_reference<T&> { typedef T& type; };
 template <class T> struct add_reference : public add_lvalue_reference<T> {};
 
 // 20.5.6.3 Sign modifications [meta.trans.sign]
-template <class T> struct make_signed;
-template <class T> struct make_unsigned;
+namespace __
+{
+  template<typename T> struct change_sign;
+
+#define _change_signs(funda) \
+  template<> struct change_sign<unsigned funda> { typedef   signed funda type; }; \
+  template<> struct change_sign<  signed funda> { typedef unsigned funda type; };
+
+  _change_signs(char);
+  _change_signs(short int);
+  _change_signs(int);
+  _change_signs(long int);
+  _change_signs(long long int);
+#undef _change_signs
+
+  template<size_t SizeOfT> struct map_to_funda;
+  template<> struct map_to_funda<0> { typedef void    type; };
+  template<> struct map_to_funda<1> { typedef int8_t  type; };
+  template<> struct map_to_funda<2> { typedef int16_t type; };
+  template<> struct map_to_funda<4> { typedef int32_t type; };
+  template<> struct map_to_funda<8> { typedef int64_t type; };
+
+  template<typename enumT>
+  struct enum_base
+  {
+    typedef typename map_to_funda<sizeof(enumT)>::type type;
+  };
+
+  template <class T, bool isenum> struct make_signed2
+  {
+  private:
+    static const bool isconst = is_const<T>::value, isvolatile = is_volatile<T>::value;
+    typedef typename remove_cv<T>::type U;
+    typedef typename conditional<is_signed<U>::value, U, typename __::change_sign<U>::type>::type V;
+    typedef typename conditional<isvolatile, typename add_volatile<V>::type, V>::type W;
+    typedef typename conditional<isconst, typename add_const<W>::type, W>::type X;
+  public:
+    typedef X type;
+  };
+
+  template <class T, bool isenum> struct make_unsigned2
+  {
+    static_assert(is_integral<T>::value, "T shall be integral type");
+    static_assert((!is_same<T, bool>::value), "T shall not be a bool type");
+  private:
+    static const bool isconst = is_const<T>::value, isvolatile = is_volatile<T>::value;
+    typedef typename remove_cv<T>::type U;
+    typedef typename conditional<is_unsigned<U>::value, U, typename __::change_sign<U>::type>::type V;
+    typedef typename conditional<isvolatile, typename add_volatile<V>::type, V>::type W;
+    typedef typename conditional<isconst, typename add_const<W>::type, W>::type X;
+  public:
+    typedef X type;
+  };
+
+  template<class T> struct make_signed2<T,true>
+  {
+    typedef typename enum_base<T>::type type;
+  };
+
+  template<class T> struct make_unsigned2<T,true>
+  {
+    typedef typename make_unsigned2<typename enum_base<T>::type, false>::type type;
+  };
+}
+
+template<class T>
+struct make_signed
+{
+  static_assert(is_integral<T>::value||is_enum<T>::value, "T shall be an integral type or enumeration");
+  static_assert((!is_same<T, bool>::value), "T shall not be a bool type");
+  
+  typedef typename __::make_signed2<T, is_enum<T>::value>::type type;
+};
+
+template<class T>
+struct make_unsigned
+{
+  static_assert(is_integral<T>::value||is_enum<T>::value, "T shall be an integral type or enumeration");
+  static_assert((!is_same<T, bool>::value), "T shall not be a bool type");
+
+  typedef typename __::make_unsigned2<T, is_enum<T>::value>::type type;
+};
+
+template<> struct make_signed  <char> { typedef   signed char type; };
+template<> struct make_unsigned<char> { typedef unsigned char type; };
 
 // 20.5.6.4 Array modifications [meta.trans.arr]
 

@@ -17,6 +17,10 @@
 # include "../atomic.hxx"
 #endif
 
+#ifndef NTL__EXT_NUMERIC_CONVERSIONS
+#include "ext/numeric_conversions.hxx"
+#endif
+
 extern "C"
 {
   typedef void __cdecl vfv_t(void);
@@ -36,14 +40,22 @@ NTL__CRTCALL
   atof(const char *nptr);
 
 /// 7.20.1.2 The atoi function
+inline
 int
 NTL__CRTCALL
-  atoi(const char *nptr);
+  atoi(const char *nptr)
+{
+  return ntl::numeric::strtoi(nptr, 0, 10);
+}
 
 /// 7.20.1.2 The atol function
+inline
 long int
 NTL__CRTCALL
-  atol(const char *nptr);
+  atol(const char *nptr)
+{
+  return ntl::numeric::strtol(nptr, 0, 10);
+}
 
 /// 7.20.1.3 The strtod function
 double
@@ -51,23 +63,39 @@ NTL__CRTCALL
   strtod(const char * __restrict nptr, char ** __restrict endptr);
 
 /// 7.20.1.4 The strtol function
+inline
 long int
 NTL__CRTCALL
-  strtol(const char * __restrict nptr, char ** __restrict endptr, int base);
+  strtol(const char * __restrict nptr, char ** __restrict endptr, int base)
+{
+  return ntl::numeric::strtol(nptr, (const char**)endptr, base);
+}
 
 /// 7.20.1.4 The strtoul function
+inline
 unsigned long int
 NTL__CRTCALL
-  strtoul(const char * __restrict nptr, char ** __restrict endptr, int base);
+  strtoul(const char * __restrict nptr, char ** __restrict endptr, int base)
+{
+  return ntl::numeric::strtoul(nptr, (const char**)endptr, base);
+}
 
 // C library extension
-NTL__EXTERNAPI
+inline
+NTL__CRTCALL
 char* _cdecl
-  _itoa(int value, char* strbuf, int radix);
+  _itoa(int value, char* strbuf, int radix)
+{
+  return ntl::numeric::itoa(value, strbuf, ntl::numeric::max_number_size, radix);
+}
 
-NTL__EXTERNAPI
+inline
+NTL__CRTCALL
 wchar_t* _cdecl
-  _itow(int value, wchar_t* strbuf, int radix);
+  _itow(int value, wchar_t* strbuf, int radix)
+{
+  return ntl::numeric::itow(value, strbuf, ntl::numeric::max_number_size, radix);
+}
 
 ///\name  7.20.2 Pseudo-random sequence generation functions
 
@@ -204,9 +232,13 @@ NTL__EXTERNAPI int NTL__CRTIMP wctomb(char *s, wchar_t wc);
 #endif// #ifndef _INC_STDLIB
 
 /// 7.20.1.2 The atoll function
+inline
 long long int
 NTL__CRTCALL
-  atoll(const char *nptr);
+  atoll(const char *nptr)
+{
+  return ntl::numeric::strtoll(nptr, 0, 10);
+}
 
 /// 7.20.1.3 The strtof function
 float
@@ -220,14 +252,22 @@ NTL__CRTCALL
   strtold(const char * __restrict nptr, char ** __restrict endptr);
 
 /// 7.20.1.4 The strtoll function
+inline
 long long int
 NTL__CRTCALL
-  strtoll(const char * __restrict nptr, char ** __restrict endptr, int base);
+  strtoll(const char * __restrict nptr, char ** __restrict endptr, int base)
+{
+  return ntl::numeric::strtoll(nptr, (const char**)endptr, base);
+}
 
 /// 7.20.1.4 The strtoull function
+inline
 unsigned long long int
 NTL__CRTCALL
-  strtoull(const char * __restrict nptr, char ** __restrict endptr, int base);
+  strtoull(const char * __restrict nptr, char ** __restrict endptr, int base)
+{
+  return ntl::numeric::strtoull(nptr, (const char**)endptr, base);
+}
 
 /// 7.20.4.4 The _Exit function
 void

@@ -170,6 +170,7 @@ namespace std {
           if(mode_ & ios_base::in)
             gbump(gp);
         }
+        pbump(1);
       }
       return c;
     }

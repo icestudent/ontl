@@ -385,7 +385,7 @@ static const int16_t __ct_space = 0x0008;
 static const int16_t __ct_punct = 0x0010;
 static const int16_t __ct_cntrl = 0x0020;
 static const int16_t __ct_blank = 0x0040;
-static const int16_t __ct_xdigit = 0x0080;
+static const int16_t __ct_xdigit= 0x0080;
 static const int16_t __ct_alpha = 0x0100;
 #endif
 
@@ -1565,7 +1565,8 @@ private:
     const char_type thousands_sep = np.thousands_sep();
     const size_t group_width = np.grouping().length();
 
-    const unsigned base = basefield == ios_base::oct ? 8 : basefield == ios_base::hex ? 16 : 10, rem = static_cast<unsigned>(max_val % base);
+    const unsigned base = basefield == ios_base::oct ? 8 : basefield == ios_base::hex ? 16 : 10;
+    unsigned rem = static_cast<unsigned>(max_val % base);
     const ctype_base::mask base_mask = base == 16 ? ctype_base::xdigit : ctype_base::digit;
 
     // parse state
@@ -1590,6 +1591,10 @@ private:
           break;
         sign_extracted = true;
         minus = c == '-';
+        if(minus){
+          max_base_val = static_cast<storage_type>(min_val);
+          rem = static_cast<unsigned>(max_base_val % base);
+        }
         continue;
       }
 
@@ -1630,7 +1635,7 @@ private:
     }while(++in, true);
 
     if(overflow)
-      value = minus ? min_val : max_val;
+      value = minus ? static_cast<storage_type>(min_val) : max_val;
     else if(minus)
       value = static_cast<storage_type>( -static_cast<signed_storage_type>(value) );
 
@@ -1731,11 +1736,11 @@ class num_put : public locale::facet
     }
     _NTL_LOC_VIRTUAL iter_type do_put(iter_type out, ios_base& str, char_type fill, long long v) const
     {
-      return put_int(out, str, fill, v, true);
+      return put_int(out, str, fill, v, true, true);
     }
     _NTL_LOC_VIRTUAL iter_type do_put(iter_type out, ios_base& str, char_type fill, unsigned long long v) const
     {
-      return put_int(out, str, fill, v, false);
+      return put_int(out, str, fill, v, false, true);
     }
     _NTL_LOC_VIRTUAL iter_type do_put(iter_type out, ios_base&, char_type, double) const
     {

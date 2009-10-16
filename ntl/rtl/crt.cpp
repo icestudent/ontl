@@ -1,5 +1,5 @@
 //#pragma warning(disable:4820 4061)
-
+#include "../stlx/cstdio.hxx"
 #include "../stlx/cstdlib.hxx"
 #include "../nt/exception.hxx"
 #include "../atomic.hxx"
