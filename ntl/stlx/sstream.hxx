@@ -66,18 +66,14 @@ namespace std {
       :mode_(which)
     {}
 
-    explicit basic_stringbuf(const basic_string<charT,traits,Allocator>& str, ios_base::openmode which = ios_base::in | ios_base::out)
-      :str_(str), mode_(which)
+    explicit basic_stringbuf(const basic_string<charT,traits,Allocator>& s, ios_base::openmode which = ios_base::in | ios_base::out)
+      :mode_(which)
     {
-      set_ptrs();
+      str(s);
     }
 
   #ifdef NTL__CXX_RV
-    basic_stringbuf(basic_stringbuf&& rhs)
-      :mode_(ios_base::in|ios_base::out)
-    {
-      swap(rhs);
-    }
+    basic_stringbuf(basic_stringbuf&& rhs);
   #endif
 
     ///\name 27.7.1.2 Assign and swap:
@@ -115,7 +111,12 @@ namespace std {
 
     void str(const basic_string<charT,traits,Allocator>& s) 
     { 
-      str_ = s;
+      //str_ = s;
+      if(mode_ & ios_base::out){
+        // reserve additional 128 characters for output buffer
+        str_.reserve(s.size() + 128);
+      }
+      str_.assign(s);
       set_ptrs();
     }
 
@@ -159,7 +160,7 @@ namespace std {
         pbump(1);
       }else{
         const bool may_reallocate = str_.size() == str_.capacity();
-        const ptrdiff_t pp = gptr() - eback(), gp = pptr() - pbase();
+        const ptrdiff_t gp = gptr() - eback(), pp = pptr() - pbase();
 
         str_.push_back(cc); // may reallocate buffer
         
@@ -280,20 +281,13 @@ namespace std {
     {}
 
     explicit basic_istringstream(const basic_string<charT,traits,Allocator>& str, ios_base::openmode which = ios_base::in)
-      :basic_istream<charT,traits>(&sb), sb(which | ios_base::in)
+      :basic_istream<charT,traits>(&sb), sb(str, which | ios_base::in)
     {}
 
   #ifdef NTL__CXX_RV
-    basic_istringstream(basic_istringstream&& rhs)
-      :basic_istream<charT,traits>(&sb), sb(ios_base::in)
-    {
-      swap(rhs);
-      basic_istream::set_rdbuf(&sb);
-    }
-  #endif
+    basic_istringstream(basic_istringstream&& rhs);
 
     ///\name 27.7.2.2 Assign and swap:
-  #ifdef NTL__CXX_RV
     basic_istringstream& operator=(basic_istringstream&& rhs)
     {
       swap(rhs); return *this;
@@ -351,21 +345,15 @@ namespace std {
     {}
 
   #ifdef NTL__CXX_RV
-    basic_ostringstream(basic_ostringstream&& rhs)
-      :basic_ostream<charT,traits>(&sb), sb(ios_base::out)
-    {
-      swap(rhs);
-      basic_ostream::set_rdbuf(&sb);
-    }
-  #endif
+    basic_ostringstream(basic_ostringstream&& rhs);
 
     ///\name 27.7.3.2 Assign/swap:
-  #ifdef NTL__CXX_RV
     basic_ostringstream& operator=(basic_ostringstream&& rhs)
     {
       swap(rhs); return *this;
     }
   #endif
+
     void swap(basic_ostringstream& rhs)
     {
       basic_ostream::swap(rhs);
@@ -417,12 +405,7 @@ namespace std {
     {}
 
   #ifdef NTL__CXX_RV
-    basic_stringstream(basic_stringstream&& rhs)
-      :sb_(ios_base::out|ios_base::in), base_type(&sb_)
-    {
-      swap(rhs);
-      basic_iostream::set_rdbuf(&sb_);
-    }
+    basic_stringstream(basic_stringstream&& rhs);
   #endif
 
     ///\name 27.7.5.1 Assign/swap:

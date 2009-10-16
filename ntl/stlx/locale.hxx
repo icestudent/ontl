@@ -1609,13 +1609,12 @@ private:
       // check is it a valid digit
       if(!ct.is(base_mask, c))
         break;
-      if(base == 8 && c == '9')
-        break;
 
       // its a valid character, use it
       unsigned digit;
       if(ct.is(ctype_base::alpha, c))
-        digit = ct.toupper(c) - 'A' + 10;
+        //digit = ct.toupper(c) - 'A' + 10;
+        digit = (c & ~(1 << 5)) - 'A' + 10;
       else
         digit = c - '0';
       if(digit >= base)
@@ -1821,6 +1820,7 @@ class num_put : public locale::facet
           out = copy_n("0x",2,out);
         out = copy_n(buf,l,out);
       }
+      str.width(0);
       return out;
     }
 

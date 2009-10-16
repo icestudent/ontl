@@ -104,12 +104,12 @@ class basic_ostream
       ///   the constructor may call setstate(failbit)
       ///   (which may throw ios_base::failure (27.4.4.3))
       __forceinline
-      explicit sentry(basic_ostream<charT, traits>& os) : os(os), ok(false)
+      explicit sentry(basic_ostream<charT, traits>& os) : os(os), ok_(false)
       {
-        if ( os.good() )
+        if ( os.good() ) // NOTE: GCC's libstdc++ sets failbit when not good
         {
           if ( os.tie() ) os.tie()->flush();
-          ok = true;
+          ok_ = true;
         }
       }
 
@@ -122,13 +122,14 @@ class basic_ostream
       }
 
 #ifdef NTL__CXX_EXPLICITOP
-      explicit
+      explicit operator bool() const { return ok_; }
+#else
+      operator __::explicit_bool_type() const { return __::explicit_bool(ok_); }
 #endif
-      operator bool() const { return ok; }
 
     private:
       basic_ostream<charT, traits>& os;
-      bool ok;
+      bool ok_;
 
       sentry(const sentry&) __deleted;
       sentry& operator=(const sentry&) __deleted;
@@ -189,21 +190,21 @@ class basic_ostream
     basic_ostream<charT, traits>& put_impl(const ValueT& value/*, typename enable_if<is_integral<ValueT>::value>::type* =0*/)
     {
       sentry good( *this );
-      ios_base::iostate state = ios_base::badbit;
+      ios_base::iostate state = good ? ios_base::goodbit : ios_base::failbit;
       if ( good )
         __ntl_try
       {
         typedef ostreambuf_iterator<charT, traits> iterator;
         typedef num_put<charT, iterator> facet_t;
-        if ( !use_facet<facet_t>(this->getloc()).put(iterator(*this), *this, this->fill(), value).failed() )
-          state = ios_base::goodbit;
+        if(use_facet<facet_t>(this->getloc()).put(iterator(*this), *this, this->fill(), value).failed())
+          state = ios_base::badbit;
       }
       __ntl_catch(...)
       {
         ///\todo shall no throw
-        //this->setstate(ios_base::badbit);
+        state |= ios_base::badbit;
       }
-      this->setstate(state);
+      if(state) this->setstate(state);
       return *this;
     }
 
@@ -248,7 +249,7 @@ class basic_ostream
     basic_ostream<charT, traits>& operator<<(basic_streambuf<char_type, traits>* sb)
     {
       const sentry ok(*this);
-      ios_base::iostate state = sb ? ios_base::goodbit : ios_base::failbit;
+      ios_base::iostate state = sb ? ios_base::goodbit : ios_base::badbit;
       streamsize n = 0;
       if (ok && sb)
       __ntl_try
@@ -293,18 +294,19 @@ class basic_ostream
     /// 4 Returns: *this.
     basic_ostream<charT, traits>& put(char_type c)
     {
-      sentry good( *this );
+      sentry good(*this);
       ios_base::iostate state = ios_base::badbit;
       if ( good )
         __ntl_try
         {
-          if ( this->rdbuf()->sputc(c) != traits_type::eof() )
-            state = ios_base::goodbit;;
+          if(!traits_type::eq_int_type(this->rdbuf()->sputc(c), traits_type::eof()))
+            state = ios_base::goodbit;
         }
         __ntl_catch(...)
         {
+          state |= ios_base::badbit;
         }
-      this->setstate(state);
+      if(state) this->setstate(state);
       return *this;
     }
 
@@ -317,17 +319,18 @@ class basic_ostream
     ///   calls setstate(badbit), which may throw ios_base::failure.
     basic_ostream<charT, traits>& write(const char_type* s, streamsize n)
     {
-      sentry good( *this );
+      sentry good(*this);
       ios_base::iostate state = ios_base::badbit;
       if (good)
         __ntl_try {
-        if (this->rdbuf()->sputn(s, n) != traits_type::eof())
-          state = ios_base::goodbit;
+          if (!traits_type::eq_int_type(this->rdbuf()->sputn(s, n), traits_type::eof()))
+            state = ios_base::goodbit;
       }
       __ntl_catch(...)
       {
+        state |= ios_base::badbit;
       }
-      this->setstate(state);
+      if(state) this->setstate(state);
       return *this;
     }
 
@@ -398,7 +401,7 @@ namespace __
     static inline stream_t& formatted_write(stream_t& os, const void* const vdata, size_t size, bool do_wide = false)
     {
       stream_t::sentry good(os);
-      ios_base::iostate state = ios_base::badbit;
+      ios_base::iostate state = ios_base::failbit;
       if (good)
         __ntl_try {
           const charT* const data = reinterpret_cast<const charT*>(vdata);
@@ -417,13 +420,15 @@ namespace __
           }else{
             (do_wide ? write_narrow : write_widden)(os, data, size);
           }
+          os.width(0);
           if(os.good())
             state = ios_base::goodbit;
       }
       __ntl_catch(...)
       {
+        state |= ios_base::badbit;
       }
-      os.setstate(state);
+      if(state) os.setstate(state);
       return os;
     }
   };
@@ -547,13 +552,14 @@ inline basic_ostream<charT, traits>& operator<<(basic_ostream<charT, traits>&& o
 
 #endif
 
-///\name  Inserters and extractors [21.3.7.9 string.io]
+///\name  Inserters and extractors [21.4.8.9 string.io]
+
 template<class charT, class traits, class Allocator>
-basic_ostream<charT, traits>& operator<<(basic_ostream<charT,traits>& os, const basic_string<charT,traits,Allocator>& str)
+inline basic_ostream<charT, traits>& operator<<(basic_ostream<charT,traits>& os, const basic_string<charT,traits,Allocator>& str)
 {
   return __::stream_writer<charT,traits>::formatted_write(os, str.data(), str.size());
 }
-
+///\}
 
 /**@} lib_output_streams */
 /**@} lib_iostream_format */

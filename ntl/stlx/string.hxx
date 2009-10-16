@@ -1416,32 +1416,14 @@ bool
 
 ///\name  swap [21.3.8.8 string.special]
 template<class charT, class traits, class Allocator>
-inline
-void
-  swap(basic_string<charT,traits,Allocator>& lhs,
-       basic_string<charT,traits,Allocator>& rhs)
-{
-  lhs.swap(rhs);
-}
+inline void swap(basic_string<charT,traits,Allocator>&  lhs, basic_string<charT,traits,Allocator>&  rhs) { lhs.swap(rhs); }
 
 #ifdef NTL__CXX_RV
 template<class charT, class traits, class Allocator>
-inline
-void
-swap(basic_string<charT,traits,Allocator>&& lhs,
-     basic_string<charT,traits,Allocator>& rhs)
-{
-  lhs.swap(rhs);
-}
+inline void swap(basic_string<charT,traits,Allocator>&& lhs, basic_string<charT,traits,Allocator>&  rhs) { lhs.swap(rhs); }
 
 template<class charT, class traits, class Allocator>
-inline
-void
-swap(basic_string<charT,traits,Allocator>& lhs,
-     basic_string<charT,traits,Allocator>&& rhs)
-{
-  lhs.swap(rhs);
-}
+inline void swap(basic_string<charT,traits,Allocator>&  lhs, basic_string<charT,traits,Allocator>&& rhs) { lhs.swap(rhs); }
 #endif
 
 template <class charT, class traits, class Allocator>
@@ -1463,6 +1445,7 @@ basic_istream<charT,traits>& getline(basic_istream<charT,traits>& is, basic_stri
 template<class charT, class traits, class Allocator>
 basic_istream<charT,traits>& getline(basic_istream<charT,traits>& is, basic_string<charT,traits,Allocator>& str);
 
+///\name basic_string typedef names
 /** Specialization of basic_string for the \e char characters */
 typedef basic_string<char>    string;
 /** Specialization of basic_string for the \e wchar_t characters */
@@ -1472,6 +1455,34 @@ typedef basic_string<char16_t> u16string;
 /** Specialization of basic_string for the \e char32_t characters */
 typedef basic_string<char32_t> u32string;
 
+///\name 21.5 Numeric Conversions [string.conversions]
+int stoi(const string& str, size_t *idx = 0, int base = 10);
+long stol(const string& str, size_t *idx = 0, int base = 10);
+unsigned long stoul(const string& str, size_t *idx = 0, int base = 10);
+long long stoll(const string& str, size_t *idx = 0, int base = 10);
+unsigned long long stoull(const string& str, size_t *idx = 0, int base = 10);
+
+float stof(const string& str, size_t *idx = 0);
+double stod(const string& str, size_t *idx = 0);
+long double stold(const string& str, size_t *idx = 0);
+
+string to_string(long long val);
+string to_string(unsigned long long val);
+string to_string(long double val);
+
+int stoi(const wstring& str, size_t *idx = 0, int base = 10);
+long stol(const wstring& str, size_t *idx = 0, int base = 10);
+unsigned long stoul(const wstring& str, size_t *idx = 0, int base = 10);
+long long stoll(const wstring& str, size_t *idx = 0, int base = 10);
+unsigned long long stoull(const wstring& str, size_t *idx = 0, int base = 10);
+
+float stof(const wstring& str, size_t *idx = 0);
+double stod(const wstring& str, size_t *idx = 0);
+long double stold(const wstring& str, size_t *idx = 0);
+
+wstring to_wstring(long long val);
+wstring to_wstring(unsigned long long val);
+wstring to_wstring(long double val);
 
 //////////////////////////////////////////////////////////////////////////
 //hash specializations for basic_string:

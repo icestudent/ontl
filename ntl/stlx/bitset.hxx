@@ -513,7 +513,8 @@ namespace std {
   template <class charT, class traits, size_t N>
   inline basic_ostream<charT, traits>& operator<<(basic_ostream<charT, traits>& os, const bitset<N>& x)
   {
-    return os << x.template to_string<charT,traits,allocator<char> >();
+    const ctype<charT>& ct = use_facet< ctype<charT> >(os.getloc());
+    return os << x.template to_string<charT,traits,allocator<char> >(ct.widen('0'),ct.widen('1'));
   }
 
   ///@}
