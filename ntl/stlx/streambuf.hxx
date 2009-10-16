@@ -189,7 +189,7 @@ class basic_streambuf
     {
       const int_type ic = traits_type::to_int_type(c);
       const streamsize wavail = pend - pnext;
-      return !(0 < wavail) ? overflow(ic) : *pnext++ = c /*traits_type::to_char_type(ic)*/, ic;
+      return !(0 < wavail) ? overflow(ic) : *pnext++ = c, ic;
     }
 
     streamsize sputn(const char_type* s, streamsize n)
@@ -332,6 +332,7 @@ class basic_streambuf
 
     virtual streamsize xsputn(const char_type* s, streamsize n)
     {
+      const int_type eof = traits_type::eof();
       for ( streamsize copied = 0; ; )
       {
         if ( !(0 < n) ) return copied;
@@ -339,10 +340,10 @@ class basic_streambuf
         if ( !(0 < wavail) )
         {
           const char_type c = *s;
-          if ( traits_type::eq_int_type(traits_type::eof(), overflow(traits_type::to_int_type(c))) )
+          if ( traits_type::eq_int_type(eof, overflow(traits_type::to_int_type(c))) )
             return copied;
-          if(pbeg)
-            *pnext++ = c;
+          //if(pbeg) // overflow already puts character into sequence
+          //  *pnext++ = c;
           s++;
           copied++;
           n--;

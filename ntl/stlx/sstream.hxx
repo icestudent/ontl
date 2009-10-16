@@ -52,6 +52,8 @@ namespace std {
     public basic_streambuf<charT,traits>
   {
     typedef typename add_rvalue_reference<basic_stringbuf>::type rvalue;
+
+    static const size_t initial_output_size = 64;
   public:
     ///\name Types
     typedef charT char_type;
@@ -113,8 +115,8 @@ namespace std {
     { 
       //str_ = s;
       if(mode_ & ios_base::out){
-        // reserve additional 128 characters for output buffer
-        str_.reserve(s.size() + 128);
+        // reserve additional characters for output buffer
+        str_.reserve(s.size() + initial_output_size);
       }
       str_.assign(s);
       set_ptrs();
@@ -159,17 +161,17 @@ namespace std {
         *pptr() = cc;
         pbump(1);
       }else{
-        const bool may_reallocate = str_.size() == str_.capacity();
         const ptrdiff_t gp = gptr() - eback(), pp = pptr() - pbase();
 
-        str_.push_back(cc); // may reallocate buffer
-        
-        if(may_reallocate){
-          set_ptrs();
-          pbump(pp);
-          if(mode_ & ios_base::in)
-            gbump(gp);
-        }
+        str_.resize(max(initial_output_size, __ntl_grow_heap_block_size(str_.size())), '\0');
+        if(str_.size() < str_.capacity())
+          str_.resize(str_.capacity(), '\0'); // we are also buffer, so lets use all memory
+
+        set_ptrs();
+        pbump(pp);
+        if(mode_ & ios_base::in)
+          gbump(gp);
+        *pptr() = cc;
         pbump(1);
       }
       return c;
@@ -244,14 +246,14 @@ namespace std {
       if ( mode_ & ios_base::out )
       {
         if(str_.empty())
-          str_.resize(16); // 16 characters by default
+          str_.resize(initial_output_size); // characters by default
         this->setp(str_.begin(), str_.end());
       }
       if ( mode_ & ios_base::in )
         this->setg(str_.begin(), str_.begin(), str_.end());      
     }
   private:
-    string str_;
+    basic_string<charT, traits> str_;
     ios_base::openmode mode_;
   };
 
