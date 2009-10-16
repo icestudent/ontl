@@ -285,7 +285,7 @@ class basic_istream : virtual public basic_ios<charT, traits>
       ccount = 0;
       /* unformatted input functions taking a character array of non-zero size as an argument 
          shall also store a null character in the first location of the array. */
-      *s = char_type();
+      if(n > 0) *s = char_type();
       const sentry ok(*this, true);
       ios_base::iostate state = ios_base::goodbit;
       if (ok){ // && n > 0?
@@ -358,7 +358,7 @@ class basic_istream : virtual public basic_ios<charT, traits>
     basic_istream<charT,traits>& getline(char_type* s, streamsize n, char_type delim)
     {
       ccount = 0;
-      *s = char_type();
+      if(n > 0) *s = char_type();
       const sentry ok(*this, true);
       ios_base::iostate state = ios_base::goodbit;
       if(ok && n > 0){
