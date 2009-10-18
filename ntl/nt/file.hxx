@@ -579,7 +579,7 @@ class file_handler : public handle, public device_traits<file_handler>
         io_apc_routine *  apc_routine       = 0,
         const void *      apc_context       = 0,
         const uint32_t *  blocking_key      = 0
-        ) __ntl_nothrow
+        ) const __ntl_nothrow
     {
       return NtReadFile(get(), completion_event, apc_routine, apc_context,
                           &iosb, out_buf, out_size, offset, blocking_key);
