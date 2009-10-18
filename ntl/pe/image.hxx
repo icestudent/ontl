@@ -1082,6 +1082,12 @@ next_entry:;
         };
       };
 
+      bool relocate()
+      {
+        return relocate(uintptr_t(this)
+                            - get_nt_headers()->optional_header32()->ImageBase);
+      }
+
       bool relocate(ptrdiff_t delta)
       {
         const data_directory * const reloc_dir =
