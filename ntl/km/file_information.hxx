@@ -54,6 +54,7 @@ using nt::file_disposition_information;
 using nt::file_end_of_file_information;
 using nt::file_network_open_information;
 using nt::file_internal_information;
+using nt::file_position_information;
 
 template<class InformationClass>
 struct file_information
@@ -101,7 +102,7 @@ namespace __
       )
     {
       io_status_block iosb;
-      return NtSetInformationFile(file_handle, &iosb, info, info_length, info_class::info_class_type);
+      return ZwSetInformationFile(file_handle, &iosb, info, info_length, info_class::info_class_type);
     }
 
   protected:
@@ -112,6 +113,25 @@ namespace __
 template<>
 struct file_information<file_rename_information>:
   __::file_rename_information_impl<file_rename_information>
+{
+  file_information(legacy_handle file_handle, const const_unicode_string& new_name, bool replace_if_exists, legacy_handle root_directory = legacy_handle())
+    :file_rename_information_impl(file_handle, new_name, replace_if_exists, root_directory)
+  {}
+};
+
+///\name  FileLinkInformation == 11
+#pragma warning(disable:4510 4610)
+struct file_link_information: file_rename_information
+{
+  static const file_information_class info_class_type = nt::FileLinkInformation;
+
+  typedef std::unique_ptr<file_link_information> ptr;
+};
+#pragma warning(default:4510 4610)
+
+template<>
+struct file_information<file_link_information>:
+  __::file_rename_information_impl<file_link_information>
 {
   file_information(legacy_handle file_handle, const const_unicode_string& new_name, bool replace_if_exists, legacy_handle root_directory = legacy_handle())
     :file_rename_information_impl(file_handle, new_name, replace_if_exists, root_directory)
