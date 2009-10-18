@@ -217,7 +217,9 @@ namespace std
 /* `purecall` handler                                                   */
 /************************************************************************/
 #ifdef _MSC_VER
-#include "../nt/debug.hxx" // for abort implementation
+# include "../nt/debug.hxx" // for abort implementation
+# pragma warning(disable:4702) // unreachable code
+
 extern "C" int _cdecl _purecall(void)
 {
 #pragma warning(disable:4127)

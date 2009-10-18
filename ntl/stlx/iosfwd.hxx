@@ -18,6 +18,11 @@ typedef int mbstate_t; // fwd
 
 namespace std {
 
+#ifndef NTL__CXX_CHARS_TYPES
+  typedef uint_least16_t char16_t;
+  typedef uint_least32_t char32_t;
+#endif
+
 /**\defgroup  lib_input_output ********* 27 Input/output library [input.output]
  *
  *    Components that C++ programs may use to perform input/output operations
@@ -26,6 +31,8 @@ namespace std {
 
 template<class charT> struct char_traits;
 template<>            struct char_traits<char>;
+template<>            struct char_traits<char16_t>;
+template<>            struct char_traits<char32_t>;
 template<>            struct char_traits<wchar_t>;
 
 template<class T>     class allocator;
@@ -100,6 +107,7 @@ class ostreambuf_iterator;
 ///\name  Typedefs define instances of class templates specialized for char or wchar_t types. (7)
 typedef basic_ios<char>               ios;
 typedef basic_ios<wchar_t>            wios;
+
 typedef basic_streambuf<char>         streambuf;
 typedef basic_streambuf<wchar_t>      wstreambuf;
 typedef basic_istream<char>           istream;
@@ -108,6 +116,7 @@ typedef basic_ostream<char>           ostream;
 typedef basic_ostream<wchar_t>        wostream;
 typedef basic_iostream<char>          iostream;
 typedef basic_iostream<wchar_t>       wiostream;
+
 typedef basic_stringbuf<char>         stringbuf;
 typedef basic_stringbuf<wchar_t>      wstringbuf;
 typedef basic_istringstream<char>     istringstream;
@@ -116,6 +125,7 @@ typedef basic_ostringstream<char>     ostringstream;
 typedef basic_ostringstream<wchar_t>  wostringstream;
 typedef basic_stringstream<char>      stringstream;
 typedef basic_stringstream<wchar_t>   wstringstream;
+
 typedef basic_filebuf<char>           filebuf;
 typedef basic_filebuf<wchar_t>        wfilebuf;
 typedef basic_ifstream<char>          ifstream;

@@ -302,6 +302,8 @@ namespace std
         /** Returns the size of file, in bytes */
         template <class Path> inline uintmax_t file_size(const Path& p, error_code& ec = throws())
         {
+          if(&ec != &throws())
+            ec.clear();
           static const uintmax_t errval = 0;
           uintmax_t size = errval;
           using namespace NTL__SUBSYSTEM_NS;
@@ -315,8 +317,7 @@ namespace std
               __ntl_throw(basic_filesystem_error<Path>("Can't get file size", p, e));
             else
               ec = e;
-          }else if(&ec != &throws())
-            ec.clear();
+          }
           return size;
         }
 

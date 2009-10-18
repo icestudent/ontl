@@ -242,8 +242,9 @@
 #define NTL__CXX_ALIGNOF
 // auto
 //#define NTL__CXX_AUTO
-// char16_t, char32_t
+// char16_t, char32_t (unicode character strings)
 #define NTL__CXX_CHARS
+// NTL__CXX_CHARS_TYPES (unicode character types)
 // concepts, concept_map, requires
 //#define NTL__CXX_CONCEPT
 // constexpr

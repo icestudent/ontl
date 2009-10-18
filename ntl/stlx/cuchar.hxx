@@ -26,7 +26,7 @@
 
 namespace std {
 
-#ifndef NTL__CXX_CHARS_
+#ifndef NTL__CXX_CHARS_TYPES
   typedef uint_least16_t char16_t;
   typedef uint_least32_t char32_t;
 #endif

@@ -232,6 +232,24 @@ inline charT tolower(charT c, const locale& loc)
   return use_facet<ctype<charT> >(loc).tolower(c);
 }
 
+/** Class codecvt base that defines a result enumeration */
+class codecvt_base 
+{
+public:
+  /** do_in/do_out result values */
+  enum result { 
+    /** completed the conversion */
+    ok, 
+    /** not all source characters converted 
+      or space for more than <tt>to_limit-to</tt> destination elements was needed to terminate a sequence given the value of specified state (for unshift())*/
+    partial, 
+    /** encountered a character in [from,from_end) that it could not convert or an unspecified error has occurred (for unshift()) */
+    error, 
+    /** internT and externT are the same type, and input sequence is identical to converted sequence or no termination is needed for this \c state_type (for unshift()) */
+    noconv 
+  };
+};
+
 ///\name 22.1.3.2.2 string conversions [conversions.string]
 
 /**
@@ -249,49 +267,137 @@ inline charT tolower(charT c, const locale& loc)
  *  which meets the requirements of the standard code-conversion facet <tt>std::codecvt<Elem, char, std::mbstate_t></tt>.
  *  @sa codecvt
  **/
-template<class Codecvt, class Elem = wchar_t>
+template<class Codecvt, class Elem = wchar_t,
+        class Wide_alloc = std::allocator<Elem>,
+        class Byte_alloc = std::allocator<char> 
+        >
 class wstring_convert
 {
+  static const size_t max_wide_size = 8;
 public:
-  typedef basic_string<char>                          byte_string;
-  typedef basic_string<Elem>                          wide_string;
-  typedef typename Codecvt::state_type                state_type;
-  typedef typename wide_string::traits_type::int_type int_type;
+  typedef basic_string<char, char_traits<char>, Byte_alloc> byte_string;
+  typedef basic_string<Elem, char_traits<Elem>, Wide_alloc> wide_string;
+  typedef typename Codecvt::state_type                      state_type;
+  typedef typename wide_string::traits_type::int_type       int_type;
 
   wstring_convert(Codecvt *pcvt = new Codecvt)
-    :cvptr(pcvt), cvtstate()
+    :cvt(pcvt), cvtstate(), count(0)
   {}
   wstring_convert(Codecvt *pcvt, state_type state)
-    :cvptr(pcvt), cvtstate(state)
+    :cvt(pcvt), state(state), count(0)
   {}
   wstring_convert(const byte_string& byte_err, const wide_string& wide_err = wide_string())
-    :cvtptr(new Codecvt), cvtstate(), serr(byte_err), werr(wide_err)
+    :cvt(new Codecvt), cvtstate(), serr(byte_err), werr(wide_err), count(0)
   {}
   ~wstring_convert()
   {
-    delete cvptr;
+    delete cvt;
   }
 
   /** convert the single-element sequence byte to a wide %string */
-  wide_string from_bytes(char byte) __ntl_throws(range_error);
+  wide_string from_bytes(char byte) __ntl_throws(range_error)
+  {
+    assert(cvt);
+    const char bytes[1] = {byte}, *bnext;
+    Elem chars[1], *wnext;
+    codecvt_base::result re = cvt->in(cvtstate, bytes, bytes+_countof(bytes), bnext, chars, chars+_countof(chars), wnext);
+    count = wnext - chars;
+    if(re == codecvt_base::error){
+      if(werr.empty())
+        __ntl_throw(range_error("conversion from bytes failed"));
+      return werr;
+    }
+    assert(re == codecvt_base::ok);
+    return wide_string(chars, count);
+  }
   /** convert the null-terminated sequence beginning at \e ptr to a wide %string. */
-  wide_string from_bytes(const char *ptr) __ntl_throws(range_error);
+  wide_string from_bytes(const char *ptr) __ntl_throws(range_error)
+  {
+    return from_bytes(ptr, ptr ? strlen(ptr) : 0);
+  }
   /** convert the sequence stored in \e str to a wide %string */
-  wide_string from_bytes(const byte_string& str) __ntl_throws(range_error);
+  wide_string from_bytes(const byte_string& str) __ntl_throws(range_error)
+  {
+    return from_bytes(str.c_str(), str.length());
+  }
   /** convert the sequence defined by the range <tt>[first,last)</tt> to a wide %string */
-  wide_string from_bytes(const char *first, const char *last) __ntl_throws(range_error);
+  wide_string from_bytes(const char *first, const char *last) __ntl_throws(range_error)
+  {
+    return from_bytes(first, last-first);
+  }
 
   /** convert the single-element sequence \e wchar to a byte %string */
-  byte_string to_bytes(Elem wchar);
+  byte_string to_bytes(Elem wchar) __ntl_throws(range_error)
+  {
+    char bytes[max_wide_size], *bnext;
+    const Elem chars[1] = {wchar}, *wnext;
+    assert(cvt);
+    codecvt_base::result re = cvt->out(cvtstate, chars, chars+_countof(chars), wnext, bytes, bytes+_countof(bytes), bnext);
+    count = bnext - bytes;
+    if(re == codecvt_base::error){
+      if(serr.empty())
+        __ntl_throw(range_error("conversion to bytes failed"));
+      return serr;
+    }
+    assert(re == codecvt_base::ok);
+    return byte_string(bytes, count);
+  }
   /** convert the null-terminated sequence beginning at \e wptr to a byte %string */
-  byte_string to_bytes(const Elem *wptr);
+  byte_string to_bytes(const Elem *wptr) __ntl_throws(range_error)
+  {
+    return to_bytes(wptr, wptr ? wcslen(wptr) : 0);
+  }
   /** convert the sequence stored in \e wstr to a byte %string */
-  byte_string to_bytes(const wide_string& wstr);
+  byte_string to_bytes(const wide_string& wstr) __ntl_throws(range_error)
+  {
+    return to_bytes(wstr.c_str(), wstr.length());
+  }
   /** convert the sequence defined by the range <tt>[first,last)</tt> to a byte %string */
-  byte_string to_bytes(const Elem *first, const Elem *last);
+  byte_string to_bytes(const Elem *first, const Elem *last) __ntl_throws(range_error)
+  {
+    return to_bytes(first, last-first);
+  }
 
-  size_t converted() const { return cvtcount; }
+  size_t converted() const { return count; }
   state_type state() const { return cvtstate; }
+
+private:
+  wide_string from_bytes(const char *ptr, size_t len) __ntl_throws(range_error)
+  {
+    wide_string ws(len, Elem(0)); // assume that wide string can't be large than multibyte
+    if(len == 0)
+      return ws;
+    const char* bnext; Elem* wnext;
+    assert(cvt);
+    codecvt_base::result re = cvt->in(cvtstate, ptr, ptr+len, bnext, ws.begin(), ws.end(), wnext);
+    count = wnext - ws.begin();
+    if(re == codecvt_base::error){
+      if(werr.empty())
+        __ntl_throw(range_error("conversion from bytes failed"));
+      return werr;
+    }
+    assert(re == codecvt_base::ok);
+    ws.resize(count);
+    return ws;
+  }
+  byte_string to_bytes(const Elem *wptr, size_t len) __ntl_throws(range_error)
+  {
+    byte_string bs(len*max_wide_size, '\0');
+    if(len == 0)
+      return bs;
+    char* bnext; const Elem *wnext;
+    assert(cvt);
+    codecvt_base::result re = cvt->out(cvtstate, wptr, wptr+len, wnext, bs.begin(), bs.end(), bnext);
+    count = bnext - bs.begin();
+    if(re == codecvt_base::error){
+      if(serr.empty())
+        __ntl_throw(range_error("conversion to bytes failed"));
+      return serr;
+    }
+    assert(re == codecvt_base::ok);
+    bs.resize(count);
+    return bs;
+  }
 
 private:
   // a byte string to display on errors
@@ -299,62 +405,13 @@ private:
   // a wide string to display on errors
   wide_string werr;
   // a pointer to the allocated conversion object
-  Codecvt *cvtptr;
+  Codecvt *cvt;
   // a conversion state object
   state_type cvtstate;
   // a conversion count
-  size_t cvtcount;
+  size_t count;
 };
 
-
-///\name 22.1.3.2.3 Buffer conversions [conversions.buffer]
-
-/**
- *	@brief Class template wbuffer_convert
- *
- *  Class template wbuffer_convert looks like a wide stream buffer, but performs all its I/O through an
- *  underlying byte stream buffer that you specify when you construct it. Like class template wstring_convert,
- *  it lets you specify a code conversion facet to perform the conversions, without affecting any streams or locales.
- *
- *  The class template describes a stream buffer that controls the transmission of elements of type \e Elem, whose
- *  character traits are described by the class \e Tr, to and from a byte stream buffer of type \c streambuf.
- *  Conversion between a sequence of \e Elem values and multibyte sequences is performed by an object of
- *  class <tt>Codecvt<Elem, char, std::mbstate_t></tt>, which shall meet the requirements of the standard code-conversion
- *  facet <tt>std::codecvt<Elem, char, std::mbstate_t></tt>.
- *  @sa codecvt
- **/
-template<class Codecvt, class Elem = wchar_t, class Tr = char_traits<Elem> >
-class wbuffer_convert
-  :public basic_streambuf<Elem, Tr>
-{
-public:
-  typedef typename Tr::state_type state_type;
-
-  wbuffer_convert(std::streambuf *bytebuf = 0, Codecvt *pcvt = new Codecvt, state_type state = state_type())
-    :buf(bytebuf), cvtptr(pcvt), cvtstate(state)
-  {}
-
-  ~wbuffer_convert()
-  {
-    delete cvtptr;
-  }
-
-  std::streambuf *rdbuf() const { return buf; }
-  std::streambuf *rdbuf(streambuf *bytebuf)
-  {
-    std::swap(buf, bytebuf);
-    return bytebuf;
-  }
-
-  state_type state() const { return cvtstate; }
-private:
-  // a pointer to its underlying byte stream buffer
-  streambuf *buf;
-  // a pointer to the allocated conversion object
-  Codecvt *cvtptr;
-  // a conversion state object
-  state_type cvtstate;
-};
 
 ///\}
 /** @} lib_conversions */
@@ -901,25 +958,7 @@ private:
 };// class ctype<wchar_t>
 
 
-// 22.2.1.5 Class template codecvt [lib.locale.codecvt]
-
-/** Class codecvt base that defines a result enumeration */
-class codecvt_base 
-{
-public:
-  /** do_in/do_out result values */
-  enum result { 
-    /** completed the conversion */
-    ok, 
-    /** not all source characters converted 
-      or space for more than <tt>to_limit-to</tt> destination elements was needed to terminate a sequence given the value of specified state (for unshift())*/
-    partial, 
-    /** encountered a character in [from,from_end) that it could not convert or an unspecified error has occurred (for unshift()) */
-    error, 
-    /** internT and externT are the same type, and input sequence is identical to converted sequence or no termination is needed for this \c state_type (for unshift()) */
-    noconv 
-  };
-};
+/// 22.2.1.5 Class template codecvt [lib.locale.codecvt]
 
 /**
  *	@brief 22.2.1.4 Class template codecvt [locale.codecvt]
@@ -989,8 +1028,9 @@ class codecvt:
       return do_in(state,from,from_end,from_next,to,to_limit,to_next);
     }
 
-    /** Returns -1 if the encoding of the \a externT sequence is state-dependent; else the constant number of
-      \a externT characters needed to produce an internal character; or 0 if this number is not a constant */
+    /** Returns -1 if the encoding of the \a externT sequence is state-dependent;
+        else the constant number of \a externT characters needed to produce an internal character;
+        or 0 if this number is not a constant */
     int encoding() const __ntl_nothrow { return do_encoding(); }
 
     /** Returns \c true if \c do_in() and \c do_out() return \c noconv for all valid argument values. */
@@ -1281,6 +1321,159 @@ namespace std {
 
 /** \addtogroup lib_locale 22 Localization library [localization]
  *@{*/
+
+  ///\name 22.1.3.2.3 Buffer conversions [conversions.buffer]
+
+/**
+ *	@brief Class template wbuffer_convert
+ *
+ *  Class template wbuffer_convert looks like a wide stream buffer, but performs all its I/O through an
+ *  underlying byte stream buffer that you specify when you construct it. Like class template wstring_convert,
+ *  it lets you specify a code conversion facet to perform the conversions, without affecting any streams or locales.
+ *
+ *  The class template describes a stream buffer that controls the transmission of elements of type \e Elem, whose
+ *  character traits are described by the class \e Tr, to and from a byte stream buffer of type \c streambuf.
+ *  Conversion between a sequence of \e Elem values and multibyte sequences is performed by an object of
+ *  class <tt>Codecvt<Elem, char, std::mbstate_t></tt>, which shall meet the requirements of the standard code-conversion
+ *  facet <tt>std::codecvt<Elem, char, std::mbstate_t></tt>.
+ *  @sa codecvt
+ **/
+template<class Codecvt, class Elem = wchar_t, class Tr = char_traits<Elem> >
+class wbuffer_convert:
+  public basic_streambuf<Elem, Tr>
+{
+  typedef Tr traits;
+  typedef Elem                      char_type;
+  typedef typename traits::int_type int_type;
+  typedef typename traits::pos_type pos_type;
+  typedef typename traits::off_type off_type;
+  typedef traits                    traits_type;
+public:
+  typedef typename Tr::state_type state_type;
+
+  wbuffer_convert(std::streambuf *bytebuf = 0, Codecvt *pcvt = new Codecvt, state_type state = state_type())
+    :sb(bytebuf), cvtptr(pcvt), cvtstate(state)
+  {
+    reset();
+  }
+
+  ~wbuffer_convert()
+  {
+    __ntl_try { sync(); }
+    __ntl_catch(...){}
+    if(buf.second)
+      delete[] buf.first;
+    delete cvtptr;
+  }
+
+  std::streambuf *rdbuf() const { return sb; }
+  std::streambuf *rdbuf(streambuf *bytebuf)
+  {
+    std::swap(sb, bytebuf);
+    reset();
+    return bytebuf;
+  }
+
+  state_type state() const { return cvtstate; }
+
+private:
+  // 27.6.2.4 virtual functions:
+  // 27.6.2.4.1 Locales:
+  virtual void imbue(const locale& loc)
+  {
+    if(sb) sb->pubimbue(loc);
+  }
+  // 27.6.2.4.2 Buffer management and positioning:
+  //virtual basic_streambuf<char_type,traits>* setbuf(char_type* s, streamsize n);
+  //virtual pos_type seekoff(off_type off, ios_base::seekdir way, ios_base::openmode which = ios_base::in | ios_base::out);
+  //virtual pos_type seekpos(pos_type sp, ios_base::openmode which = ios_base::in | ios_base::out);
+  virtual int sync()
+  {
+    const streamsize pending = pptr()-pbase();
+    if(pending){
+      if(!write(pbase(), pending))
+        return -1;
+      reset();
+      if(sb->pubsync() == -1)
+        return -1;
+    }
+    return static_cast<int>(pending);
+  }
+  // 27.6.2.4.3 Get area:
+  //virtual streamsize showmanyc();
+  //virtual int_type underflow();
+  //virtual int_type uflow();
+  // 27.6.2.4.4 Putback:
+  //virtual int_type pbackfail(int_type c = traits::eof());
+  // 27.6.2.4.5 Put area:
+  virtual int_type overflow (int_type c = traits::eof())
+  {
+    const int_type eof = traits_type::eof();
+    const bool eofc = traits_type::eq_int_type(c, eof);
+    if(!pbase() && eofc)
+      return eof;
+
+    bool ok = true;
+    if(const streamsize pending = pptr()-pbase()) {
+      // write buffer
+      if(ok = write(pbase(), pending), ok)
+        reset();
+    }
+
+    if(ok && !eofc){
+      // write c
+      const char_type cc = traits_type::to_char_type(c);
+      ok = write(&cc, 1);
+    }
+    return eofc ? traits_type::not_eof(c) : c;
+  }
+private:
+  void reset()
+  {
+    if(!sb){
+      delete[] buf.first;
+      buf.second = 0;
+    }else if(!buf.second){
+      buf.first = new char_type[buf.second = 1024*1]; // 1 KB
+      if(!buf.first) buf.second = 0;
+    }
+    setp(buf.first, buf.first+buf.second);
+  }
+  bool write(const char_type* s, streamsize n)
+  {
+    return write(s, s+n);
+  }
+  bool write(const char_type* from, const char_type* to)
+  {
+    char sbuf[1024], *snext;
+    const char_type  *wnext;
+    streamsize n = to-from;
+    do {
+      const codecvt_base::result re = cvtptr->out(cvtstate, from, to, wnext, sbuf, sbuf+_countof(sbuf), snext);
+      if(re == codecvt_base::error)
+        break;
+      assert(re != codecvt_base::noconv);
+
+      const streamsize write_size = snext-sbuf;
+      const streamsize scb = sb->sputn(sbuf, write_size);
+      if(scb != write_size)
+        break;
+
+      n = to-wnext;
+    }while(n > 0);
+    return n == 0;
+  }
+private:
+  // a pointer to its underlying byte stream buffer
+  streambuf *sb;
+  // a pointer to the allocated conversion object
+  Codecvt *cvtptr;
+  // a conversion state object
+  state_type cvtstate;
+
+  pair<char_type*, streamsize> buf;
+};
+
 /** \addtogroup lib_locale_categories 22.2 Standard locale categories [locale.categories]
  *@{*/
 
@@ -1522,16 +1715,19 @@ class num_get : public locale::facet
       v = get_int<unsigned long long, signed long long>(in,end,f,err, numeric_limits<unsigned long long>::__max, numeric_limits<unsigned long long>::__min);
       return in;
     }
-    _NTL_LOC_VIRTUAL iter_type do_get(iter_type in, iter_type end, ios_base& f, ios_base::iostate& err, float& v) const
+    _NTL_LOC_VIRTUAL iter_type do_get(iter_type in, iter_type, ios_base&, ios_base::iostate&, float& v) const
     {
+      (void)v;
       return in;
     }
-    _NTL_LOC_VIRTUAL iter_type do_get(iter_type in, iter_type end, ios_base& f, ios_base::iostate& err, double& v) const
+    _NTL_LOC_VIRTUAL iter_type do_get(iter_type in, iter_type , ios_base& , ios_base::iostate& , double& v) const
     {
+      (void)v;
       return in;
     }
-    _NTL_LOC_VIRTUAL iter_type do_get(iter_type in, iter_type end, ios_base& f, ios_base::iostate& err, long double& v) const
+    _NTL_LOC_VIRTUAL iter_type do_get(iter_type in, iter_type , ios_base& , ios_base::iostate& , long double& v) const
     {
+      (void)v;
       return in;
     }
     _NTL_LOC_VIRTUAL iter_type do_get(iter_type in, iter_type end, ios_base& f, ios_base::iostate& err, void*& v) const
@@ -1938,6 +2134,8 @@ namespace __
     template<class Facet>
     struct has_facet: false_type {};
 
+    template<class charT, class InputIterator>
+    struct has_facet<num_get<charT, InputIterator > >: true_type{};
     template<class charT, class OutputIterator>
     struct has_facet<num_put<charT, OutputIterator> >: true_type{};
 
@@ -1948,6 +2146,13 @@ namespace __
     struct has_facet<ctype<char> >: true_type{};
     template<>
     struct has_facet<ctype<wchar_t> >: true_type{};
+
+    template<>
+    struct has_facet<codecvt<char,char,mbstate_t> >: true_type{};
+    template<>
+    struct has_facet<codecvt<wchar_t,wchar_t,mbstate_t> >: true_type{};
+    template<>
+    struct has_facet<codecvt<wchar_t,char,mbstate_t> >: true_type{};
 
     //////////////////////////////////////////////////////////////////////////
     // use_facet
@@ -1970,6 +2175,20 @@ namespace __
       //return facet;
       return *static_storage<numpunct<charT> >::get_object();
     }
+
+    static const codecvt<char,char,mbstate_t>& get_facet(const locale&, type2type<codecvt<char,char,mbstate_t> >)
+    {
+      return *static_storage<codecvt<char,char,mbstate_t> >::get_object();
+    }
+    static const codecvt<wchar_t,wchar_t,mbstate_t>& get_facet(const locale&, type2type<codecvt<wchar_t,wchar_t,mbstate_t> >)
+    {
+      return *static_storage<codecvt<wchar_t,wchar_t,mbstate_t> >::get_object();
+    }
+    static const codecvt<wchar_t,char,mbstate_t>& get_facet(const locale&, type2type<codecvt<wchar_t,char,mbstate_t> >)
+    {
+      return *static_storage<codecvt<wchar_t,char,mbstate_t> >::get_object();
+    }
+
 
     static __forceinline const ctype<char>& get_facet(const locale&, type2type<ctype<char> >)
     {
