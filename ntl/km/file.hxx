@@ -205,7 +205,7 @@ class file_handler : public handle, public device_traits<file_handler>
         io_apc_routine *  apc_routine       = 0,
         const void *      apc_context       = 0,
         const uint32_t *  blocking_key      = 0
-        ) const __ntl_nothrow
+        ) __ntl_nothrow
     {
       return ZwReadFile(get(), completion_event, apc_routine, apc_context,
                           &iosb, out_buf, out_size, offset, blocking_key);
@@ -224,6 +224,11 @@ class file_handler : public handle, public device_traits<file_handler>
     {
       return ZwWriteFile(get(), completion_event, apc_routine, apc_context,
                           &iosb, in_buf, in_size, offset, blocking_key);
+    }
+
+    ntstatus flush()
+    {
+      return NtFlushBuffersFile(get(), &iosb);
     }
 
     size_type size() const

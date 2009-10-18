@@ -85,6 +85,9 @@ ntstatus __stdcall
     );
 
 NTL__EXTERNAPI
+ntstatus __stdcall NtFlushBuffersFile(legacy_handle FileHandle, io_status_block* IoStatusBlock);
+
+NTL__EXTERNAPI
 ntstatus __stdcall NtQueryAttributesFile(const object_attributes& ObjectAttributes, file_basic_information& FileInformation);
 
 NTL__EXTERNAPI
@@ -366,6 +369,7 @@ struct device_traits<nt::file_handler>:
     create,
     create_new = create,
     open_if,
+    create_if  = open_if,
     overwrite,
     overwrite_if,
   };
@@ -575,7 +579,7 @@ class file_handler : public handle, public device_traits<file_handler>
         io_apc_routine *  apc_routine       = 0,
         const void *      apc_context       = 0,
         const uint32_t *  blocking_key      = 0
-        ) const __ntl_nothrow
+        ) __ntl_nothrow
     {
       return NtReadFile(get(), completion_event, apc_routine, apc_context,
                           &iosb, out_buf, out_size, offset, blocking_key);
@@ -594,6 +598,11 @@ class file_handler : public handle, public device_traits<file_handler>
     {
       return NtWriteFile(get(), completion_event, apc_routine, apc_context,
                           &iosb, in_buf, in_size, offset, blocking_key);
+    }
+
+    ntstatus flush()
+    {
+      return NtFlushBuffersFile(get(), &iosb);
     }
 
     size_type size() const
