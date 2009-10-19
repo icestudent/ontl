@@ -1066,6 +1066,18 @@ namespace std
 
       #endif // __DOXYGEN__
 
+
+      ///\name Path creation helpers
+      inline path  make_path(const char* spath)    { return path (spath); }
+      inline path  make_path(const string& spath)  { return path (spath); }
+      inline wpath make_path(const wchar_t* spath) { return wpath(spath); }
+      inline wpath make_path(const wstring& spath) { return wpath(spath); }
+#ifdef NTL__CXX_RV
+      inline path  make_path(string&& spath)  { return path (move(spath)); }
+      inline wpath make_path(wstring&& spath) { return wpath(move(spath)); }
+#endif
+      ///\}
+
       /** @} tr2_filesystem */
       /** @} tr2 */
     } // filesystem

@@ -664,11 +664,11 @@ basic_istream<char, traits>& operator>>(basic_istream<char, traits>& is, unsigne
 template<class charT, class traits>
 inline basic_istream<charT,traits>& operator>>(basic_istream<charT,traits>& is, charT& c)
 {
-#if 1
+#if 0 // its a formatted input
   return is.get(c);
 #else
-  const basic_istream<charT,traits>::sentry ok(is, true);
-  ios_base::iostate state = ios_base::goodbit;
+  const basic_istream<charT,traits>::sentry ok(is);
+  ios_base::iostate state = ok ? ios_base::goodbit : ios_base::failbit;
   if(ok)
   __ntl_try
   {
@@ -681,7 +681,8 @@ inline basic_istream<charT,traits>& operator>>(basic_istream<charT,traits>& is, 
   __ntl_catch(...){
     state |= ios_base::badbit;
   }
-  return is.setstate(state), is;
+  if(state) is.setstate(state);
+  return is;
 #endif
 }
 

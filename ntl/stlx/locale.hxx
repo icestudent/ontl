@@ -1050,22 +1050,23 @@ class codecvt:
   protected:
     ~codecvt()
     {}
-
-    _NTL_LOC_VIRTUAL result do_out(state_type& state, const intern_type* from, const intern_type* from_end,
+#if 0
+    virtual result do_out(state_type& state, const intern_type* from, const intern_type* from_end,
       const intern_type*& from_next, extern_type* to, extern_type* to_limit, extern_type*& to_next) const;
 
-    _NTL_LOC_VIRTUAL result do_in(state_type& state, const extern_type* from, const extern_type* from_end,
+    virtual result do_in(state_type& state, const extern_type* from, const extern_type* from_end,
       const extern_type*& from_next, intern_type* to, intern_type* to_limit, intern_type*& to_next) const;
 
-    _NTL_LOC_VIRTUAL result do_unshift(state_type& state, extern_type* to, extern_type* to_limit, extern_type*& to_next) const;
+    virtual result do_unshift(state_type& state, extern_type* to, extern_type* to_limit, extern_type*& to_next) const;
 
-    _NTL_LOC_VIRTUAL int do_encoding() const __ntl_nothrow;
+    virtual int do_encoding() const __ntl_nothrow;
 
-    _NTL_LOC_VIRTUAL bool do_always_noconv() const __ntl_nothrow;
+    virtual bool do_always_noconv() const __ntl_nothrow;
 
-    _NTL_LOC_VIRTUAL int do_length(state_type&, const extern_type* from, const extern_type* end, size_t max) const;
+    virtual int do_length(state_type&, const extern_type* from, const extern_type* end, size_t max) const;
 
-    _NTL_LOC_VIRTUAL int do_max_length() const __ntl_nothrow;
+    virtual int do_max_length() const __ntl_nothrow;
+#endif
 
 };// codecvt
 
@@ -1082,7 +1083,7 @@ class codecvt_byname : public codecvt<internT, externT, stateT>
 
     ~codecvt_byname(); // virtual
 
-    _NTL_LOC_VIRTUAL result do_out(stateT& state,
+    virtual result do_out(stateT& state,
                           const internT* from,
                           const internT* from_end,
                           const internT*& from_next,
@@ -1090,22 +1091,70 @@ class codecvt_byname : public codecvt<internT, externT, stateT>
                           externT* to_limit,
                           externT*& to_next) const;
 
-    _NTL_LOC_VIRTUAL result do_in(stateT& state, const externT* from, const externT* from_end,
+    virtual result do_in(stateT& state, const externT* from, const externT* from_end,
       const externT*& from_next, internT* to, internT* to_limit, internT*& to_next) const;
 
-    _NTL_LOC_VIRTUAL int do_encoding() const __ntl_nothrow;
+    virtual int do_encoding() const __ntl_nothrow;
 
-    _NTL_LOC_VIRTUAL bool do_always_noconv() const __ntl_nothrow;
+    virtual bool do_always_noconv() const __ntl_nothrow;
 
-    _NTL_LOC_VIRTUAL int do_length(stateT&, const externT* from, const externT* end, size_t max) const;
+    virtual int do_length(stateT&, const externT* from, const externT* end, size_t max) const;
 
-    _NTL_LOC_VIRTUAL result do_unshift(stateT& state, externT* to, externT* to_limit, externT*& to_next) const;
+    virtual result do_unshift(stateT& state, externT* to, externT* to_limit, externT*& to_next) const;
 
-    _NTL_LOC_VIRTUAL int do_max_length() const __ntl_nothrow;
+    virtual int do_max_length() const __ntl_nothrow;
 
 };
 
 ///\name codecvt specializations
+
+template<class charT>
+class codecvt<charT,charT,mbstate_t>:
+  public locale::facet,
+  public codecvt_base
+{
+protected:
+  ~codecvt(){}
+public:
+  typedef charT     intern_type;
+  typedef charT     extern_type;
+  typedef mbstate_t state_type;
+
+  codecvt(size_t refs = 0)
+    :facet(refs)
+  {}
+
+  result out(state_type&, const intern_type* from, const intern_type* /*from_end*/, const intern_type*& from_next, extern_type* to, extern_type* /*to_limit*/, extern_type*& to_next) const
+  {
+    from_next = from,
+      to_next = to;
+    return noconv;
+  }
+
+  result unshift(state_type&, extern_type* to, extern_type* /*to_limit*/, extern_type*& to_next) const
+  {
+    to_next = to;
+    return noconv;
+  }
+
+  result in(state_type&, const extern_type* from, const extern_type* /*from_end*/, const extern_type*& from_next, intern_type* to, intern_type* /*to_limit*/, intern_type*& to_next) const
+  {
+    from_next = from,
+      to_next = to;
+    return noconv;
+  }
+
+  /** @return the constant number of externT characters needed to produce an internal character */
+  int encoding() const __ntl_nothrow { return 1; }
+
+  bool always_noconv() const __ntl_nothrow { return true; }
+
+  int length(state_type&, const extern_type* from, const extern_type* end, size_t max) const { return static_cast<int>(min(max, static_cast<size_t>(end - from))); }
+
+  int max_length() const __ntl_nothrow { return 1; }
+
+  static locale::id id;
+};
 
 /**
  *	@brief codecvt<char, char, mbstate_t> implements a degenerate conversion; it does not convert at all.
@@ -1165,9 +1214,128 @@ class codecvt<char16_t,char,mbstate_t>:
   public locale::facet,
   public codecvt_base
 {
+  public:
+    typedef char16_t  intern_type;
+    typedef char      extern_type;
+    typedef mbstate_t state_type;
 
+    explicit codecvt(size_t refs = 0)
+      :facet(refs)
+    {}
+
+    result out(state_type& state, const intern_type* from, const intern_type* from_end, const intern_type*& from_next, extern_type* to, extern_type* to_limit, extern_type*& to_next) const
+    {
+      return do_out(state,from,from_end,from_next,to,to_limit,to_next);
+    }
+
+    result unshift(state_type& state, extern_type* to, extern_type* to_limit, extern_type*& to_next) const
+    {
+      return do_unshift(state,to,to_limit,to_next);
+    }
+
+    result in(state_type& state, const extern_type* from, const extern_type* from_end, const extern_type*& from_next, intern_type* to, intern_type* to_limit, intern_type*& to_next) const
+    {
+      return do_in(state,from,from_end,from_next,to,to_limit,to_next);
+    }
+
+    int encoding() const __ntl_nothrow { return do_encoding(); }
+
+    bool always_noconv() const __ntl_nothrow { return do_always_noconv(); }
+
+    int length(state_type& state, const extern_type* from, const extern_type* end, size_t max) const
+    {
+      return do_length(state, from, end, max);
+    }
+
+    int max_length() const __ntl_nothrow { return do_max_length(); }
+
+    static locale::id id;
+
+  ///////////////////////////////////////////////////////////////////////////
+  protected:
+    ~codecvt()
+    {}
+
+    virtual result do_out(state_type& state, const intern_type* from, const intern_type* from_end,
+      const intern_type*& from_next, extern_type* to, extern_type* to_limit, extern_type*& to_next) const
+    {
+      // wcstombs
+      result r = ok;
+      while(from < from_end && to < to_limit){
+        size_t c = c16rtomb(to, *from, &state);
+        if(c == static_cast<size_t>(-1)){
+          r = error;
+          break;
+        }else if(c == 0){
+          if(*from == 0)
+            *to = 0;
+          c = 1;
+        }
+        from++;
+        to += c;
+      }
+      from_next = from,
+        to_next = to;
+      if(r == ok && from < from_end)
+        r = partial;
+      return r;
+    }
+
+    virtual result do_in(state_type& state, const extern_type* from, const extern_type* from_end,
+      const extern_type*& from_next, intern_type* to, intern_type* to_limit, intern_type*& to_next) const
+    {
+      // mbstowcs
+      result r = ok;
+      while(from < from_end && to < to_limit){
+        size_t c = mbrtoc16(to, from, 1, &state);
+        if(c == static_cast<size_t>(-1)){
+          r = error;
+          break;
+        }else if(c == 0){
+          if(*from == 0)
+            *to = 0;
+          c = 1;
+        }
+        from += c;
+        to++;
+      }
+      from_next = from,
+        to_next = to;
+      if(r == ok && from < from_end)
+        r = partial;
+      return r;
+    }
+
+    virtual result do_unshift(state_type& /*state*/, extern_type* to, extern_type* /*to_limit*/, extern_type*& to_next) const
+    {
+      to_next = to;
+      return noconv;
+    }
+
+    virtual int do_encoding() const __ntl_nothrow { return 2; }
+
+    virtual bool do_always_noconv() const __ntl_nothrow { return false; }
+
+    virtual int do_length(state_type&, const extern_type* from, const extern_type* end, size_t max) const
+    {
+      return static_cast<int>(min(max,static_cast<size_t>(end-from)));
+    }
+
+    virtual int do_max_length() const __ntl_nothrow { return 1; }
 };
 
+template<>
+class codecvt<char16_t,wchar_t,mbstate_t>:
+  public codecvt<char16_t, char16_t,mbstate_t>
+{
+protected:
+  ~codecvt(){}
+public:
+  codecvt(size_t refs = 0)
+    :codecvt<char16_t, char16_t,mbstate_t>(refs)
+  {}
+
+};
 
 /** The specialization codecvt<char32_t, char, mbstate_t> converts between the UTF-32 and UTF-8 encodings schemes */
 template<>
@@ -1230,7 +1398,7 @@ public:
   static locale::id id;
 
 protected:
-  _NTL_LOC_VIRTUAL result do_out(state_type& /*state*/, const intern_type* from, const intern_type* from_end,
+  virtual result do_out(state_type& /*state*/, const intern_type* from, const intern_type* from_end,
     const intern_type*& from_next, extern_type* to, extern_type* to_limit, extern_type*& to_next) const
   {
     // wcstombs
@@ -1255,7 +1423,7 @@ protected:
     return r;
   }
 
-  _NTL_LOC_VIRTUAL result do_in(state_type& /*state*/, const extern_type* from, const extern_type* from_end,
+  virtual result do_in(state_type& /*state*/, const extern_type* from, const extern_type* from_end,
     const extern_type*& from_next, intern_type* to, intern_type* to_limit, intern_type*& to_next) const
   {
     // mbstowcs
@@ -1280,28 +1448,28 @@ protected:
     return r;
   }
 
-  _NTL_LOC_VIRTUAL result do_unshift(state_type& /*state*/, extern_type* to, extern_type* /*to_limit*/, extern_type*& to_next) const
+  virtual result do_unshift(state_type& /*state*/, extern_type* to, extern_type* /*to_limit*/, extern_type*& to_next) const
   {
     to_next = to;
     return noconv;
   }
 
-  _NTL_LOC_VIRTUAL int do_encoding() const __ntl_nothrow
+  virtual int do_encoding() const __ntl_nothrow
   {
-    return 1;
+    return 2;
   }
 
-  _NTL_LOC_VIRTUAL bool do_always_noconv() const __ntl_nothrow
+  virtual bool do_always_noconv() const __ntl_nothrow
   {
     return false;
   }
 
-  _NTL_LOC_VIRTUAL int do_length(state_type&, const extern_type* from, const extern_type* end, size_t max) const
+  virtual int do_length(state_type&, const extern_type* from, const extern_type* end, size_t max) const
   {
     return static_cast<int>(min(max,static_cast<size_t>(end-from)));
   }
 
-  _NTL_LOC_VIRTUAL int do_max_length() const __ntl_nothrow
+  virtual int do_max_length() const __ntl_nothrow
   {
     return 1;
   }
@@ -1384,7 +1552,16 @@ private:
     if(sb) sb->pubimbue(loc);
   }
   // 27.6.2.4.2 Buffer management and positioning:
-  //virtual basic_streambuf<char_type,traits>* setbuf(char_type* s, streamsize n);
+  virtual basic_streambuf<char_type,traits>* setbuf(char_type* s, streamsize n)
+  {
+    if(sb && !s && !n){
+      // disable buffering
+      setp(0,0);
+      sb->pubsetbuf(0,0);
+    }
+    return this;
+  }
+
   //virtual pos_type seekoff(off_type off, ios_base::seekdir way, ios_base::openmode which = ios_base::in | ios_base::out);
   //virtual pos_type seekpos(pos_type sp, ios_base::openmode which = ios_base::in | ios_base::out);
   virtual int sync()
@@ -2153,58 +2330,20 @@ namespace __
     struct has_facet<codecvt<wchar_t,wchar_t,mbstate_t> >: true_type{};
     template<>
     struct has_facet<codecvt<wchar_t,char,mbstate_t> >: true_type{};
+    template<>
+    struct has_facet<codecvt<char16_t,char,mbstate_t> >: true_type{};
 
     //////////////////////////////////////////////////////////////////////////
     // use_facet
-    template<class charT, class InputIterator>
-    static const num_get<charT, InputIterator>& get_facet(const locale&, type2type<num_get<charT, InputIterator> >)
-    {
-      return *static_storage<num_get<charT,InputIterator> >::get_object();
-    }
 
-    template<class charT, class OutputIterator>
-    static const num_put<charT, OutputIterator>& get_facet(const locale&, type2type<num_put<charT, OutputIterator> >)
+    /** Default facet */
+    template<class DefaultFacet>
+    static const DefaultFacet& get_facet(const locale&, type2type<DefaultFacet>/*, typename enable_if<has_facet<DefaultFacet>::value>::type* =0*/)
     {
-      return *static_storage<num_put<charT,OutputIterator> >::get_object();
+      return *static_storage<DefaultFacet>::get_object();
     }
-
-    template<class charT>
-    static const numpunct<charT>& get_facet(const locale&, type2type<numpunct<charT> >)
-    {
-      //static const  facet;
-      //return facet;
-      return *static_storage<numpunct<charT> >::get_object();
-    }
-
-    static const codecvt<char,char,mbstate_t>& get_facet(const locale&, type2type<codecvt<char,char,mbstate_t> >)
-    {
-      return *static_storage<codecvt<char,char,mbstate_t> >::get_object();
-    }
-    static const codecvt<wchar_t,wchar_t,mbstate_t>& get_facet(const locale&, type2type<codecvt<wchar_t,wchar_t,mbstate_t> >)
-    {
-      return *static_storage<codecvt<wchar_t,wchar_t,mbstate_t> >::get_object();
-    }
-    static const codecvt<wchar_t,char,mbstate_t>& get_facet(const locale&, type2type<codecvt<wchar_t,char,mbstate_t> >)
-    {
-      return *static_storage<codecvt<wchar_t,char,mbstate_t> >::get_object();
-    }
-
-
-    static __forceinline const ctype<char>& get_facet(const locale&, type2type<ctype<char> >)
-    {
-      // static ctype<char> is constructed with the default table which is not to be freed,
-      // so the destructor call may be not queued up to the atexit function.
-      // This is why it is implemented through placement new over a raw storage.
-      //static void * f[sizeof(ctype<char>)/sizeof(void*)];
-      //ctype<char> * const p = reinterpret_cast<ctype<char>*>(f);
-      // The first class member is VTable ptr or the tab ptr member,
-      // both are non-null after initialization is done.
-      //if ( !f[0] ) new (p) ctype<char>;
-      //return *p;
-      return *static_storage<ctype<char> >::get_object();
-    }
-
-    static __forceinline const ctype<wchar_t>& get_facet(const locale&, type2type<ctype<wchar_t> >)
+#if 1
+    static __forceinline const ctype<wchar_t>& get_facet(const locale&, type2type<ctype<wchar_t> >/*, enable_if<has_facet<ctype<wchar_t>>::value>::type* =0*/)
     {
       //static void * f[sizeof(ctype<wchar_t>)/sizeof(void*)];
       //ctype<wchar_t> * const p = reinterpret_cast<ctype<wchar_t>*>(f);
@@ -2225,7 +2364,7 @@ namespace __
       //return *p;
       return *static_storage<ctype<wchar_t> >::get_object(table);
     }
-
+#endif
   };
 }
 

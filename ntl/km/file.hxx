@@ -173,14 +173,15 @@ class file_handler : public handle, public device_traits<file_handler>
 
     ntstatus
       open(
-        const const_unicode_string& file_name,
-        const access_mask           desired_access,
-        const share_mode            share,
-        const creation_options      co
+        const std::wstring&         file_name,
+        const access_mask           desired_access  = access_mask_default,
+        const share_mode            share           = share_mode_default,
+        const creation_options      co              = creation_options_default
         ) __ntl_nothrow
     {
       reset();
-      const object_attributes oa(file_name);
+      const const_unicode_string uname(file_name);
+      const object_attributes oa(uname);
       return ZwOpenFile(this, desired_access, &oa, &iosb, share, co);
     }
 

@@ -31,10 +31,16 @@ namespace std {
   typedef uint_least32_t char32_t;
 #endif
 
-  size_t c16rtomb(char *__restrict s, char16_t wc, mbstate_t *__restrict ps);
+  inline size_t c16rtomb(char *__restrict s, char16_t wc, mbstate_t *__restrict)
+  {
+    return wcstombs(s, reinterpret_cast<const wchar_t*>(&wc), 1);
+  }
   size_t c32rtomb(char *__restrict s, char16_t wc, mbstate_t *__restrict ps);
 
-  size_t mbrtoc16(char16_t *__restrict pwc, const char *__restrict s, size_t n, mbstate_t *__restrict ps);
+  inline size_t mbrtoc16(char16_t *__restrict pwc, const char *__restrict s, size_t n, mbstate_t *__restrict)
+  {
+    return mbstowcs(reinterpret_cast<wchar_t*>(pwc), s, n);
+  }
   size_t mbrtoc32(char16_t *__restrict pwc, const char *__restrict s, size_t n, mbstate_t *__restrict ps);
 
 } // std

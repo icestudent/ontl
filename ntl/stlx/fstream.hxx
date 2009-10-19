@@ -25,6 +25,20 @@
 
 namespace std {
 
+  namespace Encoding 
+  {
+    enum type {
+      Invalid = -2,
+      Default = -1, // based on bom or char type
+      Ansi  = 0,
+      Utf8  = 1,
+      Utf16 = 2,
+      //Utf32 = 4 // unsupported
+    };
+  }
+  typedef Encoding::type EncodingType;
+  namespace __fs = tr2::sys::filesystem;
+
   /**\addtogroup  lib_input_output ******* 27 Input/output library [input.output]
    *@{*/
   /**\addtogroup  lib_file_streams ******* 27.9 File-based streams [file.streams]
@@ -34,13 +48,13 @@ namespace std {
  *	@brief 27.9.1.1 Class template basic_filebuf [filebuf]
  *  @details The class basic_filebuf<charT,traits> associates both the input sequence and the output sequence with a file.
  **/
-template <class charT, class traits /*= char_traits<charT>*/ >
-class basic_filebuf:
-  public basic_streambuf<charT, traits>
-{
-  /** 16Kb default buffer size */
-  static const streamsize default_file_buffer_size = 1024 * 16;
-
+  template <class charT, class traits /*= char_traits<charT>*/ >
+  class basic_filebuf:
+    public basic_streambuf<charT, traits>
+  {
+    /** 16Kb default buffer size */
+    static const streamsize default_file_buffer_size = 1024 * 16;
+    typedef typename traits::state_type state_type;
   public:
     typedef charT                     char_type;
     typedef typename traits::int_type int_type;
@@ -51,12 +65,12 @@ class basic_filebuf:
     ///\name 27.9.1.2 basic_filebuf constructors [filebuf.cons]
 
     basic_filebuf()
-      :mode(), our_buffer(true)
+      :mode(), our_buffer(true),encoding(Encoding::Default)
     {}
 
-  #ifdef NTL__CXX_RV
+#ifdef NTL__CXX_RV
     basic_filebuf(basic_filebuf&& rhs);
-  #endif
+#endif
 
     virtual ~basic_filebuf()
     {
@@ -69,13 +83,13 @@ class basic_filebuf:
     }
 
     ///\name 27.9.1.3 Assign and swap [filebuf.assign]
-  #ifdef NTL__CXX_RV
+#ifdef NTL__CXX_RV
     basic_filebuf& operator=(basic_filebuf&& rhs)
     {
       swap(rhs); return *this;
     }
-  #endif
-    
+#endif
+
     void swap(basic_filebuf& rhs)
     {
       basic_streambuf::swap(rhs);
@@ -84,20 +98,20 @@ class basic_filebuf:
     ///\name 27.9.1.4 Member functions [filebuf.members]
     bool is_open() const { return !!f; }
 
-    basic_filebuf<charT,traits>* open(const string& s, ios_base::openmode mode)
+    basic_filebuf<charT,traits>* open(const string& s, ios_base::openmode mode, EncodingType encoding = Encoding::Ansi)
     {
-      return open(tr2::sys::filesystem::path(s), mode) ? this : nullptr;
+      return do_open(tr2::sys::filesystem::path(s), mode, encoding) ? this : nullptr;
     }
-    basic_filebuf<charT,traits>* open(const char* s, ios_base::openmode mode)
+    basic_filebuf<charT,traits>* open(const char* s, ios_base::openmode mode, EncodingType encoding = Encoding::Ansi)
     {
-      return open(tr2::sys::filesystem::path(s), mode) ? this : nullptr;
+      return do_open(tr2::sys::filesystem::path(s), mode, encoding) ? this : nullptr;
     }
     // NTL extension
-    basic_filebuf<charT,traits>* open(const wchar_t* s, ios_base::openmode mode)
+    template<class Path>
+    basic_filebuf<charT,traits>* open(const Path& name, ios_base::openmode mode, EncodingType encoding = Encoding::Ansi, typename enable_if<__fs::is_basic_path<Path>::value>::type* =0)
     {
-      return open(tr2::sys::filesystem::wpath(s), mode) ? this : nullptr;
+      return do_open(name, mode, encoding) ? this : nullptr;
     }
-
 
     basic_filebuf<charT,traits>* close()
     {
@@ -122,15 +136,71 @@ class basic_filebuf:
       return ok ? this : nullptr;
     }
 
-  ///////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
   protected:
 
     ///\name 27.9.1.5 Overridden virtual functions [filebuf.virtuals]
     //virtual streamsize showmanyc(); // default
     virtual int_type underflow()
     {
-      assert(false && "not implemented yet");
-      return traits_type::eof();
+      const int_type eof = traits_type::eof();
+      // backup:  gptr-eback [begin,pos) (already readed)
+      // pending: egptr-gptr [pos,end)
+
+      streamsize avail = egptr()-gptr();
+      if(avail > 0)
+        // just return it
+        return traits_type::to_int_type(*gptr());
+      
+      bool ok;
+      const bool writeable = (mode&ios_base::out) != 0;
+      streamsize cb;
+      char_type* p = eback();
+      if(!writeable){
+        // use all buffer
+        if(egptr() == p){
+          // possible first call, read 128 characters
+          cb = 128;
+        }else{
+          avail = gptr()-eback();
+          avail = avail > 32 ? 16 : (avail <= 1 ? 0 : 1); // leave 16 characters for backup seq if avail
+          cb = buf.second - avail;
+          if(avail){
+            traits_type::move(p, gptr()-1, avail);
+            p += avail;
+            setg(buf.first, p, p); // temporary set read position to the end of backup
+          }
+       }
+      }else{
+        // TODO: implement input/output management
+        assert(false && "not implemented yet");
+        return eof;
+      }
+      if(mode & ios_base::binary){
+        ok = read_binary(p, p+cb, cb);
+      }else{
+        // TODO: process CRLF && ^Z
+        EncodingType outenc = encoding;
+        if(outenc == Encoding::Default)
+          outenc = static_cast<EncodingType>(sizeof(char_type));
+        switch(outenc)
+        {
+        case Encoding::Utf16:
+          ok = read_in<wchar_t>(p, p+cb, cb, 
+            __::bool_type<__::facets::has_facet<codecvt<char_type,wchar_t,state_type> >::value>());
+          break;
+        default:
+          ok = read_in<char>(p, p+cb, cb,
+            __::bool_type<__::facets::has_facet<codecvt<char_type,char,state_type> >::value>());
+        }
+      }
+      if(!ok)
+        return eof;
+
+      // [back|pos|readed]
+      setg(eback(), p, p+cb);
+
+      return traits_type::to_int_type(*gptr());
     }
 
     //virtual int_type uflow(); // default
@@ -169,6 +239,13 @@ class basic_filebuf:
 
     virtual basic_streambuf<charT,traits>* setbuf(char_type* s, streamsize n)
     {
+      if(!s && !n){
+        // unbuffered io
+        our_buffer = true;
+        reallocate_buffer(1);
+        reset();
+        return this;
+      }
       if(buf.second) reallocate_buffer(0);
       buf.first = s,
         buf.second = n;
@@ -182,7 +259,7 @@ class basic_filebuf:
       pos_type re = pos_type(off_type(-1));
       if(!f)
         return re;
-      
+
       const int width = 
 #if !STLX__CONFORMING_FSTREAM
         1;
@@ -230,163 +307,360 @@ class basic_filebuf:
     //virtual void imbue(const locale& loc); // default
     ///\}
 
-  ///////////////////////////////////////////////////////////////////////////
-protected:
-  // manage buffer memory
-  virtual bool reallocate_buffer(streamsize n)
-  {
-    if(!our_buffer) // dont manage foreign memory
-      return true;
+    ///////////////////////////////////////////////////////////////////////////
+  protected:
+    // manage buffer memory
+    virtual bool reallocate_buffer(streamsize n)
+    {
+      if(!our_buffer) // dont manage foreign memory
+        return true;
 
-    if(n == 0) {
-      // free buffer
-      buf.second = n;
-      delete[] buf.first;
-      return true;
-
-    } else if(n > buf.second) {
-
-      // [re]allocate buffer
-      if(buf.second)
+      if(n == 0) {
+        // free buffer
+        buf.second = n;
         delete[] buf.first;
+        return true;
 
-      buf.first = new char_type[n];
-      buf.second = buf.first ? n : 0;
-    }
-    return buf.second != 0;
-  }
+      } else if(n > buf.second) {
 
-private:
-  template<class Path>
-  bool open(const Path& name, ios_base::openmode mode)
-  {
-    if(f)
-      return false;
+        // [re]allocate buffer
+        if(buf.second)
+          delete[] buf.first;
 
-    // open file
-    native_file::creation_disposition cd;
-    native_file::access_mask am;
-
-    if(mode & ios_base::out){
-      // write
-      cd = mode & ios_base::trunc ? native_file::overwrite_if : native_file::create_if;
-      am = native_file::generic_write;
-    }else{
-      // read
-      cd =  native_file::open_existing;
-      am = native_file::generic_read;
-    }
-    using namespace NTL__SUBSYSTEM_NS;
-    bool ok = success(f.create(name.external_file_string(), cd, am));
-    if(!ok)
-      return false;
-
-    if(mode & ios_base::ate){
-      ok = success(f.seek(0, native_file::file_end));
-      if(!ok){
-        f.close();
-        return false;
+        buf.first = new char_type[n];
+        buf.second = buf.first ? n : 0;
       }
+      return buf.second != 0;
     }
 
-    // setup buffer
-    if(!buf.second){
-      reallocate_buffer(default_file_buffer_size);
-      reset();
-    }
-
-    this->mode = mode;
-    return ok;
-  }
-
-  bool write(const char_type* from, const char_type* to)
-  {
-    return write(from, to-from);
-  }
-
-  bool write(const char_type* s, streamsize n)
-  {
-    if(!n)
-      return true;
-
-    const char_type *inpos = s, *frompos = s, *endpos = s + n;
-    const void* p;
-
-#if STLX__CONFORMING_FSTREAM
-    codecvt_base::result re = codecvt_base::noconv;
-    typedef typename traits::state_type state_type;
-    typedef codecvt<charT,char,typename traits::state_type> codecvt;
-    const codecvt& a_codecvt = use_facet<codecvt>(getloc());
-    char buf[1024], *outpos = buf
-    const size_t width = (mode & ios_base::binary) ? sizeof(char_type) : sizeof(char);
-#else
-    static const size_t width = sizeof(char_type);
-    if(!(mode & ios_base::binary) && f.tell() == 0){
-      // we are in the unicode text mode, write BOM
-      //(UTF-16 LE)
-      static const uint32_t bom_le = 0xFEFF;
-      uint32_t bom_size = 0;
-      if(is_same<char_type, wchar_t>::value || is_same<char_type,char16_t>::value)
-        bom_size = 2;
-      else if(is_same<char_type, char32_t>::value)
-        bom_size = 4;
-      if(bom_size)
-        f.write(&bom_le, bom_size);
-    }
-#endif
-
-    do {
-      streamsize chunk_size;
-#if STLX__CONFORMING_FSTREAM
+    template<typename toT>
+    bool write_out(const char_type* from, const char_type* to, streamsize* written, false_type)
+    {
+      typedef codecvt<toT,char_type,state_type> codecvt;
+      static const codecvt& cvt = use_facet<codecvt>(getloc());
+      streamsize pending = to-from;
       state_type state;
-      if(!(mode & ios_base::binary))
-        re = a_codecvt.out(state, frompos, endpos, inpos, buf, buf+_countof(buf), outpos);
-      if(re == codecvt_base::error)
-        break;
-      else if(re == codecvt_base::noconv)
-        p = frompos, chunk_size = endpos-frompos, inpos += chunk_size;
-      else // ok || partial
-        p = buf, chunk_size = outpos-buf;
-#else
-      p = frompos;
-      chunk_size = endpos-frompos;
-      inpos += chunk_size;
-#endif
-      const uint32_t write_size = chunk_size*width;
+      const char_type* from_next;
+      toT buf[1024], *to_next;
+      const void* p;
+      do{
+        streamsize chunk_size, write_size;
+        codecvt_base::result re = cvt.in(state,from,to,from_next,buf,buf+_countof(buf),to_next);
+        if(re == codecvt_base::error)
+          break;
+        else if(re == codecvt_base::noconv)
+          p = from, chunk_size = from_next-from, write_size = chunk_size*sizeof(char_type);
+        else // ok | partial
+          p = buf, chunk_size = to_next-buf, write_size = chunk_size*sizeof(toT);
 
-      static_assert(numeric_limits<uint32_t>::__max >= numeric_limits<streamsize>::__max, "possible incompatible types");
-      if(!NTL__SUBSYSTEM_NS::success(f.write(p,  write_size)))
-        break;
-      if(static_cast<streamsize>(f.get_io_status_block().Information) != write_size)
-        break;
+        if(!NTL__SUBSYSTEM_NS::success(f.write(p, static_cast<uint32_t>(write_size))))
+          break;
+        const streamsize fwritten = static_cast<streamsize>(f.get_io_status_block().Information);
+        assert(fwritten == write_size);
+        if(fwritten != write_size)
+          break;
 
-      n -= inpos-frompos;
-      frompos = inpos;
-    } while(n > 0);
+        pending -= chunk_size;
+        from += chunk_size;
+      }while(pending > 0);
+      if(written) *written = pending;
+      return pending == 0;
+    }
 
-    return n == 0;
-  }
 
-  bool flush()
-  {
-    return NTL__SUBSYSTEM_NS::success(f.flush());
-  }
+    template<typename toT>
+    bool write_out(const char_type* from, const char_type* to, streamsize* written, true_type)
+    {
+      typedef codecvt<char_type,toT,state_type> codecvt;
+      static const codecvt& cvt = use_facet<codecvt>(getloc());
+      streamsize pending = to-from;
+      state_type state;
+      const char_type* from_next;
+      toT buf[1024], *to_next;
+      const void* p;
+      do{
+        streamsize chunk_size, write_size;
+        codecvt_base::result re = cvt.out(state,from,to,from_next,buf,buf+_countof(buf),to_next);
+        if(re == codecvt_base::error)
+          break;
+        else if(re == codecvt_base::noconv)
+          p = from, chunk_size = from_next-from, write_size = chunk_size*sizeof(char_type);
+        else // ok | partial
+          p = buf, chunk_size = to_next-buf, write_size = chunk_size*sizeof(toT);
 
-  // reset buffer positions
-  void reset()
-  {
-    setp(buf.first, buf.first+buf.second);
-  }
+        if(!NTL__SUBSYSTEM_NS::success(f.write(p, static_cast<uint32_t>(write_size))))
+          break;
+        const streamsize fwritten = static_cast<streamsize>(f.get_io_status_block().Information);
+        assert(fwritten == write_size);
+        if(fwritten != write_size)
+          break;
+
+        pending -= chunk_size;
+        from += chunk_size;
+      }while(pending > 0);
+      if(written) *written = pending;
+      return pending == 0;
+    }
+    bool write_binary(const char_type* from, const char_type* to, streamsize* written)
+    {
+      streamsize pending = to-from, write_size = pending*sizeof(char_type);
+      do{
+        if(!NTL__SUBSYSTEM_NS::success(f.write(from, static_cast<uint32_t>(write_size))))
+          break;
+        const streamsize fwritten = static_cast<streamsize>(f.get_io_status_block().Information);
+        assert(fwritten == write_size);
+        if(fwritten != pending)
+          break;
+        pending = 0;
+      }while(pending > 0);
+      if(written) *written = to-from;
+      return pending == 0;
+    }
+
+    bool read_binary(char_type* to, char_type* to_end, streamsize& readed)
+    {
+      readed = 0;
+      streamsize read_size = to_end - to;
+      if(!NTL__SUBSYSTEM_NS::success(f.read(to, static_cast<uint32_t>(read_size))))
+        return false;
+      readed = static_cast<streamsize>(f.get_io_status_block().Information);
+      return readed > 0;
+    }
+
+    template<typename fromT>
+    bool read_in(char_type* to, char_type* to_end, streamsize& readed, true_type)
+    {
+      readed = 0;
+      streamsize read_size = to_end-to;
+      typedef codecvt<char_type,fromT,state_type> codecvt;
+      static const codecvt& cvt = use_facet<codecvt>(getloc());
+      char_type* to_next;
+      fromT buf[1024];
+      const fromT *from_next;
+      do{
+        streamsize cb = min(read_size*sizeof(fromT), _countof(buf));
+        if(!NTL__SUBSYSTEM_NS::success(f.read(buf, static_cast<uint32_t>(cb))))
+          break;
+        streamsize freaded = static_cast<streamsize>(f.get_io_status_block().Information);
+        assert(freaded > 0);
+        freaded /= sizeof(fromT);
+
+        state_type state;
+        codecvt_base::result re = cvt.in(state, buf, buf+freaded, from_next, to, to_end, to_next);
+        if(re == codecvt_base::error)
+          break;
+        else if(re == codecvt_base::noconv){
+          readed = freaded;
+          traits_type::copy(to, reinterpret_cast<const char_type*>(buf), readed);
+        }else{
+          readed = to_next-to;
+        }
+      }while(0);
+      return readed > 0;
+    }
+    template<typename fromT>
+    bool read_in(char_type* to, char_type* to_end, streamsize& readed, false_type)
+    {
+      readed = 0;
+      streamsize read_size = to_end-to;
+      typedef codecvt<fromT,char_type,state_type> codecvt;
+      static const codecvt& cvt = use_facet<codecvt>(getloc());
+      char_type* to_next;
+      fromT buf[1024];
+      const fromT *from_next;
+      do{
+        streamsize cb = min(read_size*sizeof(fromT), _countof(buf));
+        if(!NTL__SUBSYSTEM_NS::success(f.read(buf, static_cast<uint32_t>(cb))))
+          break;
+        streamsize freaded = static_cast<streamsize>(f.get_io_status_block().Information);
+        assert(freaded > 0);      // in bytes
+        freaded /= sizeof(fromT); // in chars
+
+        state_type state;
+        codecvt_base::result re = cvt.out(state, buf, buf+freaded, from_next, to, to_end, to_next);
+        if(re == codecvt_base::error)
+          break;
+        else if(re == codecvt_base::noconv){
+          readed = freaded;
+          traits_type::copy(to, reinterpret_cast<const char_type*>(buf), readed);
+        }else{
+          readed = to_next-to;
+        }
+      }while(0);
+      return readed > 0;
+    }
 
   private:
-    //typedef ntl::nt::file_handler native_file;
-    typedef NTL__SUBSYSTEM_NS::file_handler native_file;
+    template<class Path>
+    bool do_open(const Path& name, ios_base::openmode mode, EncodingType enc, typename enable_if<__fs::is_basic_path<Path>::value>::type* =0)
+    {
+      if(f)
+        return false;
+
+      this->mode = mode;
+      const wstring fname = name.external_file_string();
+
+      uint32_t bom = 0, bom_size = 0;
+      if(!(mode & (ios_base::binary|ios_base::trunc))){
+        // try to read bom when text mode & file isn't truncated
+        using namespace NTL__SUBSYSTEM_NS;
+        file_handler fh;
+        if(success(fh.open(fname)) && success(fh.read(&bom,sizeof(bom))))
+          bom_size = static_cast<uint32_t>(fh.get_io_status_block().Information);
+        fh.close();
+      }
+
+      // open file
+      native_file::creation_disposition cd;
+      native_file::access_mask am;
+
+      if(mode & ios_base::out){
+        // write
+        cd = mode & ios_base::trunc ? native_file::overwrite_if : native_file::create_if;
+        am = native_file::generic_write;
+      }else{
+        // read
+        cd =  native_file::open_existing;
+        am = native_file::generic_read;
+      }
+      using namespace NTL__SUBSYSTEM_NS;
+      bool ok = success(f.create(name.external_file_string(), cd, am));
+      if(!ok)
+        return false;
+
+      if(mode & ios_base::ate){
+        ok = success(f.seek(0, native_file::file_end));
+        if(!ok){
+          f.close();
+          return false;
+        }
+      }
+
+      // setup buffer
+      if(!buf.second){
+        reallocate_buffer(default_file_buffer_size);
+        reset();
+      }
+
+      // detect encoding on nonempty file
+      if(bom_size > 0){
+        EncodingType file_enc = parse_encoding(bom, bom_size);
+        if(bom_size && (enc == Encoding::Default || file_enc == enc))
+          f.seek(bom_size, native_file::file_begin); // skip bom
+        if(enc == Encoding::Default)
+          enc = file_enc;
+      }
+      this->encoding = enc;
+      return ok;
+    }
+
+    bool write(const char_type* from, const char_type* to)
+    {
+      return write(from, to-from);
+    }
+
+    bool write(const char_type* s, streamsize n)
+    {
+      if(!n)
+        return true;
+
+#if STLX__CONFORMING_FSTREAM
+      codecvt_base::result re = codecvt_base::noconv;
+      typedef codecvt<charT,char,typename traits::state_type> codecvt;
+      const codecvt& a_codecvt = use_facet<codecvt>(getloc());
+      char buf[1024], *outpos = buf
+        const size_t width = (mode & ios_base::binary) ? sizeof(char_type) : sizeof(char);
+#else
+      static const size_t width = sizeof(char_type);
+      if(!(mode & ios_base::binary) && f.tell() == 0){
+        // we are in the unicode text mode, write BOM
+        //(UTF-16 LE)
+        static const uint32_t bom_le = 0xFEFF;
+        uint32_t bom_size = encoding;
+        if(encoding == Encoding::Default)
+          bom_size = sizeof(char_type); // but utf8 isn't supported by native type
+        if(bom_size)
+          f.write(&bom_le, bom_size);
+      }
+#endif
+      bool ok = false;
+      if(mode & ios_base::binary) {
+        ok = write_binary(s, s+n, 0);
+      }else{
+        // TODO: process CRLF && ^Z
+        EncodingType outenc = encoding;
+        if(outenc == Encoding::Default)
+          outenc = static_cast<EncodingType>(sizeof(char_type));
+        switch(outenc)
+        {
+        case Encoding::Utf16:
+          ok = write_out<wchar_t>(s, s+n,0, 
+            __::bool_type<__::facets::has_facet<codecvt<char_type,wchar_t,state_type> >::value>());
+          break;
+        default:
+          ok = write_out<char>(s, s+n, 0,
+            __::bool_type<__::facets::has_facet<codecvt<char_type,char,state_type> >::value>());
+        }
+      }
+      return ok;
+    }
+
+    bool flush()
+    {
+      return NTL__SUBSYSTEM_NS::success(f.flush());
+    }
+
+    // reset buffer positions
+    void reset()
+    {
+      if(mode&ios_base::in)
+        setg(buf.first, buf.first, buf.first); // empty input sequence
+      if(mode&ios_base::out)
+        setp(buf.first, buf.first+buf.second);
+    }
+
+    EncodingType parse_encoding(uint32_t bom, uint32_t& bom_size)
+    {
+      EncodingType enc = Encoding::Default;
+      if(bom_size < 2)
+        return bom_size = 0, enc;
+
+      static const uint32_t utf32_be = 0xfffe0000, utf32_le = 0x0000feff,
+        utf16_be = 0xfffe, utf16_le = 0xfeff,
+        utf8 = 0xBFBBFE;
+      
+      bom_size = 4;
+      do {
+        if(bom == utf32_le || bom == utf32_be){ // 4 bytes
+          //if(bom == utf32_le) enc = Encoding::Utf32; // not supported
+          break;
+        }
+        bom_size = 3;
+        bom &= 0xffffff;
+        if(bom == utf8){
+          enc = Encoding::Utf8; break;
+        }
+        bom_size = 2;
+        bom &= 0xffff;
+        if(bom == utf16_le || bom == utf32_be){
+          if(bom == utf32_le) enc = Encoding::Utf16;
+          break;
+        }
+        bom_size = 0;
+      }while(0);
+      return enc;
+    }
+
+  private:
+    typedef ntl::nt::file_handler native_file;  // for intellisense
+    //typedef NTL__SUBSYSTEM_NS::file_handler native_file;
 
     native_file f;
     pair<char_type*, streamsize> buf;
+    EncodingType encoding;
     ios_base::openmode mode;
     bool our_buffer;
-};
+  };
 
 
 /**
@@ -411,33 +685,27 @@ class basic_ifstream:
       :basic_istream(&sb)
     {}
 
-    explicit basic_ifstream(const char* s, ios_base::openmode mode = ios_base::in)
+    explicit basic_ifstream(const char* s, ios_base::openmode mode = ios_base::in, EncodingType encoding = Encoding::Ansi)
       :basic_istream(&sb)
     {
-      open(s, mode);
+      open(s, mode, encoding);
     }
-    explicit basic_ifstream(const string& s, ios_base::openmode mode = ios_base::in)
+    explicit basic_ifstream(const string& s, ios_base::openmode mode = ios_base::in, EncodingType encoding = Encoding::Ansi)
       :basic_istream(&sb)
     {
-      open(s, mode);
+      open(s, mode, encoding);
     }
 #ifdef NTL__CXX_RV
     basic_ifstream(basic_ifstream&& rhs);
 #endif
 
     // NTL extension
-    explicit basic_ifstream(const wchar_t* s, ios_base::openmode mode = ios_base::in)
+    template<class Path>
+    explicit basic_ifstream(const Path& name, ios_base::openmode mode = ios_base::in, EncodingType encoding = Encoding::Ansi, typename enable_if<__fs::is_basic_path<Path>::value>::type* =0)
       :basic_istream(&sb)
     {
-      open(s, mode);
+      open(name, mode, encoding);
     }
-    explicit basic_ifstream(const wstring& s, ios_base::openmode mode = ios_base::in)
-      :basic_istream(&sb)
-    {
-      open(s, mode);
-    }
-
-
     ///\name 27.9.1.8 Assign and swap [ifstream.assign]
 #ifdef NTL__CXX_RV
     basic_ifstream& operator=(basic_ifstream&& rhs)
@@ -456,28 +724,23 @@ class basic_ifstream:
 
     bool is_open() const { return sb.is_open(); }
 
-    void open(const char* s, ios_base::openmode mode = ios_base::in)
+    void open(const char* s, ios_base::openmode mode = ios_base::in, EncodingType encoding = Encoding::Ansi)
     {
-      if(!sb.open(s, mode|ios_base::in))
+      if(!sb.open(s, mode|ios_base::in, encoding))
         setstate(ios_base::failbit);
     }
-    void open(const string& s, ios_base::openmode mode = ios_base::in)
+    void open(const string& s, ios_base::openmode mode = ios_base::in, EncodingType encoding = Encoding::Ansi)
     {
-      if(!sb.open(s, mode|ios_base::in))
+      if(!sb.open(s, mode|ios_base::in, encoding))
         setstate(ios_base::failbit);
     }
     // NTL extension
-    void open(const wchar_t* s, ios_base::openmode mode = ios_base::in)
+    template<class Path>
+    void open(const Path& name, ios_base::openmode mode = ios_base::in, EncodingType encoding = Encoding::Ansi, typename enable_if<__fs::is_basic_path<Path>::value>::type* =0)
     {
-      if(!sb.open(s, mode|ios_base::in))
+      if(!sb.open(name, mode|ios_base::in, encoding))
         setstate(ios_base::failbit);
     }
-    void open(const wstring& s, ios_base::openmode mode = ios_base::in)
-    {
-      if(!sb.open(s.c_str(), mode|ios_base::in))
-        setstate(ios_base::failbit);
-    }
-
     void close()
     {
       if(!sb.close())
@@ -512,32 +775,27 @@ class basic_ofstream:
     basic_ofstream()
       :basic_ostream(&sb)
     {}
-    explicit basic_ofstream(const char* s, ios_base::openmode mode = ios_base::out)
+    explicit basic_ofstream(const char* s, ios_base::openmode mode = ios_base::out, EncodingType encoding = Encoding::Ansi)
       :basic_ostream(&sb)
     {
-      open(s, mode);
+      open(s, mode, encoding);
     }
-    explicit basic_ofstream(const string& s, ios_base::openmode mode = ios_base::out)
+    explicit basic_ofstream(const string& s, ios_base::openmode mode = ios_base::out, EncodingType encoding = Encoding::Ansi)
       :basic_ostream(&sb)
     {
-      open(s, mode);
+      open(s, mode, encoding);
     }
 #ifdef NTL__CXX_RV
     basic_ofstream(basic_ofstream&& rhs);
 #endif
 
     // NTL extension
-    explicit basic_ofstream(const wchar_t* s, ios_base::openmode mode = ios_base::out)
+    template<class Path>
+    explicit basic_ofstream(const Path& name, ios_base::openmode mode = ios_base::out, EncodingType encoding = Encoding::Ansi, typename enable_if<__fs::is_basic_path<Path>::value>::type* =0)
       :basic_ostream(&sb)
     {
-      open(s, mode);
+      open(name, mode, encoding);
     }
-    explicit basic_ofstream(const wstring& s, ios_base::openmode mode = ios_base::out)
-      :basic_ostream(&sb)
-    {
-      open(s, mode);
-    }
-
     ///\name 27.9.1.12 Assign and swap [ofstream.assign]
 #ifdef NTL__CXX_RV
     basic_ofstream& operator=(basic_ofstream&& rhs)
@@ -557,25 +815,21 @@ class basic_ofstream:
     
     bool is_open() const { return sb.is_open(); }
 
-    void open(const char* s, ios_base::openmode mode = ios_base::out)
+    void open(const char* s, ios_base::openmode mode = ios_base::out, EncodingType encoding = Encoding::Ansi)
     {
-      if(!sb.open(s, mode|ios_base::out))
+      if(!sb.open(s, mode|ios_base::out, encoding))
         setstate(ios_base::failbit);
     }
-    void open(const string& s, ios_base::openmode mode = ios_base::out)
+    void open(const string& s, ios_base::openmode mode = ios_base::out, EncodingType encoding = Encoding::Ansi)
     {
-      if(!sb.open(s, mode|ios_base::out))
+      if(!sb.open(s, mode|ios_base::out, encoding))
         setstate(ios_base::failbit);
     }
     // NTL extension
-    void open(const wchar_t* s, ios_base::openmode mode = ios_base::out)
+    template<class Path>
+    void open(const Path& name, ios_base::openmode mode = ios_base::out, EncodingType encoding = Encoding::Ansi, typename enable_if<__fs::is_basic_path<Path>::value>::type* =0)
     {
-      if(!sb.open(s, mode|ios_base::in))
-        setstate(ios_base::failbit);
-    }
-    void open(const wstring& s, ios_base::openmode mode = ios_base::out)
-    {
-      if(!sb.open(s.c_str(), mode|ios_base::in))
+      if(!sb.open(name, mode|ios_base::out, encoding))
         setstate(ios_base::failbit);
     }
 
@@ -614,33 +868,27 @@ class basic_fstream:
     basic_fstream()
       :basic_iostream(&sb)
     {}
-    explicit basic_fstream(const char* s, ios_base::openmode mode = ios_base::in|ios_base::out)
+    explicit basic_fstream(const char* s, ios_base::openmode mode = ios_base::in|ios_base::out, EncodingType encoding = Encoding::Ansi)
       :basic_iostream(&sb)
     {
-      open(s, mode);
+      open(s, mode, encoding);
     }
-    explicit basic_fstream(const string& s, ios_base::openmode mode = ios_base::in|ios_base::out)
+    explicit basic_fstream(const string& s, ios_base::openmode mode = ios_base::in|ios_base::out, EncodingType encoding = Encoding::Ansi)
       :basic_iostream(&sb)
     {
-      open(s, mode);
+      open(s, mode, encoding);
     }
 #ifdef NTL__CXX_RV
     basic_fstream(basic_fstream&& rhs);
 #endif
 
     // NTL extension
-    explicit basic_fstream(const wchar_t* s, ios_base::openmode mode = ios_base::in|ios_base::out)
+    template<class Path>
+    explicit basic_fstream(const Path& name, ios_base::openmode mode = ios_base::in|ios_base::out, EncodingType encoding = Encoding::Ansi, typename enable_if<__fs::is_basic_path<Path>::value>::type* =0)
       :basic_iostream(&sb)
     {
-      open(s, mode);
+      open(name, mode, encoding);
     }
-    explicit basic_fstream(const wstring& s, ios_base::openmode mode = ios_base::in|ios_base::out)
-      :basic_iostream(&sb)
-    {
-      open(s, mode);
-    }
-
-
     ///\name 27.9.1.16 Assign and swap [fstream.assign]
 #ifdef NTL__CXX_RV
     basic_fstream& operator=(basic_fstream&& rhs)
@@ -660,29 +908,23 @@ class basic_fstream:
 
     bool is_open() const { return sb.is_open(); }
 
-    void open(const char* s, ios_base::openmode mode = ios_base::in|ios_base::out)
+    void open(const char* s, ios_base::openmode mode = ios_base::in|ios_base::out, EncodingType encoding = Encoding::Ansi)
     {
-      if(!sb.open(s, mode))
+      if(!sb.open(s, mode, encoding))
         setstate(ios_base::failbit);
     }
-    void open(const string& s, ios_base::openmode mode = ios_base::in|ios_base::out)
+    void open(const string& s, ios_base::openmode mode = ios_base::in|ios_base::out, EncodingType encoding = Encoding::Ansi)
     {
-      if(!sb.open(s, mode))
+      if(!sb.open(s, mode, encoding))
         setstate(ios_base::failbit);
     }
     // NTL extension
-    void open(const wchar_t* s, ios_base::openmode mode = ios_base::in|ios_base::out)
+    template<class Path>
+    void open(const Path& name, ios_base::openmode mode = ios_base::in|ios_base::out, EncodingType encoding = Encoding::Ansi, typename enable_if<__fs::is_basic_path<Path>::value>::type* =0)
     {
-      if(!sb.open(s, mode|ios_base::in))
+      if(!sb.open(name, mode, encoding))
         setstate(ios_base::failbit);
     }
-    void open(const wstring& s, ios_base::openmode mode = ios_base::in|ios_base::out)
-    {
-      if(!sb.open(s.c_str(), mode|ios_base::in))
-        setstate(ios_base::failbit);
-    }
-
-
     void close()
     {
       if(!sb.close())

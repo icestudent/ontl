@@ -151,17 +151,17 @@ class ios_base
 
     /// 27.4.2.1.4 Type ios_base::openmode [ios::openmode]
     typedef uint8_t openmode;
-    /** seek to end before each write */
+    /** seek to end before each write (0x01) */
     static const openmode app     = 1 << 0;
-    /** open and seek to end immediately after opening */
+    /** open and seek to end immediately after opening (0x02) */
     static const openmode ate     = 1 << 1;
-    /** truncate an existing stream when opening */
+    /** truncate an existing stream when opening (0x04) */
     static const openmode trunc   = 1 << 2;
-    /** open for input */
+    /** open for input (0x08) */
     static const openmode in      = 1 << 3;
-    /** open for output */
+    /** open for output (0x10) */
     static const openmode out     = 1 << 4;
-    /** perform input and output in binary mode (as opposed to text mode) */
+    /** perform input and output in binary mode (as opposed to text mode) (0x20) */
     static const openmode binary  = 1 << 5;
 
     /// 27.4.2.1.5 Type ios_base::seekdir [ios::seekdir]

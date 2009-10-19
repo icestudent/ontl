@@ -100,9 +100,9 @@ struct char_traits<char16_t>
   static const char_type* find(const char_type* s, size_t n, const char_type& a)
   { while ( n-- ) if ( a != *s ) ++s; else return s; return 0; }
   static char_type* move(char_type* dst, const char_type* src, size_t n)
-  { return reinterpret_cast<char_type*>(memmove(dst, src, n)); }
+  { return reinterpret_cast<char_type*>(memmove(dst, src, n*sizeof(char_type))); }
   static char_type* copy(char_type* dst, const char_type* src, size_t n)
-  { return reinterpret_cast<char_type*>(memcpy(dst, src, n)); }
+  { return reinterpret_cast<char_type*>(memcpy(dst, src, n*sizeof(char_type))); }
   static char_type* assign(char_type* s, size_t n, char_type a)
   { for ( char_type * p = s; n; --n, ++p ) *p = a; return s; }
 
@@ -143,9 +143,9 @@ struct char_traits<char32_t>
   static const char_type* find(const char_type* s, size_t n, const char_type& a)
   { while ( n-- ) if ( a != *s ) ++s; else return s; return 0; }
   static char_type* move(char_type* dst, const char_type* src, size_t n)
-  { return reinterpret_cast<char_type*>(memmove(dst, src, n)); }
+  { return reinterpret_cast<char_type*>(memmove(dst, src, n*sizeof(char_type))); }
   static char_type* copy(char_type* dst, const char_type* src, size_t n)
-  { return reinterpret_cast<char_type*>(memcpy(dst, src, n)); }
+  { return reinterpret_cast<char_type*>(memcpy(dst, src, n*sizeof(char_type))); }
   static char_type* assign(char_type* s, size_t n, char_type a)
   { for ( char_type * p = s; n; --n, ++p ) *p = a; return s; }
 
