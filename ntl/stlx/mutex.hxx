@@ -54,6 +54,7 @@ namespace std
 #endif
 
 #ifndef NTL__SUBSYSTEM_KM
+#define NTL__BASE_MUTEX
   namespace __
   {
     namespace mtx
@@ -62,6 +63,8 @@ namespace std
     }
   }
 #endif
+
+#ifdef NTL__BASE_MUTEX
 
   /**
    *	@brief Class mutex [30.3.1.1 thread.mutex.class]
@@ -188,6 +191,7 @@ namespace std
     recursive_timed_mutex& operator=(const recursive_timed_mutex&) __deleted;
   };
 
+#endif//#ifdef NTL__BASE_MUTEX
 
   /**
    *	@brief Class template lock_guard [30.3.3.1 thread.lock.guard]
@@ -508,7 +512,7 @@ namespace std
   template<class Callable>
   void call_once(once_flag& flag, Callable func)
   {
-    static_assert(std::is_member_function_pointer<Callable>::value == false, "must not be a member pointer function");
+    static_assert(std::is_member_function_pointer<Callable>::value == false, "must not be a member function pointer");
     if(flag.ready())
       return;
 
