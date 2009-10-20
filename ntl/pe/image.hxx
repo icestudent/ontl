@@ -669,6 +669,11 @@ namespace ntl {
           return 0xffffffff;
         }
 
+        uint32_t ordinal(const image * pe, char name[]) const
+        {
+          return ordinal(pe, static_cast<const char*>(name));
+        }
+
         uint32_t ordinal(const image * /*pe*/, uint16_t ordinal) const
         {
           return ordinal - Base;
