@@ -8,6 +8,8 @@
 #ifndef NTL__STLX_IOSFWD
 #define NTL__STLX_IOSFWD
 
+#include "cstdint.hxx" // for uint_least16_t
+
 //#include "cwchar.hxx" // for mbstate_t
 
 // 1 Default template arguments are described as appearing both in <iosfwd> and
