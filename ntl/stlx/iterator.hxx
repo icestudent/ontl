@@ -349,24 +349,24 @@ class back_insert_iterator
 
     explicit back_insert_iterator(Container & x) : container(&x) {}
 
-    back_insert_iterator<Container>&
-      operator=(typename Container::const_reference value)
+    back_insert_iterator&
+      operator=(typename container_type::const_reference value)
     {
       container->push_back(value);
       return *this;
     }
     #ifdef NTL__CXX_RV
-    back_insert_iterator<Container>&
-      operator=(typename Container::value_type&& value)
+    back_insert_iterator&
+      operator=(typename container_type::value_type&& value)
     {
       container->push_back(value);
       return *this;
     }
     #endif
 
-    back_insert_iterator<Container>& operator*()     { return *this; }
-    back_insert_iterator<Container>& operator++()    { return *this; }
-    back_insert_iterator<Container>  operator++(int) { return *this; }
+    back_insert_iterator& operator*()     { return *this; }
+    back_insert_iterator& operator++()    { return *this; }
+    back_insert_iterator  operator++(int) { return *this; }
 
   protected:
     Container * container;
@@ -388,24 +388,24 @@ class front_insert_iterator
 
     explicit front_insert_iterator(Container& x) : container(&x) {}
 
-    front_insert_iterator<Container>&
-      operator=(typename Container::const_reference value)
+    front_insert_iterator&
+      operator=(typename container_type::const_reference value)
     {
       container->push_front(value);
       return *this;
     }
     #ifdef NTL__CXX_RV
-    front_insert_iterator<Container>&
-      operator=(typename Container::value_type&& value)
+    front_insert_iterator&
+      operator=(typename container_type::value_type&& value)
     {
       container->push_front(value);
       return *this;
     }
     #endif
 
-    front_insert_iterator<Container>& operator*()     { return *this; }
-    front_insert_iterator<Container>& operator++()    { return *this; }
-    front_insert_iterator<Container>  operator++(int) { return *this; }
+    front_insert_iterator& operator*()     { return *this; }
+    front_insert_iterator& operator++()    { return *this; }
+    front_insert_iterator  operator++(int) { return *this; }
 
   protected:
     Container * container;
@@ -432,16 +432,16 @@ class insert_iterator
     insert_iterator(Container& x, typename Container::iterator i)
     : container(&x), iter(i) {}
 
-    insert_iterator<Container>&
-      operator=(typename Container::const_reference value)
+    insert_iterator&
+      operator=(typename container_type::const_reference value)
     {
       iter = container->insert(iter, value);
       ++iter;
       return *this;
     }
     #ifdef NTL__CXX_RV
-    insert_iterator<Container>&
-      operator=(typename Container::value_type&& value)
+    insert_iterator&
+      operator=(typename container_type::value_type&& value)
     {
       iter = container->insert(iter, value);
       ++iter;
@@ -449,9 +449,9 @@ class insert_iterator
     }
     #endif
 
-    insert_iterator<Container>& operator*()     { return *this; }
-    insert_iterator<Container>& operator++()    { return *this; }
-    insert_iterator<Container>& operator++(int) { return *this; }
+    insert_iterator& operator*()     { return *this; }
+    insert_iterator& operator++()    { return *this; }
+    insert_iterator& operator++(int) { return *this; }
 
   protected:
     Container * container;
