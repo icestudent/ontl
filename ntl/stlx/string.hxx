@@ -238,6 +238,14 @@ class basic_string
 
     static const charT zero_char = 0;
 
+    /** because Requires: s shall not be a null pointer [21.3.2/9] 
+    and http://www.open-std.org/jtc1/sc22/wg21/docs/lwg-closed.html#466 **/
+    typedef typename stringbuf_t::size_type       size_type_;
+    basic_string(nullptr_t, const Allocator& a = Allocator()) __deleted; // string(nullptr)
+    basic_string(int, const Allocator& a = Allocator()) __deleted;       // string(0)
+    basic_string(nullptr_t, size_type_, const Allocator& a = Allocator()) __deleted;
+    basic_string(int, size_type_, const Allocator& a = Allocator()) __deleted;
+
   ///////////////////////////////////////////////////////////////////////////
   public:
 

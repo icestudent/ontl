@@ -206,7 +206,9 @@
 // class enum
 //#define NTL__CXX_ENUM
 // nullptr
-//#define NTL__CXX_NULLPTR
+#ifdef _MSC_FULL_VER >= 160021003
+# define NTL__CXX_NULLPTR
+#endif
 // static assert
 #define NTL__CXX_ASSERT
 // thread_local
@@ -443,6 +445,26 @@
   #define __default
 #endif
 
+namespace ntl
+{
+  struct explicit_bool_t { void _(){} };
+  typedef void (explicit_bool_t::* explicit_bool_type)(); // pointer-to-member function instead of pointer-to-member because the pointer to second form have -1 base and 0/NULL is valid value.
+
+  template<typename T>
+  __forceinline
+  explicit_bool_type explicit_bool(T cond)
+  {
+    return *reinterpret_cast<explicit_bool_type*>(&cond);
+  }
+
+  __forceinline
+  explicit_bool_type explicit_bool(bool cond)
+  {
+    return cond ? &explicit_bool_t::_ : 0;
+  }
+}
+
+
 namespace std {
 
 /**\defgroup  lib_language_support ***** 18 Language support library [language.support]
@@ -473,6 +495,11 @@ struct nullptr_t
 {
     template<typename any> operator any * () const { return 0; }
     template<class any, typename T> operator T any:: * () const { return 0; }
+#ifdef NTL__CXX_EXPLICITOP
+    explicit operator bool() const { return false; }
+#else
+    operator ntl::explicit_bool_type() const { return ntl::explicit_bool(false); }
+#endif
 
     #ifdef _MSC_VER
     struct pad {};
@@ -580,25 +607,6 @@ static_assert(sizeof(nullptr)==sizeof(void*), "3.9.1.10: sizeof(std::nullptr_t) 
 template <typename T, size_t N>
 char (*__countof_helper(T(&array)[N]))[N];
 #define _countof(array) sizeof(*__countof_helper(array))
-
-namespace ntl
-{
-  struct explicit_bool_t { void _(){} };
-  typedef void (explicit_bool_t::* explicit_bool_type)(); // pointer-to-member function instead of pointer-to-member because the pointer to second form have -1 base and 0/NULL is valid value.
-
-  template<typename T>
-  __forceinline
-  explicit_bool_type explicit_bool(T cond)
-  {
-    return *reinterpret_cast<explicit_bool_type*>(&cond);
-  }
-
-  __forceinline
-  explicit_bool_type explicit_bool(bool cond)
-  {
-    return cond ? &explicit_bool_t::_ : 0;
-  }
-}
 
 namespace std { namespace __{ using ntl::explicit_bool; using ntl::explicit_bool_type; } }
 
