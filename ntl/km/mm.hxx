@@ -9,7 +9,7 @@
 
 #include "basedef.hxx"
 #include "../nt/virtualmem.hxx"
-#include "event.hxx" // for kguarded_mutex
+#include "mutex.hxx" // for kguarded_mutex
 
 namespace ntl {
   namespace km {
