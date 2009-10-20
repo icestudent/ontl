@@ -244,7 +244,7 @@ class basic_string
     basic_string(nullptr_t, const Allocator& a = Allocator()) __deleted; // string(nullptr)
     basic_string(int, const Allocator& a = Allocator()) __deleted;       // string(0)
     basic_string(nullptr_t, size_type_, const Allocator& a = Allocator()) __deleted;
-    basic_string(int, size_type_, const Allocator& a = Allocator()) __deleted;
+    //basic_string(int, size_type_, const Allocator& a = Allocator()) __deleted; // icl can't resolve string(1, '1') and string(0, 0)
 
   ///////////////////////////////////////////////////////////////////////////
   public:
@@ -377,7 +377,7 @@ public:
     #ifdef NTL__CXX_RV
     __forceinline
     basic_string(basic_string&& str)
-      :str(forward<stringbuf_t>(str.str))
+      :str(move(str.str))
     {}
     __forceinline
     basic_string(basic_string&& str, const Allocator& a)
@@ -406,7 +406,7 @@ public:
     __forceinline
     basic_string& operator=(basic_string&& str)
     {
-      return this == &str ? *this : assign(move(str));
+      return this == &str ? *this : assign(forward<basic_string>(str));
     }
     #endif
 
@@ -600,10 +600,10 @@ public:
     }
 
     #ifdef NTL__CXX_RV
-    basic_string& assign(basic_string&& str)
+    basic_string& assign(basic_string&& rstr)
     {
       clear();
-      swap(str);
+      swap(forward<basic_string>(rstr));
       return *this;
     }
     #endif
@@ -758,8 +758,9 @@ public:
 
     ///\name  basic_string::swap [21.3.6.8 string::swap]
     #ifdef NTL__CXX_RV
-    void swap(basic_string&&str2) { str.swap(str2.str); }
-    #else
+    void swap(basic_string&&str2) { str.swap(move(str2.str)); }
+    #endif
+    #if !defined(NTL__CXX_RV) || defined(NTL__CXX_RVFIX)
     void swap(basic_string& str2) { str.swap(str2.str); }
     #endif
 
@@ -1142,7 +1143,7 @@ public:
       sum.alloc__new(lhs.size() + rhs.size());
       sum.append_to__reserved(lhs.begin(), lhs.end());
       sum.append_to__reserved(rhs.begin(), rhs.end());
-      return sum;
+      return move(sum);
     }
 
   friend
@@ -1152,7 +1153,7 @@ public:
       sum.alloc__new(traits_type::length(lhs) + rhs.size());
       sum.append_to__reserved(lhs);
       sum.append_to__reserved(rhs.begin(), rhs.end());
-      return sum;
+      return move(sum);
     }
 
   friend
@@ -1162,7 +1163,7 @@ public:
       sum.alloc__new(1 + rhs.size());
       sum.append_to__reserved(lhs);
       sum.append_to__reserved(rhs.begin(), rhs.end());
-      return sum;
+      return move(sum);
     }
 
   friend
@@ -1172,7 +1173,7 @@ public:
       sum.alloc__new(lhs.size() + traits_type::length(rhs));
       sum.append_to__reserved(lhs.begin(), lhs.end());
       sum.append_to__reserved(rhs);
-      return sum;
+      return move(sum);
     }
 
   friend
@@ -1182,8 +1183,50 @@ public:
       sum.alloc__new(lhs.size() + 1);
       sum.append_to__reserved(lhs.begin(), lhs.end());
       sum.push_back(rhs);
-      return sum;
+      return move(sum);
     }
+
+#ifdef NTL__CXX_RV
+  friend
+  basic_string&& operator+(basic_string&& lhs, const basic_string& rhs)
+  {
+    return move(lhs.append(rhs));
+  }
+  friend
+  basic_string&& operator+(const basic_string& lhs, basic_string&& rhs)
+  {
+    return move(rhs.insert(0, lhs));
+  }
+  friend
+  basic_string&& operator+(basic_string&& lhs, basic_string&& rhs)
+  {
+    if(rhs.size() <= lhs.capacity()-lhs.size()
+      || rhs.capacity()-rhs.size() < lhs.size())
+      return move(lhs.append(rhs));
+    else
+      return move(rhs.insert(0,lhs));
+  }
+  friend
+  basic_string&& operator+(const charT* lhs, basic_string&& rhs)
+  {
+    return move(rhs.insert(0, lhs));
+  }
+  friend
+  basic_string&& operator+(charT lhs, basic_string&& rhs)
+  {
+    return move(rhs.insert(0, lhs));
+  }
+  friend
+  basic_string&& operator+(basic_string&& lhs, const charT* rhs)
+  {
+    return move(lhs.append(rhs));
+  }
+  friend
+  basic_string&& operator+(basic_string&& lhs, charT rhs)
+  {
+    return move(lhs.append(rhs));
+  }
+#endif
 
 #if !defined(NTL__STRICT_STRING) && !defined(__BCPLUSPLUS__)
 
@@ -1196,7 +1239,7 @@ public:
       sum.alloc__new(lhs.size() + rhs.size());
       sum.append_to__reserved(lhs.begin(), lhs.end());
       sum.append_to__reserved(rhs.begin(), rhs.end());
-      return sum;
+      return move(sum);
     }
 
   template<class String>
@@ -1208,7 +1251,7 @@ public:
       sum.alloc__new(lhs.size() + rhs.size());
       sum.append_to__reserved(lhs.begin(), lhs.end());
       sum.append_to__reserved(rhs.begin(), rhs.end());
-      return sum;
+      return move(sum);
     }
 
 #endif
@@ -1509,10 +1552,17 @@ namespace __
     storage_type value;
     ntl::numeric::convresult re = ntl::numeric::str2num<storage_type, typename make_signed<storage_type>::type>(value, str, length, base, numeric_limits<T>::__max, numeric_limits<T>::__min, &l);
     if(idx) *idx = l;
-    if(re <= ntl::numeric::conv_result::bad_format)
+    if(re <= ntl::numeric::conv_result::bad_format){
+      _assert_msg("stoi: no conversion could be performed");
+#ifdef NTL__STLX_STDEXCEPT
       __ntl_throw(invalid_argument("stoi: no conversion could be performed"));
-    else if(re == ntl::numeric::conv_result::overflow)
+#endif
+    }else if(re == ntl::numeric::conv_result::overflow){
+      _assert_msg("stoi: converted value is outside the range of representable values");
+#ifdef NTL__STLX_STDEXCEPT
       __ntl_throw(out_of_range("stoi: converted value is outside the range of representable values"));
+#endif
+    }
     return static_cast<T>(value);
   }
 }
@@ -1644,10 +1694,11 @@ namespace __
 
   /// basic_string<> hash implementation
   template <class charT, class traits, class Allocator>
-  struct string_hash<basic_string<charT, traits, Allocator> >: unary_function<basic_string<charT, traits, Allocator>, size_t>
+  struct string_hash<basic_string<charT, traits, Allocator> >:
+    unary_function<basic_string<charT, traits, Allocator>, size_t>
   {
     /// string hash calculation
-    inline size_t operator()(const typename unary_function::argument_type& str) const __ntl_nothrow
+    inline size_t operator()(const basic_string<charT, traits, Allocator>& str) const __ntl_nothrow // 
     {
       return FNVHash()(str.data(), str.length()*sizeof(charT));
     }

@@ -61,6 +61,7 @@ class bad_array_new_length:
 {
 public:
   bad_array_new_length() __ntl_nothrow {}
+  ~bad_array_new_length() __ntl_nothrow{}
   virtual const char* what() const __ntl_nothrow { return "bad_array_new_length"; }
 };
 

@@ -37,7 +37,7 @@ namespace ntl {
             release();
           else 
             // UB
-            assert(!"This mutex owned by other thread or deletion of owning mutex is not allowed.");
+            _assert_msg("This mutex owned by other thread or deletion of owning mutex is not allowed.");
         }
       }
 
@@ -46,7 +46,7 @@ namespace ntl {
       {
         if(!recursive){
           if(is_owner()){ // throw system_error(resource_deadlock_would_occur)
-            assert(!"Current thread already owns the mutex.");
+            _assert_msg("Current thread already owns the mutex.");
             return;
           }
         }
@@ -58,7 +58,7 @@ namespace ntl {
       {
         if(!recursive){
           if(is_owner()){ // throw system_error(resource_deadlock_would_occur)
-            assert(!"Current thread already owns the mutex.");
+            _assert_msg("Current thread already owns the mutex.");
             return false;
           }
         }
@@ -69,7 +69,7 @@ namespace ntl {
       void unlock() __ntl_nothrow
       {
         if(!locked()){
-          assert(!"Unlocking non-locked mutex."); // throw system_error(operation_not_permitted)
+          _assert_msg("Unlocking non-locked mutex."); // throw system_error(operation_not_permitted)
         }else
           release();
       }

@@ -14,7 +14,7 @@
 #include "peb.hxx"
 
 namespace ntl { namespace nt {
-  std::string strerror(ntstatus Status);
+  inline std::string strerror(ntstatus Status);
 }}
 
 namespace std

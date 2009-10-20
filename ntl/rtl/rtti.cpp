@@ -171,6 +171,8 @@ namespace ntl { namespace cxxruntime
   {
     const typeinfo& rawtype;
     const std::type_info& type;
+  private:
+    typeinfos& operator=(const typeinfos&); // make icl happy
   };
 
   inline bool operator==(const typeinfo& l, const typeinfo& r)

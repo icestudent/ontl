@@ -38,7 +38,13 @@ class basic_ostream
 {
     typedef basic_ios<charT, traits>  this_base;
 
-  ///////////////////////////////////////////////////////////////////////////
+#ifdef NTL__CXX_RV
+  protected:
+    struct rvtag{};
+    basic_ostream(rvtag)
+    {}
+#endif
+    ///////////////////////////////////////////////////////////////////////////
   public:
 
     ///\name Types (inherited from basic_ios (27.4.4)):
@@ -64,7 +70,7 @@ class basic_ostream
     ///   basic_ios<charT, traits>::move(rhs) to initialize the base class.
     basic_ostream(basic_ostream&& rhs)
     {
-      basic_ios::move(rhs);
+      basic_ios::move(std::move(rhs));
     }
 #endif
 
@@ -486,10 +492,16 @@ inline basic_ostream<char, traits>& operator<<(basic_ostream<char, traits>& os, 
 ///\name  signed and unsigned
 
 template<class traits>
-basic_ostream<char, traits>& operator<<(basic_ostream<char, traits>&, signed char);
+inline basic_ostream<char, traits>& operator<<(basic_ostream<char, traits>& os, signed char c)
+{
+  return os << static_cast<char>(c);
+}
 
 template<class traits>
-basic_ostream<char, traits>& operator<<(basic_ostream<char, traits>&, unsigned char);
+basic_ostream<char, traits>& operator<<(basic_ostream<char, traits>& os, unsigned char c)
+{
+  return os << static_cast<char>(c);
+}
 
 
 template<class traits>
@@ -541,7 +553,7 @@ basic_ostream<charT, traits>&
   return os;
 }
 
-#if defined NTL__CXX_RV && 0 // VC10, gcc doesn't requires this
+#ifdef NTL__CXX_RVFIX // VC10b1, gcc doesn't requires this
 
 /// 27.7.2.9 Rvalue stream insertion [ostream.rvalue]
 template <class charT, class traits, typename T>
@@ -549,7 +561,6 @@ inline basic_ostream<charT, traits>& operator<<(basic_ostream<charT, traits>&& o
 {
   return os << x;
 }
-
 #endif
 
 ///\name  Inserters and extractors [21.4.8.9 string.io]

@@ -28,7 +28,7 @@ namespace ntl
 #endif
 }
 
-extern "C" void _cdecl abort();
+extern "C" void __cdecl abort();
 
 namespace std
 {

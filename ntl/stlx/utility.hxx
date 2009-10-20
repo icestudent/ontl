@@ -68,7 +68,19 @@ bool operator>=(const T & x, const T & y) { return !(x < y); }
     typedef T type;
     const T& operator()(const T& x) const { return x; }
   };
+# if defined(_MSC_VER) && defined(NTL__CXX_RVFIX)
+  template <class T>
+  inline T&& forward(typename identity<T>::type& t)
+  {
+    return static_cast<T&&>(t);
+  }
 
+  template <class T>
+  inline typename remove_reference<T>::type&& move(T&& t)
+  {
+    return static_cast<typename remove_reference<T>::type&&>(t);
+  }
+# else
   template <class T>
   inline
   T&& forward(typename identity<T>::type&& t)
@@ -82,6 +94,7 @@ bool operator>=(const T & x, const T & y) { return !(x < y); }
   {
     return t;
   }
+# endif // rvalue ref v2
 
 #else
   template <class T>

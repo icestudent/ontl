@@ -19,7 +19,7 @@
 #if STLX__CONFORMING_LOCALE
 #define _NTL_LOC_VIRTUAL virtual
 #else
-#define _NTL_LOC_VIRTUAL /**virtual/**/
+#define _NTL_LOC_VIRTUAL
 #endif
 
 #ifndef NTL__STLX_STDEXCEPT_FWD
@@ -1331,6 +1331,7 @@ class codecvt<char16_t,wchar_t,mbstate_t>:
 protected:
   ~codecvt(){}
 public:
+  codecvt(const codecvt&){}
   codecvt(size_t refs = 0)
     :codecvt<char16_t, char16_t,mbstate_t>(refs)
   {}
@@ -2386,14 +2387,18 @@ __declspec(selectany)
 std::locale::id std::ctype<char>::id;
 __declspec(selectany)
 std::locale::id std::ctype<wchar_t>::id;
+template<>
 __declspec(selectany)
-std::locale::id std::num_get<char>::id;
+std::locale::id std::num_get<char, istreambuf_iterator<char> >::id;
+template<>
 __declspec(selectany)
-std::locale::id std::num_get<wchar_t>::id;
+std::locale::id std::num_get<wchar_t, istreambuf_iterator<wchar_t> >::id;
+template<>
 __declspec(selectany)
-std::locale::id std::num_put<char>::id;
+std::locale::id std::num_put<char, ostreambuf_iterator<char> >::id;
+template<>
 __declspec(selectany)
-std::locale::id std::num_put<wchar_t>::id;
+std::locale::id std::num_put<wchar_t, ostreambuf_iterator<wchar_t> >::id;
 
 
 #endif // STLX__CONFORMING_LOCALE

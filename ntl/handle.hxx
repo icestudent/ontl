@@ -63,11 +63,7 @@ class basic_handle
       set(h);
     }
 
-#ifdef NTL__CXX_RV
-    void swap(basic_handle&& rhs)
-#else
     void swap(basic_handle& rhs)
-#endif
     {
       X tmp = h;
       h = rhs.h;

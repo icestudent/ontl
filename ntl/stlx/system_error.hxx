@@ -32,8 +32,8 @@ namespace std
   class error_condition;
   class system_error;
 
-  const error_category& generic_category();
-  const error_category& system_category();
+  inline const error_category& generic_category();
+  inline const error_category& system_category();
 
 
   template<class T>
@@ -143,7 +143,8 @@ namespace std
 
     string message() const 
     {
-      assert(("C++ static objects wasn't initialized!", c));
+      if(!c)
+        _assert_msg("C++ static objects wasn't initialized!");
       return c->message(v);
     }
 

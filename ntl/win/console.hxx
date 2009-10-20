@@ -146,6 +146,9 @@ class console_buffer:
 {
   typedef std::streamsize streamsize;
   static const size_t buffer_size = 128;
+
+  using std::basic_streambuf<charT, traits>::char_type;
+  using std::basic_streambuf<charT, traits>::int_type;
 public:
   explicit console_buffer(legacy_handle outh)
     :outh(outh), buffer()

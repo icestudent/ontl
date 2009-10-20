@@ -9,6 +9,9 @@
 #pragma comment(linker, "/merge:.CRT=.rdata")
 #define sec(x) __declspec(allocate(x))
 
+#ifdef __ICL
+#pragma warning(disable: 14)
+#endif
 #pragma data_seg(push)
 
 /* c++ initializers */
@@ -33,6 +36,9 @@ sec(".CRT$XTA") vfv_t* __xt_a[]= {0};
 sec(".CRT$XTZ") vfv_t* __xt_z[]= {0};
 #undef sec
 #pragma data_seg(pop)
+#ifdef __ICL
+#pragma warning(disable: 14)
+#endif
 #pragma endregion
 
 #include "../stlx/vector.hxx"
@@ -223,7 +229,7 @@ namespace std
 extern "C" int _cdecl _purecall(void)
 {
 #pragma warning(disable:4127)
-  assert(!"pure virtual function called!");
+  _assert_msg("pure virtual function called!");
 #pragma warning(default:4127)
   debug_abort();
   abort();

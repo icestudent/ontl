@@ -160,7 +160,7 @@ class vector
     vector(vector&& x)
       :begin_(), end_(), capacity_()
     {
-      swap(x);
+      swap(forward<vector>(x));
     }
 
     vector(vector&& x, const Allocator& a)
@@ -307,7 +307,7 @@ class vector
       if(new_end < end_)
         erase(new_end, end_);
       else if(new_end > end_)
-        insert__impl(end_, new_end - end_, forward<value_type>(T()));
+        insert__impl(end_, new_end - end_, std::move(T()));
     }
 
     void resize(size_type sz, const T& c)
@@ -508,11 +508,11 @@ class vector
     {
       // return erase(position, position + 1);
       iterator i = &const_cast<value_type&>(*position);
-#if 0
+    #if 0
       array_allocator.destroy(i);
       --end_;
       do move(i, i + 1); while ( ++i != end_ );
-#else
+    #else
       if(position + 1 != end()){
         #ifdef NTL__CXX_RV
           std::move
@@ -522,20 +522,20 @@ class vector
         (i+1, end(), i);
       }
       array_allocator.destroy(--end_);
-#endif
+    #endif
       return i;
     }
 
     __forceinline
     iterator erase(const_iterator first, const_iterator last) __ntl_nothrow
     {
-#if 0
+    #if 0
       for ( iterator i = last; i != first;  ) array_allocator.destroy(--i);
       iterator const tail = first;
       for ( ; last != end_; ++first, ++last ) move(first, last);
       end_ = first;
       return tail;
-#else
+    #else
       // 1[000]
       // 1[000]2
       iterator first_ = &const_cast<value_type&>(*first), last_ = &const_cast<value_type&>(*last);
@@ -551,19 +551,25 @@ class vector
         #endif
       }
       return first_;
-#endif
+    #endif
     }
 
     #ifdef NTL__CXX_RV
     void swap(vector<T,Allocator>&& x) __ntl_nothrow
-    #else
-    void swap(vector<T, Allocator>& x) __ntl_nothrow
-    #endif
     {
       std::swap(begin_, x.begin_);
       std::swap(end_, x.end_);
       std::swap(capacity_, x.capacity_);
     }
+    #endif
+    #if !defined(NTL__CXX_RV) || defined(NTL__CXX_RVFIX)
+    void swap(vector<T, Allocator>& x) __ntl_nothrow
+    {
+      std::swap(begin_, x.begin_);
+      std::swap(end_, x.end_);
+      std::swap(capacity_, x.capacity_);
+    }
+    #endif
 
     __forceinline
     void clear() __ntl_nothrow

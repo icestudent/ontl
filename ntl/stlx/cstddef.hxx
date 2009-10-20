@@ -183,6 +183,8 @@
 #if _MSC_VER >= 1600
 
 /** VC10's partial C++0x support */
+// _MSC_FULL_VER: 160011001 (CTP), 160020506 (beta1), 160021003 (beta2)
+
 
 // keywords:
 // align (N2798+)
@@ -193,6 +195,10 @@
 //#define NTL__CXX_ALIGNOF
 // auto
 #define NTL__CXX_AUTO
+#if _MSC_FULL_VER >= 160020506 // beta1
+// auto f() -> typeid (requires auto & decltype)
+# define NTL__CXX_AUTORET
+#endif
 // char16_t, char32_t (as a builtin types, not support u/U prefixes!)
 //#define NTL__CXX_CHARS
 // concepts, concept_map, requires
@@ -206,7 +212,7 @@
 // class enum
 //#define NTL__CXX_ENUM
 // nullptr
-#ifdef _MSC_FULL_VER >= 160021003
+#if _MSC_FULL_VER >= 160021003 // beta2
 # define NTL__CXX_NULLPTR
 #endif
 // static assert
@@ -225,6 +231,9 @@
 #define NTL__CXX_LAMBDA
 // rvalues
 #define NTL__CXX_RV
+#if _MSC_FULL_VER >= 160021003 // beta2
+# define NTL__CXX_RVFIX
+#endif
 // template typedef
 //#define NTL__CXX_TT
 // variadic templates (implies rvalue references support)
@@ -298,6 +307,8 @@
 //#define NTL__CXX_ALIGNOF
 // auto
 #define NTL__CXX_AUTO
+// auto f() -> typeid
+//#define NTL__CXX_AUTORET
 // char16_t, char32_t. u/U literals supported with the /Qoption,cpp,"--uliterals" 
 //#define NTL__CXX_CHARS
 // concepts, concept_map, requires
@@ -351,6 +362,8 @@
 //#define NTL__CXX_ALIGNOF
 // auto
 #define NTL__CXX_AUTO
+// auto f() -> typeid
+#define NTL__CXX_AUTORET
 // char16_t, char32_t
 //#define NTL__CXX_CHARS
 // concepts, concept_map, requires

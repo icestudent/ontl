@@ -402,10 +402,6 @@ public:
     return *this;
   }
 
-  void swap(user_thread& rhs)
-  {
-    __super::swap(rhs);
-  }
 private:
   user_thread(const user_thread&) __deleted;
   user_thread& operator=(const user_thread&) __deleted;

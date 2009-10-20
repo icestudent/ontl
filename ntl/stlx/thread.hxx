@@ -139,14 +139,13 @@ namespace std
   #ifdef NTL__CXX_RV
     thread(thread&&);
     thread& operator=(thread&&);
-    void swap(thread&&) __ntl_nothrow;
   #else
     thread(const thread& r);
     thread& operator=(const thread& r);
+  #endif
 
     /** Swaps the current object's state with \c r */
     void swap(const thread& r) __ntl_nothrow;
-  #endif
 
     /** Is this thread a joinable */
     bool joinable() const __ntl_nothrow;
@@ -174,6 +173,11 @@ namespace std
 
   private:
     mutable native_handle_type h, tid;
+
+#ifndef NTL__CXX_RV
+    thread(const thread&) __deleted;
+    thread& operator=(const thread&) __deleted;
+#endif
   };
 
   namespace this_thread
@@ -405,15 +409,6 @@ namespace std
     swap(r);
   }
 
-  inline void thread::swap(thread&& r) __ntl_nothrow
-  {
-    volatile native_handle_type h0 = h, t0 = tid;
-    h = r.h,
-      tid = r.tid;
-    r.h = h0,
-      r.tid = t0;
-  }
-
 #else
   inline thread::thread(const thread& r)
     :h(), tid()
@@ -429,6 +424,8 @@ namespace std
     swap(r);
   }
 
+#endif
+
   // members:
   inline void thread::swap(const thread& r) __ntl_nothrow
   {
@@ -438,7 +435,6 @@ namespace std
     r.h = h0,
       r.tid = t0;
   }
-#endif
 
   inline void thread::start(__::thread_params_base* tp)
   {

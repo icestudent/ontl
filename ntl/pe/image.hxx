@@ -669,12 +669,6 @@ namespace ntl {
           return 0xffffffff;
         }
 
-        __forceinline
-          uint32_t ordinal(const image * pe, char name[]) const
-        {
-          return ordinal(pe, static_cast<const char*>(name));
-        }
-
         uint32_t ordinal(const image * /*pe*/, uint16_t ordinal) const
         {
           return ordinal - Base;
@@ -735,9 +729,15 @@ namespace ntl {
           get_data_directory(data_directory::export_table);
         if ( ! export_table || ! export_table->VirtualAddress ) return 0;
         export_directory * exports = va<export_directory*>(export_table->VirtualAddress);
+        #ifdef __ICL
+        # pragma warning(disable: 810) // conversion from const char* to uint16_t may lose significant bits
+        #endif
         const uint32_t ordinal = uintptr_t(exp) <= 0xFFFF
           ? exports->ordinal(this, reinterpret_cast<uint16_t>(exp))
           : exports->ordinal(this, exp);
+        #ifdef __ICL
+        # pragma warning(default: 810)
+        #endif
         void * const f = exports->function(this, ordinal);
         const uintptr_t ex = reinterpret_cast<uintptr_t>(exports);
         if ( !in_range(ex, ex + export_table->Size, f) )

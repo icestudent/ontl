@@ -78,11 +78,11 @@ namespace __
   template<> struct change_sign<unsigned funda> { typedef   signed funda type; }; \
   template<> struct change_sign<  signed funda> { typedef unsigned funda type; };
 
-  _change_signs(char);
-  _change_signs(short int);
-  _change_signs(int);
-  _change_signs(long int);
-  _change_signs(long long int);
+  _change_signs(char)
+  _change_signs(short int)
+  _change_signs(int)
+  _change_signs(long int)
+  _change_signs(long long int)
 #undef _change_signs
 
   template<size_t SizeOfT> struct map_to_funda;

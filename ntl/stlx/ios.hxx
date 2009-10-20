@@ -440,6 +440,9 @@ class basic_ios : public ios_base
         loc = x.loc;
       #endif
 
+        // unchanged: rdbuf, state
+
+
         /*
         If any newly stored pointer values in *this point at objects stored outside the object rhs, and
         those objects are destroyed when rhs is destroyed, the newly stored pointer values are altered to
@@ -455,6 +458,8 @@ class basic_ios : public ios_base
     void move(basic_ios&& x)
     {
       swap(x);
+      sb = nullptr;
+      x.tiestr = nullptr;
     }
   #endif
 
@@ -475,6 +480,8 @@ class basic_ios : public ios_base
       // basic_ios
       std::swap(tiestr,x.tiestr);
       std::swap(fillc,x.fillc);
+
+      // unchanged: rdbuf
     }
 
     ///\name 27.4.4.3 basic_ios flags functions [iostate.flags]

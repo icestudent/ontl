@@ -624,7 +624,7 @@ struct hash: unary_function<T, size_t>
 template<class T>
 struct hash<T*>: unary_function<T*, size_t>
 {
-  size_t operator()(argument_type val) const __ntl_nothrow
+  size_t operator()(T* val) const __ntl_nothrow
   {
     return reinterpret_cast<size_t>(val);
   }

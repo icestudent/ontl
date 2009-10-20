@@ -2070,7 +2070,7 @@ next_try: ;
 
   //#endif #ifndef NTL_EH_RUNTIME
 
-#endif//#ifdef _MSC_VER
+  #endif//#ifdef _MSC_VER
 } // cxxruntime
 }//namespace ntl
 

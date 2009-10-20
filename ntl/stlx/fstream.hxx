@@ -173,7 +173,7 @@ namespace std {
        }
       }else{
         // TODO: implement input/output management
-        assert(!"not implemented yet");
+        _assert_msg("not implemented yet");
         return eof;
       }
       if(mode & ios_base::binary){
@@ -210,7 +210,7 @@ namespace std {
       const int_type eof = traits_type::eof();
       if(!f)
         return eof;
-      assert(!"not implemented yet");
+      _assert_msg("not implemented yet");
       return c;
     }
 
@@ -285,7 +285,7 @@ namespace std {
       pos_type re = pos_type(off_type(-1));
       if(!f)
         return re;
-      assert(!"not implemented yet");
+      _assert_msg("not implemented yet");
       (void)sp;
       return re;
     }
@@ -349,10 +349,11 @@ namespace std {
         if(re == codecvt_base::error)
           break;
         else if(re == codecvt_base::noconv)
-          p = from, chunk_size = from_next-from, write_size = chunk_size*sizeof(char_type);
+          p = from, chunk_size = to-from, write_size = chunk_size*sizeof(char_type);
         else // ok | partial
           p = buf, chunk_size = to_next-buf, write_size = chunk_size*sizeof(toT);
 
+        assert(write_size > 0);
         if(!NTL__SUBSYSTEM_NS::success(f.write(p, static_cast<uint32_t>(write_size))))
           break;
         const streamsize fwritten = static_cast<streamsize>(f.get_io_status_block().Information);
@@ -384,10 +385,11 @@ namespace std {
         if(re == codecvt_base::error)
           break;
         else if(re == codecvt_base::noconv)
-          p = from, chunk_size = from_next-from, write_size = chunk_size*sizeof(char_type);
+          p = from, chunk_size = to-from, write_size = chunk_size*sizeof(char_type);
         else // ok | partial
           p = buf, chunk_size = to_next-buf, write_size = chunk_size*sizeof(toT);
 
+        assert(write_size > 0);
         if(!NTL__SUBSYSTEM_NS::success(f.write(p, static_cast<uint32_t>(write_size))))
           break;
         const streamsize fwritten = static_cast<streamsize>(f.get_io_status_block().Information);
@@ -405,6 +407,7 @@ namespace std {
     {
       streamsize pending = to-from, write_size = pending*sizeof(char_type);
       do{
+        assert(write_size > 0);
         if(!NTL__SUBSYSTEM_NS::success(f.write(from, static_cast<uint32_t>(write_size))))
           break;
         const streamsize fwritten = static_cast<streamsize>(f.get_io_status_block().Information);

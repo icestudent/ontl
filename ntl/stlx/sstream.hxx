@@ -88,9 +88,11 @@ namespace std {
 
     void swap(basic_stringbuf& rhs)
     {
-      basic_streambuf::swap(rhs);
-      str_.swap(rhs.str_); // a bit quickly
-      std::swap(mode_, rhs.mode_);
+      if(this != &rhs){
+        basic_streambuf::swap(rhs);
+        std::swap(str_, rhs.str_);
+        std::swap(mode_, rhs.mode_);
+      }
     }
 
     ///\name 27.7.1.3 Get and set:

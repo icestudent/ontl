@@ -72,7 +72,7 @@ private:
 
   void __test_create()
   {
-    assert(!"do not run");
+    _assert_msg("do not run");
     //shall not compile to dissallow storing the pointer to a temp const_unicode_string 
     //object_attributes a1(L" ");
     const_unicode_string cus(L" ");

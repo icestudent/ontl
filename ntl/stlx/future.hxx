@@ -188,7 +188,7 @@ namespace std
 
   inline const error_category& future_category()
   {
-    static const __::future_error_categrory cat;
+    static const __::future_error_category cat;
     return cat;
   }
 

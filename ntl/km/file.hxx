@@ -23,7 +23,6 @@ namespace km {
 ///\name  Legacy API
 
 
-#pragma warning(push)
 //#pragma warning(disable:4190)// C-linkage specified, but returns UDT 'identifier2' which is incompatible with C
 
 NTL__EXTERNAPI
@@ -82,7 +81,6 @@ ntstatus __stdcall
     const uint32_t *  Key           __optional
     );
 
-#pragma warning(pop)
 
 ///@}
 
@@ -107,7 +105,7 @@ class file_handler : public handle, public device_traits<file_handler>
 {
   void __test_create()
   {
-    assert(!"do not run");
+    _assert_msg("do not run");
     create(L" ");
     create(const_unicode_string(L" "));// Ok to init object_attributes with a temp string
     //create(object_attributes(L" "));// may not construct object_attributes with temp string

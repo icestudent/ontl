@@ -49,10 +49,10 @@ typedef int64_t   int_fast64_t;
 typedef uint64_t  uint_fast64_t;
 
 ///\name  Integer types capable of holding object pointers 7.18.1.4
-#ifdef _UINTPTR_T_DEFINED
+#if defined(_UINTPTR_T_DEFINED)
   using ::intptr_t;
   using ::uintptr_t;
-#elif __GNUC__
+#elif defined(__GNUC__)
   typedef __PTRDIFF_TYPE__    intptr_t;
   typedef __SIZE_TYPE__       uintptr_t;
 #else

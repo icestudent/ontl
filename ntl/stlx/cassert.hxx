@@ -45,7 +45,7 @@ inline void __ntl_assert(const char* expr, const char* file, int line)
     handler(expr, file, line);
   else
     __debugbreak();
-};
+}
 
 /// ISO C 7.2/1 The assert macro is redefined according to the current state
 ///             of NDEBUG each time that <assert.h> is included.
@@ -54,12 +54,18 @@ inline void __ntl_assert(const char* expr, const char* file, int line)
 /// \c assert macros
 #ifdef NDEBUG
   #define assert(expr)
+  #define _assert_msg(msg)
 #else
   #define assert(expr) \
     if ( !!(expr) ); else if(ntl::__assert_handler)\
       __ntl_assert("Assertion ("#expr") failed in "__func__,__FILE__,__LINE__);\
       else __debugbreak();\
     ((void)0)
+#define _assert_msg(msg) \
+  if(ntl::__assert_handler)\
+    __ntl_assert("Assertion (" msg ") failed in "__func__,__FILE__,__LINE__);\
+  else __debugbreak();\
+      ((void)0)
 #endif
 
 //}//namespace std

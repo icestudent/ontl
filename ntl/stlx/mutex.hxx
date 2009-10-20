@@ -113,7 +113,7 @@ namespace std
     bool try_lock_for(const chrono::duration<Rep, Period>& rel_time) __ntl_nothrow
     {
       if(thread_locked()) // throw system_error(resource_deadlock_would_occur)
-        assert(!"Current thread already owns the mutex.");
+        _assert_msg("Current thread already owns the mutex.");
       const ntl::nt::system_duration period = chrono::duration_cast<ntl::nt::system_duration>(rel_time);
       return period.count() <= 0 ? try_lock() : ntl::nt::success( wait( -1i64*period.count(), true ) );
     }
@@ -129,7 +129,7 @@ namespace std
     bool try_lock_until(const chrono::time_point<Clock, Duration>& abs_time) __ntl_nothrow
     {
       if(thread_locked()) // throw system_error(resource_deadlock_would_occur)
-        assert(!"Current thread already owns the mutex.");
+        _assert_msg("Current thread already owns the mutex.");
       const ntl::nt::system_duration period = chrono::duration_cast<ntl::nt::system_duration>(abs_time.time_since_epoch());
       return period.count() == 0 ? try_lock() : ntl::nt::success( wait(period.count(), true) );
     }
