@@ -18,7 +18,7 @@ namespace ntl {
     /// In NT subsystem implemented as futex.
     template<bool recursive>
     class base_mutex:
-      protected ntl::nt::critical_section
+      protected critical_section
     {
     public:
       /** Constructs mutex object */
@@ -33,7 +33,7 @@ namespace ntl {
         // NOTE: see @note
         // detect who locks the mutex
         if(locked()){
-          if(recursive && thread_locked())
+          if(recursive && is_owner())
             release();
           else 
             // UB
@@ -42,10 +42,10 @@ namespace ntl {
       }
 
       /** Blocks the calling thread until ownership of the mutex can be obtained for the calling thread. */
-      void lock() __ntl_throws(system_error)
+      void lock() __ntl_throws(std::system_error)
       {
         if(!recursive){
-          if(thread_locked()){ // throw system_error(resource_deadlock_would_occur)
+          if(is_owner()){ // throw system_error(resource_deadlock_would_occur)
             assert(!"Current thread already owns the mutex.");
             return;
           }
@@ -57,7 +57,7 @@ namespace ntl {
       bool try_lock() __ntl_nothrow
       {
         if(!recursive){
-          if(thread_locked()){ // throw system_error(resource_deadlock_would_occur)
+          if(is_owner()){ // throw system_error(resource_deadlock_would_occur)
             assert(!"Current thread already owns the mutex.");
             return false;
           }

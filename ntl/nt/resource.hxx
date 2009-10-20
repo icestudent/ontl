@@ -225,7 +225,7 @@ namespace ntl {
      }
 
      /** Checks is the current thread is owner of CS. */
-     bool thread_locked()
+     bool is_owner()
      {
        return ntl::nt::RtlIsCriticalSectionLockedByThread(this) != 0;
      }

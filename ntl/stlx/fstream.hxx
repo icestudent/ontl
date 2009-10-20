@@ -173,7 +173,7 @@ namespace std {
        }
       }else{
         // TODO: implement input/output management
-        assert(false && "not implemented yet");
+        assert(!"not implemented yet");
         return eof;
       }
       if(mode & ios_base::binary){
@@ -210,7 +210,7 @@ namespace std {
       const int_type eof = traits_type::eof();
       if(!f)
         return eof;
-      assert(false && "not implemented yet");
+      assert(!"not implemented yet");
       return c;
     }
 
@@ -285,7 +285,7 @@ namespace std {
       pos_type re = pos_type(off_type(-1));
       if(!f)
         return re;
-      assert(false && "not implemented yet");
+      assert(!"not implemented yet");
       (void)sp;
       return re;
     }

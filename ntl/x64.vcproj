@@ -891,6 +891,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\km\mutex.hxx"
+					>
+				</File>
+				<File
 					RelativePath=".\km\new.hxx"
 					>
 				</File>

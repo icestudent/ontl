@@ -66,7 +66,7 @@ namespace std
     namespace intrin = ntl::intrinsic;
 
 #pragma warning(push)
-#pragma warning(disable: 4127) // conditional expression is constant: assert(false && "message")
+#pragma warning(disable: 4127) // conditional expression is constant: assert(!"message")
 #pragma warning(disable: 4146) // unary minus operator applied to unsigned type, result still unsigned
 
     /// Base class for %atomic type
@@ -150,7 +150,7 @@ namespace std
           val = value;
           break;
         default:
-          assert(false && "invalid memory order specified");
+          assert(!"invalid memory order specified");
         case memory_order_relaxed:
           val = value;
         }
@@ -171,7 +171,7 @@ namespace std
             return r;
           }
         default:
-          assert(false && "invalid memory order specified");
+          assert(!"invalid memory order specified");
         case memory_order_relaxed:
           return val;
         }
@@ -193,7 +193,7 @@ namespace std
           intrin::_ReadWriteBarrier();
           return r;}
         default:
-          assert(false && "invalid memory order specified");
+          assert(!"invalid memory order specified");
         case memory_order_relaxed:
         case memory_order_seq_cst:
         case memory_order_acq_rel:
@@ -253,7 +253,7 @@ namespace std
           intrin::_ReadWriteBarrier();
           return r;}
         default:
-          assert(false && "invalid memory order specified");
+          assert(!"invalid memory order specified");
         case memory_order_seq_cst:
         case memory_order_acq_rel:
         case memory_order_relaxed:
@@ -301,7 +301,7 @@ namespace std
           val = value;
           break;
         default:
-          assert(false && "invalid memory order specified");
+          assert(!"invalid memory order specified");
         case memory_order_relaxed:
           val = value;
         }
@@ -322,7 +322,7 @@ namespace std
             return r;
           }
         default:
-          assert(false && "invalid memory order specified");
+          assert(!"invalid memory order specified");
         case memory_order_relaxed:
           return val;
         }
@@ -350,7 +350,7 @@ namespace std
           intrin::_ReadWriteBarrier();
           return r;}
         default:
-          assert(false && "invalid memory order specified");
+          assert(!"invalid memory order specified");
         case memory_order_relaxed:
           return rep<type>::cast(atomic::exchange(val.val, reinterpret_cast<reptype>(value)));
         }
@@ -409,7 +409,7 @@ namespace std
           intrin::_ReadWriteBarrier();
           return r;}
         default:
-          assert(false && "invalid memory order specified");
+          assert(!"invalid memory order specified");
         case memory_order_relaxed:
           return reinterpret_cast<type>(atomic::exchange_add(val.val, reinterpret_cast<uintptr_t>(operand)));
         }
@@ -457,7 +457,7 @@ namespace std
           intrin::_ReadWriteBarrier();
           return r;}
         default:
-          assert(false && "invalid memory order specified");
+          assert(!"invalid memory order specified");
         case memory_order_relaxed:
         case memory_order_seq_cst:
         case memory_order_acq_rel:
@@ -478,7 +478,7 @@ namespace std
           intrin::_ReadWriteBarrier();
           return r;}
         default:
-          assert(false && "invalid memory order specified");
+          assert(!"invalid memory order specified");
         case memory_order_seq_cst:
         case memory_order_acq_rel:
         case memory_order_relaxed:
@@ -499,7 +499,7 @@ namespace std
           intrin::_ReadWriteBarrier();
           return r;}
         default:
-          assert(false && "invalid memory order specified");
+          assert(!"invalid memory order specified");
         case memory_order_seq_cst:
         case memory_order_acq_rel:
         case memory_order_relaxed:
@@ -578,7 +578,7 @@ namespace std
 #define ATOMIC_ADDRESS_LOCK_FREE 2
 /** @} lib_atomic_4 */
 
-#pragma warning(disable: 4127) // conditional expression is constant: assert(false && "message")
+#pragma warning(disable: 4127) // conditional expression is constant: assert(!"message")
 
   /**\defgroup lib_atomic_5 29.5 Atomic Types [atomics.types]
    *@{
@@ -1044,7 +1044,7 @@ namespace std
           return r != false;
         }
       default:
-        assert(false && "invalid memory order specified");
+        assert(!"invalid memory order specified");
       case memory_order_relaxed:
         return ntl::atomic::exchange(val_, value) != false;
       }
@@ -1066,7 +1066,7 @@ namespace std
         val_ = value;
         break;
       default:
-        assert(false && "invalid memory order specified");
+        assert(!"invalid memory order specified");
       case memory_order_relaxed:
         val_ = value;
       }
