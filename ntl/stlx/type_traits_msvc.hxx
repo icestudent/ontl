@@ -289,11 +289,6 @@ template <>        struct is_void<const void>          : public true_type {};
 template <>        struct is_void<volatile void>       : public true_type {};
 template <>        struct is_void<const volatile void> : public true_type {};
 
-template <class T> struct is_integral
-: public integral_constant<bool, numeric_limits<typename remove_cv<T>::type>::is_integer> {};
-
-template <class T> struct is_floating_point
-: public integral_constant<bool, numeric_limits<typename remove_cv<T>::type>::is_iec559> {};
 
 template <class T> struct is_array      : public false_type {};
 template <class T> struct is_array<T[]> : public true_type  {};
@@ -412,6 +407,23 @@ struct is_function : public false_type {};
 #include "tt_isfunc.inl"
 #undef  NTL_TT_CC
 #endif
+
+namespace __
+{
+  template<class T> struct is_int_helper
+  {
+    template<class > struct func_limits { static const bool is_integer = false, is_iec559 = false; };
+
+    typedef typename remove_cv<T>::type U;
+    typedef typename conditional<is_function<U>::value, func_limits<U>, numeric_limits<U> >::type type;
+  };
+}
+
+template <class T> struct is_integral
+: public integral_constant<bool, __::is_int_helper<T>::type::is_integer> {};
+
+template <class T> struct is_floating_point
+: public integral_constant<bool, __::is_int_helper<T>::type::is_iec559> {};
 
 template <class T> struct decay
 {
