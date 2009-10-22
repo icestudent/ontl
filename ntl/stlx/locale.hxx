@@ -81,10 +81,7 @@ class locale
     class id
     {
       public:
-        id()
-#if !STLX__CONFORMING_LOCALE
-        {}
-#endif
+        id();
       private:
         void operator=(const id&) __deleted;
         id(const id&) __deleted;
@@ -2300,6 +2297,9 @@ template <class charT> class messages_byname;
 /** @} lib_locale_categories */
 
 #if !STLX__CONFORMING_LOCALE
+
+// locale::id ctor
+inline locale::id::id(){}
 
 namespace __
 {

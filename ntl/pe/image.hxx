@@ -654,7 +654,7 @@ namespace ntl {
         ///       sequential one could give different results on tricky PEs
         ///       and probably is exposed for some exploitation
         __forceinline
-          uint32_t ordinal(const image * pe, const char name[]) const
+        uint32_t ordinal(const image * pe, const char* name) const
         {
           const uint32_t * const name_table = pe->va<uint32_t*>(AddressOfNames);
           uint32_t l = 0, h = NumberOfNames - 1;
@@ -669,11 +669,6 @@ namespace ntl {
           return 0xffffffff;
         }
 
-        uint32_t ordinal(const image * pe, char name[]) const
-        {
-          return ordinal(pe, static_cast<const char*>(name));
-        }
-
         uint32_t ordinal(const image * /*pe*/, uint16_t ordinal) const
         {
           return ordinal - Base;
@@ -686,7 +681,8 @@ namespace ntl {
         }
 
         template<class Functor>
-        uint32_t ordinal(const image* pe, Functor finder) const
+        typename std::enable_if<!std::is_integral<typename std::remove_pointer<Functor>::type>::value, uint32_t>::type 
+        ordinal(const image* pe, Functor finder) const
         {
           const uint32_t * const name_table = pe->va<uint32_t*>(AddressOfNames);
           for(uint32_t n = 0; n < NumberOfNames-1; n++){
@@ -709,20 +705,6 @@ namespace ntl {
         if ( ! export_table || ! export_table->VirtualAddress ) return 0;
         export_directory * exports = va<export_directory*>(export_table->VirtualAddress);
         void * const f = exports->function(this, exports->ordinal(this, exp));
-        const uintptr_t ex = reinterpret_cast<uintptr_t>(exports);
-        return in_range(ex, ex + export_table->Size, f) ? 0 : f;
-      }
-
-      template<class Functor>
-      void* find_export_f(Functor finder) const
-      {
-        const data_directory * const export_table =
-          get_data_directory(data_directory::export_table);
-        if (!export_table || !export_table->VirtualAddress)
-          return 0;
-
-        export_directory* exports = va<export_directory*>(export_table->VirtualAddress);
-        void * const f = exports->function(this, exports->ordinal(this, finder));
         const uintptr_t ex = reinterpret_cast<uintptr_t>(exports);
         return in_range(ex, ex + export_table->Size, f) ? 0 : f;
       }
@@ -773,11 +755,7 @@ namespace ntl {
       {
         return brute_cast<PtrType>(find_export(exp));
       }
-      template<typename PtrType, class Functor>
-      PtrType find_export_f(Functor finder) const
-      {
-        return brute_cast<PtrType>(find_export(finder));
-      }
+
       template<typename PtrType, typename DllFinder>
       PtrType find_export(const char * exp, DllFinder find_dll) const
       {
