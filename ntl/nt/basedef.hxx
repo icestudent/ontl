@@ -20,6 +20,7 @@
 #include "../basedef.hxx"
 #include "../stdlib.hxx"
 
+
 extern "C" __declspec(selectany) volatile std::uintptr_t __security_cookie = 
   #ifdef _M_X64
     0x00002B992DDFA232;

@@ -48,6 +48,8 @@ typedef wchar_t tchar_t;
 typedef char    tchar_t;
 #endif
 
+typedef long boolean;
+
 
 typedef pe::image * hinstance;
 

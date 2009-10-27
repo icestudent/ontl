@@ -121,7 +121,12 @@ namespace std {
         str_.reserve(s.size() + initial_output_size);
       }
       str_.assign(s);
+      #ifdef _DEBUG
+      str_.c_str(); // pretty view
+      #endif
       set_ptrs();
+      if(mode_ & ios_base::ate)
+        pbump(static_cast<int>(epptr()-pptr()));
     }
 
   protected:
@@ -163,6 +168,9 @@ namespace std {
         *pptr() = cc;
         pbump(1);
       }else{
+        if(mode_ & ios_base::app)
+          pbump(static_cast<int>(epptr()-pptr()));
+
         const ptrdiff_t gp = gptr() - eback(), pp = pptr() - pbase();
 
         str_.resize(max(initial_output_size, __ntl_grow_heap_block_size(str_.size())), '\0');
@@ -170,9 +178,9 @@ namespace std {
           str_.resize(str_.capacity(), '\0'); // we are also buffer, so lets use all memory
 
         set_ptrs();
-        pbump(pp);
+        pbump(static_cast<int>(pp)); // NOTE: there is an issue about this
         if(mode_ & ios_base::in)
-          gbump(gp);
+          gbump(static_cast<int>(gp));
         *pptr() = cc;
         pbump(1);
       }
@@ -206,11 +214,11 @@ namespace std {
           newoff += egptr() - beg;
 
         if((in || both) && newoff >= 0 && egptr()-beg >= newoff){
-          gbump((beg+newoff)-gptr());
+          gbump(static_cast<int>((beg+newoff)-gptr()));
           re = pos_type(newoff);
         }
         if((out || both) && newoff >= 0 && egptr()-beg >= newoff){
-          pbump((beg+newoff)-pptr());
+          pbump(static_cast<int>((beg+newoff)-pptr()));
           re = pos_type(newoff);
         }
       }
@@ -402,11 +410,11 @@ namespace std {
 
     ///\name constructors/destructors
     explicit basic_stringstream(ios_base::openmode which = ios_base::out|ios_base::in)
-      : sb_(which), base_type(&sb_)
+      : sb(which), base_type(&sb)
     {}
 
     explicit basic_stringstream(const basic_string<charT,traits,Allocator>& str, ios_base::openmode which = ios_base::out|ios_base::in)
-      :sb_(str, which), base_type(&sb_)
+      :sb(str, which), base_type(&sb)
     {}
 
   #ifdef NTL__CXX_RV
@@ -420,16 +428,16 @@ namespace std {
 
     void swap(basic_stringstream& rhs)
     {
-      std::swap(sb_, rhs.sb_);
+      std::swap(sb, rhs.sb);
     }
 
     ///\name Members:
-    basic_stringbuf<charT,traits,Allocator>* rdbuf() const { return const_cast<basic_stringbuf<charT,traits,Allocator>*>(&sb_); }
-    basic_string<charT,traits,Allocator> str() const { return sb_.str(); }
-    void str(const basic_string<charT,traits,Allocator>& str) { sb_.str(str); }
+    basic_stringbuf<charT,traits,Allocator>* rdbuf() const { return const_cast<basic_stringbuf<charT,traits,Allocator>*>(&sb); }
+    basic_string<charT,traits,Allocator> str() const { return sb.str(); }
+    void str(const basic_string<charT,traits,Allocator>& str) { sb.str(str); }
     ///\}
   private:
-     basic_stringbuf<charT, traits> sb_;
+     basic_stringbuf<charT, traits> sb;
   };
 
 

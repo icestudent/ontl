@@ -1455,6 +1455,7 @@ namespace std
   }
 #endif
 
+#ifndef NTL__STLX_EXCLUDE_DEPRECATED
   /**\ingroup std_depr
    *@{*/
 
@@ -1543,6 +1544,7 @@ namespace std
 
   /**@} depr_autoptr */
   /**@} std_depr */
+#endif
 
   /**@} lib_memory */
   /**@} lib_utilities */

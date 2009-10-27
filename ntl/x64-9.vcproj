@@ -303,11 +303,19 @@
 					Name=".ext"
 					>
 					<File
+						RelativePath=".\stlx\ext\circular_buffer.hxx"
+						>
+					</File>
+					<File
 						RelativePath=".\stlx\ext\fib.hxx"
 						>
 					</File>
 					<File
 						RelativePath=".\stlx\ext\hashtable.hxx"
+						>
+					</File>
+					<File
+						RelativePath=".\stlx\ext\numeric_conversions.hxx"
 						>
 					</File>
 					<File
@@ -318,54 +326,6 @@
 						RelativePath=".\stlx\ext\typelist.hxx"
 						>
 					</File>
-					<Filter
-						Name="pp"
-						>
-						<File
-							RelativePath=".\stlx\ext\pp\config.hxx"
-							>
-						</File>
-						<File
-							RelativePath=".\stlx\ext\pp\macro_counter.hxx"
-							>
-						</File>
-						<File
-							RelativePath=".\stlx\ext\pp\macro_misc.hxx"
-							>
-						</File>
-						<File
-							RelativePath=".\stlx\ext\pp\macro_params.hxx"
-							>
-						</File>
-						<File
-							RelativePath=".\stlx\ext\pp\macro_repeat.hxx"
-							>
-						</File>
-					</Filter>
-					<Filter
-						Name="ttl"
-						>
-						<File
-							RelativePath=".\stlx\ext\ttl\data_holder.hxx"
-							>
-						</File>
-						<File
-							RelativePath=".\stlx\ext\ttl\exception.hxx"
-							>
-						</File>
-						<File
-							RelativePath=".\stlx\ext\ttl\typelist.hxx"
-							>
-						</File>
-					</Filter>
-					<Filter
-						Name="parallel"
-						>
-						<File
-							RelativePath=".\stlx\ext\parallel\hash_map.hxx"
-							>
-						</File>
-					</Filter>
 					<Filter
 						Name="spp"
 						>
@@ -427,6 +387,46 @@
 						</Filter>
 					</Filter>
 					<Filter
+						Name="ttl"
+						>
+						<File
+							RelativePath=".\stlx\ext\ttl\data_holder.hxx"
+							>
+						</File>
+						<File
+							RelativePath=".\stlx\ext\ttl\exception.hxx"
+							>
+						</File>
+						<File
+							RelativePath=".\stlx\ext\ttl\typelist.hxx"
+							>
+						</File>
+						<Filter
+							Name="pp"
+							>
+							<File
+								RelativePath=".\stlx\ext\pp\config.hxx"
+								>
+							</File>
+							<File
+								RelativePath=".\stlx\ext\pp\macro_counter.hxx"
+								>
+							</File>
+							<File
+								RelativePath=".\stlx\ext\pp\macro_misc.hxx"
+								>
+							</File>
+							<File
+								RelativePath=".\stlx\ext\pp\macro_params.hxx"
+								>
+							</File>
+							<File
+								RelativePath=".\stlx\ext\pp\macro_repeat.hxx"
+								>
+							</File>
+						</Filter>
+					</Filter>
+					<Filter
 						Name="tr1"
 						>
 						<File
@@ -444,10 +444,6 @@
 					</File>
 					<File
 						RelativePath=".\stlx\bitset.hxx"
-						>
-					</File>
-					<File
-						RelativePath=".\stlx\ext\circular_buffer.hxx"
 						>
 					</File>
 					<File
@@ -715,6 +711,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\stlx\typeindex.hxx"
+						>
+					</File>
+					<File
 						RelativePath=".\stlx\typeinfo.hxx"
 						>
 					</File>
@@ -880,6 +880,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\km\iocp.hxx"
+					>
+				</File>
+				<File
 					RelativePath=".\km\ioctl.hxx"
 					>
 				</File>
@@ -901,6 +905,10 @@
 				</File>
 				<File
 					RelativePath=".\km\mm.hxx"
+					>
+				</File>
+				<File
+					RelativePath=".\km\mutex.hxx"
 					>
 				</File>
 				<File
@@ -929,6 +937,10 @@
 				</File>
 				<File
 					RelativePath=".\km\string.hxx"
+					>
+				</File>
+				<File
+					RelativePath=".\km\system_error.hxx"
 					>
 				</File>
 				<File
@@ -1009,6 +1021,10 @@
 				</File>
 				<File
 					RelativePath=".\nt\heap.hxx"
+					>
+				</File>
+				<File
+					RelativePath=".\nt\iocp.hxx"
 					>
 				</File>
 				<File

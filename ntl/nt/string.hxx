@@ -59,7 +59,7 @@ class native_string
     : length_(), maximum_length_(), buffer_()
     {/**/}
 
-  explicit
+  //explicit
     native_string(
       typename std::conditional<std::is_const<charT>::value,
         const std::basic_string<value_type>&, std::basic_string<value_type>&>::type str)

@@ -1,3 +1,4 @@
+#include "../stlx/new.hxx" // for buffer allocation; otherwise it produces Compiler Error C2748 at console_buffer::init() o_0
 #include "../stlx/iostream.hxx"
 #include "../win/console.hxx"
 #include "../atomic.hxx"
@@ -8,7 +9,7 @@
 # include "../nt/new.hxx"
 #endif
 
-static void _cdecl __init_iostream_objects(bool init);
+extern "C" void _cdecl __init_iostream_objects(bool init);
 
 #ifndef NTL__SUBSYSTEM_KM
 
@@ -17,8 +18,8 @@ namespace
   typedef ntl::win::console_buffer<char>    buffer_n;
   typedef ntl::win::console_buffer<wchar_t> buffer_w;
 
-  buffer_n coutb(0), cerrb(0), clogb(0);
-  buffer_w woutb(0), werrb(0), wlogb(0);
+  buffer_n *coutb(0), *cerrb(0), *clogb(0), *cinb(0);
+  buffer_w *woutb(0), *werrb(0), *wlogb(0), *winb(0);
 
   void init_iostream_objects()
   {
@@ -26,8 +27,8 @@ namespace
     using namespace ntl::nt;
     using ntl::win::console;
 
-    buffer_n* bn[3] = {&coutb,&cerrb,&clogb};
-    buffer_w* bw[3] = {&woutb,&werrb,&wlogb};
+    buffer_n** bn[3] = {&coutb,&cerrb,&clogb};
+    buffer_w** bw[3] = {&woutb,&werrb,&wlogb};
     ostream*  noss[3] = {&cout,&clog,&cerr};
     wostream* woss[3] = {&wcout,&wclog,&wcerr};
 
@@ -37,12 +38,20 @@ namespace
     for(unsigned i = 0; i < _countof(noss); i++){
       legacy_handle h = console::handle(types[i]);
       if(h){
-        new(bn[i]) buffer_n(h);
-        new(bw[i]) buffer_w(h);
-        new(noss[i]) ostream(bn[i]);
-        new(woss[i]) wostream(bw[i]);
+        *bn[i] = new buffer_n(h);
+        *bw[i] = new buffer_w(h);
+        new(noss[i]) ostream(*bn[i]);
+        new(woss[i]) wostream(*bw[i]);
       }
     }
+
+    cinb = new buffer_n(console::stdin, false);
+    winb = new buffer_w(console::stdin, false);
+    new(&cin) istream(cinb);
+    new(&wcin) wistream(winb);
+    cin.tie(&cout);
+    wcin.tie(&wcout);
+
     if(cerr.rdbuf()){
       cerr.setf(ostream::unitbuf);
       if(cout.rdbuf())
@@ -63,8 +72,10 @@ static void destroy_iostream_objects()
   ostream*  noss[3] = {&cout,&clog,&cerr};
   wostream* woss[3] = {&wcout,&wclog,&wcerr};
 
-  std::allocator<buffer_n> na;
-  std::allocator<buffer_w> wa;
+  std::allocator<ostream> na;
+  std::allocator<wostream> wa;
+
+  // just flush (with the tied streams)
   for(unsigned i = 0; i < _countof(noss); i++){
     __ntl_try{
       noss[i]->flush();
@@ -74,8 +85,17 @@ static void destroy_iostream_objects()
       woss[i]->flush();
     }
     __ntl_catch(...){}
-    na.destroy( static_cast<buffer_n*>( noss[i]->rdbuf(nullptr) ) );
-    wa.destroy( static_cast<buffer_w*>( woss[i]->rdbuf(nullptr) ) );
+  }
+
+  // destroy buffers & streams
+  for(unsigned i = 0; i < _countof(noss); i++){
+    // destroy buffers
+    delete static_cast<buffer_n*>( noss[i]->rdbuf(nullptr) );
+    delete static_cast<buffer_w*>( woss[i]->rdbuf(nullptr) );
+    
+    // actually does nothing
+    na.destroy(noss[i]);
+    wa.destroy(woss[i]);
   }
 }
 
@@ -87,7 +107,7 @@ void _cdecl __init_iostream_objects(bool init)
     if(ntl::atomic::exchange_add(_iostreams_init_count, 1) == 0)
       init_iostream_objects();
   }else{
-    if(ntl::atomic::exchange_add(_iostreams_init_count, -1) == 1)
+    if(ntl::atomic::exchange_add(_iostreams_init_count, -1) == 0)
       destroy_iostream_objects();
   }
 }
@@ -101,25 +121,13 @@ void _cdecl __init_iostream_objects(bool)
 
 namespace std
 {
-  ostream  cout(nullptr);
-  ostream  cerr(nullptr);
-  ostream  clog(nullptr);
-  wostream wcout(nullptr);
-  wostream wcerr(nullptr);
-  wostream wclog(nullptr);
+  istream  cin ((ios_base::__noinittag()));
+  ostream  cout((ios_base::__noinittag()));
+  ostream  cerr((ios_base::__noinittag()));
+  ostream  clog((ios_base::__noinittag()));
 
-  ios_base::Init::Init()
-  {
-    __init_iostream_objects(true);
-  }
-  ios_base::Init::~Init()
-  {
-    __init_iostream_objects(false);
-  }
+  wistream wcin ((ios_base::__noinittag()));
+  wostream wcout((ios_base::__noinittag()));
+  wostream wcerr((ios_base::__noinittag()));
+  wostream wclog((ios_base::__noinittag()));
 } // std
-
-namespace
-{
-  std::ios_base::Init __init_oistream_objects;
-}
-

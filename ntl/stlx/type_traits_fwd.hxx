@@ -33,6 +33,7 @@ typedef integral_constant<bool, false>  false_type;
 template <class T, class U> struct is_same;
 template <class Base, class Derived> struct is_base_of;
 template <class From, class To> struct is_convertible;
+template <class From, class To> struct is_explicitly_convertible;
 
 // 20.5.6 Transformations between types [meta.trans]
 
@@ -129,12 +130,15 @@ namespace __ {
 }
 
 template<class T> struct is_trivial;
+template <class T> struct is_trivially_copyable;
 template<class T> struct is_standard_layout;
 
 template <class T> struct is_pod;
+template <class T> struct is_literal_type;
 template <class T> struct is_empty;
 template <class T> struct is_polymorphic;
 template <class T> struct is_abstract;
+
 template <class T> struct has_trivial_default_constructor;
 template <class T> struct has_trivial_copy_constructor;
 template <class T> struct has_trivial_assign;
@@ -143,6 +147,7 @@ template <class T> struct has_nothrow_default_constructor;
 template <class T> struct has_nothrow_copy_constructor;
 template <class T> struct has_nothrow_assign;
 template <class T> struct has_virtual_destructor;
+
 template <class T> struct is_signed;
 template <class T> struct is_unsigned;
 template <class T> struct alignment_of;
@@ -161,6 +166,10 @@ template<class T, class U = void, class V = void, class W = void>
 struct common_type;
 
 #endif
+
+// N2947:
+/// The member typedef type shall name the underlying type of the enum T.
+template <class T> struct enum_base;
 
 /**@} lib_typetraits */
 /**@} lib_utilities */

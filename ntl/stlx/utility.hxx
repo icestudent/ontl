@@ -342,24 +342,11 @@ inline InputIterator end(const std::pair<InputIterator, InputIterator>& p)   { r
 #pragma endregion
 
 ///\name 20.2.x.1 class noncopyable [utility.noncopyable] 
-namespace __ { namespace unspecified
-{
-  struct noncopyable
-  {
-  protected:
-    noncopyable(){}
-    ~noncopyable(){}
-  private:
-    noncopyable(const noncopyable&) __deleted;
-    const noncopyable& operator=(const noncopyable&) __deleted;
-  };
-}}
-
 /**
  *	@brief 20.2.x.1 class noncopyable [utility.noncopyable] 
  *  @details Class noncopyable is provided to simplify creation of classes that inhibit copy semantics.
  **/
-typedef __::unspecified::noncopyable noncopyable;
+using ntl::noncopyable;
 
 ///\}
 

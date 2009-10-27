@@ -144,7 +144,7 @@ struct file_information_base
       legacy_handle       file_handle,
       const info_class &  info
       ) __ntl_nothrow
-    : status_(_set(file_handle, &info, sizeof(info)))
+    : info(info), status_(_set(file_handle, &info, sizeof(info)))
     {/**/}
 
     info_class * data() { return nt::success(status_) ? &info : 0; }

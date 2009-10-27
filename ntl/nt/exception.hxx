@@ -1849,8 +1849,10 @@ namespace cxxruntime {
         //__debugbreak();
         if(ehfi->tryblocktable_size){
           // _GetRangeOfTrysToCheck
+        #ifdef _DEBUG
           ehstate_t state = ehfi->state_from_control(dispatch);
           assert(cs == state);
+        #endif
           const tryblock::ranges ranges = ehfi->get_try_ranges(trylevel, cs);
           const tryblock::ranges r2 = ehfi->get_try_ranges2(trylevel, cs);
           bool tryfound;
@@ -1865,13 +1867,13 @@ namespace cxxruntime {
               const ehandler* eh = dispatch->va<ehandler*>(tb->catchsym);
               for(int catches = tb->ncatches; catches != 0; catches--, eh++){
 
-                const char* catch_block_name = dispatch->va<type_info*>(eh->typeinfo)->name();
+                //const char* catch_block_name = dispatch->va<type_info*>(eh->typeinfo)->name();
 
                 for(uint32_t catchables = 0; catchables < clist->size; catchables++){
                   rva_t catchable = clist->type[catchables];
                   catchabletype* ct = dispatch->va<catchabletype*>(catchable);
 
-                  const char* thrown_cast_name = dispatch->va<type_info*>(ct->typeinfo)->name();
+                  //const char* thrown_cast_name = dispatch->va<type_info*>(ct->typeinfo)->name();
 
                   if(eh->type_match(ct, ti, dispatch)){
                     // OK.  We finally found a match.  Activate the catch.

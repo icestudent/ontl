@@ -566,9 +566,10 @@ namespace std
       // The system clock time stored as 100 nanoseconds units.
       // it customizable from 0,001 to 0,015625 sec (1 - 15,6 ms),
       // usualy 976,5us (microseconds), so an approximate value (10ms) was choosen.
-      typedef ratio_multiply<ratio<10>, milli>::type  period;
-
-      typedef chrono::duration<rep, period>           duration;
+      //typedef ratio_multiply<ratio<10>, milli>::type  period;
+      //typedef chrono::duration<rep, period>           duration;
+      typedef chrono::microseconds                    duration;
+      typedef duration::period                        period;
       typedef chrono::time_point<system_clock>        time_point;
 
       // NOTE: see the Table 54 (20.8.1), system time can be adjusted back.
@@ -631,7 +632,6 @@ namespace std
       static inline time_point now();
     };
 
-#if 0
     /**
      *	@brief Class high_resolution_clock [20.8.5.3 time.clock.hires]
      *
@@ -642,27 +642,25 @@ namespace std
     public:
       typedef uint64_t rep;
 
-      typedef ratio<unspecified, unspecified> period;
-      typedef chrono::duration<rep, period> duration;
-      typedef chrono::time_point<unspecified, duration> time_point;
+      typedef ratio_multiply<ratio<100>, nano>::type    period;
+      typedef chrono::duration<rep, period>             duration;
+      typedef chrono::time_point<high_resolution_clock> time_point;
 
       static const bool is_monotonic = true;
     public:
       /** \c return the time_point representing a current date and time */
-      static time_point now();
+      static inline time_point now();
     };
-#else
-    class high_resolution_clock;
-#endif
+
 
 #ifndef __GNUC__
     inline system_clock::time_point system_clock::now()
     {
       typedef ratio_multiply<ratio<100>, nano>::type systime_unit;
       typedef chrono::duration<ntl::nt::systime_t, systime_unit> systime_duration;
-      STATIC_ASSERT(systime_unit::den == 10000000); // 100ns is a 10^-7 of second
-      STATIC_ASSERT(period::den == 100); // 10ms is a 10^-2 (1/100) of second
-      STATIC_ASSERT((ratio_divide<period, systime_unit>::type::num == 100000 )); // 10ms is in 100 000 times greater than 100ns
+      //STATIC_ASSERT(systime_unit::den == 10000000); // 100ns is a 10^-7 of second
+      //STATIC_ASSERT(period::den == 100); // 10ms is a 10^-2 (1/100) of second
+      //STATIC_ASSERT((ratio_divide<period, systime_unit>::type::num == 100000 )); // 10ms is in 100 000 times greater than 100ns
       const ntl::nt::systime_t ntime = ntl::nt::query_system_time();
       return time_point( duration_cast<duration>(systime_duration(ntime)) );
     }
@@ -698,6 +696,14 @@ namespace std
       STATIC_ASSERT(systime_unit::den == 10000000); // 100ns is a 10^-7 of second
       STATIC_ASSERT(period::den == 100); // 10ms is a 10^-2 (1/100) of second
       STATIC_ASSERT(( ratio_divide<period, systime_unit>::type::num == 100000 )); // 10ms is in 100 000 times greater than 100ns
+      const ntl::nt::systime_t ntime = ntl::user_shared_data::instance().InterruptTime.get();
+      return time_point( duration_cast<duration>(systime_duration(ntime)) );
+    }
+
+    inline high_resolution_clock::time_point high_resolution_clock::now()
+    {
+      typedef ratio_multiply<ratio<100>, nano>::type systime_unit;
+      typedef chrono::duration<ntl::nt::systime_t, systime_unit> systime_duration;
       const ntl::nt::systime_t ntime = ntl::user_shared_data::instance().InterruptTime.get();
       return time_point( duration_cast<duration>(systime_duration(ntime)) );
     }

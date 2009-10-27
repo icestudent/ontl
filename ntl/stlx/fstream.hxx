@@ -29,11 +29,11 @@ namespace std {
   {
     enum type {
       Invalid = -2,
-      Default = -1, // based on bom or char type
-      Ansi  = 0,
-      Utf8  = 1,
+      Default = 0, // based on bom or char type
+      Ansi  = 1,
       Utf16 = 2,
-      //Utf32 = 4 // unsupported
+      //Utf32 = 4, // unsupported
+      //Utf8  = 5, // unsupported yet
     };
   }
   typedef Encoding::type EncodingType;
@@ -140,7 +140,25 @@ namespace std {
   protected:
 
     ///\name 27.9.1.5 Overridden virtual functions [filebuf.virtuals]
-    //virtual streamsize showmanyc(); // default
+    virtual streamsize showmanyc()
+    {
+      if(!f || !(mode & ios_base::in))
+        return -1;
+
+      streamsize avail = egptr()-gptr(),
+        in_avail = f.size() - f.tell();
+      if(in_avail){
+        if((mode & ios_base::binary) || encoding == Encoding::Default)
+          in_avail /= sizeof(char_type);
+        else if(encoding == Encoding::Utf16)
+          in_avail /= sizeof(char16_t);
+
+        // TODO: if we are processing CRLF, this value can be less
+        avail += in_avail;
+      }
+      return avail;
+    }
+
     virtual int_type underflow()
     {
       const int_type eof = traits_type::eof();
@@ -234,6 +252,8 @@ namespace std {
         ok = write(&cc, 1);
       }
       ok &= flush();
+      if(!ok)
+        return eof;
       return eofc ? traits_type::not_eof(c) : c;
     }
 
@@ -261,11 +281,12 @@ namespace std {
         return re;
 
       const int width = 
-#if !STLX__CONFORMING_FSTREAM
-        1;
-#else
+  #if !STLX__CONFORMING_FSTREAM
+        // output char size
+        ((mode & ios_base::binary) || encoding == Encoding::Default) ? sizeof(char_type) : encoding;
+  #else
         use_facet<codecvt<charT,char,typename traits::state_type> >(getloc()).encoding();
-#endif
+  #endif
       if(off != 0 && width <= 0)
         return re;
 
@@ -273,10 +294,15 @@ namespace std {
         if(sync() == -1)
           return re;
       }
-
       static const native_file::Origin origins[] = {native_file::file_begin, native_file::file_end, native_file::file_current};
-      if(NTL__SUBSYSTEM_NS::success(f.seek(off*width, origins[way])))
+
+      NTL__SUBSYSTEM_NS::file::size_type new_off;
+      if(NTL__SUBSYSTEM_NS::success(f.seek(width > 0 ? off*width : 0, origins[way], &new_off))){
+        off = new_off;
+        if(off != 0 && width > 0)
+          off /= width;
         re = pos_type(off);
+      }
       return re;
     }
 
@@ -586,6 +612,10 @@ namespace std {
           f.write(&bom_le, bom_size);
       }
 #endif
+
+      if(mode & ios_base::app)
+        f.seek(0, NTL__SUBSYSTEM_NS::file_handler::file_end);
+
       bool ok = false;
       if(mode & ios_base::binary) {
         ok = write_binary(s, s+n, 0);
@@ -641,7 +671,8 @@ namespace std {
         bom_size = 3;
         bom &= 0xffffff;
         if(bom == utf8){
-          enc = Encoding::Utf8; break;
+          //enc = Encoding::Utf8; 
+          break;
         }
         bom_size = 2;
         bom &= 0xffff;

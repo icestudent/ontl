@@ -62,6 +62,7 @@ class ios_base
 {
   ///////////////////////////////////////////////////////////////////////////
   public:
+    struct __noinittag{};
 
     ///\name 27.4.2.1 Types [ios.types]
 
@@ -87,8 +88,10 @@ class ios_base
     typedef uint16_t fmtflags;
     /// flushes output after each output operation
     static const fmtflags unitbuf     = 1 << 0;
+
     /// replaces certain lowercase letters with their uppercase equivalents in generated output
     static const fmtflags uppercase   = 1 << 1;
+    
     /// adds fill characters at a designated internal point in certain generated
     /// output, or identical to right if no such point is designated
     static const fmtflags internal    = 1 << 2;
@@ -97,6 +100,7 @@ class ios_base
     /// adds fill characters on the left (initial positions) of certain generated output
     static const fmtflags right       = 1 << 4;
     static const fmtflags adjustfield = left | right | internal;
+    
     /// converts integer input or generates integer output in decimal base
     static const fmtflags dec         = 1 << 5;
     /// converts integer input or generates integer output in octal base
@@ -104,12 +108,15 @@ class ios_base
     /// converts integer input or generates integer output in hexadecimal base
     static const fmtflags hex         = 1 << 7;
     static const fmtflags basefield   = dec | oct | hex;
+    
     /// generates a prefix indicating the numeric base of generated integer output
     static const fmtflags showbase    = 1 << 8;
     /// generates a + sign in non-negative generated numeric output
     static const fmtflags showpos     = 1 << 9;
+    
     /// insert and extract bool type in alphabetic format
     static const fmtflags boolalpha   = 1 << 10;
+    
     /// generate floating-point output in fixed-point notation
     static const fmtflags fixed       = 1 << 11;
     /// generates floating-point output in scientific notation
@@ -117,6 +124,7 @@ class ios_base
     static const fmtflags floatfield  = scientific | fixed;
     /// generates a decimal-point character unconditionally in generated floating-point output
     static const fmtflags showpoint   = 1 << 13;
+    
     /// skips leading whitespace before certain input operations
     static const fmtflags skipws      = 1 << 14;
 
@@ -179,8 +187,8 @@ class ios_base
     class Init
     {
       public:
-        Init();
-        ~Init();
+        Init()  { ntl::__init_iostream_objects(true);  }
+        ~Init() { ntl::__init_iostream_objects(false); }
     };
 
     ///\name  27.4.2.2 ios_base state functions [fmtflags.state]
@@ -364,7 +372,7 @@ class basic_ios : public ios_base
     {
       ios_base::init();
       this->sb = sb;
-      this->tiestr = 0;
+      this->tiestr = nullptr;
       this->fillc = widen(' ');
       this->clear();
     }
@@ -724,7 +732,5 @@ ios_base&
 ///@}
 /**@} lib_std_ios_manip */
 /**@} lib_input_output */
-
 }//namespace std
-
 #endif//#ifndef NTL__STLX_IOS

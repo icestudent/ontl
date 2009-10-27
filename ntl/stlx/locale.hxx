@@ -62,8 +62,8 @@ class locale
     /// 22.1.1.1.1 Type locale::category [locale.category]
     typedef int category;
     static const category
-      none = 0,   collate = 0x01,   ctype = 0x02,
-      monetary = 0x04,  numeric = 0x08,   time = 0x10, messages = 0x20,
+      none = 0,         collate = 0x01,   ctype = 0x02,
+      monetary = 0x04,  numeric = 0x08,   time = 0x10,    messages = 0x20,
       all = collate | ctype | monetary | numeric | time | messages;
 
     /// 22.1.1.1.2 Class locale::facet [locale.facet]
@@ -80,11 +80,13 @@ class locale
     /// 22.1.1.1.3 Class locale::id [locale.id]
     class id
     {
+      #if STLX__CONFORMING_LOCALE
       public:
         id();
       private:
         void operator=(const id&) __deleted;
         id(const id&) __deleted;
+      #endif
     };
 
     ///\name 22.1.1.2 locale constructors and destructor [locale.cons]
@@ -92,8 +94,10 @@ class locale
     locale() __ntl_nothrow {/**/}
     locale(const locale& /*other*/) __ntl_nothrow {/**/}
     const locale& operator=(const locale& other) __ntl_nothrow;
+
     explicit locale(const char* std_name) __ntl_throws(runtime_error);
     locale(const locale& other, const char* std_name, category) __ntl_throws(runtime_error);
+
     template <class Facet> locale(const locale& other, Facet* f);
     locale(const locale& other, const locale& one, category);
 
@@ -375,7 +379,7 @@ private:
     }
     assert(re == codecvt_base::ok);
     ws.resize(count);
-    return ws;
+    return move(ws);
   }
   byte_string to_bytes(const Elem *wptr, size_t len) __ntl_throws(range_error)
   {
@@ -393,7 +397,7 @@ private:
     }
     assert(re == codecvt_base::ok);
     bs.resize(count);
-    return bs;
+    return move(bs);
   }
 
 private:
@@ -2139,7 +2143,7 @@ class num_put : public locale::facet
 
       const streamsize width = str.width();
 
-      // [dec, oct, hex]
+      // [dec, oct, hex] = [0, 2, 4]
       static const char bases[] = {'u', 'o', 'x'};
 
       // %[flags] [width] [.precision] [{h | l | ll | I | I32 | I64}]type
@@ -2149,7 +2153,7 @@ class num_put : public locale::facet
 
       if(showpos)
         *fmt++ = '+';
-      if(showbase)
+      if(showbase && !is_pointer) // pointer have a custom prefix always
         *fmt++ = '#';
       if(adjust == ios_base::internal){
         *fmt++ = '0';
@@ -2163,7 +2167,7 @@ class num_put : public locale::facet
         if(is_long)
           *fmt++ = 'I', *fmt++ = '6', *fmt++ = '4';
 
-        *fmt = bases[(basefield >> 5) - 1];
+        *fmt = bases[basefield >> 6]; // (base >> 5) / 2
 
         if(basefield == ios_base::dec && is_signed)
           *fmt = 'd';
@@ -2298,13 +2302,15 @@ template <class charT> class messages_byname;
 
 #if !STLX__CONFORMING_LOCALE
 
+inline const locale& locale::operator=(const locale&) __ntl_nothrow { return *this; }
+inline basic_string<char> locale::name() const { return "C"; }
+
 // locale::id ctor
-inline locale::id::id(){}
+//inline locale::id::id(){}
 
 namespace __
 {
-  extern const unsigned char wchar_masks[];
-  extern const unsigned wchar_masks_size;
+  extern "C" bool __wchar_masks_data(const unsigned char*& masks, unsigned& size);
 
   struct facets
   {
@@ -2351,14 +2357,18 @@ namespace __
       static ctype_base::mask* table = 0;
       if(!table){
         // get table
-        table = new ctype_base::mask[ctype<wchar_t>::table_size];
-        using namespace ntl::nt;
+        const unsigned char* wchar_masks;
+        unsigned wchar_masks_size;
+        if(__wchar_masks_data(wchar_masks, wchar_masks_size)){
+          table = new ctype_base::mask[ctype<wchar_t>::table_size];
+          using namespace ntl::nt;
 
-        uint32_t dsize;
-        ntstatus st = RtlDecompressBuffer(compression::default_format, table, ctype<wchar_t>::table_size, wchar_masks, wchar_masks_size, &dsize);
-        if(!success(st)){
-          delete[] table;
-          table = nullptr;
+          uint32_t dsize;
+          ntstatus st = RtlDecompressBuffer(compression::default_format, table, ctype<wchar_t>::table_size, wchar_masks, wchar_masks_size, &dsize);
+          if(!success(st)){
+            delete[] table;
+            table = nullptr;
+          }
         }
       }
       //if ( !f[0] ) new (p) ctype<wchar_t>(table);

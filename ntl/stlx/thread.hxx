@@ -173,11 +173,6 @@ namespace std
 
   private:
     mutable native_handle_type h, tid;
-
-#ifndef NTL__CXX_RV
-    thread(const thread&) __deleted;
-    thread& operator=(const thread&) __deleted;
-#endif
   };
 
   namespace this_thread

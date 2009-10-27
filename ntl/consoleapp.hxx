@@ -56,12 +56,15 @@ extern"C" void _cdecl __console_abort();
 int _Consoleapp_entry()
 {
   #ifdef _MSC_VER
-  __init_crt_stub();
-  static void* volatile ref2 = __console_abort;
+  (void)__security_cookie;
+  (void)&__init_crt_stub;
+  (void)&__console_abort;
   #endif
+
   crt_initializer __crt;
   consoleapp app;
   return app.main();
+
 
   // for explicit instantiation to eliminate annoyed including "nt/new.hxx"
   new char, new char[0], new (std::nothrow) char, new(std::nothrow) char[0];

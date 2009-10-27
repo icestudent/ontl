@@ -22,7 +22,7 @@
 	</ToolFiles>
 	<Configurations>
 		<Configuration
-			Name="Debug|x64"
+			Name="debug|x64"
 			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="4"
@@ -87,7 +87,7 @@
 			/>
 		</Configuration>
 		<Configuration
-			Name="Debug|Win32"
+			Name="debug|Win32"
 			OutputDirectory="$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="4"
@@ -151,7 +151,7 @@
 			/>
 		</Configuration>
 		<Configuration
-			Name="Release|x64"
+			Name="release|x64"
 			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="4"
@@ -213,7 +213,7 @@
 			/>
 		</Configuration>
 		<Configuration
-			Name="Release|Win32"
+			Name="release|Win32"
 			OutputDirectory="$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="4"
@@ -507,6 +507,10 @@
 					</File>
 					<File
 						RelativePath=".\stlx\cfloat.hxx"
+						>
+					</File>
+					<File
+						RelativePath=".\stlx\cinttypes.hxx"
 						>
 					</File>
 					<File
@@ -1102,7 +1106,7 @@
 					RelativePath=".\rtl\crt.cpp"
 					>
 					<FileConfiguration
-						Name="Debug|x64"
+						Name="debug|x64"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -1110,7 +1114,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="Debug|Win32"
+						Name="debug|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -1118,7 +1122,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="Release|Win32"
+						Name="release|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -1130,7 +1134,7 @@
 					RelativePath=".\rtl\eh.cpp"
 					>
 					<FileConfiguration
-						Name="Debug|x64"
+						Name="debug|x64"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -1138,7 +1142,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="Debug|Win32"
+						Name="debug|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -1146,7 +1150,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="Release|Win32"
+						Name="release|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -1158,7 +1162,7 @@
 					RelativePath=".\rtl\ehsup.asm"
 					>
 					<FileConfiguration
-						Name="Debug|x64"
+						Name="debug|x64"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -1166,7 +1170,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="Debug|Win32"
+						Name="debug|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -1174,7 +1178,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="Release|Win32"
+						Name="release|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -1186,7 +1190,7 @@
 					RelativePath=".\rtl\iostream.cpp"
 					>
 					<FileConfiguration
-						Name="Debug|x64"
+						Name="debug|x64"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -1194,7 +1198,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="Debug|Win32"
+						Name="debug|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -1206,7 +1210,7 @@
 					RelativePath=".\rtl\rtti.cpp"
 					>
 					<FileConfiguration
-						Name="Debug|x64"
+						Name="debug|x64"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -1214,7 +1218,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="Debug|Win32"
+						Name="debug|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -1222,7 +1226,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="Release|Win32"
+						Name="release|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -1234,7 +1238,7 @@
 					RelativePath=".\rtl\safeseh.asm"
 					>
 					<FileConfiguration
-						Name="Debug|x64"
+						Name="debug|x64"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -1242,7 +1246,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="Debug|Win32"
+						Name="debug|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -1250,7 +1254,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="Release|Win32"
+						Name="release|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -1262,7 +1266,7 @@
 					RelativePath=".\rtl\syserr.cpp"
 					>
 					<FileConfiguration
-						Name="Debug|x64"
+						Name="debug|x64"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -1270,7 +1274,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="Debug|Win32"
+						Name="debug|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -1278,7 +1282,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="Release|Win32"
+						Name="release|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -1290,7 +1294,7 @@
 					RelativePath=".\rtl\wchar_mask_data.cpp"
 					>
 					<FileConfiguration
-						Name="Debug|x64"
+						Name="debug|x64"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -1298,7 +1302,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="Debug|Win32"
+						Name="debug|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool

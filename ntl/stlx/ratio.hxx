@@ -180,6 +180,7 @@ namespace std
      *  \f$ \frac{D * sign(N)}{gcd} \f$, but we use \f$ \frac{abs(D)}{gcd} \f$ (see N2661).
      **/
     static const ratio_t den = __::static_evaluation::abs<D>::value / gcd_value;
+
   };
 
 

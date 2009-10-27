@@ -28,6 +28,9 @@ class basic_istream : virtual public basic_ios<charT, traits>
 {
     typedef basic_ios<charT, traits> this_base;
 
+  public:
+    basic_istream(__noinittag)
+    {}
   ///////////////////////////////////////////////////////////////////////////
   public:
 
@@ -90,7 +93,7 @@ class basic_istream : virtual public basic_ios<charT, traits>
       {
         if ( is.good() )
         {
-          if ( is.tie() ) is.tie()->flush();
+          if ( basic_ostream<charT, traits>* tie = is.tie() ) tie->flush();
 
           if(noskipws == false && is.flags() & ios_base::skipws){
             // formatted input, discard all input spaces
@@ -866,7 +869,7 @@ class basic_iostream:
     /// 3 Effects: Move constructs from the rvalue \p rhs by constructing
     ///   the basic_istream base class with <tt>move(rhs)</tt>.
     basic_iostream(basic_iostream&& rhs)
-      :basic_istream(rhs.rdbuf()), basic_ostream(rvtag())
+      :basic_istream(rhs.rdbuf()), basic_ostream(__noinittag())
     {
       basic_ios::init(nullptr);
       basic_ios::move(forward<basic_iostream>(rhs));

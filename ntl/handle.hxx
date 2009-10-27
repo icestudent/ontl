@@ -42,7 +42,7 @@ class basic_handle
       return *this;
     }
 
-    ~basic_handle() __ntl_nothrow { if ( get() ) Delete(get()); }
+    ~basic_handle() __ntl_nothrow { if ( X x = get() ) Delete(x); }
 
     bool is_valid() const { return Validate(get()); }
 
@@ -59,7 +59,8 @@ class basic_handle
 
     void reset(X h = 0) __ntl_nothrow
     {
-      if ( get() && get() != h ) Delete(get());
+      X x = get();
+      if (x && x != h ) Delete(x);
       set(h);
     }
 

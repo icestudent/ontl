@@ -38,12 +38,9 @@ class basic_ostream
 {
     typedef basic_ios<charT, traits>  this_base;
 
-#ifdef NTL__CXX_RV
-  protected:
-    struct rvtag{};
-    basic_ostream(rvtag)
+  public:
+    basic_ostream(__noinittag)
     {}
-#endif
     ///////////////////////////////////////////////////////////////////////////
   public:
 
@@ -114,7 +111,7 @@ class basic_ostream
       {
         if ( os.good() ) // NOTE: GCC's libstdc++ sets failbit when not good
         {
-          if ( os.tie() ) os.tie()->flush();
+          if ( basic_ostream<charT, traits>* tie = os.tie() ) tie->flush();
           ok_ = true;
         }
       }
@@ -329,7 +326,7 @@ class basic_ostream
       ios_base::iostate state = ios_base::badbit;
       if (good)
         __ntl_try {
-          if (!traits_type::eq_int_type(this->rdbuf()->sputn(s, n), traits_type::eof()))
+          if(this->rdbuf()->sputn(s, n) == n)
             state = ios_base::goodbit;
       }
       __ntl_catch(...)
@@ -355,7 +352,7 @@ class basic_ostream
         if ( good() )
         {
           ///\note STLPort doesn't have this line (as one above, but that doesn't matter)
-          if ( tie() ) tie()->flush();
+          if ( basic_ostream<charT, traits>* tiestr = tie() ) tiestr->flush();
           if ( this->rdbuf()->pubsync() == -1 )
             this->setstate(ios_base::badbit);
         }

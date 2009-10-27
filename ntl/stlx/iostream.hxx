@@ -33,4 +33,9 @@ extern wostream wclog;
 
 }//namespace std
 
+namespace
+{
+  std::ios_base::Init __iostream_objects_initializer;
+}
+
 #endif // NTL__STLX_IOSTREAM

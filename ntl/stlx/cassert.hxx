@@ -53,8 +53,8 @@ inline void __ntl_assert(const char* expr, const char* file, int line)
 
 /// \c assert macros
 #ifdef NDEBUG
-  #define assert(expr)
-  #define _assert_msg(msg)
+  #define assert(expr) __noop
+  #define _assert_msg(msg) __noop
 #else
   #define assert(expr) \
     if ( !!(expr) ); else if(ntl::__assert_handler)\

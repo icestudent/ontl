@@ -81,6 +81,12 @@ ntstatus __stdcall
     const uint32_t *  Key           __optional
     );
 
+NTL__EXTERNAPI
+ntstatus __stdcall ZwFlushBuffersFile(legacy_handle FileHandle, io_status_block* IoStatusBlock);
+
+using nt::ZwQueryFullAttributesFile;
+using nt::ZwDeleteFile;
+
 
 ///@}
 
@@ -227,7 +233,7 @@ class file_handler : public handle, public device_traits<file_handler>
 
     ntstatus flush()
     {
-      return NtFlushBuffersFile(get(), &iosb);
+      return ZwFlushBuffersFile(get(), &iosb);
     }
 
     size_type size() const
@@ -251,23 +257,27 @@ class file_handler : public handle, public device_traits<file_handler>
     }
 
     enum Origin { file_begin, file_current, file_end };
-    ntstatus seek(const size_type& offset, Origin origin)
+    ntstatus seek(const size_type& offset, Origin origin, size_type* new_offset = 0)
     {
       file_position_information fi = {offset};
       if(origin != file_begin){
         if(origin == file_current){
           file_information<file_position_information> file_info(get());
-          if(!file_info)
+          if(!file_info || offset == 0){
+            // special case for using seek(0, cur) as tell()
+            if(new_offset) *new_offset = file_info ? file_info->CurrentByteOffset : 0;
             return file_info;
-          fi.CurrentByteOffset += file_info.data()->CurrentByteOffset;
+          }
+          fi.CurrentByteOffset += file_info->CurrentByteOffset;
         }else if(origin == file_end){
           file_information<file_standard_information> file_info(get());
           if(!file_info)
             return file_info;
-          fi.CurrentByteOffset += file_info.data()->EndOfFile;
+          fi.CurrentByteOffset += file_info->EndOfFile;
         }
       }
       file_information<file_position_information> file_info(get(), fi);
+      if(new_offset) *new_offset = file_info ? fi.CurrentByteOffset : 0;
       return file_info;
     }
 

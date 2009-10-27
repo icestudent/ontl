@@ -620,6 +620,7 @@ static_assert(sizeof(nullptr)==sizeof(void*), "3.9.1.10: sizeof(std::nullptr_t) 
 template <typename T, size_t N>
 char (*__countof_helper(T(&array)[N]))[N];
 #define _countof(array) sizeof(*__countof_helper(array))
+#define _endof(array) (array+_countof(array))
 
 namespace std { namespace __{ using ntl::explicit_bool; using ntl::explicit_bool_type; } }
 

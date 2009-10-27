@@ -308,7 +308,7 @@ namespace std
           uintmax_t size = errval;
           using namespace NTL__SUBSYSTEM_NS;
           file_network_open_information fbi;
-          ntstatus st = NtQueryFullAttributesFile(const_unicode_string(p.external_file_string()), fbi);
+          ntstatus st = ZwQueryFullAttributesFile(const_unicode_string(p.external_file_string()), fbi);
           if(success(st)){
             size = static_cast<uintmax_t>(fbi.EndOfFile);
           }else{
@@ -471,7 +471,7 @@ namespace std
         template <class Path> inline bool remove(const Path& p, error_code& ec = throws())
         {
           using namespace NTL__SUBSYSTEM_NS;
-          ntstatus st = NtDeleteFile(const_unicode_string(p.external_file_string()));
+          ntstatus st = ZwDeleteFile(const_unicode_string(p.external_file_string()));
           if(success(st)){
             if(&ec != &throws())
               ec.clear();

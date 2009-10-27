@@ -251,8 +251,8 @@ extern "C" generic_function_t* __CxxCallCatchBlock(exception_record* ehrec)
 #ifdef __ICL
 typedef ntl::cxxruntime::throwinfo _s__ThrowInfo;
 #endif
-extern "C"
 __declspec(noreturn)
+extern "C"
 void __stdcall _CxxThrowException(void * object, _s__ThrowInfo const * info)
 {
 #ifdef _M_IX86

@@ -310,6 +310,8 @@ binary_negate<Predicate> not2(const Predicate& pred)
 /**@} lib_negators */
 #pragma endregion
 
+#ifndef NTL__STLX_EXCLUDE_DEPRECATED
+
 #pragma region lib_binders
 /**\ingroup std_depr
  *@{*/
@@ -390,6 +392,7 @@ binder2nd<Operation>
 /**@} lib_binders */
 /**@} std_depr */
 #pragma endregion
+#endif
 
 #pragma region lib_adaptors
 /**\defgroup  lib_function_pointer_adaptors 20.6.12 Adaptors for pointers to functions [function.pointer.adaptors]

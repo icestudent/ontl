@@ -104,6 +104,15 @@ namespace
   }
 } // namespace
 
+#ifdef _MSC_VER
+  #ifdef _M_X64
+  # pragma comment(linker, "/alternatename:__init_iostream_objects=__init_iostream_objects_stub")
+  #else
+  # pragma comment(linker, "/alternatename:___init_iostream_objects=___init_iostream_objects_stub")
+  #endif
+#endif
+extern "C" void _cdecl __init_iostream_objects_stub(){}
+
 
 namespace ntl
 {
@@ -124,6 +133,9 @@ namespace ntl
     }else{
       // free static objects
       doexit(0,false,true);
+      // explicitly destroy iostreams
+      __init_iostream_objects(false);
+      (void)&__init_iostream_objects_stub;
     }
   }
 }
@@ -175,7 +187,7 @@ void NTL__CRTCALL _Exit(int code)
 /* `abort`                                                              */
 /************************************************************************/
 #ifndef NTL__SUBSYSTEM_KM
-void _cdecl abort()
+extern "C" void _cdecl abort()
 {
   ntl::nt::user_thread::exit_process(ntl::nt::status::unsuccessful);
 }

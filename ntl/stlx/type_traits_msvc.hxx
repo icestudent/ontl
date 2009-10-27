@@ -85,6 +85,7 @@ namespace __
   _change_signs(long long int)
 #undef _change_signs
 
+  // signed type by default
   template<size_t SizeOfT> struct map_to_funda;
   template<> struct map_to_funda<0> { typedef void    type; };
   template<> struct map_to_funda<1> { typedef int8_t  type; };
@@ -675,6 +676,20 @@ struct common_type
 };
 
 #endif // NTL__CXX_VT
+
+// N2947
+// NOTE: there are few limitations: enum_base determines the base type calculating size of enumeration type, 
+// so it cannot determine the char type (it reports [un]signed char) and the int type (it reports [un]signed long int).
+template<typename T> 
+struct enum_base
+{
+  static_assert(is_enum<T>::value, "T shall be an enumeration type");
+private:
+  typedef typename __::map_to_funda<sizeof(T)>::type U;
+  typedef conditional<is_unsigned<T>::value, typename make_unsigned<U>::type, U> V;
+public:
+  typedef typename V::type type;
+};
 
 }//namespace std
 

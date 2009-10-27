@@ -9,6 +9,7 @@
 #define NTL__STDLIB
 
 #include "stdint.h"
+#include "stlx/cstddef.hxx"
 
 namespace ntl {
 
@@ -17,7 +18,7 @@ template<typename T, typename T2>
 static __forceinline
 T brute_cast(T2 pf)
 {
-  STATIC_ASSERT(sizeof(T) == sizeof(T2));
+  static_assert(sizeof(T) == sizeof(T2), "types are incompatible");
   return *reinterpret_cast<const T*>(&pf);
 }
 
