@@ -493,12 +493,8 @@ class basic_ios : public ios_base
     }
 
     ///\name 27.4.4.3 basic_ios flags functions [iostate.flags]
-#ifdef NTL__CXX_EXPLICITOP
-    explicit operator bool() const { return !fail(); }
-#else
-    operator __::explicit_bool_type() const { return __::explicit_bool(!fail()); }
-#endif
     bool operator!() const { return fail(); }
+    __explicit_operator_bool() const { return __explicit_bool(!fail()); }
 
     iostate rdstate() const { return state; }
 

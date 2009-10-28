@@ -148,11 +148,7 @@ namespace std
       return c->message(v);
     }
 
-#ifdef NTL__CXX_EXPLICITOP
-    explicit operator bool() const  __ntl_nothrow { return v != 0; }
-#else
-    operator __::explicit_bool_type() const __ntl_nothrow { return __::explicit_bool(v != 0); }
-#endif
+    __explicit_operator_bool() const __ntl_nothrow { return __explicit_bool(v != 0); }
 private:
     int v;
     const error_category* c;

@@ -124,11 +124,7 @@ class basic_ostream
           os.flush();
       }
 
-#ifdef NTL__CXX_EXPLICITOP
-      explicit operator bool() const { return ok_; }
-#else
-      operator __::explicit_bool_type() const { return __::explicit_bool(ok_); }
-#endif
+      __explicit_operator_bool() const { return __explicit_bool(ok_); }
 
     private:
       basic_ostream<charT, traits>& os;

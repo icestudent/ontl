@@ -458,6 +458,14 @@
   #define __default
 #endif
 
+#ifdef NTL__CXX_EXPLICITOP
+# define __explicit_operator_bool() explicit operator bool()
+# define __explicit_bool(...) __VA_ARGS__
+#else
+# define __explicit_operator_bool() operator ntl::explicit_bool_type()
+# define __explicit_bool(...) ntl::explicit_bool(__VA_ARGS__)
+#endif
+
 namespace ntl
 {
   struct explicit_bool_t { void _(){} };
