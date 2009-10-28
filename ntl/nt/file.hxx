@@ -99,6 +99,9 @@ ntstatus __stdcall ZwQueryFullAttributesFile(const object_attributes& ObjectAttr
 NTL__EXTERNAPI
 ntstatus __stdcall NtDeleteFile(const object_attributes& ObjectAttributes);
 
+NTL__EXTERNAPI
+ntstatus __stdcall ZwDeleteFile(const object_attributes& ObjectAttributes);
+
 //////////////////////////////////////////////////////////////////////////
 NTL__EXTERNAPI
 uint32_t __stdcall RtlGetCurrentDirectory_U(uint32_t nBufferLength, wchar_t* lpBuffer);
