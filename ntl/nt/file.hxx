@@ -128,6 +128,24 @@ ntstatus __stdcall
 
 NTL__EXTERNAPI
 ntstatus __stdcall
+  ZwQueryDirectoryFile(
+    legacy_handle  FileHandle,
+    legacy_handle  Event,
+    io_apc_routine*  ApcRoutine,
+    void* ApcContext,
+    io_status_block* IoStatusBlock,
+    void* FileInformation,
+    uint32_t Length,
+    file_information_class FileInformationClass,
+    bool ReturnSingleEntry,
+    const const_unicode_string* FileName,
+    bool RestartScan
+    );
+
+//////////////////////////////////////////////////////////////////////////
+
+NTL__EXTERNAPI
+ntstatus __stdcall
   NtCreateSection(
     handle*                     SectionHandle,
     uint32_t                    DesiredAccess,

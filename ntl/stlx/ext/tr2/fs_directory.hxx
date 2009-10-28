@@ -324,11 +324,11 @@ namespace std
                   ec = make_error_code(status::insufficient_resources);
                   return false;
                 }
-                st = NtQueryDirectoryFile(f.get(), nullptr, nullptr, nullptr, &iosb, buf, memsize, FileDirectoryInformation, false, nullptr, true);
+                st = ZwQueryDirectoryFile(f.get(), nullptr, nullptr, nullptr, &iosb, buf, memsize, FileDirectoryInformation, false, nullptr, true);
                 if(success(st)){
                   file_directory_information tmp;
                   io_status_block iosb;
-                  st = NtQueryDirectoryFile(f.get(), nullptr, nullptr, nullptr, &iosb, &tmp, sizeof(tmp), FileDirectoryInformation, false, nullptr, false);
+                  st = ZwQueryDirectoryFile(f.get(), nullptr, nullptr, nullptr, &iosb, &tmp, sizeof(tmp), FileDirectoryInformation, false, nullptr, false);
                   if(st != status::no_more_files)
                     st = status::buffer_overflow;
                 }
