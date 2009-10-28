@@ -64,6 +64,24 @@ void __cdecl operator delete(void* ptr) __ntl_nothrow
   ntl::nt::heap::free(ntl::nt::process_heap(), ptr);
 }
 
+inline
+void __safe_call_new_handler(std::new_handler nh)
+{
+#if STLX__USE_EXCEPTIONS == 1
+    try {
+      nh();
+    } 
+    catch(const std::bad_alloc&){
+    }
+#elif
+    __try {
+      nh();
+    }
+    __except(1){
+    }
+#endif
+}
+
 __forceinline
 void* __cdecl operator new(std::size_t size, const std::nothrow_t&) __ntl_nothrow
 {
@@ -74,25 +92,9 @@ void* __cdecl operator new(std::size_t size, const std::nothrow_t&) __ntl_nothro
       return ptr;
 
     std::new_handler nh = ntl::__new_handler;
-    if(!nh)
-      return 0;
-#if STLX__USE_EXCEPTIONS == 1
-    try {
-      nh();
-    } 
-    catch(const std::bad_alloc&){
-      return 0;
-    }
-#elif STLX__USE_EXCEPTIONS == 2
-    __try {
-      nh();
-    }
-    __except(1){
-      return 0;
-    }
-#else
+    if ( nh )
+      __safe_call_new_handler(nh);
     return 0;
-#endif
   } 
 }
 

@@ -38,10 +38,9 @@
 class type_info
 {
   public:
-  #if STLX__USE_RTTI
+
     /** type_info destructor */
     virtual ~type_info();
-  #endif
 
     /**
      *	@brief Compares the current object with \c rhs.
@@ -49,7 +48,7 @@ class type_info
      **/
     bool operator==(const type_info& rhs) const
     {
-      return std::strcmp(mname+1, rhs.mname+1) == 0;
+      return std::strcmp(mname()+1, rhs.mname()+1) == 0;
     }
 
     /**
@@ -58,7 +57,7 @@ class type_info
      **/
     bool operator!=(const type_info& rhs) const
     {
-      return std::strcmp(mname+1, rhs.mname+1) != 0;
+      return std::strcmp(mname()+1, rhs.mname()+1) != 0;
     }
 
     /**
@@ -67,7 +66,7 @@ class type_info
      **/
     bool before(const type_info& rhs) const __ntl_nothrow
     {
-      return std::strcmp(mname+1, rhs.mname+1) <= 0;
+      return std::strcmp(mname()+1, rhs.mname()+1) <= 0;
     }
 
     /** Hashes this object */
@@ -81,19 +80,22 @@ class type_info
      *	@return a null-terminated string representing the human-readable name of the type.
      **/
     const char* name() const  __ntl_nothrow
-#if !STLX__USE_RTTI
+#ifndef _NTL_DEMANGLE
     {
-      return mname;
+      // return mangled name as implementation-defined :-)
+      return mname(); 
     }
 #else
-    ;
+      ;// use definition in rtti.cpp
 #endif
+
   private:
     type_info(const type_info&) __deleted;
     type_info& operator=(const type_info&) __deleted;
     mutable void* data;
-    char    mname[1];
+    const char* mname() const { return reinterpret_cast<const char*>(this + 1); }
 };
+STATIC_ASSERT(sizeof _TypeDescriptor == sizeof type_info);
 
 #if STLX__USE_RTTI && !defined(__ICL)
 inline type_info::~type_info()

@@ -87,12 +87,14 @@ namespace {
 } // namespace
 
 //////////////////////////////////////////////////////////////////////////
+#ifdef _NTL_DEMANGLE
 const char* std::type_info::name() const __ntl_nothrow
 {
   if(!data)
-    data = const_cast<char*>(undname(mname));
+    data = const_cast<char*>(undname(mname()));
   return reinterpret_cast<const char*>(data);
 }
+#endif
 
 #ifdef __ICL
 std::type_info::~type_info()
