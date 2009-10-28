@@ -484,6 +484,7 @@ namespace std {
         }else{
           readed = to_next-to;
         }
+        break;
       }
       return readed > 0;
     }
@@ -515,6 +516,7 @@ namespace std {
         }else{
           readed = to_next-to;
         }
+        break;
       }
       return readed > 0;
     }
@@ -681,6 +683,7 @@ namespace std {
           break;
         }
         bom_size = 0;
+        break;
       }
       return enc;
     }
