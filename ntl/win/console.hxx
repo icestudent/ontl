@@ -477,7 +477,7 @@ protected:
     streamsize readed = 0;
     NTL__SUBSYSTEM_NS::file_handler f; f.reset(outh);
     __ntl_try{
-      do{
+      for(;;){
         streamsize cb = std::min(max_size*sizeof(fromT), _countof(buf));
         if(!NTL__SUBSYSTEM_NS::success(f.read(buf, static_cast<uint32_t>(cb))))
           break;
@@ -495,7 +495,8 @@ protected:
         }else{
           readed = to_next-where;
         }
-      }while(0);
+        break;
+      }
     }
     __ntl_catch(...){
       f.release();
