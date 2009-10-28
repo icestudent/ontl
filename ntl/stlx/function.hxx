@@ -213,6 +213,12 @@ namespace std
         {
           assign_impl<F>(f);
         }
+        template<typename F>
+        explicit function(_rvalue<F> f)
+          :caller()
+        {
+          assign_impl<F>(f);
+        }
 
         ///** Constructs function wrapper from copy of callable \c f */
         //template<typename F>
@@ -224,6 +230,12 @@ namespace std
 
         /** Copies \c f to this wrapper */
         template<class F> function& operator=(const F& f) 
+        {
+          clear();
+          assign_impl<F>(f);
+          return *this;
+        }
+        template<class F> function& operator=(_rvalue<F> f) 
         {
           clear();
           assign_impl<F>(f);
@@ -323,6 +335,11 @@ namespace std
 
     #ifndef NTL__CXX_RV
         template<class Fn> inline void assign_impl(const Fn& f)
+        {
+          if(check_ptr(f, is_pointer<Fn>()))
+            caller = new impl::fun_caller<result_type, Fn, Args>(f);
+        }
+        template<class Fn> inline void assign_impl(_rvalue<Fn> f)
         {
           if(check_ptr(f, is_pointer<Fn>()))
             caller = new impl::fun_caller<result_type, Fn, Args>(f);

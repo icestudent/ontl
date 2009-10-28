@@ -19,10 +19,6 @@
 #include "../nt/event.hxx"
 #include "thread.hxx"
 
-#if !defined(NTL__CXX_RV)
-#error not implemented yet
-#endif
-
 namespace std
 {
   /**
@@ -420,15 +416,15 @@ namespace std
   template <class R>
   class unique_future 
   {
-    unique_future(const unique_future& rhs) __deleted;
-    unique_future& operator=(const unique_future& rhs) __deleted;
-
     typedef typename __::future_result<R>::type result_type;
     typedef unique_ptr<__::future_data<R> > unique_data_ptr;
   public:
+    unique_future(const unique_future& rhs) __deleted;
+    unique_future& operator=(const unique_future& rhs) __deleted;
+
     /** Move constructs a unique_future object whose associated state is the same as the state of \p x before. */
-    unique_future(unique_future&& x)
-      :data(move(x.data))
+    unique_future(__rvalue(unique_future) x)
+      :data(move(static_cast<unique_future&>(x).data))
     {}
 
     /** destroys \c *this and its associated state if no other object refers to that. */
@@ -494,7 +490,7 @@ namespace std
   protected:
     friend class __::promise<R>;
     ///\cond __
-    explicit unique_future(unique_data_ptr&& p)
+    explicit unique_future(__rvalue(unique_data_ptr) p)
       :data(move(p))
     {}
 
@@ -521,16 +517,17 @@ namespace std
   template <class R>
   class shared_future
   {
-    shared_future& operator=(const shared_future& rhs) __deleted;
-
     typedef typename __::future_result<R>::type rt0;
     typedef typename conditional<is_void<R>::value||is_reference<R>::value,rt0,typename add_const<rt0>::type>::type result_type;
+
   public:
+    shared_future& operator=(const shared_future& rhs) __deleted;
+
     shared_future(const shared_future& x)
       :data(x.data)
     {}
-    shared_future(unique_future<R>&& x)
-      :data(move(x.data))
+    shared_future(__rvalue(unique_future<R>) x)
+      :data(move(static_cast<unique_future<R>&>(x).data))
     {}
     ~shared_future()
     {}
@@ -606,16 +603,17 @@ namespace std
     template <class R>
     class promise
     {
-      promise(const promise& rhs) __deleted;
-      promise & operator=(const promise& rhs) __deleted;
-
       typedef __::future_result<R> feature_result;
       typedef typename feature_result::type result_type;
       typedef unique_ptr<__::future_data<R> > unique_data_ptr;
+
     public:
+      promise(const promise& rhs) __deleted;
+      promise & operator=(const promise& rhs) __deleted;
+
       promise()
       {}
-      promise(promise&& x)
+      promise(__rvalue(promise) x)
         :data(move(x.data)), retrieved(move(x.retrieved))
       {}
 
@@ -637,7 +635,7 @@ namespace std
       }
 
       ///\name assignment
-      promise& operator=(promise&& x)
+      promise& operator=(__rvalue(promise) x)
       {
         if(this != &x)
           data = move(x.data),
@@ -648,7 +646,6 @@ namespace std
       void swap(promise& x)
       {
         data.swap(x.data);
-        //std::swap(retrieved, x.retrieved);
         retrieved.swap(x.retrieved);
       }
       
@@ -665,7 +662,7 @@ namespace std
         }
         retrieved = true;
         check();
-        return unique_future<R>(data);
+        return unique_future<R>(move(data));
       }
       
       ///\name setting the result
@@ -717,7 +714,7 @@ namespace std
       data->set(r, ec);
     }
     ///\copydoc set_value
-    void set_value(R&& r, error_code& ec = throws()) __ntl_throws(future_error)
+    void set_value(__rvalue(R) r, error_code& ec = throws()) __ntl_throws(future_error)
     {
       check();
       data->set(forward<R>(r), ec);
@@ -759,9 +756,6 @@ namespace std
     {
       typedef unique_ptr<__::future_data<R> > unique_data_ptr;
 
-      // no copy
-      packaged_task(packaged_task&) __deleted;
-      packaged_task& operator=(packaged_task&) __deleted;
     public:
       typedef R result_type;
 
@@ -772,12 +766,15 @@ namespace std
       ~packaged_task() __ntl_throws(future_error)
       {} // ~promise() throws(broken_future)
 
+      packaged_task(packaged_task&) __deleted;
+      packaged_task& operator=(packaged_task&) __deleted;
+
       ///\name move support
-      packaged_task(packaged_task&& x)
+      packaged_task(__rvalue(packaged_task) x)
         :data(move(x.data)), f(move(x.f))
       {} // TODO: must be atomic
 
-      packaged_task& operator=(packaged_task&& x)
+      packaged_task& operator=(__rvalue(packaged_task) x)
       {
         if(this != &x){
           data = move(x.data);
@@ -787,26 +784,28 @@ namespace std
       }
       ///\}
 
-      void swap(packaged_task&& x)
+      void swap(packaged_task& x)
       {
         // TODO: must be atomic
-        data.swap(x.data);
-        f.swap(data.f);
+        using std::swap;
+        swap(x.data);
+        swap(data.f);
       }
 
       /** Returns \c true only if *this has an associated task. */
-  #ifdef NTL__CXX_EXPLICITOP
-      explicit operator bool() const
-  #else
-      operator explicit_bool_type() const
+      __explicit_operator_bool() const
       {
         return f.operator explicit_bool_type();
       }
-  #endif
 
       // result retrieval
       /** Returns a unique_future object associated with the result of the associated task of *this. */
-      unique_future<R> get_future(error_code& ec = throws()) __ntl_throws(bad_function_call)
+#ifdef NTL__CXX_RV
+      unique_future<R>
+#else
+      _rvalue<unique_future<R> >
+#endif
+        get_future(error_code& ec = throws()) __ntl_throws(bad_function_call)
       {
         error_code e;
         unique_future<R> r = data.get_future(e);
@@ -816,7 +815,7 @@ namespace std
           else
             ec = e;
         }
-        return r;
+        return move(r);
       }
 
       void reset()
@@ -885,7 +884,7 @@ namespace std
       this->f = move(f);
     }
     template <class F>
-    explicit packaged_task(F&& f)
+    explicit packaged_task(__rvalue(F) f)
     {this->f = forward<F>(f);}
 
     inline void operator()()
@@ -908,7 +907,7 @@ namespace std
     explicit packaged_task(R(*f)())
     {this->f = move(f);}
     template <class F>
-    explicit packaged_task(F&& f)
+    explicit packaged_task(__rvalue(F) f)
     {this->f = forward<F>(f);}
 
     void operator()(A1 a1)
@@ -931,7 +930,7 @@ namespace std
     explicit packaged_task(R(*f)())
     {this->f = move(f);}
     template <class F>
-    explicit packaged_task(F&& f)
+    explicit packaged_task(__rvalue(F) f)
     {this->f = forward<F>(f);}
     void operator()(A1 a1, A2 a2)
     {

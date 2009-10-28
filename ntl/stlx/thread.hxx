@@ -94,10 +94,6 @@ namespace std
    **/
   class thread
   {
-#ifdef NTL__CXX_RV
-    thread(const thread&) __deleted;
-    thread& operator=(const thread&) __deleted;
-#endif
   public:
     // types:
     class id;
@@ -120,6 +116,9 @@ namespace std
         detach();
     }
 
+    thread(const thread&) __deleted;
+    thread& operator=(const thread&) __deleted;
+
     /**
      *	@brief Constructs an object and executes \c f in a new %thread of execution.
      *  @param[in] f Callable object that will be called in the new %thread context
@@ -136,13 +135,8 @@ namespace std
     template <class F, class A1, class A2, class A3> thread(F f, A1 a1, A2 a2, A3 a3);
   #endif
 
-  #ifdef NTL__CXX_RV
-    thread(thread&&);
-    thread& operator=(thread&&);
-  #else
-    thread(const thread& r);
-    thread& operator=(const thread& r);
-  #endif
+    thread(__rvalue(thread) r);
+    thread& operator=(__rvalue(thread) r);
 
     /** Swaps the current object's state with \c r */
     void swap(const thread& r) __ntl_nothrow;
@@ -389,37 +383,19 @@ namespace std
       ::exitstatus(h) == ntl::nt::status::still_active; // may be faster
   }
 
-#ifdef NTL__CXX_RV
-  inline thread::thread(thread&& r)
+  inline thread::thread(__rvalue(thread) r)
     :h(), tid()
   {
     swap(r);
   }
 
-  inline thread& thread::operator=(thread&& r)
+  inline thread& thread::operator=(__rvalue(thread) r)
   {
     error_code ec;
     if(joinable())
       detach(ec);
     swap(r);
   }
-
-#else
-  inline thread::thread(const thread& r)
-    :h(), tid()
-  {
-    swap(r);
-  }
-
-  inline thread& thread::operator=(const thread& r) __ntl_nothrow
-  {
-    error_code ec;
-    if(joinable())
-      detach(ec);
-    swap(r);
-  }
-
-#endif
 
   // members:
   inline void thread::swap(const thread& r) __ntl_nothrow

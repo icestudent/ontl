@@ -293,24 +293,22 @@ namespace std
         m->unlock();
     }
 
-#ifdef NTL__CXX_RV
-    unique_lock(unique_lock&& u) __ntl_nothrow
+    unique_lock(__rvalue(unique_lock) u) __ntl_nothrow
       :m(), owns(false)
     {
       swap(u);
     }
 
-    unique_lock& operator=(unique_lock&& u) __ntl_nothrow
+    unique_lock& operator=(__rvalue(unique_lock) u) __ntl_nothrow
     {
       if(owns)
         m->unlock();
-      m = u.m,
-        owns = u.owns;
+      m = __lvalue(u)->m,
+        owns = __lvalue(u)->owns;
       u.m = nullptr,
-        u.owns = false;
+        __lvalue(u)->owns = false;
       return *this;
     }
-#endif
 
     // 30.3.3.2.2 locking
     void lock() __ntl_throws(system_error)
@@ -349,14 +347,11 @@ namespace std
     }
     
     // 30.3.3.2.3 modifiers
-#ifdef NTL__CXX_RV
-    void swap(unique_lock&& u) __ntl_nothrow
-#else
     void swap(unique_lock& u) __ntl_nothrow
-#endif
     {
-      std::swap(m, u.m);
-      std::swap(owns, u.owns);
+      using std::swap;
+      swap(m, u.m);
+      swap(owns, u.owns);
     }
 
     mutex_type *release() __ntl_nothrow
@@ -371,11 +366,7 @@ namespace std
     bool owns_lock() const __ntl_nothrow    { return owns; }
     mutex_type* mutex() const __ntl_nothrow { return m;    }
 
-    #ifdef NTL__CXX_EXPLICITOP
-    explicit operator bool () const;
-    #else
-    operator __::explicit_bool_type() const __ntl_nothrow { return __::explicit_bool(owns); }
-    #endif
+    __explicit_operator_bool() const __ntl_nothrow { return __explicit_bool(owns); }
 
   private:
     mutex_type *m;
