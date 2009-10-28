@@ -13,6 +13,29 @@
 /**\defgroup    lib_support_rtti ******* 18.6 Type identification [support.rtti]
  * @{ */
 
+#ifndef STLX__USE_RTTI
+  #if defined(_MSC_VER)
+    #ifdef _CPPRTTI
+      #ifdef NTL_KM
+        #pragma message("Kernel mode RTTI support was not implemented yet")
+        #define STLX__USE_RTTI 0
+      #else
+        #define STLX__USE_RTTI 1
+      #endif
+    #else
+      #define STLX__USE_RTTI 0
+    #endif
+  #elif defined(__GNUC__)
+    #ifdef __GXX_RTTI
+      #define STLX__USE_RTTI 1
+    #else
+      #define STLX__USE_RTTI 0
+    #endif
+  #else
+    #error define STLX__USE_RTTI
+  #endif
+#endif
+
 #ifndef NTL__STLX_CSTRING
 #include "cstring.hxx" // for std::strcmp
 #endif
@@ -86,7 +109,7 @@ class type_info
       return mname(); 
     }
 #else
-      ;// use definition in rtti.cpp
+    ;// use definition in rtti.cpp
 #endif
 
   private:
