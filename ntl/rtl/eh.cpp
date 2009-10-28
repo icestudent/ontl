@@ -16,6 +16,8 @@
 #include "../pe/image.hxx"
 #endif
 
+#include "../atomic.hxx"
+#include "../stlx/cstdlib.hxx"
 #include "../nt/exception.hxx"
 #include "../nt/context.hxx"
 #include "../nt/status.hxx"
