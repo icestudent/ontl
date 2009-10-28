@@ -1,13 +1,15 @@
-#include "../stlx/new.hxx" // for buffer allocation; otherwise it produces Compiler Error C2748 at console_buffer::init() o_0
+#ifdef NTL__SUBSYSTEM_KM
+# include "../km/basedef.hxx"
+# include "../km/new.hxx"
+#else
+# include "../nt/basedef.hxx"
+# include "../nt/new.hxx"
+#endif
+//#include "../stlx/new.hxx" // for buffer allocation; otherwise it produces Compiler Error C2748 at console_buffer::init() o_0
 #include "../stlx/iostream.hxx"
 #include "../win/console.hxx"
 #include "../atomic.hxx"
 
-#ifdef NTL__SUBSYSTEM_KM
-# include "../km/new.hxx"
-#else
-# include "../nt/new.hxx"
-#endif
 
 extern "C" void _cdecl __init_iostream_objects(bool init);
 
