@@ -52,9 +52,11 @@ template <class T> struct add_cv { typedef const volatile T type; };
 
 template <class T> struct remove_reference     { typedef T type; };
 template <class T> struct remove_reference<T&> { typedef T type; };
-#ifdef NTL__CXX_RV
+# ifdef NTL__CXX_RV
 template <class T> struct remove_reference<T&&> { typedef T type; };
-#endif
+# else
+template <class T> struct remove_reference<_rvalue<T> > { typedef T type; };
+# endif
 
 template <class T> struct add_lvalue_reference     { typedef T& type; };
 template <class T> struct add_lvalue_reference<T&> { typedef T& type; };
@@ -63,8 +65,9 @@ template <class T> struct add_rvalue_reference     { typedef T&& type; };
 template <class T> struct add_rvalue_reference<T&> { typedef T&& type; };
 template <class T> struct add_rvalue_reference<T&&>{ typedef T&& type; };
 #else
-template <class T> struct add_rvalue_reference     { typedef T& type; };
-template <class T> struct add_rvalue_reference<T&> { typedef T& type; };
+template <class T> struct add_rvalue_reference     { typedef _rvalue<T> type; };
+template <class T> struct add_rvalue_reference<T&> { typedef _rvalue<T> type; };
+template <class T> struct add_rvalue_reference<_rvalue<T> > { typedef _rvalue<T> type; };
 #endif
 
 template <class T> struct add_reference : public add_lvalue_reference<T> {};
@@ -308,6 +311,8 @@ template <class T> struct is_lvalue_reference<T&> : public true_type {};
 template <class T> struct is_rvalue_reference     : public false_type {};
 #ifdef NTL__CXX_RV
 template <class T> struct is_rvalue_reference<T&&>: public true_type {};
+#else
+template <class T> struct is_rvalue_reference<_rvalue<T> >: public true_type {};
 #endif
 
 template <class T>

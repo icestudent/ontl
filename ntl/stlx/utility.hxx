@@ -82,15 +82,13 @@ bool operator>=(const T & x, const T & y) { return !(x < y); }
   }
 # else
   template <class T>
-  inline
-  T&& forward(typename identity<T>::type&& t)
+  inline T&& forward(typename identity<T>::type&& t)
   {
     return t;
   }
 
   template <class T> 
-  inline
-  typename remove_reference<T>::type&& move(T&& t)
+  inline typename remove_reference<T>::type&& move(T&& t)
   {
     return t;
   }
@@ -104,6 +102,27 @@ bool operator>=(const T & x, const T & y) { return !(x < y); }
     const T& operator()(const T& x) const { return x; }
   };
 
+# if 1
+  ///\name move emulation
+
+  template<typename T>
+  inline typename enable_if<std::is_convertible<T&, _rvalue<T> >::value, _rvalue<T> >::type move(const T& t)
+  {
+    return _rvalue<T>(t);
+  }
+
+  template <class T>
+  inline _rvalue<T> forward(const typename identity<T>::type& t) { return t; }
+
+  template <class T>
+  inline _rvalue<T> forward(_rvalue<T> t) { return t; }
+
+  template<typename T>
+  inline _rvalue<T> move(_rvalue<T> t) { return t; }
+  ///\}
+
+# else
+
   template <class T>
   inline const T& forward(const typename identity<T>::type& t) { return t; }
 
@@ -112,7 +131,7 @@ bool operator>=(const T & x, const T & y) { return !(x < y); }
 
   template <class T>
   inline const T& move(const T& t) { return t; }
-
+# endif
 #endif
 #pragma endregion
 

@@ -477,7 +477,6 @@ namespace ntl
   }
 }
 
-
 namespace std {
 
 /**\defgroup  lib_language_support ***** 18 Language support library [language.support]
@@ -615,6 +614,8 @@ static_assert(sizeof(nullptr)==sizeof(void*), "3.9.1.10: sizeof(std::nullptr_t) 
   using std::ptrdiff_t;
   using std::size_t;
 #endif
+
+#include "move.hxx"
 
 /// _countof macro to calculate array length in compile time
 template <typename T, size_t N>
