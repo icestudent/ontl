@@ -85,7 +85,9 @@ NTL__EXTERNAPI
 ntstatus __stdcall ZwFlushBuffersFile(legacy_handle FileHandle, io_status_block* IoStatusBlock);
 
 using nt::ZwQueryFullAttributesFile;
-using nt::ZwDeleteFile;
+
+NTL__EXTERNAPI
+ntstatus __stdcall ZwDeleteFile(const object_attributes& ObjectAttributes);
 
 
 ///@}
