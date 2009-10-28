@@ -466,7 +466,7 @@ namespace std {
       char_type* to_next;
       fromT buf[1024];
       const fromT *from_next;
-      do{
+      for(;;){
         streamsize cb = min(read_size*sizeof(fromT), _countof(buf));
         if(!NTL__SUBSYSTEM_NS::success(f.read(buf, static_cast<uint32_t>(cb))))
           break;
@@ -484,7 +484,7 @@ namespace std {
         }else{
           readed = to_next-to;
         }
-      }while(0);
+      }
       return readed > 0;
     }
     template<typename fromT>
@@ -497,7 +497,7 @@ namespace std {
       char_type* to_next;
       fromT buf[1024];
       const fromT *from_next;
-      do{
+      for(;;){
         streamsize cb = min(read_size*sizeof(fromT), _countof(buf));
         if(!NTL__SUBSYSTEM_NS::success(f.read(buf, static_cast<uint32_t>(cb))))
           break;
@@ -515,7 +515,7 @@ namespace std {
         }else{
           readed = to_next-to;
         }
-      }while(0);
+      }
       return readed > 0;
     }
 
@@ -663,7 +663,7 @@ namespace std {
         utf8 = 0xBFBBFE;
       
       bom_size = 4;
-      do {
+      for(;;){
         if(bom == utf32_le || bom == utf32_be){ // 4 bytes
           //if(bom == utf32_le) enc = Encoding::Utf32; // not supported
           break;
@@ -681,7 +681,7 @@ namespace std {
           break;
         }
         bom_size = 0;
-      }while(0);
+      }
       return enc;
     }
 

@@ -307,7 +307,7 @@ class vector
       if(new_end < end_)
         erase(new_end, end_);
       else if(new_end > end_)
-        insert__impl(end_, new_end - end_, std::move(T()));
+        insert__impl(end_, new_end - end_, T());
     }
 
     void resize(size_type sz, const T& c)

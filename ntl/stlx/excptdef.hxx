@@ -27,6 +27,35 @@
   #endif
 #endif
 
+#ifndef STLX__USE_RTTI
+  #if defined(_MSC_VER)
+    #ifdef _CPPRTTI
+      #ifdef NTL_KM
+        #pragma message("Kernel mode RTTI support was not implemented yet")
+        #define STLX__USE_RTTI 0
+      #else
+        #define STLX__USE_RTTI 1
+      #endif
+    #else
+      #define STLX__USE_RTTI 0
+    #endif
+  #elif defined(__GNUC__)
+    #ifdef __GXX_RTTI
+      #define STLX__USE_RTTI 1
+    #else
+      #define STLX__USE_RTTI 0
+    #endif
+  #else
+    #error define STLX__USE_RTTI
+  #endif
+#endif
+
+#if (STLX__USE_EXCEPTIONS == 1) && (STLX__USE_RTTI == 0)
+// C++ exceptions with the disabled RTTI
+# undef  STLX__USE_EXCEPTIONS
+# define STLX__USE_EXCEPTIONS 3
+#endif
+
 #if STLX__USE_EXCEPTIONS == 1
   // C++ exceptions
   #define __ntl_try       try
@@ -48,6 +77,15 @@
   #define __ntl_rethrow (0)
   #define __ntl_throws(...)
   #define __ntl_nothrow
+
+#elif STLX__USE_EXCEPTIONS == 3
+  // C++ exceptions without RTTI
+  #define __ntl_try       try
+  #define __ntl_catch     catch
+  #define __ntl_throw(X)  throw X
+  #define __ntl_rethrow   throw
+  #define __ntl_throws(...)
+  #define __ntl_nothrow   
 
 
 #else
