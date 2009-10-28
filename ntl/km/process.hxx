@@ -1353,7 +1353,7 @@ void __stdcall
 
 typedef
 nt::peb * __stdcall
-  get_process_peb_t(kprocess * Process);
+  get_process_peb_t(kprocess const* Process);
 
 // XP+ only
 NTL__EXTERNAPI
