@@ -226,6 +226,17 @@ T align_down(T what, T2 alignment)
   return (what / alignment) * alignment;
 }
 
+template<typename T, typename U>
+inline T padd(T p, U offset)
+{
+  return (T)( uintptr_t(p) + uintptr_t(offset) );
+}
+
+template<typename R, typename T, typename U>
+inline R padd(T p, U offset)
+{
+  return (R)( uintptr_t(p) + uintptr_t(offset) );
+}
 
 ///@}
 

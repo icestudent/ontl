@@ -245,6 +245,17 @@ typedef native_string<const wchar_t>  const_unicode_string;
 typedef native_string<char>           ansi_string;
 typedef native_string<const char>     const_ansi_string;
 
+template<typename char_type>
+struct raw_native_string
+{
+  uint16_t    length_;
+  uint16_t    max_length_;
+  char_type*  buffer_;
+};
+
+typedef raw_native_string<char>     raw_ansi_string;
+typedef raw_native_string<wchar_t>  raw_unicode_string;
+
 
 /**@} native_types_support */
 

@@ -4,7 +4,6 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__WIN_CONSOLEAPP
 #define NTL__WIN_CONSOLEAPP
 
@@ -57,7 +56,6 @@ int _Consoleapp_entry()
 {
   #ifdef _MSC_VER
   (void)__security_cookie;
-  (void)&__init_crt_stub;
   (void)&__console_abort;
   #endif
 
@@ -68,6 +66,7 @@ int _Consoleapp_entry()
 
   // for explicit instantiation to eliminate annoyed including "nt/new.hxx"
   new char, new char[0], new (std::nothrow) char, new(std::nothrow) char[0];
+  __init_crt_stub();
 }
 #pragma warning(pop)
 

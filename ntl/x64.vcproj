@@ -298,6 +298,10 @@
 					RelativePath=".\stlx\0order.hxx"
 					>
 				</File>
+				<File
+					RelativePath=".\stlx\move.hxx"
+					>
+				</File>
 				<Filter
 					Name=".ext"
 					>
@@ -1384,6 +1388,10 @@
 				</File>
 				<File
 					RelativePath=".\linked_ptr.hxx"
+					>
+				</File>
+				<File
+					RelativePath=".\nativeapp.hxx"
 					>
 				</File>
 				<File

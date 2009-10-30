@@ -70,8 +70,7 @@ namespace std
 
     inline const native_error_category& native_category()
     {
-      static const native_error_category native_category_;
-      return native_category_;
+      return *std::__::static_storage<native_error_category>::get_object();
     }
 
     inline error_code make_error_code(native_error::ntstatus st)

@@ -14,11 +14,6 @@
 #include "../stlx/future.hxx"
 #endif
 
-namespace
-{
-  static const std::__::iostream_error_category iostream_category_instance;
-}
-
 namespace std
 {
   // TODO: implement generic error value mapping to the current subsystem error values

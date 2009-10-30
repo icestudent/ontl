@@ -12,6 +12,10 @@
 #include "type_traits.hxx"
 #endif
 
+#ifndef NTL__BASEDEF
+#include "../basedef.hxx" // for noncopyable
+#endif
+
 /// Standard Template Library
 namespace std 
 {

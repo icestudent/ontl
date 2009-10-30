@@ -70,4 +70,23 @@ inline void __ntl_assert(const char* expr, const char* file, int line)
 
 //}//namespace std
 
+#ifdef _MSC_VER
+namespace std 
+{
+  namespace __
+  {
+    extern "C" inline void __cdecl purecall_handler(void)
+    {
+      _assert_msg("pure virtual function called");
+    }
+    static void (__cdecl *__pchandler__)() = &purecall_handler;
+  }
+}
+#ifdef _M_X64
+# pragma comment(linker, "/alternatename:_purecall=purecall_handler")
+#else
+# pragma comment(linker, "/alternatename:__purecall=_purecall_handler")
+#endif
+
+#endif // msc
 #endif//#ifndef NTL__STLX_CASSERT

@@ -17,6 +17,10 @@
 #include "iosfwd.hxx"
 #endif
 
+#ifndef NTL__STLX_CASSERT
+#include "cassert.hxx"
+#endif
+
 namespace std 
 {
 
@@ -438,22 +442,20 @@ private:
   /** Returns a reference to an object of a type derived from class error_category. */
   inline const error_category& generic_category()
   {
-    static const __::generic_error_category instance;
-    return instance;
+    //static const __::generic_error_category instance;
+    return *__::static_storage<__::generic_error_category>::get_object();
   }
 
   /** Returns a reference to an object of a type derived from class error_category. */
   inline const error_category& system_category()
   {
-    static const __::system_error_category instance;
-    return instance;
+    return *__::static_storage<__::system_error_category>::get_object();
   }
 
   /** Returns a reference to an object of a type derived from class error_category. */
   inline const error_category& iostream_category()
   {
-    static const __::iostream_error_category instance;
-    return instance;
+    return *__::static_storage<__::iostream_error_category>::get_object();
   }
 
   //////////////////////////////////////////////////////////////////////////

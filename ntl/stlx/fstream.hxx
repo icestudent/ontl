@@ -146,7 +146,7 @@ namespace std {
         return -1;
 
       streamsize avail = egptr()-gptr(),
-        in_avail = f.size() - f.tell();
+        in_avail = static_cast<streamsize>(f.size() - f.tell());
       if(in_avail){
         if((mode & ios_base::binary) || encoding == Encoding::Default)
           in_avail /= sizeof(char_type);

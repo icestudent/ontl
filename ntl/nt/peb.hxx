@@ -42,9 +42,45 @@ static const unsigned rtl_max_drive_letters = 32;
 
 struct rtl_user_process_parameters
 {
+  enum flags {
+    params_normalized     = 0x00000001,
+    profile_user          = 0x00000002,
+    profile_kernel        = 0x00000004,
+    profile_server        = 0x00000008,
+    reserve_1mb           = 0x00000020,
+    reserve_16mb          = 0x00000040,
+    case_sensitive        = 0x00000080,
+    disable_heap_decommit = 0x00000100
+  };
+  __ntl_bitmask_type(flags, friend)
+private:
+  __forceinline
+  void patch_string(unicode_string& us)
+  {
+    raw_unicode_string& rus = reinterpret_cast<raw_unicode_string&>(us);
+    if(rus.buffer_)
+      rus.buffer_ = ntl::padd(rus.buffer_, this);
+  }
+public:
+  void normalize()
+  {
+    if(Flags & params_normalized)
+      return;
+
+    patch_string(CurrentDirectory.DosPath);
+    patch_string(DllPath);
+    patch_string(ImagePathName);
+    patch_string(CommandLine);
+    patch_string(WindowTitle);
+    patch_string(DesktopInfo);
+    patch_string(ShellInfo);
+    patch_string(RuntimeData);
+    Flags |= params_normalized;
+  }
+
 	/* 0x0 */ /*|0x4|*/ uint32_t MaximumLength;
 	/* 0x4 */ /*|0x4|*/ uint32_t Length;
-	/* 0x8 */ /*|0x4|*/ uint32_t Flags;
+	/* 0x8 */ /*|0x4|*/ flags    Flags;
 	/* 0xc */ /*|0x4|*/ uint32_t DebugFlags;
 	/* 0x10 */ /*|0x4|*/ legacy_handle ConsoleHandle;
 	/* 0x14 */ /*|0x4|*/ uint32_t ConsoleFlags;
@@ -163,6 +199,15 @@ struct peb
   peb& instance()
   {
     return *teb::get(&teb::ProcessEnvironmentBlock);
+  }
+
+  __forceinline
+  rtl_user_process_parameters* process_parameters()
+  {
+    if(ProcessParameters && !(ProcessParameters->Flags & rtl_user_process_parameters::params_normalized)){
+      ProcessParameters->normalize();
+    }
+    return ProcessParameters;
   }
 
   struct ldr_data

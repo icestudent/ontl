@@ -13,27 +13,17 @@
 #endif
 #endif
 
-#pragma region typeinfo::name implementation
-
-//#define CRT_UNDNAME
-
-#ifdef CRT_UNDNAME
-# include "../nt/new.hxx"
-namespace x
-{
-  void* __cdecl malloc(size_t size)
-  {
-    return new char[size];
-  }
-
-  void __cdecl free(void* p)
-  {
-    delete p;
-  }
-}
+#if !STLX__USE_RTTI
+#pragma message("This file needed only for ENABLED RTTI (see /GR).")
 #endif
 
-namespace __
+#pragma region typeinfo::name implementation
+
+#ifndef CRT_UNDNAME
+#define CRT_UNDNAME
+#endif
+
+namespace ntl { namespace __
 {
 #ifndef CRT_UNDNAME
   typedef size_t __stdcall undname_t(const char* signame, char* name, size_t length, uint32_t flags);
@@ -41,57 +31,57 @@ namespace __
   typedef void* __cdecl alloc_t(size_t);
   typedef void  __cdecl free_t(void*);
   typedef char* __cdecl undname_t(char* name, const char* signame, int max_size, alloc_t*, free_t*, uint16_t flags);
+
+  void* __cdecl alloc_f(size_t cb) { return new char[cb]; }
+  void  __cdecl free_f(void* p) { delete[] (char*)p; }
 #endif
 
-  static undname_t* undname = NULL;
+  static undname_t* undname = 0;
 
   bool init_undname()
   {
-    using namespace ntl;
     typedef pe::image* __stdcall dlopen_t(const char*);
-    nt::peb::find_dll fd(&nt::peb::instance());
+    nt::peb::find_dll fd;
     const pe::image* kernel = fd("kernel32.dll");
     dlopen_t* dlopen = kernel->find_export<dlopen_t*>("LoadLibraryA");
 #ifdef CRT_UNDNAME
-    const pe::image* crt = dlopen("msvcrt.dll");
-    if(crt)
-      undname = crt->find_export<undname_t*>("__unDName");
+    const char *dll = "msvcrt.dll", *func = "__unDName";
 #else
-    const pe::image* imagehlp = dlopen("imagehlp.dll");
-    if(imagehlp)
-      undname = imagehlp->find_export<undname_t*>("UnDecorateSymbolName");
+    const char *dll = "imagehlp.dll", *func = "UnDecorateSymbolName";
 #endif
-    return undname != NULL;
+    const pe::image* crt = dlopen(dll);
+    if(crt)
+      undname = crt->find_export<undname_t*>(func);
+    return undname != 0;
   }
-} // namespace __
+}
 
-namespace {
-  const char* undname(const char* signame)
-  {
-    if(!__::undname)
-      if(!__::init_undname())
-        return signame;
+const char* undname(const char* signame)
+{
+  if(!__::undname)
+    if(!__::init_undname())
+      return signame;
 
-    static const uint16_t flags = 0x2000; /* no_arguments */
+  static const uint16_t flags = 0x2000; /* no_arguments */
 
 #ifndef CRT_UNDNAME
-    char buf[4096];
-    size_t len = __::undname(signame+1, buf, sizeof(buf), flags);
-    if(!len)
-      return signame;
-    return std::strdup(buf);
+  char buf[4096];
+  size_t len = __::undname(signame+1, buf, sizeof(buf), flags);
+  if(!len)
+    return signame;
+  return std::strdup(buf);
 #else
-    return __::undname(0, signame+1, 0, x::malloc, x::free, flags);
+  return __::undname(0, signame+1, 0, __::alloc_f, __::free_f, flags);
 #endif
-  }
-} // namespace
+}
+} // namespace ntl
 
 //////////////////////////////////////////////////////////////////////////
 #ifdef _NTL_DEMANGLE
 const char* std::type_info::name() const __ntl_nothrow
 {
   if(!data)
-    data = const_cast<char*>(undname(mname()));
+    data = const_cast<char*>(ntl::undname(mname()));
   return reinterpret_cast<const char*>(data);
 }
 #endif
@@ -104,7 +94,10 @@ std::type_info::~type_info()
 #endif
 #pragma endregion
 
+
 #pragma region dynamic_cast implementation
+
+#if STLX__USE_RTTI
 
 namespace ptr
 {
@@ -456,5 +449,6 @@ extern "C" void* __cdecl __RTDynamicCast(void* object, int32_t vfdelta, void* sr
   return (void*)__RTDynamicCast(object, vfdelta, reinterpret_cast<ntl::cxxruntime::typeinfo&>(srctype), reinterpret_cast<ntl::cxxruntime::typeinfo&>(desttype), isreference != 0);
 }
 
+#endif // rtti
 #pragma endregion
 

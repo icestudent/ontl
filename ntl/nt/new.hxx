@@ -40,6 +40,9 @@ namespace std
 __forceinline
 void* __cdecl operator new(std::size_t size) throw(std::bad_alloc)
 {
+#ifdef NTL_NO_NEW_HANDLERS
+  return ntl::nt::heap::alloc(ntl::nt::process_heap(), size);
+#else
   void* ptr;
   for(;;) {
     ptr = ntl::nt::heap::alloc(ntl::nt::process_heap(), size);
@@ -56,6 +59,7 @@ void* __cdecl operator new(std::size_t size) throw(std::bad_alloc)
   #endif
     nh();
   }
+#endif
 }
 
 __forceinline
@@ -64,8 +68,8 @@ void __cdecl operator delete(void* ptr) __ntl_nothrow
   ntl::nt::heap::free(ntl::nt::process_heap(), ptr);
 }
 
-inline
-void __safe_call_new_handler(std::new_handler nh)
+#ifndef NTL_NO_NEW_HANDLERS
+inline void __safe_call_new_handler(std::new_handler nh)
 {
 #if STLX__USE_EXCEPTIONS == 1
     try {
@@ -73,7 +77,7 @@ void __safe_call_new_handler(std::new_handler nh)
     } 
     catch(const std::bad_alloc&){
     }
-#elif
+#else
     __try {
       nh();
     }
@@ -81,10 +85,14 @@ void __safe_call_new_handler(std::new_handler nh)
     }
 #endif
 }
+#endif 
 
 __forceinline
 void* __cdecl operator new(std::size_t size, const std::nothrow_t&) __ntl_nothrow
 {
+#ifdef NTL_NO_NEW_HANDLERS
+  return ntl::nt::heap::alloc(ntl::nt::process_heap(), size);
+#else
   void* ptr;
   for(;;) {
     ptr = ntl::nt::heap::alloc(ntl::nt::process_heap(), size);
@@ -95,7 +103,8 @@ void* __cdecl operator new(std::size_t size, const std::nothrow_t&) __ntl_nothro
     if ( nh )
       __safe_call_new_handler(nh);
     return 0;
-  } 
+  }
+#endif
 }
 
 __forceinline

@@ -240,9 +240,7 @@ namespace std
 
 extern "C" int _cdecl _purecall(void)
 {
-#pragma warning(disable:4127)
   _assert_msg("pure virtual function called!");
-#pragma warning(default:4127)
   debug_abort();
   abort();
   return 0;

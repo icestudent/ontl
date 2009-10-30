@@ -118,7 +118,7 @@ class type_info
     mutable void* data;
     const char* mname() const { return reinterpret_cast<const char*>(this + 1); }
 };
-STATIC_ASSERT(sizeof _TypeDescriptor == sizeof type_info);
+static_assert(sizeof _TypeDescriptor == sizeof type_info, "broken type");
 
 #if STLX__USE_RTTI && !defined(__ICL)
 inline type_info::~type_info()
