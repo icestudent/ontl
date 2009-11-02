@@ -4,10 +4,9 @@
  *
  ****************************************************************************
  */
-
-
 #ifndef NTL__HANDLE
 #define NTL__HANDLE
+#pragma once
 
 #include "stlx/cstdint.hxx"
 #include "stlx/excptdef.hxx"

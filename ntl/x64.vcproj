@@ -298,15 +298,15 @@
 					RelativePath=".\stlx\0order.hxx"
 					>
 				</File>
-				<File
-					RelativePath=".\stlx\move.hxx"
-					>
-				</File>
 				<Filter
 					Name=".ext"
 					>
 					<File
 						RelativePath=".\stlx\ext\circular_buffer.hxx"
+						>
+					</File>
+					<File
+						RelativePath=".\stlx\cpp0x_mode.hxx"
 						>
 					</File>
 					<File
@@ -522,6 +522,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\stlx\cmath.hxx"
+						>
+					</File>
+					<File
 						RelativePath=".\stlx\cstdarg.hxx"
 						>
 					</File>
@@ -675,6 +679,10 @@
 					</File>
 					<File
 						RelativePath=".\stlx\memory.hxx"
+						>
+					</File>
+					<File
+						RelativePath=".\stlx\move.hxx"
 						>
 					</File>
 					<File
@@ -1348,6 +1356,14 @@
 				>
 				<File
 					RelativePath=".\atomic.hxx"
+					>
+				</File>
+				<File
+					RelativePath=".\baseconf.hxx"
+					>
+				</File>
+				<File
+					RelativePath=".\baseconf_0x.hxx"
 					>
 				</File>
 				<File

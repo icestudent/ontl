@@ -6,6 +6,7 @@
  */
 #ifndef NTL__NT_EVENT
 #define NTL__NT_EVENT
+#pragma once
 
 #include "basedef.hxx"
 #include "../device_traits.hxx"

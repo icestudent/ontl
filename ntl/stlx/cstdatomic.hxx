@@ -7,6 +7,7 @@
 
 #ifndef NTL__STLX_ATOMIC
 #define NTL__STLX_ATOMIC
+#pragma once
 
 #include "../atomic.hxx"
 #include "cassert.hxx"

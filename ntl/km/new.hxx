@@ -4,9 +4,9 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__KM_NEW
 #define NTL__KM_NEW
+#pragma once
 
 namespace ntl {
   namespace km {

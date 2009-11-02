@@ -4,9 +4,9 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__KM_EVENT
 #define NTL__KM_EVENT
+#pragma once
 
 #include "basedef.hxx"
 #include "../nt/event.hxx"

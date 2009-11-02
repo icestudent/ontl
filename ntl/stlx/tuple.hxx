@@ -6,6 +6,7 @@
  */
 #ifndef NTL__STLX_TUPLE
 #define NTL__STLX_TUPLE
+#pragma once
 
 #define TTL_MAX_TEMPLATE_PARAMS 5
 #define STLX_ENABLE_TUPLE_RELATIONS

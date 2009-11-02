@@ -4,9 +4,9 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__STLX_TYPE_TRAITS_FWD
 #define NTL__STLX_TYPE_TRAITS_FWD
+#pragma once
 
 namespace std 
 {

@@ -4,9 +4,9 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__STLX_CFLOAT
 #define NTL__STLX_CFLOAT
+#pragma once
 
 namespace std {
 

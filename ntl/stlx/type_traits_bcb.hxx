@@ -4,9 +4,9 @@
  *  C++ builder version
  ****************************************************************************
  */
-
 #ifndef NTL__STLX_TYPE_TRAITS_BCB
 #define NTL__STLX_TYPE_TRAITS_BCB
+#pragma once
 
 #ifndef NTL__IN_STLX_TYPE_TRAITS
   #error Always include this file through <type_traits>.

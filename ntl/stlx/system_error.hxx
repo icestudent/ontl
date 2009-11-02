@@ -6,6 +6,7 @@
  */
 #ifndef NTL__STLX_SYSTEM_ERROR
 #define NTL__STLX_SYSTEM_ERROR
+#pragma once
 
 #ifndef NTL__STLX_TYPE_TRAITS
 #include "type_traits.hxx"

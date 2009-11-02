@@ -6,6 +6,7 @@
  */
 #ifndef NTL__STLX_FNCALLER_RV
 #define NTL__STLX_FNCALLER_RV
+#pragma once
 
 #ifndef NTL_RESULT_OF_HXX
 # include "result_of.hxx"

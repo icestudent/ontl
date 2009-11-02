@@ -6,6 +6,7 @@
  */
 #ifndef NTL__KM_THREAD
 #define NTL__KM_THREAD
+#pragma once
 
 #include "basedef.hxx"
 #include "object.hxx"

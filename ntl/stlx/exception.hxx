@@ -7,6 +7,7 @@
 
 #ifndef NTL__STLX_EXCEPTION
 #define NTL__STLX_EXCEPTION
+#pragma once
 
 #ifndef NTL__STLX_CSTDDEF
 # include "cstddef.hxx"

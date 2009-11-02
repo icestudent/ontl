@@ -6,6 +6,7 @@
  **/
 #ifndef NTL__KM_FLTMGR
 #define NTL__KM_FLTMGR
+#pragma once
 
 #include "handle.hxx"
 #include "driver_object.hxx"

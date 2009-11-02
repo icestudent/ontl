@@ -4,9 +4,9 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__STLX_STREAMBUF
 #define NTL__STLX_STREAMBUF
+#pragma once
 
 #include "locale.hxx"
 

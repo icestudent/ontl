@@ -4,9 +4,9 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__KM_PROCESS
 #define NTL__KM_PROCESS
+#pragma once
 
 #include "basedef.hxx"
 #include "apc.hxx"

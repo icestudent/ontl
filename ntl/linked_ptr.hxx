@@ -4,9 +4,9 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__LINKED_PTR
 #define NTL__LINKED_PTR
+#pragma once
 
 #include "linked_list.hxx"
 #include "stdlib.hxx"

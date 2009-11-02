@@ -10,6 +10,7 @@
 
 #ifndef __ttl_macro_repeat__hpp
 #define __ttl_macro_repeat__hpp
+#pragma once
 
 #include "macro_counter.hxx"
 

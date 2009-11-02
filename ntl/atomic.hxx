@@ -4,9 +4,9 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__ATOMIC
 #define NTL__ATOMIC
+#pragma once
 
 #ifndef NTL__NT_BASEDEF
 # include "nt/basedef.hxx"

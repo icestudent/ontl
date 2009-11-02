@@ -4,9 +4,9 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__NT_BASEDEF
 #define NTL__NT_BASEDEF
+#pragma once
 
 // VC compiler always under NT and for NT (if not for KM)
 #if defined _MSC_VER && !defined(NTL__SUBSYSTEM_KM)

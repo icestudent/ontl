@@ -4,10 +4,9 @@
  *
  ****************************************************************************
  */
-
-
 #ifndef NTL__DEVICE_TRAITS
 #define NTL__DEVICE_TRAITS
+#pragma once
 
 #include "basedef.hxx"
 #include "stdlib.hxx"

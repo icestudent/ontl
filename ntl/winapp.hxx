@@ -4,9 +4,9 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__WIN_WINAPP
 #define NTL__WIN_WINAPP
+#pragma once
 
 #include "win/application.hxx"
 #include "win/console.hxx"

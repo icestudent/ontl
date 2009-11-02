@@ -4,9 +4,9 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__WIN_SCM
 #define NTL__WIN_SCM
+#pragma once
 
 #include "windef.hxx"
 #include "../nt/service.hxx"

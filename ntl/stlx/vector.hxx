@@ -4,9 +4,9 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__STLX_VECTOR
 #define NTL__STLX_VECTOR
+#pragma once
 
 #include "algorithm.hxx"
 #include "memory.hxx"

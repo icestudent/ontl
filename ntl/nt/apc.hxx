@@ -6,6 +6,7 @@
  */
 #ifndef NTL__NT_APC
 #define NTL__NT_APC
+#pragma once
 
 #include "basedef.hxx"
 

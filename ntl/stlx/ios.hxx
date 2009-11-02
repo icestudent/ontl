@@ -4,11 +4,12 @@
  *
  ****************************************************************************
  */
-
 #include "locale.hxx" // locale.hxx includes this header
+#pragma once
 
 #ifndef NTL__STLX_IOS
 #define NTL__STLX_IOS
+#pragma once
 
 #include "cstdio.hxx"
 #include "iosfwd.hxx"

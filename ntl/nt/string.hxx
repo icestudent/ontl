@@ -4,9 +4,9 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__NT_STRING
 #define NTL__NT_STRING
+#pragma once
 
 #include "basedef.hxx"
 #ifndef NTL__STLX_STDEXCEPT

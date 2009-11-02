@@ -6,6 +6,7 @@
  */
 #ifndef NTL__STLX_NUMERICS
 #define NTL__STLX_NUMERICS
+#pragma once
 
 #include "iterator.hxx"
 

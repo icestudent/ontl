@@ -6,6 +6,7 @@
  */
 #ifndef NTL__STLX_QUEUE
 #define NTL__STLX_QUEUE
+#pragma once
 
 #include "deque.hxx"
 

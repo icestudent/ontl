@@ -6,6 +6,7 @@
  */
 #ifndef NTL__KM_IOCP
 #define NTL__KM_IOCP
+#pragma once
 
 #include "../nt/iocp.hxx"
 

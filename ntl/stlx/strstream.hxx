@@ -6,9 +6,9 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__STLX_STRSTREAM
 #define NTL__STLX_STRSTREAM
+#pragma once
 
 #include "string.hxx"
 #include "streambuf.hxx"

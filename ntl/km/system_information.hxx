@@ -4,9 +4,9 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__KM_SYSTEM_INFORMATION
 #define NTL__KM_SYSTEM_INFORMATION
+#pragma once
 
 #include "basedef.hxx"
 #include "../nt/system_information.hxx"

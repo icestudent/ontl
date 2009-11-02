@@ -4,9 +4,9 @@
 *
 ****************************************************************************
 */
-
 #ifndef NTL__KM_MEMORY
 #define NTL__KM_MEMORY
+#pragma once
 
 #include "new.hxx"
 

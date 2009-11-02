@@ -1,5 +1,6 @@
 #ifndef NTL__STDINT
 #define NTL__STDINT
+#pragma once
 
 #ifndef NTL__STLX_CSTDINT
 #include "stlx/cstdint.hxx"

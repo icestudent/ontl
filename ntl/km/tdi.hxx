@@ -6,6 +6,7 @@
  */
 #ifndef NTL__KM_TDI
 #define NTL__KM_TDI
+#pragma once
 
 #include "basedef.hxx"
 //#include "string.hxx"

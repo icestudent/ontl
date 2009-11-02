@@ -4,9 +4,9 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__KM_IO
 #define NTL__KM_IO
+#pragma once
 
 #include "basedef.hxx"
 #include "device_object.hxx"

@@ -6,6 +6,7 @@
  */
 #ifndef NTL__STLX_CSTDINT
 #define NTL__STLX_CSTDINT
+#pragma once
 
 #include "climits.hxx"
 

@@ -4,9 +4,9 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__STLX_ARRAY
 #define NTL__STLX_ARRAY
+#pragma once
 
 #ifndef NTL__STLX_ITERATOR
 #include "iterator.hxx"

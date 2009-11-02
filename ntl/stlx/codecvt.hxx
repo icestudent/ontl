@@ -6,6 +6,7 @@
  */
 #ifndef NTL__STLX_CODECVT
 #define NTL__STLX_CODECVT
+#pragma once
 
 #include "locale.hxx"
 

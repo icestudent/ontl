@@ -4,9 +4,9 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__KM_BASEDEF
 #define NTL__KM_BASEDEF
+#pragma once
 
 #ifndef NTL__SUBSYSTEM_KM
 # define NTL__SUBSYSTEM_KM

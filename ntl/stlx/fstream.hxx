@@ -6,6 +6,7 @@
  */
 #ifndef NTL__STLX_FSTREAM
 #define NTL__STLX_FSTREAM
+#pragma once
 
 #include "streambuf.hxx"
 #include "istream.hxx"

@@ -4,9 +4,9 @@
 *
 ****************************************************************************
 */
-
 #ifndef NTL__PE_IMAGE
 #define NTL__PE_IMAGE
+#pragma once
 
 #include "../stdlib.hxx"
 #include "../basedef.hxx"

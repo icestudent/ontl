@@ -1,5 +1,6 @@
 #ifndef NTL__EXT_HASHTABLE
 #define NTL__EXT_HASHTABLE
+#pragma once
 
 #include "../memory.hxx"      // for allocator
 #include "../functional.hxx"  // for hash & predicates

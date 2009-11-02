@@ -4,9 +4,9 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__STLX_NEW
 #define NTL__STLX_NEW
+#pragma once
 
 #ifndef NTL__STLX_CSTDDEF
 #include "cstddef.hxx"

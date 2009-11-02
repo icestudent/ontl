@@ -4,9 +4,9 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__NT_SECURITY
 #define NTL__NT_SECURITY
+#pragma once
 
 #include "basedef.hxx"
 

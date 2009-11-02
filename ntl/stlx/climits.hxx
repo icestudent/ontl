@@ -4,9 +4,9 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__STLX_CLIMITS
 #define NTL__STLX_CLIMITS
+#pragma once
 
 namespace std {
 

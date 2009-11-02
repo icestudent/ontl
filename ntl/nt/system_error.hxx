@@ -6,6 +6,7 @@
  */
 #ifndef NTL__NT_SYSTEMERROR
 #define NTL__NT_SYSTEMERROR
+#pragma once
 
 #include "../stlx/system_error.hxx"
 #include "status.hxx"

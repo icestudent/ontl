@@ -4,10 +4,9 @@
 *
 ****************************************************************************
 */
-
-
 #ifndef NTL__NT_VIRTUALMEM
 #define NTL__NT_VIRTUALMEM
+#pragma once
 
 #include "handle.hxx"
 

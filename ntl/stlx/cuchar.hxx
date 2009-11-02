@@ -6,6 +6,7 @@
  */
 #ifndef NTL__STLX_CUCHAR
 #define NTL__STLX_CUCHAR
+#pragma once
 
 #ifndef NTL__STLX_CSTDINT
 #include "cstdint.hxx"

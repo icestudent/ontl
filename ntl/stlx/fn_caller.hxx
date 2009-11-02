@@ -6,6 +6,7 @@
  */
 #ifndef NTL__STLX_FNCALLER
 #define NTL__STLX_FNCALLER
+#pragma once
 
 #include "result_of.hxx"
 

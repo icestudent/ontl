@@ -6,6 +6,7 @@
  */
 #ifndef NTL__WIN_NATIVEAPP
 #define NTL__WIN_NATIVEAPP
+#pragma once
 
 #include "nt/basedef.hxx"
 #include "nt/new.hxx"

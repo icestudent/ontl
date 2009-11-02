@@ -4,9 +4,9 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__NT_REGISTRY
 #define NTL__NT_REGISTRY
+#pragma once
 
 #include "../iterator"
 #include "../string"

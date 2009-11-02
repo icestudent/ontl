@@ -6,6 +6,7 @@
  */
 #ifndef NTL__EXT_TYPELIST
 #define NTL__EXT_TYPELIST
+#pragma once
 
 #include "ttl/typelist.hxx"
 

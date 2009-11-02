@@ -6,6 +6,7 @@
  */
 #ifndef NTL__STLX_DEQUE
 #define NTL__STLX_DEQUE
+#pragma once
 
 #include "memory.hxx"
 #include "algorithm.hxx"

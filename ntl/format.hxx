@@ -4,10 +4,9 @@
  *
  ****************************************************************************
  */
-
-
 #ifndef NTL__FORMAT
 #define NTL__FORMAT
+#pragma once
 
 #include "base.hxx"
 

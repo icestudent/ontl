@@ -4,9 +4,9 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__KM_STRING
 #define NTL__KM_STRING
+#pragma once
 
 #include "../nt/string.hxx"
 

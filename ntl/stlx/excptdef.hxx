@@ -4,28 +4,9 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__STLX_EXCPTDEF
 #define NTL__STLX_EXCPTDEF
-
-
-#ifndef STLX__USE_EXCEPTIONS
-  #if defined(_MSC_VER) || defined(__BCPLUSPLUS__)
-    #ifdef _CPPUNWIND
-      #define STLX__USE_EXCEPTIONS 1
-    #else
-      #define STLX__USE_EXCEPTIONS 0
-    #endif
-  #elif defined(__GNUC__)
-    #ifdef __EXCEPTIONS
-      #define STLX__USE_EXCEPTIONS 1
-    #else
-      #define STLX__USE_EXCEPTIONS 0
-    #endif
-  #else
-    #error define STLX__USE_EXCEPTIONS
-  #endif
-#endif
+#pragma once
 
 #if STLX__USE_EXCEPTIONS == 1
   // C++ exceptions

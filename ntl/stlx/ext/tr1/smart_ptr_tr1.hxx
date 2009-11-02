@@ -6,6 +6,7 @@
  */
 #ifndef NTL__STLX_SMARTPTRTR1
 #define NTL__STLX_SMARTPTRTR1
+#pragma once
 
 namespace std
 {

@@ -26,6 +26,7 @@
 
 #ifndef NTL_SPP_ARGS_HXX
 #define NTL_SPP_ARGS_HXX
+#pragma once
 
 #include "control.hxx"
 #ifndef NTL_SPP_LOOP_HXX

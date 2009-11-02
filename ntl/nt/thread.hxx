@@ -6,6 +6,7 @@
  */
 #ifndef NTL__NT_THREAD
 #define NTL__NT_THREAD
+#pragma once
 
 #include "basedef.hxx"
 #include "../device_traits.hxx"

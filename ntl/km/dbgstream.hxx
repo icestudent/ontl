@@ -6,6 +6,7 @@
  */
 #ifndef NTL__KM_DBGSTREAM
 #define NTL__KM_DBGSTREAM
+#pragma once
 
 #include "../nt/dbgstream.hxx"
 

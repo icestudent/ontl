@@ -4,9 +4,9 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__STLX_CASSERT
 #define NTL__STLX_CASSERT
+#pragma once
 
 //namespace std {
 

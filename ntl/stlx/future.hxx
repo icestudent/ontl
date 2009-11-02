@@ -6,6 +6,7 @@
  */
 #ifndef NTL__STLX_FUTURE
 #define NTL__STLX_FUTURE
+#pragma once
 
 #include "system_error.hxx"
 #include "chrono.hxx"

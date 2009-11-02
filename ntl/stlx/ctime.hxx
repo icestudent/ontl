@@ -4,9 +4,9 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__STLX_CTIME
 #define NTL__STLX_CTIME
+#pragma once
 
 #include "cstddef.hxx"
 
@@ -24,7 +24,7 @@ namespace std {
 
 #ifndef __GNUC__
   // 100ns (10^-7)
-#define CLOCKS_PER_SEC system_time_resolution
+#define CLOCKS_PER_SEC ntl::nt::system_time_resolution
 
 typedef ntl::nt::systime_t clock_t;
 typedef ntl::nt::systime_t time_t;

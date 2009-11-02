@@ -5,9 +5,9 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__STLX_STDEXCEPT
 #define NTL__STLX_STDEXCEPT
+#pragma once
 
 #ifndef NTL__STLX_STRING
 #include "string.hxx"

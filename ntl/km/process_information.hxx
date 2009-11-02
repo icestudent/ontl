@@ -6,6 +6,7 @@
  */
 #ifndef NTL__KM_PROCESS_INFORMATION
 #define NTL__KM_PROCESS_INFORMATION
+#pragma once
 
 #include "../nt/process_information.hxx"
 

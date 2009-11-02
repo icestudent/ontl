@@ -4,9 +4,9 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__STLX_LIMITS
 #define NTL__STLX_LIMITS
+#pragma once
 
 #ifndef NTL__STLX_CSTDDEF
 #include "cstddef.hxx"

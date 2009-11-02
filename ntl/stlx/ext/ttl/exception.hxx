@@ -10,6 +10,7 @@
 
 #ifndef __ttl_exception__hpp
 #define __ttl_exception__hpp
+#pragma once
 
 #include "../../stdexcept.hxx"
 

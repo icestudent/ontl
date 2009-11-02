@@ -4,9 +4,9 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__LINKED_LIST
 #define NTL__LINKED_LIST
+#pragma once
 
 #ifndef NTL__STLX_ITERATOR
 #include "stlx/iterator.hxx"

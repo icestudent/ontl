@@ -4,9 +4,9 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__STLX_MUTEX
 #define NTL__STLX_MUTEX
+#pragma once
 
 #include "chrono.hxx"
 #include "system_error.hxx"

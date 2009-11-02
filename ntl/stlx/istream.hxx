@@ -4,9 +4,9 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__STLX_ISTREAM
 #define NTL__STLX_ISTREAM
+#pragma once
 
 #include "ostream.hxx"
 

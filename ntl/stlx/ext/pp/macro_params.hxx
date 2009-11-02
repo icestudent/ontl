@@ -10,6 +10,7 @@
 
 #ifndef __ttl_macro_params__hpp
 #define __ttl_macro_params__hpp
+#pragma once
 
 #include "macro_repeat.hxx"
 

@@ -4,9 +4,9 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__STLX_MAP
 #define NTL__STLX_MAP
+#pragma once
 
 #include "stdexcept_fwd.hxx"
 #include "ext/rbtree.hxx"

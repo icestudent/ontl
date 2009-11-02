@@ -4,9 +4,9 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__STLX_IOSFWD
 #define NTL__STLX_IOSFWD
+#pragma once
 
 #include "cstdint.hxx" // for uint_least16_t
 

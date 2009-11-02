@@ -4,9 +4,9 @@
 *
 ****************************************************************************
 */
-
 #ifndef NTL__KM_IOCTL
 #define NTL__KM_IOCTL
+#pragma once
 
 #include "basedef.hxx"
 #include "../nt/ioctl.hxx"

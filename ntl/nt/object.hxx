@@ -4,9 +4,9 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__NT_OBJECT
 #define NTL__NT_OBJECT
+#pragma once
 
 #include "basedef.hxx"
 #include "string.hxx"

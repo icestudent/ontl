@@ -6,6 +6,7 @@
  */
 #ifndef NTL__STLX_CINTTYPES
 #define NTL__STLX_CINTTYPES
+#pragma once
 
 #include "cstdint.hxx"
 

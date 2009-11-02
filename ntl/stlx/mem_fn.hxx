@@ -6,6 +6,7 @@
  */
 #ifndef NTL_MEMFN_HXX
 #define NTL_MEMFN_HXX
+#pragma once
 
 #ifdef NTL__CXX_RV
 # include "mem_fn_rv.hxx"

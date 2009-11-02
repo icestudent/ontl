@@ -4,9 +4,9 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__STLX_BITSET
 #define NTL__STLX_BITSET
+#pragma once
 
 #include "cstddef.hxx"
 #include "stdexcept.hxx" // for string and exceptions

@@ -26,6 +26,7 @@
 
 #ifndef NTL_SPP_MATH_HXX
 #define NTL_SPP_MATH_HXX
+#pragma once
 
 // !fr3@K!
 // === implementation detail ===

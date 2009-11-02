@@ -4,9 +4,9 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__NT_SHARED_DATA
 #define NTL__NT_SHARED_DATA
+#pragma once
 
 #include "../cpu.hxx"
 #include "../stdint.h"

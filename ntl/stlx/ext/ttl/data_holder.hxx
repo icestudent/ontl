@@ -10,6 +10,7 @@
 
 #ifndef __ttl_impl_data_holder__hpp
 #define __ttl_impl_data_holder__hpp
+#pragma once
 
 #ifndef NTL__STLX_TYPE_TRAITS
 #include "../../type_traits.hxx"

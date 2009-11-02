@@ -4,9 +4,9 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__STLX_UNORDERED_SET
 #define NTL__STLX_UNORDERED_SET
+#pragma once
 
 #include "stdexcept_fwd.hxx"
 #include "ext/hashtable.hxx"

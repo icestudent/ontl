@@ -6,6 +6,7 @@
  */
 #ifndef NTL__NT_RESOURCE
 #define NTL__NT_RESOURCE
+#pragma once
 
 #include "handle.hxx"
 #include "../stlx/chrono.hxx"

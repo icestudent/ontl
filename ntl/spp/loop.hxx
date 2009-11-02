@@ -26,6 +26,7 @@
 
 #ifndef NTL_SPP_LOOP_HXX
 #define NTL_SPP_LOOP_HXX
+#pragma once
 
 #ifndef NTL_SPP_UTILITY_HXX
 #include "utility.hxx"

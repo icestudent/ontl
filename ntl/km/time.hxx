@@ -4,9 +4,9 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__KM_TIME
 #define NTL__KM_TIME
+#pragma once
 
 #include "basedef.hxx"
 #include "../nt/shared_data.hxx"

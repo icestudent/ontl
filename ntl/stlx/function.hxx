@@ -6,6 +6,7 @@
  */
 #ifndef NTL__STLX_FUNCTION
 #define NTL__STLX_FUNCTION
+#pragma once
 
 #include "exception.hxx"
 

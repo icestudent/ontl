@@ -6,6 +6,7 @@
  */
 #ifndef NTL__STLX_SSTREAM
 #define NTL__STLX_SSTREAM
+#pragma once
 
 #include "ios.hxx"
 

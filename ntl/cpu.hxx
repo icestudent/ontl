@@ -4,9 +4,9 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__CPU
 #define NTL__CPU
+#pragma once
 
 namespace ntl {
 

@@ -6,6 +6,7 @@
  */
 #ifndef NTL__NT_IOCP
 #define NTL__NT_IOCP
+#pragma once
 
 #include "handle.hxx"
 #include "../stlx/chrono.hxx"

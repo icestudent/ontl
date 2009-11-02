@@ -15,6 +15,7 @@
 
 #ifndef NTL__STLX_LOCALE
 #define NTL__STLX_LOCALE
+#pragma once
 
 #if STLX__CONFORMING_LOCALE
 #define _NTL_LOC_VIRTUAL virtual

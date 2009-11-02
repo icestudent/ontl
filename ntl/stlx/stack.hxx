@@ -6,6 +6,7 @@
  */
 #ifndef NTL__STLX_STACK
 #define NTL__STLX_STACK
+#pragma once
 
 #if 0
 # include "deque.hxx"

@@ -4,9 +4,9 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__STLX_CSTRING
 #define NTL__STLX_CSTRING
+#pragma once
 
 #ifndef NTL__STLX_CSTDDEF
 #include "cstddef.hxx"
@@ -157,9 +157,9 @@ NTL__CRTCALL
   ext::strcat(dst, src);
   return dst;
 }
+#endif
 
 NTL__EXTERNAPI char* NTL__CRTIMP strncat(char * __restrict s1, const char * __restrict s2, size_t n);
-#endif
 
 ///\name Comparison functions
 #ifndef _MSC_VER

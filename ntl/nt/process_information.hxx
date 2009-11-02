@@ -6,6 +6,7 @@
  */
 #ifndef NTL__NT_PROCESS_INFORMATION
 #define NTL__NT_PROCESS_INFORMATION
+#pragma once
 
 #include "teb.hxx"
 

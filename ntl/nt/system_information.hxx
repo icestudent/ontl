@@ -4,9 +4,9 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__NT_SYSTEM_INFORMATION
 #define NTL__NT_SYSTEM_INFORMATION
+#pragma once
 
 #include "basedef.hxx"
 #include "string.hxx"

@@ -4,9 +4,9 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__KM_DEVICE_OBJECT
 #define NTL__KM_DEVICE_OBJECT
+#pragma once
 
 #include "object.hxx"
 #include "irp.hxx"

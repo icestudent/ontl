@@ -10,6 +10,7 @@
 
 #ifndef __ttl_config__hpp
 #define __ttl_config__hpp
+#pragma once
 
 #ifndef TTL_MAX_TEMPLATE_PARAMS
 # if defined(_MSC_VER)

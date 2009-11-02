@@ -4,9 +4,9 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__STLX_CWCHAR
 #define NTL__STLX_CWCHAR
+#pragma once
 
 #ifndef NTL__STLX_CSTRING
 #include "cstring.hxx"

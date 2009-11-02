@@ -4,9 +4,9 @@
  *  MS VC version
  ****************************************************************************
  */
-
 #ifndef NTL__STLX_TYPE_TRAITS_MSVC
 #define NTL__STLX_TYPE_TRAITS_MSVC
+#pragma once
 
 #ifndef NTL__IN_STLX_TYPE_TRAITS
   #error Always include this file through <type_traits>.

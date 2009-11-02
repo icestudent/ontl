@@ -6,6 +6,7 @@
  */
 #ifndef NTL__STLX_SMARTPTR
 #define NTL__STLX_SMARTPTR
+#pragma once
 
 #include "memory.hxx"
 #include "utility.hxx"

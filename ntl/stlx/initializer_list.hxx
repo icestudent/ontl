@@ -4,9 +4,9 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__STLX_INITLIST
 #define NTL__STLX_INITLIST
+#pragma once
 
 #ifndef NTL__STLX_CSTDDEF
 #include "cstddef.hxx" // for size_t

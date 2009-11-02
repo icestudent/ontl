@@ -8,9 +8,9 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__NT_EXCEPTION
 #define NTL__NT_EXCEPTION
+#pragma once
 
 #include "basedef.hxx"
 #include "teb.hxx"

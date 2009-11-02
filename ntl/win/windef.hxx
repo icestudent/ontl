@@ -4,9 +4,9 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__WIN_WINDEF
 #define NTL__WIN_WINDEF
+#pragma once
 
 #include "../nt/basedef.hxx"
 #include "../nt/teb.hxx"

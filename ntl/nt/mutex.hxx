@@ -6,6 +6,7 @@
  */
 #ifndef NTL__NT_MUTEX
 #define NTL__NT_MUTEX
+#pragma once
 
 #include "resource.hxx"
 

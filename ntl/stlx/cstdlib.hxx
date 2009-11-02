@@ -4,9 +4,9 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__STLX_CSTDLIB
 #define NTL__STLX_CSTDLIB
+#pragma once
 
 #ifndef NTL__STLX_CSTDINT
 # include "cstddef.hxx"

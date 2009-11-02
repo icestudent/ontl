@@ -7,9 +7,9 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__SHA
 #define NTL__SHA
+#pragma once
 
 #include <stdint.h>
 #include <stdlib.hxx>

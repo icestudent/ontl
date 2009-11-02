@@ -4,9 +4,9 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__NT_NEW
 #define NTL__NT_NEW
+#pragma once
 
 #ifndef NTL_NO_NEW
 

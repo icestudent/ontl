@@ -4,10 +4,9 @@
  *
  ****************************************************************************
  */
-
-
 #ifndef NTL__KM_MINIPORT
 #define NTL__KM_MINIPORT
+#pragma once
 
 #include "basedef.hxx"
 

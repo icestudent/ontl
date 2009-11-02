@@ -4,10 +4,9 @@
  *
  ****************************************************************************
  */
-
-
 #ifndef NTL__KM_NDIS
 #define NTL__KM_NDIS
+#pragma once
 
 #ifndef NTL__POOL_TAG
 #define NTL__POOL_TAG 'LTN_'  // _NTL

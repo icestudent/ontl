@@ -4,9 +4,9 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__STLX_UTILITY
 #define NTL__STLX_UTILITY
+#pragma once
 
 #ifndef NTL__STLX_TYPE_TRAITS
 #include "type_traits.hxx"

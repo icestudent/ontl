@@ -4,9 +4,9 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__STLX_OSTREAM
 #define NTL__STLX_OSTREAM
+#pragma once
 
 #include "ios.hxx"
 #ifndef NTL__STLX_ITERATOR

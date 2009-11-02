@@ -4,9 +4,9 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__STLX_CWCTYPE
 #define NTL__STLX_CWCTYPE
+#pragma once
 
 #include "cwchar.hxx"
 
@@ -21,6 +21,10 @@ namespace std
  *@{*/
 /**\addtogroup  lib_c_strings_cwctype Wide character classification and mapping utilities
  *@{*/
+
+  using ::wctrans_t;
+  using ::wctype_t;
+  using ::wint_t;
 
   ///\name Wide character classification functions
   int iswalnum(wint_t wc);

@@ -4,9 +4,9 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__STLX_LIST
 #define NTL__STLX_LIST
+#pragma once
 
 #include "algorithm.hxx"
 #include "memory.hxx"

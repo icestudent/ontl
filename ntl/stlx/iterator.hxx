@@ -4,9 +4,9 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__STLX_ITERATOR
 #define NTL__STLX_ITERATOR
+#pragma once
 
 #ifndef NTL__STLX_CSTDDEF
 #include "cstddef.hxx"

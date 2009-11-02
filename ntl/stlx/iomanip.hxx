@@ -7,9 +7,9 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__STLX_IOMANIP
 #define NTL__STLX_IOMANIP
+#pragma once
 
 #include "ios.hxx"
 #include "istream.hxx"

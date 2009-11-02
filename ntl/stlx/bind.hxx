@@ -6,6 +6,7 @@
  */
 #ifndef NTL__STLX_BIND
 #define NTL__STLX_BIND
+#pragma once
 
 #include "placeholders.hxx"
 

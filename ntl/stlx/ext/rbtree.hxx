@@ -1,5 +1,6 @@
 #ifndef NTL__EXT_RBTREE
 #define NTL__EXT_RBTREE
+#pragma once
 
 #include "../iterator.hxx"
 #include "../memory.hxx"

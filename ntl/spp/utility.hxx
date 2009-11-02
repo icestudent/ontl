@@ -26,6 +26,7 @@
 
 #ifndef NTL_SPP_UTILITY_HXX
 #define NTL_SPP_UTILITY_HXX
+#pragma once
 
 // !fr3@K!
 // === public interface ===

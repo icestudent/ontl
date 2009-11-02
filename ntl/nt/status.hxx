@@ -4,9 +4,9 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__NT_STATUS
 #define NTL__NT_STATUS
+#pragma once
 
 
 namespace ntl {

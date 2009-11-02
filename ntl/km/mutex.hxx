@@ -6,6 +6,7 @@
  */
 #ifndef NTL__KM_MUTEX
 #define NTL__KM_MUTEX
+#pragma once
 
 #include "basedef.hxx"
 #include "event.hxx"

@@ -4,9 +4,9 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__STLX_IOSTREAM
 #define NTL__STLX_IOSTREAM
+#pragma once
 
 #include "streambuf.hxx"
 #include "istream.hxx"

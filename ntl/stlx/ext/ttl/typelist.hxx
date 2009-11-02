@@ -10,6 +10,7 @@
 
 #ifndef __ttl_typelist__hpp
 #define __ttl_typelist__hpp
+#pragma once
 
 #include "../pp/config.hxx"
 #include "data_holder.hxx"

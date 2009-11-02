@@ -4,10 +4,9 @@
  *
  ****************************************************************************
  */
-
-
 #ifndef NTL__WIN_HANDLE
 #define NTL__WIN_HANDLE
+#pragma once
 
 #include "windef.hxx"
 #include "../nt/handle.hxx"

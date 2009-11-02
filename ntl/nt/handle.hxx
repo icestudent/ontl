@@ -4,10 +4,9 @@
  *
  ****************************************************************************
  */
-
-
 #ifndef NTL__NT_HANDLE
 #define NTL__NT_HANDLE
+#pragma once
 
 #include "../handle.hxx"
 #include "basedef.hxx"

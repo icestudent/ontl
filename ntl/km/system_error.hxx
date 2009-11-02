@@ -6,6 +6,7 @@
  */
 #ifndef NTL__KM_SYSTEMERROR
 #define NTL__KM_SYSTEMERROR
+#pragma once
 
 #include "../nt/system_error.hxx"
 

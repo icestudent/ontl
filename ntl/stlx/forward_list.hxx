@@ -4,9 +4,9 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__STLX_FORWARDLIST
 #define NTL__STLX_FORWARDLIST
+#pragma once
 
 #include "memory.hxx"
 

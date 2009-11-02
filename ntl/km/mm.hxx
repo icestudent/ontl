@@ -6,6 +6,7 @@
  */
 #ifndef NTL__KM_MM
 #define NTL__KM_MM
+#pragma once
 
 #include "basedef.hxx"
 #include "../nt/virtualmem.hxx"

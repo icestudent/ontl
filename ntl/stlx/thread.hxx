@@ -6,6 +6,7 @@
  */
 #ifndef NTL__STLX_THREAD
 #define NTL__STLX_THREAD
+#pragma once
 
 #include "chrono.hxx"
 #include "system_error.hxx"

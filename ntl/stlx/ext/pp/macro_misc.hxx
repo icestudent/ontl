@@ -10,6 +10,7 @@
 
 #ifndef __ttl_macro_misc__hpp
 #define __ttl_macro_misc__hpp
+#pragma once
 
 #define TTL_RET(x) x
 #define TTL_APPEND( x, y ) TTL_APPEND1(x,y)

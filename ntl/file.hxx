@@ -4,9 +4,9 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__FILE
 #define NTL__FILE
+#pragma once
 
 #include "device_traits.hxx"
 #include "handle.hxx"

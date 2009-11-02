@@ -4,7 +4,13 @@
 #include "../pe/image.hxx"
 #include "../nt/exception.hxx"
 #include "../nt/status.hxx"
-#include "../nt/peb.hxx"
+
+#ifdef NTL__SUBSYSTEM_KM
+# include "../km/new.hxx"
+#else
+# include "../nt/new.hxx"
+# include "../nt/peb.hxx"
+#endif
 
 #ifdef _MSC_VER
 #pragma warning(disable:4510 4512 4610 4100)

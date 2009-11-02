@@ -6,6 +6,7 @@
  */
 #ifndef NTL__WIN_CONSOLEAPP
 #define NTL__WIN_CONSOLEAPP
+#pragma once
 
 #include "win/application.hxx"
 #include "win/console.hxx"

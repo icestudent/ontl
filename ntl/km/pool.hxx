@@ -4,9 +4,9 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__KM_POOL
 #define NTL__KM_POOL
+#pragma once
 
 #include "../cstddef"
 

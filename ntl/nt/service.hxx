@@ -4,9 +4,9 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__NT_SERVICE
 #define NTL__NT_SERVICE
+#pragma once
 
 #include "string.hxx"
 

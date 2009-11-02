@@ -4,9 +4,9 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__WIN_CONSOLE
 #define NTL__WIN_CONSOLE
+#pragma once
 
 #include "windef.hxx"
 #include "handle.hxx"
@@ -99,8 +99,9 @@ class console
       EnableWindowInput     = 0x08,
       EnableMouseInput      = 0x10,
       EnableInsertMode      = 0x20,
-      EnableQuickEdieMode   = 0x40
+      EnableQuickEditMode   = 0x40
     };
+    __ntl_bitmask_type(mode_type, friend);
 
   public:
     static legacy_handle handle(type t)
@@ -371,6 +372,9 @@ protected:
   {
     buffer = new charT[buffer_size];
     setbuf(buffer, buffer_size);
+    //console::mode_type m = console::mode(outh);
+    //m |= write_only ? console::EnableQuickEditMode : console::EnableInsertMode;
+    //console::mode(outh, m);
   }
   void reset()
   {

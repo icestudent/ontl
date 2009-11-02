@@ -6,6 +6,7 @@
  */
 #ifndef NTL__EXT_NUMERIC_CONVERSIONS
 #define NTL__EXT_NUMERIC_CONVERSIONS
+#pragma once
 
 #ifndef NTL__STLX_LIMITS
 # include "../limits.hxx"

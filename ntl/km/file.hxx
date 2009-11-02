@@ -4,9 +4,9 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__KM_FILE
 #define NTL__KM_FILE
+#pragma once
 
 #include "../nt/file.hxx"
 #include "basedef.hxx"

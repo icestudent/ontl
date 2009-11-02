@@ -4,10 +4,9 @@
  *
  ****************************************************************************
  */
-
-
 #ifndef NTL__KM_DPC
 #define NTL__KM_DPC
+#pragma once
 
 #include "basedef.hxx"
 

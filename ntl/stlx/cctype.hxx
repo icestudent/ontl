@@ -6,6 +6,7 @@
  */
 #ifndef NTL__STLX_CCTYPE
 #define NTL__STLX_CCTYPE
+#pragma once
 
 namespace std
 {

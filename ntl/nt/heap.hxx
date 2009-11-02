@@ -4,9 +4,9 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__NT_HEAP
 #define NTL__NT_HEAP
+#pragma once
 
 #include "basedef.hxx"
 #include "peb.hxx"

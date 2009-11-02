@@ -6,6 +6,7 @@
  */
 #ifndef NTL__STLX_REFWRAP
 #define NTL__STLX_REFWRAP
+#pragma once
 
 #include "fn_caller.hxx"
 #include "functional.hxx"

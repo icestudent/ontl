@@ -4,9 +4,9 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__NT_TEB
 #define NTL__NT_TEB
+#pragma once
 
 #include "handle.hxx"
 

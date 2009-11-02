@@ -4,9 +4,9 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__KM_DRIVER_OBJECT
 #define NTL__KM_DRIVER_OBJECT
+#pragma once
 
 #include "basedef.hxx"
 #include "string.hxx"

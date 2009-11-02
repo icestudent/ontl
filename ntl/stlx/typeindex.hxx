@@ -6,6 +6,7 @@
  */
 #ifndef NTL__STLX_TYPEINDEX
 #define NTL__STLX_TYPEINDEX
+#pragma once
 
 #include "typeinfo.hxx"
 #include "functional.hxx"

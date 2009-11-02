@@ -6,6 +6,7 @@
  */
 #ifndef NTL__NT_DBGSTREAM
 #define NTL__NT_DBGSTREAM
+#pragma once
 
 #include "debug.hxx"
 

@@ -4,9 +4,9 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__STLX_CSTARG
 #define NTL__STLX_CSTARG
+#pragma once
 
 //namespace std {
 

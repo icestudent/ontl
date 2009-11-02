@@ -6,6 +6,7 @@
  */
 #ifndef NTL__STLX_TR2_FILESYSTEM
 #define NTL__STLX_TR2_FILESYSTEM
+#pragma once
 
 #include "../../iosfwd.hxx"
 #include "../../string.hxx"

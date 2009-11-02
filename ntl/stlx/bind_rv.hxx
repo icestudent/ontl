@@ -6,6 +6,7 @@
  */
 #ifndef NTL__STLX_BIND_RV
 #define NTL__STLX_BIND_RV
+#pragma once
 
 #include "fn_caller_rv.hxx"
 

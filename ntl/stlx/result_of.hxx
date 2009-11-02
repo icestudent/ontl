@@ -29,9 +29,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 #ifndef NTL_RESULT_OF_HXX
 #define NTL_RESULT_OF_HXX
+#pragma once
 
 #ifndef NTL__STLX_TYPE_TRAITS
 #include "type_traits.hxx"

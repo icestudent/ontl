@@ -6,6 +6,7 @@
  */
 #ifndef NTL__NT_DEBUG
 #define NTL__NT_DEBUG
+#pragma once
 
 #include "basedef.hxx"
 #include "string.hxx"

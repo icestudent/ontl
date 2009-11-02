@@ -4,9 +4,9 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__KM_REGISTRY
 #define NTL__KM_REGISTRY
+#pragma once
 
 #include "basedef.hxx"
 #include "../nt/registry.hxx"

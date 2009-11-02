@@ -4,9 +4,9 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__NT_FILE_INFORMATION
 #define NTL__NT_FILE_INFORMATION
+#pragma once
 
 #include "basedef.hxx"
 #include "handle.hxx"

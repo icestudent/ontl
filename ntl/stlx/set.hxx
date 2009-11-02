@@ -4,9 +4,9 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__STLX_SET
 #define NTL__STLX_SET
+#pragma once
 
 #include "algorithm.hxx"
 #include "ext/rbtree.hxx"

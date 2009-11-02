@@ -4,9 +4,9 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__KM_LOOKASIDE_LIST
 #define NTL__KM_LOOKASIDE_LIST
+#pragma once
 
 #include "basedef.hxx"
 #include "pool.hxx"

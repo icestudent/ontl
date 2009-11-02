@@ -5,9 +5,9 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__STLX_STDEXCEPT_FWD
 #define NTL__STLX_STDEXCEPT_FWD
+#pragma once
 
 #ifndef NTL__STLX_EXCPTDEF
 #include "excptdef.hxx"

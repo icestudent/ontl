@@ -6,6 +6,7 @@
  */
 #ifndef NTL__STLX_PRIORITYQUEUE
 #define NTL__STLX_PRIORITYQUEUE
+#pragma once
 
 #include "vector.hxx"
 #include "functional.hxx"

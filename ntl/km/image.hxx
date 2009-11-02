@@ -4,10 +4,9 @@
  *
  ****************************************************************************
  */
-
-
 #ifndef NTL__KM_IMAGE
 #define NTL__KM_IMAGE
+#pragma once
 
 #include "../pe/image.hxx"
 #include "basedef.hxx"

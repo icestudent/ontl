@@ -4,9 +4,9 @@
  *
  ****************************************************************************
  */
-
 #ifndef NTL__STDLIB
 #define NTL__STDLIB
+#pragma once
 
 #include "stdint.h"
 #include "stlx/cstddef.hxx"
