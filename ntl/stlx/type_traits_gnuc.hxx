@@ -638,6 +638,28 @@ struct common_type<T, void, void, void>
   typedef T type;
 };
 
+namespace __
+{
+  template<typename T1, typename T2> struct select_type
+  {
+  private:
+#ifdef NTL__CXX_RV
+    static T1&& __t();
+    static T2&& __u();
+#else
+    static T1 __t();
+    static T2 __u();
+#endif
+
+    static char test(T1);
+    static int  test(T2);
+  public:
+    typedef typename conditional<sizeof(test(true ? __t() : __u())) == sizeof(char), T1, T2>::type type;
+  };
+  template<typename T1> struct select_type<T1,T1> { typedef T1 type; };
+
+}
+
 template<class T, class U>
 struct common_type<T, U, void, void>
 {
@@ -645,23 +667,23 @@ struct common_type<T, U, void, void>
   static_assert(sizeof(T) > 0, "U shall be complete");
 
 private:
-  typedef typename remove_cv<typename remove_reference<T>::type>::type rawT;
-  typedef typename remove_cv<typename remove_reference<U>::type>::type rawU;
+#ifdef NTL__CXX_RV
+  static T&& __t();
+  static U&& __u();
+#else
+  static T __t();
+  static U __u();
+#endif
 
 public:
-  /**
-   *  rules of selecting the "common" type
-   *  1) if raw types (without qualificators) are equal, then select one of them, also raw (don't sure here)
-   *  2) if one of types is convertible to other, select other type
-   *  3) else place the void
-   **/
-  typedef
-    typename conditional<is_same<rawT, rawU>::value, rawT,
-      typename conditional<is_arithmetic<rawT>::value && is_arithmetic<rawU>::value, typename conditional<(sizeof(T) < sizeof(U)), rawU, rawT>::type,
-        typename conditional<is_convertible<rawT,rawU>::value, rawU,
-          typename conditional<is_convertible<rawU,rawT>::value, rawT, void>::type
-                            >::type>::type>::type type;
+#ifdef NTL__CXX_TYPEOF
+  typedef decltype(true ? __t() : __u()) type;
+#else
+  typedef typename __::select_type<T,U>::type type;
+#endif // typeof
+
 };
+
 
 template<class T, class U, class V>
 struct common_type<T, U, V, void>
