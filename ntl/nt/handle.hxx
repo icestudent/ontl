@@ -15,8 +15,6 @@ namespace ntl {
 namespace nt {
 
 
-typedef const struct _opaque { } * legacy_handle;
-
 static const legacy_handle null_handle = 0;
 
 static inline legacy_handle current_process()

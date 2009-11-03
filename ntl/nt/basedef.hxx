@@ -64,6 +64,17 @@ namespace ntl {
   #endif
     typedef __s_GUID guid, guid_t;
 
+
+    typedef const struct _opaque { } * legacy_handle;
+
+    struct client_id
+    {
+      legacy_handle UniqueProcess;
+      legacy_handle UniqueThread;
+    };
+
+
+    ///\name Native list types
     struct list_entry
     {
       union { list_entry * Flink; list_entry * next; };
@@ -135,6 +146,7 @@ namespace ntl {
       uint16_t    Depth;
       uint16_t    Sequence;
     };
+    ///\}
 
 
     /// Masks for the predefined standard access types

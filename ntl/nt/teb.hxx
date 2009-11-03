@@ -129,13 +129,6 @@ struct tib
 //STATIC_ASSERT(sizeof(tib) == 0x1C);
 
 
-struct client_id
-{
-  legacy_handle UniqueProcess;
-  legacy_handle UniqueThread;
-};
-
-
 struct teb: public tib
 {
 #pragma warning(push)

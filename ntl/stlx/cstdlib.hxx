@@ -200,13 +200,14 @@ NTL__CRTCALL
 ///\name  7.20.6 Integer arithmetic functions
 
 /// 7.20.6.1 The abs, labs and llabs functions
-int
-NTL__CRTCALL
-  abs(int j);
+int __cdecl abs(int n);
+long int __cdecl labs(long int n);
+#ifdef _MSC_VER
+long long __cdecl _abs64(long long n);
+#pragma intrinsic(abs,labs,_abs64)
+#endif
 
-long int
-NTL__CRTCALL
-  labs(long int j);
+inline long long int NTL__CRTCALL llabs(long long int n) { return _abs64(n); }
 
 #if 0
 /// 7.20.6.2 The div, ldiv, and lldiv functions
@@ -274,9 +275,6 @@ void
 NTL__CRTCALL
   _Exit(int status);
 
-long long int
-NTL__CRTCALL
-  llabs(long long int j);
 
 
 
@@ -375,7 +373,6 @@ using ::quick_exit;
 using ::atexit;
 using ::at_quick_exit;
 
-
 using ::getenv;
 using ::system;
 
@@ -385,6 +382,9 @@ using::qsort;
 using::abs;
 using::labs;
 using::llabs;
+
+inline long abs(long n) { return labs(n); }
+inline long long abs(long long n) { return _abs64(n); }
 
 #if 0
 using::div;

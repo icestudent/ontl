@@ -71,6 +71,15 @@ namespace std {
   unsigned long long int wcstoull(const wchar_t* __restrict nptr, wchar_t** __restrict endptr, int base);
 
   ///\name Wide string copying functions
+#ifdef _MSC_VER
+  NTL__EXTERNAPI int      __cdecl wcscmp(const wchar_t * s1, const wchar_t * s2);
+  NTL__EXTERNAPI wchar_t* __cdecl wcscpy(wchar_t * const dst, const wchar_t * const src);
+  NTL__EXTERNAPI size_t   __cdecl wcslen(const wchar_t * const s);
+  NTL__EXTERNAPI wchar_t* __cdecl wcscat(wchar_t * const dst, const wchar_t * const src);
+#pragma intrinsic(wcscmp,wcscpy,wcslen,wcscat)
+#endif
+
+#ifndef _MSC_VER
 __forceinline
 wchar_t* NTL__CRTCALL wcscpy(wchar_t* dst, const wchar_t* src)
 {
@@ -79,6 +88,7 @@ wchar_t* NTL__CRTCALL wcscpy(wchar_t* dst, const wchar_t* src)
   while ( (*dst++ = *src++) != 0 ) {/**/}
   return dst;
 }
+#endif
 
 __forceinline
 wchar_t* NTL__CRTCALL wcsncpy(wchar_t* dst, const wchar_t* src, size_t n)
@@ -107,10 +117,13 @@ wchar_t* NTL__CRTCALL wmemmove(wchar_t*s1, const wchar_t*s2, size_t n)
 }
 
 ///\name Wide string concatenation functions
+#ifndef _MSC_VER
 NTL__EXTERNAPI wchar_t* NTL__CRTIMP wcscat(wchar_t* __restrict s1, const wchar_t* __restrict s2);
+#endif
 NTL__EXTERNAPI wchar_t* NTL__CRTIMP wcsncat(wchar_t* __restrict s1, const wchar_t* __restrict s2, size_t n);
 
 ///\name Wide string comparison functions
+#ifndef _MSC_VER
 __forceinline
 int NTL__CRTCALL wcscmp(const wchar_t*s1, const wchar_t*s2)
 {
@@ -118,6 +131,7 @@ int NTL__CRTCALL wcscmp(const wchar_t*s1, const wchar_t*s2)
   assert(s2);
   for ( ; ; ++s1, ++s2 ) if ( *s1 != *s2 || !*s1 ) return *s1 - *s2;
 }
+#endif
 
 int NTL__CRTCALL wcscoll(const wchar_t*s1, const wchar_t*s2);
 
@@ -157,6 +171,7 @@ wchar_t* NTL__CRTCALL wmemchr(const wchar_t*s, wchar_t c, size_t n);
 
 ///\name Miscellaneous functions
 
+#ifndef _MSC_VER
 __forceinline
 size_t NTL__CRTCALL wcslen(const wchar_t* const s)
 {
@@ -165,6 +180,7 @@ size_t NTL__CRTCALL wcslen(const wchar_t* const s)
   while ( s[count] ) count++;
   return count;
 }
+#endif
 
 __forceinline
 wchar_t* NTL__CRTCALL wmemset(wchar_t*s, wchar_t c, size_t n)
