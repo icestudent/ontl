@@ -510,6 +510,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\stlx\cfenv.hxx"
+						>
+					</File>
+					<File
 						RelativePath=".\stlx\cfloat.hxx"
 						>
 					</File>

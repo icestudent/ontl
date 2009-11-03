@@ -36,7 +36,13 @@
 # pragma message("Unknown compiler, it is unsupported probably. Sorry, mate")
 #endif
 
-
+#if defined(__GNUC__)
+#ifdef __x86_64__
+# define _M_X64
+#else
+# define _M_IX86
+# endif
+#endif
 
 /************************************************************************/
 /* Exceptions configuration                                             */

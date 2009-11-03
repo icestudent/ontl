@@ -34,30 +34,66 @@ namespace std
   typedef long double double_t;
 #endif
 
-  #define HUGE_VAL
-  #define HUGE_VALF
-  #define HUGE_VALL
-  #define INFINITY
-  #define  NAN
-  #define  FP_INFINITE
-  #define  FP_NAN
-  #define  FP_NORMAL
-  #define  FP_SUBNORMAL
-  #define  FP_ZERO
-  #define  FP_FAST_FMA
-  #define  FP_FAST_FMAF
-  #define  FP_FAST_FMAL
-  #define  FP_ILOGB0
-  #define  FP_ILOGBNAN
-  #define  MATH_ERRNO
-  #define  MATH_ERREXCEPT
-  #define  math_errhandling
+#define  FP_ILOGB0
+#define  FP_ILOGBNAN
 
-  ///\name 7.12.3 Classification macros
+#define  MATH_ERRNO     1
+#define  MATH_ERREXCEPT 2
+
+  // no error handling
+  const int math_errhandling = 0;
+
+
+  ///\name 7.12.3 Classification
+#define HUGE_VAL (*(double*)&std::fpclass::_hex_infinityd)
+#define HUGE_VALF (*(float*)&std::fpclass::_hex_infinityf)
+#define HUGE_VALL HUGE_VALF
+
+#define INFINITY HUGE_VALF
+
+#define  NAN      (*(float*)&std::fpclass::_hex_qnanf)
+
+#define  FP_INFINITE  std::fpclass::infinity
+#define  FP_NAN       std::fpclass::nan
+#define  FP_NORMAL    std::fpclass::normal
+#define  FP_SUBNORMAL std::fpclass::subnormal
+#define  FP_ZERO      std::fpclass::zero
+
+
+  namespace fpclass 
+  {
+    enum type {
+      zero      = 0,
+      denormal  = 1,
+      normal    = 2,
+      finite    = denormal|normal,
+      infinity  = 4,
+      snan      = 8,
+      qnan      = 10,
+      nan       = qnan|snan,
+
+      negative  = 1 << 7,
+      sign  = negative,
+      subnormal = denormal,
+
+      negative_zero = zero|sign,
+      negative_denormal = denormal|sign,
+      negative_normal = normal|sign,
+      negative_finite = finite|sign,
+      negative_infinity = infinity|sign,
+      negative_snan = snan|sign,
+      negative_qnan = qnan|sign,
+      negative_nan  = nan|sign
+    };
+
+    static const uint32_t _hex_infinityf = 0x7F800000, _hex_qnanf = 0x7FC00000;
+    static const uint64_t _hex_infinityd = 0x7FF0000000000000, _hex_qnand = 0x7FF8000000000000;
+  }
+  typedef fpclass::type fpclass_t;
+
   template<typename T> typename enable_if<is_floating_point<T>::value, 
-    int>::type fpclassify(T x);
+    fpclass_t>::type fpclassify(T x);
 
-#if 1
   template<typename T> typename enable_if<is_floating_point<T>::value, 
     bool>::type isfinite(T x);
   template<typename T> typename enable_if<is_floating_point<T>::value, 
@@ -70,33 +106,20 @@ namespace std
     bool>::type signbit(T x);
 
   template<typename T> inline typename enable_if<is_integral<T>::value, 
-    int>::type fpclassify(T x) { return fpclassify<double>(double(x)); }
+    fpclass_t>::type fpclassify(T x) { return fpclassify<double>(double(x)); }
 
   template<typename T> inline typename enable_if<is_integral<T>::value, 
-    bool>::type isfinite(T x) { return true; }
+    bool>::type isfinite(T) { return true; }
   template<typename T> inline typename enable_if<is_integral<T>::value, 
-    bool>::type isinf(T x) { return false; }
+    bool>::type isinf(T) { return false; }
   template<typename T> inline typename enable_if<is_integral<T>::value, 
-    bool>::type isnan(T x) { return false; }
+    bool>::type isnan(T) { return false; }
   template<typename T> inline typename enable_if<is_integral<T>::value, 
-    bool>::type isnormal(T x) { return x != 0; }
+    bool>::type isnormal(T) { return x != 0; }
   template<typename T> inline typename enable_if<is_integral<T>::value, 
     bool>::type signbit(T x)  { return is_signed<T>::value && x < 0; }
 
-#else
 
-  template<typename T> typename enable_if<is_arithmetic<T>::value, 
-    bool>::type isfinite(T x);
-  template<typename T> typename enable_if<is_arithmetic<T>::value, 
-    bool>::type isinf(T x);
-  template<typename T> typename enable_if<is_arithmetic<T>::value, 
-    bool>::type isnan(T x);
-  template<typename T> typename enable_if<is_arithmetic<T>::value, 
-    bool>::type isnormal(T x);
-  template<typename T> typename enable_if<is_arithmetic<T>::value, 
-    bool>::type signbit(T x);
-
-#endif
 
   ///\name 7.12.4 Trigonometric functions
   double acos(double x);
@@ -360,34 +383,14 @@ namespace std
     template<typename T> struct float_promote<T,T>: float_promote<T,float> {};
     template<> struct float_promote<float,float> { typedef float type; };
 
-    //template<typename T> typename enable_if<is_floating_point<T>::value, 
-    //  bool>::type isgreater(T x, T y);
-    //template<typename T> typename enable_if<is_floating_point<T>::value, 
-    //  bool>::type isgreaterequal(T x,T y);
-    //template<typename T> typename enable_if<is_floating_point<T>::value, 
-    //  bool>::type isless(T x,T y);
-    //template<typename T> typename enable_if<is_floating_point<T>::value, 
-    //  bool>::type islessequal(T x,T y);
-    //template<typename T> typename enable_if<is_floating_point<T>::value, 
-    //  bool>::type islessgreater(T x,T y);
-    //template<typename T> typename enable_if<is_floating_point<T>::value, 
-    //  bool>::type isunordered(T x,T y);
-    
     template<typename T> bool isgreater(T x, T y);
     template<typename T> bool isgreaterequal(T x, T y);
     template<typename T> bool isless(T x, T y);
     template<typename T> bool islessequal(T x, T y);
     template<typename T> bool islessgreater(T x, T y);
     template<typename T> bool isunordered(T x, T y);
-
-
-    //template<typename T> inline typename enable_if<is_integral<T>::value, bool>::type isgreater(T x, T y)     { return x > y;  }
-    //template<typename T> inline typename enable_if<is_integral<T>::value, bool>::type isgreaterequal(T x,T y) { return x >= y; }
-    //template<typename T> inline typename enable_if<is_integral<T>::value, bool>::type isless(T x,T y)         { return x < y;  }
-    //template<typename T> inline typename enable_if<is_integral<T>::value, bool>::type islessequal(T x,T y)    { return x <= y; }
-    //template<typename T> inline typename enable_if<is_integral<T>::value, bool>::type islessgreater(T x,T y)  { return (x < y) || (y < x); }
-    //template<typename T> inline typename enable_if<is_integral<T>::value, bool>::type isunordered(T x,T y)    { return false;  }
   }
+
   template<typename U, typename V>
   inline typename enable_if<is_arithmetic<U>::value && is_arithmetic<V>::value, bool>::type
     isgreater(U x, V y)
