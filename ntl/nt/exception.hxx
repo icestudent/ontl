@@ -1121,7 +1121,7 @@ namespace cxxruntime {
 #ifdef _M_IX86
     uintptr_t stackbaseptr() const
     {
-      //STATIC_ASSERT(sizeof(cxxregistration) == 0xC || sizeof(cxxregistration) == 20);
+      STATIC_ASSERT(sizeof(cxxregistration) == 0xC);
       return reinterpret_cast<uintptr_t>(this + 1);
     }
 
@@ -1453,7 +1453,7 @@ namespace cxxruntime {
       cxxregistration *   cxxreg;
       int                 catchdepth;
     };
-    //STATIC_ASSERT(sizeof(catchguard) == 28);
+    //STATIC_ASSERT(sizeof(catchguard) == 20);
 
 #ifndef _M_X64
 
@@ -1538,7 +1538,7 @@ namespace cxxruntime {
       int                   const catchdepth,
       unsigned              const nlg_code)
     {
-      catchguard guard;
+      volatile catchguard guard;
       guard.next        = nt::teb::get(&nt::teb::ExceptionList);
       guard.handler     = catchguardhandler;
       guard.funcinfo    = funcinfo;
