@@ -1224,7 +1224,7 @@ public:
   friend
   basic_string&& operator+(basic_string&& lhs, charT rhs)
   {
-    return move(lhs.append(rhs));
+    return move(lhs.append(1, rhs));
   }
 #endif
 
