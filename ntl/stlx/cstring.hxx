@@ -51,8 +51,8 @@ __forceinline
 void *
   memcpy(void * const dst, const void * const src, size_t n)
 {
-  assert(dst);
-  assert(src);
+  assert(dst || n == 0);
+  assert(src || n == 0);
   const char * s = reinterpret_cast<const char*>(src);
   char * d = reinterpret_cast<char*>(dst);
   while ( n-- ) *d++ = *s++;
@@ -65,8 +65,8 @@ void *
 NTL__CRTCALL
   memcpy(void * const dst, const void * const src, size_t n)
 {
-  assert(dst);
-  assert(src);
+  assert(dst || n == 0);
+  assert(src || n == 0);
   ext::memcpy(dst, src, n);
   return dst;
 }
@@ -77,8 +77,8 @@ __forceinline
 void *
   memcpybw(void * const dst, const void * const src, size_t n)
 {
-  assert(dst);
-  assert(src);
+  assert(dst || n == 0);
+  assert(src || n == 0);
   const char * const s = reinterpret_cast<const char*>(src);
   char * const d = reinterpret_cast<char*>(dst);
   while ( n-- ) d[n] = s[n];
@@ -90,8 +90,8 @@ void *
 NTL__CRTCALL
   memmove(void * const dst, const void * const src, size_t n)
 {
-  assert(dst);
-  assert(src);
+  assert(dst || n == 0);
+  assert(src || n == 0);
   return ( reinterpret_cast<char*>(dst) < reinterpret_cast<const char*>(src) )
      ? memcpy(dst, src, n) : ext::memcpybw(dst, src, n);
 }
@@ -124,8 +124,8 @@ strcpy(char * const dst, const char * const src)
 __forceinline
 char* NTL__CRTCALL strncpy(char* dst, const char* src, size_t n)
 {
-  assert(dst);
-  assert(src);
+  assert(dst || n == 0);
+  assert(src || n == 0);
   while (n && (*dst++ = *src++) != 0)
     n--;
   if(n)
@@ -168,8 +168,8 @@ int
 NTL__CRTCALL
 memcmp(const void * s1, const void * s2, size_t n)
 {
-  assert(s1);
-  assert(s2);
+  assert(s1 || n == 0);
+  assert(s2 || n == 0);
   const unsigned char * p  = reinterpret_cast<const unsigned char*>(s1);
   const unsigned char * p2 = reinterpret_cast<const unsigned char*>(s2);
   for ( const unsigned char * const end = p + n; p != end; ++p, ++p2 )
@@ -198,8 +198,8 @@ int
 NTL__CRTCALL
 strncmp(const char * s1, const char * s2, size_t n)
 {
-  assert(s1);
-  assert(s2);
+  assert(s1 || n == 0);
+  assert(s2 || n == 0);
   for ( ; n; --n, ++s1, ++s2 )
     if ( !*s1 || *s1 != *s2 )
       return  *reinterpret_cast<const unsigned char*>(s1)
@@ -213,7 +213,7 @@ size_t NTL__CRTCALL strxfrm(char * __restrict s1, const char * __restrict s2, si
 __forceinline
 const void * NTL__CRTCALL memchr(const void * const mem, const int c, size_t n)
 {
-  assert(mem);
+  assert(mem || n == 0);
   const unsigned char * p = reinterpret_cast<const unsigned char*>(mem);
   while ( n-- )
     if ( static_cast<unsigned char>(c) != *p ) ++p;
@@ -259,7 +259,7 @@ __forceinline
 void *
   memset(void * const s, int c, size_t n)
 {
-  assert(s);
+  assert(s || n == 0);
   unsigned char * p = reinterpret_cast<unsigned char*>(s);
   while ( n-- )
     *p++ = static_cast<unsigned char>(c);
@@ -272,7 +272,7 @@ void *
 NTL__CRTCALL
   memset(void * const s, int c, size_t n)
 {
-  assert(s);
+  assert(s || n == 0);
   unsigned char * const p = reinterpret_cast<unsigned char*>(s);
   for ( unsigned i = 0; i != n; ++i )
     p[i] = static_cast<unsigned char>(c);
