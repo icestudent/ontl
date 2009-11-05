@@ -110,7 +110,16 @@ namespace std {
     #endif
 
 #ifdef NTL__CXX_RV
-    using tree_type::insert;
+    std::pair<iterator, bool> insert(const value_type& x)
+    {
+      return insert_impl(construct_node(x));
+    }
+
+    iterator insert(const_iterator /*position*/, const value_type& x)
+    {
+      // TODO: implement fast insert function based on position
+      return insert_impl(construct_node(x)).first;
+    }
 
     std::pair<iterator, bool> insert(value_type&& x)
     {

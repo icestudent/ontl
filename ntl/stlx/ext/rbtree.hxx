@@ -367,7 +367,7 @@ namespace std
         iterator insert(const_iterator /*position*/, const value_type& x)
         {
           // TODO: implement fast insert function based on position
-          return insert(x).first;
+          return insert_impl(construct_node(x)).first;
         }
 
         template <class InputIterator>

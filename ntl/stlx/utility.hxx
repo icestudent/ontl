@@ -234,13 +234,18 @@ struct pair
     }
 
     void swap(pair&& p)
-#else
-    void swap(pair& p)
-#endif
     {
       std::swap(first, p.first);
       std::swap(second, p.second);
     }
+#endif
+#if !defined(NTL__CXX_RV) || defined(NTL__CXX_RVFIX)
+    void swap(pair& p)
+    {
+      std::swap(first, p.first);
+      std::swap(second, p.second);
+    }
+#endif
 };
 #pragma warning(pop)
 
