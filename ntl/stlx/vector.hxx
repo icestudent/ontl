@@ -105,8 +105,13 @@ class vector
     {
       end_ = begin_ = array_allocator.allocate(n);
       // TODO: detect move constructor existance and split this implementation in two other (common and move)
+#if !defined(NTL__CXX_RV) || defined(NTL__CXX_RVFIX)
+      while(n--)
+        array_allocator.construct(end_++, T());
+#else
       while(n--)
         array_allocator.construct(end_++, forward<value_type>(T()));
+#endif
     }
 
     vector(size_type n,

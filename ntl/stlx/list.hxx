@@ -448,15 +448,24 @@ class list
 
     #ifdef NTL__CXX_RV
     void swap(list<T,Allocator>&& x)
-    #else
-    void swap(list<T, Allocator>& x)
-#endif
     {
-      std::swap(size_, x.size_);
-      std::swap(head.next, x.head.next);
-      std::swap(head.prev, x.head.prev);
-      std::swap(node_allocator, x.node_allocator);
+      using std::swap;
+      swap(size_, x.size_);
+      swap(head.next, x.head.next);
+      swap(head.prev, x.head.prev);
+      swap(node_allocator, x.node_allocator);
     }
+    #endif
+    #if !defined(NTL__CXX_RV) || defined(NTL__CXX_RVFIX)
+    void swap(list<T, Allocator>& x)
+    {
+      using std::swap;
+      swap(size_, x.size_);
+      swap(head.next, x.head.next);
+      swap(head.prev, x.head.prev);
+      swap(node_allocator, x.node_allocator);
+    }
+    #endif
 
     __forceinline
     void clear() { erase(begin(), end()); }

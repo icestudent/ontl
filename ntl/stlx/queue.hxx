@@ -94,9 +94,10 @@ namespace std {
     void pop() { c.pop_front(); }
     
     #ifdef NTL__CXX_RV
-    void swap(queue&& q) { c.swap(q.c); }
-    #else
-    void swap(queue& q)  { c.swap(q.c); }
+    void swap(queue&& q) { c.swap(move(q.c)); }
+    #endif
+    #if !defined(NTL__CXX_RV) || defined(NTL__CXX_RVFIX)
+    void swap(queue& q)  { c.swap(move(q.c)); }
     #endif
 
     friend inline bool operator==(const queue<T, Container>& x, const queue<T, Container>& y) { return x.c == y.c; }

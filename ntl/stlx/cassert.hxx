@@ -8,6 +8,8 @@
 #define NTL__STLX_CASSERT
 #pragma once
 
+#include "cstddef.hxx"
+
 //namespace std {
 
 #ifdef _DEBUG

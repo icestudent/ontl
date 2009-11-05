@@ -51,8 +51,13 @@ namespace std {
       if(n){
         reserve(n);
         capR -= n;
+      #if !defined(NTL__CXX_RV) || defined(NTL__CXX_RVFIX)
         while(n--)
-          alloc.construct(right++, forward<value_type>(value_type()));
+          alloc.construct(right++, T());
+      #else
+        while(n--)
+          alloc.construct(right++, forward<value_type>(T()));
+      #endif
       }
     }
 
@@ -216,8 +221,13 @@ namespace std {
         if(sz > capR)
           reallocate(sz/*-capR*/);
         capR -= sz;
+      #if !defined(NTL__CXX_RV) || defined(NTL__CXX_RVFIX)
         while(sz--)
-          alloc.construct(right++, forward<value_type>(value_type()));
+          alloc.construct(right++, T());
+      #else
+        while(sz--)
+          alloc.construct(right++, forward<value_type>(T()));
+      #endif
         validate();
       }
     #endif
@@ -420,22 +430,38 @@ namespace std {
 
     #ifdef NTL__CXX_RV
     void swap(deque<T,Allocator>&& x)
-    #else
-    void swap(deque<T,Allocator>& x)
-    #endif
     {
       if(this != &x){
+        using std::swap;
         pointer l = left, r = right;
         size_type cl = capL, cr = capR;
         left = x.left, right = x.right;
         capL = x.capL, capR = x.capR;
         x.left = l, x.right = r;
         x.capL = cl, x.capR = cr;
-        std::swap(alloc, x.alloc);
-        std::swap(base_, x.base_);
-        std::swap(cap_,  x.cap_);
+        swap(alloc, x.alloc);
+        swap(base_, x.base_);
+        swap(cap_,  x.cap_);
       }
     }
+    #endif
+    #if !defined(NTL__CXX_RV) || defined(NTL__CXX_RVFIX)
+    void swap(deque<T,Allocator>& x)
+    {
+      if(this != &x){
+        using std::swap;
+        pointer l = left, r = right;
+        size_type cl = capL, cr = capR;
+        left = x.left, right = x.right;
+        capL = x.capL, capR = x.capR;
+        x.left = l, x.right = r;
+        x.capL = cl, x.capR = cr;
+        swap(alloc, x.alloc);
+        swap(base_, x.base_);
+        swap(cap_,  x.cap_);
+      }
+    }
+    #endif
 
     void clear()
     {
