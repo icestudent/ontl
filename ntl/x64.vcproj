@@ -1119,6 +1119,18 @@
 				Name="rtl"
 				>
 				<File
+					RelativePath=".\rtl\consoleapp.cpp"
+					>
+					<FileConfiguration
+						Name="debug|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
 					RelativePath=".\rtl\crt.cpp"
 					>
 					<FileConfiguration

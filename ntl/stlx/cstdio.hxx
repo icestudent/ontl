@@ -18,6 +18,9 @@
 #ifndef _INC_STDLIB// MSVC compatibility
 
 NTL__EXTERNAPI size_t __cdecl
+  sprintf(char *buffer, const char *format, ...);
+
+NTL__EXTERNAPI size_t __cdecl
   _snprintf(char *buffer, size_t count, const char *format, ...);
 
 NTL__EXTERNAPI size_t __cdecl
