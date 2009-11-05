@@ -417,7 +417,7 @@ private:
       /** Returns a string naming the error category ("iostream") */
       const char *name() const __ntl_nothrow { return "iostream"; }
 
-      virtual string message(int ev) const;
+      inline virtual string message(int ev) const;
 
       /**
       *	If the argument \c ev corresponds to a POSIX \c errno value \c posv, 

@@ -56,6 +56,13 @@ inline error_condition make_error_condition(io_errc e)
 {
   return error_condition(static_cast<int>(e), iostream_category());
 }
+
+string __::iostream_error_category::message(int ev) const
+{
+  char buf[40];
+  sprintf(buf, "iostream error code #%d%s", ev, ev == io_errc::stream ? ": 'stream'" : "");
+  return string(buf);
+}
 ///\}
 
 /// 27.4.2 Class ios_base [ios.base]
