@@ -281,7 +281,7 @@ namespace std
           }
         }
 
-#ifdef NTL__CXX_RV
+  #ifdef NTL__CXX_RV
         void assign(rb_tree&& x)
         {
           if(this != x){
@@ -289,7 +289,7 @@ namespace std
             swap(x);
           }
         }
-#endif
+  #endif
 
       protected:
         node_type* construct_node(const value_type& x)
@@ -299,7 +299,7 @@ namespace std
           return np;
         }
 
-#ifdef NTL__CXX_RV
+    #ifdef NTL__CXX_RV
         node_type* construct_node(value_type&& x)
         {
           node_type* const np = node_allocator.allocate(1);
@@ -311,7 +311,7 @@ namespace std
         {
           return insert_impl(construct_node(std::forward<value_type>(x)));
         }
-#endif
+    #endif
 
         std::pair<iterator, bool> insert_impl(node* const np)
         {
@@ -358,6 +358,7 @@ namespace std
         }
 
       public:
+
         std::pair<iterator, bool> insert(const value_type& x)
         {
           return insert_impl(construct_node(x));
@@ -452,20 +453,30 @@ namespace std
           return pos == end() ? 0 : (erase(pos), 1);
         }
 
-#ifdef NTL__CXX_RV
+    #ifdef NTL__CXX_RV
         void swap(rb_tree<T, Compare, Allocator>&& tree)
-#else
-        void swap(rb_tree<T, Compare, Allocator>& tree)
-#endif
         {
           if(this != &tree){
-            //if(node_allocator == tree.node_allocator){
-            std::swap(root_, tree.root_);
-            std::swap(count_, tree.count_);
-            std::swap(comparator_, tree.comparator_);
-            std::swap(node_allocator, tree.node_allocator);
+            using std::swap;
+            swap(root_, tree.root_);
+            swap(count_, tree.count_);
+            swap(comparator_, tree.comparator_);
+            swap(node_allocator, tree.node_allocator);
           }
         }
+    #endif
+    #if !defined(NTL__CXX_RV) || defined(NTL__CXX_RVFIX)
+        void swap(rb_tree<T, Compare, Allocator>& tree)
+        {
+          if(this != &tree){
+            using std::swap;
+            swap(root_, tree.root_);
+            swap(count_, tree.count_);
+            swap(comparator_, tree.comparator_);
+            swap(node_allocator, tree.node_allocator);
+          }
+        }
+    #endif
 
         void clear()
         {

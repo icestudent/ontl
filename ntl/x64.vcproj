@@ -1007,7 +1007,7 @@
 					>
 				</File>
 				<File
-					RelativePath=".\nt\exception.hxx"
+					RelativePath=".\nt\exceptions.hxx"
 					>
 				</File>
 				<File

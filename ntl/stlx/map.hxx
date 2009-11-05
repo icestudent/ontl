@@ -249,17 +249,19 @@ public:
 #endif
 
 #ifdef NTL__CXX_RV
-    template <class P>
-    pair<iterator, bool> insert(P&& x)
-    {
-      return tree_type::insert(std::forward<P>(x));
-    }
+    using tree_type::insert;
 
-    //template <class P>
-    //iterator insert(const_iterator position, P&& x);
-    //{
-    //  return tree_type::insert(position, std::forward<P>(x)).first;
-    //}
+    template<class P>
+    std::pair<iterator, bool> insert(P&& x)
+    {
+      return insert_reference(std::forward<P>(x));
+    }
+    template<class P>
+    iterator insert(const_iterator /*position*/, P&& x)
+    {
+      // TODO: implement fast insert function based on position
+      return insert_reference(std::forward<P>(x)).first;
+    }
 #endif
 
     __forceinline
@@ -278,13 +280,24 @@ public:
 
 #ifdef NTL__CXX_RV
     void swap(map<Key,T,Compare,Allocator>&& x)
-#else
-    void swap(map<Key,T,Compare,Allocator>& x)
-#endif
     {
-      tree_type::swap(x);
-      std::swap(val_comp_, x.val_comp_);
+      if(this != &x){
+        tree_type::swap(forward<map>(x));
+        using std::swap;
+        swap(val_comp_, x.val_comp_);
+      }
     }
+#endif
+#if !defined(NTL__CXX_RV) || defined(NTL__CXX_RVFIX)
+    void swap(map<Key,T,Compare,Allocator>& x)
+    {
+      if(this != &x){
+        tree_type::swap(x);
+        using std::swap;
+        swap(val_comp_, x.val_comp_);
+      }
+    }
+#endif
 
     // observers:
     key_compare key_comp() const { return val_comp_.comp; }

@@ -557,17 +557,23 @@ class vector
     #ifdef NTL__CXX_RV
     void swap(vector<T,Allocator>&& x) __ntl_nothrow
     {
-      std::swap(begin_, x.begin_);
-      std::swap(end_, x.end_);
-      std::swap(capacity_, x.capacity_);
+      if(this != &x){
+        using std::swap;
+        swap(begin_, x.begin_);
+        swap(end_, x.end_);
+        swap(capacity_, x.capacity_);
+      }
     }
     #endif
     #if !defined(NTL__CXX_RV) || defined(NTL__CXX_RVFIX)
     void swap(vector<T, Allocator>& x) __ntl_nothrow
     {
-      std::swap(begin_, x.begin_);
-      std::swap(end_, x.end_);
-      std::swap(capacity_, x.capacity_);
+      if(this != &x){
+        using std::swap;
+        swap(begin_, x.begin_);
+        swap(end_, x.end_);
+        swap(capacity_, x.capacity_);
+      }
     }
     #endif
 

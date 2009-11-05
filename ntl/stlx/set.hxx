@@ -109,17 +109,19 @@ namespace std {
     template <class... Args> iterator emplace(const_iterator position, Args&&... args);
     #endif
 
-    #ifdef NTL__CXX_RV
-    pair<iterator,bool> insert(value_type&& x)
-    {
-      return tree_type::insert(x);
-    }
+#ifdef NTL__CXX_RV
+    using tree_type::insert;
 
-    iterator insert(const_iterator position, value_type&& x)
+    std::pair<iterator, bool> insert(value_type&& x)
     {
-      return tree_type::insert(position, x);
+      return insert_reference(std::forward<value_type>(x));
     }
-    #endif
+    iterator insert(const_iterator /*position*/, value_type&& x)
+    {
+      // TODO: implement fast insert function based on position
+      return insert_reference(std::forward<value_type>(x)).first;
+    }
+#endif
 
     // observers:
     key_compare key_comp() const { return tree_type::value_comp(); }

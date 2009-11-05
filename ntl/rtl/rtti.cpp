@@ -2,7 +2,7 @@
 #include "../stlx/typeinfo.hxx"
 
 #include "../pe/image.hxx"
-#include "../nt/exception.hxx"
+#include "../nt/exceptions.hxx"
 #include "../nt/status.hxx"
 
 #ifdef NTL__SUBSYSTEM_KM
