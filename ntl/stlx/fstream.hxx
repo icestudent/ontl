@@ -524,7 +524,7 @@ namespace std {
 
   private:
     template<class Path>
-    bool do_open(const Path& name, ios_base::openmode mode, EncodingType enc, typename enable_if<__fs::is_basic_path<Path>::value>::type* =0)
+    bool do_open(const Path& name, ios_base::openmode mode, EncodingType enc)
     {
       if(f)
         return false;
