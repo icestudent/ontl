@@ -260,9 +260,10 @@ class basic_ostream
           if(traits_type::eq_int_type(buf->sputc(traits_type::to_char_type(c)), eof))
             break;
           ++n;
+          c = sb->snextc();
         }
-        if(traits_type::eq_int_type(c, eof))
-          state |= ios_base::eofbit;
+        //if(traits_type::eq_int_type(c, eof))
+        //  state |= ios_base::eofbit;
       }
       __ntl_catch(...)
       {

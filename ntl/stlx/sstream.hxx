@@ -44,8 +44,8 @@ namespace std {
 
   /**
    *	@brief 27.7.1 Class template basic_stringbuf [stringbuf]
-   *  @details The class basic_stringbuf is derived from basic_streambuf to associate 
-   *  possibly the input sequence and possibly the output sequence with a sequence of arbitrary characters. 
+   *  @details The class basic_stringbuf is derived from basic_streambuf to associate
+   *  possibly the input sequence and possibly the output sequence with a sequence of arbitrary characters.
    *  The sequence can be initialized from, or made available as, an object of class basic_string.
    **/
   template <class charT, class traits, class Allocator>
@@ -97,14 +97,14 @@ namespace std {
     }
 
     ///\name 27.7.1.3 Get and set:
-    basic_string<charT,traits,Allocator> str() const 
-    { 
+    basic_string<charT,traits,Allocator> str() const
+    {
       // NOTE: update to the specification:
       /*
        * If the basic_stringbuf was created only in input mode, the resultant basic_string
       contains the character sequence in the range [eback(),egptr()).
-       * If the basic_stringbuf was created with which & ios_base::out being true 
-      then the resultant basic_string contains the character sequence in the range [pbase(),high_mark), 
+       * If the basic_stringbuf was created with which & ios_base::out being true
+      then the resultant basic_string contains the character sequence in the range [pbase(),high_mark),
       where high_mark represents the position one past the highest initialized character in the buffer.
        */
       const char_type * const beg = mode_ & ios_base::out ? this->pbase()
@@ -114,8 +114,8 @@ namespace std {
       return basic_string<charT,traits,Allocator>(beg, end);
     }
 
-    void str(const basic_string<charT,traits,Allocator>& s) 
-    { 
+    void str(const basic_string<charT,traits,Allocator>& s)
+    {
       //str_ = s;
       if(mode_ & ios_base::out){
         // reserve additional characters for output buffer
@@ -132,8 +132,19 @@ namespace std {
 
   protected:
     ///\name 27.7.1.4 Overridden virtual functions:
+    streamsize showmanyc()
+    {
+      streamsize c = -1;
+      if(mode_ & ios_base::in){
+        syncg();
+        c = egptr()-gptr();
+      }
+      return c;
+    }
+
     virtual int_type underflow()
     {
+      syncg();
       return this->gptr() < this->egptr()
         ? traits::to_int_type(*this->gptr()) : traits::eof();
     }
@@ -178,10 +189,13 @@ namespace std {
         if(str_.size() < str_.capacity())
           str_.resize(str_.capacity(), '\0'); // we are also buffer, so lets use all memory
 
-        set_ptrs();
-        pbump(static_cast<int>(pp)); // NOTE: there is an issue about this
+        char_type* newbeg = str_.begin();
+        setp(newbeg, str_.end());
+        pbump(static_cast<int>(pp)); // NOTE: there is an issue in "C++ Standard Library Issues List" about this
+
+        // 27.8.1.4/8
         if(mode_ & ios_base::in)
-          gbump(static_cast<int>(gp));
+          setg(newbeg, newbeg+gp, pptr());
         *pptr() = cc;
         pbump(1);
       }
@@ -200,14 +214,7 @@ namespace std {
       const char_type* const beg = in ? eback() : pbase();
       if((beg || !off) && (in || out || both)){
         // updage egptr
-        char_type* const pp = pptr();
-        if(pp && pp > egptr()){
-          if(mode_ & ios_base::in)
-            setg(eback(), gptr(), pp);
-          else
-            setg(pp,pp,pp);
-        }
-
+        syncg();
         off_type newoff = off;
         if(way == ios_base::cur)
           newoff += gptr() - beg;
@@ -231,6 +238,7 @@ namespace std {
       const bool in = (which & ios_base::in) != 0, out = (which & ios_base::out) != 0;
       bool ok = false;
       if(sp != -1 && (in || out)){
+        syncg();
         ok = true;
         if(in){
           if(sp >= 0 && sp < (egptr()-eback()))
@@ -261,7 +269,17 @@ namespace std {
         this->setp(str_.begin(), str_.end());
       }
       if ( mode_ & ios_base::in )
-        this->setg(str_.begin(), str_.begin(), str_.end());      
+        this->setg(str_.begin(), str_.begin(), str_.end());
+    }
+    void syncg()
+    {
+      char_type* const p = pptr();
+      if(p && p > egptr()){
+        if(mode_ & ios_base::in)
+          setg(eback(), gptr(), p);
+        else
+          setg(p, p, p);
+      }
     }
   private:
     basic_string<charT, traits> str_;
@@ -271,7 +289,7 @@ namespace std {
 
   /**
    *	@brief 27.7.2 Class template basic_istringstream [istringstream]
-   *  @details The class basic_istringstream<charT, traits, Allocator> supports reading objects of class 
+   *  @details The class basic_istringstream<charT, traits, Allocator> supports reading objects of class
    *  basic_string<charT, traits, Allocator>. It uses a basic_stringbuf<charT, traits, Allocator> object
    *  to control the associated storage.
    **/
@@ -307,7 +325,7 @@ namespace std {
       swap(rhs); return *this;
     }
   #endif
-    
+
     void swap(basic_istringstream& rhs)
     {
       basic_istream::swap(rhs);
@@ -332,7 +350,7 @@ namespace std {
 
   /**
    *	@brief 27.7.3 Class basic_ostringstream [ostringstream]
-   *  @details The class basic_ostringstream<charT, traits, Allocator> supports writing objects of class 
+   *  @details The class basic_ostringstream<charT, traits, Allocator> supports writing objects of class
    *  basic_string<charT, traits, Allocator>. It uses a basic_stringbuf object to control the associated storage.
    **/
   template <class charT, class traits, class Allocator>
