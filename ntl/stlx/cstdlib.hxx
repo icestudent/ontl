@@ -205,9 +205,13 @@ long int __cdecl labs(long int n);
 #ifdef _MSC_VER
 long long __cdecl _abs64(long long n);
 #pragma intrinsic(abs,labs,_abs64)
+#if _MSC_VER >= 1600
+long long __cdecl llabs(long long int n);
+#pragma intrinsic(llabs)
+#else
+inline long long int llabs(long long int n) { return _abs64(n); }
 #endif
-
-inline long long int NTL__CRTCALL llabs(long long int n) { return _abs64(n); }
+#endif
 
 #if 0
 /// 7.20.6.2 The div, ldiv, and lldiv functions
