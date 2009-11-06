@@ -106,7 +106,7 @@ bool operator>=(const T & x, const T & y) { return !(x < y); }
     const T& operator()(const T& x) const { return x; }
   };
 
-# if 1
+# if 0
   ///\name move emulation
 
   template<typename T>

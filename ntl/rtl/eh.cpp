@@ -32,7 +32,7 @@
 
 #pragma region std::unexpected
 /// RTL poiner to the current unexpected_handler
-std::unexpected_handler __ntl_std_unexpected_handler;
+volatile std::unexpected_handler __ntl_std_unexpected_handler;
 
 std::unexpected_handler std::set_unexpected(std::unexpected_handler f) __ntl_nothrow
 {
@@ -43,7 +43,8 @@ std::unexpected_handler std::set_unexpected(std::unexpected_handler f) __ntl_not
 
 void std::unexpected()
 {
-  if(__ntl_std_unexpected_handler)
+  std::unexpected_handler handler = __ntl_std_unexpected_handler;
+  if(handler)
     __ntl_std_unexpected_handler();
   else
     std::terminate();
@@ -99,7 +100,6 @@ ntl::cxxruntime::cxxframehandler(
           eframe->unwind(dispatch, ehfi, state);
           unwinded = true;
         }else if(er->isconsolidate()){
-          __debugbreak();
           ehstate_t state = static_cast<ehstate_t>(er->ExceptionInformation[3]);
           if(state < -1 || state >= ehfi->unwindtable_size)
             __debugbreak();
@@ -277,6 +277,10 @@ void fixptr(uintptr_t base, const rva_t ptr, T& vptr)
   vptr = (T)(base + ptr);
 }
 
+#ifdef __ICL
+# define __CxxFrameHandler3 __CxxFrameHandler
+#endif
+
 ///\see exception_handler
 /// indirectly called by _CxxThrowException -> RtlDispatchException (RtlpExecuteHandlerForException)
 /// OR RtlUnwind (RtlpExecuteHandlerForUnwind)
@@ -316,22 +320,6 @@ __CxxFrameHandler3(
 #endif
 }
 
-#ifdef __ICL
-extern "C"
-exception_disposition
-__cdecl ///\note actually the first arg is passed in EAX register on x86
-__CxxFrameHandler(
-                   /** ehfuncinfo * eax on x86 */
-                   exception_record *    er,       ///< thrown NT exception
-                   cxxregistration *     frame,    ///< tib::ExceptionList node
-                   nt::context *         ectx,     ///< not used on x86
-                   dispatcher_context *  dispatch  ///< not used on x86
-                   )
-{
-  const ehfuncinfo* /*const*/ ehfi = reinterpret_cast<const ehfuncinfo*>(get_eax());
-  return cxxframehandler(er, frame, ectx, dispatch, ehfi);
-}
-#endif
 ///\todo __EH_prolog for /Os
 
 void ntl::nt::exception::inconsistency()

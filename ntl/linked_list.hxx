@@ -67,7 +67,7 @@ struct linked<2>
     link(prev, prev->next);
   }
 
-  void static unlink(this_type * prev, this_type * next)
+  static void unlink(this_type * prev, this_type * next)
   {
     prev->next = next; next->prev = prev;
   }

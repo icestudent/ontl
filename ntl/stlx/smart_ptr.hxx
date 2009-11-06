@@ -716,7 +716,7 @@ namespace std
     public:
       bad_weak_ptr()
       {}
-      virtual const char* what() __ntl_nothrow { return "bad_weak_ptr"; }
+      virtual const char* what() const __ntl_nothrow { return "bad_weak_ptr"; }
     };
 
     template<class T> class weak_ptr;

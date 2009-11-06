@@ -95,7 +95,9 @@ class type_info
     mutable void* data;
     const char* mname() const { return reinterpret_cast<const char*>(this + 1); }
 };
+#if defined(_MSC_VER) && !defined(__ICL)
 static_assert(sizeof _TypeDescriptor == sizeof type_info, "broken type");
+#endif
 
 #if STLX__USE_RTTI && !defined(__ICL)
 inline type_info::~type_info()

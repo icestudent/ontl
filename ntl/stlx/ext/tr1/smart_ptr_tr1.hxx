@@ -34,7 +34,7 @@ namespace std
     public:
       bad_weak_ptr()
       {}
-      const char* what() __ntl_nothrow { return "tr1::bad_weak_ptr"; }
+      const char* what() const __ntl_nothrow { return "tr1::bad_weak_ptr"; }
     };
 
     template<class T> class weak_ptr;
