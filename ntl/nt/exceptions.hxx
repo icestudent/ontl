@@ -1130,7 +1130,7 @@ namespace cxxruntime {
       // what this stuff is about to do?
       const ehstate_t cs = ehfi->unwindtable_size <= 0x80 ?
         static_cast<int8_t>(this->state) : this->state;
-      assert( cs > -1 );
+      assert( cs >= -1 );
       assert( cs < ehfi->unwindtable_size );
       return cs;
     }
@@ -1303,6 +1303,7 @@ namespace cxxruntime {
       (void)dispatch;
       for ( ehstate_t cs = current_state(ehfi); cs != to_state; cs = ehfi->unwindtable[cs].state )
       {
+        assert( cs > -1 );
         __try
         {
           if ( ehfi->unwindtable[cs].unwindfunclet )
@@ -1698,7 +1699,6 @@ namespace cxxruntime {
       (void)recursive;
       cxxregistration* const cxxframe = cxxreg;
 #endif
-
 
       //  15.3/7  A handler is considered active when initialization is complete
       //          for the formal parameter (if any) of the catch clause.
