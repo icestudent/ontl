@@ -1209,19 +1209,20 @@ namespace cxxruntime {
       frame_info(void* thrown_object)
       {
         object_ = thrown_object;
-        frame_info* head = info_ < this ? 0 : info_;
+        frame_info** info_ = info();
+        frame_info* head = *info_ < this ? 0 : *info_;
         next = head;
-        info_ = this;
+        *info_ = this;
       }
 
       void unlink()
       {
-        frame_info* head = info_;
+        frame_info* head = *info();
         if(this != head)
           nt::exception::inconsistency();
         do{
           if(head == this){
-            info_ = next;
+            *info() = next;
             break;
           }
         }while(head = head->next, head);
@@ -1229,18 +1230,18 @@ namespace cxxruntime {
 
       static bool find(void* object)
       {
-        frame_info* p = info_;
+        const frame_info* p = *info();
         while(p){
           if(p->object_ == object)
             return false;
         }
         return true;
       }
+    protected:
+      static frame_info** info() { return reinterpret_cast<frame_info**>(&_getptd()->frame_info); }
     private:
       void* object_;
       frame_info* next;
-      // TODO: replace this with ptd
-      static frame_info* info_;
     };
 
     void unwindnestedframes(const exception_record* ehrec, const nt::context* ctx, uintptr_t establishedframe, const void* handler, int state, const ehfuncinfo* ehfi, dispatcher_context* const dispatch, bool recursive);

@@ -140,11 +140,6 @@ ntl::cxxruntime::cxxframehandler(
 extern "C" generic_function_t* RtlVirtualUnwind(uint32_t HandlerType, uintptr_t ImageBase, uintptr_t ControlPc, nt::exception::runtime_function* FunctionEntry, nt::context* Context, 
                                                 void** HandlerData, uintptr_t* EstablisherFrame, void* ContextPointers);
 
-extern "C" void* _AddressOfReturnAddress();
-void* get_ip()
-{
-  return _AddressOfReturnAddress();
-}
 
 extern "C" void* _GetImageBase()
 {
@@ -169,9 +164,6 @@ void cxxregistration::unwindnestedframes(const exception_record* ehrec, const nt
   nt::context octx;
   RtlUnwindEx(fp.FramePointers, dispatch->ControlPc, &er, 0, &octx, dispatch->HistoryTable);
 }
-
-//////////////////////////////////////////////////////////////////////////
-cxxregistration::frame_info* cxxregistration::frame_info::info_ = NULL;
 
 exception_filter ExFilterRethrow(exception_pointers* ep, cxxrecord* old, bool& rethrown)
 {
