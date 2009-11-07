@@ -1122,6 +1122,14 @@
 					RelativePath=".\rtl\consoleapp.cpp"
 					>
 					<FileConfiguration
+						Name="debug|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
 						Name="debug|Win32"
 						ExcludedFromBuild="true"
 						>

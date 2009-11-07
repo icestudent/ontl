@@ -1901,7 +1901,7 @@ next_try:;
         // check the current exception
         if(!current_exception())
           return;
-        return;
+        //return;
 
         // restore exception information
         isRethrow = true;

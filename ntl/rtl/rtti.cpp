@@ -429,10 +429,11 @@ extern "C" void* __cdecl __RTtypeid(void* object) __ntl_throws(...)
 #else
     const pe::image* pe;
     if(!locator.type || !(pe = pe::image::base_from(object), pe)){
-      __ntl_throw(std::bad_typeid(/*"A typeid of bad pointer attempted"*/));
-    #if STLX__USE_EXCEPTIONS == 0
-      return nullptr;
-    #endif
+      pe = pe::image::this_module();
+    //  __ntl_throw(std::bad_typeid(/*"A typeid of bad pointer attempted"*/));
+    //#if STLX__USE_EXCEPTIONS == 0
+    //  return nullptr;
+    //#endif
     }
     return pe->va<void*>(locator.type);
 #endif
