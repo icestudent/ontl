@@ -1021,10 +1021,10 @@ namespace cxxruntime {
 
     ehstate_t state_from_ip(const dispatcher_context* const dispatch, const void* ip) const
     {
+      const rva_t va_ip = static_cast<rva_t>((uintptr_t)ip - (uintptr_t)dispatch->ImageBase);
       for(uint32_t i = 0; i < ipmap_count; i++){
         const ipstateentry* entry = &ipmap[i];
-        const void* p = dispatch->va<const void*>(entry->ip);
-        if(ip < p)
+        if(va_ip < entry->ip)
           return ipmap[i-1].state;
       }
       return -1;
@@ -1043,13 +1043,13 @@ namespace cxxruntime {
     RtlLookupFunctionEntry(
     const void* ControlPc,
     void**      ImageBase,
-    nt::exception::unwind_history_table** History
+    nt::exception::unwind_history_table* History
     );
 
   NTL__EXTERNAPI
     void __stdcall
     RtlUnwindEx(
-    nt::exception::frame_pointers     TargetFrame,
+    uintptr_t                         TargetFrame,
     void*                             TargetIp,
     exception_record*                 ExceptionRecord,
     void*                             ReturnValue,
@@ -1153,11 +1153,13 @@ namespace cxxruntime {
       return etb;
     }
 
-    void unwind_try_block(ehstate_t state, uintptr_t fp, const ehfuncinfo* const ehfi, const dispatcher_context* const dispatch)
+    void unwind_try_block(ehstate_t state, uintptr_t /*fp*/, const ehfuncinfo* const ehfi, const dispatcher_context* const dispatch)
     {
-      ehstate_t etb = unwind_try_block(fp, ehfi, dispatch);
+      frame_pointers establisher;
+      establisherframe(ehfi, dispatch, &establisher);
+      ehstate_t etb = unwind_try_block(establisher.FramePointers, ehfi, dispatch);
       if(state > etb)
-        framepointers(fp,ehfi)->MemoryStoreFp = state;
+        framepointers(establisher.FramePointers,ehfi)->MemoryStoreFp = state;
     }
 
     // __GetCurrentState
@@ -1173,7 +1175,8 @@ namespace cxxruntime {
     void current_state(const ehfuncinfo* const ehfi, uintptr_t fp, ehstate_t state)
     {
       //ehstate_t old = framepointers(fp,ehfi)->MemoryStackFp;
-      framepointers(fp,ehfi)->MemoryStackFp = state;
+      frame_pointers* place = framepointers(fp,ehfi);
+      place->MemoryStackFp = state;
     }
 
     frame_pointers* establisherframe(const ehfuncinfo* const ehfi, const dispatcher_context* const dispatch, frame_pointers* frame) const
@@ -1328,9 +1331,10 @@ namespace cxxruntime {
         to_state = tb ? tb->tryhigh : -1;
       }
       // __FrameUnwindToState
-      ehstate_t uestate, cs;
-      for(uestate = -1, cs = current_state(ehfi, frame.FramePointers, dispatch); cs != -1 && cs > to_state; )
+      ehstate_t uestate, cs = current_state(ehfi, frame.FramePointers, dispatch);
+      for(uestate = -1; cs != -1 && cs > to_state; )
       {
+        assert( cs > -1 );
         __try {
           unwindtable* ute = &ehfi->unwindtable[cs];
           uestate = ute->state;
@@ -1591,7 +1595,7 @@ namespace cxxruntime {
         enum catchable_info { cidefault, cicomplex, civirtual } cinfo = cidefault;
 
         const typeinfo_t* ti = catchblock->typeinfo ? dispatch->va<typeinfo_t*>(catchblock->typeinfo) : NULL;
-        if(ti && *ti->name && (ti->spare || catchblock->ishz)){
+        if(ti && *ti->name && (catchblock->eobject_bpoffset || catchblock->ishz)){
           eobject** objplace = catchblock->ishz
             ? reinterpret_cast<eobject**>(cxxreg)
             : reinterpret_cast<eobject**>(catchblock->eobject_bpoffset + cxxreg->fp.FramePointers);
@@ -1759,89 +1763,19 @@ namespace cxxruntime {
     {
       _getptd()->curexception.ExceptionRecord = this;
     }
-
-    void restore_exception()
-    {
-      exception_record* er = _getptd()->curexception.ExceptionRecord;
-      std::memcpy(this, er, sizeof(exception_record));
-    }
-
-    /// 15.1/2  When an exception is thrown, control is transferred
-    ///         to the nearest handler with a matching type (15.3)
-    ///\return  does not return on handled exceptions.
-    void find_handler(
+#ifdef _M_X64
+    void find_handler2(
       cxxregistration *       const ereg,
       const nt::context *           ctx,
       dispatcher_context *    const dispatch,
       const ehfuncinfo *      const ehfi,
       const bool                    recursive,
       const ehstate_t               trylevel,
-      const exception_registration *const nested_eframe)
+      const exception_registration *const nested_eframe,
+      ehstate_t cs
+      )
     {
-#ifdef _M_IX86
-      ehstate_t cs = ereg->current_state(ehfi);
-#endif
-#ifdef _M_X64
-      // get the current state
-      ehstate_t cs = ehfi->state_from_control(dispatch);
-
-      // get establisher frame
-      cxxregistration::frame_pointers frame;
-      ereg->establisherframe(ehfi, dispatch, &frame);
-
-      // unwind try block
-      ehstate_t etb = ereg->unwind_try_block(frame.FramePointers, ehfi, dispatch);
-      if(cs > etb){
-        ereg->current_state(ehfi, frame.FramePointers, cs);
-        ereg->unwind_try_block(cs, frame.FramePointers, ehfi, dispatch);
-      }else{
-        cs = etb;
-      }
-
-      assert(cs >= -1 && cs < ehfi->unwindtable_size);
-      if(cs < -1 || cs >= ehfi->unwindtable_size)
-        nt::exception::inconsistency();
-
       bool catched = false;
-      bool isRethrow = false;
-
-      // is_cxx1
-      if(is_msvc(true) && !get_throwinfo()){
-        __debugbreak();
-
-        // check the current exception
-        if(!current_exception())
-          return;
-
-        // restore exception information
-        isRethrow = true;
-        restore_exception();
-        ctx = _getptd()->curexception.ContextRecord;
-
-        if(iscxx() && !get_throwinfo())
-          nt::exception::inconsistency();
-
-        f108_t* ptd_108 = 0;
-        if(ptd_108){
-          f108_t* f108 = 0;
-          std::swap(ptd_108, f108);
-          if(!is_inexceptionSpec(f108, dispatch)){
-
-          }
-        }
-
-        //if(ptd.field108){
-        //  auto f108 = 0;
-        //  swap(ptd.field_108, f108);
-        //  if(!IsInExceptionSpec(pair<count, ehandlers_rva>* &f108, dispatch)){
-        //    if(!Is_bad_exception_allowed)
-        //      nt::exception::inconsistency();
-        //    __DestructExceptionObject(erec, true);
-        //    throw std::bad_exception();
-        //  }
-        //}
-        //return;
-      }
 
       // not cxx: is_cxx2
       bool is_cxx = is_msvc(true);
@@ -1849,15 +1783,12 @@ namespace cxxruntime {
         //__debugbreak();
         if(ehfi->tryblocktable_size){
           // _GetRangeOfTrysToCheck
-        #ifdef _DEBUG
-          ehstate_t state = ehfi->state_from_control(dispatch);
-          assert(cs == state);
-        #endif
-          const tryblock::ranges ranges = ehfi->get_try_ranges(trylevel, cs);
-          const tryblock::ranges r2 = ehfi->get_try_ranges2(trylevel, cs);
+          ///*const */tryblock::ranges ranges = ehfi->get_try_ranges(trylevel, cs);
+          //const tryblock::ranges r2 = ehfi->get_try_ranges2(trylevel, cs);
           bool tryfound;
-          const tryblock::ranges r3 = ehfi->get_try_ranges3(trylevel, cs, dispatch, tryfound);
-          assert(ranges == r2 && ranges == r3);
+          const tryblock::ranges ranges = ehfi->get_try_ranges3(trylevel, cs, dispatch, tryfound);
+          //assert(ranges == r2 && ranges == r3);
+          //ranges = r3;
 
           const tryblock* tb = ranges.first;
           const throwinfo* const ti = get_throwinfo();
@@ -1922,6 +1853,87 @@ next_try:;
           }
         }
       }
+    }
+#endif
+
+    /// 15.1/2  When an exception is thrown, control is transferred
+    ///         to the nearest handler with a matching type (15.3)
+    ///\return  does not return on handled exceptions.
+    void find_handler(
+      cxxregistration *       const ereg,
+      const nt::context *           ctx,
+      dispatcher_context *    const dispatch,
+      const ehfuncinfo *      const ehfi,
+      const bool                    recursive,
+      const ehstate_t               trylevel,
+      const exception_registration *const nested_eframe)
+    {
+#ifdef _M_IX86
+      ehstate_t cs = ereg->current_state(ehfi);
+#endif
+#ifdef _M_X64
+      // get the current state
+      ehstate_t cs = ehfi->state_from_control(dispatch);
+
+      // get establisher frame
+      cxxregistration::frame_pointers establisher;
+      ereg->establisherframe(ehfi, dispatch, &establisher);
+
+      // unwind try block
+      ehstate_t etb = ereg->unwind_try_block(ereg->fp.FramePointers /*frame.FramePointers*/, ehfi, dispatch);
+      if(cs > etb){
+        ereg->current_state(ehfi, establisher.FramePointers, cs);
+        ereg->unwind_try_block(cs, ereg->fp.FramePointers/*frame.FramePointers*/, ehfi, dispatch);
+      }else{
+        cs = etb;
+      }
+
+      assert(cs >= -1 && cs < ehfi->unwindtable_size);
+      if(cs < -1 || cs >= ehfi->unwindtable_size)
+        nt::exception::inconsistency();
+
+      bool isRethrow = false;
+      cxxrecord* cxxrec = this;
+
+      // is_cxx1
+      if(is_msvc(true) && !get_throwinfo()){
+
+        // check the current exception
+        if(!current_exception())
+          return;
+        return;
+
+        // restore exception information
+        isRethrow = true;
+        static_assert(sizeof(*this) == sizeof(exception_record), "this types must be equal");
+        cxxrec = static_cast<cxxrecord*>(_getptd()->curexception.ExceptionRecord);
+        ctx = _getptd()->curexception.ContextRecord;
+
+        if(cxxrec->iscxx() && !cxxrec->get_throwinfo())
+          nt::exception::inconsistency();
+
+        //f108_t* ptd_108 = 0;
+        //if(ptd_108){
+        //  f108_t* f108 = 0;
+        //  std::swap(ptd_108, f108);
+        //  if(!is_inexceptionSpec(f108, dispatch)){
+
+        //  }
+        //}
+
+        //if(ptd.field108){
+        //  auto f108 = 0;
+        //  swap(ptd.field_108, f108);
+        //  if(!IsInExceptionSpec(pair<count, ehandlers_rva>* &f108, dispatch)){
+        //    if(!Is_bad_exception_allowed)
+        //      nt::exception::inconsistency();
+        //    __DestructExceptionObject(erec, true);
+        //    throw std::bad_exception();
+        //  }
+        //}
+        //return;
+      }
+      cxxrec->find_handler2(ereg, ctx, dispatch, ehfi, recursive, trylevel, nested_eframe, cs);
       return;
 #endif
 #ifdef _M_IX86

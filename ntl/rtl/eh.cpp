@@ -137,6 +137,20 @@ ntl::cxxruntime::cxxframehandler(
   return ExceptionContinueSearch;
 }
 
+extern "C" generic_function_t* RtlVirtualUnwind(uint32_t HandlerType, uintptr_t ImageBase, uintptr_t ControlPc, nt::exception::runtime_function* FunctionEntry, nt::context* Context, 
+                                                void** HandlerData, uintptr_t* EstablisherFrame, void* ContextPointers);
+
+extern "C" void* _AddressOfReturnAddress();
+void* get_ip()
+{
+  return _AddressOfReturnAddress();
+}
+
+extern "C" void* _GetImageBase()
+{
+  __debugbreak();
+  return pe::image::this_module();
+}
 void cxxregistration::unwindnestedframes(const exception_record* ehrec, const nt::context* ctx, uintptr_t establishedframe, const void* handler, int state, const ehfuncinfo* ehfi, dispatcher_context* const dispatch, bool recursive)
 {
   static const exception_record ehtemplate = {ntl::nt::status::unwind_consolidate, exception_noncontinuable, NULL, NULL, exception_record::maximum_parameters, {ehmagic1200}};
@@ -153,27 +167,27 @@ void cxxregistration::unwindnestedframes(const exception_record* ehrec, const nt
     er.ExceptionInformation[8] = ehmagic1200;
 
   nt::context octx;
-  STATIC_ASSERT(sizeof(octx) == 0x4d0);
-  RtlUnwindEx(fp, dispatch->ControlPc, &er, NULL, &octx, dispatch->HistoryTable);
+  RtlUnwindEx(fp.FramePointers, dispatch->ControlPc, &er, 0, &octx, dispatch->HistoryTable);
 }
 
 //////////////////////////////////////////////////////////////////////////
 cxxregistration::frame_info* cxxregistration::frame_info::info_ = NULL;
 
-exception_filter ExFilterRethrow(exception_pointers* ep)
+exception_filter ExFilterRethrow(exception_pointers* ep, cxxrecord* old, bool& rethrown)
 {
+  //__debugbreak();
   cxxrecord* ehrec = static_cast<cxxrecord*>(ep->ExceptionRecord);
-  exception_record* ehrec2 = 0;
-  bool arg10 = false;
+  rethrown = false;
   if(ehrec->is_msvc(true)){
-    if(ehrec->ExceptionInformation[1] == ehrec2->ExceptionInformation[1])
-      arg10 = true;
-    if(ehrec->ExceptionInformation[1]){
-      // ptd->2d0 = 1
-      arg10 = true;
+    if(ehrec->ExceptionInformation[1] == old->ExceptionInformation[1])
+      rethrown = true;
+    if(ehrec->ExceptionInformation[1] == 0){
+      // + ptd->isRethrow = 1
+      rethrown = true;
+      return exception_execute_handler;
     }
   }
-  return arg10 ? exception_execute_handler : exception_continue_search;
+  return exception_continue_search;
 }
 
 void RethrowException(exception_record* ehrec)
@@ -194,25 +208,34 @@ extern "C" generic_function_t* __CxxCallCatchBlock(exception_record* ehrec)
   cxxrecord* cxxer = reinterpret_cast<cxxrecord*>(ehrec->ExceptionInformation[6]);
   cxxregistration* eframe = reinterpret_cast<cxxregistration*>(ehrec->ExceptionInformation[1]);
   generic_function_t* ret = 0;
-  bool fail = false;
+  bool rethrow = false;
   cxxregistration::frame_info frame(cxxer->get_object());
 
   exception_record* tmpER = 0;
   generic_function_t *handler = reinterpret_cast<generic_function_t*>(ehrec->ExceptionInformation[2]);
-  bool recursive = ehrec->ExceptionInformation[7] != 0;
-  if(recursive){
+  bool translated = ehrec->ExceptionInformation[7] != 0;
+  if(translated){
     tmpER = _getptd()->prevER;
     _getptd()->curexception.ExceptionRecord = tmpER;
   }
 
   __try{
     __try{
-      ret = _CallSettingFrame(handler, eframe, 0x100);
+      //__try{
+        //typedef generic_function_t* handler_t(generic_function_t*, uintptr_t);
+        //handler_t* hr = reinterpret_cast<handler_t*>(handler);
+        //ret = hr(handler, eframe->fp.FramePointers);
+        ret = _CallSettingFrame(handler, eframe, 0x100);
+      //}
+      //__except(exception_execute_handler){
+      //  __debugbreak();
+      //  ret = 0;
+      //}
     }
-    __except(ExFilterRethrow(ntl::_exception_info())){
-      fail = true;
-      // ptd->2d0 = 0
-      if(recursive){
+    __except(ExFilterRethrow(ntl::_exception_info(), cxxer, rethrow)){
+      rethrow = true;
+      // ptd->_cxxReThrow = 0
+      if(translated){
         cxxer->destruct_eobject(true);
         RethrowException(_getptd()->prevER);
       }else{
@@ -223,8 +246,8 @@ extern "C" generic_function_t* __CxxCallCatchBlock(exception_record* ehrec)
   }
   __finally{
     frame.unlink();
-    fail |= _abnormal_termination() != 0;
-    if(!fail && cxxer->is_msvc(true)){
+    rethrow |= _abnormal_termination() != 0;
+    if(!rethrow && cxxer->is_msvc(true)){
       if(cxxregistration::frame_info::find(cxxer->get_object()))
         cxxer->destruct_eobject();
     }
@@ -305,6 +328,7 @@ __CxxFrameHandler3(
 
   const ehfuncinfo_packed* ehfip = reinterpret_cast<const ehfuncinfo_packed*>( imagebase + *dispatch->HandlerData );
 
+#if 0
   struct frame_t
   {
     cxxregistration* frame;
@@ -312,6 +336,9 @@ __CxxFrameHandler3(
     uintptr_t var38;
     uintptr_t var40;
   } lframe = {frame};
+#else
+  cxxregistration* lframe = frame;
+#endif
 
   ehfuncinfo efi(*ehfip, imagebase);
   const ehfuncinfo* ehfi = &efi;
