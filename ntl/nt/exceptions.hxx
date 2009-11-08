@@ -1071,7 +1071,7 @@ namespace cxxruntime {
     nt::exception::unwind_history_table*  HistoryTable
     );
 
-  extern "C" generic_function_t* __CxxCallCatchBlock(void* ehrec);
+  extern "C" generic_function_t* CxxCallCatchBlock(void* ehrec);
   extern "C" generic_function_t* _CallSettingFrame(void (*unwindfunclet)(), void* frame, int notify_param);
 
 #endif // _M_IX86

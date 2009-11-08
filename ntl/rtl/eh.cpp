@@ -159,7 +159,8 @@ void cxxregistration::unwindnestedframes(const exception_record* ehrec, const nt
   static const exception_record ehtemplate = {ntl::nt::status::unwind_consolidate, exception_noncontinuable, 0, 0, exception_record::maximum_parameters, {ehmagic1200}};
 
   exception_record er = ehtemplate;
-  er.ExceptionInformation[0] = (uintptr_t)__CxxCallCatchBlock,
+  void* const block = CxxCallCatchBlock;
+  er.ExceptionInformation[0] = (uintptr_t)block,
     er.ExceptionInformation[1] = (uintptr_t)establishedframe,
     er.ExceptionInformation[2] = (uintptr_t)handler,
     er.ExceptionInformation[3] = state,
@@ -196,7 +197,7 @@ void RethrowException(exception_record* ehrec)
   cxxer->raise();
 }
 
-extern "C" generic_function_t* __CxxCallCatchBlock(exception_record* ehrec)
+extern "C" generic_function_t* CxxCallCatchBlock(exception_record* ehrec)
 {
   // save the current exception
   exception_pointers* ep = &_getptd()->curexception;

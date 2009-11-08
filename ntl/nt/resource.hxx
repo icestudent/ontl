@@ -327,7 +327,7 @@ namespace ntl {
 
       bool acquire(bool exclusive, bool wait)
       {
-        (exclusive ? RtlAcquireResourceExclusive : RtlAcquireResourceShared)(this, wait);
+        return (exclusive ? RtlAcquireResourceExclusive : RtlAcquireResourceShared)(this, wait);
       }
 
       bool acquire_shared(bool wait = true)
