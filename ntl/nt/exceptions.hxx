@@ -272,8 +272,9 @@ class exception
     {
       struct
       {
-        /*0x00*/ rva_t MemoryStackFp;
-        /*0x04*/ rva_t MemoryStoreFp;
+        // ehstate_t
+        /*0x00*/ int MemoryStackFp;
+        /*0x04*/ int MemoryStoreFp;
       };
         /*0x00*/ uintptr_t FramePointers;
     };
@@ -302,8 +303,8 @@ class exception
       rva_t *           HandlerData;
       /** unwind history table */
       unwind_history_table * HistoryTable;
-      uint64_t          ScopeIndex;
-      uint64_t          Fill0;
+      uint32_t          ScopeIndex;
+      uint32_t          Fill0;
 
       void* va(rva_t rva) const
       {
@@ -819,6 +820,8 @@ namespace cxxruntime {
 
   // have you seen /d1ESrt in TFM? so do I...
 
+
+#ifdef _M_IX86
   /// 15.4 Exception specifications - internal representation
   struct estypeinfo
   {
@@ -826,7 +829,6 @@ namespace cxxruntime {
     /* 0x04 */  ehandler *  ptr;
   };
 
-#ifdef _M_IX86
   struct ehfuncinfo1200 //_s_ESTypeList
   {
     /* 0x00 */  uint32_t        magic : 30;
@@ -871,10 +873,16 @@ namespace cxxruntime {
 
 #endif // _M_IX86
 #ifdef _M_X64
-
+  struct estypeinfo
+  {
+    /* 0x00 */  size_t      size;
+    /* 0x04 */  rva_t       typeArray;
+  };
+  
   struct ehfuncinfo_packed
   {
-    /* 0x00 */  uint32_t        magic : 30;
+    /* 0x00 */  uint32_t        magic : 29;
+    /* 0x00 */  uint32_t        bbtFlags:3;
     /* 0x04 */  ehstate_t       unwindtable_size;
     /* 0x08 */  rva_t           unwindtable;
     /* 0x0C */  uint32_t        tryblocktable_size;
@@ -885,6 +893,7 @@ namespace cxxruntime {
     /* 0x20 */  rva_t           estypeinfo;
     /* 0x24 */  uint32_t        synchronous : 1; // EHFlags
   };
+  STATIC_ASSERT(sizeof(ehfuncinfo_packed) == 0x28);
 
   struct ipstateentry
   {
@@ -895,7 +904,9 @@ namespace cxxruntime {
   struct ehfuncinfo
   {
     // compiler version
-    uint32_t        magic : 30;
+    uint32_t        magic : 29;
+    uint32_t        bbtFlags:3;
+
     // max_state, unwind map size
     ehstate_t       unwindtable_size;
     // unwind map
@@ -917,6 +928,7 @@ namespace cxxruntime {
     ehfuncinfo(const ehfuncinfo_packed& fi, uintptr_t base)
     {
       magic = fi.magic;
+      bbtFlags = fi.bbtFlags;
       unwindtable_size = fi.unwindtable_size;
       tryblocktable_size = fi.tryblocktable_size;
       ipmap_count = fi.ipmap_count;
@@ -1022,12 +1034,14 @@ namespace cxxruntime {
     ehstate_t state_from_ip(const dispatcher_context* const dispatch, const void* ip) const
     {
       const rva_t va_ip = static_cast<rva_t>((uintptr_t)ip - (uintptr_t)dispatch->ImageBase);
-      for(uint32_t i = 0; i < ipmap_count; i++){
+      uint32_t i = 0;
+      while(i < ipmap_count){
         const ipstateentry* entry = &ipmap[i];
         if(va_ip < entry->ip)
-          return ipmap[i-1].state;
+          break;
+        i++;
       }
-      return -1;
+      return i == 0 ? -1 : ipmap[i-1].state;
     }
 
     ehstate_t state_from_control(const dispatcher_context* const dispatch) const
@@ -1158,8 +1172,10 @@ namespace cxxruntime {
       frame_pointers establisher;
       establisherframe(ehfi, dispatch, &establisher);
       ehstate_t etb = unwind_try_block(establisher.FramePointers, ehfi, dispatch);
-      if(state > etb)
-        framepointers(establisher.FramePointers,ehfi)->MemoryStoreFp = state;
+      if(state > etb){
+        frame_pointers* place = framepointers(establisher.FramePointers,ehfi);
+        place->MemoryStoreFp = state;
+      }
     }
 
     // __GetCurrentState
@@ -1179,10 +1195,11 @@ namespace cxxruntime {
       place->MemoryStackFp = state;
     }
 
-    frame_pointers* establisherframe(const ehfuncinfo* const ehfi, const dispatcher_context* const dispatch, frame_pointers* frame) const
+    cxxregistration* establisherframe(const ehfuncinfo* const ehfi, const dispatcher_context* const dispatch, frame_pointers* frame) const
     {
       ehstate_t cs = ehfi->state_from_control(dispatch);
       *frame = fp;
+      cxxregistration* eframe = reinterpret_cast<cxxregistration*>(frame);
 
       for(uint32_t i = ehfi->tryblocktable_size; i > 0; --i){
         tryblock* tb = &ehfi->tryblocktable[i-1];
@@ -1197,11 +1214,11 @@ namespace cxxruntime {
           if(eh.handler == funcStart){
             uintptr_t f = fp.FramePointers; // [rcx]
             frame->FramePointers = *reinterpret_cast<uintptr_t*>( f + eh.frame );
-            return frame;
+            return eframe;
           }
         }
       }
-      return frame;
+      return eframe;
     }
 
     struct frame_info
@@ -1244,7 +1261,7 @@ namespace cxxruntime {
       frame_info* next;
     };
 
-    void unwindnestedframes(const exception_record* ehrec, const nt::context* ctx, uintptr_t establishedframe, const void* handler, int state, const ehfuncinfo* ehfi, dispatcher_context* const dispatch, bool recursive);
+    void unwindnestedframes(const exception_record* ehrec, const nt::context* ctx, cxxregistration* establishedframe, const void* handler, int state, const ehfuncinfo* ehfi, dispatcher_context* const dispatch, bool recursive);
 #endif // _M_X64
 
     // __CallSettingFrame
@@ -1322,17 +1339,9 @@ namespace cxxruntime {
       }
 #endif // _M_IX86
 #ifdef _M_X64
-      frame_pointers frame;
-      establisherframe(ehfi, dispatch, &frame);
-      if(to_state == -1){
-        // __FrameUnwindToEmptyState
-        //__debugbreak();
-        ehstate_t state = ehfi->state_from_control(dispatch);
-        const tryblock* tb = ehfi->catch_try_block(state);
-        to_state = tb ? tb->tryhigh : -1;
-      }
       // __FrameUnwindToState
-      ehstate_t uestate, cs = current_state(ehfi, frame.FramePointers, dispatch);
+      ehstate_t uestate, cs = current_state(ehfi, fp.FramePointers, dispatch);
+      assert(cs >= -1 && cs < ehfi->unwindtable_size);
       for(uestate = -1; cs != -1 && cs > to_state; )
       {
         assert( cs > -1 );
@@ -1341,7 +1350,7 @@ namespace cxxruntime {
           uestate = ute->state;
           generic_function_t* action = ute->unwindfunclet ? dispatch->va<generic_function_t*>(ute->unwindfunclet) : NULL;
           if(action){
-            current_state(ehfi, frame.FramePointers, uestate);
+            current_state(ehfi, fp.FramePointers, uestate);
             callsettingframe(action, this);
           }
           //cs &= 0x30; // ??
@@ -1353,7 +1362,7 @@ namespace cxxruntime {
       }
       if(cs != -1 && cs > to_state)
         nt::exception::inconsistency();
-      current_state(ehfi, frame.FramePointers, cs);
+      current_state(ehfi, fp.FramePointers, cs);
 
 #endif // _M_X64
     }
@@ -1558,16 +1567,16 @@ namespace cxxruntime {
 #pragma warning(pop)
 #else // _M_X64
   private:
-    eobject* adjust_pointer(void* p1, void* p2) const
+    eobject* adjust_pointer(void* p1, const catchabletype* const convertable) const
     {
-      intptr_t up1 = reinterpret_cast<intptr_t>(p1);
-      int32_t* up2 = reinterpret_cast<int32_t*>( (char*)p2 + sizeof(void*) );
-      intptr_t ptr = up1 + up2[0];
-      if(up2[1] < 0)
+      intptr_t obj = reinterpret_cast<intptr_t>(p1);
+      const ptrtomember& pmd = *ntl::padd<const ptrtomember*>(convertable, sizeof(void*));
+      intptr_t ptr = obj + pmd.member_offset;
+      if(pmd.vbtable_offset < 0)
         return reinterpret_cast<eobject*>(ptr);
 
-      ptr = ptr + *reinterpret_cast<int32_t*>( (up1 + up2[1]) + up2[2] );
-      ptr = ptr + up2[1];
+      ptr += *reinterpret_cast<intptr_t*>(obj+pmd.vbtable_offset);
+      ptr += *reinterpret_cast<int32_t*>(ptr + pmd.vdisp_offset);
       return reinterpret_cast<eobject*>(ptr);
     }
   public:
@@ -1698,8 +1707,7 @@ namespace cxxruntime {
       (void)nested; // unreferenced parameter
       (void)catchdepth;
       cxxregistration::frame_pointers xframe;
-      cxxregistration::frame_pointers* frame = cxxreg->establisherframe(funcinfo, dispatch, &xframe);
-      cxxregistration* cxxframe = reinterpret_cast<cxxregistration*>(frame);
+      cxxregistration* cxxframe = cxxreg->establisherframe(funcinfo, dispatch, &xframe);
 #else
       (void)recursive;
       cxxregistration* const cxxframe = cxxreg;
@@ -1723,7 +1731,7 @@ namespace cxxruntime {
       if ( continuation )
         jumptocontinuation(continuation, cxxreg);
 #else
-      cxxreg->unwindnestedframes(this, ctx, uintptr_t(frame), dispatch->va(catchblock->handler), tb->trylow, funcinfo, dispatch, recursive);
+      cxxreg->unwindnestedframes(this, ctx, cxxframe, dispatch->va(catchblock->handler), tb->trylow, funcinfo, dispatch, recursive);
 #endif
     }
 
@@ -1734,17 +1742,16 @@ namespace cxxruntime {
     }
 
 #ifdef _M_X64
-    typedef std::pair<uint32_t, rva_t> f108_t;
-    bool is_inexceptionSpec(const f108_t* ptd108, const dispatcher_context* const dispatch) const
+    bool is_inexceptionSpec(const estypeinfo* pESTypeList, const dispatcher_context* const dispatch) const
     {
-      if(!ptd108)
+      if(!pESTypeList)
         nt::exception::inconsistency();
 
       const throwinfo* const ti = get_throwinfo();
-      const ehandler* handlers = dispatch->va<const ehandler*>(ptd108->second);
+      const ehandler* handlers = dispatch->va<const ehandler*>(pESTypeList->typeArray);
       const catchabletypearray* const catchables = thrown_va<catchabletypearray*>(ti->catchabletypearray);
 
-      for(uint32_t i = 0; i < ptd108->first; i++){
+      for(uint32_t i = 0; i < pESTypeList->size; i++){
         for(uint32_t j = 0; j < catchables->size; j++){
           const catchabletype* ct = dispatch->va<const catchabletype*>(catchables->type[j]);
           if(handlers[j].type_match(ct, ti, dispatch))
@@ -1823,14 +1830,14 @@ next_try:;
 
         // tryEmpty:
         if(catched == false && ehfi->magic >= ehmagic1300){
-          const f108_t* ehtable = ehfi->estypeinfo ? dispatch->va<f108_t*>(ehfi->estypeinfo) : 0;
+          const estypeinfo* ehtable = ehfi->estypeinfo ? dispatch->va<estypeinfo*>(ehfi->estypeinfo) : 0;
           if(ehtable){
             __debugbreak();
             if(is_inexceptionSpec(ehtable, dispatch)){
               uintptr_t frame;
-              ereg->establisherframe(ehfi, dispatch, reinterpret_cast<cxxregistration::frame_pointers*>(&frame));
-              // TODO: _ptd()->110 = {tmp508, ereg, 0, frame}
-              ereg->unwindnestedframes(this, ctx, frame, NULL, -1, ehfi, dispatch, recursive);
+              cxxregistration* esframe = ereg->establisherframe(ehfi, dispatch, reinterpret_cast<cxxregistration::frame_pointers*>(&frame));
+              // TODO: _ptd()->_pExitContext = {exitContext, ereg, 0, frame}
+              ereg->unwindnestedframes(this, ctx, esframe, NULL, -1, ehfi, dispatch, recursive);
             }
 
           }

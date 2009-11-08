@@ -83,6 +83,7 @@ ntl::cxxruntime::cxxframehandler(
     || er->islongjump() || ehfi->magic < _EH_MAGIC || !ehfi->synchronous)
     )
   {
+    // TODO: FindHandlerForForeignException
     return ExceptionContinueSearch;
   }
 
@@ -101,8 +102,9 @@ ntl::cxxruntime::cxxframehandler(
           unwinded = true;
         }else if(er->isconsolidate()){
           ehstate_t state = static_cast<ehstate_t>(er->ExceptionInformation[3]);
+          assert(state >= -1 && state < ehfi->unwindtable_size);
           if(state < -1 || state >= ehfi->unwindtable_size)
-            __debugbreak();
+            nt::exception::inconsistency();
           cxxregistration* frame = reinterpret_cast<cxxregistration*>(er->ExceptionInformation[1]);
           frame->unwind(dispatch, ehfi, state);
           unwinded = true;
@@ -110,7 +112,13 @@ ntl::cxxruntime::cxxframehandler(
       }
       if(!unwinded){
         // __FrameUnwindToEmptyState
-        eframe->unwind(dispatch, ehfi);
+        cxxregistration::frame_pointers frame;
+        cxxregistration* unwindframe = eframe->establisherframe(ehfi, dispatch, &frame);
+        ehstate_t state = ehfi->state_from_control(dispatch);
+        assert(state >= -1 && state < ehfi->unwindtable_size);
+        const tryblock* tb = ehfi->catch_try_block(state);
+        ehstate_t to_state = tb ? tb->tryhigh : -1;
+        unwindframe->unwind(dispatch, ehfi, to_state);
       }
     }
     // async exceptions are to be unwinded by __except_handler3
@@ -146,13 +154,13 @@ extern "C" void* _GetImageBase()
   __debugbreak();
   return pe::image::this_module();
 }
-void cxxregistration::unwindnestedframes(const exception_record* ehrec, const nt::context* ctx, uintptr_t establishedframe, const void* handler, int state, const ehfuncinfo* ehfi, dispatcher_context* const dispatch, bool recursive)
+void cxxregistration::unwindnestedframes(const exception_record* ehrec, const nt::context* ctx, cxxregistration* establishedframe, const void* handler, int state, const ehfuncinfo* ehfi, dispatcher_context* const dispatch, bool recursive)
 {
-  static const exception_record ehtemplate = {ntl::nt::status::unwind_consolidate, exception_noncontinuable, NULL, NULL, exception_record::maximum_parameters, {ehmagic1200}};
+  static const exception_record ehtemplate = {ntl::nt::status::unwind_consolidate, exception_noncontinuable, 0, 0, exception_record::maximum_parameters, {ehmagic1200}};
 
   exception_record er = ehtemplate;
   er.ExceptionInformation[0] = (uintptr_t)__CxxCallCatchBlock,
-    er.ExceptionInformation[1] = establishedframe,
+    er.ExceptionInformation[1] = (uintptr_t)establishedframe,
     er.ExceptionInformation[2] = (uintptr_t)handler,
     er.ExceptionInformation[3] = state,
     er.ExceptionInformation[4] = (uintptr_t)ctx,
@@ -335,6 +343,15 @@ __CxxFrameHandler3(
   ehfuncinfo efi(*ehfip, imagebase);
   const ehfuncinfo* ehfi = &efi;
 
+#if 0
+  // check current states
+  const cxxrecord* cxxer = static_cast<cxxrecord*>(er);
+  if(cxxer->get_throwinfo()){
+    cxxregistration* fp = ntl::padd(frame, ehfi->unwindhelp);
+    assert(fp->fp.MemoryStackFp >= -2 && fp->fp.MemoryStackFp < ehfi->unwindtable_size);
+    assert(fp->fp.MemoryStoreFp >= -2 && fp->fp.MemoryStoreFp < ehfi->unwindtable_size);
+  }
+#endif
   return cxxframehandler(er, reinterpret_cast<cxxregistration*>(&lframe), ectx, dispatch, ehfi);
 #endif
 }
