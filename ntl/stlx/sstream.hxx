@@ -242,13 +242,13 @@ namespace std {
         ok = true;
         if(in){
           if(sp >= 0 && sp < (egptr()-eback()))
-            gbump(static_cast<int>( eback() - gptr() + sp ));
+            gbump(static_cast<int>( eback() - gptr() + static_cast<streamoff>(sp) ));
           else
             ok = false;
         }
         if(out){
           if(sp >= 0 && sp < (epptr()-pbase()))
-            pbump(static_cast<int>(  pbase() - pptr() + sp));
+            pbump(static_cast<int>(  pbase() - pptr() + static_cast<streamoff>(sp)));
           else
             ok = false;
         }

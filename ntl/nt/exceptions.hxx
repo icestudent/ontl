@@ -1160,10 +1160,12 @@ namespace cxxruntime {
 
     ehstate_t unwind_try_block(uintptr_t fp, const ehfuncinfo* const ehfi, const dispatcher_context* const dispatch) const
     {
-      uintptr_t frame;
-      const_cast<cxxregistration*>(this)->establisherframe(ehfi, dispatch, reinterpret_cast<frame_pointers*>(&frame));
+      frame_pointers establisher;
+      const_cast<cxxregistration*>(this)->establisherframe(ehfi, dispatch, &establisher);
       //ehstate_t etb1 = *reinterpret_cast<ehstate_t*>( frame + ehfi->unwindhelp + 4 );
-      ehstate_t etb  = framepointers(fp,ehfi)->MemoryStoreFp; // *(eframe+unwindhelp+4)
+      //ehstate_t etb  = framepointers(fp,ehfi)->MemoryStoreFp; // *(eframe+unwindhelp+4)
+      frame_pointers* place = framepointers(establisher.FramePointers,ehfi);
+      ehstate_t etb = place->MemoryStoreFp;
       return etb;
     }
 
