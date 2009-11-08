@@ -159,8 +159,7 @@ void cxxregistration::unwindnestedframes(const exception_record* ehrec, const nt
   static const exception_record ehtemplate = {ntl::nt::status::unwind_consolidate, exception_noncontinuable, 0, 0, exception_record::maximum_parameters, {ehmagic1200}};
 
   exception_record er = ehtemplate;
-  void* const block = CxxCallCatchBlock;
-  er.ExceptionInformation[0] = (uintptr_t)block,
+  er.ExceptionInformation[0] = (uintptr_t)CxxCallCatchBlock,
     er.ExceptionInformation[1] = (uintptr_t)establishedframe,
     er.ExceptionInformation[2] = (uintptr_t)handler,
     er.ExceptionInformation[3] = state,
