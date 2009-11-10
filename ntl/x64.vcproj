@@ -594,6 +594,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\stlx\exception2.hxx"
+						>
+					</File>
+					<File
 						RelativePath=".\stlx\excptdef.hxx"
 						>
 					</File>
@@ -1179,6 +1183,42 @@
 					</FileConfiguration>
 					<FileConfiguration
 						Name="debug|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath=".\rtl\ehptr.cpp"
+					>
+					<FileConfiguration
+						Name="debug|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release|x64"
 						ExcludedFromBuild="true"
 						>
 						<Tool

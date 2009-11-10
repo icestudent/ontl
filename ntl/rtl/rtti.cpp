@@ -23,7 +23,7 @@
 #pragma message("This file needed only for ENABLED RTTI (see /GR).")
 #endif
 
-#pragma region typeinfo::name implementation
+//#pragma region typeinfo::name implementation
 
 #ifndef CRT_UNDNAME
 #define CRT_UNDNAME
@@ -98,33 +98,12 @@ std::type_info::~type_info()
 
 }
 #endif
-#pragma endregion
+//#pragma endregion
 
 
-#pragma region dynamic_cast implementation
+//#pragma region dynamic_cast implementation
 
-#if STLX__USE_RTTI
-
-namespace ptr
-{
-  template<typename T, typename U>
-  inline T round_to_size(T size, U alignment)
-  {
-    return (T)( (uintptr_t(size) + uintptr_t(alignment) - 1) & ~(uintptr_t(alignment)-1) );
-  }
-
-  template<typename T, typename U>
-  inline T padd(T p, U offset)
-  {
-    return (T)( uintptr_t(p) + uintptr_t(offset) );
-  }
-
-  template<typename R, typename T, typename U>
-  inline R padd(T p, U offset)
-  {
-    return (R)( uintptr_t(p) + uintptr_t(offset) );
-  }
-}
+//#if STLX__USE_RTTI
 
 namespace ntl { namespace cxxruntime
 {
@@ -145,10 +124,10 @@ namespace ntl { namespace cxxruntime
       ptrdiff_t off = 0;
       if(static_cast<int>(vbtable_offset) >= 0){
         // *(ptrdiff_t*)((char*)*(ptrdiff_t*)((char*)pThis + RetOff) + pmd.vdisp);
-        off = vbtable_offset + *reinterpret_cast<const ptrdiff_t*>(*reinterpret_cast<const ptrdiff_t*>(ptr::padd(obj, vbtable_offset)) + vdisp_offset);
+        off = vbtable_offset + *reinterpret_cast<const ptrdiff_t*>(*reinterpret_cast<const ptrdiff_t*>(ntl::padd(obj, vbtable_offset)) + vdisp_offset);
       }
       off += member_offset;
-      return ptr::padd(obj, off);
+      return ntl::padd(obj, off);
     }
   };
 
@@ -159,8 +138,8 @@ namespace ntl { namespace cxxruntime
   {
     const void* vptr;
     mutable void* spare;
-    char name[1];
   };
+  static_assert(sizeof(typeinfo) == sizeof(std::type_info), "invalid cxxruntime::typeinfo");
   #pragma pack(pop, _TypeDescriptor)
   #pragma pack(pop, ehdata)
 
@@ -190,7 +169,8 @@ namespace ntl { namespace cxxruntime
 #endif
     uint32_t    bases;
     pmd         thiscast;
-    //uint32_t  attributes;
+
+    //uint32_t  attributes:
     uint32_t    notvisible:1;
     uint32_t    ambiguous:1;
     uint32_t    privcomp:1;
@@ -201,7 +181,11 @@ namespace ntl { namespace cxxruntime
 
   struct base_class2: base_class
   {
+#ifndef _M_X64
     const class_hierarchy* hierarchy;
+#else
+    rva_t                  hierarchy;
+#endif
   };
 
   struct base_class_array
@@ -210,6 +194,36 @@ namespace ntl { namespace cxxruntime
     const base_class2* bases[1];
 #else
     rva_t              bases[1];
+#endif
+  };
+
+  struct throwbase
+  {
+#ifndef _M_X64
+    throwbase(const void*)
+    {}
+
+    template<typename T>
+    T va(const void* p) const { return (T)p; }
+
+    template<typename T>
+    T va(const typeinfos& ti) const { return (T)&ti; }
+#else
+    template<typename T>
+    T va(uintptr_t rva) const
+    {
+      return image->va<T>(rva);
+    }
+
+    uintptr_t va(uintptr_t rva) const
+    {
+      return image->va(rva);
+    }
+
+    explicit throwbase(const pe::image* image)
+      :image(image)
+    {}
+    const pe::image* image;
 #endif
   };
 
@@ -247,24 +261,23 @@ namespace ntl { namespace cxxruntime
 
     const void* find_object(const void* object) const
     {
-      intptr_t complete = ptr::padd<intptr_t>(object, -offset);
+      intptr_t complete = ntl::padd<intptr_t>(object, -offset);
       if(cdoffset)
 #ifndef _M_X64
         complete +=
 #else
         complete -=
 #endif
-        *reinterpret_cast<const rva_t*>( ptr::padd(object, -cdoffset) );
+        *reinterpret_cast<const rva_t*>( ntl::padd(object, -cdoffset) );
       return reinterpret_cast<const void*>(complete);
     }
 
-    const base_class2* find_instance(const void* complete, ptrdiff_t ptrdelta, const typeinfo& srctype, const typeinfo& desttype, const pe::image* imagebase = NULL) const
+    const base_class2* find_instance(const void* complete, ptrdiff_t ptrdelta, const typeinfo& srctype, const typeinfo& desttype, const throwbase* imagebase = 0) const
     {
-      const class_hierarchy* hierarchy =
-#ifndef _M_X64
-        this->hierarchy;
+#ifdef _M_X64
+      const class_hierarchy* hierarchy = imagebase->va<const class_hierarchy*>(this->hierarchy);
 #else
-        imagebase->va<const class_hierarchy*>(this->hierarchy);
+      const class_hierarchy* hierarchy = this->hierarchy;
 #endif
 
       if(!hierarchy->ismultiple)
@@ -276,7 +289,7 @@ namespace ntl { namespace cxxruntime
     }
 
   protected:
-    const base_class2* find_single_instance(const typeinfo& srctype, const typeinfo& desttype, const pe::image* imagebase) const
+    const base_class2* find_single_instance(const typeinfo& srctype, const typeinfo& desttype, const throwbase* imagebase) const
     {
 #ifndef _M_X64
       const base_class2* base, * const * ptr = hierarchy->classes->bases;
@@ -293,30 +306,91 @@ namespace ntl { namespace cxxruntime
       }
 #else
       const class_hierarchy* hierarchy = imagebase->va<const class_hierarchy*>(this->hierarchy);
-      const rva_t* bases = imagebase->va<const rva_t*>( hierarchy->classes );
+      const base_class_array* bases = imagebase->va<const base_class_array*>( hierarchy->classes );
       for(unsigned i = 0; i < hierarchy->bases; i++){
-        const base_class2* base = imagebase->va<const base_class2*>(bases[i]);
+        const base_class2* base = imagebase->va<const base_class2*>(bases->bases[i]);
         const typeinfo* type = imagebase->va<const typeinfo*>(base->type);
         if(*type == desttype){
           // on x64 behaviour should be such as find_multiple_instance
           for(unsigned j = i + 1; j < hierarchy->bases; j++){
-            const base_class2* base2 = imagebase->va<const base_class2*>(bases[i]);
+            const base_class2* base2 = imagebase->va<const base_class2*>(bases->bases[j]);
+            if(base2->privcomp)
+              break;
             type = imagebase->va<const typeinfo*>(base2->type);
             if(*type == srctype)
               return base;
           }
+          break;
         }
       }
 #endif
-      return NULL;
+      return nullptr;
     }
 
-    const base_class2* find_multiple_instance(const void* complete, ptrdiff_t ptrdelta, const typeinfo& srctype, const typeinfo& desttype, const pe::image* imagebase) const
+    const base_class2* find_multiple_instance(const void* complete, ptrdiff_t ptrdelta, const typeinfo& srctype, const typeinfo& desttype, const throwbase* imagebase) const
     {
-      __debugbreak();
-      return 0;
+      const class_hierarchy* hierarchy = imagebase->va<const class_hierarchy*>(this->hierarchy);
+      const base_class_array* bases = imagebase->va<const base_class_array*>( hierarchy->classes );
+
+      const base_class2 *prevBase = nullptr, *base2 = nullptr;
+
+      for(unsigned i = 0, prevNum = 0, previ = unsigned(-1); i < hierarchy->bases; i++){
+        
+        const base_class2* base = imagebase->va<const base_class2*>(bases->bases[i]);
+        const typeinfo* type = 
+#ifdef _M_X64
+        imagebase->va<const typeinfo*>(base->type);
+#else
+          &base->type.rawtype;
+#endif
+
+        // check dest
+        if(i - previ > prevNum && *type == desttype){
+          if(!prevBase){
+            prevNum = base->bases;
+            base2 = base;
+            previ = i;
+          }else{
+            // check Prev
+            if(base->notvisible || base->ambiguous)
+              return nullptr;
+            return base;
+          }
+        }
+        // check src
+        if(!(*type == srctype))
+          continue;
+
+        static const int* nil = 0;
+        if(base->thiscast(nil)-nil != ptrdelta)
+          continue;
+
+        if(!base2){
+          prevBase = base;
+          continue;
+        }
+
+        // base found
+        if(i - previ > prevNum){
+          if(base2->notvisible || base2->ambiguous)
+            return nullptr;
+        }
+        if(!base2->nonpolymorphic){
+          if(previ != 0)
+            return base2;
+          if(base2->notvisible)
+            return nullptr;
+          return base2;
+        }else{
+          const class_hierarchy* hierarchy = imagebase->va<const class_hierarchy*>(base2->hierarchy);
+          const base_class_array* bases = imagebase->va<const base_class_array*>( hierarchy->classes );
+          const base_class2* daddy = imagebase->va<const base_class2*>(bases->bases[i]);
+          return daddy->notvisible ? nullptr : base2;
+        }
+      }
+      return nullptr;
     }
-    const base_class2* find_virtual_instance(const void* complete, ptrdiff_t ptrdelta, const typeinfo& srctype, const typeinfo& desttype, const pe::image* imagebase) const
+    const base_class2* find_virtual_instance(const void* complete, ptrdiff_t ptrdelta, const typeinfo& srctype, const typeinfo& desttype, const throwbase* imagebase) const
     {
       __debugbreak();
       return 0;
@@ -325,7 +399,11 @@ namespace ntl { namespace cxxruntime
 
   struct object_locator2: object_locator
   {
+#ifndef _M_X64
     const object_locator2* self;
+#else
+    int32_t self;
+#endif
 
     static const object_locator2& instance(const void* object)
     {
@@ -354,30 +432,33 @@ using namespace ntl;
 
 namespace {
 
-  const void* __cdecl __RTDynamicCast(const void* object, int32_t vfdelta, const ntl::cxxruntime::typeinfo& srctype, const ntl::cxxruntime::typeinfo& desttype, bool isreference)
+  const void* RTDynamicCast(const void* object, int32_t vfdelta, const ntl::cxxruntime::typeinfo& srctype, const ntl::cxxruntime::typeinfo& desttype, bool isreference)
   {
     using namespace ntl::cxxruntime;
     __try {
-      const pe::image* imagebase =
-      #ifdef _M_X64
-        pe::image::base_from(object);
-      #else
-        NULL;
-      #endif
       const object_locator2& locator = object_locator2::instance(object);
       locator.validate();
 
       const void* complete = locator.find_object(object);
 
+      const pe::image* imagebase = nullptr;
+      #ifdef _M_X64
+      imagebase = !locator.signature 
+        ? pe::image::base_from(&locator)
+        : ntl::padd<const pe::image*>(&locator, -locator.self);
+      #endif
+
+      throwbase module_base(imagebase);
+
       // adjust object ptr by vptr diplacement
-      object = ptr::padd(object, -vfdelta);
-      const base_class2* base = locator.find_instance(complete, (const char*)object - (const char*)complete, srctype, desttype, imagebase);
+      object = ntl::padd(object, -vfdelta);
+      const base_class2* base = locator.find_instance(complete, (const char*)object - (const char*)complete, srctype, desttype, &module_base);
 
       const void* result;
       if(base)
         result = base->thiscast(complete);
       else {
-        result = NULL;
+        result = nullptr;
         if(isreference)
           __ntl_throw(std::bad_cast(/*"Bad dynamic_cast<>"*/));
       }
@@ -397,7 +478,7 @@ namespace {
 extern "C" void* __cdecl __RTCastToVoid (void* object) __ntl_throws(...)
 {
   if(!object)
-    return NULL;
+    return nullptr;
 
   __try {
     const cxxruntime::object_locator2& locator = cxxruntime::object_locator2::instance(object);
@@ -416,7 +497,7 @@ extern "C" void* __cdecl __RTCastToVoid (void* object) __ntl_throws(...)
 extern "C" void* __cdecl __RTtypeid(void* object) __ntl_throws(...)
 {
   if(!object){
-    __ntl_throw(std::bad_typeid(/*"A typeid of NULL pointer attempted"*/));
+    __ntl_throw(std::bad_typeid(/*"A typeid of nullptr pointer attempted"*/));
     #if STLX__USE_EXCEPTIONS == 0
       return nullptr;
     #endif
@@ -451,11 +532,11 @@ extern "C" void* __cdecl __RTtypeid(void* object) __ntl_throws(...)
 extern "C" void* __cdecl __RTDynamicCast(void* object, int32_t vfdelta, void* srctype, void* desttype, int isreference) 
 {
   if(!object)
-    return NULL;
+    return nullptr;
 
-  return (void*)__RTDynamicCast(object, vfdelta, reinterpret_cast<ntl::cxxruntime::typeinfo&>(srctype), reinterpret_cast<ntl::cxxruntime::typeinfo&>(desttype), isreference != 0);
+  return (void*)RTDynamicCast(object, vfdelta, *reinterpret_cast<ntl::cxxruntime::typeinfo*>(srctype), *reinterpret_cast<ntl::cxxruntime::typeinfo*>(desttype), isreference != 0);
 }
 
-#endif // rtti
-#pragma endregion
+//#endif // rtti
+//#pragma endregion
 

@@ -62,6 +62,13 @@
 /* Common declarations                                                  */
 /************************************************************************/
 
+#ifdef NTL__CXX_ATTRIBUTES
+# define __noreturn [[noreturn]]
+#else
+  // __declspec-aware compilers only
+# define __noreturn __declspec(noreturn)
+#endif
+
 // explicit function definition
 #ifdef NTL__CXX_EF
   #define __deleted = delete

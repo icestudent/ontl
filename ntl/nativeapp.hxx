@@ -11,7 +11,7 @@
 #include "nt/basedef.hxx"
 #include "nt/new.hxx"
 #include "nt/thread.hxx"
-#include <cstdlib>
+#include "cstdlib"
 
 namespace ntl
 {

@@ -50,6 +50,13 @@ void std::unexpected()
     std::terminate();
 }
 
+bool std::uncaught_exception() __ntl_nothrow
+{
+  using namespace ntl::cxxruntime;
+   tiddata* ptd = _getptd_noinit();
+   return ptd && ptd->processingThrow > 0;
+};
+
 #pragma endregion
 
 using namespace ntl;
@@ -61,6 +68,25 @@ uint32_t get_eax()
 {
   __asm xchg eax, eax
 }
+
+#ifndef _M_X64
+extern "C" void _chkstk();
+extern "C" __declspec(naked) void _alloca_probe_16()
+{
+  __asm {
+    push ecx
+    lea  ecx,[esp+8]
+    sub  ecx,eax
+    and  ecx,15
+    add  eax,ecx
+    sbb  ecx,ecx
+    or   eax,ecx
+    pop  ecx
+    jmp  _chkstk
+  }
+}
+#endif
+
 #endif
 
 #ifdef _M_X64
@@ -182,7 +208,7 @@ exception_filter ExFilterRethrow(exception_pointers* ep, cxxrecord* old, bool& r
     if(ehrec->ExceptionInformation[1] == old->ExceptionInformation[1])
       rethrown = true;
     if(ehrec->ExceptionInformation[1] == 0){
-      // + ptd->isRethrow = 1
+      _getptd()->processingThrow = 1;
       rethrown = true;
       return exception_execute_handler;
     }
@@ -203,6 +229,7 @@ extern "C" generic_function_t* CxxCallCatchBlock(exception_record* ehrec)
   exception_pointers saved_exception = *ep;
   ep->ExceptionRecord = reinterpret_cast<exception_record*>(ehrec->ExceptionInformation[6]);
   ep->ContextRecord = reinterpret_cast<nt::context*>(ehrec->ExceptionInformation[4]);
+  _getptd()->nestedExcount++;
 
   // original record
   cxxrecord* cxxer = reinterpret_cast<cxxrecord*>(ehrec->ExceptionInformation[6]);
@@ -221,20 +248,11 @@ extern "C" generic_function_t* CxxCallCatchBlock(exception_record* ehrec)
 
   __try{
     __try{
-      //__try{
-        //typedef generic_function_t* handler_t(generic_function_t*, uintptr_t);
-        //handler_t* hr = reinterpret_cast<handler_t*>(handler);
-        //ret = hr(handler, eframe->fp.FramePointers);
-        ret = _CallSettingFrame(handler, eframe, 0x100);
-      //}
-      //__except(exception_execute_handler){
-      //  __debugbreak();
-      //  ret = 0;
-      //}
+      ret = _CallSettingFrame(handler, eframe, 0x100);
     }
     __except(ExFilterRethrow(ntl::_exception_info(), cxxer, rethrow)){
       rethrow = true;
-      // ptd->_cxxReThrow = 0
+      _getptd()->processingThrow = 0;
       if(translated){
         cxxer->destruct_eobject(true);
         RethrowException(_getptd()->prevER);
@@ -251,13 +269,8 @@ extern "C" generic_function_t* CxxCallCatchBlock(exception_record* ehrec)
       if(cxxregistration::frame_info::find(cxxer->get_object()))
         cxxer->destruct_eobject();
     }
+    _getptd()->nestedExcount--;
   }
-  //frame.unlink();
-  //if(!fail && cxxer->is_msvc(true)){
-  //  if(!cxxregistration::frame_info::find(cxxer->get_object()))
-  //    cxxer->destruct_eobject();
-  //}
-
   // restore saved exception
   ep = &_getptd()->curexception;
   *ep = saved_exception;
@@ -276,7 +289,7 @@ extern "C" generic_function_t* CxxCallCatchBlock(exception_record* ehrec)
 #ifdef __ICL
 typedef ntl::cxxruntime::throwinfo _s__ThrowInfo;
 #endif
-__declspec(noreturn)
+__noreturn
 extern "C"
 void __stdcall _CxxThrowException(void * object, _s__ThrowInfo const * info)
 {

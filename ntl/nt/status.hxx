@@ -1673,10 +1673,12 @@ struct status
 
 #if !defined(__BCPLUSPLUS__) && !defined(__ICL)
     cxx_exception = (int)(0xE0000000|'msc'),
-    com_exception = (int)(0xE0000000|'MOC')
+    com_exception = (int)(0xE0000000|'MOC'),
+    complus_exception = (int)(0xE0000000|'RCC')
 #else
     cxx_exception = (int)0xE063736D,
-    com_exception = (int)0xE0434F4D
+    com_exception = (int)0xE0434F4D,
+    complus_exception = (int)0xE0434352
 #endif
   };
 };

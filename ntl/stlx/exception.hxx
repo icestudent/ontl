@@ -1,6 +1,6 @@
 /**\file*********************************************************************
  *                                                                     \brief
- *  18.7 Exception handling [support.exception]
+ *  18.8 Exception handling [support.exception]
  *
  ****************************************************************************
  */
@@ -22,15 +22,21 @@
 #pragma warning(disable:4290)
 #endif
 
+#if STLX__USE_EXCEPTIONS == 0
+# pragma push_macro("__noreturn")
+# define __noreturn
+#endif
+
+
 namespace std {
 
 /**\addtogroup  lib_language_support *** 18 Language support library [language.support]
  *@{*/
 
-/**\defgroup  lib_support_exception **** 18.7 Exception handling [support.exception]
+/**\defgroup  lib_support_exception **** 18.8 Exception handling [support.exception]
  *@{*/
 
-/// 18.7.1 Class exception [exception]
+/// 18.8.1 Class exception [exception]
 class exception
 {
   public:
@@ -41,7 +47,9 @@ class exception
     virtual const char* what() const __ntl_nothrow { return "exception"; }
 };
 
-/// Class bad_exception [18.7.2.1 lib.bad.exception]
+///\name 18.8.2 Violating exception-specifications [exception.unexpected]
+
+/// Class bad_exception [18.8.2.1 bad.exception]
 class bad_exception : public exception
 {
   public:
@@ -53,7 +61,7 @@ class bad_exception : public exception
 };
 
   /**
-   *	@brief Type unexpected_handler [18.7.2.2 unexpected.handler]
+   *	@brief Type unexpected_handler [18.8.2.2 unexpected.handler]
    *  @details The type of a handler function to be called by unexpected() when a function attempts 
    *  to throw an exception not listed in its exception-specification.
    *  @note An unexpected_handler shall not return.
@@ -62,47 +70,48 @@ class bad_exception : public exception
   typedef void (*unexpected_handler)();
 
   /**
-   *	@brief set_unexpected [18.7.2.3 set.unexpected]
+   *	@brief set_unexpected [18.8.2.3 set.unexpected]
    *  @details Establishes the function designated by \c f as the current \c unexpected_handler.
    *  @return The previous \c unexpected_handler.
    **/
   unexpected_handler set_unexpected(unexpected_handler f) __ntl_nothrow;
 
   /**
-   *	@brief unexpected [18.7.2.4 unexpected]
+   *	@brief unexpected [18.8.2.4 unexpected]
    *  @details Calls the \c unexpected_handler function in effect immediately after evaluating 
-   *  the \e throw-expression (18.7.2.2), if called by the implementation, or calls the current \c unexpected_handler, 
+   *  the \e throw-expression (18.8.2.2), if called by the implementation, or calls the current \c unexpected_handler, 
    *  if called by the program.
    **/
-  __declspec(noreturn)
+  __noreturn
   void unexpected();
 
+  ///\}
 
   /**
-   *	@brief Type terminate_handler [18.7.3.1 terminate.handler]
+   *	@brief Type terminate_handler [18.8.3.1 terminate.handler]
    *  @details The type of a handler function to be called by terminate() when terminating exception processing.
    **/
   typedef void (*terminate_handler)();
 
   /**
-   *	@brief set_terminate [18.7.3.2 set.terminate]
+   *	@brief set_terminate [18.8.3.2 set.terminate]
    *  @details Establishes the function designated by \c f as the current handler function for terminating exception processing.
    *  @return The previous \c terminate_handler.
    **/
   terminate_handler set_terminate(terminate_handler f) __ntl_nothrow;
 
   /**
-   *	@brief terminate [18.7.3.3 terminate]
+   *	@brief terminate [18.8.3.3 terminate]
    *  @details Calls the \c terminate_handler function in effect immediately after evaluating 
-   *  the throw-expression (18.7.3.1), if called by the implementation, or calls the current \c terminate_handler function,
+   *  the throw-expression (18.8.3.1), if called by the implementation, or calls the current \c terminate_handler function,
    *  if called by the program.
    **/
-  __declspec(noreturn)
+  __noreturn
   void terminate();
 
 
   /**
-   *	@brief uncaught_exception [18.7.4 uncaught]
+   *	@brief uncaught_exception [18.8.4 uncaught]
    *  @details Returns \c true after completing evaluation of a \e throw-expression until either completing initialization
    *  of the exception-declaration in the matching handler or entering unexpected() due to the throw; or
    *  after entering terminate() for any reason other than an explicit call to terminate().
@@ -110,74 +119,7 @@ class bad_exception : public exception
    **/
   bool uncaught_exception() __ntl_nothrow;
 
-  namespace __
-  {
-    struct exception_ptr
-    {
-      operator explicit_bool_type() const { return explicit_bool(false); }
-    };
-
-    inline bool operator==(const exception_ptr&  , const exception_ptr&  ) { return false; }
-    inline bool operator!=(const exception_ptr& x, const exception_ptr& y) { return !(x == y); }
-    //bool operator==(const exception_ptr&  , const nullptr_t&  ) { return false; }
-    //bool operator!=(const exception_ptr& x, const nullptr_t& y) { return !(x == y); }
-    //bool operator==(const nullptr_t&  , const exception_ptr&  ) { return false; }
-    //bool operator!=(const nullptr_t& x, const exception_ptr& y) { return !(x == y); }
-  }
-
-  /// Exception Propagation [18.7.5 propagation]
-  ///
-  using __::exception_ptr;
-
-  exception_ptr current_exception();
-
-  void rethrow_exception(exception_ptr e);
-
-  template<class E>
-  exception_ptr copy_exception(E e);
-
-  /// nested_exception [18.7.6 except.nested]
-  class nested_exception
-  {
-  public:
-    nested_exception() throw()
-      :e(current_exception())
-    {}
-
-  #ifdef NTL__CXX_EF
-    nested_exception(const nested_exception&) throw() = default;
-    nested_exception& operator=(const nested_exception&) throw() = default;
-    virtual ~nested_exception() = default;
-  #else
-    // default generated
-  #endif
-
-    // access functions
-    void rethrow_nested() const; // [[noreturn]]
-    exception_ptr nested_ptr() const { return e; }
-
-  private:
-    exception_ptr e;
-  };
-
-#ifdef NTL__CXX_RV
-  template<class T> void throw_with_nested(T&& t); // [[noreturn]]
-#else
-  template<class T> void throw_with_nested(T& t); // [[noreturn]]
-#endif
-
-  template <class E> void rethrow_if_nested(const E& e);
-
-#if !STLX__USE_EXCEPTIONS
-  inline exception_ptr current_exception() { return exception_ptr(); }
-
-  inline void rethrow_exception(exception_ptr){}
-#endif
-
-
 /**@} lib_support_exception */
 /**@} lib_language_support */
-
 }//namespace std
-
 #endif//#ifndef NTL__STLX_EXCEPTION

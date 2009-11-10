@@ -42,6 +42,9 @@
   // thread_local
   #define NTL__CXX_THREADL
 
+  // C++0x attributes
+  #define NTL__CXX_ATTRIBUTES
+
   // language features:
   // explicit delete/default function definition
   #define NTL__CXX_EF
@@ -93,7 +96,7 @@
 #elif defined(__BCPLUSPLUS__)
 
 /** BCB's partial C++0x support */
-
+#define NTL__CXX_ATTRIBUTES
 #define NTL__CXX_ALIGNOF
 #define NTL__CXX_CHARS
 #define NTL__CXX_TYPEOF

@@ -409,7 +409,7 @@ void *__stdcall
 #endif
 
 NTL__EXTERNAPI
-__declspec(noreturn)
+__noreturn
 void __stdcall
 RtlRaiseException(
     const exception::record * ExceptionRecord
@@ -506,7 +506,7 @@ extern "C" void * _ReturnAddress();
 #pragma intrinsic(_ReturnAddress)
 
 extern "C"//NTL__EXTERNAPI is not an option because of __declspec(dllimport)
-__declspec(noreturn)
+__noreturn
 void __stdcall
 RaiseException(ntstatus, exception_flags, uint32_t, const uintptr_t *);
 
@@ -538,7 +538,7 @@ RaiseException(
 /// through the OS's exception dispatcher
 ///\todo use std::tuple
 template <typename T, size_t N>
-__declspec(noreturn)
+__noreturn
 void inline
   raise_exception(
     const ntstatus           code,
@@ -552,7 +552,7 @@ void inline
   RaiseException(code, flags, N, reinterpret_cast<const uintptr_t*>(&args));
 }
 
-__declspec(noreturn)
+__noreturn
 void inline
   raise_exception(
     const ntstatus        code,
@@ -719,9 +719,11 @@ namespace cxxruntime {
     uint32_t isvolatile   : 1;
     uint32_t isunaligned  : 1;// guess it is not used on x86
     uint32_t isreference  : 1;
+    uint32_t              : 2;
+    uint32_t unknown7     : 1;
 
 #ifdef _M_X64
-    uint32_t              :27;
+    uint32_t              :24;
     uint32_t ishz         : 1;
 #endif
 
@@ -790,7 +792,7 @@ namespace cxxruntime {
     }
   };
 
-  typedef int ehstate_t; ///< unwind map index
+  typedef int ehstate_t; ///< unwind map index: -2 means `invalid`, -1 means `none`.
 
   struct unwindtable
   {
@@ -1076,13 +1078,6 @@ namespace cxxruntime {
 
 #endif // _M_IX86
 
-  /* BTW, per-thread data returned by MSVC's _getptd()
-
-  +0x78 - terminate handler
-  +0x7C - unexpected handler
-  +0x80 - SE translator
-  */
-
   ///\name VC++ _tiddata clone
   struct tiddata
   {
@@ -1092,8 +1087,21 @@ namespace cxxruntime {
     /** Current exception */
     exception_pointers curexception;
     exception_record* prevER;
+
+    /** SEH translator */
     void* setranslator;
+    void* unexpected; // is it must be per-thread?
+
+    /** nested exceptions count */
+    uint32_t nestedExcount;
+    uint32_t processingThrow;
+    /** current exception specifier */
+    void* curexspec;
+
+  #ifdef _M_X64
     void* frame_info;
+    void* foreignException;
+  #endif
   };
 
   inline tiddata* _initptd()
@@ -1158,7 +1166,7 @@ namespace cxxruntime {
       return reinterpret_cast<frame_pointers*>( fp + ehfi->unwindhelp);
     }
 
-    ehstate_t unwind_try_block(uintptr_t fp, const ehfuncinfo* const ehfi, const dispatcher_context* const dispatch) const
+    ehstate_t unwind_try_block(uintptr_t /*fp*/, const ehfuncinfo* const ehfi, const dispatcher_context* const dispatch) const
     {
       frame_pointers establisher;
       const_cast<cxxregistration*>(this)->establisherframe(ehfi, dispatch, &establisher);
@@ -1253,6 +1261,7 @@ namespace cxxruntime {
         while(p){
           if(p->object_ == object)
             return false;
+          p = p->next;
         }
         return true;
       }
@@ -1271,7 +1280,7 @@ namespace cxxruntime {
     ///\return the value returned from unwindfunclet
 #ifdef _M_X64
     generic_function_t *
-      callsettingframe(void (*unwindfunclet)(), cxxregistration* frame, int nlg_notify_param = 0x103)
+      callsettingframe(void (*unwindfunclet)(), cxxregistration* frame, int nlg_notify_param = 0x100)
     {
       return _CallSettingFrame(unwindfunclet, frame, nlg_notify_param);
     }
@@ -1324,6 +1333,7 @@ namespace cxxruntime {
     {
 #ifdef _M_IX86
       (void)dispatch;
+      _getptd()->processingThrow++;
       for ( ehstate_t cs = current_state(ehfi); cs != to_state; cs = ehfi->unwindtable[cs].state )
       {
         assert( cs > -1 );
@@ -1339,11 +1349,15 @@ namespace cxxruntime {
         {
         }
       }
+      _getptd()->processingThrow--;
+
 #endif // _M_IX86
 #ifdef _M_X64
+
       // __FrameUnwindToState
       ehstate_t uestate, cs = current_state(ehfi, fp.FramePointers, dispatch);
       assert(cs >= -1 && cs < ehfi->unwindtable_size);
+      _getptd()->processingThrow++;
       for(uestate = -1; cs != -1 && cs > to_state; )
       {
         assert( cs > -1 );
@@ -1362,6 +1376,7 @@ namespace cxxruntime {
           cs = uestate;
         }
       }
+      _getptd()->processingThrow--;
       if(cs != -1 && cs > to_state)
         nt::exception::inconsistency();
       current_state(ehfi, fp.FramePointers, cs);
@@ -1419,6 +1434,9 @@ namespace cxxruntime {
     {
       return reinterpret_cast<const pe::image*>(get_throwimagebase())->va<T>(rva);
     }
+#else
+    template<typename T>
+    T thrown_va(T va) const { return va; }
 #endif
 
     /// destruct the exception object if it has a destructor
@@ -1460,9 +1478,10 @@ namespace cxxruntime {
     {
       const cxxrecord & cxxrec = *static_cast<const cxxrecord *>(ptrs->ExceptionRecord);
       return cxxrec.iscxx() && !cxxrec.get_throwinfo() // re-throw?
-        ? exception_execute_handler : exception_continue_search;
+        ? (_getptd()->processingThrow = 1, exception_execute_handler) : exception_continue_search;
     }
 
+#ifndef _M_X64
     ///\note no ___security_cookie support yet
     struct catchguard : public exception_registration
     {
@@ -1470,9 +1489,7 @@ namespace cxxruntime {
       cxxregistration *   cxxreg;
       int                 catchdepth;
     };
-    //STATIC_ASSERT(sizeof(catchguard) == 20);
-
-#ifndef _M_X64
+    STATIC_ASSERT(sizeof(catchguard) == 20);
 
     static
       exception_disposition __cdecl
@@ -1490,7 +1507,7 @@ namespace cxxruntime {
     generic_function_t *
       callcatchblock(
       cxxregistration *     const cxxreg,
-      const nt::context *   const /*ctx*/,
+      const nt::context *   const ctx,
       const ehfuncinfo *    const funcinfo,
       generic_function_t *  const handler,
       int                   const catchdepth,
@@ -1499,6 +1516,14 @@ namespace cxxruntime {
       // assume callcatchblockhelper throws
       generic_function_t * continuation = 0;
       const uintptr_t stackptr = cxxreg->stackptr();
+
+      // save the current exception
+      exception_pointers* ep = &_getptd()->curexception;
+      exception_pointers saved_exception = *ep;
+      ep->ExceptionRecord = this;
+      ep->ContextRecord = const_cast<nt::context*>(ctx);
+      _getptd()->nestedExcount++;
+
       __try
       {
         __try
@@ -1507,6 +1532,7 @@ namespace cxxruntime {
         }
         __except(callcatchblockfilter(_exception_info()))
         {
+          _getptd()->processingThrow = 0;
         }
       }
       __finally
@@ -1516,7 +1542,12 @@ namespace cxxruntime {
         {
           destruct_eobject(!!_abnormal_termination());
         }
+        _getptd()->nestedExcount--;
       }
+      // restore saved exception
+      ep = &_getptd()->curexception;
+      *ep = saved_exception;
+
       return continuation;
     }
 
@@ -1525,7 +1556,7 @@ namespace cxxruntime {
 #pragma warning(disable:4731)//frame pointer register 'ebp' modified by inline assembly code
 #pragma warning(disable:4733)//Inline asm assigning to 'FS:0' : handler not registered as safe handler
     // SE handlers already registered should be SAFESEH
-    static __declspec(noreturn)
+    static __noreturn
       void jumptocontinuation(generic_function_t * funclet, cxxregistration *cxxreg)
     {
       using namespace nt;
@@ -1567,18 +1598,30 @@ namespace cxxruntime {
       return continuation;
     }
 #pragma warning(pop)
+  public:
+    eobject* adjust_pointer(void* p1, const catchabletype* const convertable) const
+    {
+      return reinterpret_cast<eobject*>(convertable->thiscast(p1));
+    }
+
 #else // _M_X64
-  private:
+  public:
+    // TODO: replace this with convertable->thiscast
     eobject* adjust_pointer(void* p1, const catchabletype* const convertable) const
     {
       intptr_t obj = reinterpret_cast<intptr_t>(p1);
-      const ptrtomember& pmd = *ntl::padd<const ptrtomember*>(convertable, sizeof(void*));
+      //const ptrtomember& pmd = *ntl::padd<const ptrtomember*>(convertable, sizeof(void*));
+      const ptrtomember& pmd = convertable->thiscast;
+      intptr_t ptr2 = (intptr_t)pmd(p1);
       intptr_t ptr = obj + pmd.member_offset;
-      if(pmd.vbtable_offset < 0)
+      if(pmd.vbtable_offset < 0){
+        assert(ptr2 == ptr);
         return reinterpret_cast<eobject*>(ptr);
+      }
 
       ptr += *reinterpret_cast<intptr_t*>(obj+pmd.vbtable_offset);
       ptr += *reinterpret_cast<int32_t*>(ptr + pmd.vdisp_offset);
+      assert(ptr2 == ptr);
       return reinterpret_cast<eobject*>(ptr);
     }
   public:

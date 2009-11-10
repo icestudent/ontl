@@ -12,7 +12,7 @@
 #include "win/console.hxx"
 #include "nt/new.hxx"
 #include "nt/thread.hxx"
-#include <cstdlib>
+#include "cstdlib"
 
 #pragma comment(linker, "/subsystem:console")
 #pragma comment(linker, "/entry:ntl::_Consoleapp_entry")
@@ -74,7 +74,7 @@ int _Consoleapp_entry()
 
 //////////////////////////////////////////////////////////////////////////
 namespace win {
-NTL__EXTERNAPI __declspec(noreturn) void __stdcall ExitProcess(ntl::nt::ntstatus);
+NTL__EXTERNAPI __noreturn void __stdcall ExitProcess(ntl::nt::ntstatus);
 }
 
 extern"C" void _cdecl __console_abort()

@@ -194,12 +194,6 @@
  #define __fastcall _fastcall
 #endif
 
-#ifndef __GNUC__
- #define NTL__NORETURN __declspec(noreturn)
-#else
- #define NTL__NORETURN __attribute__((noreturn))
-#endif
-
 #ifndef NTL__CRTCALL
 # ifdef NTL__STLX_FORCE_CDECL
   #ifdef _MSC_VER
