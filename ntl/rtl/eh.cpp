@@ -70,7 +70,7 @@ uint32_t get_eax()
 }
 
 #ifndef _M_X64
-extern "C" void _chkstk();
+extern "C" void __cdecl _chkstk();
 extern "C" __declspec(naked) void _alloca_probe_16()
 {
   __asm {

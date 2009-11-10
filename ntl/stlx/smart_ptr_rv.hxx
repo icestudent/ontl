@@ -926,7 +926,7 @@ namespace std
       :shared(),ptr()
     {
       __ntl_try {
-        shared = new __::shared_ptr_deleter<Y,D>(p, d);
+        shared = new __::shared_ptr_deleter<Y,D>(p, forward<D>(d));
         set(p);
       }
       __ntl_catch(bad_alloc){
