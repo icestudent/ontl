@@ -164,7 +164,7 @@ class list
     {
       init_head();
       while(n--)
-        insert(end(), forward<value_type>(T()));
+        insert(end(), T());
     }
 
     __forceinline
@@ -339,7 +339,7 @@ class list
       }else if(sz > size()) {
         size_type n = sz - size();
         while(n--)
-          insert(end(), forward<value_type>(T()));
+          insert(end(), T());
       }
     }
 

@@ -1161,7 +1161,7 @@ namespace cxxruntime {
 #ifdef _M_X64
     typedef nt::exception::frame_pointers frame_pointers;
 
-    __forceinline static frame_pointers* framepointers(uintptr_t fp, const ehfuncinfo* const ehfi)
+    static __forceinline frame_pointers* framepointers(uintptr_t fp, const ehfuncinfo* const ehfi)
     {
       return reinterpret_cast<frame_pointers*>( fp + ehfi->unwindhelp);
     }

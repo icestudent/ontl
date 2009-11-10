@@ -184,10 +184,13 @@ namespace std
       set(p);
     }
 
-    void swap(unique_ptr&& u) __ntl_nothrow 
+    void swap(unique_ptr& u) __ntl_nothrow 
     {
-      std::swap(ptr, u.ptr);
-      std::swap(deleter, u.deleter);
+      if(this != &u){
+        using std::swap;
+        swap(ptr, u.ptr);
+        swap(deleter, u.deleter);
+      }
     }
 
   private:
@@ -311,9 +314,10 @@ namespace std
       set(p);
     }
 
-    void swap(unique_ptr&& u) __ntl_nothrow 
+    void swap(unique_ptr& u) __ntl_nothrow 
     {
-      std::swap(ptr, u.ptr); 
+      if(this != &u)
+        std::swap(ptr, u.ptr); 
     }
 
   private:
@@ -445,10 +449,13 @@ namespace std
       set(p);
     }
 
-    void swap(unique_ptr&& u) __ntl_nothrow
+    void swap(unique_ptr& u) __ntl_nothrow
     {
-      std::swap(ptr, u.ptr); 
-      std::swap(deleter, u.deleter);
+      if(this != &u){
+        using std::swap;
+        swap(ptr, u.ptr); 
+        swap(deleter, u.deleter);
+      }
     }
 
 
@@ -564,9 +571,10 @@ namespace std
       set(p);
     }
 
-    void swap(unique_ptr&& u) __ntl_nothrow
+    void swap(unique_ptr& u) __ntl_nothrow
     {
-      std::swap(ptr, u.ptr); 
+      if(this != &u)
+        std::swap(ptr, u.ptr); 
     }
 
   private:
@@ -670,9 +678,10 @@ namespace std
       set(p);
     }
 
-    void swap(unique_ptr&& u) __ntl_nothrow 
+    void swap(unique_ptr& u) __ntl_nothrow 
     { 
-      std::swap(ptr, u.ptr); 
+      if(this != &u)
+        std::swap(ptr, u.ptr); 
     }
 
   private:
@@ -697,6 +706,7 @@ namespace std
     x.swap(y);
   }
 
+#ifndef NTL__CXX_RVFIX
   template <class T, class D> void swap(unique_ptr<T, D>&& x, unique_ptr<T, D>& y)
   {
     x.swap(y);
@@ -705,6 +715,7 @@ namespace std
   {
     x.swap(y);
   }
+#endif
 
   template <class T1, class D1, class T2, class D2>
   bool operator==(const unique_ptr<T1, D1>& x, const unique_ptr<T2, D2>& y)
@@ -942,7 +953,7 @@ namespace std
 
       __ntl_try {
         shared_data3* s = alloc.allocate(1);
-        alloc.construct(s, p, d, a);
+        alloc.construct(s, p, forward<D>(d), forward<A>(a));
         shared = s;
         set(p);
       }
@@ -959,7 +970,7 @@ namespace std
     shared_ptr(shared_ptr&& r) __ntl_nothrow
       :shared(),ptr()
     {
-      swap(r);
+      swap(move(r));
     }
     template<class Y> shared_ptr(const shared_ptr<Y>& r) __ntl_nothrow
       :shared(/*__::shared_data_cast<T>*/(r.shared)),ptr(r.get())
@@ -1028,38 +1039,41 @@ namespace std
     {
       if(this != &r){
         reset();
-        swap(r);
+        swap(move(r));
       }
       return *this;
     }
     template<class Y> shared_ptr& operator=(const shared_ptr<Y>& r)
     {
       if(shared != /*__::shared_data_cast<T>*/(r.shared))
-        shared_ptr(r).swap(*this);
+        shared_ptr(move(r)).swap(static_cast<shared_ptr&&>(*this));
       return *this;
     }
     template<class Y> shared_ptr& operator=(shared_ptr<Y>&& r)
     {
       if(shared != /*__::shared_data_cast<T>*/(r.shared))
-        shared_ptr(r).swap(*this);
+        shared_ptr(move(r)).swap(static_cast<shared_ptr&&>(*this));
       return *this;
     }
     template<class Y> shared_ptr& operator=(auto_ptr<Y>&& r)
     {
-      shared_ptr(r).swap(*this);
+      shared_ptr(move(r)).swap(static_cast<shared_ptr&&>(*this));
       return *this;
     }
     template <class Y, class D>
     shared_ptr& operator=(unique_ptr<Y, D>&& r)
     {
-      shared_ptr(r).swap(*this);
+      shared_ptr(move(r)).swap(static_cast<shared_ptr&&>(*this));
       return *this;
     }
 
     void swap(shared_ptr&& r) __ntl_nothrow
     {
-      std::swap(shared, r.shared);
-      std::swap(ptr, r.ptr);
+      if(this != &r){
+        using std::swap;
+        swap(shared, r.shared);
+        swap(ptr, r.ptr);
+      }
     }
 
     void reset()

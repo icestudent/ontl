@@ -301,8 +301,8 @@ namespace std
       tuples& operator=(tuples&& r)
       {
         if(this == &r) return *this;
-        head = move(r.head);
-        tail = move(r.tail);
+        head = std::move(r.head);
+        tail = std::move(r.tail);
         return *this;
       }
 
@@ -310,8 +310,8 @@ namespace std
       template<typename U1, typename U2, typename U3, typename U4, typename U5>
       tuples& operator=(tuples<meta::typelist<U1,U2,U3,U4,U5>, Idx>&& r)
       {
-        head = move(r.head);
-        tail = move(r.tail);
+        head = std::move(r.head);
+        tail = std::move(r.tail);
         return *this;
       }
 #endif

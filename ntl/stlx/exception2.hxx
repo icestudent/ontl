@@ -19,6 +19,7 @@
 
 #if STLX__USE_EXCEPTIONS == 0
 # pragma push_macro("__noreturn")
+# undef __noreturn
 # define __noreturn
 #endif
 
@@ -157,7 +158,7 @@ namespace ntl
     };
   }
 }
-#elif STLX__USE_EXCEPTIONS
+#elif !STLX__USE_EXCEPTIONS
 
 namespace ntl { namespace cxxruntime {
   struct exception_ptr

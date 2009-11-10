@@ -24,6 +24,7 @@
 
 #if STLX__USE_EXCEPTIONS == 0
 # pragma push_macro("__noreturn")
+# undef __noreturn
 # define __noreturn
 #endif
 

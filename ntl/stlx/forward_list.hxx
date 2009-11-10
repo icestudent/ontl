@@ -158,7 +158,7 @@ namespace std {
     {
       init_head();
       while(n--)
-        insert_after(cbefore_begin(), forward<value_type>(T()));
+        insert_after(cbefore_begin(), T());
     }
 
     forward_list(size_type n, const T& value, const Alloc& a = Alloc())
@@ -188,7 +188,7 @@ namespace std {
       :node_allocator()
     {
       init_head();
-      swap(x);
+      swap(move(x));
     }
   #endif
 
@@ -216,7 +216,7 @@ namespace std {
     {
       if(this != &x){
         clear();
-        swap(x);
+        swap(move(x));
       }
       return *this;
     }
@@ -439,7 +439,7 @@ namespace std {
       }else if(sz > size_) {
         size_type n = sz - size_;
         while(n--)
-          insert_after(end(), forward<value_type>(T()));
+          insert_after(end(), T());
       }
     }
 
@@ -490,7 +490,7 @@ namespace std {
 
     void splice_after(const_iterator position, list_reference x, const_iterator i)
     {
-      splice_after(position, x, i, i.p->next);
+      splice_after(position, move(x), i, i.p->next);
     }
 
     void splice_after(const_iterator position, list_reference /*x*/, const_iterator first, const_iterator last)
@@ -543,7 +543,7 @@ namespace std {
     
     void merge(list_reference x)
     {
-      merge(x, less<T>());
+      merge(move(x), less<T>());
     }
 
     template <class Compare> 

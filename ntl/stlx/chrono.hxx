@@ -48,13 +48,9 @@ namespace std
   template <class Rep1, class Period1, class Rep2, class Period2>
   struct common_type<chrono::duration<Rep1, Period1>, chrono::duration<Rep2, Period2> >
   {
-    typedef chrono::duration<
-      typename common_type<Rep1, Rep2>::type,
-      ratio<
-        __::static_evaluation::gcd<Period1::num, Period2::num>::value,
-        (Period1::den / __::static_evaluation::gcd<Period1::den, Period2::den>::value) * Period2::den
-           >
-                            > type;
+    typedef ratio<__::static_evaluation::gcd<Period1::num, Period2::num>::value,
+      (Period1::den / __::static_evaluation::gcd<Period1::den, Period2::den>::value) * Period2::den> resulted_ratio;
+    typedef chrono::duration<typename common_type<Rep1, Rep2>::type, resulted_ratio> type;
   };
 
   template <class Clock, class Duration1, class Duration2>
@@ -62,6 +58,24 @@ namespace std
   {
     typedef chrono::time_point<Clock, typename common_type<Duration1, Duration2>::type> type;
   };
+
+  namespace __
+  {
+    template<class NotDuration>
+    struct is_duration: false_type
+    {};
+    template <class Rep, class Period>
+    struct is_duration<chrono::duration<Rep, Period> >: true_type
+    {};
+
+    template<class Rep1, class Rep2>
+    struct safe_common
+    {
+      static const bool fail = is_duration<Rep2>::value;
+      typedef conditional<fail, Rep1, Rep2> R2;
+      typedef typename common_type<Rep1, typename R2::type>::type type;
+    };
+  }
 
 
   namespace chrono
@@ -286,7 +300,7 @@ namespace std
     }
 
     template <class Rep1, class Period, class Rep2>
-    inline duration<typename common_type<Rep1, Rep2>::type, Period>
+    inline duration<typename std::__::safe_common<Rep1, Rep2>::type, Period>
       operator/ (const duration<Rep1, Period>& d, const Rep2& s)
     {
       return duration<typename common_type<Rep1, Rep2>::type, Period>(d) /= s;
@@ -299,7 +313,6 @@ namespace std
       typedef typename common_type<duration<Rep1, Period1>, duration<Rep2, Period2> >::type CD;
       return CD(lhs).count() / CD(rhs).count();
     }
-
 
     ///\name duration comparisons
     template <class Rep1, class Period1, class Rep2, class Period2>
@@ -417,14 +430,8 @@ namespace std
     template <class Clock, class Duration>
     class time_point
     {
-      template<class NotDuration>
-      struct is_duration: false_type
-      {};
-      template <class Rep, class Period>
-      struct is_duration<duration<Rep, Period> >: true_type
-      {};
     public:
-      static_assert(is_duration<Duration>::value, "Duration shall be an instance of duration");
+      static_assert(std::__::is_duration<Duration>::value, "Duration shall be an instance of duration");
 
     public:
       typedef Clock clock;

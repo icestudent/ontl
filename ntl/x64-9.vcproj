@@ -579,6 +579,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\stlx\exception2.hxx"
+						>
+					</File>
+					<File
 						RelativePath=".\stlx\excptdef.hxx"
 						>
 					</File>
@@ -1238,6 +1242,14 @@
 				<File
 					RelativePath=".\rtl\syserr.cpp"
 					>
+					<FileConfiguration
+						Name="debug|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
 					<FileConfiguration
 						Name="debug|Win32"
 						ExcludedFromBuild="true"
