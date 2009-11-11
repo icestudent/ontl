@@ -48,5 +48,19 @@ namespace
     }
   }
 
+  template<> template<> void tut::to::test<05>()
+  {
+    struct base{};
+    struct derived: base{};
+    try {
+      throw derived();
+    }
+    catch(...){
+      std::exception_ptr ptr = std::current_exception();
+      quick_ensure(ptr->target<derived>() != nullptr);
+      quick_ensure(ptr->target<base>() != nullptr);
+    }
+  }
+
 
 }

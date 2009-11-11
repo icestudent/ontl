@@ -126,7 +126,7 @@ namespace ntl
         const catchabletypearray* types = cxx.thrown_va<const catchabletypearray*>(info->catchabletypearray);
         assert(types->size != 0);
         for(uint32_t t = 0; t < types->size; t++){
-          const catchabletype* type = cxx.thrown_va<const catchabletype*>(types->type[0]);
+          const catchabletype* type = cxx.thrown_va<const catchabletype*>(types->type[t]);
           if(desttype == *cxx.thrown_va<const std::type_info*>(type->typeinfo))
             return reinterpret_cast<const T*>(cxx.adjust_pointer(cxx.get_object(), type));
         }
