@@ -20,7 +20,7 @@
 // with this library; see the file COPYING3.  If not see
 // <http://www.gnu.org/licenses/>.
 
-// current_exception() under various conditions.
+// rethrow_exception() and preservation of data
 
 #include <ntl-tests-common.hxx>
 
@@ -28,25 +28,21 @@
 
 namespace tut
 {
-  STLX_DEFINE_TESTGROUP(std::exception_ptr);
-  testgroup tg_exception_ptr("std::exception_ptr");
-
-  template<> template<> void to::test<0>()
-  {
-    std::exception_ptr ptr;
-    quick_ensure(ptr == 0);
-#if _MSC_VER > 1400
-    quick_ensure(ptr == nullptr);
-#endif
-  }
+  STLX_DEFAULT_TESTGROUP();
+  testgroup tg_rethrow_exception("std::rethrow_exception");
 
   template<> template<> void to::test<01>()
   {
     bool test __attribute__((unused)) = true;
     using namespace std;
 
-    exception_ptr ep = current_exception();
-    VERIFY( ep == 0 );
+    try {
+      rethrow_exception(copy_exception(0));
+    } catch(int i){
+      quick_ensure(i == 0);
+    } catch(...) {
+      tut::fail(extmsg("wrong exception type"));
+    }
   }
 
   template<> template<> void to::test<02>()
@@ -55,10 +51,10 @@ namespace tut
     using namespace std;
 
     try {
-      throw 0;
-    } catch(...) {
-      exception_ptr ep = current_exception();
-      VERIFY( ep != 0 );
+      rethrow_exception(copy_exception(runtime_error("test")));
+    } catch(exception &e) {
+      VERIFY( typeid(e) == typeid(runtime_error) );
+      VERIFY( strcmp(e.what(), "test") == 0 );
     }
   }
 
@@ -67,11 +63,18 @@ namespace tut
     bool test __attribute__((unused)) = true;
     using namespace std;
 
+    exception_ptr ep;
     try {
-      throw exception();
-    } catch(std::exception&) {
-      exception_ptr ep = current_exception();
-      VERIFY( ep != 0 );
+      throw 0;
+    } catch(...) {
+      ep = current_exception();
+    }
+    try {
+      rethrow_exception(ep);
+    } catch(int i){
+      quick_ensure(i == 0);
+    } catch(...) {
+      tut::fail(extmsg("wrong exception type"));
     }
   }
 
@@ -80,23 +83,39 @@ namespace tut
     bool test __attribute__((unused)) = true;
     using namespace std;
 
+    // Weave the exceptions in an attempt to confuse the machinery.
     try {
       throw 0;
     } catch(...) {
       exception_ptr ep1 = current_exception();
       try {
-        throw 0;
+        throw 1;
       } catch(...) {
         exception_ptr ep2 = current_exception();
-        VERIFY( ep1 != ep2 );
+        try {
+          rethrow_exception(ep1);
+        } catch(...) {
+          try {
+            rethrow_exception(ep2);
+          } catch(...) {
+            try {
+              rethrow_exception(ep1);
+            } catch(int i){
+              quick_ensure(i == 0);
+            } catch(...) {
+              tut::fail(extmsg("wrong exception type"));
+            }
+            try {
+              rethrow_exception(ep2);
+            } catch(int i){
+              quick_ensure(i == 1);
+            } catch(...) {
+              tut::fail(extmsg("wrong exception type"));
+            }
+          }
+        }
       }
-      exception_ptr ep3 = current_exception();
-      
-      // Not guaranteed by standard.
-      VERIFY( ep1 != ep3 );
-
-      // oNTL specific
-      VERIFY( *ep1 == *ep3 );
     }
   }
+
 }
