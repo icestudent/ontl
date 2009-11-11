@@ -369,7 +369,12 @@ private:
       /** Returns a string naming the error category ("generic") */
       const char *name() const __ntl_nothrow { return "generic"; }
 
-      virtual string message(int ev) const;
+      virtual string message(int ev) const
+      {
+        char buf[40];
+        sprintf(buf, "generic error code #%d", ev);
+        return string(buf);
+      }
 
       error_condition default_error_condition(int ev) const __ntl_nothrow
       {
@@ -392,14 +397,24 @@ private:
       /** Returns a string naming the error category ("system") */
       const char *name() const __ntl_nothrow { return "system"; }
 
-      virtual string message(int ev) const;
+      virtual string message(int ev) const
+      {
+        char buf[40];
+        sprintf(buf, "system error code #%d", ev);
+        return string(buf);
+      }
 
       /**
        *	If the argument \c ev corresponds to a POSIX \c errno value \c posv, 
        *  the function shall return <tt> error_condition(posv, generic_category) </tt>.
        *  Otherwise, the function shall return <tt> error_condition(ev, system_category) </tt>.
        **/
-      error_condition default_error_condition(int ev) const __ntl_nothrow;
+      error_condition default_error_condition(int ev) const __ntl_nothrow
+      {
+        // TODO: detect posix errno
+        return error_condition(ev, system_category());
+      }
+
       bool equivalent(int code, const error_condition& condition) const __ntl_nothrow
       {
         return default_error_condition(code) == condition;

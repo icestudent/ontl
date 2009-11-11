@@ -23,7 +23,7 @@
 #pragma message("This file needed only for ENABLED RTTI (see /GR).")
 #endif
 
-//#pragma region typeinfo::name implementation
+#pragma region typeinfo::name implementation
 
 #ifndef CRT_UNDNAME
 #define CRT_UNDNAME
@@ -98,10 +98,10 @@ std::type_info::~type_info()
 
 }
 #endif
-//#pragma endregion
+#pragma endregion
 
 
-//#pragma region dynamic_cast implementation
+#pragma region dynamic_cast implementation
 
 //#if STLX__USE_RTTI
 
@@ -508,8 +508,8 @@ extern "C" void* __cdecl __RTtypeid(void* object) __ntl_throws(...)
 #ifndef _M_X64
     return (void*)&locator.type.type;
 #else
-    const pe::image* pe;
-    if(!locator.type || !(pe = pe::image::base_from(object), pe)){
+    const pe::image* pe = nullptr;
+    if(!locator.type || !(pe = pe::image::base_from(&locator), pe)){
       pe = pe::image::this_module();
     //  __ntl_throw(std::bad_typeid(/*"A typeid of bad pointer attempted"*/));
     //#if STLX__USE_EXCEPTIONS == 0
@@ -538,5 +538,5 @@ extern "C" void* __cdecl __RTDynamicCast(void* object, int32_t vfdelta, void* sr
 }
 
 //#endif // rtti
-//#pragma endregion
+#pragma endregion
 

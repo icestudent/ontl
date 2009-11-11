@@ -46,8 +46,10 @@ void std::unexpected()
   std::unexpected_handler handler = __ntl_std_unexpected_handler;
   if(handler)
     __ntl_std_unexpected_handler();
-  else
+  else{
+    __debugbreak();
     std::terminate();
+  }
 }
 
 bool std::uncaught_exception() __ntl_nothrow

@@ -1310,9 +1310,7 @@ namespace cxxruntime {
       switch ( code )
       {
       case exception_record::cxxmagic:
-        nt::exception::inconsistency();
-      case exception_record::commagic:
-        /**/
+        std::unexpected();
       default:
         return exception_continue_search;
       }
@@ -1440,6 +1438,7 @@ namespace cxxruntime {
 #endif
 
     /// destruct the exception object if it has a destructor
+    ///\warning If the destructor throws an exception during the stack unwinding, std::unexpected would be called
     void destruct_eobject(bool cannotthrow = true) const
     {
       assert(ExceptionCode == cxxmagic);
@@ -1454,7 +1453,7 @@ namespace cxxruntime {
         }
         __except(cannotthrow ? exception_execute_handler : exception_continue_search)
         {
-          nt::exception::inconsistency();
+          std::unexpected();
         }
       }
 #else
@@ -1465,7 +1464,7 @@ namespace cxxruntime {
           return;
         }
         __except(cannotthrow ? exception_execute_handler : exception_continue_search){
-          nt::exception::inconsistency();
+          std::unexpected();
         }
       }
 #endif
@@ -1634,6 +1633,7 @@ namespace cxxruntime {
     ///         if the exception-declaration does not specify a name,
     ///         a temporary object of that type.
     ///\note    This is the question may we optimize out the last case.
+    ///\warning If the copy constructor throws an exception, std::unexpected would be called
     void
       constructcatchobject(
       cxxregistration *             cxxreg,
@@ -1684,7 +1684,7 @@ namespace cxxruntime {
             (eobject::ctor_ptr2(copyctor))(objthis, copyarg, 1);
         }
       }
-      __except(exception_execute_handler)
+      __except(cxxregistration::unwindfilter(static_cast<nt::ntstatus>(_exception_code())))
       {
         nt::exception::inconsistency();
       }
@@ -1727,7 +1727,7 @@ namespace cxxruntime {
             convertable->object_size);
         }
       }
-      __except(exception_execute_handler)
+      __except(cxxregistration::unwindfilter(static_cast<nt::ntstatus>(_exception_code())))
       {
         nt::exception::inconsistency();
       }

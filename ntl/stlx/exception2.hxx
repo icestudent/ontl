@@ -98,6 +98,55 @@ namespace ntl
         }
       }
 
+      ///\name oNTL extensions
+
+      /** Returns type info of the thrown object if exists; otherwise returns <tt>typeid(void)</tt> */
+      const std::type_info& target_type() const __ntl_nothrow
+      {
+        const cxxrecord& cxx = static_cast<const cxxrecord&>(ehrec);
+        if(!(this && cxx.is_msvc() && cxx.get_throwinfo()))
+          return typeid(void);
+        const throwinfo* info = cxx.get_throwinfo();
+        assert(info->catchabletypearray != 0);
+        const catchabletypearray* types = cxx.thrown_va<const catchabletypearray*>(info->catchabletypearray);
+        assert(types->size != 0);
+        const catchabletype* type = cxx.thrown_va<const catchabletype*>(types->type[0]);
+        return *cxx.thrown_va<const std::type_info*>(type->typeinfo);
+      }
+
+      /** Returns pointer to constant target if T is type of the target or null pointer otherwise */
+      template <typename T> const T* target() const __ntl_nothrow
+      {
+        const cxxrecord& cxx = static_cast<const cxxrecord&>(ehrec);
+        if(!(this && cxx.is_msvc() && cxx.get_throwinfo()))
+          return nullptr;
+        const std::type_info& desttype = typeid(T);
+        const throwinfo* info = cxx.get_throwinfo();
+        assert(info->catchabletypearray != 0);
+        const catchabletypearray* types = cxx.thrown_va<const catchabletypearray*>(info->catchabletypearray);
+        assert(types->size != 0);
+        for(uint32_t t = 0; t < types->size; t++){
+          const catchabletype* type = cxx.thrown_va<const catchabletype*>(types->type[0]);
+          if(desttype == *cxx.thrown_va<const std::type_info*>(type->typeinfo))
+            return reinterpret_cast<const T*>(cxx.adjust_pointer(cxx.get_object(), type));
+        }
+        return nullptr;
+      }
+
+      friend bool operator!=(const exception_ptr& e1, const exception_ptr& e2) { return !(e1 == e2); }
+      friend bool operator==(const exception_ptr& e1, const exception_ptr& e2)
+      {
+        if(&e1 == &e2)   return true;
+        if(!&e1 || !&e2) return false;
+
+        const cxxrecord& cxx1 = static_cast<const cxxrecord&>(e1.ehrec), cxx2 = static_cast<const cxxrecord&>(e2.ehrec);
+        if(cxx1.is_msvc() != cxx2.is_msvc()) return false;
+        if(!cxx1.is_msvc())
+          return std::memcmp(&e1.ehrec,&e2.ehrec,sizeof(exception_record)) == 0;
+        return cxx1.get_throwinfo() == cxx2.get_throwinfo();
+      }
+      ///\}
+
     protected:
       uintptr_t copyThrownObject(const cxxrecord& cxx, const catchabletype& type, void* obj)
       {
@@ -125,6 +174,7 @@ namespace ntl
           }
         }
         __except(exception_execute_handler){
+          // copy-ctor raises an exception or something wrong
           nt::exception::inconsistency();
         }
         return reinterpret_cast<uintptr_t>(obj);
