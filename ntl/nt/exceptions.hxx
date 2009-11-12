@@ -1419,16 +1419,6 @@ namespace cxxruntime {
     const exception_registration *  const nested_eframe = 0,
     bool                            const destruct      = false);
 
-#ifndef _M_X64
-  extern "C" generic_function_t * __cdecl CxxCallCatchBlock(struct cxxrecord* ehrec,
-    cxxregistration *     const cxxreg,
-    const nt::context *   const ctx,
-    const ehfuncinfo *    const funcinfo,
-    generic_function_t *  const handler,
-    int                   const catchdepth,
-    unsigned              const nlg_code = 0x100);
-#endif
-
   //#ifndef NTL_EH_RUNTIME
 
   struct cxxrecord : public nt::exception::record
@@ -1619,9 +1609,23 @@ namespace cxxruntime {
       int                   const catchdepth,
       unsigned              const nlg_code)
     {
+      #pragma pack(push,1)
+      struct jump_thunk
+      {
+        byte      jmp;
+        int32_t  offset;
+      };
+      #pragma pack(pop)
+
+      intptr_t gha = (uintptr_t)&cxxrecord::catchguardhandler;
+      const jump_thunk* thunk = reinterpret_cast<jump_thunk*>(gha);
+      if(thunk->jmp == 0xE9){
+        gha = gha + thunk->offset + 5;
+      }
+
       volatile catchguard guard;
       guard.next        = nt::teb::get(&nt::teb::ExceptionList);
-      guard.handler     = catchguardhandler;
+      guard.handler     = reinterpret_cast<nt::exception::handler_t*>(gha);
       guard.funcinfo    = funcinfo;
       guard.cxxreg      = cxxreg;
       guard.catchdepth  = catchdepth + 1;
@@ -1806,8 +1810,8 @@ namespace cxxruntime {
 
       cxxreg->state = tb->tryhigh + 1;
       generic_function_t * const continuation =
-        //callcatchblock(cxxreg, ctx, funcinfo, catchblock->handler, catchdepth);
-        CxxCallCatchBlock(this, cxxreg, ctx, funcinfo, catchblock->handler, catchdepth);
+        callcatchblock(cxxreg, ctx, funcinfo, catchblock->handler, catchdepth);
+        //CxxCallCatchBlock(this, cxxreg, ctx, funcinfo, catchblock->handler, catchdepth);
       if ( continuation )
         jumptocontinuation(continuation, cxxreg);
 #else

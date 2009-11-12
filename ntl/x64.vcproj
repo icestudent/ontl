@@ -1141,6 +1141,14 @@
 							Name="VCCLCompilerTool"
 						/>
 					</FileConfiguration>
+					<FileConfiguration
+						Name="release|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath=".\rtl\crt.cpp"
@@ -1281,6 +1289,14 @@
 							Name="VCCLCompilerTool"
 						/>
 					</FileConfiguration>
+					<FileConfiguration
+						Name="release|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath=".\rtl\math.cpp"
@@ -1295,6 +1311,14 @@
 					</FileConfiguration>
 					<FileConfiguration
 						Name="debug|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -1399,6 +1423,14 @@
 					</FileConfiguration>
 					<FileConfiguration
 						Name="debug|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool

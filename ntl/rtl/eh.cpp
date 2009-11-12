@@ -73,7 +73,6 @@ uint32_t get_eax()
   __asm xchg eax, eax
 }
 
-#ifndef _M_X64
 extern "C" void __cdecl _chkstk();
 extern "C" __declspec(naked) void _alloca_probe_16()
 {
@@ -90,87 +89,6 @@ extern "C" __declspec(naked) void _alloca_probe_16()
   }
 }
 #endif
-
-#endif
-
-#ifndef _M_X64
-
-extern "C" exception_disposition __cdecl CxxCatchGuardHandler(
-                  exception_record  *           er,
-                  nt::exception::registration * establisher_frame,
-                  nt::context *                 ctx,
-                  dispatcher_context *          dispatch/*not used*/)
-{
-  const cxxrecord::catchguard &cg = *static_cast<const cxxrecord::catchguard*>(establisher_frame);
-  return cxxframehandler(er, cg.cxxreg, ctx, dispatch, cg.funcinfo,
-    cg.catchdepth, &cg, false);
-}
-
-exception_filter __cdecl
-CxxCallCatchBlockFilter(exception_pointers * ptrs)
-{
-  const cxxrecord & cxxrec = *static_cast<const cxxrecord *>(ptrs->ExceptionRecord);
-  return cxxrec.iscxx() && !cxxrec.get_throwinfo() // re-throw?
-    ? (_getptd()->processingThrow = 1, exception_execute_handler) : exception_continue_search;
-}
-
-#pragma warning(disable:4733)//Inline asm assigning to 'FS:0' : handler not registered as safe handler
-extern "C" generic_function_t * __cdecl CxxCallCatchBlock(cxxrecord* ehrec,
-               cxxregistration *     const cxxreg,
-               const nt::context *   const ctx,
-               const ehfuncinfo *    const funcinfo,
-               generic_function_t *  const handler,
-               int                   const catchdepth,
-               unsigned              const nlg_code)
-{
-  // assume callcatchblockhelper throws
-  generic_function_t * continuation = 0;
-  const uintptr_t stackptr = cxxreg->stackptr();
-
-  // save the current exception
-  exception_pointers* ep = &_getptd()->curexception;
-  exception_pointers saved_exception = *ep;
-  ep->ExceptionRecord = ehrec;
-  ep->ContextRecord = const_cast<nt::context*>(ctx);
-  _getptd()->nestedExcount++;
-  volatile cxxrecord::catchguard guard;
-
-  __try
-  {
-    __try
-    {
-      guard.next        = nt::teb::get(&nt::teb::ExceptionList);
-      guard.handler     = CxxCatchGuardHandler;
-      guard.funcinfo    = funcinfo;
-      guard.cxxreg      = cxxreg;
-      guard.catchdepth  = catchdepth + 1;
-      nt::teb::set(&nt::teb::ExceptionList, &guard);
-      continuation = cxxreg->callsettingframe(handler, static_cast<int>(nlg_code));
-      nt::teb::set(&nt::teb::ExceptionList, guard.next);
-    }
-    __except(CxxCallCatchBlockFilter(ntl::_exception_info()))
-    {
-      _getptd()->processingThrow = 0;
-    }
-  }
-  __finally
-  {
-    cxxreg->stackptr() = stackptr;
-    if ( continuation )
-    {
-      ehrec->destruct_eobject(!!_abnormal_termination());
-    }
-    _getptd()->nestedExcount--;
-    // restore saved exception
-    ep = &_getptd()->curexception;
-    *ep = saved_exception;
-  }
-
-  return continuation;
-}
-#pragma warning(default:4733)
-
-#endif // !x86
 
 #ifdef _M_X64
 

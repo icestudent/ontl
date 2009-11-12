@@ -55,15 +55,17 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions="-d1Binl"
 				Optimization="0"
 				AdditionalIncludeDirectories="../ntl;."
 				PreprocessorDefinitions="_NTL_DEMANGLE"
 				MinimalRebuild="true"
 				RuntimeLibrary="0"
 				BufferSecurityCheck="false"
+				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
 				WarningLevel="4"
-				DebugInformationFormat="4"
+				DebugInformationFormat="3"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -76,8 +78,8 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalOptions="/safeseh"
 				AdditionalDependencies="ntdll.lib"
-				LinkIncremental="2"
 				GenerateManifest="false"
 				IgnoreDefaultLibraryNames="libcmt.lib"
 				GenerateDebugInformation="true"
@@ -246,6 +248,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalOptions="/safeseh"
 				AdditionalDependencies="ntdll.lib"
 				LinkIncremental="1"
 				GenerateManifest="false"
