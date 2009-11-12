@@ -17,7 +17,9 @@
 #ifndef NTL__STLX_IOSFWD
 #include "iosfwd.hxx"
 #endif
-
+#ifndef NTL__STLX_CSTDIO
+#include "cstdio.hxx"
+#endif
 #ifndef NTL__STLX_CASSERT
 #include "cassert.hxx"
 #endif
