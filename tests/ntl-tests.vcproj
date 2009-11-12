@@ -216,7 +216,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories="../ntl;."
-				PreprocessorDefinitions="_NTL_DEMANGLE"
+				PreprocessorDefinitions="_NTL_DEMANGLE;_DEBUG"
 				RuntimeLibrary="0"
 				BufferSecurityCheck="false"
 				UsePrecompiledHeader="0"
@@ -300,8 +300,11 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="3"
+				InlineFunctionExpansion="2"
+				EnableIntrinsicFunctions="true"
+				FavorSizeOrSpeed="1"
 				AdditionalIncludeDirectories="../ntl;."
-				PreprocessorDefinitions="_NTL_DEMANGLE"
+				PreprocessorDefinitions="_NTL_DEMANGLE;_DEBUG"
 				StringPooling="true"
 				RuntimeLibrary="0"
 				BufferSecurityCheck="false"
@@ -391,6 +394,7 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
+							Optimization="0"
 							WholeProgramOptimization="false"
 						/>
 					</FileConfiguration>

@@ -26,12 +26,12 @@
 #include <ntl-tests-common.hxx>
 
 STLX_DEFAULT_TESTGROUP_NAME("std::exception_ptr#lifespan");
-
+#include <nt/debug.hxx>
 
 namespace 
 {
 
-  bool may_destruct = false;
+  volatile bool may_destruct = false;
 
   class destructing
   {
@@ -42,6 +42,8 @@ namespace
     destructing(const destructing &o) : copied(false) { o.copied = true; }
     ~destructing()
     {
+      ntl::nt::dbg::info.printf("tut::ensure(%d)\n", copied || may_destruct);
+      assert(copied || may_destruct);
       VERIFY( copied || may_destruct );
     }
   };

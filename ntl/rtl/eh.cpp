@@ -22,6 +22,8 @@
 #include "../nt/context.hxx"
 #include "../nt/status.hxx"
 
+namespace dbg = ntl::nt::dbg;
+
 #ifdef _DEBUG
 # include "../nt/debug.hxx"
   void dbg_pause()
@@ -197,6 +199,11 @@ void cxxregistration::unwindnestedframes(const exception_record* ehrec, const nt
     er.ExceptionInformation[7] = recursive,
     er.ExceptionInformation[8] = ehmagic1200;
 
+  exception_pointers ep; ep.ExceptionRecord = reinterpret_cast<exception_record*>(er.ExceptionInformation[6]);
+  assert(!ep.ExceptionRecord || ep.ExceptionRecord->NumberParameters <= exception_record::maximum_parameters);
+
+  //tiddata* ptd = _getptd();
+  //dbg::trace.printf("sending   ehrec %p, cur ex %p (valid: %d)\n", ep.ExceptionRecord, ptd->curexception.ExceptionRecord, !ptd->curexception.ExceptionRecord || ptd->curexception.ExceptionRecord->NumberParameters <= 15);
   nt::context octx;
   RtlUnwindEx(fp.FramePointers, dispatch->ControlPc, &er, 0, &octx, dispatch->HistoryTable);
 }
@@ -227,14 +234,17 @@ void RethrowException(exception_record* ehrec)
 extern "C" generic_function_t* CxxCallCatchBlock(exception_record* ehrec)
 {
   // save the current exception
-  exception_pointers* ep = &_getptd()->curexception;
-  assert(!ep->ExceptionRecord || ep->ExceptionRecord->NumberParameters <= exception_record::maximum_parameters);
+  tiddata* ptd = _getptd();
+  exception_pointers* ep = &ptd->curexception;//&_getptd()->curexception;
   exception_pointers saved_exception = *ep;
-
+  assert(!ep->ExceptionRecord || ep->ExceptionRecord->NumberParameters <= exception_record::maximum_parameters);
+  
   ep->ExceptionRecord = reinterpret_cast<exception_record*>(ehrec->ExceptionInformation[6]);
   assert(ep->ExceptionRecord->NumberParameters <= exception_record::maximum_parameters);
+  //dbg::trace.printf("received  ehrec %p, cur ex %p (valid: %d)\n", ep->ExceptionRecord, ptd->curexception.ExceptionRecord, !ptd->curexception.ExceptionRecord || ptd->curexception.ExceptionRecord->NumberParameters <= 15);
   ep->ContextRecord = reinterpret_cast<nt::context*>(ehrec->ExceptionInformation[4]);
   _getptd()->nestedExcount++;
+  assert(!ep->ExceptionRecord || ep->ExceptionRecord->NumberParameters <= exception_record::maximum_parameters);
 
   // original record
    ehfuncinfo* ehfi = reinterpret_cast<ehfuncinfo*>(ehrec->ExceptionInformation[5]);
@@ -250,7 +260,7 @@ extern "C" generic_function_t* CxxCallCatchBlock(exception_record* ehrec)
   if(translated){
     tmpER = _getptd()->prevER;
     assert(!tmpER || tmpER->NumberParameters <= exception_record::maximum_parameters);
-    _getptd()->curexception.ExceptionRecord = tmpER;
+    ep->ExceptionRecord = tmpER;
   }
 
   __try{
@@ -279,7 +289,9 @@ extern "C" generic_function_t* CxxCallCatchBlock(exception_record* ehrec)
     _getptd()->nestedExcount--;
     // restore saved exception
     ep = &_getptd()->curexception;
+    //exception_record* old = ep->ExceptionRecord;
     *ep = saved_exception;
+    //dbg::trace.printf("restored cur ex %p (valid: %d) (was %p)\n", ptd->curexception.ExceptionRecord, !ptd->curexception.ExceptionRecord || ptd->curexception.ExceptionRecord->NumberParameters <= 15, old);
     assert(!ep->ExceptionRecord || ep->ExceptionRecord->NumberParameters <= exception_record::maximum_parameters);
   }
 
@@ -320,10 +332,6 @@ void fixptr(uintptr_t base, const rva_t ptr, T& vptr)
 {
   vptr = (T)(base + ptr);
 }
-
-#ifdef __ICL
-# define __CxxFrameHandler3 __CxxFrameHandler
-#endif
 
 ///\see exception_handler
 /// indirectly called by _CxxThrowException -> RtlDispatchException (RtlpExecuteHandlerForException)
@@ -375,6 +383,11 @@ __CxxFrameHandler3(
 #endif
   return cxxframehandler(er, reinterpret_cast<cxxregistration*>(&lframe), ectx, dispatch, ehfi);
 #endif
+}
+
+extern "C" exception_disposition __cdecl __CxxFrameHandler(exception_record* er, cxxregistration* frame, nt::context* ectx, dispatcher_context* dispatch)
+{
+  return __CxxFrameHandler3(er,frame,ectx,dispatch);
 }
 
 ///\todo __EH_prolog for /Os

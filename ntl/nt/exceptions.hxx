@@ -19,6 +19,7 @@
 
 #include "../pe/image.hxx"
 
+
 #undef exception_code
 #undef exception_info
 #undef abnormal_termination
@@ -33,6 +34,8 @@ extern "C"
   void *        __cdecl _exception_info(void);
   int           __cdecl _abnormal_termination(void);
 }
+
+#include "../nt/debug.hxx"
 
 #ifdef _DEBUG
   void dbg_pause();
@@ -1293,15 +1296,29 @@ namespace cxxruntime {
 #else
 #pragma warning(push)
 #pragma warning(disable:4731)//frame pointer register 'ebp' modified by inline assembly code
-    generic_function_t *
+    generic_function_t * __stdcall
       callsettingframe(void (*unwindfunclet)(), int /*nlg_notify_param*/ = 0x103)
     {
       uintptr_t const _ebp = stackbaseptr();
-      __asm mov   eax, unwindfunclet
-      __asm push  ebp
-      __asm mov   ebp, _ebp
-      __asm call  eax;
-      __asm pop   ebp
+      __asm {
+        mov   eax, unwindfunclet
+        push  ebp
+        mov   ebp, _ebp
+        
+        push  esi
+        push  edi
+        push  ebx
+        push  ecx
+
+        call  eax;
+
+        pop   ecx
+        pop   ebx
+        pop   edi
+        pop   esi
+
+        pop   ebp
+      }
 #ifdef __ICL
 #pragma warning(disable:1011)// missing return statement
 #endif
@@ -1447,7 +1464,7 @@ namespace cxxruntime {
     ///\warning If the destructor throws an exception during the stack unwinding, std::unexpected would be called
     void destruct_eobject(bool cannotthrow = true) const
     {
-      assert(ExceptionCode == cxxmagic);
+      assert(ExceptionCode == cxxmagic && NumberParameters <= maximum_parameters);
       assert(get_throwinfo());
 #ifndef _M_X64
       eobject::dtor_ptr const exception_dtor = get_throwinfo()->exception_dtor;
@@ -1561,8 +1578,8 @@ namespace cxxruntime {
 #pragma warning(disable:4731)//frame pointer register 'ebp' modified by inline assembly code
 #pragma warning(disable:4733)//Inline asm assigning to 'FS:0' : handler not registered as safe handler
     // SE handlers already registered should be SAFESEH
-    static __noreturn
-      void jumptocontinuation(generic_function_t * funclet, cxxregistration *cxxreg)
+    static __noreturn __declspec(noinline)
+      void __stdcall jumptocontinuation(generic_function_t * funclet, cxxregistration *cxxreg)
     {
       using namespace nt;
       // unlink SE handler

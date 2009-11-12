@@ -93,7 +93,7 @@ const char* std::type_info::name() const __ntl_nothrow
 #endif
 
 #ifdef __ICL
-std::type_info::~type_info()
+::type_info::~type_info()
 {
 
 }

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<VisualStudioProject
+	ProjectType="Intel C++ Project"
+	Version="11.1"
+	Name="ntl-tests"
+	ProjectGUID="{7DC65AEB-8DD2-44E6-91DF-33EBB37427B1}"
+	VCNestedProjectGUID="{3B627EF7-D051-4A65-846A-DA4347397DD1}"
+	VCNestedProjectFileName="ntl-tests9.vcproj">
+	<Configurations>
+		<Configuration
+			Name="debug|x64">
+			<Tool
+				Name="CppCmplrTool"
+				Cpp0xSupport="true"/>
+		</Configuration>
+		<Configuration
+			Name="release|x64">
+			<Tool
+				Name="CppCmplrTool"
+				Cpp0xSupport="true"/>
+		</Configuration>
+	</Configurations>
+	<Files/>
+</VisualStudioProject>
