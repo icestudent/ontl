@@ -1,12 +1,8 @@
-
 #include <exception>
 #include <ntl-tests-common.hxx>
 
-namespace tut
-{
-  STLX_DEFAULT_TESTGROUP();
-  testgroup tg_eptr_access("std::exception_ptr#access");
-}
+STLX_DEFAULT_TESTGROUP_NAME("std::exception_ptr#access");
+
 
 namespace 
 {

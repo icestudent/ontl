@@ -114,7 +114,7 @@ namespace ntl
         return *cxx.thrown_va<const std::type_info*>(type->typeinfo);
       }
 
-      /** Returns pointer to constant target if T is type of the target or null pointer otherwise */
+      /** Returns pointer to constant target if T is type of the thrown obhect or null pointer otherwise */
       template <typename T> const T* target() const __ntl_nothrow
       {
         const cxxrecord& cxx = static_cast<const cxxrecord&>(ehrec);
@@ -185,7 +185,10 @@ namespace ntl
       {
         exception_ptr* ptr = nullptr;
         tiddata* ptd = _getptd_noinit();
-        if(ptd && ptd->curexception.ExceptionRecord && ptd->processingThrow == 0
+        assert(!ptd || ptd->nestedExcount == 0 || !ptd->curexception.ExceptionRecord || ptd->curexception.ExceptionRecord->NumberParameters <= exception_record::maximum_parameters);
+        if(ptd 
+          && ptd->curexception.ExceptionRecord && ptd->curexception.ExceptionRecord->NumberParameters <= exception_record::maximum_parameters
+          && ptd->processingThrow == 0 && ptd->nestedExcount > 0
           && ptd->curexception.ExceptionRecord->ExceptionCode != nt::status::com_exception
           && ptd->curexception.ExceptionRecord->ExceptionCode != nt::status::complus_exception)
         {
@@ -238,9 +241,12 @@ namespace std
 
   /**
    *	@brief Exception Propagation [18.8.5 propagation]
-   *  @details An exception_ptr object that refers to the currently handled exception (15.3) 
-   *  or a copy of the currently handled exception, or a \c null exception_ptr object if no exception is being handled.
+   *  @details An exception_ptr object that refers to the copy of the currently handled %exception, 
+   *  or a \c null exception_ptr object if no %exception is being handled.
    *  The referenced object shall remain valid at least as long as there is an exception_ptr object that refers to it. 
+   *
+   *  @remarks exception_ptr have a few extensions such as comparing exceptions and accessing the thrown object.
+   *  @note Dereferencing an empty exception_ptr is safe.
    **/
   typedef std::shared_ptr<ntl::cxxruntime::exception_ptr> exception_ptr;
 
@@ -270,7 +276,7 @@ namespace std
    *	@brief Class nested_exception [18.8.6 except.nested]
    *
    *  The class nested_exception is designed for use as a mixin through multiple inheritance.
-   *  It captures the currently handled exception and stores it for later use.
+   *  It captures the currently handled %exception and stores it for later use.
    *
    *  @note nested_exception has a virtual destructor to make it a polymorphic class.
    *  Its presence can be tested for with \c dynamic_cast.
@@ -292,13 +298,13 @@ namespace std
     {}
   #endif
 
-    /** @throws exception the stored exception captured by this object */
+    /** @throws exception_ptr the stored %exception captured by this object */
     void rethrow_nested() const
     {
       rethrow_exception(e);
     }
 
-    /** @return the stored exception captured by this object */
+    /** @return the stored %exception captured by this object */
     exception_ptr nested_ptr() const { return e; }
 
   private:
@@ -360,7 +366,7 @@ namespace std
     if(__::get_nested(t, is_pointer<T>()))
       throw t;
     else
-      __::throw_nested_impl(static_cast<__rvtype(T)>(t));
+      __::throw_nested_impl(static_cast<__rvtype(T)>(t), &t);
   }
 
   template<class T>

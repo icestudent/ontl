@@ -25,11 +25,8 @@
 #include <exception>
 #include <ntl-tests-common.hxx>
 
-namespace tut
-{
-  STLX_DEFAULT_TESTGROUP();
-  testgroup tg_lifespan("std::exception_ptr#lifespan");
-}
+STLX_DEFAULT_TESTGROUP_NAME("std::exception_ptr#lifespan");
+
 
 namespace 
 {

@@ -26,12 +26,11 @@
 
 #include <exception>
 
-namespace tut
-{
-  STLX_DEFAULT_TESTGROUP();
-  testgroup tg_rethrow_exception("std::rethrow_exception");
+STLX_DEFAULT_TESTGROUP_NAME("std::rethrow_exception");
 
-  template<> template<> void to::test<01>()
+namespace {
+
+  template<> template<> void tut::to::test<01>()
   {
     bool test __attribute__((unused)) = true;
     using namespace std;
@@ -45,7 +44,7 @@ namespace tut
     }
   }
 
-  template<> template<> void to::test<02>()
+  template<> template<> void tut::to::test<02>()
   {
     bool test __attribute__((unused)) = true;
     using namespace std;
@@ -58,7 +57,7 @@ namespace tut
     }
   }
 
-  template<> template<> void to::test<03>()
+  template<> template<> void tut::to::test<03>()
   {
     bool test __attribute__((unused)) = true;
     using namespace std;
@@ -78,7 +77,7 @@ namespace tut
     }
   }
 
-  template<> template<> void to::test<04>()
+  template<> template<> void tut::to::test<04>()
   {
     bool test __attribute__((unused)) = true;
     using namespace std;

@@ -35,6 +35,12 @@ namespace
 #define STLX_DEFAULT_TESTGROUP() \
   typedef test_group<empty_type> testgroup; \
   typedef testgroup::object to;
+#define STLX_DEFAULT_TESTGROUP_NAME(name) \
+  namespace tut { \
+    typedef test_group<empty_type> testgroup; \
+    typedef testgroup::object to; \
+    testgroup tg(name); \
+  }
 
 // specify type to test, e.g. stlx::string or stlx::vector<int>
 #define STLX_DEFINE_TESTGROUP(class) \

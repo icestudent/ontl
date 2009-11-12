@@ -64,7 +64,7 @@ class bad_exception : public exception
   /**
    *	@brief Type unexpected_handler [18.8.2.2 unexpected.handler]
    *  @details The type of a handler function to be called by unexpected() when a function attempts 
-   *  to throw an exception not listed in its exception-specification.
+   *  to throw an %exception not listed in its exception-specification.
    *  @note An unexpected_handler shall not return.
    **/
   /// @note an unexpected_handler shall not return.
@@ -90,13 +90,13 @@ class bad_exception : public exception
 
   /**
    *	@brief Type terminate_handler [18.8.3.1 terminate.handler]
-   *  @details The type of a handler function to be called by terminate() when terminating exception processing.
+   *  @details The type of a handler function to be called by terminate() when terminating %exception processing.
    **/
   typedef void (*terminate_handler)();
 
   /**
    *	@brief set_terminate [18.8.3.2 set.terminate]
-   *  @details Establishes the function designated by \c f as the current handler function for terminating exception processing.
+   *  @details Establishes the function designated by \c f as the current handler function for terminating %exception processing.
    *  @return The previous \c terminate_handler.
    **/
   terminate_handler set_terminate(terminate_handler f) __ntl_nothrow;
@@ -116,7 +116,7 @@ class bad_exception : public exception
    *  @details Returns \c true after completing evaluation of a \e throw-expression until either completing initialization
    *  of the exception-declaration in the matching handler or entering unexpected() due to the throw; or
    *  after entering terminate() for any reason other than an explicit call to terminate().
-   *  @note When uncaught_exception() is \c true, throwing an exception can result in a call of terminate()
+   *  @note When uncaught_exception() is \c true, throwing an %exception can result in a call of terminate()
    **/
   bool uncaught_exception() __ntl_nothrow;
 

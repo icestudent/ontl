@@ -1082,7 +1082,7 @@ namespace cxxruntime {
   struct tiddata
   {
     /** Thread ID */
-    uint32_t tid;
+    nt::legacy_handle tid;
 
     /** Current exception */
     exception_pointers curexception;
@@ -1106,22 +1106,28 @@ namespace cxxruntime {
 
   inline tiddata* _initptd()
   {
+    nt::teb& teb = nt::teb::instance();
     tiddata* tid = new tiddata();
-    nt::teb::set(&nt::teb::EnvironmentPointer, tid);
+    tid->tid = teb.ClientId.UniqueThread;
+    teb.EnvironmentPointer = tid;
     return tid;
   }
 
   inline tiddata* _getptd()
   {
-    tiddata* tid = reinterpret_cast<tiddata*>(nt::teb::get(&nt::teb::EnvironmentPointer));
-    if(!tid)
+    nt::teb& teb = nt::teb::instance();
+    tiddata* tid = reinterpret_cast<tiddata*>(teb.EnvironmentPointer);
+    if(!tid || tid->tid != teb.ClientId.UniqueThread)
       tid = _initptd();
     return tid;
   }
 
   inline tiddata* _getptd_noinit()
   {
-    return reinterpret_cast<tiddata*>(nt::teb::get(&nt::teb::EnvironmentPointer));
+    nt::teb& teb = nt::teb::instance();
+    tiddata* td = reinterpret_cast<tiddata*>(teb.EnvironmentPointer);
+    if(td && td->tid != teb.ClientId.UniqueThread) td = nullptr;
+    return td;
   }
 
   inline void _freeptd()
@@ -1542,10 +1548,10 @@ namespace cxxruntime {
           destruct_eobject(!!_abnormal_termination());
         }
         _getptd()->nestedExcount--;
+        // restore saved exception
+        ep = &_getptd()->curexception;
+        *ep = saved_exception;
       }
-      // restore saved exception
-      ep = &_getptd()->curexception;
-      *ep = saved_exception;
 
       return continuation;
     }
@@ -1960,6 +1966,7 @@ next_try:;
         isRethrow = true;
         static_assert(sizeof(*this) == sizeof(exception_record), "this types must be equal");
         cxxrec = static_cast<cxxrecord*>(_getptd()->curexception.ExceptionRecord);
+        assert(cxxrec->NumberParameters <= exception_record::maximum_parameters);
         ctx = _getptd()->curexception.ContextRecord;
 
         if(cxxrec->iscxx() && !cxxrec->get_throwinfo())

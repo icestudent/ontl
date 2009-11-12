@@ -428,6 +428,10 @@
 				Name="18.8 exception handling"
 				>
 				<File
+					RelativePath=".\stlx\18.8.exception_handling\exception.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\stlx\18.8.exception_handling\exception_ptr.cpp"
 					>
 				</File>
@@ -440,7 +444,27 @@
 					>
 				</File>
 				<File
+					RelativePath=".\stlx\18.8.exception_handling\nested exception cons.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\stlx\18.8.exception_handling\nested ptr.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\stlx\18.8.exception_handling\rethrow if nested.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\stlx\18.8.exception_handling\rethrow nested.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\stlx\18.8.exception_handling\rethrow_exception.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\stlx\18.8.exception_handling\throw with nested.cpp"
 					>
 				</File>
 			</Filter>

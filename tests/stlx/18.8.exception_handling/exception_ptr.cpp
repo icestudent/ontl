@@ -30,8 +30,10 @@ namespace tut
 {
   STLX_DEFINE_TESTGROUP(std::exception_ptr);
   testgroup tg_exception_ptr("std::exception_ptr");
+}
 
-  template<> template<> void to::test<0>()
+namespace {
+  template<> template<> void tut::to::test<0>()
   {
     std::exception_ptr ptr;
     quick_ensure(ptr == 0);
@@ -40,7 +42,7 @@ namespace tut
 #endif
   }
 
-  template<> template<> void to::test<01>()
+  template<> template<> void tut::to::test<01>()
   {
     bool test __attribute__((unused)) = true;
     using namespace std;
@@ -49,7 +51,7 @@ namespace tut
     VERIFY( ep == 0 );
   }
 
-  template<> template<> void to::test<02>()
+  template<> template<> void tut::to::test<02>()
   {
     bool test __attribute__((unused)) = true;
     using namespace std;
@@ -62,7 +64,7 @@ namespace tut
     }
   }
 
-  template<> template<> void to::test<03>()
+  template<> template<> void tut::to::test<03>()
   {
     bool test __attribute__((unused)) = true;
     using namespace std;
@@ -75,7 +77,7 @@ namespace tut
     }
   }
 
-  template<> template<> void to::test<04>()
+  template<> template<> void tut::to::test<04>()
   {
     bool test __attribute__((unused)) = true;
     using namespace std;

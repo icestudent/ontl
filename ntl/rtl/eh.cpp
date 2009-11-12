@@ -56,7 +56,7 @@ bool std::uncaught_exception() __ntl_nothrow
 {
   using namespace ntl::cxxruntime;
    tiddata* ptd = _getptd_noinit();
-   return ptd && ptd->processingThrow > 0;
+   return ptd && ptd->nestedExcount > 0;
 };
 
 #pragma endregion
@@ -228,23 +228,28 @@ extern "C" generic_function_t* CxxCallCatchBlock(exception_record* ehrec)
 {
   // save the current exception
   exception_pointers* ep = &_getptd()->curexception;
+  assert(!ep->ExceptionRecord || ep->ExceptionRecord->NumberParameters <= exception_record::maximum_parameters);
   exception_pointers saved_exception = *ep;
+
   ep->ExceptionRecord = reinterpret_cast<exception_record*>(ehrec->ExceptionInformation[6]);
+  assert(ep->ExceptionRecord->NumberParameters <= exception_record::maximum_parameters);
   ep->ContextRecord = reinterpret_cast<nt::context*>(ehrec->ExceptionInformation[4]);
   _getptd()->nestedExcount++;
 
   // original record
+   ehfuncinfo* ehfi = reinterpret_cast<ehfuncinfo*>(ehrec->ExceptionInformation[5]);
   cxxrecord* cxxer = reinterpret_cast<cxxrecord*>(ehrec->ExceptionInformation[6]);
   cxxregistration* eframe = reinterpret_cast<cxxregistration*>(ehrec->ExceptionInformation[1]);
+  cxxregistration::frame_info frame(cxxer->get_object());
   generic_function_t* ret = 0;
   bool rethrow = false;
-  cxxregistration::frame_info frame(cxxer->get_object());
 
   exception_record* tmpER = 0;
   generic_function_t *handler = reinterpret_cast<generic_function_t*>(ehrec->ExceptionInformation[2]);
   bool translated = ehrec->ExceptionInformation[7] != 0;
   if(translated){
     tmpER = _getptd()->prevER;
+    assert(!tmpER || tmpER->NumberParameters <= exception_record::maximum_parameters);
     _getptd()->curexception.ExceptionRecord = tmpER;
   }
 
@@ -266,18 +271,19 @@ extern "C" generic_function_t* CxxCallCatchBlock(exception_record* ehrec)
   }
   __finally{
     frame.unlink();
-    rethrow |= _abnormal_termination() != 0;
+    //rethrow |= _abnormal_termination() != 0;
     if(!rethrow && cxxer->is_msvc(true)){
       if(cxxregistration::frame_info::find(cxxer->get_object()))
-        cxxer->destruct_eobject();
+        cxxer->destruct_eobject(!!_abnormal_termination());
     }
     _getptd()->nestedExcount--;
+    // restore saved exception
+    ep = &_getptd()->curexception;
+    *ep = saved_exception;
+    assert(!ep->ExceptionRecord || ep->ExceptionRecord->NumberParameters <= exception_record::maximum_parameters);
   }
-  // restore saved exception
-  ep = &_getptd()->curexception;
-  *ep = saved_exception;
 
-  *reinterpret_cast<intptr_t*>(eframe->fp.FramePointers + reinterpret_cast<ehfuncinfo*>(ehrec->ExceptionInformation[5])->unwindhelp) = -2;
+  *reinterpret_cast<intptr_t*>(eframe->fp.FramePointers + ehfi->unwindhelp) = -2;
   return ret;
 }
 
