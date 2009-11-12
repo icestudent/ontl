@@ -28,93 +28,90 @@
 
 STLX_DEFAULT_TESTGROUP_NAME("std::rethrow_exception");
 
-namespace {
+template<> template<> void tut::to::test<01>()
+{
+  bool test __attribute__((unused)) = true;
+  using namespace std;
 
-  template<> template<> void tut::to::test<01>()
-  {
-    bool test __attribute__((unused)) = true;
-    using namespace std;
-
-    try {
-      rethrow_exception(copy_exception(0));
-    } catch(int i){
-      quick_ensure(i == 0);
-    } catch(...) {
-      tut::fail(extmsg("wrong exception type"));
-    }
+  try {
+    rethrow_exception(copy_exception(0));
+  } catch(int i){
+    quick_ensure(i == 0);
+  } catch(...) {
+    tut::fail(extmsg("wrong exception type"));
   }
+}
 
-  template<> template<> void tut::to::test<02>()
-  {
-    bool test __attribute__((unused)) = true;
-    using namespace std;
+template<> template<> void tut::to::test<02>()
+{
+  bool test __attribute__((unused)) = true;
+  using namespace std;
 
-    try {
-      rethrow_exception(copy_exception(runtime_error("test")));
-    } catch(exception &e) {
-      VERIFY( typeid(e) == typeid(runtime_error) );
-      VERIFY( strcmp(e.what(), "test") == 0 );
-    }
+  try {
+    rethrow_exception(copy_exception(runtime_error("test")));
+  } catch(exception &e) {
+    VERIFY( typeid(e) == typeid(runtime_error) );
+    VERIFY( strcmp(e.what(), "test") == 0 );
   }
+}
 
-  template<> template<> void tut::to::test<03>()
-  {
-    bool test __attribute__((unused)) = true;
-    using namespace std;
+template<> template<> void tut::to::test<03>()
+{
+  bool test __attribute__((unused)) = true;
+  using namespace std;
 
-    exception_ptr ep;
-    try {
-      throw 0;
-    } catch(...) {
-      ep = current_exception();
-    }
-    try {
-      rethrow_exception(ep);
-    } catch(int i){
-      quick_ensure(i == 0);
-    } catch(...) {
-      tut::fail(extmsg("wrong exception type"));
-    }
+  exception_ptr ep;
+  try {
+    throw 0;
+  } catch(...) {
+    ep = current_exception();
   }
+  try {
+    rethrow_exception(ep);
+  } catch(int i){
+    quick_ensure(i == 0);
+  } catch(...) {
+    tut::fail(extmsg("wrong exception type"));
+  }
+}
 
-  template<> template<> void tut::to::test<04>()
-  {
-    bool test __attribute__((unused)) = true;
-    using namespace std;
+template<> template<> void tut::to::test<04>()
+{
+  bool test __attribute__((unused)) = true;
+  using namespace std;
 
-    // Weave the exceptions in an attempt to confuse the machinery.
+  // Weave the exceptions in an attempt to confuse the machinery.
+  try {
+    throw 0;
+  } catch(...) {
+    exception_ptr ep1 = current_exception();
     try {
-      throw 0;
+      throw 1;
     } catch(...) {
-      exception_ptr ep1 = current_exception();
+      exception_ptr ep2 = current_exception();
       try {
-        throw 1;
+        rethrow_exception(ep1);
       } catch(...) {
-        exception_ptr ep2 = current_exception();
         try {
-          rethrow_exception(ep1);
+          rethrow_exception(ep2);
         } catch(...) {
           try {
-            rethrow_exception(ep2);
+            rethrow_exception(ep1);
+          } catch(int i){
+            quick_ensure(i == 0);
           } catch(...) {
-            try {
-              rethrow_exception(ep1);
-            } catch(int i){
-              quick_ensure(i == 0);
-            } catch(...) {
-              tut::fail(extmsg("wrong exception type"));
-            }
-            try {
-              rethrow_exception(ep2);
-            } catch(int i){
-              quick_ensure(i == 1);
-            } catch(...) {
-              tut::fail(extmsg("wrong exception type"));
-            }
+            tut::fail(extmsg("wrong exception type"));
+          }
+          try {
+            rethrow_exception(ep2);
+          } catch(int i){
+            quick_ensure(i == 1);
+          } catch(...) {
+            tut::fail(extmsg("wrong exception type"));
           }
         }
       }
     }
   }
-
 }
+

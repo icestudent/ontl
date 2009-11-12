@@ -27,31 +27,28 @@ namespace tut
   testgroup tg_nec("std::nested_exception");
 }
 
-namespace 
+
+template<> template<> void tut::to::test<01>() 
 {
+  bool test __attribute__((unused)) = true;
 
-  template<> template<> void tut::to::test<01>() 
-  {
-    bool test __attribute__((unused)) = true;
+  std::nested_exception e;
 
-    std::nested_exception e;
-
-    VERIFY( e.nested_ptr() == 0 );
-  }
-
-  template<> template<> void tut::to::test<02>() 
-  {
-    bool test __attribute__((unused)) = true;
-
-    try
-    {
-      throw 42;
-    }
-    catch (...)
-    {
-      std::nested_exception e;
-      VERIFY( *e.nested_ptr() == *std::current_exception() );
-    }
-  }
-
+  VERIFY( e.nested_ptr() == 0 );
 }
+
+template<> template<> void tut::to::test<02>() 
+{
+  bool test __attribute__((unused)) = true;
+
+  try
+  {
+    throw 42;
+  }
+  catch (...)
+  {
+    std::nested_exception e;
+    VERIFY( *e.nested_ptr() == *std::current_exception() );
+  }
+}
+

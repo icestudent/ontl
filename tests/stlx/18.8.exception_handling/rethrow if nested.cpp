@@ -31,79 +31,77 @@ namespace
   struct base { virtual ~base()/* = default;*/{} };
 
   struct derived2 : base, std::nested_exception { };
+}
 
-  template<> template<> void tut::to::test<01>() 
+template<> template<> void tut::to::test<01>() 
+{
+  bool test __attribute__((unused)) = false;
+
+  try
   {
-    bool test __attribute__((unused)) = false;
-
+    throw 42;
+  }
+  catch (...)
+  {
+    derived d;
     try
     {
-      throw 42;
+      std::rethrow_if_nested(d);
     }
-    catch (...)
+    catch (const int& i)
     {
-      derived d;
-      try
-      {
-        std::rethrow_if_nested(d);
-      }
-      catch (const int& i)
-      {
-        test = true;
-        VERIFY( i == 42 );
-      }
+      test = true;
+      VERIFY( i == 42 );
     }
-
-    VERIFY( test );
   }
 
-  template<> template<> void tut::to::test<02>() 
-  {
-    bool test __attribute__((unused)) = false;
+  VERIFY( test );
+}
 
+template<> template<> void tut::to::test<02>() 
+{
+  bool test __attribute__((unused)) = false;
+
+  try
+  {
+    throw base();
+  }
+  catch (const base& b)
+  {
+    std::rethrow_if_nested(b);
+    test = true;
+  }
+
+  VERIFY( test );
+}
+
+template<> template<> void tut::to::test<03>() 
+{
+  bool test __attribute__((unused)) = false;
+
+  try
+  {
+    throw 42;
+  }
+  catch (...)
+  {
     try
     {
-      throw base();
+      throw derived2();
     }
     catch (const base& b)
     {
-      std::rethrow_if_nested(b);
-      test = true;
-    }
-
-    VERIFY( test );
-  }
-
-  template<> template<> void tut::to::test<03>() 
-  {
-    bool test __attribute__((unused)) = false;
-
-    try
-    {
-      throw 42;
-    }
-    catch (...)
-    {
       try
       {
-        throw derived2();
+        std::rethrow_if_nested(b);
       }
-      catch (const base& b)
+      catch (const int& i)
       {
-        try
-        {
-          std::rethrow_if_nested(b);
-        }
-        catch (const int& i)
-        {
-          VERIFY( i == 42 );
-          test = true;
-        }
+        VERIFY( i == 42 );
+        test = true;
       }
     }
-
-    VERIFY( test );
   }
 
-
+  VERIFY( test );
 }

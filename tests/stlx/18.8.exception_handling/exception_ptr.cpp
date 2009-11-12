@@ -32,73 +32,72 @@ namespace tut
   testgroup tg_exception_ptr("std::exception_ptr");
 }
 
-namespace {
-  template<> template<> void tut::to::test<0>()
-  {
-    std::exception_ptr ptr;
-    quick_ensure(ptr == 0);
+
+template<> template<> void tut::to::test<0>()
+{
+  std::exception_ptr ptr;
+  quick_ensure(ptr == 0);
 #if _MSC_VER > 1400
-    quick_ensure(ptr == nullptr);
+  quick_ensure(ptr == nullptr);
 #endif
-  }
+}
 
-  template<> template<> void tut::to::test<01>()
-  {
-    bool test __attribute__((unused)) = true;
-    using namespace std;
+template<> template<> void tut::to::test<01>()
+{
+  bool test __attribute__((unused)) = true;
+  using namespace std;
 
+  exception_ptr ep = current_exception();
+  VERIFY( ep == 0 );
+}
+
+template<> template<> void tut::to::test<02>()
+{
+  bool test __attribute__((unused)) = true;
+  using namespace std;
+
+  try {
+    throw 0;
+  } catch(...) {
     exception_ptr ep = current_exception();
-    VERIFY( ep == 0 );
+    VERIFY( ep != 0 );
   }
+}
 
-  template<> template<> void tut::to::test<02>()
-  {
-    bool test __attribute__((unused)) = true;
-    using namespace std;
+template<> template<> void tut::to::test<03>()
+{
+  bool test __attribute__((unused)) = true;
+  using namespace std;
 
+  try {
+    throw exception();
+  } catch(std::exception&) {
+    exception_ptr ep = current_exception();
+    VERIFY( ep != 0 );
+  }
+}
+
+template<> template<> void tut::to::test<04>()
+{
+  bool test __attribute__((unused)) = true;
+  using namespace std;
+
+  try {
+    throw 0;
+  } catch(...) {
+    exception_ptr ep1 = current_exception();
     try {
       throw 0;
     } catch(...) {
-      exception_ptr ep = current_exception();
-      VERIFY( ep != 0 );
+      exception_ptr ep2 = current_exception();
+      VERIFY( ep1 != ep2 );
     }
-  }
+    exception_ptr ep3 = current_exception();
 
-  template<> template<> void tut::to::test<03>()
-  {
-    bool test __attribute__((unused)) = true;
-    using namespace std;
+    // Not guaranteed by standard.
+    VERIFY( ep1 != ep3 );
 
-    try {
-      throw exception();
-    } catch(std::exception&) {
-      exception_ptr ep = current_exception();
-      VERIFY( ep != 0 );
-    }
-  }
-
-  template<> template<> void tut::to::test<04>()
-  {
-    bool test __attribute__((unused)) = true;
-    using namespace std;
-
-    try {
-      throw 0;
-    } catch(...) {
-      exception_ptr ep1 = current_exception();
-      try {
-        throw 0;
-      } catch(...) {
-        exception_ptr ep2 = current_exception();
-        VERIFY( ep1 != ep2 );
-      }
-      exception_ptr ep3 = current_exception();
-      
-      // Not guaranteed by standard.
-      VERIFY( ep1 != ep3 );
-
-      // oNTL specific
-      VERIFY( *ep1 == *ep3 );
-    }
+    // oNTL specific
+    VERIFY( *ep1 == *ep3 );
   }
 }

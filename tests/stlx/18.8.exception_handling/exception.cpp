@@ -7,20 +7,16 @@ namespace tut
   testgroup tg_exception("std::exception");
 }
 
-namespace 
+template<> template<> void ::tut::to::test<01>()
 {
-  template<> template<> void tut::to::test<01>()
-  {
+  tut::ensure_equals(extmsg("uncaught exceptions"), std::uncaught_exception(), false);
+}
+template<> template<> void ::tut::to::test<02>()
+{
+  try{
     tut::ensure_equals(extmsg("uncaught exceptions"), std::uncaught_exception(), false);
+    throw 0;
+  }catch(...){
+    tut::ensure_equals(extmsg("uncaught exceptions"), std::uncaught_exception(), true);
   }
-  template<> template<> void tut::to::test<02>()
-  {
-    try{
-      tut::ensure_equals(extmsg("uncaught exceptions"), std::uncaught_exception(), false);
-      throw 0;
-    }catch(...){
-      tut::ensure_equals(extmsg("uncaught exceptions"), std::uncaught_exception(), true);
-    }
-  }
-
 }

@@ -45,143 +45,142 @@ namespace
       VERIFY( copied || may_destruct );
     }
   };
+}
 
-  template<> template<> void tut::to::test<01>()
+template<> template<> void tut::to::test<01>()
+{
+  bool test __attribute__((unused)) = true;
+  using namespace std;
+
+  may_destruct = false;
+
+  // Test the destructing class.
   {
-    bool test __attribute__((unused)) = true;
-    using namespace std;
+    destructing *d = new destructing;
+    destructing d2(*d);
+    delete d;
+    may_destruct = true;
+  }
+  may_destruct = false;
+}
 
-    may_destruct = false;
+template<> template<> void tut::to::test<02>()
+{
+  bool test __attribute__((unused)) = true;
+  using namespace std;
 
-    // Test the destructing class.
+  may_destruct = false;
+
+  try {
+    throw destructing();
+  } catch(...) {
+    may_destruct = true;
+  }
+  may_destruct = false;
+}
+
+template<> template<> void tut::to::test<03>()
+{
+  bool test __attribute__((unused)) = true;
+  using namespace std;
+
+  may_destruct = false;
+
+  try {
+    throw destructing();
+  } catch(...) {
     {
-      destructing *d = new destructing;
-      destructing d2(*d);
-      delete d;
-      may_destruct = true;
-    }
-    may_destruct = false;
-  }
-
-  template<> template<> void tut::to::test<02>()
-  {
-    bool test __attribute__((unused)) = true;
-    using namespace std;
-
-    may_destruct = false;
-
-    try {
-      throw destructing();
-    } catch(...) {
-      may_destruct = true;
-    }
-    may_destruct = false;
-  }
-
-  template<> template<> void tut::to::test<03>()
-  {
-    bool test __attribute__((unused)) = true;
-    using namespace std;
-
-    may_destruct = false;
-
-    try {
-      throw destructing();
-    } catch(...) {
-      {
-        exception_ptr ep = current_exception();
-        may_destruct = true;  // ontl isn't sharing current exception object, so current_exception()->copied == false
-      }
-    }
-    may_destruct = false;
-  }
-
-  template<> template<> void tut::to::test<04>()
-  {
-    bool test __attribute__((unused)) = true;
-    using namespace std;
-
-    may_destruct = false;
-
-    {
-      exception_ptr ep;
-      try {
-        throw destructing();
-      } catch(...) {
-        ep = current_exception();
-      }
-      may_destruct = true;
-    }
-    may_destruct = false;
-  }
-
-  void test05_helper()
-  {
-    using namespace std;
-    try {
-      throw destructing();
-    } catch(...) {
       exception_ptr ep = current_exception();
-      rethrow_exception(ep);
+      may_destruct = true;  // ontl isn't sharing current exception object, so current_exception()->copied == false
     }
   }
+  may_destruct = false;
+}
 
-  template<> template<> void tut::to::test<05>()
+template<> template<> void tut::to::test<04>()
+{
+  bool test __attribute__((unused)) = true;
+  using namespace std;
+
+  may_destruct = false;
+
   {
-    bool test __attribute__((unused)) = true;
-    using namespace std;
-
-    may_destruct = false;
-
-    try {
-      test05_helper();
-    } catch(...) {
-      may_destruct = true;
-    }
-    may_destruct = false;
-  }
-
-  void test06_helper()
-  {
-    using namespace std;
+    exception_ptr ep;
     try {
       throw destructing();
     } catch(...) {
-      exception_ptr ep = current_exception();
-      may_destruct = true; // because the current_exception() object was destructed before the thrown
-      throw;
+      ep = current_exception();
     }
+    may_destruct = true;
   }
+  may_destruct = false;
+}
 
-  template<> template<> void tut::to::test<06>()
-  {
-    bool test __attribute__((unused)) = true;
-    using namespace std;
+void test05_helper()
+{
+  using namespace std;
+  try {
+    throw destructing();
+  } catch(...) {
+    exception_ptr ep = current_exception();
+    rethrow_exception(ep);
+  }
+}
 
-    may_destruct = false;
+template<> template<> void tut::to::test<05>()
+{
+  bool test __attribute__((unused)) = true;
+  using namespace std;
 
-    try {
-      test06_helper();
-    } catch(...) {
-      may_destruct = false;
-    }
+  may_destruct = false;
+
+  try {
+    test05_helper();
+  } catch(...) {
+    may_destruct = true;
+  }
+  may_destruct = false;
+}
+
+void test06_helper()
+{
+  using namespace std;
+  try {
+    throw destructing();
+  } catch(...) {
+    exception_ptr ep = current_exception();
+    may_destruct = true; // because the current_exception() object was destructed before the thrown
+    throw;
+  }
+}
+
+template<> template<> void tut::to::test<06>()
+{
+  bool test __attribute__((unused)) = true;
+  using namespace std;
+
+  may_destruct = false;
+
+  try {
+    test06_helper();
+  } catch(...) {
     may_destruct = false;
   }
+  may_destruct = false;
+}
 
-  std::exception_ptr gep;
+std::exception_ptr gep;
 
-  template<> template<> void tut::to::test<99>()
-  {
-    bool test __attribute__((unused)) = true;
-    using namespace std;
+template<> template<> void tut::to::test<99>()
+{
+  bool test __attribute__((unused)) = true;
+  using namespace std;
 
-    may_destruct = false;
+  may_destruct = false;
 
-    try {
-      throw destructing();
-    } catch(...) {
-      gep = current_exception();
-    }
+  try {
+    throw destructing();
+  } catch(...) {
+    gep = current_exception();
   }
-
 }

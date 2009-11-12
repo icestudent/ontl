@@ -23,49 +23,45 @@
 
 STLX_DEFAULT_TESTGROUP_NAME("std::nested_exception#nested_ptr");
 
-namespace 
+
+template<> template<> void tut::to::test<01>() 
 {
+  bool test __attribute__((unused)) = true;
 
-  template<> template<> void tut::to::test<01>() 
+  try
   {
-    bool test __attribute__((unused)) = true;
+    throw std::nested_exception();
+  }
+  catch (const std::nested_exception& e)
+  {
+    VERIFY( e.nested_ptr() == 0 );
+  }
+}
 
+template<> template<> void tut::to::test<02>() 
+{
+  bool test __attribute__((unused)) = true;
+
+  try
+  {
+    throw 42;
+  }
+  catch (...)
+  {
     try
     {
       throw std::nested_exception();
     }
     catch (const std::nested_exception& e)
     {
-      VERIFY( e.nested_ptr() == 0 );
-    }
-  }
-
-  template<> template<> void tut::to::test<02>() 
-  {
-    bool test __attribute__((unused)) = true;
-
-    try
-    {
-      throw 42;
-    }
-    catch (...)
-    {
       try
       {
-        throw std::nested_exception();
+        std::rethrow_exception( e.nested_ptr() );
       }
-      catch (const std::nested_exception& e)
+      catch(const int& i)
       {
-        try
-        {
-          std::rethrow_exception( e.nested_ptr() );
-        }
-        catch(const int& i)
-        {
-          VERIFY( i == 42 );
-        }
+        VERIFY( i == 42 );
       }
     }
   }
-
 }

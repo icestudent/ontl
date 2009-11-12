@@ -1,9 +1,9 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 9.00
-# Visual Studio 2005
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ntl-tests", "ntl-tests.vcproj", "{3B627EF7-D051-4A65-846A-DA4347397DD1}"
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ntl-tests", "ntl-tests9.vcproj", "{3B627EF7-D051-4A65-846A-DA4347397DD1}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = ".ntl", "..\ntl\x64.vcproj", "{081E6E33-CC33-4BBF-81E8-2865B1D8FD67}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = ".ntl", "..\ntl\x64-9.vcproj", "{081E6E33-CC33-4BBF-81E8-2865B1D8FD67}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

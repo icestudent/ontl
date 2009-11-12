@@ -29,55 +29,54 @@ namespace
   struct derived : std::nested_exception { };
 
   struct not_derived { virtual ~not_derived(){} };
+}
 
-  template<> template<> void tut::to::test<01>() 
+template<> template<> void tut::to::test<01>() 
+{
+  bool test __attribute__((unused)) = false;
+
+  try
   {
-    bool test __attribute__((unused)) = false;
-
+    std::throw_with_nested(derived());
+  }
+  catch (const std::nested_exception& e)
+  {
+    const std::type_info& ti = std::current_exception()->target_type();
+    VERIFY( e.nested_ptr() == 0 );
     try
     {
-      std::throw_with_nested(derived());
+      throw;
     }
-    catch (const std::nested_exception& e)
+    catch (const derived&)
     {
+      test = true;
+    }
+    catch(...){
       const std::type_info& ti = std::current_exception()->target_type();
-      VERIFY( e.nested_ptr() == 0 );
-      try
-      {
-        throw;
-      }
-      catch (const derived&)
-      {
-        test = true;
-      }
-      catch(...){
-        const std::type_info& ti = std::current_exception()->target_type();
-      }
     }
-    VERIFY( test );
   }
+  VERIFY( test );
+}
 
-  template<> template<> void tut::to::test<02>() 
+template<> template<> void tut::to::test<02>() 
+{
+  bool test __attribute__((unused)) = false;
+
+  try
   {
-    bool test __attribute__((unused)) = false;
-
+    std::throw_with_nested(not_derived());
+  }
+  catch (const std::nested_exception& e)
+  {
+    VERIFY( e.nested_ptr() == 0 );
     try
     {
-      std::throw_with_nested(not_derived());
+      throw;
     }
-    catch (const std::nested_exception& e)
+    catch (const not_derived&)
     {
-      VERIFY( e.nested_ptr() == 0 );
-      try
-      {
-        throw;
-      }
-      catch (const not_derived&)
-      {
-        test = true;
-      }
+      test = true;
     }
-    VERIFY( test );
   }
-
+  VERIFY( test );
 }

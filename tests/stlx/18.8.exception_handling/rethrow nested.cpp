@@ -23,32 +23,28 @@
 
 STLX_DEFAULT_TESTGROUP_NAME("std::nested_exception#rethrow_nested");
 
-namespace 
+
+template<> template<> void tut::to::test<01>() 
 {
+  bool test __attribute__((unused)) = false;
 
-  template<> template<> void tut::to::test<01>() 
+  try
   {
-    bool test __attribute__((unused)) = false;
-
     try
     {
-      try
-      {
-        throw 42;
-      }
-      catch (...)
-      {
-        std::nested_exception e;
-        e.rethrow_nested();
-      }
+      throw 42;
     }
-    catch(const int& i)
+    catch (...)
     {
-      test = true;
-      VERIFY( i == 42 );
+      std::nested_exception e;
+      e.rethrow_nested();
     }
-
-    VERIFY( test );
+  }
+  catch(const int& i)
+  {
+    test = true;
+    VERIFY( i == 42 );
   }
 
+  VERIFY( test );
 }
