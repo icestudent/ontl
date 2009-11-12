@@ -1419,6 +1419,16 @@ namespace cxxruntime {
     const exception_registration *  const nested_eframe = 0,
     bool                            const destruct      = false);
 
+#ifndef _M_X64
+  extern "C" generic_function_t * __cdecl CxxCallCatchBlock(struct cxxrecord* ehrec,
+    cxxregistration *     const cxxreg,
+    const nt::context *   const ctx,
+    const ehfuncinfo *    const funcinfo,
+    generic_function_t *  const handler,
+    int                   const catchdepth,
+    unsigned              const nlg_code = 0x100);
+#endif
+
   //#ifndef NTL_EH_RUNTIME
 
   struct cxxrecord : public nt::exception::record
@@ -1493,6 +1503,7 @@ namespace cxxruntime {
 #endif
     }
 
+#ifndef _M_X64
     //ExFilterRethrow
     static
       exception_filter
@@ -1503,7 +1514,6 @@ namespace cxxruntime {
         ? (_getptd()->processingThrow = 1, exception_execute_handler) : exception_continue_search;
     }
 
-#ifndef _M_X64
     ///\note no ___security_cookie support yet
     struct catchguard : public exception_registration
     {
@@ -1512,6 +1522,7 @@ namespace cxxruntime {
       int                 catchdepth;
     };
     STATIC_ASSERT(sizeof(catchguard) == 20);
+
 
     static
       exception_disposition __cdecl
@@ -1795,7 +1806,8 @@ namespace cxxruntime {
 
       cxxreg->state = tb->tryhigh + 1;
       generic_function_t * const continuation =
-        callcatchblock(cxxreg, ctx, funcinfo, catchblock->handler, catchdepth);
+        //callcatchblock(cxxreg, ctx, funcinfo, catchblock->handler, catchdepth);
+        CxxCallCatchBlock(this, cxxreg, ctx, funcinfo, catchblock->handler, catchdepth);
       if ( continuation )
         jumptocontinuation(continuation, cxxreg);
 #else

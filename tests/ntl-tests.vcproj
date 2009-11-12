@@ -19,6 +19,9 @@
 		<DefaultToolFile
 			FileName="ml64.rules"
 		/>
+		<DefaultToolFile
+			FileName="masm.rules"
+		/>
 	</ToolFiles>
 	<Configurations>
 		<Configuration
@@ -33,10 +36,13 @@
 				Name="VCPreBuildEventTool"
 			/>
 			<Tool
+				Name="MASM64"
+			/>
+			<Tool
 				Name="VCCustomBuildTool"
 			/>
 			<Tool
-				Name="MASM64"
+				Name="MASM"
 			/>
 			<Tool
 				Name="VCXMLDataGeneratorTool"
@@ -115,10 +121,13 @@
 				Name="VCPreBuildEventTool"
 			/>
 			<Tool
+				Name="MASM64"
+			/>
+			<Tool
 				Name="VCCustomBuildTool"
 			/>
 			<Tool
-				Name="MASM64"
+				Name="MASM"
 			/>
 			<Tool
 				Name="VCXMLDataGeneratorTool"
@@ -199,10 +208,13 @@
 				Name="VCPreBuildEventTool"
 			/>
 			<Tool
+				Name="MASM64"
+			/>
+			<Tool
 				Name="VCCustomBuildTool"
 			/>
 			<Tool
-				Name="MASM64"
+				Name="MASM"
 			/>
 			<Tool
 				Name="VCXMLDataGeneratorTool"
@@ -282,10 +294,13 @@
 				Name="VCPreBuildEventTool"
 			/>
 			<Tool
+				Name="MASM64"
+			/>
+			<Tool
 				Name="VCCustomBuildTool"
 			/>
 			<Tool
-				Name="MASM64"
+				Name="MASM"
 			/>
 			<Tool
 				Name="VCXMLDataGeneratorTool"
@@ -432,6 +447,18 @@
 						<Tool
 							Name="VCCLCompilerTool"
 							WholeProgramOptimization="false"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath="..\ntl\rtl\safeseh.asm"
+					>
+					<FileConfiguration
+						Name="release|Win32"
+						>
+						<Tool
+							Name="MASM"
+							UseSafeExceptionHandlers="true"
 						/>
 					</FileConfiguration>
 				</File>

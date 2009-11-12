@@ -82,6 +82,7 @@ template<> template<> void tut::to::test<04>()
   bool test __attribute__((unused)) = true;
   using namespace std;
 
+  //tut::skip();
   try {
     throw 0;
   } catch(...) {
@@ -94,8 +95,8 @@ template<> template<> void tut::to::test<04>()
     }
     exception_ptr ep3 = current_exception();
 
-    // Not guaranteed by standard.
-    VERIFY( ep1 != ep3 );
+    // Not guaranteed by standard, and not true for oNTL.
+    //VERIFY( ep1 == ep3 );
 
     // oNTL specific
     VERIFY( *ep1 == *ep3 );
