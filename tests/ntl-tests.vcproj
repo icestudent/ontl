@@ -457,6 +457,14 @@
 					RelativePath="..\ntl\rtl\safeseh.asm"
 					>
 					<FileConfiguration
+						Name="debug|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="MASM"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
 						Name="release|Win32"
 						>
 						<Tool

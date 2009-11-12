@@ -31,35 +31,66 @@ namespace
   struct not_derived { virtual ~not_derived(){} };
 }
 
-template<> template<> void tut::to::test<01>() 
+template<> template<> void tut::to::test<03>() 
 {
-  bool test __attribute__((unused)) = false;
-
-  try
-  {
-    std::throw_with_nested(derived());
+  bool test = false;
+  try {
+    throw 1;
   }
-  catch (const std::nested_exception& e)
-  {
-    const std::type_info& ti = std::current_exception()->target_type();
-    VERIFY( e.nested_ptr() == 0 );
-    try
-    {
+  catch(...){
+    try {
       throw;
     }
-    catch (const derived&)
-    {
+    catch(int i){
       test = true;
     }
     catch(...){
-      const std::type_info& ti = std::current_exception()->target_type();
+      test = false;
     }
+  }
+  return;
+
+}
+
+template<> template<> void tut::to::test<01>() 
+{
+  //tut::skip();
+  bool test __attribute__((unused)) = false;
+
+  try {
+    try
+    {
+      std::throw_with_nested(derived());
+    }
+    //catch (const derived&){
+    //  test = true;
+    //}
+    catch (const std::nested_exception& e)
+    {
+      const std::type_info& ti = std::current_exception()->target_type();
+      VERIFY( e.nested_ptr() == 0 );
+      try
+      {
+        throw;
+      }
+      catch (const derived&)
+      {
+        test = true;
+      }
+      catch(...){
+        const std::type_info& ti = std::current_exception()->target_type();
+      }
+    }
+  }catch(...){
+    const std::type_info* ti = &std::current_exception()->target_type();
+    test = false;
   }
   VERIFY( test );
 }
 
 template<> template<> void tut::to::test<02>() 
 {
+  //tut::skip();
   bool test __attribute__((unused)) = false;
 
   try

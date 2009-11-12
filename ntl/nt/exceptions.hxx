@@ -1615,12 +1615,13 @@ namespace cxxruntime {
         byte      jmp;
         int32_t  offset;
       };
+      static_assert(sizeof(jump_thunk) == 5, "something wrong..");
       #pragma pack(pop)
 
       intptr_t gha = (uintptr_t)&cxxrecord::catchguardhandler;
       const jump_thunk* thunk = reinterpret_cast<jump_thunk*>(gha);
       if(thunk->jmp == 0xE9){
-        gha = gha + thunk->offset + 5;
+        gha = gha + thunk->offset + sizeof(jump_thunk);
       }
 
       volatile catchguard guard;
@@ -2040,13 +2041,22 @@ next_try:;
 #endif
           )
         {
-          const throwinfo * const ti = get_throwinfo();
+          const throwinfo * ti = get_throwinfo();
+          cxxrecord* cxxrec = this;
           //__debugbreak();
           if ( !ti ) // rethrow?
           {
+            cxxrec = static_cast<cxxrecord*>(_getptd()->curexception.ExceptionRecord);
+            assert(cxxrec->NumberParameters <= exception_record::maximum_parameters);
+            ctx = _getptd()->curexception.ContextRecord;
+            ti = cxxrec->get_throwinfo();
+
+            if(cxxrec->iscxx() && !cxxrec->get_throwinfo())
+              nt::exception::inconsistency();
+
             // MSVC keeps previous thrown object in the per-thread data...
             // we just return to continue search in the containing scope.
-            return;
+            //return;
           }
           for ( tryblock::ranges tr = ehfi->get_try_ranges(trylevel, cs);
             tr.first < tr.second;
@@ -2063,7 +2073,7 @@ next_try:;
 
                   if(eh->type_match(ti->catchabletypearray->type[i], ti, dispatch)) // catch block <=> cast type of the thrown object
                   {
-                    catchit(ereg, ctx, dispatch, ehfi, eh,
+                    cxxrec->catchit(ereg, ctx, dispatch, ehfi, eh,
                       ti->catchabletypearray->type[i], tb, trylevel, nested_eframe, recursive);
                     // rethrown excetion
                     goto next_try;
