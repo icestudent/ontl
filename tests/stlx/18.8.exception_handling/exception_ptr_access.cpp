@@ -3,6 +3,10 @@
 
 STLX_DEFAULT_TESTGROUP_NAME("std::exception_ptr#access");
 
+std::ostream& operator<<(std::ostream& os, const std::type_info& ti)
+{
+  return os << "type_info{" << ti.name() << '}';
+}
 
 namespace 
 {
@@ -55,6 +59,25 @@ namespace
       std::exception_ptr ptr = std::current_exception();
       quick_ensure(ptr->target<derived>() != nullptr);
       quick_ensure(ptr->target<base>() != nullptr);
+    }
+  }
+  template<> template<> void tut::to::test<06>()
+  {
+    struct base{};
+    struct derived: base{};
+    try {
+      throw derived();
+    }
+    catch(...){
+      std::exception_ptr ptr = std::current_exception();
+      
+      tut::ensure_equals(extmsg("type count"), ptr->type_count(), 2U);
+      
+      quick_ensure(ptr->target<derived>(0) != nullptr);
+      quick_ensure(ptr->target<derived>(1) != nullptr);
+
+      tut::ensure_equals(extmsg("type #1"), ptr->target_type(0), typeid(derived));
+      tut::ensure_equals(extmsg("type #2"), ptr->target_type(1), typeid(base));
     }
   }
 

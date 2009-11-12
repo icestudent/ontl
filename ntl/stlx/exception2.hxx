@@ -99,38 +99,48 @@ namespace ntl
       }
 
       ///\name oNTL extensions
+      size_t type_count() const
+      {
+        const catchabletypearray* types = get_target();
+        return types ? types->size : 0;
+      }
 
       /** Returns type info of the thrown object if exists; otherwise returns <tt>typeid(void)</tt> */
-      const std::type_info& target_type() const __ntl_nothrow
+      const std::type_info& target_type(uint32_t idx = 0) const __ntl_nothrow
       {
-        const cxxrecord& cxx = static_cast<const cxxrecord&>(ehrec);
-        if(!(this && cxx.is_msvc() && cxx.get_throwinfo()))
+        const catchabletypearray* types = get_target();
+        if(!types || idx >= types->size)
           return typeid(void);
-        const throwinfo* info = cxx.get_throwinfo();
-        assert(info->catchabletypearray != 0);
-        const catchabletypearray* types = cxx.thrown_va<const catchabletypearray*>(info->catchabletypearray);
-        assert(types->size != 0);
-        const catchabletype* type = cxx.thrown_va<const catchabletype*>(types->type[0]);
+        const cxxrecord& cxx = static_cast<const cxxrecord&>(ehrec);
+        const catchabletype* type = cxx.thrown_va<const catchabletype*>(types->type[idx]);
         return *cxx.thrown_va<const std::type_info*>(type->typeinfo);
       }
 
-      /** Returns pointer to constant target if T is type of the thrown obhect or null pointer otherwise */
+      /** Returns pointer to constant target if T is type of the thrown object or null pointer otherwise */
       template <typename T> const T* target() const __ntl_nothrow
       {
-        const cxxrecord& cxx = static_cast<const cxxrecord&>(ehrec);
-        if(!(this && cxx.is_msvc() && cxx.get_throwinfo()))
+        const catchabletypearray* types = get_target();
+        if(!types)
           return nullptr;
         const std::type_info& desttype = typeid(T);
-        const throwinfo* info = cxx.get_throwinfo();
-        assert(info->catchabletypearray != 0);
-        const catchabletypearray* types = cxx.thrown_va<const catchabletypearray*>(info->catchabletypearray);
-        assert(types->size != 0);
+        const cxxrecord& cxx = static_cast<const cxxrecord&>(ehrec);
         for(uint32_t t = 0; t < types->size; t++){
           const catchabletype* type = cxx.thrown_va<const catchabletype*>(types->type[t]);
           if(desttype == *cxx.thrown_va<const std::type_info*>(type->typeinfo))
             return reinterpret_cast<const T*>(cxx.adjust_pointer(cxx.get_object(), type));
         }
         return nullptr;
+      }
+      
+      /** Returns pointer to constant target or null pointer otherwise */
+      template <typename T> const T* target(size_t idx) const __ntl_nothrow
+      {
+        const catchabletypearray* types = get_target();
+        if(!types || idx >= types->size)
+          return nullptr;
+        const cxxrecord& cxx = static_cast<const cxxrecord&>(ehrec);
+        const catchabletype* type = cxx.thrown_va<const catchabletype*>(types->type[idx]);
+        return reinterpret_cast<const T*>(cxx.adjust_pointer(cxx.get_object(), type));
       }
 
       friend bool operator!=(const exception_ptr& e1, const exception_ptr& e2) { return !(e1 == e2); }
@@ -178,6 +188,18 @@ namespace ntl
           nt::exception::inconsistency();
         }
         return reinterpret_cast<uintptr_t>(obj);
+      }
+
+      const catchabletypearray* get_target() const
+      {
+        const cxxrecord& cxx = static_cast<const cxxrecord&>(ehrec);
+        if(!(this && cxx.is_msvc() && cxx.get_throwinfo()))
+          return nullptr;
+        const throwinfo* info = cxx.get_throwinfo();
+        assert(info->catchabletypearray != 0);
+        const catchabletypearray* types = cxx.thrown_va<const catchabletypearray*>(info->catchabletypearray);
+        assert(types->size != 0);
+        return types;
       }
 
     public:

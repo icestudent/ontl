@@ -40,6 +40,7 @@ namespace
     }
     catch (const std::nested_exception& e)
     {
+      const std::type_info& ti = std::current_exception()->target_type();
       VERIFY( e.nested_ptr() == 0 );
       try
       {
@@ -48,6 +49,9 @@ namespace
       catch (const derived&)
       {
         test = true;
+      }
+      catch(...){
+        const std::type_info& ti = std::current_exception()->target_type();
       }
     }
     VERIFY( test );
