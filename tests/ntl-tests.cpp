@@ -6,6 +6,8 @@
 
 tut::test_runner_singleton runner;
 
+#include <string>
+
 int ntl::consoleapp::main()
 {
   tut::reporter writer;

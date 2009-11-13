@@ -25,7 +25,6 @@ STLX_DEFAULT_TESTGROUP_NAME("std::rethrow_if_nested");
 
 namespace 
 {
-
   struct derived : std::nested_exception { };
 
   struct base { virtual ~base()/* = default;*/{} };

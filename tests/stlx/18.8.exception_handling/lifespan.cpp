@@ -26,7 +26,6 @@
 #include <ntl-tests-common.hxx>
 
 STLX_DEFAULT_TESTGROUP_NAME("std::exception_ptr#lifespan");
-#include <nt/debug.hxx>
 
 namespace 
 {

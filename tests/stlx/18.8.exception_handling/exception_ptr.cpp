@@ -26,12 +26,8 @@
 
 #include <exception>
 
-namespace tut
-{
-  STLX_DEFINE_TESTGROUP(std::exception_ptr);
-  testgroup tg_exception_ptr("std::exception_ptr");
-}
 
+STLX_CLASS_TESTGROUP(std::exception_ptr);
 
 template<> template<> void tut::to::test<0>()
 {

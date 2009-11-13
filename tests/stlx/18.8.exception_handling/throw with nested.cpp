@@ -25,7 +25,6 @@ STLX_DEFAULT_TESTGROUP_NAME("std::throw_with_nested");
 
 namespace 
 {
-
   struct derived : std::nested_exception { };
 
   struct not_derived { virtual ~not_derived(){} };

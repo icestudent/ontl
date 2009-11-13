@@ -1,11 +1,8 @@
 #include <exception>
 #include <ntl-tests-common.hxx>
 
-namespace tut
-{
-  STLX_DEFINE_TESTGROUP(std::exception);
-  testgroup tg_exception("std::exception");
-}
+
+STLX_CLASS_TESTGROUP(std::exception);
 
 template<> template<> void ::tut::to::test<01>()
 {

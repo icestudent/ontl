@@ -21,12 +21,8 @@
 #include <exception>
 #include <ntl-tests-common.hxx>
 
-namespace tut
-{
-  STLX_DEFINE_TESTGROUP(std::nested_exception);
-  testgroup tg_nec("std::nested_exception");
-}
 
+STLX_CLASS_TESTGROUP(std::nested_exception);
 
 template<> template<> void tut::to::test<01>() 
 {

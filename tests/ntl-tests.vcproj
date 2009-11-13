@@ -472,6 +472,14 @@
 							UseSafeExceptionHandlers="true"
 						/>
 					</FileConfiguration>
+					<FileConfiguration
+						Name="release|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="MASM"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\ntl\rtl\wchar_mask_data.cpp"
@@ -535,6 +543,10 @@
 					RelativePath=".\stlx\18.8.exception_handling\throw with nested.cpp"
 					>
 				</File>
+			</Filter>
+			<Filter
+				Name="23.containers"
+				>
 			</Filter>
 		</Filter>
 	</Files>

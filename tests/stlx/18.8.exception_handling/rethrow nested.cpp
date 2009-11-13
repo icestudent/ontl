@@ -23,7 +23,6 @@
 
 STLX_DEFAULT_TESTGROUP_NAME("std::nested_exception#rethrow_nested");
 
-
 template<> template<> void tut::to::test<01>() 
 {
   bool test __attribute__((unused)) = false;
