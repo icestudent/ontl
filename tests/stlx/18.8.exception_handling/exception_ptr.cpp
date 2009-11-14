@@ -27,7 +27,7 @@
 #include <exception>
 
 
-STLX_CLASS_TESTGROUP(std::exception_ptr);
+STLX_DEFAULT_TESTGROUP_NAME("std::exception_ptr");
 
 template<> template<> void tut::to::test<0>()
 {

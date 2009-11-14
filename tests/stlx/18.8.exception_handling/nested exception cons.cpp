@@ -22,7 +22,7 @@
 #include <ntl-tests-common.hxx>
 
 
-STLX_CLASS_TESTGROUP(std::nested_exception);
+STLX_DEFAULT_TESTGROUP_NAME("std::nested_exception");
 
 template<> template<> void tut::to::test<01>() 
 {
