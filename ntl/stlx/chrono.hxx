@@ -219,6 +219,11 @@ namespace std
         rep_ -= d.rep_; return *this;
       }
 
+      duration& operator%=(const duration& d)
+      {
+        rep_ %= d.rep_; return *this;
+      }
+
       duration& operator*=(const rep& rhs)
       {
         rep_ *= rhs; return *this;
@@ -227,6 +232,11 @@ namespace std
       duration& operator/=(const rep& rhs)
       {
         rep_ /= rhs; return *this;
+      }
+
+      duration& operator%=(const rep& rhs)
+      {
+        rep_ %= rhs; return *this;
       }
 
 
@@ -312,6 +322,21 @@ namespace std
     {
       typedef typename common_type<duration<Rep1, Period1>, duration<Rep2, Period2> >::type CD;
       return CD(lhs).count() / CD(rhs).count();
+    }
+
+    template <class Rep1, class Period, class Rep2>
+    inline duration<typename std::__::safe_common<Rep1, Rep2>::type, Period>
+      operator% (const duration<Rep1, Period>& d, const Rep2& s)
+    {
+      return duration<typename common_type<Rep1, Rep2>::type, Period>(d) %= s;
+    }
+
+    template <class Rep1, class Period1, class Rep2, class Period2>
+    inline typename common_type<Rep1, Rep2>::type
+      operator% (const duration<Rep1, Period1>& lhs, const duration<Rep2, Period2>& rhs)
+    {
+      typedef typename common_type<duration<Rep1, Period1>, duration<Rep2, Period2> >::type CD;
+      return CD(lhs).count() % CD(rhs).count();
     }
 
     ///\name duration comparisons

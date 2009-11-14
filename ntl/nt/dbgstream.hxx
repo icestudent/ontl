@@ -12,7 +12,7 @@
 
 #include "../stlx/ostream.hxx"
 #include "../stlx/streambuf.hxx"
-#include "../stlx/string.hxx"
+#include "../stlx/stdstring.hxx"
 
 namespace ntl
 {

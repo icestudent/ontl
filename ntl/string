@@ -1,1 +1,1 @@
-#include "stlx/string.hxx"
+#include "stlx/stdstring.hxx"

@@ -17,7 +17,7 @@
 #include "cstring.hxx" // for std::strcmp
 #endif
 #ifndef NTL__STLX_EXCEPTION
-#include "exception.hxx"
+#include "stdexception.hxx"
 #endif
 
 #pragma warning(push)

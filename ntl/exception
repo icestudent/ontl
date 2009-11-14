@@ -1,2 +1,2 @@
-#include "stlx/exception.hxx"
+#include "stlx/stdexception.hxx"
 #include "stlx/exception2.hxx"

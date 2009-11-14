@@ -443,13 +443,13 @@ namespace std
         
         /** Creates a hard link, named \c new_fp, to \c old_fp */
         template <class Path1, class Path2>
-        void inline create_hard_link(const Path1& old_fp, const Path2& new_fp) __ntl_throws(basic_filesystem_error<Path1::external_string_type>)
+        void inline create_hard_link(const Path1& old_fp, const Path2& new_fp) __ntl_throws(basic_filesystem_error<typename Path1::external_string_type>)
         {
           static_assert((is_same<typename Path1::external_string_type, typename Path2::external_string_type>::value), "Must be the same type");
           error_code ec;
           create_hard_link(old_fp, new_fp, ec);
           if(ec)
-            __ntl_throw(basic_filesystem_error<Path1::external_string_type>("Failed to create hard link [from:to]", old_fp.external_file_string(), new_fp.external_file_string(), ec));
+            __ntl_throw(basic_filesystem_error<typename Path1::external_string_type>("Failed to create hard link [from:to]", old_fp.external_file_string(), new_fp.external_file_string(), ec));
         }
 
         /** Creates a symbolic link, named \c new_fp, to \c old_fp */
@@ -458,13 +458,13 @@ namespace std
         
         /** Creates a symbolic link, named \c new_fp, to \c old_fp */
         template <class Path1, class Path2>
-        void inline create_symlink(const Path1& old_fp, const Path2& new_fp) __ntl_throws(basic_filesystem_error<Path1::external_string_type>)
+        void inline create_symlink(const Path1& old_fp, const Path2& new_fp) __ntl_throws(basic_filesystem_error<typename Path1::external_string_type>)
         {
           static_assert((is_same<typename Path1::external_string_type, typename Path2::external_string_type>::value), "Must be the same type");
           error_code ec;
           create_symlink(old_fp, new_fp, ec);
           if(ec)
-            __ntl_throw(basic_filesystem_error<Path1::external_string_type>("Failed to create symlink [from:to]", old_fp.external_file_string(), new_fp.external_file_string(), ec));
+            __ntl_throw(basic_filesystem_error<typename Path1::external_string_type>("Failed to create symlink [from:to]", old_fp.external_file_string(), new_fp.external_file_string(), ec));
         }
 
         /** Removes the file object */

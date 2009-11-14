@@ -303,7 +303,20 @@ public:
                  size_type            pos,
                  size_type            n     = npos,
                  const Allocator &    a     = Allocator())//throw(out_of_range)
-    : str(&str[pos], str.max__it(pos, n), a) {/**/}
+    : str(a)
+    {
+      if(pos > str.size()){
+    #if STLX__USE_EXCEPTIONS
+        // TODO: throw
+        return;
+    #else
+        assert(pos <= str.size());
+        return;
+    #endif
+      }
+      if(pos < str.size())
+        this->str.assign(&str[pos], str.max__it(pos, n));
+    }
 
     /// 7 Requires: s shall not be a null pointer and n < npos.
     /// 8 Effects: Constructs an object of class basic_string and determines
@@ -315,7 +328,12 @@ public:
     /// - size() == n;
     /// - capacity() is at least as large as size().
     basic_string(const charT* s, size_type n, const Allocator& a = Allocator())
-    : str(assert_ptr(s), &s[n], a) {}
+    : str(a)
+    {
+      assert(n < npos);
+      if(n >= npos || !assert_ptr(s)) return;
+      str.assign(s,s+n);
+    }
 
     /// 9 Requires: s shall not be a null pointer.
     /// 10 Effects: Constructs an object of class basic_string and determines
@@ -329,13 +347,14 @@ public:
     basic_string(const charT* s, const Allocator& a = Allocator())
     : str(a)
     {
-      assert_ptr(s);
+      if(!assert_ptr(s)) return;
       // small hack: copy terminating 0 to avoid case when n == 0
       size_type n = traits_type::length(s) + 1; // include '\0'
       alloc__new(n - 1); // allocates (n - 1) + 1
       str.end_ += n - 1;
       __assume(n > 0);
-      while ( n-- ) traits_type::assign(str[n], s[n]);
+      traits_type::copy(str.data(), s, n);
+      //while ( n-- ) traits_type::assign(str[n], s[n]);
     }
 
     /// 12 Requires: n < npos
@@ -348,7 +367,12 @@ public:
     /// - size() = n;
     /// - capacity() is at least as large as size().
     basic_string(size_type n, charT c, const Allocator& a = Allocator())
-    : str(n, c, a) {}
+    : str(a)
+    {
+      assert(n < npos);
+      if(n < npos)
+        str.assign(n, c);
+    }
 
     /// 14 Effects: If InputIterator is an integral type, equivalent to
     ///   basic_string(static_cast<size_type>(begin), static_cast<value_type>(end), a)
@@ -451,7 +475,7 @@ public:
     ///\name  21.3.4 basic_string capacity [string.capacity]
 
     /// 1 Returns: a count of the number of char-like objects currently in the string.
-    size_type size()      const { return str.size();      }
+    size_type size() const __ntl_nothrow { return str.size();      }
 
     /// 2 Returns: size().
     size_type length()    const { return str.size();      }
@@ -513,7 +537,13 @@ public:
 
     /// 1 Returns: If pos < size(), returns *(begin() + pos).
     ///   Otherwise, the behavior is undefined.
-    reference operator[](size_type pos)   { return str[pos];  }
+    reference operator[](size_type pos)
+    {
+      static charT zero_char = 0;
+      if(pos < str.size())
+        return str[pos];
+      return zero_char;
+    }
 
     /// 2 Requires: pos < size()
     /// 3 Throws: out_of_range if pos >= size().
@@ -610,7 +640,9 @@ public:
 
     basic_string& assign(const basic_string& str, size_type pos, size_type n)
     {
-      this->str.assign(&str[pos], str.max__it(pos, n));
+      assert(pos <= str.size());
+      if(pos < str.size())
+        this->str.assign(&str[pos], str.max__it(pos, n));
       return *this;
     }
 
@@ -650,7 +682,9 @@ public:
 
     basic_string& insert(size_type pos1, const basic_string& str)
     {
-      this->str.insert(&this->str[pos1], str.begin(), str.end());
+      assert(pos1 <= size());
+      if(pos1 <= size())
+        this->str.insert(&this->str[pos1], str.begin(), str.end());
       return *this;
     }
 
@@ -659,40 +693,48 @@ public:
                          size_type            pos2,
                          size_type            n)
     {
-      this->str.insert(&this->str[pos1], &str[pos2], str.max__it(pos2, n));
+      assert(pos1 <= size() && pos2 <= str.size());
+      if(pos1 <= size() && pos2 <= str.size())
+        this->str.insert(&this->str[pos1], &str[pos2], str.max__it(pos2, n));
       return *this;
     }
 
     basic_string& insert(size_type pos, const charT* s, size_type n)
     {
-      str.insert(&str[pos], s, &s[n]);
+      assert(pos <= size());
+      if(pos <= size())
+        str.insert(&str[pos], s, &s[n]);
       return *this;
     }
 
     basic_string& insert(size_type pos, const charT* s)
     {
       const size_t n = traits_type::length(s);
-      insert(&str[pos], s, &s[n]);
+      assert(pos <= size());
+      if(pos <= size())
+        insert(&str[pos], s, &s[n]);
       return *this;
     }
 
     basic_string& insert(size_type pos, size_type n, charT c)
     {
-      str.insert(&str[pos], n, c);
+      assert(pos <= size());
+      if(pos <= size())
+        str.insert(&str[pos], n, c);
       return *this;
     }
 
     iterator insert(iterator p, charT c) { return str.insert(p, c); }
 
-    void insert(iterator p, size_type n, charT c) { str.insert(p, n, c); }
+    iterator insert(iterator p, size_type n, charT c) { return str.insert(p, n, c); }
 
     template<class InputIterator>
-    void insert(iterator p, InputIterator first, InputIterator last)
+    iterator insert(iterator p, InputIterator first, InputIterator last)
     {
-      str.insert(p, first, last);
+      return str.insert(p, first, last);
     }
 
-    void insert(iterator p, initializer_list<charT> il)
+    iterator insert(iterator p, initializer_list<charT> il)
     {
       return str.insert(p, il.begin(), il.end());
     }
@@ -714,35 +756,90 @@ public:
 
     ///\name  basic_string::replace [21.3.6.6 ib.string::replace]
 
-    basic_string& replace(size_type pos1, size_type n1, const basic_string& str);
+    basic_string& replace(size_type pos1, size_type n1, const basic_string& str)
+    {
+      return replace_impl(pos1, n1, str.data(), str.length());
+    }
 
     basic_string& replace(size_type           pos1,
                           size_type           n1,
                           const basic_string& str,
                           size_type           pos2,
                           size_type           n2)
-                          ;
+    {
+      return replace_impl(pos1,n1,str.data(),str.length(),pos2,n2);
+    }
 
-    basic_string& replace(size_type     pos,
-                          size_type     n1,
-                          const charT * s,
-                          size_type     n2)
-                          ;
+    basic_string& replace(size_type pos, size_type n1, const charT* s, size_type n2)
+    {
+      return replace_impl(pos, n1, s, traits_type::length(s), 0, n2);
+    }
 
-    basic_string& replace(size_type pos, size_type n1, const charT* s);
-    basic_string& replace(size_type pos, size_type n1, size_type n2, charT c);
+    basic_string& replace(size_type pos, size_type n1, const charT* s)
+    {
+      return replace_impl(pos,n1,s,traits_type::length(s));
+    }
 
-    basic_string& replace(iterator i1, iterator i2, const basic_string& str);
-    basic_string& replace(iterator i1, iterator i2, const charT* s, size_type n);
-    basic_string& replace(iterator i1, iterator i2, const charT* s);
-    basic_string& replace(iterator i1, iterator i2, size_type n, charT c);
+    basic_string& replace(size_type pos, size_type n1, size_type n2, charT c)
+    {
+      return replace(pos, n1, basic_string(n2,c));
+    }
+
+    basic_string& replace(iterator i1, iterator i2, const basic_string& str)
+    {
+      return replace_impl(i1-begin(),i2-begin(),str.data(),str.length());
+    }
+
+    basic_string& replace(iterator i1, iterator i2, const charT* s, size_type n)
+    {
+      return replace_impl(i1-begin(),i2-begin(),s,n);
+    }
+
+    basic_string& replace(iterator i1, iterator i2, const charT* s)
+    {
+      return replace_impl(i1-begin(),i2-begin(),s,traits_type::length(s));
+    }
+    
+    basic_string& replace(iterator i1, iterator i2, size_type n, charT c)
+    {
+      return replace(i1,i2,basic_string(n,c));
+    }
 
     template<class InputIterator>
     basic_string& replace(iterator i1,
                           iterator i2,
                           InputIterator j1,
                           InputIterator j2)
-                          ;
+    {
+      return replace(i1,i2,basic_string(j1,j2));
+    }
+
+    private:
+      basic_string& replace_impl(size_type pos1, size_type n1, const charT* s, size_type len, size_type pos2 = 0, size_type n2 = npos)// __ntl_throws(out_of_range, length_error)
+      {
+        size_type siz = size();
+        assert(pos1 <= siz && pos2 <= len);
+        if(pos1 > siz || pos2 > len){
+          // out_of_range
+          return *this;
+        }
+
+        // dest size, src size
+        size_type xlen = min(n1, siz-pos1), rlen = min(n2, len-pos2);
+        if(siz - xlen >= max_size()-rlen){
+          // length_error
+          return *this;
+        }
+
+        if(rlen > xlen)
+          resize(siz + (rlen-xlen));
+        
+        traits_type::copy(&str[pos1], s+pos2, rlen);
+        if(rlen < xlen)
+          resize(pos1 + rlen);
+        return *this;
+      }
+    public:
 
     ///\name  basic_string::copy [21.3.6.7 string::copy]
     size_type copy(charT* s, size_type n, size_type pos = 0) const// __ntl_throws(out_of_range)
@@ -757,16 +854,11 @@ public:
     }
 
     ///\name  basic_string::swap [21.3.6.8 string::swap]
-    #ifdef NTL__CXX_RV
-    void swap(basic_string&&str2) { str.swap(move(str2.str)); }
-    #endif
-    #if !defined(NTL__CXX_RV) || defined(NTL__CXX_RVFIX)
     void swap(basic_string& str2) { str.swap(str2.str); }
-    #endif
 
     ///\name  basic_string string operations [21.3.6 string.ops]
 
-    const charT* c_str() const // explicit
+    const charT* c_str() const  __ntl_nothrow
     {
       // ensure string is null-terminated
       if(!str.capacity())
@@ -776,7 +868,7 @@ public:
       return str.begin();
     }
 
-    const charT* data() const
+    const charT* data() const __ntl_nothrow
     {
       return /*size()*/ capacity() ? begin() : &zero_char;
     }
@@ -801,10 +893,13 @@ public:
     /// 4 Returns: find(basic_string<charT,traits,Allocator>(s,n),pos).
     size_type find(const charT* s, size_type pos, size_type n) const
     {
-      for ( size_type xpos = pos; xpos + n <= size(); ++xpos )
+      size_type cursize = size();
+      if(pos > cursize || pos+n > cursize) return npos;
+      const charT* beg = begin();
+      for ( size_type xpos = pos; xpos + n <= cursize; ++xpos )
       {
         for(size_type i = 0; i != n; ++i)
-          if ( !traits_type::eq(*(begin() + xpos  + i), *(s + i)) )
+          if ( !traits_type::eq(*(beg + xpos  + i), *(s + i)) )
             goto next_xpos;
         return xpos;
       next_xpos:;
@@ -822,8 +917,9 @@ public:
     /// 7 Returns: find(basic_string<charT,traits,Allocator>(1,c),pos).
     size_type find(charT c, size_type pos = 0) const
     {
+      const charT* beg = begin();
       for ( size_type xpos = pos; xpos < size(); ++xpos )
-        if ( traits_type::eq(*(begin() + xpos), c) )
+        if ( traits_type::eq(*(beg + xpos), c) )
           return xpos;
       return npos;
     }
@@ -846,13 +942,15 @@ public:
     /// 4 Returns: rfind(basic_string<charT,traits,Allocator>(s,n),pos).
     size_type rfind(const charT* s, size_type pos, size_type n) const
     {
+      if(!n) return min(pos,size());
       size_type & xpos = pos;
       if ( xpos > size() || xpos + n > size() )
         xpos = size() - n;
+      const charT* beg = begin();
       while ( xpos + n > 0 )
       {
         for ( size_type i = 0; i != n; ++i )
-          if ( !traits_type::eq(*(begin() + xpos + i), *(s + i)) )
+          if ( !traits_type::eq(*(beg + xpos + i), *(s + i)) )
             goto next_xpos;
         return xpos;
       next_xpos:
@@ -873,8 +971,9 @@ public:
     {
       ///\note  Standard claims the use of at() member function, but
       ///       we stick to an exception-safe way
+      const charT* beg = begin();
       for ( size_type xpos = pos < size() ? pos + 1 : size(); xpos; )
-        if ( traits_type::eq(*(begin() + --xpos), c) )
+        if ( traits_type::eq(*(beg + --xpos), c) )
           return xpos;
       return npos;
     }
@@ -883,8 +982,9 @@ public:
     size_type rfind(charT c/*, size_type pos = npos*/) const
     {
       size_type xpos = size();
+      const charT* beg = begin();
       while ( xpos-- )
-        if ( traits_type::eq(*(begin() + xpos), c) )
+        if ( traits_type::eq(*(beg + xpos), c) )
           return xpos;
       return npos;
     }
@@ -907,9 +1007,10 @@ public:
     /// 4 Returns: find_first_of(basic_string<charT,traits,Allocator>(s,n),pos).
     size_type find_first_of(const charT* s, size_type pos, size_type n) const
     {
+      const charT* beg = begin();
       for ( size_type xpos = pos; xpos < size(); ++xpos )
         for ( size_type i = 0; i != n; ++i )
-          if ( traits_type::eq(*(begin() + xpos), *(s + i)) )
+          if ( traits_type::eq(*(beg + xpos), *(s + i)) )
             return xpos;
       return npos;
     }
@@ -924,8 +1025,9 @@ public:
     /// 7 Returns: find_first_of(basic_string<charT,traits,Allocator>(1,c),pos).
     size_type find_first_of(charT c, size_type pos = 0) const
     {
+      const charT* beg = begin();
       for ( size_type xpos = pos; xpos < size(); ++xpos )
-        if ( traits_type::eq(*(begin() + xpos), c) )
+        if ( traits_type::eq(*(beg + xpos), c) )
           return xpos;
       return npos;
     }
@@ -950,11 +1052,13 @@ public:
     {
       size_type & xpos = pos;
       if ( xpos > size() ) xpos = size();
+      const charT* beg = begin();
       while ( xpos )
       {
-        for ( size_type i = 0; i != n; ++i )
-          if ( traits_type::eq(*(begin() + xpos), *(s + i)) )
+        for ( size_type i = 0; i != n; ++i ){
+          if ( traits_type::eq(*(beg + xpos), *(s + i)) )
             return xpos;
+        }
         --xpos;
       }
       return npos;
@@ -991,10 +1095,11 @@ public:
     /// 4 Returns: find_first_not_of(basic_string<charT,traits,Allocator>(s,n),pos).
     size_type find_first_not_of(const charT* s, size_type pos, size_type n) const
     {
+      const charT* beg = begin();
       for ( size_type xpos = pos; xpos < size(); ++xpos )
       {
         for ( size_type i = 0; i != n; ++i )
-          if ( traits_type::eq(*(begin() + xpos), *(s + i)) )
+          if ( traits_type::eq(*(beg + xpos), *(s + i)) )
             goto next_xpos;
         return xpos;
       next_xpos:;
@@ -1012,8 +1117,9 @@ public:
     /// 7 Returns: find_first_not_of(basic_string<charT,traits,Allocator>(1,c),pos).
     size_type find_first_not_of(charT c, size_type pos = 0) const
     {
+      const charT* beg = begin();
       for ( size_type xpos = pos; xpos < size(); ++xpos )
-        if ( !traits_type::eq(*(begin() + xpos), c) )
+        if ( !traits_type::eq(*(beg + xpos), c) )
           return xpos;
       return npos;
     }
@@ -1036,11 +1142,12 @@ public:
     /// 4 Returns: find_last_not_of(basic_string<charT,traits,Allocator>(s,n),pos).
     size_type find_last_not_of(const charT* s, size_type pos, size_type n) const
     {
+      const charT* beg = begin();
       for ( size_type xpos = pos < size() ? pos + 1 : size(); xpos; )
       {
         --xpos;
         for ( size_type i = 0; i != n; ++i )
-          if ( traits_type::eq(*(begin() + xpos), *(s + i)) )
+          if ( traits_type::eq(*(beg + xpos), *(s + i)) )
             goto next_xpos;
         return xpos;
       next_xpos:;
@@ -1058,8 +1165,9 @@ public:
     /// 7 Returns: find_last_not_of(basic_string<charT,traits,Allocator>(1,c),pos).
     size_type find_last_not_of(charT c, size_type pos = npos) const
     {
+      const charT* beg = begin();
       for ( size_type xpos = pos < size() ? pos + 1 : size(); xpos; )
-        if ( !traits_type::eq(*(begin() + --xpos), c) )
+        if ( !traits_type::eq(*(beg + --xpos), c) )
           return xpos;
       return npos;
     }
@@ -1093,7 +1201,8 @@ public:
       const size_t rlen = std::min(n, str.size());
       if(!rlen)
         return static_cast<int>(n - str.size());
-      return traits_type::compare(begin()+pos, str.begin(), rlen);
+      const int r = traits_type::compare(begin()+pos, str.begin(), rlen);
+      return r != 0 ? r : static_cast<int>(n - str.size());
     }
 
     int compare(size_type pos1, size_type n1, const basic_string& str, size_type pos2, size_type n2) const
@@ -1105,7 +1214,8 @@ public:
       const size_t rlen = std::min(n1, n2);
       if(!rlen)
         return static_cast<int>(n1 - n2);
-      return traits_type::compare(begin()+pos1, str.begin()+pos2, rlen);
+      const int r = traits_type::compare(begin()+pos1, str.begin()+pos2, rlen);
+      return r != 0 ? r : static_cast<int>(n1 - n2);
     }
 
     int compare(const charT* s) const
@@ -1130,7 +1240,8 @@ public:
         return static_cast<int>(n1 - n2);
       else if(pos1+n1 >= size())
         return -1;
-      return traits_type::compare(begin()+pos1, s, min(n1, n2));
+      const int r = traits_type::compare(begin()+pos1, s, min(n1, n2));
+      return r != 0 ? r : static_cast<int>(n1 - n2);
     }
 
     ///\name  operator+ [21.3.8.1 string::op+]
@@ -1475,14 +1586,6 @@ bool
 ///\name  swap [21.3.8.8 string.special]
 template<class charT, class traits, class Allocator>
 inline void swap(basic_string<charT,traits,Allocator>&  lhs, basic_string<charT,traits,Allocator>&  rhs) { lhs.swap(rhs); }
-
-#ifdef NTL__CXX_RV
-template<class charT, class traits, class Allocator>
-inline void swap(basic_string<charT,traits,Allocator>&& lhs, basic_string<charT,traits,Allocator>&  rhs) { lhs.swap(rhs); }
-
-template<class charT, class traits, class Allocator>
-inline void swap(basic_string<charT,traits,Allocator>&  lhs, basic_string<charT,traits,Allocator>&& rhs) { lhs.swap(rhs); }
-#endif
 
 template <class charT, class traits, class Allocator>
 struct constructible_with_allocator_suffix<

@@ -8,8 +8,8 @@
 
 #define NTL_EH_RUNTIME
 
-#include "../nt/exceptions.hxx"
-#include "exception.hxx"
+#include "../nt/exception.hxx"
+#include "stdexception.hxx"
 
 #ifdef NTL__CXX_RV
 # include "smart_ptr_rv.hxx"

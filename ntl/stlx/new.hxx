@@ -12,7 +12,7 @@
 #include "cstddef.hxx"
 #endif
 
-#include "exception.hxx"
+#include "stdexception.hxx"
 
 /// calculates the new size of a reallocating heap block.
 /// Win32 heaps have granularity of 8 and store 8 byte control structure

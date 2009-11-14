@@ -78,6 +78,8 @@ class vector
     template <class InputIterator>
     void vector__disp(InputIterator first, InputIterator last, input_iterator_tag)
     {
+      capacity_ = 0;
+      begin_ = end_ = nullptr;
       while(first != last){
         push_back(*first);
         ++first;
@@ -120,8 +122,12 @@ class vector
     : array_allocator(a)
     {
       capacity_ = n;
-      begin_= array_allocator.allocate(n);
-      construct(n, value);
+      if(n){
+        begin_= array_allocator.allocate(n);
+        construct(n, value);
+      }else{
+        begin_ = end_ = nullptr;
+      }
     }
 
     template <class InputIterator>
@@ -492,20 +498,20 @@ class vector
     }
     #endif
 
-    void insert(const_iterator position, size_type n, const T& x)
+    iterator insert(const_iterator position, size_type n, const T& x)
     {
-      insert__impl(position, n, x);
+      return insert__impl(position, n, x);
     }
 
     template <class InputIterator>
-    void insert(const_iterator position, InputIterator first, InputIterator last)
+    iterator insert(const_iterator position, InputIterator first, InputIterator last)
     {
-      insert__disp(&const_cast<value_type&>(*position), first, last, is_integral<InputIterator>::type());
+      return insert__disp(&const_cast<value_type&>(*position), first, last, is_integral<InputIterator>::type());
     }
 
-    void insert(const_iterator position, initializer_list<T> il)
+    iterator insert(const_iterator position, initializer_list<T> il)
     {
-      insert__disp(&const_cast<value_type&>(*position), il.begin(), il.end(), false_type());
+      return insert__disp(&const_cast<value_type&>(*position), il.begin(), il.end(), false_type());
     }
 
     __forceinline
@@ -630,7 +636,7 @@ class vector
     // hack: MSVC doesn't look inside function body
     void check_bounds(size_type n) const //__ntl_throws(out_of_range)
     {
-      if ( n > size() ) __ntl_throw(out_of_range(__FUNCTION__));
+      if ( n >= size() ) __ntl_throw(out_of_range(__FUNCTION__));
     }
 
     void move(const iterator to, const iterator from) const

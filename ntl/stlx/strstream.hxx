@@ -10,7 +10,7 @@
 #define NTL__STLX_STRSTREAM
 #pragma once
 
-#include "string.hxx"
+#include "stdstring.hxx"
 #include "streambuf.hxx"
 #include "istream.hxx"
 #include "ostream.hxx"

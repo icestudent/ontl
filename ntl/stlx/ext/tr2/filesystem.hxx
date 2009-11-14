@@ -9,7 +9,7 @@
 #pragma once
 
 #include "../../iosfwd.hxx"
-#include "../../string.hxx"
+#include "../../stdstring.hxx"
 #include "../../system_error.hxx"
 #include "../../algorithm.hxx"
 #include "../../ctime.hxx"

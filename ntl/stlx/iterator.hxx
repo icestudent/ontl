@@ -572,7 +572,7 @@ template <class T,
           class Distance = ptrdiff_t>
 class istream_iterator
 : public iterator<input_iterator_tag, T, Distance, const T*, const T&>
-{
+  {
     typedef istream_iterator<T, charT, traits, Distance> this_type;
 
   public:
@@ -582,9 +582,13 @@ class istream_iterator
 
     istream_iterator()                : in_stream(0) {}
     istream_iterator(istream_type& s) : in_stream(&s) { read(); }
-    istream_iterator(const this_type& x)
-    : in_stream(x.in_stream), value(x.value) {}
-    ~istream_iterator() {}
+    //istream_iterator(const this_type& x)
+    //: in_stream(x.in_stream), value(x.value) {}
+
+  #ifdef NTL__CXX_EF
+    istream_iterator(const this_type& x) __default;
+    ~istream_iterator() __default;
+  #endif
 
     const T&   operator* () const { return value; }
     const T*   operator->() const { return &(operator*()); }
@@ -606,7 +610,7 @@ class istream_iterator
     void read()
     {
       // The result of operator* on an end of stream is not defined.
-      if ( ! (*in_stream >> value).operator void*() ) in_stream = 0;
+      if ( (*in_stream >> value).fail() ) in_stream = 0;
     }
 };
 
@@ -699,7 +703,7 @@ class istreambuf_iterator
       return static_cast<charT>(c);
     }
 
-    this_type& operator++() { sbuf_->sbumpc(); return *this; }
+    this_type& operator++() { if(sbuf_) sbuf_->sbumpc(); return *this; }
 
     proxy operator++(int) { return proxy( sbuf_->sbumpc(), sbuf_ ); }
 

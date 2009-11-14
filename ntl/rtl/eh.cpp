@@ -18,7 +18,7 @@
 
 #include "../atomic.hxx"
 #include "../stlx/cstdlib.hxx"
-#include "../nt/exceptions.hxx"
+#include "../nt/exception.hxx"
 #include "../nt/context.hxx"
 #include "../nt/status.hxx"
 

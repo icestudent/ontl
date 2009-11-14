@@ -91,8 +91,9 @@ class basic_istream : virtual public basic_ios<charT, traits>
       explicit sentry(basic_istream& is, bool noskipws = false)
         : ok_(false)
       {
-        if ( is.good() )
-        {
+        if ( !is.good() ){
+          is.setstate(failbit);
+        } else {
           if ( basic_ostream<charT, traits>* tie = is.tie() ) tie->flush();
 
           if(noskipws == false && is.flags() & ios_base::skipws){

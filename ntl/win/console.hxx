@@ -12,7 +12,7 @@
 #include "handle.hxx"
 #include "../nt/peb.hxx"
 #include "application.hxx"
-#include "stlx/string.hxx"
+#include "stlx/stdstring.hxx"
 
 #include "stlx/streambuf.hxx"
 #include "../nt/file.hxx"

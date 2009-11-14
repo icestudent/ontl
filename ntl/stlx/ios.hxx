@@ -201,10 +201,7 @@ class ios_base
 
     ///\name  27.4.2.2 ios_base state functions [fmtflags.state]
 
-    fmtflags flags() const
-    {
-      return fmtfl;
-    }
+    fmtflags flags() const { return fmtfl; }
 
     fmtflags flags(fmtflags fmtfl)
     {
@@ -232,10 +229,7 @@ class ios_base
       fmtfl &= ~mask;
     }
 
-    streamsize precision() const
-    {
-      return prec;
-    }
+    streamsize precision() const { return prec; }
 
     streamsize precision(streamsize prec)
     {
@@ -244,10 +238,7 @@ class ios_base
       return old;
     }
 
-    streamsize width() const
-    {
-      return wide;
-    }
+    streamsize width() const { return wide; }
 
     streamsize width(streamsize wide)
     {
@@ -390,10 +381,7 @@ class basic_ios : public ios_base
 
     ///\name  27.4.4.2 Member functions [basic.ios.members]
 
-    basic_ostream<charT, traits>* tie() const
-    {
-      return tiestr;
-    }
+    basic_ostream<charT, traits>* tie() const { return tiestr; }
 
     basic_ostream<charT, traits>* tie(basic_ostream<charT, traits>* tiestr)
     {
@@ -402,10 +390,7 @@ class basic_ios : public ios_base
       return old;
     }
 
-    basic_streambuf<charT, traits>* rdbuf() const
-    {
-      return sb;
-    }
+    basic_streambuf<charT, traits>* rdbuf() const { return sb; }
 
     basic_streambuf<charT, traits>* rdbuf(basic_streambuf<charT, traits>* sb)
     {
@@ -431,10 +416,7 @@ class basic_ios : public ios_base
       return use_facet<ctype<char_type> >(getloc()).widen(c);
     }
 
-    char_type fill() const
-    {
-      return fillc;
-    }
+    char_type fill() const { return fillc; }
 
     char_type fill(char_type ch)
     {
@@ -484,18 +466,19 @@ class basic_ios : public ios_base
       if(this == &x)
         return;
       // ios_base
-      std::swap(prec, x.prec);
-      std::swap(wide, x.wide);
-      std::swap(fmtfl, x.fmtfl);
-      std::swap(state, x.state);
-      std::swap(exceptmask, x.exceptmask);
+      using std::swap;
+      swap(prec, x.prec);
+      swap(wide, x.wide);
+      swap(fmtfl, x.fmtfl);
+      swap(state, x.state);
+      swap(exceptmask, x.exceptmask);
     #if STLX__CONFORMING_LOCALE
-      std::swap(loc, x.loc);
+      swap(loc, x.loc);
     #endif
 
       // basic_ios
-      std::swap(tiestr,x.tiestr);
-      std::swap(fillc,x.fillc);
+      swap(tiestr,x.tiestr);
+      swap(fillc,x.fillc);
 
       // unchanged: rdbuf
     }

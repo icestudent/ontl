@@ -10,7 +10,7 @@
 #pragma once
 
 #ifndef NTL__STLX_STRING
-#include "string.hxx"
+#include "stdstring.hxx"
 #endif
 #ifndef NTL__STLX_STDEXCEPT_FWD
 #include "stdexcept_fwd.hxx"

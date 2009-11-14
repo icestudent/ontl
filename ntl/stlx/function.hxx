@@ -8,7 +8,7 @@
 #define NTL__STLX_FUNCTION
 #pragma once
 
-#include "exception.hxx"
+#include "stdexception.hxx"
 
 #include "mem_fn.hxx"
 #ifndef NTL__STLX_FNCALLER

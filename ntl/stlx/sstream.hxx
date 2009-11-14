@@ -235,6 +235,9 @@ namespace std {
 
     virtual pos_type seekpos(pos_type sp, ios_base::openmode which = ios_base::in | ios_base::out)
     {
+    #if 1
+      return seekoff(off_type(sp), ios_base::beg, which);
+    #else
       const bool in = (which & ios_base::in) != 0, out = (which & ios_base::out) != 0;
       bool ok = false;
       if(sp != -1 && (in || out)){
@@ -254,6 +257,7 @@ namespace std {
         }
       }
       return ok ? sp : pos_type(off_type(-1));
+    #endif
     }
 
     ///\}

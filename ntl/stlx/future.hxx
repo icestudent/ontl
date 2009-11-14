@@ -14,7 +14,7 @@
 #include "function.hxx"
 #include "mutex.hxx"
 #include "cstdatomic.hxx"
-#include "exception.hxx"
+#include "stdexception.hxx"
 #include "exception2.hxx"
 #include "system_error.hxx"
 #include "smart_ptr_rv.hxx"
