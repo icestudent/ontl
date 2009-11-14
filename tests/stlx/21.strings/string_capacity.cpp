@@ -19,10 +19,9 @@
 // <http://www.gnu.org/licenses/>.
 
 // 21.3.3 string capacity
-#define STLX__STRING_NO_CONVERSION
+#include <ntl-tests-common.hxx>
 #include <string>
 #include <cstring>
-#include <ntl-tests-common.hxx>
 
 STLX_DEFAULT_TESTGROUP_NAME("std::string#capacity");
 

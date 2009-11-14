@@ -19,9 +19,9 @@
 
 // 21.3.4 basic_string element access
 
+#include <ntl-tests-common.hxx>
 #include <string>
 #include <stdexcept>
-#include <ntl-tests-common.hxx>
 
 STLX_DEFAULT_TESTGROUP_NAME("std::string#access");
 

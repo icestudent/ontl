@@ -20,10 +20,10 @@
 
 // 21.3.1 basic_string constructors.
 
+#include <ntl-tests-common.hxx>
 #include <new>
 #include <string>
 #include <stdexcept>
-#include <ntl-tests-common.hxx>
 
 STLX_DEFAULT_TESTGROUP_NAME("std::string#constructors");
 

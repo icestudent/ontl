@@ -21,10 +21,10 @@
 // 21.3.5.6 basic_string::replace
 
 #pragma warning(disable:4244) // for int ar[] = { 'H', 'e', 'l', 'l', 'o' };
+#include <ntl-tests-common.hxx>
 
 #include <string>
 #include <algorithm> // for std::find
-#include <ntl-tests-common.hxx>
 
 STLX_DEFAULT_TESTGROUP_NAME("std::string#replace");
 

@@ -15,6 +15,18 @@
 
 namespace std
 {
+  template<class charT>
+    struct char_traits;
+
+  template<class T>
+    class allocator;
+
+  template <class charT,
+            class traits    = char_traits<charT>,
+            class Allocator = allocator<charT> >
+  class basic_string;
+  typedef basic_string<char> string;
+
   class logic_error;
     class domain_error;
     class invalid_argument;
@@ -26,11 +38,23 @@ namespace std
     class overflow_error;
     class underflow_error;
 
-  void __throw_out_of_range(const char* msg = "out of range");
+  ///\name exception helpers
+  inline void __throw_out_of_range(const char* msg = "out of range");
+  inline void __throw_length_error(const char* msg = "length exceeds its maximum allowable size");
+  inline void __throw_invalid_argument(const char* msg = "invalid argument");
+  ///\}
 }
 
 #if STLX__USE_EXCEPTIONS
 # include "stdexcept.hxx"
+#else
+# include "cassert.hxx"
+namespace std {
+  inline void __throw_out_of_range(const char* msg)      { _assert_string(msg); }
+  inline void __throw_length_error(const char* msg)      { _assert_string(msg); }
+  inline void __throw_invalid_argument(const char* msg)  { _assert_string(msg); }
+}
+
 #endif
 
 #endif // NTL__STLX_STDEXCEPT_FWD

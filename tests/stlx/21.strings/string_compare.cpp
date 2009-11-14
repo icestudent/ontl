@@ -31,9 +31,9 @@
 // NB compare should be thought of as a lexographical compare, ie how
 // things would be sorted in a dictionary.
 
+#include <ntl-tests-common.hxx>
 #include <string>
 #include <cstring>
-#include <ntl-tests-common.hxx>
 
 STLX_DEFAULT_TESTGROUP_NAME("std::string#compare");
 

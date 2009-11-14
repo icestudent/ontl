@@ -1,7 +1,7 @@
 /**\file*********************************************************************
  *                                                                     \brief
- *  Diagnostics library [19 lib.diagnostics]
- *  Exception classes [19.1 lib.std.exceptions]
+ *  Diagnostics library [19 diagnostics]
+ *  Exception classes   [19.2 std.exceptions]
  *
  ****************************************************************************
  */
@@ -9,17 +9,57 @@
 #define NTL__STLX_STDEXCEPT
 #pragma once
 
-#ifndef NTL__STLX_STRING
-#include "stdstring.hxx"
-#endif
 #ifndef NTL__STLX_STDEXCEPT_FWD
 #include "stdexcept_fwd.hxx"
 #endif
 
 namespace std
 {
+  namespace __
+  {
+    struct exstring
+    {
+      exstring()
+        :msg(), len()
+      {}
+      explicit exstring(const char* s)
+        :msg(s), len()
+      {}
+      explicit exstring(const std::string& s);
 
-/// 19.1.1 Class logic_error [logic.error]
+    #ifdef NTL__CXX_RV
+      exstring(exstring&& r)
+        :msg(r.msg), len(r.len)
+      {
+        r.msg = 0, r.len = 0;
+      }
+    #endif
+      inline exstring(const exstring& r);
+
+      ~exstring()
+      {
+        if(len)
+          delete[] msg;
+      }
+
+      const char* c_str() const __ntl_nothrow { return msg; }
+        
+    private:
+      const char* msg;
+      size_t len;
+    };
+  }
+}
+
+#ifndef NTL__STLX_EXCEPTION
+# include "stdexception.hxx"
+#endif
+
+namespace std
+{
+
+
+/// 19.2.1 Class logic_error [logic.error]
 class logic_error : public exception
 {
   public:
@@ -28,12 +68,12 @@ class logic_error : public exception
     virtual const char* what() const __ntl_nothrow { return msg.c_str(); }
     ~logic_error() /*__ntl_nothrow*/ {}
   private:
-    const string msg;
-  protected:
+    const __::exstring msg;
+  //protected:
     logic_error operator=(const logic_error&) {/* do not use */ return *this; }
 };
 
-/// 19.1.2 Class domain_error [domain.error]
+/// 19.2.2 Class domain_error [domain.error]
 class domain_error : public logic_error
 {
   public:
@@ -41,7 +81,7 @@ class domain_error : public logic_error
     explicit domain_error(const char* what_arg )  : logic_error(what_arg) {}
 };
 
-/// 19.1.3 Class invalid_argument [invalid.argument]
+/// 19.2.3 Class invalid_argument [invalid.argument]
 class invalid_argument : public logic_error
 {
   public:
@@ -49,7 +89,7 @@ class invalid_argument : public logic_error
     explicit invalid_argument(const char* what_arg )  : logic_error(what_arg) {}
 };
 
-/// 19.1.4 Class length_error [length.error]
+/// 19.2.4 Class length_error [length.error]
 class length_error : public logic_error
 {
   public:
@@ -57,7 +97,7 @@ class length_error : public logic_error
     explicit length_error(const char* what_arg )  : logic_error(what_arg) {}
 };
 
-/// 19.1.5 Class out_of_range [lib.out.of.range]
+/// 19.2.5 Class out_of_range [lib.out.of.range]
 class out_of_range : public logic_error
 {
   public:
@@ -65,7 +105,7 @@ class out_of_range : public logic_error
     explicit out_of_range(const char* what_arg )  : logic_error(what_arg) {}
 };
 
-/// 19.1.6 Class runtime_error [lib.runtime.error]
+/// 19.2.6 Class runtime_error [lib.runtime.error]
 class runtime_error : public exception
 {
   public:
@@ -74,12 +114,12 @@ class runtime_error : public exception
     virtual const char* what() const __ntl_nothrow { return msg.c_str(); }
     ~runtime_error() /*__ntl_nothrow*/ {}
   private:
-    const string msg;
-  protected:
+    const __::exstring msg;
+  //protected:
     runtime_error operator=(const runtime_error&) {/* do not use */ return *this; }
 };
 
-/// 19.1.7 Class range_error [lib.range.error]
+/// 19.2.7 Class range_error [lib.range.error]
 class range_error : public runtime_error
 {
   public:
@@ -87,7 +127,7 @@ class range_error : public runtime_error
     explicit range_error(const char* what_arg )  : runtime_error(what_arg) {}
 };
 
-/// 19.1.8 Class overflow_error [lib.overflow.error]
+/// 19.2.8 Class overflow_error [lib.overflow.error]
 class overflow_error : public runtime_error
 {
   public:
@@ -95,7 +135,7 @@ class overflow_error : public runtime_error
     explicit overflow_error(const char* what_arg )  : runtime_error(what_arg) {}
 };
 
-/// 19.1.9 Class underflow_error [lib.underflow.error]
+/// 19.2.9 Class underflow_error [lib.underflow.error]
 class underflow_error : public runtime_error
 {
   public:
@@ -103,15 +143,31 @@ class underflow_error : public runtime_error
     explicit underflow_error(const char* what_arg )  : runtime_error(what_arg) {}
 };
 
+//////////////////////////////////////////////////////////////////////////
+#if STLX__USE_EXCEPTIONS
+///\name exception helpers
+void __throw_out_of_range(const char* msg)      { __ntl_throw(out_of_range(msg)); }
+void __throw_length_error(const char* msg)      { __ntl_throw(length_error(msg)); }
+void __throw_invalid_argument(const char* msg)  { __ntl_throw(invalid_argument(msg)); }
+} // std
 
-///\name raise exceptions halpers
-inline void __throw_out_of_range(const char* msg)
+#include "cstring.hxx"
+
+std::__::exstring::exstring(const std::__::exstring& r)
 {
-  __ntl_throw(out_of_range(msg));
-  (void)msg;
+  if(r.msg){
+    len = r.len;
+    if(!len)
+      len = strlen(r.msg);
+    msg = new char[len+1];
+    strncpy(const_cast<char*>(msg), r.msg, len);
+  }else{
+    msg = 0, len = 0;
+  }
 }
+namespace std {
+#endif
 ///\}
 
 }//namespace std
-
 #endif//#ifndef NTL__STLX_STDEXCEPT

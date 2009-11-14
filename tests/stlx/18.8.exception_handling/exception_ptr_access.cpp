@@ -1,5 +1,5 @@
-#include <exception>
 #include <ntl-tests-common.hxx>
+#include <exception>
 
 STLX_DEFAULT_TESTGROUP_NAME("std::exception_ptr#access");
 

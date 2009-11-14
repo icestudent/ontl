@@ -52,6 +52,7 @@
     #ifdef _CPPUNWIND
       #define STLX__USE_EXCEPTIONS 1
     #else
+#error ?!
       #define STLX__USE_EXCEPTIONS 0
     #endif
   #elif defined(__GNUC__)

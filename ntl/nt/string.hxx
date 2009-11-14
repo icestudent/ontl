@@ -10,11 +10,14 @@
 
 #include "basedef.hxx"
 #ifndef NTL__STLX_STDEXCEPT
-#include "../stlx/stdexcept.hxx"
+#include "../stlx/stdexcept_fwd.hxx"
 #endif
 #include "../stlx/array.hxx"
 #ifndef NTL__STLX_FUNCTIONAL
 #include "../stlx/functional.hxx"
+#endif
+#ifndef NTL__STLX_STRING
+# include "../stlx/stdstring.hxx"
 #endif
 
 namespace ntl {

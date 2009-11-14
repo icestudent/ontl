@@ -19,8 +19,8 @@
 
 // 21.3.6.1 basic_string find
 
-#include <string>
 #include <ntl-tests-common.hxx>
+#include <string>
 
 STLX_DEFAULT_TESTGROUP_NAME("std::string#find");
 

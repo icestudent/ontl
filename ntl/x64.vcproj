@@ -482,7 +482,7 @@
 						>
 					</File>
 					<File
-						RelativePath=".\stlx\string.hxx"
+						RelativePath=".\stlx\stdstring.hxx"
 						>
 					</File>
 					<File
@@ -590,10 +590,6 @@
 						>
 					</File>
 					<File
-						RelativePath=".\stlx\exception.hxx"
-						>
-					</File>
-					<File
 						RelativePath=".\stlx\exception2.hxx"
 						>
 					</File>
@@ -623,6 +619,10 @@
 					</File>
 					<File
 						RelativePath=".\stlx\stdexcept.hxx"
+						>
+					</File>
+					<File
+						RelativePath=".\stlx\stdexception.hxx"
 						>
 					</File>
 					<File
@@ -1011,7 +1011,7 @@
 					>
 				</File>
 				<File
-					RelativePath=".\nt\exceptions.hxx"
+					RelativePath=".\nt\exception.hxx"
 					>
 				</File>
 				<File

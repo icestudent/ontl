@@ -30,7 +30,6 @@ namespace dbg = ntl::nt::dbg;
 #define VERIFY(cond) quick_ensure(cond)
 #define quick_ensure(cond) __quick_ensure1(cond, __LINE__)
 
-//#undef assert
 //#define assert(expr) __quick_ensure1(!!(expr), __LINE__)
 
 //////////////////////////////////////////////////////////////////////////

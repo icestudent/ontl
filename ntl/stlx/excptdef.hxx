@@ -8,6 +8,10 @@
 #define NTL__STLX_EXCPTDEF
 #pragma once
 
+#ifndef NTL__STLX_CSTDDEF
+#include "cstddef.hxx" // for STLX__USE_EXCEPTIONS
+#endif
+
 #if STLX__USE_EXCEPTIONS == 1
   // C++ exceptions
   #define __ntl_try       try

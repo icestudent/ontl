@@ -57,6 +57,7 @@ inline void __ntl_assert(const char* expr, const char* file, int line)
 #ifdef NDEBUG
   #define assert(expr) __noop
   #define _assert_msg(msg) __noop
+  #define _assert_string(msg) __noop
 #else
   #define assert(expr) \
     if ( !!(expr) ); else if(ntl::__assert_handler)\
@@ -68,6 +69,11 @@ inline void __ntl_assert(const char* expr, const char* file, int line)
     __ntl_assert("Assertion (" msg ") failed in "__func__,__FILE__,__LINE__);\
   else __debugbreak();\
       ((void)0)
+#define _assert_string(msg) \
+  if(ntl::__assert_handler)\
+  __ntl_assert(msg,__FILE__,__LINE__);\
+  else __debugbreak();\
+  ((void)0)
 #endif
 
 //}//namespace std

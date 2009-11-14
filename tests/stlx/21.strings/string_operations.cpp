@@ -14,11 +14,11 @@
 // You should have received a copy of the GNU General Public License along
 // with this library; see the file COPYING3.  If not see
 // <http://www.gnu.org/licenses/>.
+#include <ntl-tests-common.hxx>
 
 #include <string>
 #include <stdexcept>
 
-#include <ntl-tests-common.hxx>
 
 STLX_DEFAULT_TESTGROUP_NAME("std::string#operations");
 

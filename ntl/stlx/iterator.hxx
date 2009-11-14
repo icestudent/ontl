@@ -688,6 +688,7 @@ class istreambuf_iterator
         streambuf_type *  sbuf_;
         charT             c;
         proxy(charT c, streambuf_type* sbuf) : c(c), sbuf_(sbuf) {}
+        friend proxy istreambuf_iterator::operator++(int);
     };
 
     istreambuf_iterator()                   __ntl_nothrow : sbuf_(0) {}
@@ -700,12 +701,12 @@ class istreambuf_iterator
       // The result of operator*() on an end of stream is undefined.
       int_type c = sbuf_->sgetc();
       if ( ! traits::not_eof(c) ) sbuf_ = 0;
-      return static_cast<charT>(c);
+      return traits::to_char_type(c);
     }
 
     this_type& operator++() { if(sbuf_) sbuf_->sbumpc(); return *this; }
 
-    proxy operator++(int) { return proxy( sbuf_->sbumpc(), sbuf_ ); }
+    proxy operator++(int) { return proxy( traits::to_char_type(sbuf_->sbumpc()), sbuf_ ); }
 
     bool equal(const istreambuf_iterator& b) const
     {

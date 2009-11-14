@@ -10,6 +10,7 @@
 
 #include "algorithm.hxx"
 #include "memory.hxx"
+#include "stdexcept_fwd.hxx"
 
 #ifdef _MSC_VER
 # pragma warning(push)
@@ -314,6 +315,8 @@ class vector
 
     void resize(size_type sz)
     {
+      if(sz > max_size())
+        __throw_length_error(__func__": `sz` too large");
       iterator new_end = begin_ + sz;
       if(new_end < end_)
         erase(new_end, end_);
@@ -323,6 +326,8 @@ class vector
 
     void resize(size_type sz, const T& c)
     {
+      if(sz > max_size())
+        __throw_length_error(__func__": `sz` too large");
       iterator new_end = begin_ + sz;
       if(new_end < end_)
         erase(new_end, end_);
@@ -330,8 +335,10 @@ class vector
         insert(end_, new_end - end_, c);
     }
 
-    void reserve(size_type n) __ntl_throws(bad_alloc) //throw(length_error)
+    void reserve(size_type n) __ntl_throws(bad_alloc, length_error)
     {
+      if(n > max_size())
+        __throw_length_error(__func__": size too big");
       if ( capacity() < n ) realloc(n);
     }
 
@@ -346,13 +353,13 @@ class vector
     reference       operator[](size_type n)       { return *(begin_ + n); }
     const_reference operator[](size_type n) const { return *(begin_ + n); }
 
-    const_reference at(size_type n) const
+    const_reference at(size_type n) const __ntl_throws(out_of_range)
     {
       check_bounds(n);
       return operator[](n);
     }
 
-    reference at(size_type n)
+    reference at(size_type n) __ntl_throws(out_of_range)
     {
       check_bounds(n);
       return operator[](n);
@@ -429,10 +436,11 @@ class vector
                          InputIterator last, const input_iterator_tag&)
     {
       while ( first != last ) position = insert__impl(position, 1, *first++) + 1;
+      return position;
     }
 
     template <class InputIterator>
-   iterator insert__disp_it(iterator position, InputIterator first,
+    iterator insert__disp_it(iterator position, InputIterator first,
                          InputIterator last, const random_access_iterator_tag &)
     {
       iterator i = position = insert__blank_space(position, static_cast<size_type>(last - first));
@@ -632,11 +640,9 @@ class vector
 
     typedef __::bool_type<is_pod<T>::value || has_trivial_destructor<T>::value> no_dtor;
 
-    // "stdexcept.hxx" includes this header
-    // hack: MSVC doesn't look inside function body
-    void check_bounds(size_type n) const //__ntl_throws(out_of_range)
+    void check_bounds(size_type n) const __ntl_throws(out_of_range)
     {
-      if ( n >= size() ) __ntl_throw(out_of_range(__FUNCTION__));
+      if ( n >= size() ) __throw_out_of_range(__func__": no such element.");
     }
 
     void move(const iterator to, const iterator from) const

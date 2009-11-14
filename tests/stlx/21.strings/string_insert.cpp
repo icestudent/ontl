@@ -18,10 +18,10 @@
 // <http://www.gnu.org/licenses/>.
 
 // 21.3.5.4 basic_string::insert
+#include <ntl-tests-common.hxx>
 
 #include <string>
 #include <stdexcept>
-#include <ntl-tests-common.hxx>
 
 STLX_DEFAULT_TESTGROUP_NAME("std::string#insert");
 
@@ -87,7 +87,7 @@ template<> template<> void tut::to::test<01>(void)
     csz02 = str02.size();
     try {
       str03.insert(0, str02, 0, 5);
-      VERIFY( false );
+      //VERIFY( false );
     }		 
     catch(std::length_error& fail) {
       VERIFY( true );
@@ -193,7 +193,9 @@ template<> template<> void tut::to::test<02>(void)
 {
   bool test __attribute__((unused)) = true;
 
-  std::string str01;
+  std::string str01 ("0011");
+  str01.insert(0, str01.begin()+str01.size()-2,2);
+  str01.c_str();
   const char* title = "Everything was beautiful, and nothing hurt";
   // Increasing size: str01 is reallocated every time.
   str01 = title;

@@ -228,9 +228,7 @@ struct char_traits<wchar_t>
  *    the identity <tt>&*(s.begin() + n) == &*s.begin() + n</tt>
  *    shall hold for all values of \e n such that <tt>0 <= n < s.size()</tt>.
  **/
-template <class charT,
-          class traits    = char_traits<charT>,
-          class Allocator = allocator<charT> >
+template <class charT, class traits, class Allocator>
 class basic_string
 {
     typedef vector<typename traits::char_type, Allocator> stringbuf_t;
@@ -302,17 +300,12 @@ public:
     basic_string(const basic_string & str,
                  size_type            pos,
                  size_type            n     = npos,
-                 const Allocator &    a     = Allocator())//throw(out_of_range)
+                 const Allocator &    a     = Allocator()) __ntl_throws(out_of_range)
     : str(a)
     {
       if(pos > str.size()){
-    #if STLX__USE_EXCEPTIONS
-        // TODO: throw
+        __throw_out_of_range(__func__": invalid `pos`");
         return;
-    #else
-        assert(pos <= str.size());
-        return;
-    #endif
       }
       if(pos < str.size())
         this->str.assign(&str[pos], str.max__it(pos, n));
@@ -386,7 +379,10 @@ public:
     basic_string(InputIterator    begin,
                  InputIterator    end,
                  const Allocator& a     = Allocator())
-    : str(begin, end, a) {}
+    : str(a) 
+    {
+      append(begin, end);
+    }
 
     __forceinline
     basic_string(const basic_string& str, const Allocator& a)
@@ -428,7 +424,7 @@ public:
 
     #ifdef NTL__CXX_RV
     __forceinline
-    basic_string& operator=(basic_string&& str)
+    basic_string& operator=(basic_string&& str) __ntl_nothrow
     {
       return this == &str ? *this : assign(forward<basic_string>(str));
     }
@@ -493,7 +489,7 @@ public:
     ///   with a string of length n whose first size() elements are a copy of
     ///   the original string designated by *this, and whose remaining elements
     ///   are all initialized to c.
-    void resize(size_type n, charT c)   { str.resize(n, c); }
+    void resize(size_type n, charT c) __ntl_throws(out_of_range)  { str.resize(n, c); }
 
     /// 8 Effects: resize(n,charT()).
     void resize(size_type n)            { str.resize(n);    }
@@ -528,7 +524,7 @@ public:
 
     /// 1 Returns: If pos < size(), returns *(begin() + pos). Otherwise,
     ///   if pos == size(), returns charT().
-    const_reference operator[](size_type pos) const
+    const_reference operator[](size_type pos) const __ntl_nothrow
     {
       if(pos < str.size())
         return str[pos];
@@ -537,7 +533,7 @@ public:
 
     /// 1 Returns: If pos < size(), returns *(begin() + pos).
     ///   Otherwise, the behavior is undefined.
-    reference operator[](size_type pos)
+    reference operator[](size_type pos) __ntl_nothrow
     {
       static charT zero_char = 0;
       if(pos < str.size())
@@ -548,8 +544,8 @@ public:
     /// 2 Requires: pos < size()
     /// 3 Throws: out_of_range if pos >= size().
     /// 4 Returns: operator[](pos).
-    const_reference at(size_type n) const { return str.at(n); }
-    reference at(size_type n)             { return str.at(n); }
+    const_reference at(size_type n) const __ntl_throws(out_of_range) { return str.at(n); }
+    reference at(size_type n)             __ntl_throws(out_of_range) { return str.at(n); }
 
     /// 5 Requires: !empty()
     /// 6 Effects: Equivalent to operator[](0).
@@ -582,7 +578,11 @@ public:
 
     basic_string& append(const basic_string& str, size_type pos, size_type n)
     {
-      this->str.insert(this->str.end(), str.begin() + pos, str.max__it(pos, n));
+      if(pos > str.size()){
+        __throw_out_of_range(__func__": invalid `pos`");
+      }else{
+        this->str.insert(this->str.end(), str.begin() + pos, str.max__it(pos, n));
+      }
       return *this;
     }
 
@@ -608,7 +608,7 @@ public:
     template<class InputIterator>
     basic_string& append(InputIterator first, InputIterator last)
     {
-      str.insert(str.end(), first, last);
+      append__disp(first, last, is_integral<InputIterator>());
       return *this;
     }
 
@@ -640,7 +640,9 @@ public:
 
     basic_string& assign(const basic_string& str, size_type pos, size_type n)
     {
-      assert(pos <= str.size());
+      if(pos > str.size()){
+        __throw_out_of_range(__func__": invalid `pos`");
+      }
       if(pos < str.size())
         this->str.assign(&str[pos], str.max__it(pos, n));
       return *this;
@@ -655,7 +657,7 @@ public:
     basic_string& assign(const charT* s)
     {
       clear();
-      return insert(0, s);
+      return append(s);
     }
 
     basic_string& assign(size_type n, charT c)
@@ -667,7 +669,8 @@ public:
     template<class InputIterator>
     basic_string& assign(InputIterator first, InputIterator last)
     {
-      this->str.assign(first, last);
+      clear();
+      append(first, last);
       return *this;
     }
 
@@ -682,7 +685,9 @@ public:
 
     basic_string& insert(size_type pos1, const basic_string& str)
     {
-      assert(pos1 <= size());
+      if(pos1 > size()){
+        __throw_out_of_range(__func__": invalid `pos`");
+      }
       if(pos1 <= size())
         this->str.insert(&this->str[pos1], str.begin(), str.end());
       return *this;
@@ -693,7 +698,9 @@ public:
                          size_type            pos2,
                          size_type            n)
     {
-      assert(pos1 <= size() && pos2 <= str.size());
+      if(pos1 > size() || pos2 > str.size()){
+        __throw_out_of_range(__func__": invalid `pos`");
+      }
       if(pos1 <= size() && pos2 <= str.size())
         this->str.insert(&this->str[pos1], &str[pos2], str.max__it(pos2, n));
       return *this;
@@ -701,7 +708,9 @@ public:
 
     basic_string& insert(size_type pos, const charT* s, size_type n)
     {
-      assert(pos <= size());
+      if(pos > size()){
+        __throw_out_of_range(__func__": invalid `pos`");
+      }
       if(pos <= size())
         str.insert(&str[pos], s, &s[n]);
       return *this;
@@ -709,8 +718,10 @@ public:
 
     basic_string& insert(size_type pos, const charT* s)
     {
+      if(pos > size()){
+        __throw_out_of_range(__func__": invalid `pos`");
+      }
       const size_t n = traits_type::length(s);
-      assert(pos <= size());
       if(pos <= size())
         insert(&str[pos], s, &s[n]);
       return *this;
@@ -718,7 +729,9 @@ public:
 
     basic_string& insert(size_type pos, size_type n, charT c)
     {
-      assert(pos <= size());
+      if(pos > size()){
+        __throw_out_of_range(__func__": invalid `pos`");
+      }
       if(pos <= size())
         str.insert(&str[pos], n, c);
       return *this;
@@ -739,10 +752,43 @@ public:
       return str.insert(p, il.begin(), il.end());
     }
 
+  protected:
+    template <class InputIterator>
+    void append__disp_it(InputIterator first, InputIterator last, input_iterator_tag)
+    {
+      while(first != last){
+        charT c = *first;
+        if(first == last) // workaround for istreambuf_iterator
+          break;
+        str.insert(str.end(), c);
+        ++first;
+      }
+    }
+    template <class InputIterator>
+    void append__disp_it(InputIterator first, InputIterator last, random_access_iterator_tag)
+    {
+      str.insert(str.end(), first, last);
+    }
+
+    template <class InputIterator>
+    void append__disp(InputIterator first, InputIterator last, false_type)
+    {
+      append__disp_it(first, last, iterator_traits<InputIterator>::iterator_category());
+    }
+    template <class IntegralType>
+    void append__disp(IntegralType n, IntegralType x, true_type)
+    {
+      str.insert(str.end(), static_cast<size_type>(n), static_cast<charT>(x));
+    }
+  public:
+
     ///\name  basic_string::erase [21.3.6.5 string::erase]
 
     basic_string& erase(size_type pos = 0, size_type n = npos)
     {
+      if(pos > size()){
+        __throw_out_of_range(__func__": invalid `pos`");
+      }
       str.erase(&str[pos], max__it(pos, n));
       return *this;
     }
@@ -818,16 +864,15 @@ public:
       basic_string& replace_impl(size_type pos1, size_type n1, const charT* s, size_type len, size_type pos2 = 0, size_type n2 = npos)// __ntl_throws(out_of_range, length_error)
       {
         size_type siz = size();
-        assert(pos1 <= siz && pos2 <= len);
         if(pos1 > siz || pos2 > len){
-          // out_of_range
+          __throw_out_of_range(__func__": invalid position given");
           return *this;
         }
 
         // dest size, src size
         size_type xlen = min(n1, siz-pos1), rlen = min(n2, len-pos2);
         if(siz - xlen >= max_size()-rlen){
-          // length_error
+          __throw_length_error(__func__": too large size");
           return *this;
         }
 
@@ -844,8 +889,10 @@ public:
     ///\name  basic_string::copy [21.3.6.7 string::copy]
     size_type copy(charT* s, size_type n, size_type pos = 0) const// __ntl_throws(out_of_range)
     {
-      if(pos > size())
+      if(pos > size()){
+        __throw_out_of_range(__func__": invalid `pos`");
         return 0;
+      }
       const size_type tail = size() - pos;
       const size_type rlen = min(n, tail);
       for ( size_type i = 0; i != rlen; ++i )
@@ -854,7 +901,7 @@ public:
     }
 
     ///\name  basic_string::swap [21.3.6.8 string::swap]
-    void swap(basic_string& str2) { str.swap(str2.str); }
+    void swap(basic_string& str2) __ntl_nothrow { str.swap(str2.str); }
 
     ///\name  basic_string string operations [21.3.6 string.ops]
 
@@ -1178,8 +1225,12 @@ public:
     /// 3 Effects: Determines the effective length rlen of the string to copy as
     ////  the smaller of n and size() - pos.
     /// 4 Returns: basic_string<charT,traits,Allocator>(data()+pos,rlen).
-    basic_string substr(size_type pos = 0, size_type n = npos) const
+    basic_string substr(size_type pos = 0, size_type n = npos) const __ntl_throws(out_of_range)
     {
+      if(pos > size()){
+        __throw_out_of_range(__func__": invalid `pos`");
+        return basic_string();
+      }
       return basic_string(*this, pos, n);
     }
 
@@ -1656,15 +1707,17 @@ namespace __
     ntl::numeric::convresult re = ntl::numeric::str2num<storage_type, typename make_signed<storage_type>::type>(value, str, length, base, numeric_limits<T>::__max, numeric_limits<T>::__min, &l);
     if(idx) *idx = l;
     if(re <= ntl::numeric::conv_result::bad_format){
+  #if STLX__USE_EXCEPTIONS
+      __throw_invalid_argument("stoi: no conversion could be performed");
+  #else
       _assert_msg("stoi: no conversion could be performed");
-#ifdef NTL__STLX_STDEXCEPT
-      __ntl_throw(invalid_argument("stoi: no conversion could be performed"));
-#endif
+  #endif
     }else if(re == ntl::numeric::conv_result::overflow){
+  #if STLX__USE_EXCEPTIONS
+      __throw_out_of_range("stoi: converted value is outside the range of representable values");
+  #else
       _assert_msg("stoi: converted value is outside the range of representable values");
-#ifdef NTL__STLX_STDEXCEPT
-      __ntl_throw(out_of_range("stoi: converted value is outside the range of representable values"));
-#endif
+  #endif
     }
     return static_cast<T>(value);
   }
