@@ -16,7 +16,7 @@
 
 #include "../nt/basedef.hxx"
 #include "../stdlib.hxx"
-#include "../nt/exceptions.hxx"
+#include "../nt/exception.hxx"
 #include "../nt/string.hxx"
 #include "../atomic.hxx"
 
