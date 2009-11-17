@@ -23,6 +23,7 @@
 #ifndef NTL__STLX_CASSERT
 #include "cassert.hxx"
 #endif
+#include "stdstring.hxx"
 
 namespace std 
 {
