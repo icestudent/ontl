@@ -443,8 +443,12 @@ class vector
     iterator insert__disp_it(iterator position, InputIterator first,
                          InputIterator last, const random_access_iterator_tag &)
     {
-      iterator i = position = insert__blank_space(position, static_cast<size_type>(last - first));
-      while ( first != last ) array_allocator.construct(--position, *--last);
+      size_t const n = static_cast<size_type>(last - first);
+      bool const insert_from_self = begin() <= first && first < end();
+      iterator i = insert__blank_space(position, n);
+      const difference_type disp = insert_from_self ? i - position - n : 0;
+      position = i;
+      while ( first != last ) array_allocator.construct(--position, (--last)[disp]);
       return i;
     }
 
