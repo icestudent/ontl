@@ -50,9 +50,12 @@ namespace std
 #else
 # include "cassert.hxx"
 namespace std {
+#pragma warning(push)
+#pragma warning(disable:4100)// 'msg' : unreferenced formal parameter
   inline void __throw_out_of_range(const char* msg)      { _assert_string(msg); }
   inline void __throw_length_error(const char* msg)      { _assert_string(msg); }
   inline void __throw_invalid_argument(const char* msg)  { _assert_string(msg); }
+#pragma warning(pop)
 }
 
 #endif
