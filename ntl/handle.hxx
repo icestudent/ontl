@@ -15,16 +15,17 @@
 namespace ntl
 {
 
-
+#if 0
 namespace aux {
+// this may give unresolved external symbol "bool __stdcall ntl::aux::is_valid<struct ntl::nt::_opaque const *>(struct ntl::nt::_opaque const *)"
 template<typename T> __forceinline bool is_valid(T t) { return t != 0; }
 }
+#endif
 
 /// handle RAII wrapper
 template <class X,
           void(*Delete)(X),
-          X(*Duplicate)(X),
-          bool(*Validate)(X) = aux::is_valid>
+          X(*Duplicate)(X)>
 class basic_handle
 {
   ///////////////////////////////////////////////////////////////////////////
@@ -43,9 +44,9 @@ class basic_handle
 
     ~basic_handle() __ntl_nothrow { if ( X x = get() ) Delete(x); }
 
-    bool is_valid() const { return Validate(get()); }
+    //bool is_valid() const { return Validate(get()); }
 
-    operator explicit_bool_type() const __ntl_nothrow { return explicit_bool(Validate(h)); }
+    operator explicit_bool_type() const __ntl_nothrow { return explicit_bool(get()); }
 
     X get() const __ntl_nothrow { return h; }
     X get() const volatile __ntl_nothrow { return h; }

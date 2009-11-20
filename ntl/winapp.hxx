@@ -17,6 +17,7 @@
 
 #pragma comment(linker, "/nodefaultlib:libc")
 #pragma comment(linker, "/nodefaultlib:libcmt")
+#pragma comment(linker, "/nodefaultlib:oldnames")
 
 namespace ntl {
 
