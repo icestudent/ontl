@@ -444,7 +444,7 @@ class vector
                          InputIterator last, const random_access_iterator_tag &)
     {
       size_t const n = static_cast<size_type>(last - first);
-      bool const insert_from_self = begin() <= first && first < end();
+      bool const insert_from_self = begin() <= &*first && &*first < end();
       iterator i = insert__blank_space(position, n);
       const difference_type disp = insert_from_self ? i - position - n : 0;
       position = i;
