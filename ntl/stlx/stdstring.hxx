@@ -535,10 +535,9 @@ public:
     ///   Otherwise, the behavior is undefined.
     reference operator[](size_type pos) __ntl_nothrow
     {
-      static charT zero_char = 0;
       if(pos < str.size())
         return str[pos];
-      return zero_char;
+      return const_cast<charT&>(zero_char);
     }
 
     /// 2 Requires: pos < size()
@@ -942,7 +941,7 @@ public:
     {
       size_type cursize = size();
       if(pos > cursize || pos+n > cursize) return npos;
-      const charT* beg = begin();
+      const charT* const beg = begin();
       for ( size_type xpos = pos; xpos + n <= cursize; ++xpos )
       {
         for(size_type i = 0; i != n; ++i)
@@ -964,7 +963,7 @@ public:
     /// 7 Returns: find(basic_string<charT,traits,Allocator>(1,c),pos).
     size_type find(charT c, size_type pos = 0) const
     {
-      const charT* beg = begin();
+      const charT* const beg = begin();
       for ( size_type xpos = pos; xpos < size(); ++xpos )
         if ( traits_type::eq(*(beg + xpos), c) )
           return xpos;
@@ -993,7 +992,7 @@ public:
       size_type & xpos = pos;
       if ( xpos > size() || xpos + n > size() )
         xpos = size() - n;
-      const charT* beg = begin();
+      const charT* const beg = begin();
       while ( xpos + n > 0 )
       {
         for ( size_type i = 0; i != n; ++i )
@@ -1018,7 +1017,7 @@ public:
     {
       ///\note  Standard claims the use of at() member function, but
       ///       we stick to an exception-safe way
-      const charT* beg = begin();
+      const charT* const beg = begin();
       for ( size_type xpos = pos < size() ? pos + 1 : size(); xpos; )
         if ( traits_type::eq(*(beg + --xpos), c) )
           return xpos;
@@ -1029,7 +1028,7 @@ public:
     size_type rfind(charT c/*, size_type pos = npos*/) const
     {
       size_type xpos = size();
-      const charT* beg = begin();
+      const charT* const beg = begin();
       while ( xpos-- )
         if ( traits_type::eq(*(beg + xpos), c) )
           return xpos;
@@ -1054,7 +1053,7 @@ public:
     /// 4 Returns: find_first_of(basic_string<charT,traits,Allocator>(s,n),pos).
     size_type find_first_of(const charT* s, size_type pos, size_type n) const
     {
-      const charT* beg = begin();
+      const charT* const beg = begin();
       for ( size_type xpos = pos; xpos < size(); ++xpos )
         for ( size_type i = 0; i != n; ++i )
           if ( traits_type::eq(*(beg + xpos), *(s + i)) )
@@ -1072,7 +1071,7 @@ public:
     /// 7 Returns: find_first_of(basic_string<charT,traits,Allocator>(1,c),pos).
     size_type find_first_of(charT c, size_type pos = 0) const
     {
-      const charT* beg = begin();
+      const charT* const beg = begin();
       for ( size_type xpos = pos; xpos < size(); ++xpos )
         if ( traits_type::eq(*(beg + xpos), c) )
           return xpos;
@@ -1099,7 +1098,7 @@ public:
     {
       size_type & xpos = pos;
       if ( xpos > size() ) xpos = size();
-      const charT* beg = begin();
+      const charT* const beg = begin();
       while ( xpos )
       {
         for ( size_type i = 0; i != n; ++i ){
@@ -1142,7 +1141,7 @@ public:
     /// 4 Returns: find_first_not_of(basic_string<charT,traits,Allocator>(s,n),pos).
     size_type find_first_not_of(const charT* s, size_type pos, size_type n) const
     {
-      const charT* beg = begin();
+      const charT* const beg = begin();
       for ( size_type xpos = pos; xpos < size(); ++xpos )
       {
         for ( size_type i = 0; i != n; ++i )
@@ -1164,7 +1163,7 @@ public:
     /// 7 Returns: find_first_not_of(basic_string<charT,traits,Allocator>(1,c),pos).
     size_type find_first_not_of(charT c, size_type pos = 0) const
     {
-      const charT* beg = begin();
+      const charT* const beg = begin();
       for ( size_type xpos = pos; xpos < size(); ++xpos )
         if ( !traits_type::eq(*(beg + xpos), c) )
           return xpos;
@@ -1189,7 +1188,7 @@ public:
     /// 4 Returns: find_last_not_of(basic_string<charT,traits,Allocator>(s,n),pos).
     size_type find_last_not_of(const charT* s, size_type pos, size_type n) const
     {
-      const charT* beg = begin();
+      const charT* const beg = begin();
       for ( size_type xpos = pos < size() ? pos + 1 : size(); xpos; )
       {
         --xpos;
@@ -1212,7 +1211,7 @@ public:
     /// 7 Returns: find_last_not_of(basic_string<charT,traits,Allocator>(1,c),pos).
     size_type find_last_not_of(charT c, size_type pos = npos) const
     {
-      const charT* beg = begin();
+      const charT* const beg = begin();
       for ( size_type xpos = pos < size() ? pos + 1 : size(); xpos; )
         if ( !traits_type::eq(*(beg + --xpos), c) )
           return xpos;
