@@ -975,13 +975,13 @@ namespace std
     template<class Y> shared_ptr(const shared_ptr<Y>& r) __ntl_nothrow
       :shared(/*__::shared_data_cast<T>*/(r.shared)),ptr(r.get())
     {
-      static_assert((is_convertible<Y*,T*>::value), "Y* shall be convertible to T*");
+      static_assert(is_convertible<Y*,T*>::value, "Y* shall be convertible to T*");
       add_ref();
     }
     template<class Y> shared_ptr(shared_ptr<Y>&& r) __ntl_nothrow
       :shared(/*__::shared_data_cast<T>*/(r.shared)),ptr(r.get())
     {
-      static_assert((is_convertible<Y*,T*>::value), "Y* shall be convertible to T*");
+      static_assert(is_convertible<Y*,T*>::value, "Y* shall be convertible to T*");
       r.shared = nullptr,
         r.ptr = nullptr;
     }
@@ -994,7 +994,7 @@ namespace std
     template<class Y> explicit shared_ptr(const weak_ptr<Y>& r) __ntl_throws(bad_weak_ptr)
       :shared(),ptr()
     {
-      static_assert((is_convertible<Y*,T*>::value), "Y* shall be convertible to T*");
+      static_assert(is_convertible<Y*,T*>::value, "Y* shall be convertible to T*");
       if(r.expired())
         __ntl_throw(bad_weak_ptr());
 

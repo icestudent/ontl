@@ -53,8 +53,8 @@ namespace std {
   class basic_filebuf:
     public basic_streambuf<charT, traits>
   {
-    /** 16Kb default buffer size */
-    static const streamsize default_file_buffer_size = 1024 * 16;
+    /** 128 KB default buffer size */
+    static const streamsize default_file_buffer_size = 1024 * 128;
     typedef typename traits::state_type state_type;
   public:
     typedef charT                     char_type;
@@ -611,7 +611,7 @@ namespace std {
         uint32_t bom_size = encoding;
         if(encoding == Encoding::Default)
           bom_size = sizeof(char_type); // but utf8 isn't supported by native type
-        if(bom_size)
+        if(bom_size > 1) // ansi isn't uses bom
           f.write(&bom_le, bom_size);
       }
 #endif

@@ -41,14 +41,14 @@
   NTL_SPP_CAT(NTL_SPP_COMMA prefix, n)
 
 #define NTL_SPP_DETAIL_TARG_FIRST(n, p) \
-  T##n p##n
+  T##n NTL_SPP_CAT(p,n)
 #define NTL_SPP_DETAIL_TARG_OTHER(n, p) \
-  NTL_SPP_CAT(NTL_SPP_COMMA T, n) p##n
+  NTL_SPP_CAT(NTL_SPP_COMMA T, n) NTL_SPP_CAT(p,n)
 
 #define NTL_SPP_DETAIL_AARG_FIRST(n, p) \
-  A##n p##n
+  A##n NTL_SPP_CAT(p,n)
 #define NTL_SPP_DETAIL_AARG_OTHER(n, p) \
-  NTL_SPP_CAT(NTL_SPP_COMMA A, n) p##n
+  NTL_SPP_CAT(NTL_SPP_COMMA A, n) NTL_SPP_CAT(p,n)
 
 // !fr3@K!
 // === public interface ===
@@ -93,7 +93,7 @@
  *  Example:
  *  \code
     NTL_SPP_AARGS(1,2,a)
-    'A1 a1, A2 p2'
+    'A1 a1, A2 a2'
     \endcode
  **/
 #define NTL_SPP_AARGS(init, count, ArgName) \

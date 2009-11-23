@@ -283,6 +283,7 @@ class ios_base
 
     void init()
     {
+      this->state = goodbit;
       this->prec = 6;
       this->wide = 0;
       this->fmtfl = skipws | dec;

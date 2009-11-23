@@ -1,6 +1,6 @@
 /**\file*********************************************************************
  *                                                                     \brief
- *  /// 20.7.11 Class template unique_ptr for legacy compilers [unique.ptr]
+ *  /// 20.8.11 Class template unique_ptr for legacy compilers [unique.ptr]
  *
  ****************************************************************************
  */
@@ -19,18 +19,18 @@ namespace std
 {
   /**\addtogroup  lib_utilities ********** 20 General utilities library [utilities]
    *@{*/
-  /**\addtogroup  lib_memory ************* 20.7 Memory [memory]
+  /**\addtogroup  lib_memory ************* 20.8 Memory [memory]
    *@{*/
 
-  /**\addtogroup  lib_uniqueptr ********** 20.7.11 Class template unique_ptr (legacy) [unique.ptr]
+  /**\addtogroup  lib_uniqueptr ********** 20.8.11 Class template unique_ptr (legacy) [unique.ptr]
    *@{*/
 
 
-  // 20.7.11 Class template unique_ptr [unique.ptr]
+  // 20.8.11 Class template unique_ptr [unique.ptr]
 
-  ///\name 20.7.11.1 Default deleters [unique.ptr.dltr]
+  ///\name 20.8.11.1 Default deleters [unique.ptr.dltr]
 
-  /// 20.7.11.1.1 default_delete [unique.ptr.dltr.dflt]
+  /// 20.8.11.1.1 default_delete [unique.ptr.dltr.dflt]
   template <class T> struct default_delete
   {
     default_delete() {}
@@ -46,7 +46,7 @@ namespace std
     template <class U, size_t S> default_delete(const default_delete<U[S]>&);
   };
 
-  /// 20.7.11.1.2 default_delete<T[]> [unique.ptr.dltr.dflt1]
+  /// 20.8.11.1.2 default_delete<T[]> [unique.ptr.dltr.dflt1]
   template <class T> struct default_delete<T[]>
   {
     void operator()(T* ptr) const
@@ -59,7 +59,7 @@ namespace std
   };
 
 #ifdef STLX__SMARTPTR_WITH_N
-  /// 20.7.11.1.3 default_delete<T[N]> [unique.ptr.dltr.dflt2]
+  /// 20.8.11.1.3 default_delete<T[N]> [unique.ptr.dltr.dflt2]
   template <class T, size_t N> struct default_delete<T[N]>
   {
     void operator()(T* ptr, size_t) const { ::delete[] ptr; }
@@ -71,7 +71,7 @@ namespace std
   template <class T, class D = default_delete<T> >
   class unique_ptr;
 
-  /// 20.7.11.2 unique_ptr for single objects [unique.ptr.single]
+  /// 20.8.11.2 unique_ptr for single objects [unique.ptr.single]
   template <class T, class D>
   class unique_ptr
   {
@@ -88,7 +88,7 @@ namespace std
     typedef T  element_type;
     typedef D  deleter_type;
 
-    ///\name 20.7.11.2.1 unique_ptr constructors [unique.ptr.single.ctor]
+    ///\name 20.8.11.2.1 unique_ptr constructors [unique.ptr.single.ctor]
     unique_ptr() __ntl_nothrow
       : ptr(0), deleter()
     {
@@ -124,14 +124,14 @@ namespace std
       u.release();
     }
 
-    ///\name 20.7.11.2.2 unique_ptr destructor [unique.ptr.single.dtor]
+    ///\name 20.8.11.2.2 unique_ptr destructor [unique.ptr.single.dtor]
     ~unique_ptr() __ntl_nothrow
     {
       if ( get() )
         get_deleter()(get());
     }
 
-    ///\name 20.7.11.2.3 unique_ptr assignment [unique.ptr.single.asgn]
+    ///\name 20.8.11.2.3 unique_ptr assignment [unique.ptr.single.asgn]
     __forceinline
       unique_ptr& operator=(const unique_ptr& u) __ntl_nothrow
     {
@@ -156,7 +156,7 @@ namespace std
       return *this;
     }
 
-    ///\name 20.7.11.2.4 unique_ptr observers [unique.ptr.single.observers]
+    ///\name 20.8.11.2.4 unique_ptr observers [unique.ptr.single.observers]
     typename add_lvalue_reference<T>::type operator*() const __ntl_nothrow { return *get(); }
     pointer operator->() const __ntl_nothrow { return get(); }
     pointer get() const __ntl_nothrow { return ptr; }
@@ -166,7 +166,7 @@ namespace std
 
     operator __::explicit_bool_type() const __ntl_nothrow { return __::explicit_bool(ptr); }
 
-    ///\name 20.7.11.2.5 unique_ptr modifiers [unique.ptr.single.modifiers]
+    ///\name 20.8.11.2.5 unique_ptr modifiers [unique.ptr.single.modifiers]
     pointer release() const
     {
       pointer tmp = nullptr;
@@ -222,7 +222,7 @@ namespace std
     typedef T  element_type;
     typedef default_delete<T> deleter_type;
 
-    ///\name 20.7.11.2.1 unique_ptr constructors [unique.ptr.single.ctor]
+    ///\name 20.8.11.2.1 unique_ptr constructors [unique.ptr.single.ctor]
     unique_ptr() __ntl_nothrow : ptr(0) {}
 
     unique_ptr(nullptr_t) __ntl_nothrow
@@ -245,7 +245,7 @@ namespace std
       u.release();
     }
 
-    ///\name 20.7.11.2.2 unique_ptr destructor [unique.ptr.single.dtor]
+    ///\name 20.8.11.2.2 unique_ptr destructor [unique.ptr.single.dtor]
     ~unique_ptr() __ntl_nothrow
     {
       if ( get() )
@@ -253,7 +253,7 @@ namespace std
     }
 
 
-    ///\name 20.7.11.2.3 unique_ptr assignment [unique.ptr.single.asgn]
+    ///\name 20.8.11.2.3 unique_ptr assignment [unique.ptr.single.asgn]
     __forceinline
       unique_ptr& operator=(const unique_ptr& u) __ntl_nothrow
     {
@@ -275,7 +275,7 @@ namespace std
       return *this;
     }
 
-    ///\name 20.7.11.2.4 unique_ptr observers [unique.ptr.single.observers]
+    ///\name 20.8.11.2.4 unique_ptr observers [unique.ptr.single.observers]
     typename add_lvalue_reference<T>::type operator*() const __ntl_nothrow { return *get(); }
     pointer operator->() const __ntl_nothrow { return get(); }
     pointer get() const __ntl_nothrow { return ptr; }
@@ -286,7 +286,7 @@ namespace std
 
     operator __::explicit_bool_type() const __ntl_nothrow { return __::explicit_bool(ptr); }
 
-    ///\name 20.7.11.2.5 unique_ptr modifiers [unique.ptr.single.modifiers]
+    ///\name 20.8.11.2.5 unique_ptr modifiers [unique.ptr.single.modifiers]
     pointer release() const
     {
       pointer tmp = nullptr;
@@ -315,7 +315,7 @@ namespace std
   };//template class unique_ptr
 
 
-  /// 20.7.11.3 unique_ptr for array objects with a runtime length [unique.ptr.runtime]
+  /// 20.8.11.3 unique_ptr for array objects with a runtime length [unique.ptr.runtime]
   template <class T, class D>
   class unique_ptr<T[], D>
   {
@@ -331,7 +331,7 @@ namespace std
     typedef T  element_type;
     typedef D  deleter_type;
 
-    ///\name 20.7.11.3.1 unique_ptr constructors [unique.ptr.runtime.ctor]
+    ///\name 20.8.11.3.1 unique_ptr constructors [unique.ptr.runtime.ctor]
     unique_ptr() __ntl_nothrow
       : ptr(0), deleter()
     {
@@ -367,7 +367,7 @@ namespace std
       u.release();
     }
 
-    ///\name 20.7.11.2.2 unique_ptr destructor [unique.ptr.single.dtor]
+    ///\name 20.8.11.2.2 unique_ptr destructor [unique.ptr.single.dtor]
     ~unique_ptr() __ntl_nothrow
     {
       if ( get() )
@@ -375,7 +375,7 @@ namespace std
     }
 
 
-    ///\name 20.7.11.2.3 unique_ptr assignment [unique.ptr.single.asgn]
+    ///\name 20.8.11.2.3 unique_ptr assignment [unique.ptr.single.asgn]
     __forceinline
       unique_ptr& operator=(const unique_ptr& u) __ntl_nothrow
     {
@@ -390,7 +390,7 @@ namespace std
       return *this;
     }
 
-    ///\name 20.7.11.3.2 unique_ptr observers [unique.ptr.runtime.observers]
+    ///\name 20.8.11.3.2 unique_ptr observers [unique.ptr.runtime.observers]
     T& operator[](size_t i) const __ntl_nothrow { return get()[i]; }
     pointer get() const __ntl_nothrow { return ptr; }
 
@@ -399,7 +399,7 @@ namespace std
 
     operator __::explicit_bool_type() const __ntl_nothrow { return __::explicit_bool(ptr); }
 
-    ///\name 20.7.11.2.5 unique_ptr modifiers [unique.ptr.single.modifiers]
+    ///\name 20.8.11.2.5 unique_ptr modifiers [unique.ptr.single.modifiers]
     pointer release() const
     {
       pointer tmp = nullptr;
@@ -456,7 +456,7 @@ namespace std
     typedef T  element_type;
     typedef default_delete<T[]> deleter_type;
 
-    ///\name 20.7.11.3.1 unique_ptr constructors [unique.ptr.runtime.ctor]
+    ///\name 20.8.11.3.1 unique_ptr constructors [unique.ptr.runtime.ctor]
     unique_ptr() __ntl_nothrow : ptr(0) {}
 
     explicit unique_ptr(pointer p) __ntl_nothrow : ptr(p) {}
@@ -480,14 +480,14 @@ namespace std
       u.release();
     }
 
-    ///\name 20.7.11.2.2 unique_ptr destructor [unique.ptr.single.dtor]
+    ///\name 20.8.11.2.2 unique_ptr destructor [unique.ptr.single.dtor]
     ~unique_ptr() __ntl_nothrow
     {
       if ( get() )
         get_deleter()(get());
     }
 
-    ///\name 20.7.11.2.3 unique_ptr assignment [unique.ptr.single.asgn]
+    ///\name 20.8.11.2.3 unique_ptr assignment [unique.ptr.single.asgn]
     __forceinline
       unique_ptr& operator=(const unique_ptr& u) __ntl_nothrow
     {
@@ -501,7 +501,7 @@ namespace std
       return *this;
     }
 
-    ///\name 20.7.11.3.2 unique_ptr observers [unique.ptr.runtime.observers]
+    ///\name 20.8.11.3.2 unique_ptr observers [unique.ptr.runtime.observers]
     T& operator[](size_t i) const __ntl_nothrow { return get()[i]; }
     pointer get() const __ntl_nothrow { return ptr; }
 
@@ -519,7 +519,7 @@ namespace std
 
     operator __::explicit_bool_type() const __ntl_nothrow { return __::explicit_bool(ptr); }
 
-    ///\name 20.7.11.2.5 unique_ptr modifiers [unique.ptr.single.modifiers]
+    ///\name 20.8.11.2.5 unique_ptr modifiers [unique.ptr.single.modifiers]
     pointer release() const
     {
       pointer tmp = nullptr;
@@ -567,7 +567,7 @@ namespace std
 
     static const size_t size = N;
 
-    ///\name 20.7.11.3.1 unique_ptr constructors [unique.ptr.runtime.ctor]
+    ///\name 20.8.11.3.1 unique_ptr constructors [unique.ptr.runtime.ctor]
     unique_ptr() __ntl_nothrow : ptr(0) {}
 
     explicit unique_ptr(pointer p) __ntl_nothrow : ptr(p) {}
@@ -583,14 +583,14 @@ namespace std
       u.release();
     }
 
-    ///\name 20.7.11.4.1 unique_ptr destructor [unique.ptr.compiletime.dtor]
+    ///\name 20.8.11.4.1 unique_ptr destructor [unique.ptr.compiletime.dtor]
     ~unique_ptr() __ntl_nothrow
     {
       if ( get() )
         get_deleter()(get(), N);
     }
 
-    ///\name 20.7.11.2.3 unique_ptr assignment [unique.ptr.single.asgn]
+    ///\name 20.8.11.2.3 unique_ptr assignment [unique.ptr.single.asgn]
     __forceinline
       unique_ptr& operator=(const unique_ptr& u) __ntl_nothrow
     {
@@ -604,7 +604,7 @@ namespace std
       return *this;
     }
 
-    ///\name 20.7.11.4.1 unique_ptr destructor [unique.ptr.compiletime.dtor]
+    ///\name 20.8.11.4.1 unique_ptr destructor [unique.ptr.compiletime.dtor]
     T& operator[](size_t i) const __ntl_nothrow { return get()[i]; }
     pointer get() const __ntl_nothrow { return ptr; }
 
@@ -622,7 +622,7 @@ namespace std
 
     operator __::explicit_bool_type() const __ntl_nothrow { return __::explicit_bool(ptr); }
 
-    ///\name 20.7.11.2.5 unique_ptr modifiers [unique.ptr.single.modifiers]
+    ///\name 20.8.11.2.5 unique_ptr modifiers [unique.ptr.single.modifiers]
     pointer release() const
     {
       pointer tmp = nullptr;
@@ -659,7 +659,7 @@ namespace std
   };//template class unique_ptr<T[N], default_delete<T[N]> >
 #endif
 
-  ///\name 20.7.11.4 unique_ptr specialized algorithms [unique.shared.special]
+  ///\name 20.8.11.4 unique_ptr specialized algorithms [unique.shared.special]
   template <class T, class D> void swap(unique_ptr<T, D>& x, unique_ptr<T, D>& y)
   {
     x.swap(y);
@@ -704,7 +704,7 @@ namespace std
   ///\}
   /*@} lib_uniqueptr */
 
- /**\defgroup  lib_smartptr *************** 20.7.12 Smart pointers (legacy) [util.smartptr]
+ /**\defgroup  lib_smartptr *************** 20.8.12 Smart pointers (legacy) [util.smartptr]
    *@{*/
 
   template<class X> class auto_ptr;
@@ -1095,7 +1095,7 @@ namespace std
     };
 
     //////////////////////////////////////////////////////////////////////////
-    // 20.7.12.2.6, shared_ptr creation
+    // 20.8.12.2.6, shared_ptr creation
   #ifdef NTL__CXX_VT
     template<class T, class... Args> shared_ptr<T> make_shared(Args&&... args);
     template<class T, class A, class... Args>
@@ -1411,7 +1411,7 @@ namespace std
     /**@} lib_smartptr */
 
 
-  /// 20.7.12.6 Pointer safety [util.dynamic.safety]
+  /// 20.8.12.6 Pointer safety [util.dynamic.safety]
 #ifdef NTL__CXX_ENUM
   enum class pointer_safety { relaxed, preferred, strict };
 #else
@@ -1441,7 +1441,7 @@ namespace std
   pointer_safety get_pointer_safety();
 
 
-  /// 20.7.13 Align [ptr.align]
+  /// 20.8.13 Align [ptr.align]
 #ifndef NTL__CXX_ALIGN
   inline void * align(size_t alignment, size_t size, void* &ptr, size_t& space)
   {

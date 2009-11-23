@@ -47,13 +47,13 @@
 \defgroup  lib_binders ***************** D.8 Binders [depr.lib.binders]
 @}
 
-\defgroup  lib_memory *************** 20.7 Memory [memory]
+\defgroup  lib_memory *************** 20.8 Memory [memory]
 @{
 
-\addtogroup  lib_uniqueptr ********** 20.7.11 Class template unique_ptr (legacy) [unique.ptr]
-\addtogroup  lib_uniqueptr_rv ******* 20.7.11 Class template unique_ptr [unique.ptr]
-\addtogroup  lib_smartptr *********** 20.7.12 Smart pointers (legacy) [util.smartptr]
-\addtogroup  lib_smartptr_rv ******** 20.7.12 Smart pointers [util.smartptr]
+\addtogroup  lib_uniqueptr ********** 20.8.11 Class template unique_ptr (legacy) [unique.ptr]
+\addtogroup  lib_uniqueptr_rv ******* 20.8.11 Class template unique_ptr [unique.ptr]
+\addtogroup  lib_smartptr *********** 20.8.12 Smart pointers (legacy) [util.smartptr]
+\addtogroup  lib_smartptr_rv ******** 20.8.12 Smart pointers [util.smartptr]
 
 @}
 @} lib_utilities */

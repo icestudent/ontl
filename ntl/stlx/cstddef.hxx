@@ -98,10 +98,10 @@ namespace std {
 
   /**\addtogroup  lib_utilities ********** 20 General utilities library [utilities]
   *@{*/
-  /**\addtogroup  lib_memory ************* 20.7 Memory [memory]
+  /**\addtogroup  lib_memory ************* 20.8 Memory [memory]
   *@{*/
 
-  /// 20.7.1 Allocator argument tag [allocator.tag]
+  /// 20.8.1 Allocator argument tag [allocator.tag]
   struct allocator_arg_t {/**/};
 #ifdef _MSC_VER
   const allocator_arg_t allocator_arg;// = allocator_arg_t();

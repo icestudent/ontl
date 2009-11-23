@@ -1,6 +1,6 @@
 /**\file*********************************************************************
  *                                                                     \brief
- *  N2723 20.7 Memory [memory]
+ *  N3000 20.8 Memory [memory]
  *
  ****************************************************************************
  */
@@ -26,15 +26,19 @@
 #include "type_traits.hxx"
 #endif
 
+#ifndef NTL_SPP_ARGS_HXX
+#include "../spp/args.hxx"
+#endif
+
 namespace std
 {
 
 /**\addtogroup  lib_utilities ********** 20 General utilities library [utilities]
  *@{*/
-/**\defgroup  lib_memory *************** 20.7 Memory [memory]
+/**\defgroup  lib_memory *************** 20.8 Memory [memory]
  *@{*/
 
-///\name 20.7.2 Allocator-related traits [allocator.traits]
+///\name 20.8.3 Allocator-related traits [allocator.traits]
 /**
  *	Automatically detects whether \c T has a nested \c allocator_type that is convertible from \c Alloc.
  **/
@@ -42,130 +46,110 @@ template<class T, class Alloc> struct uses_allocator
 : public integral_constant<
     bool, is_convertible<Alloc, typename T::allocator_type>::value == true
     > {};
-/**
- *	If a specialization \c is_scoped_allocator<Alloc> is derived from \c true_type, it indicates that
- *  \c Alloc is a \c scoped allocator. A scoped allocator specifies the memory resource to be used by a container
- *  (as all allocators do) and also specifies an inner allocator resource to be used by every element of the container.
- *
- *  @note \e Requires: If a specialization \c is_scoped_allocator<Alloc> is derived from \c true_type,
- *  \c Alloc shall have a nested type \c inner_allocator_type and a member function \c inner_allocator() which is
- *  callable with no arguments and which returns an object of a type that is convertible to \c inner_allocator_type.
- **/
-template<class Alloc> struct is_scoped_allocator : false_type {};
-
-/**
- *	If a specialization \c constructible_with_allocator_suffix<T> is derived from \c true_type, it
- *  indicates that \c T can be constructed with an allocator as its last constructor argument. Ideally, all
- *  constructors of \c T (including copy and move constructors) should have a variant that accepts a final
- *  argument of \c allocator_type.
- *
- *  @note \e Requires: If a specialization \c constructible_with_allocator_suffix<T> is derived from \c true_type,
- *  \c T shall have a nested type \c allocator_type and at least one constructor for which \c allocator_type is
- *  the last parameter. If not all constructors of \c T can be called with a final \c allocator_type argument
- *  and \c T is used in a context where a container must call such a constructor, the program is ill-formed.
- **/
-template<class T> struct constructible_with_allocator_suffix : false_type {};
-
-/**
- *	If a specialization \c constructible_with_allocator_prefix<T> is derived from \c true_type,
- *  it indicates that \c T can be constructed with allocator_arg and \c T::allocator_type as its first two
- *  constructor arguments. Ideally, all constructors of \c T (including copy and move constructors) should
- *  have a variant that accepts these two initial arguments.
- *
- *  @note \e Requires: If a specialization \c constructible_with_allocator_suffix<T> is derived from \c true_type,
- *  \c T shall have a nested type \c allocator_type and at least one constructor for which \c allocator_arg_t
- *  is the first parameter and \c allocator_type is the second parameter. If not all constructors of \c T can
- *  be called with these initial arguments and \c T is used in a context where a container must call such a
- *  constructor, the program is ill-formed.
- **/
-template<class T> struct constructible_with_allocator_prefix : false_type {};
-///}
 
 
-///\name 20.7.3 Allocator propagation traits [allocator.propagation]
-/**
- *	If specialized to derive from \c true_type for a specific allocator type, indicates that a container
- *  using the specified \c Alloc should not copy or move the allocator when the container is copy-constructed,
- *  move-constructed, copy-assigned, moved-assigned, or swapped.
- *  @note \e Requires: Alloc shall be an Allocator (20.1.2).
- **/
-template<class Alloc> struct allocator_propagate_never
-: false_type {};
-
-/**
- *	If specialized to derive from \c true_type for specific allocator type, indicates that a container
- *  using the specified \c Alloc should copy or move the allocator when the container is copy constructed,
- *  move constructed, move assigned, or swapped but not when the container is copy assigned.
- *  @note \e Requires: Alloc shall be an Allocator (20.1.2).
- **/
-template<class Alloc> struct allocator_propagate_on_move_assignment
-: false_type {};
-
-/**
- *	If specialized to derive from \c true_type for a specific allocator type, indicates that a container
- *  using the specified \c Alloc should copy or move the allocator when the container is copy constructed,
- *  move constructed, move assigned, swapped or copy assigned.
- *  @note \e Requires: Alloc shall be an Allocator (20.1.2).
- **/
-template<class Alloc> struct allocator_propagate_on_copy_assignment
-: false_type {};
-
-/**
- *	If specialized to derive from \c true_type for specific allocator type, indicates that a container
- *  using the specified \c Alloc should copy or move the allocator when the container is copy constructed or
- *  move constructed, but not when the container is copy assigned, moved assigned, or swapped.
- *  @note \e Requires: Alloc shall be an Allocator (20.1.2).
- **/
-template<class Alloc> struct allocator_propagate_on_copy_construction
-: integral_constant<bool, !
-   (allocator_propagate_never<Alloc>::value ||
-    allocator_propagate_on_move_assignment<Alloc>::value ||
-    allocator_propagate_on_copy_assignment<Alloc>::value)>
-  {};
-
-///}
-
-/// 20.7.3 20.7.4 Allocator propogation map [allocator.propagation.map]
-/**
- *	The \c allocator_propagation_map provides functions to be used by containers for manipulating
- *  allocators during construction, assignment, and swap operations. The implementations of the functions
- *  above are dependent on the allocator propagation traits of the specific \c Alloc.
- *  @note \e Requires: Exactly one propagation trait shall derive from \c true_type for \c Alloc.
- **/
-template<class Alloc> struct allocator_propagation_map
-{
-  static Alloc select_for_copy_construction(const Alloc& x)
+  /**
+   *	@brief 20.8.6 Pointer traits [pointer.traits]
+   *  @details The template class pointer_traits supplies a uniform interface to certain attributes of pointer-like types.
+   **/
+  template<class Ptr>
+  struct pointer_traits
   {
-    return allocator_propagate_never<Alloc>::value ? Alloc() : x;
-  }
-#ifdef NTL__CXX_RV
-  static void move_assign(Alloc& to, Alloc&& from)
-  {
-    if ( allocator_propagate_on_move_assignment<Alloc>::value
-      || allocator_propagate_on_copy_assignment<Alloc>::value )
-      to = forward(from);
-  }
-#endif
-  static void copy_assign(Alloc& to, Alloc& from)
-  {
-    if ( allocator_propagate_on_copy_assignment<Alloc>::value )
-      to = from;
-  }
-  static void swap(Alloc& a, Alloc& b)
-  {
-    // anywhy UB
-    if ( allocator_propagate_on_move_assignment<Alloc>::value
-      || allocator_propagate_on_copy_assignment<Alloc>::value )
+    typedef Ptr pointer;
+    typedef typename Ptr::element_type element_type;
+    typedef typename Ptr::difference_type difference_type;
+
+    template<class U> struct rebind { typedef U* other; }; //typedef Ptr::template rebind<U> other; };
+
+    static pointer pointer_to(typename Ptr::element_type& r)
     {
-      if ( !(a == b ) )
-        swap(a, b);
-    }else{
-      // UB
+      return Ptr::pointer_to(r);
     }
-  }
-};
+  };
 
-/// 20.7.5 The default allocator [default.allocator]
+  template<class T>
+  struct pointer_traits<T*>
+  {
+    typedef T element_type;
+    typedef T* pointer;
+    typedef ptrdiff_t difference_type;
+
+    template<class U> struct rebind { typedef U* other; };
+
+    static pointer pointer_to(T& r)
+    {
+      return std::addressof(r);
+    }
+  };
+
+
+  /**
+   *	@brief 20.8.7 Allocator traits [allocator.traits]
+   *  @details The template class allocator_traits supplies a uniform interface to all allocator types.
+   **/
+  template <class Alloc>
+  struct allocator_traits
+  {
+    ///\name 20.8.7.1 Allocator traits member types [allocator.traits.types]
+    typedef Alloc                           allocator_type;
+    typedef typename Alloc::value_type      value_type;
+    
+    typedef typename Alloc::reference       reference;
+    typedef typename Alloc::const_reference const_reference;
+
+    typedef typename Alloc::pointer         pointer;
+    typedef typename Alloc::const_pointer   const_pointer;
+
+    typedef typename Alloc::difference_type difference_type;
+    typedef typename Alloc::size_type       size_type;
+
+    typedef typename pointer_traits<pointer>::rebind<void>::other void_pointer;
+    typedef typename pointer_traits<pointer>::rebind<const void>::other const_void_pointer;
+    
+    typedef false_type propagate_on_container_copy_assignment;
+    typedef false_type propagate_on_container_move_assignment;
+    typedef false_type propagate_on_container_swap;
+
+    template <class T> struct rebind_alloc { typedef typename Alloc::template rebind<T>::other type; };
+    template <class T> struct rebind_traits { typedef allocator_traits<rebind_alloc<T> > type; };
+    
+    ///\name 20.8.7.2 Allocator traits static member functions [allocator.traits.members]
+    static pointer allocate(Alloc& a, size_type n) { return a.allocate(n); }
+    static pointer allocate(Alloc& a, size_type n, const_void_pointer hint) { return a.allocate(n, hint); }
+
+    static void deallocate(Alloc& a, pointer p, size_type n) { a.deallocate(p, n); }
+    
+    static size_type max_size(const Alloc& a) { return a.max_size(); }
+    static Alloc select_on_container_copy_construction(const Alloc& rhs) { return rhs; }
+
+    template <class T>
+    static void destroy(Alloc& a, T* p) { a.destroy(p); }
+
+    //template <class T, class... Args>
+    //static void construct(Alloc& a, T* p, Args&&... args);
+#ifdef NTL__CXX_RV
+    #define NTL_X(n,p) forward<NTL_SPP_CAT(A,n)>(NTL_SPP_CAT(p,n))
+    #define NTL_DEFINE_CONSTRUCT(n,aux) \
+    template <class T NTL_SPP_COMMA_IF(n) NTL_SPP_ARGS(1,n,class A)> \
+    static void construct(Alloc& a, T* p NTL_SPP_COMMA_IF(n) NTL_SPP_AARGS(1,n,&& a)) { return a.constuct(p NTL_SPP_COMMA_IF(n) NTL_SPP_LOOP(1,n,NTL_X,a)); }
+#else
+    #define NTL_X
+    #define NTL_DEFINE_CONSTRUCT(n,aux) \
+    template <class T NTL_SPP_COMMA_IF(n) NTL_SPP_ARGS(1,n,class A)> \
+    static void construct(Alloc& a, T* p NTL_SPP_COMMA_IF(n) NTL_SPP_AARGS(1,n,const& a)) { return a.constuct(p NTL_SPP_COMMA_IF(n) NTL_SPP_ARGS(1,n,a)); }
+#endif
+    NTL_DEFINE_CONSTRUCT(0,)
+    NTL_DEFINE_CONSTRUCT(1,)
+    NTL_DEFINE_CONSTRUCT(2,)
+    NTL_DEFINE_CONSTRUCT(3,)
+    NTL_DEFINE_CONSTRUCT(4,)
+    NTL_DEFINE_CONSTRUCT(5,)
+#undef NTL_X
+#undef NTL_DEFINE_CONSTRUCT
+    ///\}
+  };
+
+/// 20.8.8 The default allocator [default.allocator]
 template<class T> class allocator;
 
 /// specialize for void
@@ -199,7 +183,7 @@ class allocator
     template<class U> allocator(const allocator<U> &) __ntl_nothrow {}
     ~allocator() __ntl_nothrow {}
 
-    ///\name  20.7.5.1 allocator members [allocator.members]
+    ///\name  20.8.8.1 allocator members [allocator.members]
 
 #ifndef NTL_STLEXT
     pointer address(typename add_reference<typename remove_const<typename remove_reference<reference>::type>::type>::type x) const
@@ -235,117 +219,50 @@ class allocator
 
     size_type max_size() const __ntl_nothrow { return size_t(-1) / sizeof(T); }
 
+    //    __forceinline
+    void destroy(const pointer p)
+    {
+      p->T::/*< workaround MSVC's weird `scalar deleting destructor'*/ ~T();
+    }
+
 #if defined(NTL__CXX_VT)
+
     template<class... Args>
     void construct(pointer p, Args&&... args)
     {
       __assume(p);
       ::new((void*)p) T(forward<Args>(args)...);
     }
-#elif defined(NTL__CXX_RV) //&& 0
-    template<class Pointer>
-    __forceinline
-      typename enable_if<is_same<Pointer, pointer>::value>::type construct(Pointer p)
-    {
-      __assume(p);
-      ::new((void *)p) T();
-    }
-    template<class Arg>
-    __forceinline
-    void construct(pointer p, Arg&& val)
-    {
-      __assume(p);
-      ::new((void *)p) T(std::forward<Arg>(val));
-    }
-    template<class Arg, class Arg2>
-    __forceinline
-    void construct(pointer p, Arg&& val, Arg2&& val2)
-    {
-      __assume(p);
-      ::new((void *)p) T(std::forward<Arg>(val), std::forward<Arg2>(val2));
-    }
-    template<class Arg, class Arg2, class Arg3>
-    __forceinline
-    void construct(pointer p, Arg&& val, Arg2&& val2, Arg3&& val3)
-    {
-      __assume(p);
-      ::new((void *)p) T(std::forward<Arg>(val), std::forward<Arg2>(val2), std::forward<Arg3>(val3));
-    }
-    template<class Arg, class Arg2, class Arg3, class Arg4>
-    __forceinline
-    void construct(pointer p, Arg&& val, Arg2&& val2, Arg3&& val3, Arg4&& val4)
-    {
-      __assume(p);
-      ::new((void *)p) T(std::forward<Arg>(val), std::forward<Arg2>(val2), std::forward<Arg3>(val3), std::forward<Arg4>(val4));
-    }
-    template<class Arg, class Arg2, class Arg3, class Arg4, class Arg5>
-    __forceinline
-    void construct(pointer p, Arg&& val, Arg2&& val2, Arg3&& val3, Arg4&& val4, Arg5&& val5)
-    {
-      __assume(p);
-      ::new((void *)p) T(std::forward<Arg>(val), std::forward<Arg2>(val2), std::forward<Arg3>(val3), std::forward<Arg4>(val4), std::forward<Arg5>(val5));
-    }
 #else
-    template<class Pointer>
-    __forceinline
-    typename enable_if<is_same<Pointer, pointer>::value>::type construct(Pointer p)
-    {
-      __assume(p);
-      ::new((void *)p) T();
-    }
-    template<class Arg>
-    __forceinline
-    void construct(pointer p, const Arg& val)
-    {
-      __assume(p);
-      ::new((void *)p) T(val);
-    }
-    template<class A1, class A2>
-    __forceinline
-    void construct(pointer p, const A1& a1, const A2& a2)
-    {
-      __assume(p);
-      ::new((void *)p) T(a1,a2);
-    }
-    template<class A1, class A2, class A3>
-    __forceinline
-    void construct(pointer p, const A1& a1, const A2& a2, const A3& a3)
-    {
-      __assume(p);
-      ::new((void *)p) T(a1,a2,a3);
-    }
-    template<class A1, class A2, class A3, class A4>
-    __forceinline
-      void construct(pointer p, const A1& a1, const A2& a2, const A3& a3, const A4& a4)
-    {
-      __assume(p);
-      ::new((void *)p) T(a1,a2,a3,a4);
-    }
-    template<class A1, class A2, class A3, class A4, class A5>
-    __forceinline
-      void construct(pointer p, const A1& a1, const A2& a2, const A3& a3, const A4& a4, const A5& a5)
-    {
-      __assume(p);
-      ::new((void *)p) T(a1,a2,a3,a4,a5);
-    }
+
+#ifdef NTL__CXX_RV
+    #define NTL_X(n,p) forward<NTL_SPP_CAT(A,n)>(NTL_SPP_CAT(p,n))
+    #define NTL_CONSTRUCT(n,aux) \
+    template <class U NTL_SPP_COMMA_IF(n) NTL_SPP_ARGS(1,n,class A)> \
+    void construct(U* p NTL_SPP_COMMA_IF(n) NTL_SPP_AARGS(1,n,&& a)) { __assume(p); ::new( (void*)p ) T(NTL_SPP_LOOP(1,n,NTL_X,a)); }
+#else
+    #define NTL_X
+    #define NTL_DEFINE_CONSTRUCT(n,aux) \
+    template <class U NTL_SPP_COMMA_IF(n) NTL_SPP_ARGS(1,n,class A)> \
+    void construct(U* p NTL_SPP_COMMA_IF(n) NTL_SPP_AARGS(1,n,const& a)) { __assume(p); ::new( (void*)p ) T(NTL_SPP_ARGS(1,n,a)); }
 #endif
 
-//    __forceinline
-    void destroy(const pointer p)
-    {
-      p->T::/*< workaround MSVC's weird `scalar deleting destructor'*/ ~T();
-    }
+    NTL_DEFINE_CONSTRUCT(0,)
+    NTL_DEFINE_CONSTRUCT(1,)
+    NTL_DEFINE_CONSTRUCT(2,)
+    NTL_DEFINE_CONSTRUCT(3,)
+    NTL_DEFINE_CONSTRUCT(4,)
+    NTL_DEFINE_CONSTRUCT(5,)
+#undef NTL_X
+#undef NTL_DEFINE_CONSTRUCT
+#endif // CXX VT
 
     ///\}
 
 };//class allocator
 
 
-template<class T> struct allocator_propagate_never<allocator<T> >
-: true_type {};
-
-
-///\name  20.7.5.2 allocator globals [allocator.globals]
+///\name  20.8.8.2 allocator globals [allocator.globals]
 
 template<class T, class U>
 inline bool operator==(const allocator<T>&, const allocator<U>&) __ntl_nothrow
@@ -361,7 +278,7 @@ inline bool operator!=(const allocator<T>&, const allocator<U>&) __ntl_nothrow
 
 ///\}
 
-///\ 20.7.6 Scoped allocator adaptor [allocator.adaptor]
+///\ 20.8.6 Scoped allocator adaptor [allocator.adaptor]
 template <class OuterA, class InnerA = void>
 class scoped_allocator_adaptor;
 
@@ -497,13 +414,6 @@ public:
   const inner_allocator_type& inner_allocator() const;
 };
 
-template <class OuterA, class InnerA>
-struct is_scoped_allocator<scoped_allocator_adaptor<OuterA, InnerA> >
-  : true_type { };
-
-template <class OuterA, class InnerA>
-struct allocator_propagate_never<scoped_allocator_adaptor<OuterA, InnerA> >
-  : true_type { };
 
 template<typename OuterA1, typename OuterA2, typename InnerA>
 inline bool operator==(const scoped_allocator_adaptor<OuterA1,InnerA>& a, const scoped_allocator_adaptor<OuterA2,InnerA>& b)
@@ -520,7 +430,7 @@ inline bool operator!=(const scoped_allocator_adaptor<OuterA1,InnerA>& a, const 
 
 
 
-/// 20.7.7 Raw storage iterator [storage.iterator]
+/// 20.8.7 Raw storage iterator [storage.iterator]
 template<class OutputIterator, class T>
 class raw_storage_iterator
 : public iterator<output_iterator_tag, void, void, void, void>
@@ -543,7 +453,7 @@ class raw_storage_iterator
 };
 
 
-///\name  20.7.8 Temporary buffers [temporary.buffer]
+///\name  20.8.8 Temporary buffers [temporary.buffer]
 template<class T1, class T2> struct pair;
 
 template <class T>
@@ -560,87 +470,20 @@ __forceinline
 void
   return_temporary_buffer(T* p)
 {
-  // 20.7.1.1/7  n shall equal the value passed as the first argument
+  // 20.8.1.1/7  n shall equal the value passed as the first argument
   //             to the invocation of allocate which returned p.
   // but allocator::deallocate() does not use n
   typename allocator<T>::size_type const n = 0;
   allocator<T>().deallocate(p, n);
 }
 
-/// 20.7.9 construct_element [construct.element]
-#ifdef NTL__CXX_VT
-namespace __
-{
-  template<bool prefix, bool suffix>
-  struct construct_element_policy
-  {
-    template <class Alloc, class T, class... Args>
-    static void construct_element(Alloc& alloc, T& r, Args&&... args)
-    {
-      alloc.construct(alloc.address(r), args...);
-    }
-  };
+///\name  20.8.10 Specialized algorithms [specialized.algorithms]
 
-  template<bool suffix>
-  struct construct_element_policy<true, suffix>
-  {
-    template <class Alloc, class T, class... Args>
-    static void construct_element(Alloc& alloc, T& r, Args&&... args)
-    {
-      alloc.construct(alloc.address(r), allocator_arg_t, alloc.inner_allocator(), args...);
-    }
-  };
+/// 20.8.13.1 addressof [specialized.addressof ]
+template <class T>
+inline T* addressof(T& r) __ntl_nothrow { return &r; }
 
-  template<bool prefix>
-  struct construct_element_policy<prefix, true>
-  {
-    template <class Alloc, class T, class... Args>
-    static void construct_element(Alloc& alloc, T& r, Args&&... args)
-    {
-      alloc.construct(alloc.address(r), args..., alloc.inner_allocator());
-    }
-  };
-}
-
-
-template <class Alloc, class T, class... Args>
-inline void construct_element(Alloc& alloc, T& r, Args&&... args)
-{
-  typedef typename
-    __select_or<is_scoped_allocator<Alloc>::value == false, uses_allocator<T, Alloc::inner_allocator_type>::value == false,
-      __::construct_element_policy<false, false>,
-      __::construct_element_policy<
-          constructible_with_allocator_prefix<T, Alloc::inner_allocator_type, Args...>::value,
-          constructible_with_allocator_suffix<T, Alloc::inner_allocator_type, Args...>::value> policy;
-  policy::construct_element(alloc, r, args...);
-}
-#else
-
-// either inner or scoped allocator isn't supported yet
-
-template <class Alloc, class T>
-inline void construct_element(Alloc& alloc, T& r) { alloc.contruct(r); }
-
-#ifdef NTL__CXX_RV
-
-template <class Alloc, class T, class A1>
-inline void construct_element(Alloc& alloc, T& r, A1&& a1) { alloc.contruct(r, forward<A1>(a1)); }
-template <class Alloc, class T, class A1, class A2>
-inline void construct_element(Alloc& alloc, T& r, A1&& a1, A2&& a2) { alloc.contruct(r, forward<A1>(a1), forward<A2>(a2)); }
-template <class Alloc, class T, class A1, class A2, class A3>
-inline void construct_element(Alloc& alloc, T& r, A1&& a1, A2&& a2, A3&& a3) { alloc.contruct(r, forward<A1>(a1), forward<A2>(a2), forward<A3>(a3)); }
-template <class Alloc, class T, class A1, class A2, class A3, class A4>
-inline void construct_element(Alloc& alloc, T& r, A1&& a1, A2&& a2, A3&& a3, A4&& a4) { alloc.contruct(r, forward<A1>(a1), forward<A2>(a2), forward<A3>(a3), forward<A4>(a4)); }
-template <class Alloc, class T, class A1, class A2, class A3, class A4, class A5>
-inline void construct_element(Alloc& alloc, T& r, A1&& a1, A2&& a2, A3&& a3, A4&& a4, A5&& a5) { alloc.contruct(r, forward<A1>(a1), forward<A2>(a2), forward<A3>(a3), forward<A4>(a4), forward<A5>(a5)); }
-
-
-#endif // cxx rv
-#endif
-
-///\name  20.7.10 Specialized algorithms [specialized.algorithms]
-
-/// 20.7.10.1 uninitialized_copy [uninitialized.copy]
+/// 20.8.10.1 uninitialized_copy [uninitialized.copy]
 template <class InputIterator, class ForwardIterator>
 __forceinline
 ForwardIterator uninitialized_copy(InputIterator first, InputIterator last, ForwardIterator result)
@@ -697,7 +540,7 @@ ForwardIterator uninitialized_move_n(InputIterator first, Size n,
   return result;
 }
 
-/// 20.7.10.2 uninitialized_fill [uninitialized.fill]
+/// 20.8.10.2 uninitialized_fill [uninitialized.fill]
 template <class ForwardIterator, class T>
 __forceinline
 void uninitialized_fill(ForwardIterator first, ForwardIterator last, const T& x)
@@ -712,7 +555,7 @@ void uninitialized_fill(ForwardIterator first, ForwardIterator last, const T& x)
   ///@todo separate function for scalar types ?
 }
 
-/// 20.7.10.3 uninitialized_fill_n [uninitialized.fill.n]
+/// 20.8.10.3 uninitialized_fill_n [uninitialized.fill.n]
 template <class ForwardIterator, class Size, class T>
 __forceinline
 void uninitialized_fill_n(ForwardIterator first, Size n, const T& x)

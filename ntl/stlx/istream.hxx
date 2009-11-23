@@ -174,7 +174,8 @@ class basic_istream : virtual public basic_ios<charT, traits>
         long value;
         use_facet<facet_t>(getloc()).get(iterator(*this), iterator(), *this, state, value);
 
-        if(state == ios_base::goodbit){
+        // NOTE: N3000 skips error check (value is always stored)
+        //if(!( state & (ios_base::failbit|ios_base::badbit) )){
           typedef numeric_limits<ValueT> lim;
           if(!(value < lim::__min || value > lim::__max))
             n = static_cast<ValueT>(value);
@@ -182,7 +183,7 @@ class basic_istream : virtual public basic_ios<charT, traits>
             state |= ios_base::failbit;
             value = value < lim::__min ? lim::__min : lim::__max;
           }
-        }
+        //}
       }
       __ntl_catch(...){
         state |= ios_base::badbit;
@@ -753,6 +754,7 @@ inline basic_istream<charT,traits>& getline(basic_istream<charT,traits>& is, bas
   const basic_istream<charT,traits>::sentry ok(is, true); // unformatted input
   ios_base::iostate state = ios_base::goodbit;
   basic_string<charT,traits,Allocator>::size_type ccount = 0, max = str.max_size();
+  bool delim_only = false;
   if(ok){
     __ntl_try
     {
@@ -766,7 +768,7 @@ inline basic_istream<charT,traits>& getline(basic_istream<charT,traits>& is, bas
 
       while(ccount < max){
         c = sb->sbumpc();
-        if(traits::eq_int_type(c, eof) || traits::eq_int_type(c, d))
+        if(traits::eq_int_type(c, eof) || (delim_only = traits::eq_int_type(c, d), delim_only))
           break;
         buf[bufc++] = traits::to_char_type(c);
         ++ccount;
@@ -786,7 +788,7 @@ inline basic_istream<charT,traits>& getline(basic_istream<charT,traits>& is, bas
       state |= ios_base::badbit;
     }
   }
-  if(!ccount)
+  if(!ccount && !delim_only)
     state |= ios_base::failbit;
   if(state) is.setstate(state);
   return is;
