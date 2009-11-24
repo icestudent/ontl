@@ -53,8 +53,8 @@ namespace std {
   class basic_filebuf:
     public basic_streambuf<charT, traits>
   {
-    /** 128 KB default buffer size */
-    static const streamsize default_file_buffer_size = 1024 * 128;
+    /** 16 KB default buffer size */
+    static const streamsize default_file_buffer_size = 1024 * 16;
     typedef typename traits::state_type state_type;
   public:
     typedef charT                     char_type;
@@ -233,6 +233,24 @@ namespace std {
       return c;
     }
 
+    virtual streamsize xsputn(const char_type* s, streamsize n)
+    {
+      if(n <= default_file_buffer_size)
+        return basic_streambuf::xsputn(s, n);
+      else if(!f)
+        return 0;
+      // directly put the large data
+
+      // put the pending data
+      overflow();
+      // request file space & write data
+      f.size(f.tell() + n);
+      streamsize written;
+      write(s, n, &written);
+      f.flush();
+      return written;
+    }
+
     virtual int_type overflow (int_type c = traits::eof())
     {
       const int_type eof = traits_type::eof();
@@ -365,7 +383,7 @@ namespace std {
     {
       typedef codecvt<toT,char_type,state_type> codecvt;
       static const codecvt& cvt = use_facet<codecvt>(getloc());
-      streamsize pending = to-from;
+      streamsize pending = to-from, actual = 0;
       state_type state;
       const char_type* from_next;
       toT buf[1024], *to_next;
@@ -384,6 +402,7 @@ namespace std {
         if(!NTL__SUBSYSTEM_NS::success(f.write(p, static_cast<uint32_t>(write_size))))
           break;
         const streamsize fwritten = static_cast<streamsize>(f.get_io_status_block().Information);
+        actual += fwritten / (re == codecvt_base::noconv ? sizeof(char_type) : sizeof(toT));
         assert(fwritten == write_size);
         if(fwritten != write_size)
           break;
@@ -391,7 +410,7 @@ namespace std {
         pending -= chunk_size;
         from += chunk_size;
       }while(pending > 0);
-      if(written) *written = pending;
+      if(written) *written = actual;
       return pending == 0;
     }
 
@@ -401,7 +420,7 @@ namespace std {
     {
       typedef codecvt<char_type,toT,state_type> codecvt;
       static const codecvt& cvt = use_facet<codecvt>(getloc());
-      streamsize pending = to-from;
+      streamsize pending = to-from, actual = 0;
       state_type state;
       const char_type* from_next;
       toT buf[1024], *to_next;
@@ -420,6 +439,7 @@ namespace std {
         if(!NTL__SUBSYSTEM_NS::success(f.write(p, static_cast<uint32_t>(write_size))))
           break;
         const streamsize fwritten = static_cast<streamsize>(f.get_io_status_block().Information);
+        actual += fwritten / (re == codecvt_base::noconv ? sizeof(char_type) : sizeof(toT));
         assert(fwritten == write_size);
         if(fwritten != write_size)
           break;
@@ -427,23 +447,24 @@ namespace std {
         pending -= chunk_size;
         from += chunk_size;
       }while(pending > 0);
-      if(written) *written = pending;
+      if(written) *written = actual;
       return pending == 0;
     }
     bool write_binary(const char_type* from, const char_type* to, streamsize* written)
     {
-      streamsize pending = to-from, write_size = pending*sizeof(char_type);
+      streamsize pending = to-from, write_size = pending*sizeof(char_type), actual = 0;
       do{
         assert(write_size > 0);
         if(!NTL__SUBSYSTEM_NS::success(f.write(from, static_cast<uint32_t>(write_size))))
           break;
         const streamsize fwritten = static_cast<streamsize>(f.get_io_status_block().Information);
+        actual += fwritten;
         assert(fwritten == write_size);
         if(fwritten != pending)
           break;
         pending = 0;
       }while(pending > 0);
-      if(written) *written = to-from;
+      if(written) *written = actual;
       return pending == 0;
     }
 
@@ -586,13 +607,14 @@ namespace std {
       return ok;
     }
 
-    bool write(const char_type* from, const char_type* to)
+    bool write(const char_type* from, const char_type* to, streamsize* written = 0)
     {
-      return write(from, to-from);
+      return write(from, to-from, written);
     }
 
-    bool write(const char_type* s, streamsize n)
+    bool write(const char_type* s, streamsize n, streamsize* written = 0)
     {
+      if(written) *written = 0;
       if(!n)
         return true;
 
@@ -621,7 +643,7 @@ namespace std {
 
       bool ok = false;
       if(mode & ios_base::binary) {
-        ok = write_binary(s, s+n, 0);
+        ok = write_binary(s, s+n, written);
       }else{
         // TODO: process CRLF && ^Z
         EncodingType outenc = encoding;
@@ -630,11 +652,11 @@ namespace std {
         switch(outenc)
         {
         case Encoding::Utf16:
-          ok = write_out<wchar_t>(s, s+n,0, 
+          ok = write_out<wchar_t>(s, s+n,written, 
             __::bool_type<__::facets::has_facet<codecvt<char_type,wchar_t,state_type> >::value>());
           break;
         default:
-          ok = write_out<char>(s, s+n, 0,
+          ok = write_out<char>(s, s+n, written,
             __::bool_type<__::facets::has_facet<codecvt<char_type,char,state_type> >::value>());
         }
       }
