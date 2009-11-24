@@ -246,10 +246,11 @@ void test06_inner(int iter)
 
   for (long i = 0, j = 1; i < iter; ++i, j *= 3)
   {
-    istringstream isstr(data(j));
-
-    string str((istreambuf_iterator<char>(isstr)),
-      istreambuf_iterator<char>());
+    string sdata(data(j));
+    istringstream isstr(sdata);//data(j));
+    istringstream::iostate state = isstr.rdstate();
+    istreambuf_iterator<char> from(isstr), to;
+    string str(from, to);
     bool ok = str == isstr.str();
     VERIFY( str == isstr.str() );
   }

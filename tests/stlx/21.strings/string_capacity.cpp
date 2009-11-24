@@ -258,7 +258,7 @@ template<> template<> void tut::to::test<02>()
 
 template<> template<> void tut::to::test<03>()
 {
-  tut::skip("oNTL doesn't shrinks reserved memory (see .shrink_to_fit())");
+  //tut::skip("oNTL doesn't shrinks reserved memory (see .shrink_to_fit())");
   using namespace std;
   bool test __attribute__((unused)) = true;
 
@@ -275,7 +275,7 @@ template<> template<> void tut::to::test<03>()
     str.reserve(3 * i);
 
     str.reserve(2 * i);
-    VERIFY( str.capacity() == 2 * i );
+    VERIFY( str.capacity() >= 2 * i );
 
     str.reserve();
     VERIFY( str.capacity() == i );
@@ -284,7 +284,7 @@ template<> template<> void tut::to::test<03>()
 
 template<> template<> void tut::to::test<04>()
 {
-  tut::skip("see above");
+  //tut::skip("see above");
   bool test __attribute__((unused)) = true;
 
   std::string str01 = "twelve chars";

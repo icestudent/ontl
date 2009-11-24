@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 
 // You should have received a copy of the GNU General Public License along
-// with this library; see the file COPYING3.  If not see
+// with this library; see the file COPYING3.  If not see121
 // <http://www.gnu.org/licenses/>.
 #include <ntl-tests-common.hxx>
 
@@ -22,7 +22,7 @@
 
 STLX_DEFAULT_TESTGROUP_NAME("std::string#operations");
 
-template<> template<> void tut::to::test<01>(void)
+template<> template<> void tut::to::test<01>()
 {
   bool test __attribute__((unused)) = true;
   typedef std::string::size_type csize_type;
@@ -117,7 +117,7 @@ template<> template<> void tut::to::test<01>(void)
   VERIFY( str06 == "corpus, corpus" );
 
   str06 = str02;
-  str06.append("corpus, ", 12);
+  str06.append("corpus, ", 12); // UB
   VERIFY( str06 != "corpus, corpus, " );
 
 

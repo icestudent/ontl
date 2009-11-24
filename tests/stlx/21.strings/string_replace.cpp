@@ -84,6 +84,9 @@ template<> template<> void tut::to::test<02>()
   bool test __attribute__((unused)) = true;
   const char* strlit = "../the long pier/Hanalei Bay/Kauai/Hawaii";
   std::string aux = strlit;
+  std::string what(aux.begin()+5, aux.begin()+20), instead(aux.begin()+10, aux.begin()+15), tmp = aux;
+  tmp.replace(tmp.begin()+5, tmp.begin()+20, instead);
+
   aux.replace(aux.begin()+5, aux.begin()+20,
     aux.begin()+10, aux.begin()+15);
   VERIFY(aux == "../thg piealei Bay/Kauai/Hawaii");
@@ -197,6 +200,8 @@ template<> template<> void tut::to::test<06>()
   VERIFY( str01 == "Salto Del Salto" );
 
   std::string str02("Colle di Val d'Elsa");
+  std::string what(str02,0,9), instead(str02,10,0), tmp = str02;
+  tmp.replace(0,9,instead);
   str02.replace(0, 9, str02.data() + 10, 0);
   VERIFY( str02 == "Val d'Elsa" );
 

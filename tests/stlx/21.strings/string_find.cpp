@@ -300,7 +300,7 @@ template<> template<> void tut::to::test<06>()
   pos = z.find_last_of("ab");
   VERIFY( pos == 1 );
   pos = z.find_last_of("Xa");
-  tut::ensure_equals(extmsg("string(\"ab\").find_last_of(\"Xa\")"), pos, 0);
+  tut::ensure_equals(extmsg("string(\"ab\").find_last_of(\"Xa\")"), pos, 0U);
   pos = z.find_last_of("Xb");
   VERIFY( pos == 1 );
   pos = z.find_last_of("XYZ");

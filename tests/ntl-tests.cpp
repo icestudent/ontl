@@ -11,8 +11,12 @@ int ntl::consoleapp::main()
 {
   tut::reporter writer;
   runner.get().set_callback(&writer);
-  //runner.get().run_test("std::throw_with_nested", 1);
-  //runner.get().run_tests("std::string#compare");
+  //tut::test_result tr;
+  //runner.get().run_test("std::throw_with_nested", 1, tr);
+  //writer.test_completed(tr);
+  
+  //runner.get().run_tests("std::string#constructors");
+
   runner.get().run_tests();
 
 

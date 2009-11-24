@@ -196,6 +196,7 @@ template<> template<> void tut::to::test<02>(void)
   std::string str01 ("0011");
   str01.insert(0, str01.begin()+str01.size()-2,2);
   str01.c_str();
+  assert(str01 == "110011");
   const char* title = "Everything was beautiful, and nothing hurt";
   // Increasing size: str01 is reallocated every time.
   str01 = title;
@@ -299,6 +300,8 @@ template<> template<> void tut::to::test<03>(void)
   try 
   {
     istrs01.clear();
+    //char buf[128];
+    //istrs01.getline(buf, _countof(buf), '\t');
     getline(istrs01, str10,'\t');
     VERIFY( !istrs01.fail() );
     VERIFY( !istrs01.eof() );
@@ -412,7 +415,7 @@ void test05(std::size_t size)
   bool test __attribute__((unused)) = true;
   const char filename[] = "inserters_extractors-1.txt";
   const char fillc = 'f';
-  std::ofstream ofs(filename);
+  std::ofstream ofs(filename, std::ofstream::out|std::ofstream::trunc);
   std::string str(size, fillc);
 
   // sanity checks
@@ -567,6 +570,9 @@ void check(istream& stream, const string& str, unsigned nchunks, char delim)
   while (getline(stream, chunk, delim))
   {
     index_new = str.find(delim, index);
+    bool ok1 = str.compare(index, index_new - index, chunk) == 0;
+    string tmp(str, index, index_new-index);
+    bool ok2 = tmp.compare(chunk) == 0;
     VERIFY( !str.compare(index, index_new - index, chunk) );
     index = index_new + 1;
     ++n;
@@ -585,7 +591,7 @@ template<> template<> void tut::to::test<10>()
   const string data = prepare(777, nchunks, delim);
 
   ofstream ofstrm;
-  ofstrm.open(filename);
+  ofstrm.open(filename, ofstream::out|ofstream::trunc);
   ofstrm.write(data.data(), data.size());
   ofstrm.close();
 
@@ -636,7 +642,7 @@ template<> template<> void tut::to::test<11>()
   const string data = prepare(666, nchunks);
 
   ofstream ofstrm;
-  ofstrm.open(filename);
+  ofstrm.open(filename, ofstream::out|ofstream::trunc);
   ofstrm.write(data.data(), data.size());
   ofstrm.close();
 
