@@ -160,7 +160,9 @@ std::__::exstring::exstring(const std::__::exstring& r)
     if(!len)
       len = strlen(r.msg);
     msg = new char[len+1];
-    strncpy(const_cast<char*>(msg), r.msg, len);
+    char* const dest = const_cast<char*>(msg);
+    strncpy(dest, r.msg, len);
+    dest[len] = 0;
   }else{
     msg = 0, len = 0;
   }
