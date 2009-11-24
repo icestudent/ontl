@@ -1254,10 +1254,12 @@ next_xpos:
     size_type find_first_of(const charT* s, size_type pos, size_type n) const
     {
       const charT* const beg = begin();
-      for ( size_type xpos = pos; xpos < size(); ++xpos )
-        for ( size_type i = 0; i != n; ++i )
+      for ( size_type xpos = pos; xpos < length_; ++xpos ){
+        for ( size_type i = 0; i != n; ++i ) {
           if ( traits_type::eq(*(beg + xpos), *(s + i)) )
             return xpos;
+        }
+      }
       return npos;
     }
 
@@ -1272,7 +1274,7 @@ next_xpos:
     size_type find_first_of(charT c, size_type pos = 0) const
     {
       const charT* const beg = begin();
-      for ( size_type xpos = pos; xpos < size(); ++xpos )
+      for ( size_type xpos = pos; xpos < length_; ++xpos )
         if ( traits_type::eq(*(beg + xpos), c) )
           return xpos;
       return npos;
@@ -1296,17 +1298,18 @@ next_xpos:
     /// 4 Returns: find_last_of(basic_string<charT,traits,Allocator>(s,n),pos).
     size_type find_last_of(const charT* s, size_type pos, size_type n) const
     {
-      size_type & xpos = pos;
-      if ( xpos > size() ) xpos = size();
+      if(!n || !length_)
+        return npos;
+
+      size_type xpos = min(pos, length_-1);
       const charT* const beg = begin();
-      while ( xpos )
+      do
       {
         for ( size_type i = 0; i != n; ++i ){
           if ( traits_type::eq(*(beg + xpos), *(s + i)) )
             return xpos;
         }
-        --xpos;
-      }
+      }while(xpos--);
       return npos;
     }
 
