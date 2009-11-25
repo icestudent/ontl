@@ -19,7 +19,7 @@
 
 #include "../pe/image.hxx"
 
-#if 1//def _NTL_EH_TRACE
+#ifdef _NTL_EH_TRACE
 #include <iostream>
 // may not use RAII helper as it is incompatible with __try
 #define _EH_TRACE_ENTER std::cerr<<" enter "__FUNCTION__<<std::endl;
