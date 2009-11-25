@@ -384,7 +384,12 @@ __CxxFrameHandler3(
 
 extern "C" exception_disposition __cdecl __CxxFrameHandler(exception_record* er, cxxregistration* frame, nt::context* ectx, dispatcher_context* dispatch)
 {
+#ifdef _M_IX86
+  const ehfuncinfo* /*const*/ ehfi = reinterpret_cast<const ehfuncinfo*>(get_eax());
+  return cxxframehandler(er, frame, ectx, dispatch, ehfi);
+#else
   return __CxxFrameHandler3(er,frame,ectx,dispatch);
+#endif
 }
 
 ///\todo __EH_prolog for /Os
