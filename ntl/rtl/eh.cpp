@@ -228,7 +228,7 @@ void RethrowException(exception_record* ehrec)
   cxxer->raise();
 }
 
-extern "C" generic_function_t* CxxCallCatchBlock(exception_record* ehrec)
+extern "C" generic_function_t* ntl::cxxruntime::CxxCallCatchBlock(exception_record* ehrec)
 {
   // save the current exception
   tiddata* ptd = _getptd();
@@ -305,9 +305,12 @@ extern "C" generic_function_t* CxxCallCatchBlock(exception_record* ehrec)
 ///\note    MSVC's `throw;` statement sets both pointers to nulls.
 #if defined(__ICL)// && defined(_M_IX86)
 typedef ntl::cxxruntime::throwinfo _s__ThrowInfo;
-#endif
+extern "C"
+__noreturn
+#else
 __noreturn
 extern "C"
+#endif
 void __stdcall _CxxThrowException(void * object, _s__ThrowInfo const * info)
 {
 #ifdef _M_IX86

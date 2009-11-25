@@ -20,6 +20,9 @@
 		<DefaultToolFile
 			FileName="ml64.rules"
 		/>
+		<DefaultToolFile
+			FileName="masm.rules"
+		/>
 	</ToolFiles>
 	<Configurations>
 		<Configuration
@@ -34,10 +37,13 @@
 				Name="VCPreBuildEventTool"
 			/>
 			<Tool
+				Name="MASM64"
+			/>
+			<Tool
 				Name="VCCustomBuildTool"
 			/>
 			<Tool
-				Name="MASM64"
+				Name="MASM"
 			/>
 			<Tool
 				Name="VCXMLDataGeneratorTool"
@@ -113,10 +119,13 @@
 				Name="VCPreBuildEventTool"
 			/>
 			<Tool
+				Name="MASM64"
+			/>
+			<Tool
 				Name="VCCustomBuildTool"
 			/>
 			<Tool
-				Name="MASM64"
+				Name="MASM"
 			/>
 			<Tool
 				Name="VCXMLDataGeneratorTool"
@@ -194,10 +203,13 @@
 				Name="VCPreBuildEventTool"
 			/>
 			<Tool
+				Name="MASM64"
+			/>
+			<Tool
 				Name="VCCustomBuildTool"
 			/>
 			<Tool
-				Name="MASM64"
+				Name="MASM"
 			/>
 			<Tool
 				Name="VCXMLDataGeneratorTool"
@@ -274,10 +286,13 @@
 				Name="VCPreBuildEventTool"
 			/>
 			<Tool
+				Name="MASM64"
+			/>
+			<Tool
 				Name="VCCustomBuildTool"
 			/>
 			<Tool
-				Name="MASM64"
+				Name="MASM"
 			/>
 			<Tool
 				Name="VCXMLDataGeneratorTool"
@@ -389,10 +404,17 @@
 					>
 					<FileConfiguration
 						Name="debug|Win32"
-						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="MASM"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug|x64"
 						>
 						<Tool
 							Name="MASM64"
+							PreprocessorDefinitions="_M_X64"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -401,6 +423,14 @@
 						>
 						<Tool
 							Name="MASM64"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release|x64"
+						>
+						<Tool
+							Name="MASM"
+							PreprocessorDefinitions="_M_X64"
 						/>
 					</FileConfiguration>
 				</File>

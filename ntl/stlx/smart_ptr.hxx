@@ -75,12 +75,7 @@ namespace std
   template <class T, class D>
   class unique_ptr
   {
-#if defined(_MSC_VER) && !defined(__ICL)
-    typedef typename const unique_ptr::T** unspecified_pointer_type;
-#else
-    typedef const T** unspecified_pointer_type;
-#endif
-
+    typedef const T* unique_ptr<T, default_delete<T> >::* unspecified_pointer_type;
     ///////////////////////////////////////////////////////////////////////////
   public:
 
@@ -193,7 +188,13 @@ namespace std
   private:
     mutable pointer ptr;
 #ifndef __GNUC__
+#ifdef __ICL
+#pragma warning(disable:80) // a storage class may not be specified here
+#endif
     typename conditional<is_const<deleter_type>::value, deleter_type, mutable deleter_type>::type deleter;
+#ifdef __ICL
+#pragma warning(default:80)
+#endif
 #else
     mutable deleter_type deleter;
 #endif
@@ -209,11 +210,7 @@ namespace std
   template <class T>
   class unique_ptr<T, default_delete<T> >
   {
-#if defined(_MSC_VER) && !defined(__ICL)
-    typedef typename const unique_ptr::T** unspecified_pointer_type;
-#else
-    typedef const T** unspecified_pointer_type;
-#endif
+    typedef const T* unique_ptr<T, default_delete<T> >::* unspecified_pointer_type;
 
     ///////////////////////////////////////////////////////////////////////////
   public:
@@ -281,8 +278,8 @@ namespace std
     pointer get() const __ntl_nothrow { return ptr; }
 
     // local statics produce code bloat, shoud we replace the UD with a global static?
-    deleter_type& get_deleter() __ntl_nothrow { return *(deleter_type*)0; }
-    const deleter_type& get_deleter() const __ntl_nothrow { return *(deleter_type*)0; }
+    deleter_type& get_deleter() __ntl_nothrow { return *(deleter_type*)1; }
+    const deleter_type& get_deleter() const __ntl_nothrow { return *(deleter_type*)1; }
 
     operator __::explicit_bool_type() const __ntl_nothrow { return __::explicit_bool(ptr); }
 
@@ -319,12 +316,7 @@ namespace std
   template <class T, class D>
   class unique_ptr<T[], D>
   {
-#if defined(_MSC_VER) && !defined(__ICL)
-    typedef typename const unique_ptr::T** unspecified_pointer_type;
-#else
-    typedef const T** unspecified_pointer_type;
-#endif
-
+    typedef const T* unique_ptr<T, default_delete<T> >::* unspecified_pointer_type;
     ///////////////////////////////////////////////////////////////////////////
   public:
     typedef T* pointer;
@@ -426,7 +418,13 @@ namespace std
   private:
     mutable pointer ptr;
   #ifndef __GNUC__
+  #ifdef __ICL
+  #pragma warning(disable:80) // a storage class may not be specified here
+  #endif
     typename conditional<is_const<deleter_type>::value, deleter_type, mutable deleter_type>::type deleter;
+  #ifdef __ICL
+  #pragma warning(default:80)
+  #endif
   #else
     mutable deleter_type deleter;
   #endif
@@ -443,12 +441,7 @@ namespace std
   template <class T>
   class unique_ptr<T[], default_delete<T[]> >
   {
-#if defined(_MSC_VER) && !defined(__ICL)
-    typedef typename const unique_ptr::T** unspecified_pointer_type;
-#else
-    typedef const T** unspecified_pointer_type;
-#endif
-
+    typedef const T* unique_ptr<T, default_delete<T> >::* unspecified_pointer_type;
     ///////////////////////////////////////////////////////////////////////////
   public:
 
@@ -505,17 +498,9 @@ namespace std
     T& operator[](size_t i) const __ntl_nothrow { return get()[i]; }
     pointer get() const __ntl_nothrow { return ptr; }
 
-    deleter_type& get_deleter() __ntl_nothrow
-    {
-      static deleter_type deleter;
-      return deleter;
-    }
+    deleter_type& get_deleter() __ntl_nothrow { return *(deleter_type*)1; }
 
-    const deleter_type& get_deleter() const __ntl_nothrow
-    {
-      static const deleter_type deleter;
-      return deleter;
-    }
+    const deleter_type& get_deleter() const __ntl_nothrow { return *(deleter_type*)1; }
 
     operator __::explicit_bool_type() const __ntl_nothrow { return __::explicit_bool(ptr); }
 
@@ -608,17 +593,8 @@ namespace std
     T& operator[](size_t i) const __ntl_nothrow { return get()[i]; }
     pointer get() const __ntl_nothrow { return ptr; }
 
-    deleter_type& get_deleter() __ntl_nothrow
-    {
-      static deleter_type deleter;
-      return deleter;
-    }
-
-    const deleter_type& get_deleter() const __ntl_nothrow
-    {
-      static const deleter_type deleter;
-      return deleter;
-    }
+    deleter_type& get_deleter() __ntl_nothrow { return *(deleter_type*)1; }
+    const deleter_type& get_deleter() const __ntl_nothrow { return *(deleter_type*)1; }
 
     operator __::explicit_bool_type() const __ntl_nothrow { return __::explicit_bool(ptr); }
 

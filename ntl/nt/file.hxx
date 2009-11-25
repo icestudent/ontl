@@ -828,8 +828,8 @@ public:
 
 
   // static helpers
-  __forceinline
-    static ntstatus
+  static __forceinline
+    ntstatus
       create(
         handle*             SectionHandle,
         access_mask         DesiredAccess,
@@ -843,8 +843,8 @@ public:
       return NtCreateSection(SectionHandle, DesiredAccess, ObjectAttributes, MaximumSize, SectionPageProtection, AllocationAttributes, FileHandle);
     }
 
-  __forceinline
-    static ntstatus
+  static __forceinline
+    ntstatus
       open(
         handle*             SectionHandle,
         access_mask         DesiredAccess,

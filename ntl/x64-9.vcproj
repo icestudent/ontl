@@ -1008,7 +1008,7 @@
 					>
 				</File>
 				<File
-					RelativePath=".\nt\exceptions.hxx"
+					RelativePath=".\nt\exception.hxx"
 					>
 				</File>
 				<File
@@ -1216,26 +1216,6 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-						/>
-					</FileConfiguration>
-				</File>
-				<File
-					RelativePath=".\rtl\safeseh.asm"
-					>
-					<FileConfiguration
-						Name="debug|x64"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="MASM"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="debug|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="MASM"
 						/>
 					</FileConfiguration>
 				</File>

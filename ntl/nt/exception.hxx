@@ -38,14 +38,16 @@
 #undef abnormal_termination
 
 #define exception_code              ::_exception_code()
-#define exception_info()            reinterpret_cast<struct ntl::nt::exception::pointers*>(::_exception_info())
-#define abnormal_termination        (::_abnormal_termination() != 0)
+#define exception_info()            reinterpret_cast<struct ntl::nt::exception::pointers*>(ntl::_exception_info())
+#define abnormal_termination        (ntl::_abnormal_termination() != 0)
 
 extern "C"
 {
   unsigned long __cdecl _exception_code(void);
+#ifndef __ICL
   void *        __cdecl _exception_info(void);
   int           __cdecl _abnormal_termination(void);
+#endif
 }
 
 #include "../nt/debug.hxx"
@@ -519,7 +521,7 @@ static const exception_disposition
       ExceptionCollidedUnwind     = nt::exception::CollidedUnwind;
 
 //extern "C" int __cdecl  _abnormal_termination();
-//extern "C" unsigned long __cdecl  _exception_code();
+//extern "C" ntl::nt::ntstatus __cdecl  _exception_code();
 extern "C" exception_pointers * __cdecl _exception_info();
 
 #define _exception_status() static_cast<ntstatus>(_exception_code())
@@ -629,14 +631,12 @@ namespace cxxruntime {
       uintptr_t ptr = tp + member_offset;
       if ( vbtable_offset != -1 ) // !(vbtable_offset < 0)
       {
-        ptr += *reinterpret_cast<mdiff_t*>(vdisp_offset +
-          *reinterpret_cast<mdiff_t*>(tp + vbtable_offset))
+        ptr += *reinterpret_cast<mdiff_t*>( static_cast<intptr_t>(vdisp_offset + *reinterpret_cast<mdiff_t*>(tp + vbtable_offset)) )
           + vbtable_offset;
       }
       return reinterpret_cast<T*>(ptr);
     }
   };
-
 
   /// The generic UDT to avoid ugly __asm for thiscall
   struct eobject
@@ -1095,7 +1095,7 @@ namespace cxxruntime {
     nt::exception::unwind_history_table*  HistoryTable
     );
 
-  extern "C" generic_function_t* CxxCallCatchBlock(void* ehrec);
+  extern "C" generic_function_t* CxxCallCatchBlock(exception_record* ehrec);
   extern "C" generic_function_t* _CallSettingFrame(void (*unwindfunclet)(), void* frame, int notify_param);
 
 #endif // _M_IX86
@@ -1636,6 +1636,9 @@ namespace cxxruntime {
       int                   const catchdepth,
       unsigned              const nlg_code)
     {
+      #ifdef __ICL
+      #pragma warning(disable:906)
+      #endif
       #pragma pack(push,1)
       struct jump_thunk
       {
@@ -1644,6 +1647,9 @@ namespace cxxruntime {
       };
       static_assert(sizeof(jump_thunk) == 5, "something wrong..");
       #pragma pack(pop)
+      #ifdef __ICL
+      #pragma warning(default:906)
+      #endif
 
       intptr_t gha = (uintptr_t)&cxxrecord::catchguardhandler;
       const jump_thunk* thunk = reinterpret_cast<jump_thunk*>(gha);
