@@ -20,13 +20,17 @@
 #include "../pe/image.hxx"
 
 #ifdef _NTL_EH_TRACE
-#include <iostream>
-// may not use RAII helper as it is incompatible with __try
-#define _EH_TRACE_ENTER std::cerr<<" enter "__FUNCTION__<<std::endl;
-#define _EH_TRACE_LEAVE __asm{push eax}std::cerr<<" leave "__FUNCTION__<<std::endl;__asm{pop eax}
+  #include <iostream>
+  // may not use RAII helper as it is incompatible with __try
+  #define _EH_TRACE_ENTER() std::cerr<<" enter "__FUNCTION__<<std::endl;
+  #ifdef _M_X64
+  # define _EH_TRACE_LEAVE() std::cerr<<" leave "__FUNCTION__<<std::endl;
+  #else
+  # define _EH_TRACE_LEAVE() __asm{push eax}std::cerr<<" leave "__FUNCTION__<<std::endl;__asm{pop eax}
+  #endif // x64
 #else
-#define _EH_TRACE_ENTER
-#define _EH_TRACE_LEAVE
+  #define _EH_TRACE_ENTER()
+  #define _EH_TRACE_LEAVE()
 #endif
 
 #undef exception_code
@@ -392,14 +396,14 @@ class exception
       __declspec(noinline)
       void unwindnestedframes(record * ehrec) const
       {
-        _EH_TRACE_ENTER
+        _EH_TRACE_ENTER();
         // same cast
         registration * const top = reinterpret_cast<registration*>(teb::get(&teb::ExceptionList));
         unwind(ehrec);
         ehrec->ExceptionFlags &= ~unwinding;
         top->next = reinterpret_cast<registration*>(teb::get(&teb::ExceptionList));
         teb::set(&teb::ExceptionList, reinterpret_cast<uintptr_t>(top));
-        _EH_TRACE_LEAVE
+        _EH_TRACE_LEAVE();
       }
       #pragma warning(pop)
     };
@@ -431,9 +435,9 @@ RtlRaiseException(
 
 void exception::record::raise() const
 {
-  _EH_TRACE_ENTER
+  _EH_TRACE_ENTER();
   RtlRaiseException(this);
-  _EH_TRACE_LEAVE
+  _EH_TRACE_LEAVE();
 }
 
 }//namespace nt
@@ -484,9 +488,9 @@ void inline
 void nt::exception::registration::unwind(const exception_record * er)
 const
 {
-  //_EH_TRACE_ENTER
+  //_EH_TRACE_ENTER();
   ntl::unwind(this, er);
-  //_EH_TRACE_LEAVE
+  //_EH_TRACE_LEAVE();
 }
 
 #endif // _M_IX86
@@ -1314,7 +1318,7 @@ namespace cxxruntime {
     generic_function_t * __stdcall
       callsettingframe(void (*unwindfunclet)(), int /*nlg_notify_param*/ = 0x103)
     {
-      _EH_TRACE_ENTER
+      _EH_TRACE_ENTER();
       uintptr_t const _ebp = stackbaseptr();
       __asm {
         mov   eax, unwindfunclet
@@ -1335,7 +1339,7 @@ namespace cxxruntime {
 
         pop   ebp
       }
-      _EH_TRACE_LEAVE
+      _EH_TRACE_LEAVE();
 #ifdef __ICL
 #pragma warning(disable:1011)// missing return statement
 #endif
@@ -1369,7 +1373,7 @@ namespace cxxruntime {
     void// __forceinline
       unwind(const dispatcher_context * const dispatch, const ehfuncinfo * const ehfi, ehstate_t to_state = -1) ///< defaults to empty state
     {
-      _EH_TRACE_ENTER
+      _EH_TRACE_ENTER();
 #ifdef _M_IX86
       (void)dispatch;
       _getptd()->processingThrow++;
@@ -1422,7 +1426,7 @@ namespace cxxruntime {
       current_state(ehfi, fp.FramePointers, cs);
 
 #endif // _M_X64
-      _EH_TRACE_LEAVE
+      _EH_TRACE_LEAVE();
     }
 
   };//struct cxxregistration
@@ -1484,7 +1488,7 @@ namespace cxxruntime {
     ///\warning If the destructor throws an exception during the stack unwinding, std::unexpected would be called
     void destruct_eobject(bool cannotthrow = true) const
     {
-      _EH_TRACE_ENTER
+      _EH_TRACE_ENTER();
       assert(ExceptionCode == cxxmagic && NumberParameters <= maximum_parameters);
       assert(get_throwinfo());
 #ifndef _M_X64
@@ -1512,7 +1516,7 @@ namespace cxxruntime {
         }
       }
 #endif
-      _EH_TRACE_LEAVE
+      _EH_TRACE_LEAVE();
     }
 
 #ifndef _M_X64
@@ -1705,7 +1709,7 @@ namespace cxxruntime {
       )
       const
     {
-      _EH_TRACE_ENTER
+      _EH_TRACE_ENTER();
 #ifdef _M_X64
       // build helper
       __try {
@@ -1796,7 +1800,7 @@ namespace cxxruntime {
         nt::exception::inconsistency();
       }
 #endif
-      _EH_TRACE_LEAVE
+      _EH_TRACE_LEAVE();
     }
 
     void catchit (
@@ -1813,7 +1817,7 @@ namespace cxxruntime {
       bool                                  recursive
       )
     {
-      _EH_TRACE_ENTER
+      _EH_TRACE_ENTER();
 #ifdef _M_X64
       (void)nested; // unreferenced parameter
       (void)catchdepth;
@@ -1845,7 +1849,7 @@ namespace cxxruntime {
 #else
       cxxreg->unwindnestedframes(this, ctx, cxxframe, dispatch->va(catchblock->handler), tb->trylow, funcinfo, dispatch, recursive);
 #endif
-      _EH_TRACE_LEAVE
+      _EH_TRACE_LEAVE();
     }
 
     bool is_msvc(bool flexible = false) const
@@ -1989,7 +1993,7 @@ next_try:;
       const ehstate_t               trylevel,
       const exception_registration *const nested_eframe)
     {
-      _EH_TRACE_ENTER
+      _EH_TRACE_ENTER();
 #ifdef _M_IX86
       ehstate_t cs = ereg->current_state(ehfi);
 #endif
@@ -2140,7 +2144,7 @@ next_try: ;
         nt::exception::inconsistency();
       }
 #endif
-      _EH_TRACE_LEAVE
+      _EH_TRACE_LEAVE();
     }
   };
 
@@ -2177,10 +2181,10 @@ next_try: ;
         && sizeof(ehfuncinfo) >= sizeof(ehfuncinfo1400) && ehfi->synchronous )
 #pragma warning(pop)
         //#endif//MSVC 14
-//        _EH_TRACE_LEAVE
+//        _EH_TRACE_LEAVE();
         return ExceptionContinueSearch;
     }
-    _EH_TRACE_ENTER
+    _EH_TRACE_ENTER();
     // check a call by RtlUnwind
     if ( er->ExceptionFlags & nt::exception::unwind )
     {
@@ -2188,7 +2192,7 @@ next_try: ;
       {
         eframe->unwind(dispatch, ehfi);
       }
-      _EH_TRACE_LEAVE
+      _EH_TRACE_LEAVE();
       // async exceptions are to be unwinded by __except_handler3
       return ExceptionContinueSearch;
     }
@@ -2204,7 +2208,7 @@ next_try: ;
         && cxxer->NumberParameters >= CxxNumberOfParameters /**\see _CxxThrowException args*/
         && cxxer->get_throwinfo()->forwardcompathandler )
       {
-//        _EH_TRACE_LEAVE
+//        _EH_TRACE_LEAVE();
         return cxxer->get_throwinfo()->forwardcompathandler
           (er, eframe, ectx, dispatch, ehfi, trylevel, nested_eframe, destruct);
       }
@@ -2214,7 +2218,7 @@ next_try: ;
         cxxer->find_handler(eframe, ectx, dispatch, ehfi, destruct, trylevel, nested_eframe);
       }
     }
-    _EH_TRACE_LEAVE
+    _EH_TRACE_LEAVE();
     return ExceptionContinueSearch;
   }
 
