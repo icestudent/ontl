@@ -8,12 +8,6 @@
 	VCNestedProjectFileName="ntl-tests9.vcproj">
 	<Configurations>
 		<Configuration
-			Name="debug|x64">
-			<Tool
-				Name="CppCmplrTool"
-				Cpp0xSupport="true"/>
-		</Configuration>
-		<Configuration
 			Name="release|x64">
 			<Tool
 				Name="CppCmplrTool"

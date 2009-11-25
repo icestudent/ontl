@@ -303,7 +303,7 @@ extern "C" generic_function_t* CxxCallCatchBlock(exception_record* ehrec)
 ///         An object is passed and the type of that object determines which
 ///         handlers can catch it.
 ///\note    MSVC's `throw;` statement sets both pointers to nulls.
-#ifdef __ICL
+#if defined(__ICL)// && defined(_M_IX86)
 typedef ntl::cxxruntime::throwinfo _s__ThrowInfo;
 #endif
 __noreturn

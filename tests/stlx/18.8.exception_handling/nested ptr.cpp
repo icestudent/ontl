@@ -41,7 +41,7 @@ template<> template<> void tut::to::test<01>()
 template<> template<> void tut::to::test<02>() 
 {
   bool test __attribute__((unused)) = true;
-#ifdef __ICL
+#if defined(__ICL) && defined(_M_IX86)
   tut::skip("isn't works with icc");
 #endif
 
