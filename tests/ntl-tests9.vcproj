@@ -483,6 +483,42 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="21.strings"
+				>
+				<File
+					RelativePath=".\stlx\21.strings\string_access.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\stlx\21.strings\string_capacity.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\stlx\21.strings\string_compare.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\stlx\21.strings\string_constructors.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\stlx\21.strings\string_find.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\stlx\21.strings\string_insert.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\stlx\21.strings\string_operations.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\stlx\21.strings\string_replace.cpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 	</Files>
 	<Globals>

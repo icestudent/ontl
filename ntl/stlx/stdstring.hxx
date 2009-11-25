@@ -25,6 +25,14 @@
 # include "ext/numeric_conversions.hxx"
 #endif
 
+#ifndef NTL__STLX_STDEXCEPT_FWD
+# include "stdexcept_fwd.hxx"
+#endif
+
+#ifndef NTL__STDLIB
+# include "../stdlib.hxx"
+#endif
+
 #ifndef EOF // should be moved to "stdio.hxx" ?
 # define EOF -1
 #endif
@@ -695,7 +703,7 @@ struct char_traits<wchar_t>
     {
       if(this != &rstr){
         clear();
-        swap(forward<basic_string>(rstr));
+        swap(rstr);
       }
       return *this;
     }

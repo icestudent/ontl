@@ -31,4 +31,7 @@ Global
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		AMDCaProjectFile = F:\VX Studio\Visual Studio\VSLibraries\common\ontl\branches\x64\tests\CodeAnalyst\ntl-tests.caw
+	EndGlobalSection
 EndGlobal

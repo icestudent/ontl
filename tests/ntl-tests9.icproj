@@ -8,6 +8,13 @@
 	VCNestedProjectFileName="ntl-tests9.vcproj">
 	<Configurations>
 		<Configuration
+			Name="debug|Win32">
+			<Tool
+				Name="CppCmplrTool"
+				Cpp0xSupport="true"
+				RecognizeRestrictKeyword="true"/>
+		</Configuration>
+		<Configuration
 			Name="debug|x64">
 			<Tool
 				Name="CppCmplrTool"

@@ -574,6 +574,10 @@
 					Name="runtime"
 					>
 					<File
+						RelativePath=".\stlx\atomic.hxx"
+						>
+					</File>
+					<File
 						RelativePath=".\stlx\chrono.hxx"
 						>
 					</File>
@@ -583,10 +587,6 @@
 					</File>
 					<File
 						RelativePath=".\stlx\condition_variable.hxx"
-						>
-					</File>
-					<File
-						RelativePath=".\stlx\cstdatomic.hxx"
 						>
 					</File>
 					<File
