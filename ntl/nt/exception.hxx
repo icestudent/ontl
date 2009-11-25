@@ -1753,9 +1753,9 @@ namespace cxxruntime {
       }
 #else // _M_X64
       (void)dispatch;
-      //if ( !catchblock->typeinfo ) return;
-      //if ( !catchblock->eobject_bpoffset ) return;
-      assert(catchblock->typeinfo && catchblock->eobject_bpoffset);
+      //assert(catchblock->typeinfo && catchblock->eobject_bpoffset);
+      if ( !catchblock->typeinfo ) return;
+      if ( !catchblock->eobject_bpoffset ) return;
       void** catchstackframe = reinterpret_cast<void**>(cxxreg->stackbaseptr()
         + catchblock->eobject_bpoffset);
       __try
