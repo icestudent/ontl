@@ -79,6 +79,9 @@ template<> template<> void tut::to::test<04>()
 {
   bool test __attribute__((unused)) = true;
   using namespace std;
+#ifdef __ICL
+  tut::skip("isn't works with icc");
+#endif
 
   // Weave the exceptions in an attempt to confuse the machinery.
   try {

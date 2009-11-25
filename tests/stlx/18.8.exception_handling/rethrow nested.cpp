@@ -26,6 +26,9 @@ STLX_DEFAULT_TESTGROUP_NAME("std::nested_exception#rethrow_nested");
 template<> template<> void tut::to::test<01>() 
 {
   bool test __attribute__((unused)) = false;
+#ifdef __ICL
+  tut::skip("isn't works with icc");
+#endif
 
   try
   {

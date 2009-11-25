@@ -133,6 +133,9 @@ template<> template<> void tut::to::test<05>()
   bool test __attribute__((unused)) = true;
   using namespace std;
 
+#ifdef __ICL
+  tut::skip("isn't works with icc");
+#endif
   may_destruct = false;
 
   try {
@@ -160,6 +163,9 @@ template<> template<> void tut::to::test<06>()
   bool test __attribute__((unused)) = true;
   using namespace std;
 
+#ifdef __ICL
+  tut::skip("isn't works with icc");
+#endif
   may_destruct = false;
 
   try {

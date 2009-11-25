@@ -35,6 +35,9 @@ namespace
 template<> template<> void tut::to::test<01>() 
 {
   bool test __attribute__((unused)) = false;
+#ifdef __ICL
+  tut::skip("isn't works with icc");
+#endif
 
   try
   {
@@ -77,6 +80,9 @@ template<> template<> void tut::to::test<02>()
 template<> template<> void tut::to::test<03>() 
 {
   bool test __attribute__((unused)) = false;
+#ifdef __ICL
+  tut::skip("isn't works with icc");
+#endif
 
   try
   {
