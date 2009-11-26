@@ -8,7 +8,7 @@
 tut::test_runner_singleton runner;
 
 // 1 - single test; 2 - single group test; else - all tests
-#define RUN_TESTS_METHOD 2
+#define RUN_TESTS_METHOD 0
 
 int ntl::consoleapp::main()
 {

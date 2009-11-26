@@ -90,10 +90,36 @@ template<> template<> void tut::to::test<04>()
     }
     exception_ptr ep3 = current_exception();
 
-    // Not guaranteed by standard, and not true for oNTL.
+    // Not guaranteed by standard
     VERIFY( ep1 == ep3 );
 
     // oNTL specific
     VERIFY( *ep1 == *ep3 );
+  }
+}
+
+template<> template<> void tut::to::test<05>()
+{
+  static bool copyctor_can_throw;
+  copyctor_can_throw = false;
+
+  struct bad_copy{
+    bad_copy(){}
+    bad_copy(const bad_copy&)
+    {
+      if(copyctor_can_throw)
+        throw 0;
+    }
+  };
+  try {
+    throw bad_copy();
+  }
+  catch(...){
+    std::exception_ptr ep1 = std::current_exception();
+    quick_ensure(ep1->target_type() == typeid(bad_copy));
+
+    copyctor_can_throw = true;
+    std::exception_ptr ep2 = std::current_exception();
+    quick_ensure(ep2->target_type() == typeid(std::bad_exception));
   }
 }

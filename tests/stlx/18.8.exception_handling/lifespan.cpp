@@ -38,7 +38,11 @@ namespace
 
   public:
     destructing() : copied(false) { }
-    destructing(const destructing &o) : copied(false) { o.copied = true; }
+    destructing(const destructing &o)
+      :copied(false)
+    {
+      o.copied = true;
+    }
     ~destructing()
     {
       ntl::nt::dbg::info.printf("tut::ensure(%d)\n", copied || may_destruct);
@@ -170,9 +174,12 @@ template<> template<> void tut::to::test<06>()
   may_destruct = false;
 }
 
+
+
+//////////////////////////////////////////////////////////////////////////
 std::exception_ptr gep;
 
-template<> template<> void tut::to::test<99>()
+template<> template<> void tut::to::test<50>() // must be last test at this file
 {
   bool test __attribute__((unused)) = true;
   using namespace std;
@@ -184,4 +191,6 @@ template<> template<> void tut::to::test<99>()
   } catch(...) {
     gep = current_exception();
   }
+
+  may_destruct = true;
 }
