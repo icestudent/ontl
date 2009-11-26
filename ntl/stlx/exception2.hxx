@@ -43,19 +43,22 @@ namespace ntl
       noncopyable
     {
       exception_record ehrec;
+      const eobject* original;
 
       exception_ptr()
       {
+        original = nullptr;
         std::memset(&ehrec, 0, sizeof(exception_record));
       }
       explicit exception_ptr(const exception_record& er)
       {
+        original = nullptr;
         std::memset(&ehrec, 0, sizeof(exception_record));
         ehrec.ExceptionCode = er.ExceptionCode;
         ehrec.ExceptionFlags = er.ExceptionFlags;
         ehrec.NumberParameters = er.NumberParameters;
         std::memcpy(ehrec.ExceptionInformation, er.ExceptionInformation, er.NumberParameters*sizeof(uintptr_t));
-
+#if 1 // copy exception object
         const cxxrecord& cxx = static_cast<const cxxrecord&>(er);
         if(cxx.is_msvc()){
           ehrec.ExceptionInformation[1] = 0; // reset throwobject
@@ -66,10 +69,12 @@ namespace ntl
             const catchabletype& type = *cxx.thrown_va<catchabletype*>(types->type[0]);
             byte* obj = new byte[type.object_size]; // malloc
             ehrec.ExceptionInformation[1] = copyThrownObject(cxx, type, obj);
+            original = cxx.get_object();
           }else{
             nt::exception::inconsistency();
           }
         }
+#endif
       }
 
       __noreturn
@@ -106,7 +111,7 @@ namespace ntl
       }
 
       /** Returns type info of the thrown object if exists; otherwise returns <tt>typeid(void)</tt> */
-      const std::type_info& target_type(uint32_t idx = 0) const __ntl_nothrow
+      const std::type_info& target_type(size_t idx = 0) const __ntl_nothrow
       {
         const catchabletypearray* types = get_target();
         if(!types || idx >= types->size)
@@ -153,7 +158,7 @@ namespace ntl
         if(cxx1.is_msvc() != cxx2.is_msvc()) return false;
         if(!cxx1.is_msvc())
           return std::memcmp(&e1.ehrec,&e2.ehrec,sizeof(exception_record)) == 0;
-        return cxx1.get_throwinfo() == cxx2.get_throwinfo();
+        return cxx1.get_throwinfo() == cxx2.get_throwinfo() && e1.original == e2.original;
       }
       ///\}
 
@@ -220,6 +225,7 @@ namespace ntl
       }
       static void delete_exception(exception_ptr* ptr)
       {
+#if 1
         cxxrecord& cxx = static_cast<cxxrecord&>(ptr->ehrec);
         if(cxx.is_msvc()){
           const throwinfo* info = cxx.get_throwinfo();
@@ -229,6 +235,8 @@ namespace ntl
           }
           delete[] reinterpret_cast<byte*>(cxx.get_object());
         }
+#endif
+        delete ptr;
       }
     };
   }
