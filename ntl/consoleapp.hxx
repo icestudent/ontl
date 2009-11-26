@@ -37,7 +37,7 @@ class consoleapp : public win::application<win::tchar_t>
 
 };
 
-extern"C" void _cdecl __console_abort();
+extern"C" void __cdecl __console_abort();
 
 #ifdef _MSC_VER
   // this used to prevent linker error if CRT initialization isn't needed
@@ -48,7 +48,7 @@ extern"C" void _cdecl __console_abort();
   # pragma comment(linker, "/alternatename:___init_crt=___init_crt_stub")
   # pragma comment(linker, "/alternatename:_abort=___console_abort")
   #endif
-  extern "C" inline void _cdecl __init_crt_stub(){}
+  extern "C" inline void __cdecl __init_crt_stub(){}
 #endif
 
 #pragma warning(push)
@@ -77,7 +77,7 @@ namespace win {
 NTL__EXTERNAPI __noreturn void __stdcall ExitProcess(ntl::nt::ntstatus);
 }
 
-extern"C" void _cdecl __console_abort()
+extern"C" void __cdecl __console_abort()
 {
   win::ExitProcess(ntl::nt::status::unsuccessful);
 }

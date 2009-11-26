@@ -104,7 +104,7 @@ namespace ntl {
         );
 
     NTL__EXTERNAPI
-    void _fastcall
+    void __fastcall
       IofCompleteRequest(
         irp* Irp,
         int8_t PriorityBoost

@@ -111,13 +111,13 @@ namespace
   # pragma comment(linker, "/alternatename:___init_iostream_objects=___init_iostream_objects_stub")
   #endif
 #endif
-extern "C" void _cdecl __init_iostream_objects_stub(){}
+extern "C" void __cdecl __init_iostream_objects_stub(){}
 
 
 namespace ntl
 {
 
-  extern "C" void _cdecl __init_crt(bool init)
+  extern "C" void __cdecl __init_crt(bool init)
   {
     if(init){
       // init exception support on current thread
@@ -143,12 +143,12 @@ namespace ntl
 /************************************************************************/
 /* `exit` and `quick_exit`                                              */
 /************************************************************************/
-extern "C" int _cdecl atexit(vfv_t func)
+extern "C" int __cdecl atexit(vfv_t func)
 {
   return onexit(func) ? 0 : -1;
 }
 
-extern "C" int _cdecl at_quick_exit(vfv_t* f)
+extern "C" int __cdecl at_quick_exit(vfv_t* f)
 {
   const uint32_t idx = ntl::atomic::exchange_add(quick_exit_count, 1);
   if(f && idx < _countof(quick_exit_list)){
@@ -187,7 +187,7 @@ void NTL__CRTCALL _Exit(int code)
 /* `abort`                                                              */
 /************************************************************************/
 #ifndef NTL__SUBSYSTEM_KM
-extern "C" void _cdecl abort()
+extern "C" void __cdecl abort()
 {
   ntl::nt::user_thread::exit_process(ntl::nt::status::unsuccessful);
 }
@@ -238,7 +238,7 @@ namespace std
 # include "../nt/debug.hxx" // for abort implementation
 # pragma warning(disable:4702) // unreachable code
 
-extern "C" int _cdecl _purecall(void)
+extern "C" int __cdecl _purecall(void)
 {
   _assert_msg("pure virtual function called!");
   debug_abort();

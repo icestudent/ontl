@@ -28,7 +28,7 @@ namespace ntl
 #else
 # pragma comment(linker, "/alternatename:___init_crt=___init_crt_stub")
 #endif
-  extern "C" inline void _cdecl __init_crt_stub(){}
+  extern "C" inline void __cdecl __init_crt_stub(){}
 #endif
 
 #pragma warning(push)

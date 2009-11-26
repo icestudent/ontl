@@ -287,7 +287,7 @@ namespace ntl {
 # pragma comment(linker, "/alternatename:_abort=_debug_abort")
 #endif
 
-extern "C" inline void _cdecl debug_abort()
+extern "C" inline void __cdecl debug_abort()
 {
   ntl::intrinsic::debugbreak();
 }

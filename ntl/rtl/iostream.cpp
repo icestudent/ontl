@@ -11,7 +11,7 @@
 #include "../atomic.hxx"
 
 
-extern "C" void _cdecl __init_iostream_objects(bool init);
+extern "C" void __cdecl __init_iostream_objects(bool init);
 
 #ifndef NTL__SUBSYSTEM_KM
 
@@ -103,7 +103,7 @@ static void destroy_iostream_objects()
 
 static int32_t _iostreams_init_count = 0;
 
-void _cdecl __init_iostream_objects(bool init)
+void __cdecl __init_iostream_objects(bool init)
 {
   if(init){
     if(ntl::atomic::exchange_add(_iostreams_init_count, 1) == 0)
@@ -115,7 +115,7 @@ void _cdecl __init_iostream_objects(bool init)
 }
 #else // km
 
-void _cdecl __init_iostream_objects(bool)
+void __cdecl __init_iostream_objects(bool)
 {
 }
 

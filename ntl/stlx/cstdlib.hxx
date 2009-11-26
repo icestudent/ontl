@@ -83,7 +83,7 @@ NTL__CRTCALL
 // C library extension
 inline
 NTL__CRTCALL
-char* _cdecl
+char* __cdecl
   _itoa(int value, char* strbuf, int radix)
 {
   return ntl::numeric::itoa(value, strbuf, ntl::numeric::max_number_size, radix);
@@ -91,7 +91,7 @@ char* _cdecl
 
 inline
 NTL__CRTCALL
-wchar_t* _cdecl
+wchar_t* __cdecl
   _itow(int value, wchar_t* strbuf, int radix)
 {
   return ntl::numeric::itow(value, strbuf, ntl::numeric::max_number_size, radix);
@@ -155,10 +155,10 @@ NTL__CRTCALL
 ///\name  7.20.4 Communication with the environment
 
 /// 7.20.4.1 The abort function + 18.3/3
-void _cdecl abort();
+void __cdecl abort();
 
 /// 7.20.4.2 The atexit function
-int _cdecl atexit(vfv_t* func);
+int __cdecl atexit(vfv_t* func);
 
 #define EXIT_SUCCESS  0
 #define EXIT_FAILURE  1
@@ -166,7 +166,7 @@ int _cdecl atexit(vfv_t* func);
 /// 7.20.4.3 The exit function
 void NTL__CRTCALL exit(int status);
 
-int _cdecl at_quick_exit(vfv_t* f);
+int __cdecl at_quick_exit(vfv_t* f);
 
 void NTL__CRTCALL quick_exit(int status);
 
@@ -311,9 +311,9 @@ namespace ntl
    }
    \endcode
    **/
-  extern "C" void _cdecl __init_crt(bool init);
+  extern "C" void __cdecl __init_crt(bool init);
 
-  extern "C" void _cdecl __init_iostream_objects(bool init);
+  extern "C" void __cdecl __init_iostream_objects(bool init);
 
   /**
    *	@brief C++ static initialization helper

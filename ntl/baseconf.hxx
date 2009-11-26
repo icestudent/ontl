@@ -198,12 +198,9 @@
 #endif // __GNUC__
 
 #ifdef __GNUC__
- #define _cdecl    __attribute__((cdecl))
- #define _stdcall  __attribute__((stdcall))
- #define _fastcall __attribute__((fastcall))
- #define __cdecl    _cdecl
- #define __stdcall  _stdcall
- #define __fastcall _fastcall
+ #define __cdecl    __attribute__((cdecl))
+ #define __stdcall  __attribute__((stdcall))
+ #define __fastcall __attribute__((fastcall))
 #endif
 
 #ifndef NTL__CRTCALL

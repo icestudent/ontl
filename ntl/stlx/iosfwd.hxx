@@ -156,6 +156,6 @@ typedef fpos<mbstate_t/*char_traits<wchar_t>::state_type*/>  wstreampos;
 namespace ntl
 {
   // duplicate from cstdlib
-  extern "C" void _cdecl __init_iostream_objects(bool init);
+  extern "C" void __cdecl __init_iostream_objects(bool init);
 }
 #endif//#ifndef NTL__STLX_IOSFWD
