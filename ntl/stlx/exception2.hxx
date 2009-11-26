@@ -54,27 +54,7 @@ namespace ntl
       {
         original = nullptr;
         std::memset(&ehrec, 0, sizeof(exception_record));
-        ehrec.ExceptionCode = er.ExceptionCode;
-        ehrec.ExceptionFlags = er.ExceptionFlags;
-        ehrec.NumberParameters = er.NumberParameters;
-        std::memcpy(ehrec.ExceptionInformation, er.ExceptionInformation, er.NumberParameters*sizeof(uintptr_t));
-#if 1 // copy exception object
-        const cxxrecord& cxx = static_cast<const cxxrecord&>(er);
-        if(cxx.is_msvc()){
-          ehrec.ExceptionInformation[1] = 0; // reset throwobject
-          const throwinfo* info = cxx.get_throwinfo();
-          if(cxx.get_object() && info && info->catchabletypearray){
-            const catchabletypearray* types = cxx.thrown_va<catchabletypearray*>(info->catchabletypearray);
-            assert(types->size > 0);
-            const catchabletype& type = *cxx.thrown_va<catchabletype*>(types->type[0]);
-            byte* obj = new byte[type.object_size]; // malloc
-            ehrec.ExceptionInformation[1] = copyThrownObject(cxx, type, obj);
-            original = cxx.get_object();
-          }else{
-            nt::exception::inconsistency();
-          }
-        }
-#endif
+        copy_from(er);
       }
 
       __noreturn
@@ -163,7 +143,63 @@ namespace ntl
       ///\}
 
     protected:
-      uintptr_t copyThrownObject(const cxxrecord& cxx, const catchabletype& type, void* obj)
+      void copy_from(const exception_record& er)
+      {
+        ehrec.ExceptionCode = er.ExceptionCode;
+        ehrec.ExceptionFlags = er.ExceptionFlags;
+        ehrec.NumberParameters = er.NumberParameters;
+        std::memcpy(ehrec.ExceptionInformation, er.ExceptionInformation, er.NumberParameters*sizeof(uintptr_t));
+        // copy exception object
+        const cxxrecord& cxx = static_cast<const cxxrecord&>(er);
+        if(cxx.is_msvc()){
+          ehrec.ExceptionInformation[1] = 0; // reset throwobject
+          const throwinfo* info = cxx.get_throwinfo();
+          if(cxx.get_object() && info && info->catchabletypearray){
+            const catchabletypearray* types = cxx.thrown_va<catchabletypearray*>(info->catchabletypearray);
+            assert(types->size > 0);
+            const catchabletype& type = *cxx.thrown_va<catchabletype*>(types->type[0]);
+            byte* obj = new byte[type.object_size]; // malloc
+            try {
+              ehrec.ExceptionInformation[1] = copyThrownObject(cxx, type, obj, true);
+              original = cxx.get_object();
+            }
+            catch(...){
+              /* If the attempt to copy the current exception object throws an exception, 
+               the function returns an exception_ptr object that refers to the thrown exception or, 
+               if this is not possible, to an instance of bad_exception. */
+              copy_from_bad_exception();
+            }
+          }else{
+            nt::exception::inconsistency();
+          }
+        }
+      }
+
+      void copy_from_bad_exception()
+      {
+        try {
+          throw std::bad_exception();
+        }catch(...){
+          tiddata* ptd = _getptd_noinit();
+          assert(ptd && ptd->curexception.ExceptionRecord && ptd->curexception.ExceptionRecord->NumberParameters <= exception_record::maximum_parameters);
+          if(ptd 
+            && ptd->curexception.ExceptionRecord && ptd->curexception.ExceptionRecord->NumberParameters <= exception_record::maximum_parameters
+            && ptd->processingThrow == 0 && ptd->nestedExcount > 0
+            && ptd->curexception.ExceptionRecord->ExceptionCode != nt::status::com_exception
+            && ptd->curexception.ExceptionRecord->ExceptionCode != nt::status::complus_exception)
+          {
+            copy_from(*ptd->curexception.ExceptionRecord);
+          }
+        }
+      }
+
+      static exception_filter ehfilter(exception_pointers* eh, bool can_throw)
+      {
+        const cxxrecord* cxx = static_cast<const cxxrecord*>(eh->ExceptionRecord);
+        return can_throw && cxx && cxx->is_msvc() ? exception_continue_search : exception_execute_handler;
+      }
+
+      uintptr_t copyThrownObject(const cxxrecord& cxx, const catchabletype& type, void* obj, bool can_throw = false)
       {
         __try{
           if(type.memmoveable || !type.copyctor){
@@ -171,7 +207,7 @@ namespace ntl
           }else{
             eobject *objthis = reinterpret_cast<eobject*>(obj), 
               *copyarg = cxx.adjust_pointer(cxx.get_object(), &type);
-#ifdef _M_X64
+    #ifdef _M_X64
             void* copyctor = cxx.thrown_va(type.copyctor);
             if(type.hasvirtbase){
               // virtual type
@@ -180,15 +216,15 @@ namespace ntl
               // nonvirtual
               (eobject::ctor_ptr(copyctor))(objthis, copyarg);
             }
-#else
+    #else
             if(type.hasvirtbase)
               (objthis->*type.copyctor2)(*copyarg, 1);
             else
               (objthis->*type.copyctor)(*copyarg);
-#endif
+    #endif
           }
         }
-        __except(exception_execute_handler){
+        __except(ehfilter(_exception_info(), can_throw)){
           // copy-ctor raises an exception or something wrong
           nt::exception::inconsistency();
         }
@@ -225,7 +261,6 @@ namespace ntl
       }
       static void delete_exception(exception_ptr* ptr)
       {
-#if 1
         cxxrecord& cxx = static_cast<cxxrecord&>(ptr->ehrec);
         if(cxx.is_msvc()){
           const throwinfo* info = cxx.get_throwinfo();
@@ -235,7 +270,6 @@ namespace ntl
           }
           delete[] reinterpret_cast<byte*>(cxx.get_object());
         }
-#endif
         delete ptr;
       }
     };
