@@ -38,7 +38,7 @@ namespace ntl {
 #pragma warning(push)
 #pragma warning(disable:4100)
 
-#if defined(_DEBUG) || defined(DBG)
+#ifdef NTL__DEBUG
 #	define KdBreakPointWithStatus() DbgBreakPointWithStatus(X)
 #else
 #	define KdBreakPointWithStatus()

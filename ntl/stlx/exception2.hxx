@@ -272,6 +272,11 @@ namespace std
    **/
   typedef std::shared_ptr<ntl::cxxruntime::exception_ptr> exception_ptr;
 
+  inline bool operator==(const exception_ptr& a, const exception_ptr& b) { return *a == *b; }
+  inline bool operator!=(const exception_ptr& a, const exception_ptr& b) { return *a != *b; }
+
+
+
   inline exception_ptr current_exception();
 
   inline void rethrow_exception(exception_ptr e);

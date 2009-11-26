@@ -8,7 +8,7 @@
 tut::test_runner_singleton runner;
 
 // 1 - single test; 2 - single group test; else - all tests
-#define RUN_TESTS_METHOD 0
+#define RUN_TESTS_METHOD 2
 
 int ntl::consoleapp::main()
 {
@@ -19,8 +19,11 @@ int ntl::consoleapp::main()
   tut::test_result tr;
 
   runner.get().run_test ("std::exception_ptr", 4, tr);
+
 #elif RUN_TESTS_METHOD == 2
+
   runner.get().run_tests("std::exception_ptr");
+
 #else
   runner.get().run_tests();
 #endif

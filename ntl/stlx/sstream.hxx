@@ -122,7 +122,7 @@ namespace std {
         str_.reserve(s.size() + initial_output_size);
       }
       str_.assign(s);
-      #ifdef _DEBUG
+      #ifdef NTL__DEBUG
       str_.c_str(); // pretty view
       #endif
       set_ptrs();

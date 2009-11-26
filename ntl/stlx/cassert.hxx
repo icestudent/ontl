@@ -12,9 +12,6 @@
 
 //namespace std {
 
-#ifdef _DEBUG
-#define NTL__DEBUG
-#endif
 
 namespace ntl
 {
@@ -54,7 +51,7 @@ inline void __ntl_assert(const char* expr, const char* file, int line)
 #undef assert
 
 /// \c assert macros
-#ifdef NDEBUG
+#ifndef NTL__DEBUG
   #define assert(expr) __noop
   #define _assert_msg(msg) __noop
   #define _assert_string(msg) __noop

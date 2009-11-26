@@ -125,7 +125,7 @@ namespace std
         struct const_iterator_impl:
           std::iterator<std::bidirectional_iterator_tag, value_type, difference_type, const_pointer, const_reference>
         {
-#ifdef _DEBUG
+#ifdef NTL__DEBUG
           const_iterator_impl()
             :p(), tree_()
           {}

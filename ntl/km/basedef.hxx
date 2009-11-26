@@ -146,7 +146,7 @@ void KfLowerIrql(kirql_t NewIrql)
 
 #endif
 
-#ifdef _DEBUG
+#ifdef NTL__DEBUG
 NTL__EXTERNAPI
 void __stdcall
 DbgBreakPointWithStatus(ntstatus Status);
@@ -206,7 +206,7 @@ public:
 
   void raise(const level NewIrql)
   {
-#ifdef _DEBUG
+#ifdef NTL__DEBUG
     if(KeGetCurrentIrql() > static_cast<kirql_t>(NewIrql))
       // lower irql is impossible
       // IRQL_NOT_GREATER_OR_EQUAL
@@ -216,7 +216,7 @@ public:
   }
   void raisetodpc()
   {
-#ifdef _DEBUG
+#ifdef NTL__DEBUG
     if(KeGetCurrentIrql() > static_cast<kirql_t>(dispatch_level))
       // lower irql is impossible
       // IRQL_NOT_GREATER_OR_EQUAL
@@ -226,7 +226,7 @@ public:
   }
   void raisetosynch()
   {
-#ifdef _DEBUG
+#ifdef NTL__DEBUG
     if(KeGetCurrentIrql() > static_cast<kirql_t>(synch_level))
       // lower irql is impossible
       // IRQL_NOT_GREATER_OR_EQUAL

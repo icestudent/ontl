@@ -59,7 +59,7 @@ namespace ntl {
 #pragma warning(push)
 #pragma warning(disable:4100)
 
-#if defined(_DEBUG) || defined(DBG)
+#ifdef NTL__DEBUG
 #	define KdBreakPoint() intrinsic::debugbreak()
 # ifndef KdPrint
 #	  define KdPrint(X) DbgPrint X
@@ -270,7 +270,7 @@ namespace ntl {
       static __forceinline
         void bp()
       {
-      #if defined(_DEBUG) || defined(DBG)
+      #ifdef NTL__DEBUG
         intrinsic::debugbreak();
       #endif
       }

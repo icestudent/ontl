@@ -91,7 +91,7 @@ template<> template<> void tut::to::test<04>()
     exception_ptr ep3 = current_exception();
 
     // Not guaranteed by standard, and not true for oNTL.
-    //VERIFY( ep1 == ep3 );
+    VERIFY( ep1 == ep3 );
 
     // oNTL specific
     VERIFY( *ep1 == *ep3 );

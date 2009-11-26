@@ -30,7 +30,7 @@ typedef struct { } * va_list;
 
 #define va_arg(__argptr, __type)(*(__type*) __argptr += __type + 3 & ~3)
 
-#ifdef _DEBUG
+#ifdef NTL__DEBUG
 #   define va_end(__argptr)(__argptr = (va_list)0)
 #else
 #   define va_end(__argptr)
@@ -45,7 +45,7 @@ typedef struct { } * va_list;
 
 #define va_arg(__argptr, __type)(*(__type*) __argptr += __type + 7 & ~7)
 
-#ifdef _DEBUG
+#ifdef NTL__DEBUG
 #   define va_end(__argptr)(__argptr = (va_list)0)
 #else
 #   define va_end(__argptr)()

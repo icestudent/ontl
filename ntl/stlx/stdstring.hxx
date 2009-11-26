@@ -422,7 +422,7 @@ struct char_traits<wchar_t>
     {
       if(buffer_){
         allocator_traits::deallocate(alloc, buffer_, capacity_);
-        #ifdef _DEBUG
+        #ifdef NTL__DEBUG
         length_ = 0;
         #endif
       }
@@ -820,7 +820,7 @@ struct char_traits<wchar_t>
         traits_type::move(pc+n, pc, length_-pos);
       length_ += n;
       traits_type::assign(pc, n, c);
-      #ifdef _DEBUG
+      #ifdef NTL__DEBUG
       assert(length_ < capacity_);
       buffer_[length_] = zero_char;
       #endif
@@ -859,7 +859,7 @@ struct char_traits<wchar_t>
       if(position >= buffer_ && pos < length_){
         traits_type::move(position, position+1, length_-pos);
         length_--; pos++;
-        #ifdef _DEBUG
+        #ifdef NTL__DEBUG
         assert(length_ < capacity_);
         buffer_[length_] = zero_char;
         #endif
@@ -877,7 +877,7 @@ struct char_traits<wchar_t>
         traits_type::move(first, last, len);
         length_ -= len;
         last -= len;
-        #ifdef _DEBUG
+        #ifdef NTL__DEBUG
         assert(length_ < capacity_);
         buffer_[length_] = zero_char;
         #endif
@@ -987,7 +987,7 @@ struct char_traits<wchar_t>
         traits_type::move(buffer_+pos+rlen, buffer_+pos+xlen, length_-pos);
       length_ += rlen - xlen;
 
-      #ifdef _DEBUG
+      #ifdef NTL__DEBUG
       assert(length_ < capacity_);
       buffer_[length_] = zero_char;
       #endif
@@ -1015,7 +1015,7 @@ struct char_traits<wchar_t>
       if(rlen == 0 && xlen == 0)
         return end();
       length_ += rlen - xlen;
-      #ifdef _DEBUG
+      #ifdef NTL__DEBUG
       assert(length_ < capacity_);
       buffer_[length_] = zero_char;
       #endif
@@ -1074,7 +1074,7 @@ struct char_traits<wchar_t>
         traits_type::move(buffer_+pos1+rlen, buffer_+pos1+xlen, length_-pos1);
 
       length_ += rlen - xlen;
-      #ifdef _DEBUG
+      #ifdef NTL__DEBUG
       assert(length_ < capacity_);
       buffer_[length_] = zero_char;
       #endif

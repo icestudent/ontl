@@ -917,7 +917,7 @@ namespace std
           path_ += *p == backslash ? slashval : *p;
           p++;
         }
-#ifdef _DEBUG
+#ifdef NTL__DEBUG
         path_.c_str();
 #endif
         return *this;
@@ -973,7 +973,7 @@ namespace std
         name = p.substr(cur, pos-cur);
         if(pos != static_cast<pos_type>(size))
           pos++;
-      #if _DEBUG
+      #ifdef NTL__DEBUG
         name.c_str();
       #endif
         return *this;

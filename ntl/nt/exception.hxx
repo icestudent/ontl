@@ -52,7 +52,7 @@ extern "C"
 
 #include "../nt/debug.hxx"
 
-#ifdef _DEBUG
+#ifdef NTL__DEBUG
   void dbg_pause();
 # define dbgpause() dbg_pause()
 #else
