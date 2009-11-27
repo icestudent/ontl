@@ -529,7 +529,7 @@ extern "C" void* __cdecl __RTtypeid(void* object) __ntl_throws(...)
 
 #include "../stlx/stdexcept.hxx"
 
-extern "C" void* __cdecl __RTDynamicCast(void* object, int32_t vfdelta, void* srctype, void* desttype, int isreference) 
+extern "C" void* __cdecl __RTDynamicCast(void* object, int32_t vfdelta, void* srctype, void* desttype, int isreference) __ntl_throws(...)
 {
   if(!object)
     return nullptr;
