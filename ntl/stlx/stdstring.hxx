@@ -1880,7 +1880,9 @@ basic_istream<charT,traits>& getline(basic_istream<charT,traits>& is, basic_stri
 template<class charT, class traits, class Allocator>
 basic_istream<charT,traits>& getline(basic_istream<charT,traits>& is, basic_string<charT,traits,Allocator>& str);
 
+
 ///\name basic_string typedef names
+
 /** Specialization of basic_string for the \e char characters */
 typedef basic_string<char>    string;
 /** Specialization of basic_string for the \e wchar_t characters */
@@ -1890,7 +1892,9 @@ typedef basic_string<char16_t> u16string;
 /** Specialization of basic_string for the \e char32_t characters */
 typedef basic_string<char32_t> u32string;
 
+
 ///\name 21.5 Numeric Conversions [string.conversions]
+
 int stoi(const string& str, size_t *idx = 0, int base = 10);
 long stol(const string& str, size_t *idx = 0, int base = 10);
 unsigned long stoul(const string& str, size_t *idx = 0, int base = 10);
@@ -2065,6 +2069,8 @@ inline string to_string(unsigned int val) { return to_string(static_cast<unsigne
 inline wstring to_wstring(int val) { return to_wstring(static_cast<long long>(val)); }
 inline wstring to_wstring(unsigned int val) { return to_wstring(static_cast<unsigned long long>(val)); }
 
+///\}
+
 //////////////////////////////////////////////////////////////////////////
 //hash specializations for basic_string:
 namespace __
@@ -2088,6 +2094,25 @@ template <> struct hash<std::string>: __::string_hash<std::string>{};
 template <> struct hash<std::wstring>: __::string_hash<std::wstring>{};
 template <> struct hash<std::u16string>: __::string_hash<std::u16string>{};
 template <> struct hash<std::u32string>: __::string_hash<std::u32string>{};
+
+
+
+//////////////////////////////////////////////////////////////////////////
+// 
+#if STLX__USE_EXCEPTIONS
+std::__::exstring::exstring(const std::string& r)
+{
+  len = r.length();
+  if(len == 0){
+    msg = 0;
+  }else{
+    msg = new char[len+1];
+    char* const dest = const_cast<char*>(msg);
+    r.copy(dest, len);
+    dest[len] = 0;
+  }
+}
+#endif
 
 ///@}
 /**@} lib_strings */

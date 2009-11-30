@@ -46,7 +46,9 @@ namespace std
 }
 
 #if STLX__USE_EXCEPTIONS
-# include "stdexcept.hxx"
+# ifndef NTL__STLX_STDEXCEPT
+#  include "stdexcept.hxx"
+# endif
 #else
 # include "cassert.hxx"
 namespace std {

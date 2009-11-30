@@ -25,7 +25,7 @@ namespace std
       explicit exstring(const char* s)
         :msg(s), len()
       {}
-      explicit exstring(const std::string& s);
+      inline explicit exstring(const std::string& s);
 
     #ifdef NTL__CXX_RV
       exstring(exstring&& r)

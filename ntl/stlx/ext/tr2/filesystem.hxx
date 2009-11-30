@@ -91,9 +91,9 @@ namespace std
         typedef  string internal_string_type;
 
         /** \a is, converted by the \c m_locale \c codecvt facet to external_string_type. */
-        static external_string_type to_external(const path& p, const internal_string_type& is);
+        static inline external_string_type to_external(const path& p, const internal_string_type& is);
         /** \a xs, converted by the \c m_locale \c codecvt facet to to internal_string_type. */
-        static internal_string_type to_internal(const path& p, const external_string_type& xs);
+        static inline internal_string_type to_internal(const path& p, const external_string_type& xs);
 
         static void imbue(const locale& loc);
         static bool imbue(const locale& loc, std::nothrow_t);
@@ -108,13 +108,13 @@ namespace std
         typedef wstring internal_string_type;
 
         /** \a is, converted by the \c m_locale \c codecvt facet to external_string_type. */
-        static external_string_type to_external(const wpath&, const internal_string_type& is) { return is; }
+        static inline external_string_type to_external(const wpath&, const internal_string_type& is) { return is; }
         /** \a xs, converted by the \c m_locale \c codecvt facet to to internal_string_type. */
-        static internal_string_type to_internal(const wpath&, const external_string_type& xs) { return xs; }
-#ifdef NTL__CXX_RV
-        static external_string_type to_external(const wpath&, internal_string_type&& is)      { return move(is); }
-        static internal_string_type to_internal(const wpath&, external_string_type&& xs)      { return move(xs); }
-#endif
+        static inline internal_string_type to_internal(const wpath&, const external_string_type& xs) { return xs; }
+    #ifdef NTL__CXX_RV
+        static inline external_string_type to_external(const wpath&, internal_string_type&& is)      { return move(is); }
+        static inline internal_string_type to_internal(const wpath&, external_string_type&& xs)      { return move(xs); }
+    #endif
         static void imbue(const locale& loc);
         static bool imbue(const locale& loc, std::nothrow_t);
       };
