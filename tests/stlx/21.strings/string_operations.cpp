@@ -531,3 +531,22 @@ template<> template<> void tut::to::test<10>(void)
 
 }
 
+template<> template<> void tut::to::test<11>(void)
+{
+  std::string s("xarg");
+  s.erase(1,1);
+  tut::ensure_equals(s, "xrg");
+  s.erase(1);
+  tut::ensure_equals(s, "x");
+
+  s = "xarg";
+  s.erase();
+  tut::ensure_equals(s, "");
+
+  s = "xarg";
+  s.erase(0,1);
+  tut::ensure_equals(s, "arg");
+
+  s.erase(s.length()-1);
+  tut::ensure_equals(s, "ar");
+}

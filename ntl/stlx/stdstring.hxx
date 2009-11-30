@@ -846,9 +846,18 @@ struct char_traits<wchar_t>
     {
       if(pos > length_){
         __throw_out_of_range(__func__": invalid `pos`");
-      }else{
+      }else if(length_){
         const size_type xlen = min(n, length_-pos);
-        replace_impl(pos, xlen, buffer_, xlen, pos+xlen);
+        if(xlen < length_){
+          const size_type rlen = length_-(pos+xlen);
+          if(rlen)
+            traits_type::move(buffer_+pos, buffer_+pos+xlen, rlen);
+        }
+        length_ -= xlen;
+        #ifdef NTL__DEBUG
+        assert(length_ < capacity_);
+        buffer_[length_] = zero_char;
+        #endif
       }
       return *this;
     }
