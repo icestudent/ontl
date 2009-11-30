@@ -27,6 +27,31 @@ namespace nt {
 /**\addtogroup  native_types_support *** NT Types support library ***********
  *@{*/
 
+  /**
+   *	@brief Native string allocator
+   *  @details Allocator for native strings which serves several purposes:
+   *  * make std::basic_string binary compatible with nt::native_string
+   *  * use the same string memory management routines as the OS does.
+   **/
+  template<class charT>
+  class string_allocator:
+    public std::allocator<charT>
+  {
+  public:
+    typedef uint16_t size_type;
+
+    __noalias __forceinline pointer __restrict allocate(size_type n, std::allocator<void>::const_pointer = 0)
+    {
+      return heap::alloc(process_heap(), n);
+    }
+
+    __noalias __forceinline void deallocate(pointer p, size_type)
+    {
+      heap::free(process_heap(), p);
+    }
+  };
+
+
 template <class charT,
           class traits    = std::char_traits<typename std::remove_const<charT>::type>,
           class Allocator = std::allocator<charT> >
