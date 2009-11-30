@@ -24,7 +24,7 @@ namespace km {
   public:
     __noalias __forceinline pointer __restrict allocate(size_type n, std::allocator<void>::const_pointer = 0)
     {
-      return pool<PagedPool>::alloc(n, km_string_tag);
+      return pool<PagedPool>::alloc(n*sizeof(value_type), km_string_tag);
     }
 
     __noalias __forceinline void deallocate(pointer p, size_type)

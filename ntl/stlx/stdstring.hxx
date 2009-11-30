@@ -657,7 +657,7 @@ struct char_traits<wchar_t>
 
     basic_string& append(const charT * s)
     {
-      return replace_impl(length_,0,s,traits::length(s));
+      return replace_impl(length_,0,s,static_cast<size_type>(traits::length(s)));
     }
 
     basic_string& append(size_type n, charT c)
@@ -811,7 +811,7 @@ struct char_traits<wchar_t>
       assert(p >= buffer_ && p <= buffer_+length_);
       if(n == 0) return p;
 
-      const size_type pos = p-buffer_;
+      const size_type pos = static_cast<size_type>(p-buffer_);
       if(length_ + n + 1 > capacity_)
         reserve(length_+n+1);
       charT* pc = buffer_+pos;
@@ -1031,7 +1031,7 @@ struct char_traits<wchar_t>
       }
 
       // dest size, src size
-      const size_type xlen = min(n1, length_-pos1), rlen = min(n2, len-pos2);
+      const size_type xlen = min<size_type>(n1, length_-pos1), rlen = min<size_type>(n2, len-pos2);
       if(xlen == 0 && rlen == 0)
         return *this;
 
@@ -1657,7 +1657,7 @@ next_xpos:;
 
     void grow_buffer(size_type new_size, size_type length)
     {
-      const size_type n = __ntl_grow_heap_block_size(new_size + 1);
+      const size_type n = static_cast<size_type>(__ntl_grow_heap_block_size(new_size + 1));
       if(!(n < new_size)) // overflow
         new_size = n;
       charT* buf = allocator_traits::allocate(alloc, new_size);

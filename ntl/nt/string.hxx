@@ -40,15 +40,17 @@ namespace nt {
   public:
     typedef uint16_t size_type;
 
-    __noalias __forceinline pointer __restrict allocate(size_type n, std::allocator<void>::const_pointer = 0)
+    __noalias __forceinline charT* __restrict allocate(size_type n, std::allocator<void>::const_pointer = 0)
     {
-      return heap::alloc(process_heap(), n);
+      return reinterpret_cast<charT*>(heap::alloc(process_heap(), n*sizeof(value_type)));
     }
 
     __noalias __forceinline void deallocate(pointer p, size_type)
     {
       heap::free(process_heap(), p);
     }
+
+    size_type max_size() const __ntl_nothrow { return static_cast<size_type>(std::numeric_limits<size_type>::max() / sizeof(value_type)); }
   };
 
 
