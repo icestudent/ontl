@@ -73,6 +73,14 @@ namespace
     typedef testgroup::object to; \
   }
 
+// name, class
+#define STLX_CLASS_TESTGROUP_NAME_EX(name, ...) \
+  namespace tut { \
+  typedef test_group<__VA_ARGS__> testgroup; \
+  typedef testgroup::object to; \
+} namespace { \
+  tut::testgroup tg(name); \
+}
 
 //////////////////////////////////////////////////////////////////////////
 // compiler-specific settings

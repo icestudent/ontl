@@ -421,13 +421,6 @@
 					RelativePath="..\ntl\rtl\ehsup.asm"
 					>
 					<FileConfiguration
-						Name="debug|Win32"
-						>
-						<Tool
-							Name="MASM"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="debug|x64"
 						>
 						<Tool
@@ -483,6 +476,10 @@
 				RelativePath=".\ntl-tests-common.hxx"
 				>
 			</File>
+			<File
+				RelativePath=".\ntl-tests-containers.hxx"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Tests"
@@ -534,6 +531,26 @@
 			<Filter
 				Name="23.containers"
 				>
+				<Filter
+					Name="requirements"
+					>
+					<File
+						RelativePath=".\stlx\23.containers\2.requirements\general.hxx"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="sequence"
+					>
+					<Filter
+						Name="3.1.array"
+						>
+						<File
+							RelativePath=".\stlx\23.containers\3.1.array\requirements.cpp"
+							>
+						</File>
+					</Filter>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="21.strings"
