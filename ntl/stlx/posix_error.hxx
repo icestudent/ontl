@@ -6,7 +6,7 @@
  */
 
 #ifndef NTL__STLX_SYSTEM_ERROR
-#error don't use this header, it included via <system_error>
+#error don`t use this header, it included via <system_error>
 #endif
 
 
