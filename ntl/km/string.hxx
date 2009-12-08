@@ -22,7 +22,7 @@ namespace km {
     // 'Strg'
     static const uint32_t km_string_tag = 'grtS';
   public:
-    __noalias __forceinline pointer __restrict allocate(size_type n, std::allocator<void>::const_pointer = 0)
+    __noalias __forceinline pointer /*__restrict*/ allocate(size_type n, std::allocator<void>::const_pointer = 0)
     {
       return pool<PagedPool>::alloc(n*sizeof(value_type), km_string_tag);
     }
