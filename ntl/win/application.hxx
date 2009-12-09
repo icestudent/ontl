@@ -114,6 +114,7 @@ class application: noncopyable
       typedef const char_type * * iterator;
       typedef const char_type* const * const_iterator;
       typedef std::reverse_iterator<iterator> reverse_iterator;
+      typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
 
       iterator begin() { return &argv[0]; }
       iterator end()   { return &argv[argc]; }
@@ -123,6 +124,14 @@ class application: noncopyable
 
       const_iterator cbegin() const{ return begin(); }
       const_iterator cend() const  { return end(); }
+
+      reverse_iterator        rbegin()        { return reverse_iterator(end()); }
+      const_reverse_iterator  rbegin() const  { return const_reverse_iterator(end()); }
+      reverse_iterator        rend()          { return reverse_iterator(begin()); }
+      const_reverse_iterator  rend()   const  { return const_reverse_iterator(begin()); }
+
+      const_reverse_iterator  crbegin()const { return rbegin(); }
+      const_reverse_iterator  crend()  const { return rend(); }
 
       // random access
       const char_type* operator[](int argno)

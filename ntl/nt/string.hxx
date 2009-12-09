@@ -56,7 +56,7 @@ namespace nt {
 
 template <class charT,
           class traits    = std::char_traits<typename std::remove_const<charT>::type>,
-          class Allocator = std::allocator<charT> >
+          class Allocator = string_allocator<charT> >
 class native_string
 {
 

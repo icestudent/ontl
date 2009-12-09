@@ -51,7 +51,8 @@
 /* Debugging support                                                    */
 /************************************************************************/
 #ifndef NTL__DEBUG
-  #if !defined(NDEBUG) || defined(_DEBUG) || defined(DBG)
+  #if defined(NDEBUG)
+  #elif defined(_DEBUG) || defined(DBG)
   # define NTL__DEBUG
   #endif
 #endif

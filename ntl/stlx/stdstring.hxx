@@ -818,7 +818,7 @@ struct char_traits<wchar_t>
       p = pc;
       if(pos < length_)
         traits_type::move(pc+n, pc, length_-pos);
-      length_ += n;
+      length_ = length_ + n;
       traits_type::assign(pc, n, c);
       #ifdef NTL__DEBUG
       assert(length_ < capacity_);

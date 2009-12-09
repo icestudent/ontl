@@ -131,12 +131,12 @@ template<class T, class Alloc> struct uses_allocator
     #define NTL_X(n,p) NTL_SPP_COMMA forward<NTL_SPP_CAT(A,n)>(NTL_SPP_CAT(p,n))
     #define NTL_DEFINE_CONSTRUCT(n,aux) \
     template <class T NTL_SPP_COMMA_IF(n) NTL_SPP_ARGS(1,n,class A)> \
-    static void construct(Alloc& a, T* p NTL_SPP_COMMA_IF(n) NTL_SPP_AARGS(1,n,&& a)) { return a.constuct(p NTL_SPP_LOOP(1,n,NTL_X,a)); }
+    static void construct(Alloc& a, T* p NTL_SPP_COMMA_IF(n) NTL_SPP_AARGS(1,n,&& a)) { return a.construct(p NTL_SPP_LOOP(1,n,NTL_X,a)); }
 #else
     #define NTL_X
     #define NTL_DEFINE_CONSTRUCT(n,aux) \
     template <class T NTL_SPP_COMMA_IF(n) NTL_SPP_ARGS(1,n,class A)> \
-    static void construct(Alloc& a, T* p NTL_SPP_COMMA_IF(n) NTL_SPP_AARGS(1,n,const& a)) { return a.constuct(p NTL_SPP_COMMA_IF(n) NTL_SPP_ARGS(1,n,a)); }
+    static void construct(Alloc& a, T* p NTL_SPP_COMMA_IF(n) NTL_SPP_AARGS(1,n,const& a)) { return a.construct(p NTL_SPP_COMMA_IF(n) NTL_SPP_ARGS(1,n,a)); }
 #endif
     NTL_DEFINE_CONSTRUCT(0,)
     NTL_DEFINE_CONSTRUCT(1,)
