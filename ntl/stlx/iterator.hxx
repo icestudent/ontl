@@ -710,8 +710,7 @@ class istreambuf_iterator
 
     bool equal(const istreambuf_iterator& b) const
     {
-      return sbuf_ && b.sbuf_ ? traits::not_eof(sbuf_->sgetc()) && traits::not_eof(b.sbuf_->sgetc())
-        : sbuf_ == b.sbuf_;
+      return at_end() == b.at_end();
     }
 
   friend
@@ -721,6 +720,12 @@ class istreambuf_iterator
   friend
     bool operator!=(const this_type& a, const this_type& b)
       { return ! a.equal(b); }
+
+  private:
+    bool at_end() const
+    {
+      return !(sbuf_ && traits_type::not_eof(sbuf_->sgetc()));
+    }
 
   private:
     mutable streambuf_type * sbuf_;

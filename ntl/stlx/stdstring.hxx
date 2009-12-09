@@ -1013,8 +1013,7 @@ struct char_traits<wchar_t>
           grow_buffer(capacity_ + 1, max(pos, length_));
         }
         value_type c = *first;
-        if(first == last)     // istreambuf_iterator workaround
-          break;
+        assert(first != last);     // istreambuf_iterator workaround isn't need (was fixed)
         if(have_tail)
           traits_type::move(buffer_+pos+1, buffer_+pos, xend++);
         traits_type::assign(buffer_[pos++], c);
