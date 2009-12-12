@@ -396,7 +396,7 @@ struct rtl_process_module_information// RTL_PROCESS_MODULE_INFORMATION
 
   pe::image * image() const
   {
-    return pe::image::bind(ImageBase);
+    return this ? pe::image::bind(ImageBase) : nullptr;
   }
 
   const char * file_name() const
