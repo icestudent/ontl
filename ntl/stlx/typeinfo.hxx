@@ -96,6 +96,7 @@ class type_info
     const char* mname() const { return reinterpret_cast<const char*>(this + 1); }
 };
 #if defined(_MSC_VER) && !defined(__ICL)
+///\warning break this to get `Unresolved external : const type_info::'vftable' (??_7type_info@@6B@)`
 static_assert(sizeof _TypeDescriptor == sizeof type_info, "broken type");
 #endif
 
