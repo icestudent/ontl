@@ -1,6 +1,6 @@
 /**\file*********************************************************************
  *                                                                     \brief
- *  20.6 Function objects [function.objects]
+ *  20.7 Function objects [function.objects]
  *
  ****************************************************************************
  */
@@ -18,9 +18,9 @@ namespace std
 {
  /**\addtogroup  lib_utilities ************ 20 General utilities library [utilities]
   *@{*/
- /**\addtogroup  lib_function_objects ***** 20.6 Function objects [function.objects]
+ /**\addtogroup  lib_function_objects ***** 20.7 Function objects [function.objects]
   *@{*/
-  /**\defgroup  lib_member_function_adaptors 20.6.14 Member function adaptors [func.memfn]
+  /**\defgroup  lib_member_function_adaptors 20.7.14 Member function adaptors [func.memfn]
   *@{*/
 
 

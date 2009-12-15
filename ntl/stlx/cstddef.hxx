@@ -1,6 +1,6 @@
 /**\file*********************************************************************
  *                                                                     \brief
- *  18.1 Types [lib.support.types]
+ *  18.2 Types [lib.support.types]
  *
  ****************************************************************************
  */
@@ -14,7 +14,7 @@
 
 namespace std {
 
-/**\defgroup  lib_language_support ***** 18 Language support library [language.support]
+/**\addtogroup  lib_language_support *** 18 Language support library [language.support]
  *@{*/
 
 #ifdef _MSC_VER
@@ -30,7 +30,7 @@ namespace std {
   typedef struct {} max_align_t;
 #endif
 
-/**\defgroup  lib_support_types ******** 18.1 Types [support.types]
+/**\addtogroup  lib_support_types ****** 18.2 Types [support.types]
  *@{*/
 
 #if defined(NTL__CXX_NULLPTR)

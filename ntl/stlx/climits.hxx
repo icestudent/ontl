@@ -13,7 +13,7 @@ namespace std {
 /**\addtogroup  lib_language_support *** 18 Language support library [language.support]
  *@{*/
 
-/**\defgroup  lib_support_limits ******* 18.2 Implementation properties [support.limits]
+/**\addtogroup  lib_support_limits ***** 18.3 Implementation properties [support.limits]
  *
  *    Characteristics of implementation dependent fundamental types
  *@{

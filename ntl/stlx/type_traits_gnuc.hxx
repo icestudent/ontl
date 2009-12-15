@@ -1,6 +1,6 @@
 /**\file*********************************************************************
  *                                                                     \brief
- *  20.5 Metaprogramming and type traits [meta]
+ *  20.6 Metaprogramming and type traits [meta]
  *  GCC version
  ****************************************************************************
  */
@@ -14,7 +14,7 @@
 
 namespace std {
 
-// 20.5.5 Relationships between types [meta.rel]
+// 20.6.5 Relationships between types [meta.rel]
 
 template <class T, class U> struct is_same : false_type {};
 template <class T> struct is_same<T, T> : true_type {};
@@ -111,9 +111,9 @@ template <class Base, class Derived> struct is_base_of
 //: public integral_constant<bool, __is_convertible_to(From, To)> {};
 
 
-// 20.5.6 Transformations between types [meta.trans]
+// 20.6.6 Transformations between types [meta.trans]
 
-// 20.5.6.1 Const-volatile modifications [meta.trans.cv]
+// 20.6.6.1 Const-volatile modifications [meta.trans.cv]
 
 template <class T> struct remove_const              { typedef T type; };
 template <class T> struct remove_const<const T>     { typedef T type; };
@@ -131,7 +131,7 @@ template <class T> struct add_volatile        { typedef volatile T type; };
 
 template <class T> struct add_cv { typedef const volatile T type; };
 
-// 20.5.6.2 Reference modifications [meta.trans.ref]
+// 20.6.6.2 Reference modifications [meta.trans.ref]
 
 template <class T> struct remove_reference     { typedef T type; };
 template <class T> struct remove_reference<T&> { typedef T type; };
@@ -152,11 +152,11 @@ template <class T> struct add_rvalue_reference<T&> { typedef T& type; };
 
 template <class T> struct add_reference : add_lvalue_reference<T> {};
 
-// 20.5.6.3 Sign modifications [meta.trans.sign]
+// 20.6.6.3 Sign modifications [meta.trans.sign]
 template <class T> struct make_signed;
 template <class T> struct make_unsigned;
 
-// 20.5.6.4 Array modifications [meta.trans.arr]
+// 20.6.6.4 Array modifications [meta.trans.arr]
 
 template <class T> struct remove_extent { typedef T type; };
 template <class T> struct remove_extent<T[]> { typedef T type; };
@@ -168,7 +168,7 @@ template <class T> struct remove_all_extents<T[]>
 template <class T, size_t Size> struct remove_all_extents<T[Size]>
   { typedef typename remove_all_extents<T>::type type; };
 
-// 20.5.6.5 Pointer modifications [meta.trans.ptr]
+// 20.6.6.5 Pointer modifications [meta.trans.ptr]
 
 template <class T> struct remove_pointer     { typedef T type; };
 template <class T> struct remove_pointer<T*> { typedef T type; };
@@ -178,7 +178,7 @@ template <class T> struct add_pointer<T&> { typedef typename remove_reference<T>
 
 #if(0) // !fr3@K!
 
-// 20.5.7 Other transformations [meta.trans.other]
+// 20.6.7 Other transformations [meta.trans.other]
 
 #pragma warning(push)
 #pragma warning(disable:4324) // structure was padded due to __declspec(align())
@@ -284,13 +284,13 @@ namespace __
 }
 
 #endif // !fr3@K!
-// 20.5.4 Unary Type Traits [meta.unary]
+// 20.6.4 Unary Type Traits [meta.unary]
 #define NTL__STLX_DEF_TRAIT(trait)\
   template <class T> struct trait : public integral_constant<bool, __##trait(T)> {};
 #define NTL__STLX_DEF_TRAIT2(trait,builtin_trait)\
   template <class T> struct trait : public integral_constant<bool, __##builtin_trait(T)> {};
 
-// 20.5.4.1 Primary Type Categories [meta.unary.cat]
+// 20.6.4.1 Primary Type Categories [meta.unary.cat]
 
 template <class T> struct is_void                      : public false_type {};
 template <>        struct is_void<void>                : public true_type {};
@@ -442,7 +442,7 @@ template <class T> struct decay
 };
 
 
-// 20.5.4.2 Composite type traits [meta.unary.comp]
+// 20.6.4.2 Composite type traits [meta.unary.comp]
 
 template <class T> struct is_reference
 : public integral_constant<
@@ -492,7 +492,7 @@ template <class T> struct is_compound
        || is_member_pointer<T>::value
        > {};
 
-// 20.5.4.3 Type properties [meta.unary.prop]
+// 20.6.4.3 Type properties [meta.unary.prop]
 
 template <class T> struct is_const          : public false_type {};
 template <class T> struct is_const<const T> : public true_type {};
@@ -605,7 +605,7 @@ bool,( has_trivial_default_constructor<T>::value &&
 {};
 
 
-// 20.5.7.2 Other transformations [meta.trans.other]
+// 20.6.7.2 Other transformations [meta.trans.other]
 #if defined(NTL__CXX_VT) && defined(NTL__CXX_TYPEOF)
 
 template <class ...T> struct common_type;

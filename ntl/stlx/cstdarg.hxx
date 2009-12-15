@@ -1,6 +1,6 @@
 /**\file*********************************************************************
  *                                                                     \brief
- *  18.7 Other runtime support [lib.support.runtime]
+ *  18.10 Other runtime support [lib.support.runtime]
  *
  ****************************************************************************
  */
@@ -10,9 +10,9 @@
 
 //namespace std {
 
-/**\defgroup  lib_language_support ***** 18 Language support library [language.support]
+/**\addtogroup  lib_language_support *** 18 Language support library [language.support]
  *@{*/
-/**\defgroup  lib_support_runtime ****** 18.9 Other runtime support [support.runtime]
+/**\addtogroup  lib_support_runtime **** 18.10 Other runtime support [support.runtime]
  *@{*/
 
 #ifndef va_start

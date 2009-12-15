@@ -1147,7 +1147,7 @@ namespace std
 
 namespace std 
 {
-  ///\name 20.7.12.5 shared_ptr %atomic access [util.smartptr.shared.atomic]
+  ///\name 20.8.12.5 shared_ptr %atomic access [util.smartptr.shared.atomic]
   template<class T>
   inline bool atomic_is_lock_free(const shared_ptr<T>* p) __ntl_nothrow
   {

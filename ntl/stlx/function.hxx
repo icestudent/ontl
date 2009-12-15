@@ -1,6 +1,6 @@
 /**\file*********************************************************************
  *                                                                     \brief
- *  20.6 Function objects [function.objects]
+ *  20.7 Function objects [function.objects]
  *  Implementation of polymorphic function wrappers for legacy compilers
  ****************************************************************************
  */
@@ -19,13 +19,13 @@ namespace std
 {
  /**\addtogroup  lib_utilities ************ 20 General utilities library [utilities]
   *@{*/
- /**\addtogroup  lib_function_objects ***** 20.6 Function objects [function.objects]
+ /**\addtogroup  lib_function_objects ***** 20.7 Function objects [function.objects]
   *@{*/
- /**\defgroup lib_func_wrap *************** 20.6.15 Polymorphic function wrappers [func.wrap]
+ /**\defgroup lib_func_wrap *************** 20.7.15 Polymorphic function wrappers [func.wrap]
   *@{*/
 
   /**
-   *	An exception of type \c bad_function_call is thrown by \c function::operator() (20.6.15.2.4) when the function wrapper object has no target.
+   *	An exception of type \c bad_function_call is thrown by \c function::operator() (20.7.15.2.4) when the function wrapper object has no target.
    **/
   class bad_function_call:
     public exception
@@ -124,7 +124,7 @@ namespace std
           arity = tuple_size<Args>::value
         };
 
-        ///\name 20.6.15.2.1, construct/copy/destroy:
+        ///\name 20.7.15.2.1, construct/copy/destroy:
         // allocator-aware:
         //template<class A> function(allocator_arg_t, const A&);
         //template<class A> function(allocator_arg_t, const A&, unspecified-null-pointer-type );
@@ -259,7 +259,7 @@ namespace std
           return *this;
         }
 
-        ///\name 20.6.15.2.4, function invocation:
+        ///\name 20.7.15.2.4, function invocation:
         result_type operator()(const Args& args) const __ntl_nothrow
         {
           if(!caller) __ntl_throw(bad_function_call());
@@ -276,13 +276,13 @@ namespace std
         { if(!caller) __ntl_throw(bad_function_call()); return (*caller)(Args(a1,a2)); }
 
 
-        ///\name 20.6.15.2.3 function capacity
+        ///\name 20.7.15.2.3 function capacity
 
         /** Returns true if this has target */
         operator __::explicit_bool_type() const __ntl_nothrow { return __::explicit_bool(caller); }
 
 
-        ///\name 20.6.15.2.2, function modifiers:
+        ///\name 20.7.15.2.2, function modifiers:
 
         /** Swaps this target with the target of \c r */
     #ifdef NTL__CXX_RV
@@ -302,7 +302,7 @@ namespace std
         }
 
     #if STLX__USE_RTTI
-        ///\name 20.6.15.2.5, function target access:
+        ///\name 20.7.15.2.5, function target access:
 
         /** Returns type info of the target if exists; otherwise returns <tt>typeid(void)</tt> */
         const std::type_info& target_type() const __ntl_nothrow

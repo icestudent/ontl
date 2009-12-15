@@ -1,6 +1,6 @@
 /**\file*********************************************************************
  *                                                                     \brief
- *  20.6 Function objects [function.objects]
+ *  20.7 Function objects [function.objects]
  *
  ****************************************************************************
  */
@@ -15,10 +15,10 @@ namespace std
 {
   /**\addtogroup  lib_utilities ********** 20 General utilities library [utilities]
    *@{*/
-  /**\addtogroup  lib_function_objects *** 20.6 Function objects [function.objects]
+  /**\addtogroup  lib_function_objects *** 20.7 Function objects [function.objects]
    *@{*/
 
- /**\defgroup  lib_refwrap *************** 20.6.05 Class template reference_wrapper [refwrap]
+ /**\defgroup  lib_refwrap *************** 20.7.05 Class template reference_wrapper [refwrap]
   *    reference_wrapper<T> is a CopyConstructible and Assignable wrapper around a reference to an object of type T.
   *@{*/
   namespace __
@@ -159,11 +159,11 @@ namespace std
   }
 
   /**
-  *	@brief 20.6.05 Class template reference_wrapper [refwrap]
+  *	@brief 20.7.05 Class template reference_wrapper [refwrap]
   *
   *  \c reference_wrapper<T> is a CopyConstructible and Assignable wrapper around a reference to an object of type \c T.
   *
-  *  @note implements 20.6.5/3, 20.6.5/4 (N2723); has \c result_type if type \c T has it.
+  *  @note implements 20.7.5/3, 20.7.5/4 (N2723); has \c result_type if type \c T has it.
   *  @sa result_of notes
   **/
   template <class T>

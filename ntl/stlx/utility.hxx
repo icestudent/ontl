@@ -27,11 +27,11 @@ namespace std
  * Standard, but not guaranteed to be part of the Standard in future revisions.
  **/
 
-/**\defgroup  lib_utilities *** 20 General utilities library [utilities]
+/**\addtogroup  lib_utilities *** 20 General utilities library [utilities]
  *@{
  **/
 
-/**\defgroup  lib_utility ***** 20.2 Utility components [utility]
+/**\addtogroup  lib_utility ***** 20.3 Utility components [utility]
  *
  *    basic function and class templates that are used throughout
  *    the rest of the library.
@@ -42,7 +42,7 @@ namespace std
   /**
    *  @brief Relation operators
    *
-   *	20.2.1 Operators [operators]\n
+   *	20.3.1 Operators [operators]\n
    *	To avoid redundant definitions of <tt>operator!=</tt> out of <tt>operator==</tt> and
    *	<tt>operators ></tt>, <tt><=</tt>, and <tt>>=</tt> out of <tt>operator<</tt>, the library provides the following:
    **/
@@ -64,7 +64,7 @@ bool operator>=(const T & x, const T & y) { return !(x < y); }
 #pragma endregion
 
 #pragma region forward
-///\name 20.2.2 forward/move helpers [forward]
+///\name 20.3.3 forward/move helpers [forward]
 #ifdef NTL__CXX_RV
   template <class T>
   struct identity
@@ -144,7 +144,7 @@ bool operator>=(const T & x, const T & y) { return !(x < y); }
   template<class T>
   inline void swap(T& a, T& b);
 
-///\name Pairs [20.2.3 pairs]
+///\name Pairs [20.3.4 pairs]
 
 #pragma warning(push)
 #pragma warning(disable:4512) // assignment operator could not be generated if either T is const
@@ -360,7 +360,7 @@ inline pair<T1, T2> make_pair(T1 x, T2 y)
 
 #endif // RV
 
-///\name 20.3.5 pair range access [pair.range]
+///\name 20.3.6 pair range access [pair.range]
 template <class InputIterator>
 inline InputIterator begin(const std::pair<InputIterator, InputIterator>& p) { return p.first; }
 template <class InputIterator>

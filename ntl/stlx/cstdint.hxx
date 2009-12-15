@@ -1,6 +1,6 @@
 /**\file*********************************************************************
  *                                                                     \brief
- *  18.3 Integer types [cstdint]
+ *  18.4 Integer types [cstdint]
  *
  ****************************************************************************
  */
@@ -14,7 +14,7 @@ namespace std {
 
 /**\addtogroup  lib_language_support *** 18 Language support library [language.support]
  *@{*/
-/** \defgroup   lib_cstdint 18.3 Integer types [cstdint]
+/** \addtogroup lib_cstdint 18.4 Integer types [cstdint]
  *
  *  This defines all functions, types, and macros the same as C99 7.18.
  *@{*/
@@ -74,7 +74,7 @@ typedef uint64_t  uintmax_t;
 
 /**@} lib_cstdint */
 
-/**\addtogroup  lib_support_limits ***** 18.2 Implementation properties [support.limits]
+/**\addtogroup  lib_support_limits ***** 18.3 Implementation properties [support.limits]
  *@{*/
 
 ///\name  Limits of exact-width integer types 7.18.2.1

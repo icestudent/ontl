@@ -1,6 +1,6 @@
 /**\file*********************************************************************
  *                                                                     \brief
- *  18.6 Type identification [support.rtti]
+ *  18.7 Type identification [support.rtti]
  *
  ****************************************************************************
  */
@@ -10,7 +10,7 @@
 
 /**\addtogroup  lib_language_support *** 18 Language support library [language.support]
  * @{ */
-/**\defgroup    lib_support_rtti ******* 18.6 Type identification [support.rtti]
+/**\addtogroup  lib_support_rtti ******* 18.7 Type identification [support.rtti]
  * @{ */
 
 #ifndef NTL__STLX_CSTRING

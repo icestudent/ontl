@@ -1,6 +1,6 @@
 /**\file*********************************************************************
  *                                                                     \brief
- *  20.6 Function objects [function.objects]
+ *  20.7 Function objects [function.objects]
  *
  ****************************************************************************
  */
@@ -44,10 +44,10 @@ namespace std
 {
  /**\addtogroup  lib_utilities ************ 20 General utilities library [utilities]
   *@{*/
- /**\addtogroup  lib_function_objects ***** 20.6 Function objects [function.objects]
+ /**\addtogroup  lib_function_objects ***** 20.7 Function objects [function.objects]
   *@{*/
 
-/**\defgroup lib_func_ret ***************** 20.6.04 Function object return types [func.ret]
+/**\defgroup lib_func_ret ***************** 20.7.04 Function object return types [func.ret]
  *  Function return type detector
  *@{
  **/
@@ -286,7 +286,7 @@ namespace std
 
 
   /**
-   *	@brief 20.6.4 Function return types [func.ret]
+   *	@brief 20.7.4 Function return types [func.ret]
    *  
    *  \c FunctionCallType is a <tt> F(T1, T2, ..., TN) </tt>
    *

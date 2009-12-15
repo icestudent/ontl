@@ -1,6 +1,6 @@
 /**\file*********************************************************************
  *                                                                     \brief
- *  Compile-time rational arithmetic [20.3 ratio]
+ *  Compile-time rational arithmetic [20.4 ratio]
  *
  ****************************************************************************
  */
@@ -18,7 +18,7 @@ namespace std
  *@{
  **/
 
-  /**\defgroup lib_ratio ****** 20.3 Compile-time rational arithmetic [ratio]
+  /**\defgroup lib_ratio ****** 20.4 Compile-time rational arithmetic [ratio]
    *  The ratio library provides a class template ratio which exactly represents any finite rational number 
    *  with a numerator and denominator representable by compile-time constants of type intmax_t.
    *@{
@@ -54,8 +54,8 @@ namespace std
 
   // convenience SI typedefs
 #if _INTEGRAL_MAX_BITS >= 128
-  typedef ratio<1, 1000000000000000000000000> yocto; // see 20.3.4
-  typedef ratio<1,    1000000000000000000000> zepto; // see 20.3.4
+  typedef ratio<1, 1000000000000000000000000> yocto; // see 20.4.4
+  typedef ratio<1,    1000000000000000000000> zepto; // see 20.4.4
 #elif _INTEGRAL_MAX_BITS >= 64
   typedef ratio<1,       1000000000000000000> atto;   // 10^-18
   typedef ratio<1,          1000000000000000> femto;  // 10^-15
@@ -76,8 +76,8 @@ namespace std
   typedef ratio<         1000000000000000, 1> peta;   // 10^15
   typedef ratio<      1000000000000000000, 1> exa;    // 10^18
 #elif _INTEGRAL_MAX_BITS >= 128
-  typedef ratio<   1000000000000000000000, 1> zetta; // see 20.3.4
-  typedef ratio<1000000000000000000000000, 1> yotta; // see 20.3.4
+  typedef ratio<   1000000000000000000000, 1> zetta; // see 20.4.4
+  typedef ratio<1000000000000000000000000, 1> yotta; // see 20.4.4
 #endif
 
   namespace __ { namespace static_evaluation {
@@ -148,7 +148,7 @@ namespace std
   }}
 
   /**
-   *	@brief Class template ratio [20.3.1 ratio.ratio]
+   *	@brief Class template ratio [20.4.1 ratio.ratio]
    *
    *  \code typedef std::ratio<-2,6> one_third; one_third::num == -1, one_third::den == 3 \endcode
    *
@@ -185,7 +185,7 @@ namespace std
 
 
 
-  // 20.3.2 Arithmetic on ratio types [ratio.arithmetic]
+  // 20.4.2 Arithmetic on ratio types [ratio.arithmetic]
   namespace __ {
 
     /*
@@ -291,7 +291,7 @@ namespace std
 
   }
 
-  /// 20.3.2 Arithmetic on ratio types [ratio.arithmetic]
+  /// 20.4.2 Arithmetic on ratio types [ratio.arithmetic]
   /** static addition with overflow detection */
   template <ratio_t a, ratio_t b>
   struct ratio_checked_add
@@ -386,7 +386,7 @@ namespace std
 
 
 
-  /// 20.3.3 Comparison of ratio types [ratio.comparison]
+  /// 20.4.3 Comparison of ratio types [ratio.comparison]
 
   /** Check is two ratios are equal */
   template <class R1, class R2>

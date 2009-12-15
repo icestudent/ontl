@@ -680,7 +680,7 @@ namespace std
   ///\}
   /*@} lib_uniqueptr */
 
- /**\defgroup  lib_smartptr *************** 20.8.12 Smart pointers (legacy) [util.smartptr]
+ /**\addtogroup  lib_smartptr ************* 20.8.12 Smart pointers (legacy) [util.smartptr]
    *@{*/
 
   template<class X> class auto_ptr;

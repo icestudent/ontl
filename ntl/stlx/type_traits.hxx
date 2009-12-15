@@ -1,6 +1,6 @@
 /**\file*********************************************************************
  *                                                                     \brief
- *  20.5 Metaprogramming and type traits [meta]
+ *  20.6 Metaprogramming and type traits [meta]
  *
  ****************************************************************************
  */
@@ -30,7 +30,7 @@ namespace std
   *@{
   **/
 
- /**\defgroup  lib_typetraits ** 20.5 Metaprogramming and type traits [meta]
+ /**\addtogroup  lib_typetraits ** 20.6 Metaprogramming and type traits [meta]
   *
   * This subclause describes components used by C++ programs, particularly in templates, to support the
   * widest possible range of types, optimise template code usage, detect type related user errors, and perform

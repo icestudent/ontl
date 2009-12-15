@@ -1,6 +1,6 @@
 /**\file*********************************************************************
  *                                                                     \brief
- *  20.5 Metaprogramming and type traits [meta]
+ *  20.6 Metaprogramming and type traits [meta]
  *
  ****************************************************************************
  */
@@ -13,11 +13,11 @@ namespace std
  /**\addtogroup  lib_utilities *** 20 General utilities library [utilities]
   *@{
   **/
- /**\addtogroup  lib_typetraits ** 20.5 Metaprogramming and type traits [meta]
+ /**\addtogroup  lib_typetraits ** 20.6 Metaprogramming and type traits [meta]
   *@{
   **/
 
-// 20.5.3 Helper classes [meta.help]
+// 20.6.3 Helper classes [meta.help]
 template <class T, T v>
 struct integral_constant
 {
@@ -29,15 +29,15 @@ struct integral_constant
 typedef integral_constant<bool, true>   true_type;
 typedef integral_constant<bool, false>  false_type;
 
-// 20.5.5 Relationships between types [meta.rel]
+// 20.6.5 Relationships between types [meta.rel]
 template <class T, class U> struct is_same;
 template <class Base, class Derived> struct is_base_of;
 template <class From, class To> struct is_convertible;
 template <class From, class To> struct is_explicitly_convertible;
 
-// 20.5.6 Transformations between types [meta.trans]
+// 20.6.6 Transformations between types [meta.trans]
 
-// 20.5.6.1 Const-volatile modifications [meta.trans.cv]
+// 20.6.6.1 Const-volatile modifications [meta.trans.cv]
 template <class T> struct remove_const;
 template <class T> struct remove_volatile;
 template <class T> struct remove_cv;
@@ -45,25 +45,25 @@ template <class T> struct add_const;
 template <class T> struct add_volatile;
 template <class T> struct add_cv;
 
-// 20.5.6.2 Reference modifications [meta.trans.ref]
+// 20.6.6.2 Reference modifications [meta.trans.ref]
 template <class T> struct remove_reference;
 template <class T> struct add_lvalue_reference;
 template <class T> struct add_rvalue_reference;
 template <class T> struct add_reference;
 
-// 20.5.6.3 Sign modifications [meta.trans.sign]
+// 20.6.6.3 Sign modifications [meta.trans.sign]
 template <class T> struct make_signed;
 template <class T> struct make_unsigned;
 
-// 20.5.6.4 Array modifications [meta.trans.arr]
+// 20.6.6.4 Array modifications [meta.trans.arr]
 template <class T> struct remove_extent;
 template <class T> struct remove_all_extents;
 
-// 20.5.6.5 Pointer modifications [meta.trans.ptr]
+// 20.6.6.5 Pointer modifications [meta.trans.ptr]
 template <class T> struct remove_pointer;
 template <class T> struct add_pointer;
 
-// 20.5.7 Other transformations [meta.trans.other]
+// 20.6.7 Other transformations [meta.trans.other]
 
 
 namespace aux {
@@ -94,9 +94,9 @@ namespace __
 
 }
 
-// 20.5.4 Unary Type Traits [meta.unary]
+// 20.6.4 Unary Type Traits [meta.unary]
 
-// 20.5.4.1 Primary Type Categories [meta.unary.cat]
+// 20.6.4.1 Primary Type Categories [meta.unary.cat]
 template <class T> struct is_void;
 template <class T> struct is_integral;
 template <class T> struct is_floating_point;
@@ -112,7 +112,7 @@ template <class T> struct is_class;
 template <class T> struct is_function;
 template <class RT> struct is_function<RT()>;
 
-// 20.5.4.2 Composite type traits [meta.unary.comp]
+// 20.6.4.2 Composite type traits [meta.unary.comp]
 template <class T> struct is_reference;
 template <class T> struct is_arithmetic;
 template <class T> struct is_fundamental;
@@ -121,7 +121,7 @@ template <class T> struct is_member_pointer;
 template <class T> struct is_scalar;
 template <class T> struct is_compound;
 
-// 20.5.4.3 Type properties [meta.unary.prop]
+// 20.6.4.3 Type properties [meta.unary.prop]
 template <class T> struct is_const;
 template <class T> struct is_volatile;
 
@@ -155,7 +155,7 @@ template <class T> struct rank;
 template <class T, unsigned I = 0> struct extent;
 template<class T> struct is_trivial;
 
-// 20.5.7.2 Other transformations [meta.trans.other]
+// 20.6.7.2 Other transformations [meta.trans.other]
 #if defined(NTL__CXX_VT) && defined(NTL__CXX_TYPEOF)
 
 template <class ...T> struct common_type;

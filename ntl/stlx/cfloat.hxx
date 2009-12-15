@@ -12,7 +12,7 @@ namespace std {
 
 /**\addtogroup  lib_language_support *** 18 Language support library [language.support]
  *@{*/
-/**\addtogroup  lib_support_limits ***** 18.2 Implementation properties [support.limits]
+/**\addtogroup  lib_support_limits ***** 18.3 Implementation properties [support.limits]
  *@{*/
 
 #ifdef __GNUC__
