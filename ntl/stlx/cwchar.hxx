@@ -51,6 +51,7 @@ namespace std {
     size_t NTL__CRTIMP
     _snwprintf(wchar_t*buffer, size_t count, const wchar_t*format, ...);
 
+  ///\warning not available in W2K ntoskrnl
   NTL__EXTERNAPI
     size_t NTL__CRTIMP
     _vsnwprintf(wchar_t*buffer, size_t count, const wchar_t*format, va_list argptr);

@@ -181,6 +181,7 @@ class ios_base
     static const openmode binary  = 1 << 5;
 
     /// 27.4.2.1.5 Type ios_base::seekdir [ios::seekdir]
+    ///\todo must be static const
     enum seekdir
     { 
       /** request a seek (for subsequent input or output) relative to the beginning of the stream */

@@ -15,6 +15,8 @@
 #include "handle.hxx"
 #include "object.hxx"
 
+#include <vector>
+
 
 namespace ntl {
 namespace nt {
