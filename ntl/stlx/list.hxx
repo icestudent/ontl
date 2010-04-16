@@ -496,14 +496,13 @@ class list
     void splice(const_iterator position, list<T,Allocator>&& x);
     void splice(const_iterator position, list<T,Allocator>&& x, const_iterator i);
     void splice(const_iterator position, list<T,Allocator>&& x, const_iterator first, const_iterator last);
-    #else
-    // NOTE: may be const too?
-    void splice(iterator position, list<T, Allocator>& x);
-
-    void splice(iterator position, list<T, Allocator>& x, iterator i);
-
-    void splice(iterator position, list<T, Allocator>& x, iterator first, iterator last);
     #endif
+
+    void splice(const_iterator position, list<T, Allocator>& x);
+
+    void splice(const_iterator position, list<T, Allocator>& x, const_iterator i);
+
+    void splice(const_iterator position, list<T, Allocator>& x, const_iterator first, const_iterator last);
 
     void remove(const T& value)
     {

@@ -12,7 +12,13 @@
 #include "../baseconf_0x.hxx"
 #include "cpp0x_mode.hxx"
 
+// NTL LIB signature
+#define NTL__CPPLIB
+
 namespace std {
+
+// Boost support
+#define __STDC_VERSION__ 199901 
 
 /**\addtogroup  lib_language_support *** 18 Language support library [language.support]
  *@{*/

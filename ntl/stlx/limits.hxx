@@ -46,6 +46,14 @@ enum float_denorm_style
   denorm_present        = 1
 };
 
+#ifdef min
+#undef min
+#endif
+
+#ifdef max
+#undef max
+#endif
+
 /// Class template numeric_limits [18.2.1.1 lib.numeric.limits]
 template<class T>
 class numeric_limits

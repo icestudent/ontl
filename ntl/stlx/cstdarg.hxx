@@ -17,7 +17,11 @@
 
 #ifndef va_start
 
+// MSVC stdlib compatibility
+#ifndef _VA_LIST_DEFINED
 typedef struct { } * va_list;
+#define _VA_LIST_DEFINED
+#endif
 
 #ifdef _MSC_VER
 

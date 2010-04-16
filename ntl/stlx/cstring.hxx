@@ -8,6 +8,9 @@
 #define NTL__STLX_CSTRING
 #pragma once
 
+// MSVC winnt.h" compatibility
+extern "C++" {
+
 #ifndef NTL__STLX_CSTDDEF
 #include "cstddef.hxx"
 #endif
@@ -338,5 +341,8 @@ int NTL__CRTIMP
 #ifdef __ICL
 #pragma warning(default:2259)
 #endif
+
+// MSVC winnt.h" compatibility
+}//extern "C++" {
 
 #endif//#ifndef NTL__STLX_CSTRING

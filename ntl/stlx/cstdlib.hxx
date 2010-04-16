@@ -164,6 +164,7 @@ int __cdecl atexit(vfv_t* func);
 #define EXIT_FAILURE  1
 
 /// 7.20.4.3 The exit function
+__declspec(noreturn) 
 void NTL__CRTCALL exit(int status);
 
 int __cdecl at_quick_exit(vfv_t* f);
