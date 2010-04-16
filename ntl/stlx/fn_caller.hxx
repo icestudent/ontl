@@ -101,7 +101,7 @@ namespace std
         return call_fun(f, args, index_type<tuple_size<Args>::value>());
       }
 
-      static R call_fun(F f, Args&     , index_type<0>) { return f(); }
+      static R call_fun(F f, Args&     , index_type<0>) { return static_cast<R>(f()); } // work arround C2562. May be specialize for R=void?
       static R call_fun(F f, Args& args, index_type<1>) { return f(get<0>(args)); }
       static R call_fun(F f, Args& args, index_type<2>) { return f(get<0>(args), get<1>(args)); }
       static R call_fun(F f, Args& args, index_type<3>) { return f(get<0>(args), get<1>(args), get<2>(args)); }

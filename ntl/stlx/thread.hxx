@@ -396,6 +396,7 @@ namespace std
     if(joinable())
       detach(ec);
     swap(r);
+	return *this;
   }
 
   // members:
