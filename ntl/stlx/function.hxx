@@ -260,7 +260,7 @@ namespace std
         }
 
         ///\name 20.7.15.2.4, function invocation:
-        result_type operator()(const Args& args) const __ntl_nothrow
+        result_type operator()(const Args& args) const __ntl_throws(bad_function_call)
         {
           if(!caller) __ntl_throw(bad_function_call());
           return (*caller)(args);

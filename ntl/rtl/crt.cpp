@@ -186,12 +186,14 @@ void NTL__CRTCALL _Exit(int code)
 /************************************************************************/
 /* `abort`                                                              */
 /************************************************************************/
-#ifndef NTL__SUBSYSTEM_KM
+//#ifndef NTL__SUBSYSTEM_KM
 extern "C" void __cdecl abort()
 {
-  ntl::nt::user_thread::exit_process(ntl::nt::status::unsuccessful);
+  assert(false);
+  //raise(SIGABRT);
+  //ntl::nt::user_thread::exit_process(ntl::nt::status::unsuccessful);
 }
-#endif
+//#endif
 /************************************************************************/
 /* `new` handler                                                        */
 /************************************************************************/

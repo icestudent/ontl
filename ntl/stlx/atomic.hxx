@@ -104,14 +104,14 @@ namespace std
     };
 
     template<>
-    struct rep<void*,(sizeof(void*) == sizeof(uint32_t))>
+    struct rep<void*,(sizeof(void*) == sizeof(uint32_t))> /*ST: why pointer is not a small type on x64?*/
     {
-      typedef uintptr_t type;
+      typedef uint32_t type;
       __forceinline operator void*() const volatile { return reinterpret_cast<void*>(val); }
       __forceinline void* operator=(void* p)volatile{ val = reinterpret_cast<type>(p); return p; }
       __forceinline static void* cast(type v) { return reinterpret_cast<void*>(v); }
       __forceinline static type  cast(void*v) { return reinterpret_cast<type >(v); }
-      uintptr_t val;
+      uint32_t val;
     };
 
     /// Base class for %atomic fundamental type

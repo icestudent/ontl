@@ -13,7 +13,7 @@
 #include "tuple.hxx"
 #include "function.hxx"
 #include "mutex.hxx"
-#include "cstdatomic.hxx"
+#include "atomic.hxx"
 #include "stdexception.hxx"
 #include "exception2.hxx"
 #include "system_error.hxx"
@@ -710,7 +710,7 @@ namespace std
   public:
     /** Stores \c r in the associated state and sets that state to ready. Any blocking waits on the
       associated state are woken up. */
-    void set_value(const R& r, error_code& ec = throws()) __ntl_throws(feature_error)
+    void set_value(const R& r, error_code& ec = throws()) __ntl_throws(future_error)
     {
       check();
       data->set(r, ec);
@@ -730,7 +730,7 @@ namespace std
   public:
     /** Stores \c r in the associated state and sets that state to ready. Any blocking waits on the
       associated state are woken up. */
-    void set_value(R& r, error_code& ec = throws()) __ntl_throws(feature_error)
+    void set_value(R& r, error_code& ec = throws()) __ntl_throws(future_error)
     {
       check();
       data->set(r, ec);
@@ -743,7 +743,7 @@ namespace std
   {
   public:
     /** Sets that state to ready. Any blocking waits on the associated state are woken up. */
-    void set_value(error_code& ec = throws()) __ntl_throws(feature_error)
+    void set_value(error_code& ec = throws()) __ntl_throws(future_error)
     {
       check();
       data->set(ec);
