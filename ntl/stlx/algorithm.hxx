@@ -19,6 +19,7 @@
 #endif
 
 #include "cstring.hxx"
+#include "functional.hxx"
 
 namespace std
 {
@@ -859,16 +860,41 @@ void
               RandomAccessIterator last, Compare comp);
 
 ///\name 25.3.3, binary search:
-template<class ForwardIterator, class T>
-inline
-ForwardIterator
-  lower_bound(ForwardIterator first, ForwardIterator last, const T& value);
 
 template<class ForwardIterator, class T, class Compare>
 inline
 ForwardIterator
   lower_bound(ForwardIterator first, ForwardIterator last,
-              const T& value, Compare comp);
+              const T& value, Compare comp)
+{
+  typedef iterator_traits<ForwardIterator>::difference_type difference_t; 
+  difference_t len = distance(first, last);
+  while ( len > 0 )
+  {
+    difference_t const half = len / 2;
+    ForwardIterator middle = first;
+    advance(middle, half);
+    if ( comp(*middle, value) != false )
+    {
+      first = middle;
+      ++first;
+      len = len - half - 1;
+    }
+    else
+    {
+      len = half;
+    }
+  }
+  return first;
+}
+
+template<class ForwardIterator, class T>
+inline
+ForwardIterator
+  lower_bound(ForwardIterator first, ForwardIterator last, const T& value)
+{
+  return lower_bound(first, last, value, less<T>());
+}
 
 template<class ForwardIterator, class T>
 inline
