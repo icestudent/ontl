@@ -230,6 +230,9 @@ class reverse_iterator
 
     reverse_iterator() {}
     explicit reverse_iterator(Iterator x) : current(x) {}
+
+    template<class U> friend class reverse_iterator;
+    
     template <class U>
     reverse_iterator(const reverse_iterator<U>& u) : current(u.current) {}
     template <class U>
