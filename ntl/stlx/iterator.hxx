@@ -634,9 +634,9 @@ class ostream_iterator
     typedef traits                        traits_type;
     typedef basic_ostream<charT, traits>  ostream_type;
 
-    ostream_iterator(ostream_type& s) : out_stream(s), delim(0) {}
+    ostream_iterator(ostream_type& s) : out_stream(&s), delim(0) {}
     ostream_iterator(ostream_type& s, const charT* delimiter)
-    : out_stream(s), delim(delimiter) {}
+    : out_stream(&s), delim(delimiter) {}
     ostream_iterator(const this_type& x)
     : out_stream(x.out_stream), delim(x.delim) {}
     ~ostream_iterator() {}
