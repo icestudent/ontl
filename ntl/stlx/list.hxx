@@ -139,8 +139,8 @@ class list
       friend class list;
 
       private:
-        const_iterator__impl(const double_linked * const p) : p(p) {}
-        const double_linked * p;
+        const_iterator__impl(double_linked * const p) : p(p) {}
+        double_linked * p;
     };
 
   public:
@@ -153,14 +153,13 @@ class list
     ///\name construct/copy/destroy [23.2.4.1]
 
     explicit list(const Allocator& a = Allocator())
-    : node_allocator(a), size_(0)
+    : node_allocator(a)
     {
       init_head();
     }
 
     __forceinline
     explicit list(size_type n)
-    : size_(0)
     {
       init_head();
       while(n--)
@@ -181,21 +180,21 @@ class list
     list(InputIterator    first,
          InputIterator    last,
          const Allocator& a     = Allocator())
-    : node_allocator(a), size_(0)
+    : node_allocator(a)
     {
       init_head();
       insert(begin(), first, last);
     }
 
     list(const list<T, Allocator>& x)
-    : node_allocator(x.node_allocator), size_(0)
+    : node_allocator(x.node_allocator)
     {
       init_head();
       insert(begin(), x.begin(), x.end());
     }
 
     list(const list& x, const Allocator& a)
-      : node_allocator(a), size_(0)
+    : node_allocator(a)
     {
       init_head();
       insert(begin(), x.begin(), x.end());
@@ -203,14 +202,14 @@ class list
     
     #ifdef NTL__CXX_RV
     list(list&& x)
-      :node_allocator(), size_(0)
+    : node_allocator()
     {
       init_head();
       swap(x);
     }
 
     list(list&& x, const Allocator& a)
-      :node_allocator(a), size_(0)
+    : node_allocator(a)
     {
       init_head();
       if(x.get_allocator() == a){
@@ -225,7 +224,7 @@ class list
     #endif
     
     list(initializer_list<T> il, Allocator& a = Allocator())
-      :node_allocator(a), size_(0)
+      :node_allocator(a)
     {
       init_head();
       insert(begin(), il);
@@ -266,10 +265,11 @@ class list
     {
       //clear();
       //insert(begin(), n, t);
-      while ( n < size() ) pop_back();
+      size_type s = size();// I guess it's faster than reallocs - ST
+      for ( ; n < s; --s ) pop_back();
       iterator it = begin();
-      for ( size_type i = size(); i; --i, ++it ) replace(it, t);
-      if ( n > size() ) insert(it, n - size(), t);
+      for ( size_type i = s; i; --i, ++it ) replace(it, t);
+      if ( n > s ) insert(it, n - s, t);
     }
     
     void assign(initializer_list<T> il)
@@ -325,29 +325,28 @@ class list
 
     ///\name capacity [23.2.4.2]
 
-    bool      empty()     const { return size_ == 0; }
-    size_type size()      const { return size_; }
+    bool      empty()     const { return begin() == end(); }
+    size_type size()      const { return distance(begin(), end()); }
     size_type max_size()  const { return node_allocator.max_size(); }
-
-    void resize(size_type sz)
-    {
-      //while ( sz < size() ) pop_back();
-      if(sz < size()){
-        const_iterator from = cbegin();
-        for(size_type i = 0; i < sz; ++i, ++from);
-        erase(from, cend());
-      }else if(sz > size()) {
-        size_type n = sz - size();
-        while(n--)
-          insert(end(), T());
-      }
-    }
 
     __forceinline
     void resize(size_type sz, const T& c)
     {
-      while ( sz < size() ) pop_back();
-      if    ( sz > size() ) insert(end(), sz - size(), c);
+      const_iterator odd = cbegin();
+      for ( size_type i = 0; i < sz; ++i )
+      {
+        // if current size is less than required, add new elements
+        if ( cend() == odd )
+          push_back(c);
+        else
+          ++odd;
+      }
+      erase(odd, cend());
+    }
+
+    void resize(size_type sz)
+    {
+      resize(sz, T());
     }
 
     ///\name element access:
@@ -387,11 +386,10 @@ class list
     __forceinline
     iterator insert(const_iterator position, const T& x)
     {
-      ++size_;
       node_type * const p = node_allocator.allocate(1);
       //get_allocator().construct(&p->elem, x);
       node_allocator.construct(p, x);
-      double_linked* const np = const_cast<double_linked*>(position.p);
+      double_linked* const np = position.p;
       p->link(np->prev, np);
       return p;
     }
@@ -400,10 +398,9 @@ class list
     __forceinline
     iterator insert(const_iterator position, T&& x)
     {
-      ++size_;
       node_type * const p = node_allocator.allocate(1);
       node_allocator.construct(p, forward<T>(x));
-      double_linked* const np = const_cast<double_linked*>(position.p);
+      double_linked* const np = position.p;
       p->link(np->prev, np);
       return p;
     }
@@ -431,9 +428,8 @@ class list
     iterator erase(const_iterator position)
     {
       iterator res( position.p->next );
-      node_type* const np = const_cast<node_type*>(static_cast<const node_type*>(position.p));
-      np->unlink();
-      --size_;
+      node_type* const np = static_cast<node_type*>(position.p);
+      position.p->unlink();
       node_allocator.destroy(np);
       node_allocator.deallocate(np, 1);
       return res;
@@ -443,14 +439,13 @@ class list
     iterator erase(const_iterator position, const_iterator last)
     {
       while ( position != last ) position = erase(position);
-      return const_cast<double_linked*>(last.p);
+      return last.p;
     }
 
     #ifdef NTL__CXX_RV
     void swap(list<T,Allocator>&& x)
     {
       using std::swap;
-      swap(size_, x.size_);
       swap(head.next, x.head.next);
       swap(head.prev, x.head.prev);
       swap(node_allocator, x.node_allocator);
@@ -460,7 +455,6 @@ class list
     void swap(list<T, Allocator>& x)
     {
       using std::swap;
-      swap(size_, x.size_);
       swap(head.next, x.head.next);
       swap(head.prev, x.head.prev);
       swap(node_allocator, x.node_allocator);
@@ -498,9 +492,16 @@ class list
     void splice(const_iterator position, list<T,Allocator>&& x, const_iterator first, const_iterator last);
     #endif
 
-    void splice(const_iterator position, list<T, Allocator>& x);
+    void splice(const_iterator position, list<T, Allocator>& x);//  assert(&x != this);
 
-    void splice(const_iterator position, list<T, Allocator>& x, const_iterator i);
+    void splice(const_iterator position, list<T, Allocator>& x, const_iterator i)
+    {
+      (void)&x;
+      assert(get_allocator() == x.get_allocator());
+      double_linked* const p = position.p->next;
+      i.p->unlink();
+      i.p->link(p->prev, p);
+    }
 
     void splice(const_iterator position, list<T, Allocator>& x, const_iterator first, const_iterator last);
 
@@ -525,17 +526,23 @@ class list
 
     void unique()
     {
-      if ( size() < 2 ) return;
-      iterator i = --end();
-      do { const iterator next = i--; if ( *next == *i ) erase(next); }
+      //if ( size() < 2 ) return;
+      iterator i = end();
+      if ( i == begin() || --i == begin() ) return;
+      do
+      { 
+        const iterator next = i--;
+        if ( *next == *i ) 
+          erase(next);
+      }
       while ( i != begin() );
     }
 
     template <class BinaryPredicate>
     void unique(BinaryPredicate binary_pred)
     {
-      if ( size() < 2 ) return;
-      iterator i = --end();
+      iterator i = end();
+      if ( i == begin() || --i == begin() ) return;
       do { const iterator next = i--; if ( binary_pred(*next, *i) ) erase(next); }
       while ( i != begin() );
     }
@@ -565,8 +572,8 @@ class list
   ///////////////////////////////////////////////////////////////////////////
   private:
 
-    double_linked head;
-    size_type     size_;
+    mutable double_linked head;
+    //size_type     size_;
 
     typename allocator_type::template rebind<node_type>::other node_allocator;
 
@@ -587,7 +594,7 @@ class list
 template <class T, class Allocator>
 bool operator==(const list<T,Allocator>& x, const list<T,Allocator>& y) __ntl_nothrow
 {
-  return x.size() == y.size() && equal(x.begin(), x.end(), y.begin());
+  return equal(x.begin(), x.end(), y.begin());
 }
 
 template <class T, class Allocator>
@@ -642,54 +649,6 @@ struct constructible_with_allocator_suffix<list<T, Alloc> >
 ///@}
 /**@} lib_sequence */
 /**@} lib_containers */
-
-///////////////////////////////////////////////////////////////////////////
-#if 0
-
-template<>
-const char * list<int>::test__implementation()
-{
-  list<int> l( 0 );
-  if ( l.size() != 0 )  return "list<int> ( 0 )";
-
-  l.resize(2);
-  if ( l.size() != 2 )  return "list<int>::resize(2)";
-
-  l.clear();
-  if ( l.size() != 0 )  return "list<int>::clear()";
-
-  l.push_back(3);
-  l.push_back(4);
-  l.push_back(5);
-  l.push_front(2);
-  l.push_front(1);
-  l.push_front(0);
-
-  list<int>::const_iterator i0 = l.begin();
-  //list<int>::iterator i1 = i0;//shall not compile
-
-  int j = 5;
-  for ( list<int>::const_reverse_iterator i = l.rbegin();
-        i != static_cast<const_reverse_iterator>(l.rend()); )
-  {
-    if ( *i++ != j-- )  return "list<int> [0..5]";
-  }
-
-  list<int> l2;
-
-  int * p = 0;
-  l2.assign(p, p);
-  l2.insert(l2.begin(), p, p);
-
-  l2.insert(l2.begin(), l.begin(), l.end());
-
- // l2.insert(l2.begin(), 5.5, 5);
-
-  return 0;
-}
-
-#endif
-///////////////////////////////////////////////////////////////////////////
 
 }//namespace std
 
