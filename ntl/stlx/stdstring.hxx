@@ -1009,8 +1009,8 @@ struct char_traits<wchar_t>
       size_type xpos = pos, rlen = 0, xlen = min(n, length_-pos), xend = length_-pos;
       const bool have_tail = length_ && pos < length_;
       while(first != last){
-        if(pos >= capacity_){
-          grow_buffer(capacity_ + 1, max(pos, length_));
+        if(pos + 1 >= capacity_){
+          grow_buffer(capacity_/* + 1*/, max(pos, length_));
         }
         value_type c = *first;
         assert(first != last);     // istreambuf_iterator workaround isn't need (was fixed)

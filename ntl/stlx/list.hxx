@@ -39,7 +39,14 @@ class list
         prev->next = this; next->prev = this;
       }
 
-      void unlink() { prev->next = next; next->prev = prev; }
+      void unlink()
+      { 
+        prev->next = next;
+        next->prev = prev;
+        #ifdef NTL__DEBUG
+        prev = next = nullptr;
+        #endif
+      }
     };
 
     //#pragma warning(push)
@@ -498,6 +505,9 @@ class list
     {
       (void)&x;
       assert(get_allocator() == x.get_allocator());
+     // if ( position == i || position == next(i) ) return;
+     // insert(position, *i);
+     // x.erase(i);
       if ( position == i /*|| position == next(i)*/ ) return;
       i.p->unlink();
       i.p->link(position.p->prev, position.p);
