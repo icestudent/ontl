@@ -218,32 +218,6 @@ tm* gmtime(const time_t *__restrict timer, tm result = tm())
   return gmtime_r(timer, &result);
 }
 
-/** OMG who'll use this thread unsafe stuff?!
-template<bool Local>
-__forceinline
-tm *__gettime(const time_t* timer)
-{
-  ntl::nt::systime_t SystemTime = ctime2ntime(*timer);
-  int64_t LocalTime;
-  if ( Local )
-  {
-    ntl::nt::RtlSystemTimeToLocalTime(&SystemTime, &LocalTime);
-  }
-  ntl::nt::time_fields TimeFields;
-  ntl::nt::RtlTimeToTimeFields(LocalTime? &LocalTime : &SystemTime, &TimeFields);
-  static tm t;
-  t.tm_sec  = TimeFields.Second;
-  t.tm_min  = TimeFields.Minute;
-  t.tm_hour = TimeFields.Hour;
-  t.tm_mday = TimeFields.Day;
-  t.tm_mon  = TimeFields.Month;
-  t.tm_year = TimeFields.Year;
-  t.tm_wday = TimeFields.Weekday;
-  t.tm_yday;
-  t.tm_isdst;
-}
-*/
-
 #endif // __GNUC__
 
 /**@} lib_date_time */
