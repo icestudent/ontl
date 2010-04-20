@@ -167,6 +167,57 @@ inline time_t time(time_t* timer)
   return ct;
 }
 
+#pragma warning(push)
+#pragma warning(disable:4127)
+template<bool UTC>
+__forceinline
+tm *__gettime(const time_t *__restrict timer, tm *__restrict result)
+{
+  ntl::nt::systime_t SystemTime = ctime2ntime(*timer);
+  int64_t LocalTime;
+  if ( !UTC )
+  {
+    ntl::nt::RtlSystemTimeToLocalTime(&SystemTime, &LocalTime);
+  }
+  ntl::nt::time_fields TimeFields;
+  ntl::nt::RtlTimeToTimeFields(UTC? &SystemTime : &LocalTime, &TimeFields);
+  result->tm_sec  = TimeFields.Second;
+  result->tm_min  = TimeFields.Minute;
+  result->tm_hour = TimeFields.Hour;
+  result->tm_mday = TimeFields.Day;
+  result->tm_mon  = TimeFields.Month;
+  result->tm_year = TimeFields.Year;
+  result->tm_wday = TimeFields.Weekday;
+  result->tm_yday;
+  result->tm_isdst;
+  return result;
+}
+#pragma warning(pop)
+
+__forceinline
+tm* localtime_r(const time_t *__restrict timer, tm *__restrict result)
+{
+  return __gettime<false>(timer, result);
+}
+
+__forceinline
+tm* localtime(const time_t *__restrict timer, tm result = tm())
+{
+  return localtime_r(timer, &result);
+}
+
+__forceinline
+tm* gmtime_r(const time_t *__restrict timer, tm *__restrict result)
+{
+  return __gettime<true>(timer, result);
+}
+
+__forceinline
+tm* gmtime(const time_t *__restrict timer, tm result = tm())
+{
+  return gmtime_r(timer, &result);
+}
+
 /** OMG who'll use this thread unsafe stuff?!
 template<bool Local>
 __forceinline

@@ -566,9 +566,6 @@ class list
 
     ///@}
 
-    static inline
-    const char * test__implementation();
-
   ///////////////////////////////////////////////////////////////////////////
   private:
 

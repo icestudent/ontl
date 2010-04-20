@@ -429,10 +429,10 @@ struct constructible_with_allocator_suffix< map<Key, T, Compare, Allocator> >
 {};
 
 /// [23.3.2 multimap]
-#if 0
 template <class Key, class T, class Compare = less<Key>, class Allocator = allocator<pair<const Key, T> > >
 class multimap;
 
+#if 0
 template <class Key, class T, class Compare, class Allocator>
 bool operator==(const multimap<Key,T,Compare,Allocator>& x,
                 const multimap<Key,T,Compare,Allocator>& y);
