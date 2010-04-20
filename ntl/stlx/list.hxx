@@ -498,9 +498,9 @@ class list
     {
       (void)&x;
       assert(get_allocator() == x.get_allocator());
-      double_linked* const p = position.p->next;
+      if ( position == i /*|| position == next(i)*/ ) return;
       i.p->unlink();
-      i.p->link(p->prev, p);
+      i.p->link(position.p->prev, position.p);
     }
 
     void splice(const_iterator position, list<T, Allocator>& x, const_iterator first, const_iterator last);
