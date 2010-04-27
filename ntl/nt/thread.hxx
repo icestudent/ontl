@@ -280,8 +280,23 @@ public:
       client_id *         client          = 0,
       security_descriptor* thread_security = 0)
   {
-    return RtlCreateUserThread(process_handle, thread_security, create_suspended, 0,
+#ifdef NTL__CSRSS_NOTIFY_THREAD
+    client_id cid;
+    if ( !client ) client = &cid;
+#endif
+    ntstatus s = RtlCreateUserThread(process_handle, thread_security, create_suspended, 0,
       maximum_stack_size, commited_stack_size, start_routine, start_context, thread_handle, client);
+#ifdef NTL__CSRSS_NOTIFY_THREAD
+    if ( success(s) )
+    {
+      base_api_msg msg;
+      msg.u.CreateThread.ThreadHandle = thread_handle->get();
+      msg.u.CreateThread.ClientId = *client;
+      CsrClientCallServer((csr_api_msg*)&msg, nullptr, MAKE_API_NUMBER(1, BasepCreateThread), (uint32_t)sizeof(base_createthread_msg));
+      s = static_cast<ntstatus>(msg.ReturnValue);
+    }
+#endif
+    return s;
   }
 
   static ntstatus
