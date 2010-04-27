@@ -20,6 +20,7 @@ namespace std
   namespace posix_error 
   {
     enum posix_errno {
+      success = 0,
       address_family_not_supported, // EAFNOSUPPORT, Address family not supported.
       address_in_use,               // EADDRINUSE,
       address_not_available,        // EADDRNOTAVAIL

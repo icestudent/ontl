@@ -249,7 +249,12 @@ class ios_base
     }
 
     ///\name  27.4.2.3 ios_base locale functions [ios.base.locales]
-    locale imbue(const locale& loc);
+    // dummy 
+    locale imbue(const locale& loc)
+    {
+      assert(&std::locale::classic() == &loc);
+      return getloc();
+    }
 
     ///\note empty locale is always used to avoid lots of stuff
     locale getloc() const
