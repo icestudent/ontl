@@ -18,7 +18,9 @@
 namespace std {
 
 // Boost support
+#ifndef __STDC_VERSION__
 #define __STDC_VERSION__ 199901 
+#endif
 
 /**\addtogroup  lib_language_support *** 18 Language support library [language.support]
  *@{*/

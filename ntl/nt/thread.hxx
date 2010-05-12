@@ -289,13 +289,29 @@ public:
 #ifdef NTL__CSRSS_NOTIFY_THREAD
     if ( success(s) )
     {
-      base_api_msg msg;
-      msg.u.CreateThread.ThreadHandle = thread_handle->get();
-      msg.u.CreateThread.ClientId = *client;
-      CsrClientCallServer((csr_api_msg*)&msg, nullptr, MAKE_API_NUMBER(1, BasepCreateThread), (uint32_t)sizeof(base_createthread_msg));
-      s = static_cast<ntstatus>(msg.ReturnValue);
+      // WoW needs 64 bit message from 32 bit code, try brute force as a quick hack
+      union msg_t {
+        struct { base_api_msg_64 msg64; uint64_t createthread_msg[3]; } msg64;
+        base_api_msg msg;
+      };
+      msg_t msg = {};
+      msg.msg.u.CreateThread.ThreadHandle = thread_handle->get();
+      msg.msg.u.CreateThread.ClientId = *client;
+      //This is somehow success on 2003x64
+      //s = static_cast<ntstatus>(msg.msg.ReturnValue);
+      s = CsrClientCallServer((csr_api_msg*)&msg, nullptr, MAKE_API_NUMBER(1, BasepCreateThread), (uint32_t)sizeof(base_createthread_msg));
+#ifndef _M_X64//we done this already above
+      if ( !success(s) )
+      {
+        msg.msg64.createthread_msg[0] = reinterpret_cast<uint64_t>(thread_handle->get());
+        msg.msg64.createthread_msg[1] = reinterpret_cast<uint64_t>(client->UniqueProcess);
+        msg.msg64.createthread_msg[2] = reinterpret_cast<uint64_t>(client->UniqueThread);
+        //s = static_cast<ntstatus>(msg.msg64.msg64.ReturnValue);
+        s = CsrClientCallServer((csr_api_msg*)&msg, nullptr, MAKE_API_NUMBER(1, BasepCreateThread), (uint32_t)sizeof(msg.msg64.createthread_msg));
+      }
     }
-#endif
+#endif//_M_X64
+#endif//NTL__CSRSS_NOTIFY_THREAD
     return s;
   }
 

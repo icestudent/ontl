@@ -405,6 +405,15 @@ struct base_api_msg {
   } u;
 };
 
+///This is for WoW
+struct base_api_msg_64 
+{
+  uint64_t _space[6];
+  uint32_t _, ReturnValue;
+  uint64_t Reserved;
+};
+STATIC_ASSERT(offsetof(base_api_msg_64, ReturnValue) == 0x34);
+
 #define MAKE_API_NUMBER(DllIndex, ApiIndex) (csr_api_number)((DllIndex) << 16) | (ApiIndex)
 
 //////////////////////////////////////////////////////////////////////////
