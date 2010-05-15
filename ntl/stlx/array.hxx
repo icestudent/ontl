@@ -43,6 +43,13 @@ namespace std
 template <class T, size_t N>
 struct array
 {
+  
+#ifdef NTL__ARRAY_BOOST_COMPATIBLE
+#define __elems elems
+#define __check_bounds  rangecheck
+    T* c_array() { return __elems; }
+#endif
+
     // types:
 
     typedef T &                                   reference;
@@ -132,6 +139,11 @@ struct array
     {
       if ( n > size() ) __throw_out_of_range();
     }
+
+#ifdef NTL__ARRAY_BOOST_COMPATIBLE
+#undef __elems
+#undef __check_bounds
+#endif
 
 };//struct array
 
