@@ -100,7 +100,7 @@ class type_info
 static_assert(sizeof _TypeDescriptor == sizeof type_info, "broken type");
 #endif
 
-#if STLX__USE_RTTI && !defined(__ICL)
+#if (STLX__USE_RTTI || STLX__USE_EXCEPTIONS/*do we need another macro instead?*/) && !defined(__ICL)
 inline type_info::~type_info()
 {}
 #endif
