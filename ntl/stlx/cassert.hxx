@@ -5,14 +5,11 @@
  ****************************************************************************
  */
 #ifndef NTL__STLX_CASSERT
-#define NTL__STLX_CASSERT
+//#define NTL__STLX_CASSERT//done below
 
 #ifndef NTL__STLX_CSTDDEF
 #include "cstddef.hxx"
 #endif
-
-//namespace std {
-
 
 namespace ntl
 {
@@ -47,31 +44,7 @@ inline void __ntl_assert(const char* expr, const char* file, int line)
     __debugbreak();
 }
 
-
-
-//}//namespace std
-
-#ifdef _MSC_VER
-namespace std 
-{
-  namespace __
-  {
-    extern "C" inline void __cdecl purecall_handler(void)
-    {
-      __ntl_assert("pure virtual function called", __FILE__, __LINE__);
-    }
-    static void (__cdecl *__pchandler__)() = &purecall_handler;
-  }
-}
-#ifdef _M_X64
-# pragma comment(linker, "/alternatename:_purecall=purecall_handler")
-#else
-# pragma comment(linker, "/alternatename:__purecall=_purecall_handler")
-#endif
-
-#endif // msc
 #endif//#ifndef NTL__STLX_CASSERT
-
 
 
 /// ISO C 7.2/1 The assert macro is redefined according to the current state
@@ -100,3 +73,29 @@ namespace std
   else __debugbreak();\
   ((void)0)
 #endif
+
+#ifndef NTL__STLX_CASSERT
+#define NTL__STLX_CASSERT
+
+#ifdef _MSC_VER
+namespace std 
+{
+  namespace __
+  {
+    extern "C" inline void __cdecl purecall_handler(void)
+    {
+      assert(!!"pure virtual function called");
+//      __ntl_assert("pure virtual function called", __FILE__, __LINE__);
+    }
+    static void (__cdecl *__pchandler__)() = &purecall_handler;
+  }
+}
+#ifdef _M_X64
+# pragma comment(linker, "/alternatename:_purecall=purecall_handler")
+#else
+# pragma comment(linker, "/alternatename:__purecall=_purecall_handler")
+#endif
+
+#endif // msc
+  
+#endif//#ifndef NTL__STLX_CASSERT
