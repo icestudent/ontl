@@ -368,11 +368,22 @@ class key : public handle, public device_traits<key>
                               length, &result_length);
     }
 
+    static std::wstring crop(std::wstring& s)
+    {
+      while ( s.size() && !s.back() ) s.resize(s.size()-1);
+      return s;
+    }
+
+    /// There is the catch: returned value_string may contain terminating '\0'
+    /// so a logically equal wstring may be false compared.
+    /// It is logical to crop it but wat if it is to be stored back?
+    /// The choise is yours.
     __forceinline
     bool
       query(
         const const_unicode_string &  value_name,
-        std::wstring &                value_string
+        std::wstring &                value_string,
+        bool                          crop          = false
         ) const
     {
       uint32_t size = query_buf_default_size;
@@ -396,6 +407,7 @@ class key : public handle, public device_traits<key>
               value_string.assign(reinterpret_cast<const wchar_t*>(&p->Data[0]),
                                   p->DataLength / sizeof(wchar_t));
               delete[] buf;
+              if ( crop ) key::crop(value_string);
               return true;
             }
           default:
