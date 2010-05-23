@@ -1324,7 +1324,9 @@ namespace cxxruntime {
         mov   eax, unwindfunclet
         push  ebp
         mov   ebp, _ebp
-        
+
+        ///\todo These pushs are not necessary (except of ecx) as
+        ///     shold be done by compiler. But not sure about all of them.
         push  esi
         push  edi
         push  ebx
