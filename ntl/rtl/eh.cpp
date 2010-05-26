@@ -88,6 +88,24 @@ extern "C" __declspec(naked) void _alloca_probe_16()
     jmp  _chkstk
   }
 }
+
+extern "C" __declspec(naked)
+void __cdecl _EH_prolog(void* handler)
+{
+  __asm 
+  {
+    push  -1
+    push  eax
+    mov   eax, fs:0
+    push  eax
+    mov   eax, [esp+3*4]
+    mov   fs:0, esp
+    mov   [esp+3*4], ebp
+    lea   ebp, [esp+3*4]
+    push  eax
+    retn
+  }
+}
 #endif
 
 #ifdef _M_X64
