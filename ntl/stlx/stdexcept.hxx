@@ -153,7 +153,9 @@ void __throw_invalid_argument(const char* msg)  { __ntl_throw(invalid_argument(m
 
 #include "cstring.hxx"
 
-std::__::exstring::exstring(const std::__::exstring& r)
+namespace std {
+
+__::exstring::exstring(const std::__::exstring& r)
 {
   if(r.msg){
     len = r.len;
@@ -167,7 +169,12 @@ std::__::exstring::exstring(const std::__::exstring& r)
     msg = 0, len = 0;
   }
 }
-namespace std {
+
+#else
+
+///\warnong Avoid unresolved external when compiling with /EH 
+//__::exstring::exstring(const std::string& s){ assert(s.c_str()); }
+
 #endif
 ///\}
 

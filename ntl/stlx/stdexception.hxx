@@ -41,11 +41,15 @@ namespace std {
 class exception
 {
   public:
+#if STLX__USE_EXCEPTIONS
     exception() __ntl_nothrow {}
     exception(const exception&) __ntl_nothrow {}
     exception& operator=(const exception&) __ntl_nothrow { return *this; }
+
+    ///\warning This is non virtual to help optimizing, as exceptions are not used anyway
     virtual ~exception() /*__ntl_nothrow */{}
     virtual const char* what() const __ntl_nothrow { return "exception"; }
+#endif
 };
 
 ///\name 18.8.2 Violating exception-specifications [exception.unexpected]
