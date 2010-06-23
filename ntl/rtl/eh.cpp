@@ -89,8 +89,11 @@ extern "C" __declspec(naked) void _alloca_probe_16()
   }
 }
 
+#pragma warning (push)
+// This library helper shall receive only valid handlers
+#pragma warning (disable:4733)//Inline asm assigning to 'FS:0' : handler not registered as safe handler
 extern "C" __declspec(naked)
-void __cdecl _EH_prolog(void* handler)
+void __cdecl _EH_prolog(void* /*handler*/)
 {
   __asm 
   {
@@ -106,6 +109,7 @@ void __cdecl _EH_prolog(void* handler)
     retn
   }
 }
+#pragma warning (pop)
 #endif
 
 #ifdef _M_X64

@@ -253,6 +253,7 @@ class ios_base
     locale imbue(const locale& loc)
     {
       assert(&std::locale::classic() == &loc);
+      (void)&loc;
       return getloc();
     }
 
