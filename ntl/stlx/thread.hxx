@@ -143,15 +143,15 @@ namespace std
     void swap(const thread& r) __ntl_nothrow;
 
     /** Is this thread a joinable */
-    bool joinable() const __ntl_nothrow;
+    inline bool joinable() const __ntl_nothrow;
 
     /** Waits for a thread to complete */
-    void join(error_code& ec = throws()) __ntl_throws(system_error);
+    inline void join(error_code& ec = throws()) __ntl_throws(system_error);
     /** Detaches from a thread of execution */
-    void detach(error_code& ec = throws()) __ntl_throws(system_error);
+    inline void detach(error_code& ec = throws()) __ntl_throws(system_error);
 
     /** Returns a %thread id if object represents a valid %thread of execution or default constructed id otherwise */
-    id get_id() const __ntl_nothrow;
+    inline id get_id() const __ntl_nothrow;
 
     /** Returns the platform-specific %thread handle */
     native_handle_type native_handle() const __ntl_nothrow { return h; }
@@ -160,11 +160,11 @@ namespace std
     static unsigned hardware_concurrency();
 
   protected:
-    static void __stdcall thread_routine(void* Parm);
+    static inline void __stdcall thread_routine(void* Parm);
     static uint32_t __stdcall start_routine(void* Parm);
-    bool alive() const __ntl_nothrow;
-    bool check_alive() __ntl_nothrow;
-    void start(__::thread_params_base* tp);
+    inline bool alive() const __ntl_nothrow;
+    inline bool check_alive() __ntl_nothrow;
+    inline void start(__::thread_params_base* tp);
 
   private:
     mutable native_handle_type h, tid;
@@ -348,13 +348,19 @@ namespace std
     tid = 0;
   }
 
+#ifndef __ntl_thread_start_hook
+/// This hook macro is called on thread create
+#define __ntl_thread_start_hook(P)
+#endif
+
   inline uint32_t __stdcall thread::start_routine(void* Parm)
   {
+    __ntl_thread_start_hook(Parm);
     thread_routine(Parm);
     return 0;
   }
 
-  inline void __stdcall thread::thread_routine(void* Parm)
+  __forceinline void __stdcall thread::thread_routine(void* Parm)
   {
     __::thread_params_base* tp = reinterpret_cast<__::thread_params_base*>(Parm);
     // wait for start before run
