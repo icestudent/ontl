@@ -209,10 +209,16 @@ InputIterator
 /**@} lib_std_iterator_operations */
 
 
-/**\addtogroup lib_std_predef_iterators ** 24.4 Predefined iterators [predef.iterators]
+/**\addtogroup lib_std_predef_iterators ** 24.5 Iterator adaptors [predef.iterators]
  *@{*/
 
-/// 24.4.1 Reverse iterators [lib.reverse.iterators]
+/// 24.5.1 Reverse iterators [lib.reverse.iterators]
+/// Class template reverse_iterator is an iterator adaptor that iterates
+/// from the end of the sequence defined by its underlying iterator
+/// to the beginning of that sequence.
+/// The fundamental relation between a reverse iterator and
+/// its corresponding iterator i is established by the identity:
+/// &*(reverse_iterator(i)) == &*(i - 1).
 template <class Iterator>
 class reverse_iterator
 : public iterator<typename iterator_traits<Iterator>::iterator_category,
@@ -243,7 +249,8 @@ class reverse_iterator
     }
 
     Iterator  base()        const { return current; }
-    ///\warning see N2960 24.5.1.2.4: This operation must use an auxiliary member variable rather than a temporary variable to avoid returning a reference that persists beyond the lifetime of its associated iterator.
+    ///\warning see N3092 24.5.1.3.4: This operation must use an auxiliary member variable rather than a temporary variable to avoid returning a reference that persists beyond the lifetime of its associated iterator.
+    ///\todo make this to { return *current; }
     reference operator*()   const { Iterator tmp = current; return *--tmp; }
     pointer   operator->()  const { return &(operator*()); }
 
@@ -342,7 +349,7 @@ class reverse_iterator
 };//class reverse_iterator
 
 
-/// 24.4.2.1 Class template back_insert_iterator [lib.back.insert.iterator]
+/// 24.5.2.1 Class template back_insert_iterator [lib.back.insert.iterator]
 template <class Container>
 class back_insert_iterator
 : public iterator<output_iterator_tag, void, void, void, void>
@@ -362,7 +369,7 @@ class back_insert_iterator
     back_insert_iterator<Container>&
       operator=(typename Container::value_type&& value)
     {
-      container->push_back(value);
+      container->push_back(std::move(value));
       return *this;
     }
     #endif
@@ -375,13 +382,13 @@ class back_insert_iterator
     Container * container;
 };
 
-/// 24.4.2.2.5 back_inserter [lib.back.inserter]
+/// 24.5.2.2.5 back_inserter [lib.back.inserter]
 template <class Container> inline
 back_insert_iterator<Container>
 back_inserter(Container& x) { return back_insert_iterator<Container>( x ); }
 
 
-/// 24.4.2.3 Class template front_insert_iterator [lib.front.insert.iterator]
+/// 24.5.2.3 Class template front_insert_iterator [lib.front.insert.iterator]
 template <class Container>
 class front_insert_iterator
 : public iterator<output_iterator_tag, void, void, void, void>
@@ -401,7 +408,7 @@ class front_insert_iterator
     front_insert_iterator<Container>&
       operator=(typename Container::value_type&& value)
     {
-      container->push_front(value);
+      container->push_front(std::move(value));
       return *this;
     }
     #endif
@@ -414,7 +421,7 @@ class front_insert_iterator
     Container * container;
 };
 
-/// 24.4.2.4.5 front_inserter [lib.front.inserter]
+/// 24.5.2.4.5 front_inserter [lib.front.inserter]
 template <class Container>
 inline
 front_insert_iterator<Container>
@@ -424,7 +431,7 @@ front_insert_iterator<Container>
 }
 
 
-/// 24.4.2.5 Class template insert_iterator [lib.insert.iterator]
+/// 24.5.2.5 Class template insert_iterator [lib.insert.iterator]
 template <class Container>
 class insert_iterator
 : public iterator<output_iterator_tag, void, void, void, void>
@@ -446,7 +453,7 @@ class insert_iterator
     insert_iterator<Container>&
       operator=(typename Container::value_type&& value)
     {
-      iter = container->insert(iter, value);
+      iter = container->insert(iter, std::move(value));
       ++iter;
       return *this;
     }
@@ -461,7 +468,7 @@ class insert_iterator
     typename Container::iterator iter;
 };
 
-/// 24.4.2.6.5 inserter [lib.inserter]
+/// 24.5.2.6.5 inserter [lib.inserter]
 template <class Container, class Iterator>
 inline
 insert_iterator<Container>
@@ -470,7 +477,7 @@ insert_iterator<Container>
   return insert_iterator<Container>( x, typename Container::iterator( i ) );
 }
 
-/// 24.4.3.1 Class template move_iterator [move.iterator]
+/// 24.5.3.1 Class template move_iterator [move.iterator]
 #ifdef NTL__CXX_RV
 template <class Iterator>
 class move_iterator
