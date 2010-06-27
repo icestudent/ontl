@@ -82,11 +82,13 @@ namespace std
 {
   namespace __
   {
+#pragma warning(push)
+#pragma warning(disable:4127)//conditional expression is constant
     extern "C" inline void __cdecl purecall_handler(void)
     {
-      assert(!!"pure virtual function called");
-//      __ntl_assert("pure virtual function called", __FILE__, __LINE__);
+      assert("pure virtual function called");
     }
+#pragma warning(pop)
     static void (__cdecl *__pchandler__)() = &purecall_handler;
   }
 }
