@@ -153,19 +153,17 @@ namespace std {
       node* p = root_;
       while(p){
         if(elem_less(x, p->elem)){
-          if(p->left){
-            p = p->left;
+          if(p->child[left]){
+            p = p->child[left];
           }else{
-            iterator re(p, this);
-            return make_pair(re, re); // is a closest nodes
+            return make_pair(make_iterator(p), make_iterator(p)); // is a closest nodes
           }
         }else if(elem_greater(x, p->elem))
-          p = p->right;
+          p = p->child[right];
         else
-          return make_pair(iterator(p, this), iterator(next(p), this));
+          return make_pair(make_iterator(p), make_iterator(next(p, right)));
       }
-      iterator re(NULL, this);
-      return make_pair(re, re);
+      return make_pair(make_iterator(p), make_iterator(p));
     }
 
     pair<const_iterator,const_iterator> equal_range(const key_type& x) const

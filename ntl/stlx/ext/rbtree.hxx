@@ -521,8 +521,7 @@ namespace std
           x->child[reverse] = prev->child[direction];
           if ( prev->child[direction] )
             prev->child[direction]->parent(x);
-//         if ( prev )
-            prev->parent(x->parent());
+          prev->parent(x->parent());
 
           if ( x->parent() )
           {
@@ -535,11 +534,8 @@ namespace std
           {
             root_ = prev;
           }
-
-          // x-y
           prev->child[direction] = x;
- //         if ( x )
-            x->parent(prev);
+          x->parent(prev);
         }
 
         node* fixup_insert(node* x, direction_type direction) __ntl_nothrow
