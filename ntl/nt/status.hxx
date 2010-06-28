@@ -43,21 +43,6 @@ namespace nt {
    **/
 struct status
 {
-  enum type;
-
-  static bool is_error(const type s)
-  {
-    return static_cast<unsigned>(s) >> 30 == 3;
-  }
-  static bool is_warning(const type s)
-  {
-    return static_cast<unsigned>(s) >> 30 == 2;
-  }
-  static bool is_informational(const type s)
-  {
-    return static_cast<unsigned>(s) >> 30 == 1;
-  }
-
   enum type
   {
     success                                                        = (int)0x00000000,
@@ -1681,6 +1666,20 @@ struct status
     complus_exception = (int)0xE0434352
 #endif
   };
+
+  static bool is_error(const type s)
+  {
+    return static_cast<unsigned>(s) >> 30 == 3;
+  }
+  static bool is_warning(const type s)
+  {
+    return static_cast<unsigned>(s) >> 30 == 2;
+  }
+  static bool is_informational(const type s)
+  {
+    return static_cast<unsigned>(s) >> 30 == 1;
+  }
+
 };
 
 typedef nt::status::type ntstatus;

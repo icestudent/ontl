@@ -688,42 +688,42 @@ namespace __
     template<typename Iterator>
     inline typename enable_if<sizeof(typename iterator_traits<Iterator>::value_type) == sizeof(uint8_t), hash_t>::type operator()(Iterator first, Iterator last) const
     {
-      hash_t hash = seed;
+      hash_t h = seed;
       while(first != last){
-        hash = hash * prime ^ static_cast<hash_t>(*first);
+        h = h * prime ^ static_cast<hash_t>(*first);
         ++first;
       }
-      return hash;
+      return h;
     }
 
     /** Data sequence hashing (large values) */
     template<typename Iterator>
     inline typename enable_if<(sizeof(typename iterator_traits<Iterator>::value_type) > sizeof(uint8_t)), hash_t>::type operator()(Iterator first, Iterator last) const
     {
-      hash_t hash = seed;
+      hash_t h = seed;
       while(first != last){
         size_t size = sizeof(*first);
         for(const uint8_t* p = reinterpret_cast<const uint8_t*>(&*first); size--; p++)
-          hash = hash * prime ^ *p;
+          h = h * prime ^ *p;
         ++first;
       }
-      return hash;
+      return h;
     }
 
     /** Data buffer hashing (by octets) */
     inline hash_t operator()(const void* data, size_t size) const
     {
-      hash_t hash = seed;
+      hash_t h = seed;
       for(const uint8_t* p = reinterpret_cast<const uint8_t*>(data); size--; p++)
-        hash = hash * prime ^ *p;
-      return hash;
+        h = h * prime ^ *p;
+      return h;
     }
 
-    static inline hash_t hash_op(const void* data, size_t size, hash_t hash = seed)
+    static inline hash_t hash_op(const void* data, size_t size, hash_t h = seed)
     {
       for(const uint8_t* p = reinterpret_cast<const uint8_t*>(data); size--; p++)
-        hash = hash * prime ^ *p;
-      return hash;
+        h = h * prime ^ *p;
+      return h;
     }
 
     static inline hash_t hash_combine(hash_t hash1, hash_t hash2 = seed)

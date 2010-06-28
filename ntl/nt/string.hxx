@@ -39,6 +39,7 @@ namespace nt {
   {
   public:
     typedef uint16_t size_type;
+    using std::allocator<charT>::pointer;
 
     __noalias __forceinline charT* __restrict allocate(size_type n, std::allocator<void>::const_pointer = 0)
     {
