@@ -30,59 +30,66 @@ namespace std
         typedef typename  allocator::difference_type  difference_type;
 
       protected:
+
+        enum direction_type  { left, right };
+
+        static direction_type reverse_direction(direction_type d)
+        {
+          assert( d == left || d == right );
+          return static_cast<direction_type>(d ^ left ^ right);
+        }
+
+        static direction_type right_direction(bool b)
+        {
+          return b ? right : left;
+        }
+
         struct node
         {
-          enum color_type { black, red };
-          union
-          {
-            struct
-            {
-              node *left, *right;
-            } s;
-            node* link[2];
-          } u;
-
-          node* parent;
+          enum color_type { black, red, colors };
+          node* child[colors];
+          uintptr_t parent_and_color;// pointers are always aligned
+          color_type color() const { return color_type(parent_and_color & 1); }
+          void color(color_type c) { parent_and_color = (parent_and_color & ~1) | c; }
+          node* parent() const { return reinterpret_cast<node*>(parent_and_color & ~1); }
+          void parent(node* p) 
+          { 
+            assert( (reinterpret_cast<uintptr_t>(p) & 1) == 0 );
+            parent_and_color = reinterpret_cast<uintptr_t>(p) | color();
+          }
+          
           T elem;
-          int8_t color;
 
-          explicit node(const T& elem, node* parent, node* left = NULL, node* right = NULL)
-            :elem(elem), parent(parent),
-            color(black)
+          explicit node(const T& elem, node* parent, node* l = nullptr, node* r = nullptr)
+          : elem(elem),
+            parent_and_color(reinterpret_cast<uintptr_t>(parent) | black)
           {
-            u.s.left = left;
-            u.s.right= right;
+            child[left] = l;
+            child[right]= r;
           }
           node(const T& elem)
-            :elem(elem),
-            parent(),
-            color(red)
+          : elem(elem), parent_and_color(0 | red)
           {
-            u.s.left = NULL;
-            u.s.right= NULL;
+            child[left] = child[right] = nullptr;
           }
 #ifdef NTL__CXX_RV
           node(T&& elem)
-            :elem(std::forward<T>(elem)),
-            parent(),
-            color(red)
+          : elem(std::forward<T>(elem)), parent_and_color(0 | red)
           {
-            u.s.left = NULL;
-            u.s.right= NULL;
+            child[left] = child[right] = nullptr;
           }
           node(node&& n)
-            :elem(std::forward<T>(n.elem)),
-            parent(n.parent), color(n.color)
+          : elem(std::forward<T>(n.elem)), parent_and_color(n.parent_and_color)
           {
-            u.s.left = n.u.s.left;
-            u.s.right= n.u.s.right;
+            child[left] = n.child[left];
+            child[right]= n.child[right];
           }
 #endif
           node(const node& n)
-            :elem(n.elem), parent(n.parent), color(n.color)
+          : elem(n.elem), parent_and_color(n.parent_and_color)
           {
-            u.s.left = n.u.s.left;
-            u.s.right= n.u.s.right;
+            child[left] = n.child[left];
+            child[right]= n.child[right];
           }
         private:
           node& operator=(const node& n);
@@ -99,8 +106,8 @@ namespace std
 
           reference operator* () const { return p->elem; }
           pointer   operator->() const { return &p->elem; }
-          iterator_impl& operator++()  { p = tree_->next(p, right ); return *this; }
-          iterator_impl& operator--()  { p = tree_->next(p, left  ); return *this; }
+          iterator_impl& operator++()  { p = tree_->next(p, right); return *this; }
+          iterator_impl& operator--()  { p = tree_->next(p, left); return *this; }
           iterator_impl operator++(int){ iterator_impl tmp( *this ); ++*this; return tmp; }
           iterator_impl operator--(int){ iterator_impl tmp( *this ); --*this; return tmp; }
 
@@ -116,7 +123,7 @@ namespace std
           friend struct const_iterator_impl;
           friend class rb_tree<T,Compare, Allocator>;
 
-          iterator_impl(node_type* /*const*/ p, rb_tree<T, Compare, Allocator>* tree)
+          iterator_impl(node_type* const p, rb_tree<T, Compare, Allocator>* tree)
             :p(p), tree_(tree)
           {}
 
@@ -142,7 +149,7 @@ namespace std
           const_pointer   operator->() const { return &operator*(); }
 
           const_iterator_impl& operator++()  { p = tree_->next(p, right); return *this; }
-          const_iterator_impl& operator--()  { p = tree_->next(p, left ); return *this; }
+          const_iterator_impl& operator--()  { p = tree_->next(p, left); return *this; }
           const_iterator_impl operator++(int){ const_iterator_impl tmp( *this ); ++*this; return tmp; }
           const_iterator_impl operator--(int){ const_iterator_impl tmp( *this ); --*this; return tmp; }
 
@@ -258,15 +265,16 @@ namespace std
         iterator find(const value_type& x)
         {
           node* p = root_;
-          while(p){
+          while ( p )
+          {
             if(elem_less(x, p->elem))
-              p = p->u.s.left;
+              p = p->child[left];
             else if(elem_greater(x, p->elem))
-              p = p->u.s.right;
+              p = p->child[right];
             else
-              return iterator(p, this);
+              break;//return iterator(p, this);
           }
-          return end();
+          return make_iterator(p);// returns end() if !p
         }
 
         const_iterator find(const value_type& x) const { return find(x); }
@@ -315,46 +323,35 @@ namespace std
 
         std::pair<iterator, bool> insert_impl(node* const np)
         {
-          // I guess this is not necessary:
-          // Node_allocator.allocate shall throw bad_alloc in this case.
-          // Moreover logic_error contains std::string member which
-          // potentially could not be allocated as well. - ST
-          // if(count_ == max_size()-1)
-          // __ntl_throw(std::length_error("rb_tree<T> too long"));
-
-          if(empty()){
-            // insert x as the root node
-            root_ = np;
-            root_->color = node::black;
-            first_ = last_ = root_;
+          // insert this as the root node if the tree is empty
+          if ( empty() )
+          {
+            np->color(node::black);
+            first_ = last_ = root_ = np;
             ++count_;
-            return std::make_pair(iterator(root_, this), true);
+            return std::make_pair(make_iterator(root_), true);
           }
-
           bool greater = false;
-          node *q = NULL;
-          for(node* p = root_; p != NULL; q = p, p = p->u.link[ greater ]){
-            greater = comparator_(p->elem, np->elem);
-            if(!greater && !elem_less(np->elem, p->elem))
-              // equal
-              return std::make_pair(iterator(p, this), false);
+          node *q = nullptr;
+          // check if node exists
+          for ( node* p = root_; p; p = p->child[greater] )
+          {
+            greater = elem_greater(np->elem, p->elem);
+            if ( !greater && !elem_less(np->elem, p->elem) )
+              return std::make_pair(make_iterator(p), false);
+            q = p;
           }
-
           // create node
-          np->parent = q;
-
-          // u.link
-          q->u.link[greater] = np;
-          if(q == first_ && !greater)
+          np->parent(q);
+          q->child[greater] = np;
+          if ( q == first_ && !greater )
             first_ = np;
           else if(q == last_ && greater)
             last_  = np;
-
           ++count_;
-
           // balance tree
           fixup_insert(np);
-          return std::make_pair(iterator(np, this), true);
+          return std::make_pair(make_iterator(np), true);
         }
 
       public:
@@ -379,60 +376,55 @@ namespace std
 
         iterator erase(const_iterator position)
         {
-          node *y, *z = const_cast<node*>(position.p);
-          if(!z)
+          node* const erasable = const_cast<node*>(position.p);
+          if ( !erasable )
             return make_iterator(nullptr);
 
           ++position;
-
           // check limits
-          if(z == first_)
-            first_ = next(z, right);
-          if(z == last_)
-            last_  = next(z, left);
+          if ( erasable == first_ )
+            first_ = next(erasable, right);
+          if ( erasable == last_ )
+            last_  = next(erasable, left);
 
-          if(z->u.s.left == NULL || z->u.s.right == NULL){
-            y = z;
-          }else{
-            // find tree successor with a NULL node as a child
-            y = z->u.s.right;
-            while(y->u.s.left)
-              y = y->u.s.left;
+          // find tree successor with a NULL node as a child
+          node* succ;
+          if( !erasable->child[left] || !erasable->child[right] )
+            succ = erasable;
+          else
+          {
+            succ = erasable->child[right];
+            while ( succ->child[left] )
+              succ = succ->child[left];
           }
-          node* x = y->u.link[ y->u.s.left == NULL ];
-
-          // remove y from the parent chain
-          node* prev_root = NULL;
-          if(x)
-            x->parent = y->parent;
-          if(y->parent)
-            y->parent->u.link[ y != y->parent->u.s.left ] = x;
-          else{
+          // remove successor from the parent chain
+          node* const x = succ->child[right_direction(!succ->child[left])];
+          node* prev_root = nullptr;
+          if ( x )
+            x->parent(succ->parent());
+          if ( succ->parent() )
+            succ->parent()->child[ succ != succ->parent()->child[left] ] = x;
+          else
+          {
             prev_root = root_;
             root_ = x;
+            //root_->color(node::black);
           }
 
-          if(y != z){
-            //z->data = y->data;
-            // save z fields
-            node* l[3] = {z->u.s.left, z->u.s.right, z->parent};
-            int8_t c = y->color;
-            node_allocator.destroy(z);
-            node_allocator.construct(z, *y);
-            z->color = c,
-              z->u.s.left = l[0],
-              z->u.s.right= l[1],
-              z->parent=l[2];
+          if ( succ != erasable )
+          {
+            std::swap(succ->elem, erasable->elem);
           }
-          if(y->color == node::black && x){
-            if(!prev_root)
+          if ( succ->color() == node::black && x )
+          {
+            if ( !prev_root )
               fixup_delete(x);
             else
-              x->color = node::black;
+              x->color(node::black);
           }
-          node_allocator.destroy(y);
-          node_allocator.deallocate(y, 1);
-          if(count_)
+          node_allocator.destroy(succ);
+          node_allocator.deallocate(succ, 1);
+          if ( count_ )
             --count_;
           return make_iterator(const_cast<node*>(position.p));
         }
@@ -441,7 +433,6 @@ namespace std
         {
           while(first != last)
             first = erase(first);
-
           return empty() ? end() : make_iterator(const_cast<node*>(last.p));
         }
 
@@ -456,9 +447,12 @@ namespace std
     #ifdef NTL__CXX_RV
         void swap(rb_tree<T, Compare, Allocator>&& tree)
         {
-          if(this != &tree){
+          if ( this != &tree )
+          {
             using std::swap;
             swap(root_, tree.root_);
+            swap(first_, tree.first_);
+            swap(last_, tree.last_);
             swap(count_, tree.count_);
             swap(comparator_, tree.comparator_);
             swap(node_allocator, tree.node_allocator);
@@ -468,9 +462,12 @@ namespace std
     #if !defined(NTL__CXX_RV) || defined(NTL__CXX_RVFIX)
         void swap(rb_tree<T, Compare, Allocator>& tree)
         {
-          if(this != &tree){
+          if ( this != &tree )
+          {
             using std::swap;
             swap(root_, tree.root_);
+            swap(first_, tree.first_);
+            swap(last_, tree.last_);
             swap(count_, tree.count_);
             swap(comparator_, tree.comparator_);
             swap(node_allocator, tree.node_allocator);
@@ -488,126 +485,122 @@ namespace std
         value_compare value_comp() const { return comparator_; }
 
       protected:
-        node* next(node* from, bool direction) const __ntl_nothrow
+        node* next(node* from, direction_type direction) const __ntl_nothrow
         {
           // if --begin() || ++end(), do nothing;
           // if --end(), return last.
-          if(!direction && from == first_)
+          if ( from == nullptr /* end() */ )
+            return direction == left ? last_ : from;
+          if ( from == first_ && direction == left )
             return from;
-          else if(!from){
-            if(direction)
-              return from;
-            else
-              return last_;
-          }
-
-          const bool indirection = !direction;
-          if(from->u.link[direction] == NULL){
-            for(node *p = from, *q = p->parent; ; p = q, q = q->parent)
-              if(q == NULL || p == q->u.link[indirection])
-                return q;
-          }else{
-            from = from->u.link[direction];
-            while(from->u.link[indirection])
-              from = from->u.link[indirection];
+          // if node has a child in the required direction,
+          // reverse iterate through its descendants 
+          direction_type const r_direction = reverse_direction(direction);
+          if ( from->child[direction] )
+          {
+            from = from->child[direction];
+            while ( from->child[r_direction] )
+              from = from->child[r_direction];
             return from;
           }
+          // go to the root unless parent is in the required direction 
+          for ( node *parent = from->parent(); ; from = parent, parent = parent->parent() )
+            if ( !parent || from == parent->child[r_direction] )
+              return parent;
         }
 
-        const node* next(const node* from, bool direction) const __ntl_nothrow
+        const node* next(const node* from, direction_type direction) const __ntl_nothrow
         {
           return next(const_cast<node*>(from), direction);
         }
 
-        // true to rotateRight
-        void rotate(node* x, bool direction) __ntl_nothrow
+        void rotate(node* x, direction_type direction) __ntl_nothrow
         {
-          // rotateLeft: right = true
-          const bool right = !direction, left = direction;
+          direction_type const reverse = reverse_direction(direction);;
+          node* const prev = x->child[reverse];
+          x->child[reverse] = prev->child[direction];
+          if ( prev->child[direction] )
+            prev->child[direction]->parent(x);
+//         if ( prev )
+            prev->parent(x->parent());
 
-          node* y = x->u.link[right];
-
-          // right x u.link
-          x->u.link[right] = y->u.link[left];
-          if(y->u.link[left])
-            y->u.link[left]->parent = x;
-
-          // parent y u.link
-          if(y)
-            y->parent = x->parent;
-
-          if(x->parent){
-            bool l = x == x->parent->u.link[left];
+          if ( x->parent() )
+          {
+            bool l = x == x->parent()->child[direction];
             if(!direction)
               l = !l;
-            x->parent->u.link[ l ] = y;
-          }else{
-            root_ = y;
+            x->parent()->child[ l ] = prev;
+          }
+          else
+          {
+            root_ = prev;
           }
 
           // x-y
-          y->u.link[left] = x;
-          if(x)
-            x->parent = y;
+          prev->child[direction] = x;
+ //         if ( x )
+            x->parent(prev);
         }
 
-        node* fixup_insert(node* x, bool direction) __ntl_nothrow
+        node* fixup_insert(node* x, direction_type direction) __ntl_nothrow
         {
-          const bool right = direction, left = !direction;
-
-          node* y = x->parent->parent->u.link[right];
-          if(y && y->color == node::red){
-            // uncle is red
-            x->parent->color = node::black;
-            y->color = node::black;
-            x->parent->parent->color = node::red;
-            x = x->parent->parent;
-          }else{
-            // uncle is black
-            if(x == x->parent->u.link[right]){
-              x = x->parent;
-              rotate(x, left);
+          node* const y = x->parent()->parent()->child[direction];
+          if( y && y->color() == node::red )
+          {
+            x->parent()->color(node::black);
+            y->color(node::black);
+            x->parent()->parent()->color(node::red);
+            x = x->parent()->parent();
+          }
+          else
+          {
+            if ( x == x->parent()->child[direction] )
+            {
+              x = x->parent();
+              rotate(x, reverse_direction(direction));
             }
-            // recolor and rotate
-            x->parent->color = node::black;
-            x->parent->parent->color = node::red;
-            rotate(x->parent->parent, right);
+            x->parent()->color(node::black);
+            x->parent()->parent()->color(node::red);
+            rotate(x->parent()->parent(), direction);
           }
           return x;
         }
 
-        node* fixup_delete(node* x, bool direction) __ntl_nothrow
+        node* fixup_delete(node* x, direction_type direction) __ntl_nothrow
         {
-          const bool right = direction, left = !direction;
-
-          node* w = x->parent->u.link[right];
-          if(!w)
-            return x->parent;
-          if(w->color == node::red){
-            w->color = node::black;
-            x->parent->color = node::red;
-            rotate(x->parent, left);
-            w = x->parent->u.link[right];
-          }
-          if(!w)
-            return x->parent;
-          if(
-            (!w->u.link[left] || w->u.link[left] ->color == node::black) &&
-            (!w->u.link[right]|| w->u.link[right]->color == node::black))
+          direction_type const reverse = reverse_direction(direction);;
+          node* w = x->parent()->child[direction];
+          if ( !w )
+            return x->parent();
+          if ( w->color() == node::red )
           {
-            w->color = node::red;
-            x = x->parent;
-          }else{
-            if(!w->u.link[right] || w->u.link[right]->color == node::black){
-              w->u.link[left]->color = node::black;
-              w->color = node::red;
-              rotate(w, right);
-              w = x->parent->u.link[right];
+            w->color(node::black);
+            x->parent()->color(node::red);
+            rotate(x->parent(), reverse);
+            w = x->parent()->child[direction];
+          }
+          if ( !w )
+            return x->parent();
+          if(
+            (!w->child[reverse] || w->child[reverse]->color() == node::black) &&
+            (!w->child[direction]|| w->child[direction]->color() == node::black))
+          {
+            w->color(node::red);
+            x = x->parent();
+          }
+          else
+          {
+            if(!w->child[direction] || w->child[direction]->color() == node::black)
+            {
+              w->child[reverse]->color(node::black);
+              w->color(node::red);
+              rotate(w, direction);
+              w = x->parent()->child[direction];
             }
-            w->color = x->parent->color;
-            x->parent->color = node::black;
-            w->u.link[right]->color = node::black;
-            rotate(x->parent, left);
+            w->color(x->parent()->color());
+            x->parent()->color(node::black);
+            w->child[direction]->color(node::black);
+            rotate(x->parent(), reverse);
             x = root_;
           }
           return x;
@@ -615,19 +608,22 @@ namespace std
 
         void fixup_insert(node* x) __ntl_nothrow
         {
-          while(x != root_ && x->parent->color == node::red){
-            x = fixup_insert(x, x->parent == x->parent->parent->u.s.left);
+          while ( x != root_ && x->parent()->color() == node::red )
+          {
+            x = fixup_insert(x,
+              right_direction(x->parent() == x->parent()->parent()->child[left]));
           }
-          root_->color = node::black;
+          root_->color(node::black);
         }
 
         void fixup_delete(node* x) __ntl_nothrow
         {
-          if(!x) return;
-          while(x != root_ && x->color == node::black){
-            x = fixup_delete(x, x == x->parent->u.s.left);
+          if ( !x ) return;
+          while ( x != root_ && x->color() == node::black )
+          {
+            x = fixup_delete(x, right_direction(x == x->parent()->child[left]));
           }
-          x->color = node::black;
+          x->color(node::black);
         }
 
         bool elem_less(const T& x, const T& y) const
@@ -663,15 +659,14 @@ namespace std
         }
 
       protected:
-        typename allocator_type::template rebind<node_type>::other node_allocator;
-        value_compare comparator_;
 
         node* root_;
         node *first_, *last_;
         size_type count_;
 
+        value_compare comparator_;
+        typename allocator_type::template rebind<node_type>::other node_allocator;
 
-        static const bool left = false, right = true;
       };
 
       template<class T, class Compare, class Allocator>

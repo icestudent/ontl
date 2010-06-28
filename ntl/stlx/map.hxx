@@ -80,20 +80,20 @@ namespace std {
 template <class Key,
           class T,
           class Compare = less<Key>,
-          class Allocator = allocator<pair<const Key, T> > >
+          class Allocator = allocator<pair</*const*/ Key, T> > >
 class map:
-  protected std::ext::tree::rb_tree<pair<const Key, T>, __::value_compare<Key, T, Compare, Allocator>, Allocator>
+  protected std::ext::tree::rb_tree<pair</*const*/ Key, T>, __::value_compare<Key, T, Compare, Allocator>, Allocator>
 {
   ///////////////////////////////////////////////////////////////////////////
   typedef __::value_compare<Key, T, Compare, Allocator>  value_compare;
-  typedef std::ext::tree::rb_tree<pair<const Key, T>, value_compare, Allocator> tree_type;
+  typedef std::ext::tree::rb_tree<pair</*const*/ Key, T>, value_compare, Allocator> tree_type;
   typedef typename tree_type::node node;
   public:
 
     ///\name  types
     typedef Key                                       key_type;
     typedef T                                         mapped_type;
-    typedef pair<const Key, T>                        value_type;
+    typedef pair</*const*/ Key, T>                        value_type;
     typedef Compare                                   key_compare;
 
     typedef Allocator                                 allocator_type;
@@ -316,11 +316,12 @@ public:
     iterator find(const key_type& x)
     {
       node* p = tree_type::root_;
-      while(p){
-        if(val_comp_.comp(x, p->elem.first))
-          p = p->u.s.left;
+      while ( p )
+      {
+        if ( val_comp_.comp(x, p->elem.first) )
+          p = p->child[left];
         else if(val_comp_.comp(p->elem.first, x))
-          p = p->u.s.right;
+          p = p->child[right];
         else
           return tree_type::make_iterator(p);
       }
@@ -346,16 +347,20 @@ public:
     {
       // find a node with value which are equal or nearest to the x
       node* p = tree_type::root_;
-      while(p){
-        if(val_comp_(value_type(x, mapped_type()), p->elem)){
-          if(p->u.s.left){
-            p = p->u.s.left;
-          }else{
+      while ( p )
+      {
+        if ( val_comp_(value_type(x, mapped_type()), p->elem) )
+        {
+          if(p->child[left])
+            p = p->child[left];
+          else
+          {
             iterator re(make_iterator(p));
             return make_pair(re, re); // is a closest nodes
           }
-        }else if(val_comp_(p->elem, value_type(x, mapped_type()))) // greater
-          p = p->u.s.right;
+        }
+        else if ( val_comp_(p->elem, value_type(x, mapped_type())) ) // greater
+          p = p->child[right];
         else
           return make_pair(make_iterator(p), make_iterator(next(p, tree_type::right)));
       }
