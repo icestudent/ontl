@@ -165,93 +165,92 @@ namespace atomic {
     return intrinsic::_InterlockedDecrement64(&val);
   }
 
-  ///\warning These bellow are keywords (see 2.11/2) and incompatible with /Za
   static inline
-    bool and(volatile bool & val, bool mask)
+    bool bit_and(volatile bool & val, bool mask)
   {
     return intrinsic::_InterlockedAnd8(reinterpret_cast<volatile uint8_t*>(&val), mask) == 1;
   }
 
   static inline
-    uint8_t and(volatile uint8_t & val, uint8_t mask)
+    uint8_t bit_and(volatile uint8_t & val, uint8_t mask)
   {
     return intrinsic::_InterlockedAnd8(&val, mask);
   }
 
   static inline
-    uint16_t and(volatile uint16_t & val, uint16_t mask)
+    uint16_t bit_and(volatile uint16_t & val, uint16_t mask)
   {
     return intrinsic::_InterlockedAnd16(&val, mask);
   }
 
   static inline
-    uint32_t and(volatile uint32_t & val, uint32_t mask)
+    uint32_t bit_and(volatile uint32_t & val, uint32_t mask)
   {
     return intrinsic::_InterlockedAnd(&val, mask);
   }
 
   static inline
-    uint64_t and(volatile uint64_t & val, uint64_t mask)
+    uint64_t bit_and(volatile uint64_t & val, uint64_t mask)
   {
     return intrinsic::_InterlockedAnd64(&val, mask);
   }
 
   static inline
-    bool or(volatile bool & val, bool mask)
+    bool bit_or(volatile bool & val, bool mask)
   {
     return intrinsic::_InterlockedOr8(reinterpret_cast<volatile uint8_t*>(&val), mask) == 1;
   }
 
   static inline
-    uint8_t or(volatile uint8_t & val, uint8_t mask)
+    uint8_t bit_or(volatile uint8_t & val, uint8_t mask)
   {
     return intrinsic::_InterlockedOr8(&val, mask);
   }
 
   static inline
-    uint16_t or(volatile uint16_t & val, uint16_t mask)
+    uint16_t bit_or(volatile uint16_t & val, uint16_t mask)
   {
     return intrinsic::_InterlockedOr16(&val, mask);
   }
 
   static inline
-    uint32_t or(volatile uint32_t & val, uint32_t mask)
+    uint32_t bit_or(volatile uint32_t & val, uint32_t mask)
   {
     return intrinsic::_InterlockedOr(&val, mask);
   }
 
   static inline
-    uint64_t or(volatile uint64_t & val, uint64_t mask)
+    uint64_t bit_or(volatile uint64_t & val, uint64_t mask)
   {
     return intrinsic::_InterlockedOr64(&val, mask);
   }
 
   static inline
-    bool xor(volatile bool & val, bool mask)
+    bool bit_xor(volatile bool & val, bool mask)
   {
     return intrinsic::_InterlockedXor8(reinterpret_cast<volatile uint8_t*>(&val), mask) == 1;
   }
 
   static inline
-    uint8_t xor(volatile uint8_t & val, uint8_t mask)
+    uint8_t bit_xor(volatile uint8_t & val, uint8_t mask)
   {
     return intrinsic::_InterlockedXor8(&val, mask);
   }
 
   static inline
-    uint16_t xor(volatile uint16_t & val, uint16_t mask)
+    uint16_t bit_xor(volatile uint16_t & val, uint16_t mask)
   {
     return intrinsic::_InterlockedXor16(&val, mask);
   }
 
   static inline
-    uint32_t xor(volatile uint32_t & val, uint32_t mask)
+    uint32_t bit_xor(volatile uint32_t & val, uint32_t mask)
   {
     return intrinsic::_InterlockedXor(&val, mask);
   }
 
   static inline
-    uint64_t xor(volatile uint64_t & val, uint64_t mask)
+    uint64_t bit_xor(volatile uint64_t & val, uint64_t mask)
   {
     return intrinsic::_InterlockedXor64(&val, mask);
   }
@@ -361,73 +360,73 @@ namespace atomic {
   }
 
   static inline
-    int8_t and(volatile int8_t & val, int8_t mask)
+    int8_t bit_and(volatile int8_t & val, int8_t mask)
   {
     return intrinsic::_InterlockedAnd8(reinterpret_cast<volatile uint8_t*>(&val), mask);
   }
 
   static inline
-    int16_t and(volatile int16_t & val, int16_t mask)
+    int16_t bit_and(volatile int16_t & val, int16_t mask)
   {
     return intrinsic::_InterlockedAnd16(reinterpret_cast<volatile uint16_t*>(&val), mask);
   }
 
   static inline
-    int32_t and(volatile int32_t & val, int32_t mask)
+    int32_t bit_and(volatile int32_t & val, int32_t mask)
   {
     return intrinsic::_InterlockedAnd(reinterpret_cast<volatile uint32_t*>(&val), mask);
   }
 
   static inline
-    int64_t and(volatile int64_t & val, int64_t mask)
+    int64_t bit_and(volatile int64_t & val, int64_t mask)
   {
     return intrinsic::_InterlockedAnd64(reinterpret_cast<volatile uint64_t*>(&val), mask);
   }
 
   static inline
-    int8_t or(volatile int8_t & val, int8_t mask)
+    int8_t bit_or(volatile int8_t & val, int8_t mask)
   {
     return intrinsic::_InterlockedOr8(reinterpret_cast<volatile uint8_t*>(&val), mask);
   }
 
   static inline
-    int16_t or(volatile int16_t & val, int16_t mask)
+    int16_t bit_or(volatile int16_t & val, int16_t mask)
   {
     return intrinsic::_InterlockedOr16(reinterpret_cast<volatile uint16_t*>(&val), mask);
   }
 
   static inline
-    int32_t or(volatile int32_t & val, int32_t mask)
+    int32_t bit_or(volatile int32_t & val, int32_t mask)
   {
     return intrinsic::_InterlockedOr(reinterpret_cast<volatile uint32_t*>(&val), mask);
   }
 
   static inline
-    int64_t or(volatile int64_t & val, int64_t mask)
+    int64_t bit_or(volatile int64_t & val, int64_t mask)
   {
     return intrinsic::_InterlockedOr64(reinterpret_cast<volatile uint64_t*>(&val), mask);
   }
 
   static inline
-    int8_t xor(volatile int8_t & val, int8_t mask)
+    int8_t bit_xor(volatile int8_t & val, int8_t mask)
   {
     return intrinsic::_InterlockedXor8(reinterpret_cast<volatile uint8_t*>(&val), mask);
   }
 
   static inline
-    int16_t xor(volatile int16_t & val, int16_t mask)
+    int16_t bit_xor(volatile int16_t & val, int16_t mask)
   {
     return intrinsic::_InterlockedXor16(reinterpret_cast<volatile uint16_t*>(&val), mask);
   }
 
   static inline
-    int32_t xor(volatile int32_t & val, int32_t mask)
+    int32_t bit_xor(volatile int32_t & val, int32_t mask)
   {
     return intrinsic::_InterlockedXor(reinterpret_cast<volatile uint32_t*>(&val), mask);
   }
 
   static inline
-    int64_t xor(volatile int64_t & val, int64_t mask)
+    int64_t bit_xor(volatile int64_t & val, int64_t mask)
   {
     return intrinsic::_InterlockedXor64(reinterpret_cast<volatile uint64_t*>(&val), mask);
   }
@@ -528,22 +527,22 @@ namespace atomic {
       return reinterpret_cast<T>(atomic::decrement(reinterpret_cast<volatile U&>(val)));
     }
     template<typename T>
-    static inline T or(volatile T& val, T mask)
+    static inline T bit_or(volatile T& val, T mask)
     {
       typedef typename tmap<T>::type U;
-      return reinterpret_cast<T>(atomic::or(reinterpret_cast<volatile U&>(val), reinterpret_cast<U>(mask)));
+      return reinterpret_cast<T>(atomic::bit_or(reinterpret_cast<volatile U&>(val), reinterpret_cast<U>(mask)));
     }
     template<typename T>
-    static inline T xor(volatile T& val, T mask)
+    static inline T bit_xor(volatile T& val, T mask)
     {
       typedef typename tmap<T>::type U;
-      return reinterpret_cast<T>(atomic::xor(reinterpret_cast<volatile U&>(val), reinterpret_cast<U>(mask)));
+      return reinterpret_cast<T>(atomic::bit_xor(reinterpret_cast<volatile U&>(val), reinterpret_cast<U>(mask)));
     }
     template<typename T>
-    static inline T and(volatile T& val, T mask)
+    static inline T bit_and(volatile T& val, T mask)
     {
       typedef typename tmap<T>::type U;
-      return reinterpret_cast<T>(atomic::and(reinterpret_cast<volatile U&>(val), reinterpret_cast<U>(mask)));
+      return reinterpret_cast<T>(atomic::bit_and(reinterpret_cast<volatile U&>(val), reinterpret_cast<U>(mask)));
     }
     template<typename T>
     static inline T exchange(volatile T& dest, T val)
@@ -588,38 +587,38 @@ namespace atomic {
 
   template<typename T>
   static inline
-    T and(volatile T & val, T mask)
+    T bit_and(volatile T & val, T mask)
   {
     return __sync_fetch_and_and(&val, mask);
   }
   static inline
-    bool and(volatile bool & val, bool mask)
+    bool bit_and(volatile bool & val, bool mask)
   {
-    return and(reinterpret_cast<volatile uint8_t&>(val), mask) == 1;
+    return bit_and<uint8_t>(reinterpret_cast<volatile uint8_t&>(val), mask) == 1;
   }
 
   template<typename T>
   static inline
-    T or(volatile T & val, T mask)
+    T bit_or(volatile T & val, T mask)
   {
     return __sync_fetch_and_or(&val, mask);
   }
   static inline
-    bool or(volatile bool & val, bool mask)
+    bool bit_or(volatile bool & val, bool mask)
   {
-    return or(reinterpret_cast<volatile uint8_t&>(val), mask) == 1;
+    return bit_or<uint8_t>(reinterpret_cast<volatile uint8_t&>(val), mask) == 1;
   }
 
   template<typename T>
   static inline
-    T xor(volatile T & val, T mask)
+    T bit_xor(volatile T & val, T mask)
   {
     return __sync_fetch_and_xor(&val, mask);
   }
   static inline
-    bool xor(volatile bool & val, bool mask)
+    bool bit_xor(volatile bool & val, bool mask)
   {
-    return xor(reinterpret_cast<volatile uint8_t&>(&val), mask) == 1;
+    return bit_xor<uint8_t>(reinterpret_cast<volatile uint8_t&>(val), mask) == 1;
   }
 
   template<typename T>

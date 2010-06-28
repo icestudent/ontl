@@ -450,10 +450,10 @@ namespace std
         {
         case memory_order_release:
           intrin::_ReadWriteBarrier();
-          return rep<type>::cast(atomic::and(val.val, operand));
+          return rep<type>::cast(atomic::bit_and(val.val, operand));
         case memory_order_acquire:
         case memory_order_consume:
-          {const type r = rep<type>::cast(atomic::and(val.val, operand));
+          {const type r = rep<type>::cast(atomic::bit_and(val.val, operand));
           intrin::_ReadWriteBarrier();
           return r;}
         default:
@@ -461,7 +461,7 @@ namespace std
         case memory_order_relaxed:
         case memory_order_seq_cst:
         case memory_order_acq_rel:
-          return rep<type>::cast(atomic::and(val.val, operand));
+          return rep<type>::cast(atomic::bit_and(val.val, operand));
         }
       }
       /** \copydoc fetch_add() */
@@ -471,10 +471,10 @@ namespace std
         {
         case memory_order_release:
           intrin::_ReadWriteBarrier();
-          return rep<type>::cast(atomic::or(val.val, operand));
+          return rep<type>::cast(atomic::bit_or(val.val, operand));
         case memory_order_acquire:
         case memory_order_consume:
-          {const type r = rep<type>::cast(atomic::or(val.val, operand));
+          {const type r = rep<type>::cast(atomic::bit_or(val.val, operand));
           intrin::_ReadWriteBarrier();
           return r;}
         default:
@@ -482,7 +482,7 @@ namespace std
         case memory_order_seq_cst:
         case memory_order_acq_rel:
         case memory_order_relaxed:
-          return rep<type>::cast(atomic::or(val.val, operand));
+          return rep<type>::cast(atomic::bit_or(val.val, operand));
         }
       }
       /** \copydoc fetch_add() */
@@ -492,10 +492,10 @@ namespace std
         {
         case memory_order_release:
           intrin::_ReadWriteBarrier();
-          return rep<type>::cast(atomic::xor(val.val, operand));
+          return rep<type>::cast(atomic::bit_xor(val.val, operand));
         case memory_order_acquire:
         case memory_order_consume:
-          {const type r = rep<type>::cast(atomic::xor(val.val, operand));
+          {const type r = rep<type>::cast(atomic::bit_xor(val.val, operand));
           intrin::_ReadWriteBarrier();
           return r;}
         default:
@@ -503,7 +503,7 @@ namespace std
         case memory_order_seq_cst:
         case memory_order_acq_rel:
         case memory_order_relaxed:
-          return rep<type>::cast(atomic::xor(val.val, operand));
+          return rep<type>::cast(atomic::bit_xor(val.val, operand));
         }
       }
 
