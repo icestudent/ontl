@@ -162,7 +162,8 @@ namespace std {
         }else if(tree_type::elem_greater(x, p->elem))
           p = p->child[tree_type::right];
         else
-          return make_pair(tree_type::make_iterator(p), tree_type::make_iterator(next(p, tree_type::right)));
+          return make_pair(tree_type::make_iterator(p),
+              tree_type::make_iterator(tree_type::next(p, tree_type::right)));
       }
       return make_pair(tree_type::make_iterator(p), tree_type::make_iterator(p));
     }

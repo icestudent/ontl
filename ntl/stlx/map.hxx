@@ -362,7 +362,8 @@ public:
         else if ( val_comp_(p->elem, value_type(x, mapped_type())) ) // greater
           p = p->child[tree_type::right];
         else
-          return make_pair(tree_type::make_iterator(p), tree_type::make_iterator(next(p, tree_type::right)));
+          return make_pair(tree_type::make_iterator(p),
+              tree_type::make_iterator(tree_type::next(p, tree_type::right)));
       }
       iterator re(tree_type::make_iterator(nullptr));
       return make_pair(re, re);

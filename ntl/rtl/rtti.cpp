@@ -494,7 +494,6 @@ extern "C" void* __cdecl __RTCastToVoid (void* object) throw(...)
   }
 }
 
-// extern "C" const std::type_info* __cdecl __RTtypeid(const void* object)
 extern "C" void* __cdecl __RTtypeid(void* object) throw(...)
 {
   if(!object){
