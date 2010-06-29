@@ -113,23 +113,23 @@ namespace std {
 #ifdef NTL__CXX_RV
     std::pair<iterator, bool> insert(const value_type& x)
     {
-      return insert_impl(construct_node(x));
+      return tree_type::insert_impl(construct_node(x));
     }
 
     iterator insert(const_iterator /*position*/, const value_type& x)
     {
       // TODO: implement fast insert function based on position
-      return insert_impl(construct_node(x)).first;
+      return tree_type::insert_impl(construct_node(x)).first;
     }
 
     std::pair<iterator, bool> insert(value_type&& x)
     {
-      return insert_reference(std::forward<value_type>(x));
+      return tree_type::insert_reference(std::forward<value_type>(x));
     }
     iterator insert(const_iterator /*position*/, value_type&& x)
     {
       // TODO: implement fast insert function based on position
-      return insert_reference(std::forward<value_type>(x)).first;
+      return tree_type::insert_reference(std::forward<value_type>(x)).first;
     }
 #endif
 
