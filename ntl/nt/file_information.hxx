@@ -288,7 +288,8 @@ struct file_rename_information
 
   static inline ptr alloc(const const_unicode_string& new_name, bool replace_if_exists, legacy_handle root_directory = legacy_handle())
   {
-    return ptr(new (varsize, new_name.size()*sizeof(wchar_t)) file_rename_information(new_name, replace_if_exists, root_directory));
+    ptr p(new (varsize, new_name.size()*sizeof(wchar_t)) file_rename_information(new_name, replace_if_exists, root_directory));
+    return p;
   }
 
   bool          ReplaceIfExists;
