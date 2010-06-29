@@ -25,6 +25,7 @@ namespace std {
     public std::ext::tree::rb_tree<Key, Compare, Allocator>
   {
     typedef std::ext::tree::rb_tree<Key, Compare, Allocator> tree_type;
+    using tree_type::node;
   public:
     // types:
     typedef Key                                   key_type;
@@ -150,20 +151,20 @@ namespace std {
     pair<iterator,iterator> equal_range(const key_type& x)
     {
       // find a node with value which are equal or nearest to the x
-      node* p = root_;
+      node* p = tree_type::root_;
       while(p){
-        if(elem_less(x, p->elem)){
-          if(p->child[left]){
-            p = p->child[left];
+        if(tree_type::elem_less(x, p->elem)){
+          if(p->child[tree_type::left]){
+            p = p->child[tree_type::left];
           }else{
-            return make_pair(make_iterator(p), make_iterator(p)); // is a closest nodes
+            return make_pair(tree_type::make_iterator(p), tree_type::make_iterator(p)); // is a closest nodes
           }
-        }else if(elem_greater(x, p->elem))
-          p = p->child[right];
+        }else if(tree_type::elem_greater(x, p->elem))
+          p = p->child[tree_type::right];
         else
-          return make_pair(make_iterator(p), make_iterator(next(p, right)));
+          return make_pair(tree_type::make_iterator(p), tree_type::make_iterator(next(p, tree_type::right)));
       }
-      return make_pair(make_iterator(p), make_iterator(p));
+      return make_pair(tree_type::make_iterator(p), tree_type::make_iterator(p));
     }
 
     pair<const_iterator,const_iterator> equal_range(const key_type& x) const

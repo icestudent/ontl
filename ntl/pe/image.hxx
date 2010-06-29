@@ -720,7 +720,7 @@ namespace ntl {
         # pragma warning(disable: 810) // conversion from const char* to uint16_t may lose significant bits
         #endif
         const uint32_t ordinal = uintptr_t(exp) <= 0xFFFF
-          ? exports->ordinal(this, reinterpret_cast<uint16_t>(exp))
+          ? exports->ordinal(this, static_cast<uint16_t>(reinterpret_cast<uintptr_t>(exp)))
           : exports->ordinal(this, exp);
         #ifdef __ICL
         # pragma warning(default: 810)

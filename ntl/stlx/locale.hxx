@@ -297,10 +297,10 @@ public:
   }
 
   /** convert the single-element sequence byte to a wide %string */
-  wide_string from_bytes(char byte) __ntl_throws(range_error)
+  wide_string from_bytes(char one_byte) __ntl_throws(range_error)
   {
     assert(cvt);
-    const char bytes[1] = {byte}, *bnext;
+    const char bytes[1] = {one_byte}, *bnext;
     Elem chars[1], *wnext;
     codecvt_base::result re = cvt->in(cvtstate, bytes, bytes+_countof(bytes), bnext, chars, chars+_countof(chars), wnext);
     count = wnext - chars;
@@ -2132,7 +2132,7 @@ class num_put : public locale::facet
     }
     ///\}
   private:
-    static iter_type put_int(iter_type out, ios_base& str, char_type fill, unsigned long long v, bool is_signed, bool is_long = false, bool is_pointer = false)
+    static iter_type put_int(iter_type out, ios_base& str, char_type fill, unsigned long long v, bool signed_v, bool long_v = false, bool pointer_v = false)
     {
       const ios_base::fmtflags flags = str.flags();
       const ios_base::fmtflags adjust = flags & ios_base::adjustfield;
@@ -2154,7 +2154,7 @@ class num_put : public locale::facet
 
       if(showpos)
         *fmt++ = '+';
-      if(showbase && !is_pointer) // pointer have a custom prefix always
+      if(showbase && !pointer_v) // pointer have a custom prefix always
         *fmt++ = '#';
       if(adjust == ios_base::internal){
         *fmt++ = '0';
@@ -2162,15 +2162,15 @@ class num_put : public locale::facet
           *fmt++ = '*';
       }
 
-      if(is_pointer){
+      if(pointer_v){
         *fmt = 'p';
       }else{
-        if(is_long)
+        if(long_v)
           *fmt++ = 'I', *fmt++ = '6', *fmt++ = '4';
 
         *fmt = bases[basefield >> 6]; // (base >> 5) / 2
 
-        if(basefield == ios_base::dec && is_signed)
+        if(basefield == ios_base::dec && signed_v)
           *fmt = 'd';
         else if(basefield == ios_base::hex && uppercase)
           *fmt = 'X';
@@ -2179,25 +2179,25 @@ class num_put : public locale::facet
 
       char buf[32]; // may not enough if large width
       streamsize l = adjust == ios_base::internal && width
-        ? _snprintf(buf, _countof(buf), fmtbuf, width, is_long ? v : static_cast<unsigned long>(v))
-      : _snprintf(buf, _countof(buf), fmtbuf, is_long ? v : static_cast<unsigned long>(v));
+        ? _snprintf(buf, _countof(buf), fmtbuf, width, long_v ? v : static_cast<unsigned long>(v))
+      : _snprintf(buf, _countof(buf), fmtbuf, long_v ? v : static_cast<unsigned long>(v));
 
       // adjust
       if(width && width > l){
         streamsize pad = width - l;
-        if(is_pointer)
+        if(pointer_v)
           pad -= 2;
         if(adjust != ios_base::left && adjust != ios_base::internal) // before
           out = __::fill_n(out, pad, fill);
 
-        if(is_pointer)
+        if(pointer_v)
           out = copy_n("0x",2,out);
         out = copy_n(buf,l,out);
 
         if(adjust == ios_base::left)
           out = __::fill_n(out, pad, fill);
       }else{
-        if(is_pointer)
+        if(pointer_v)
           out = copy_n("0x",2,out);
         out = copy_n(buf,l,out);
       }

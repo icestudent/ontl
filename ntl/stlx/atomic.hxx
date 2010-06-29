@@ -425,6 +425,8 @@ namespace std
     struct integral:
       public base<T, true>
     {
+      using base<T, true>::type;
+
       ///\name arithmetic computations
 
       /**
@@ -436,12 +438,12 @@ namespace std
        **/
       type fetch_add(type operand, memory_order mo = memory_order_seq_cst) volatile
       {
-        return x_add(operand, mo);
+        return this->x_add(operand, mo);
       }
       /** \copydoc fetch_add() */
       type fetch_sub(type operand, memory_order mo = memory_order_seq_cst) volatile
       {
-        return x_add(-operand, mo);
+        return this->x_add(-operand, mo);
       }
       /** \copydoc fetch_add() */
       type fetch_and(type operand, memory_order mo = memory_order_seq_cst) volatile
@@ -450,10 +452,10 @@ namespace std
         {
         case memory_order_release:
           intrin::_ReadWriteBarrier();
-          return rep<type>::cast(atomic::bit_and(val.val, operand));
+          return rep<type>::cast(atomic::bit_and(this->val.val, operand));
         case memory_order_acquire:
         case memory_order_consume:
-          {const type r = rep<type>::cast(atomic::bit_and(val.val, operand));
+          {const type r = rep<type>::cast(atomic::bit_and(this->val.val, operand));
           intrin::_ReadWriteBarrier();
           return r;}
         default:
@@ -461,7 +463,7 @@ namespace std
         case memory_order_relaxed:
         case memory_order_seq_cst:
         case memory_order_acq_rel:
-          return rep<type>::cast(atomic::bit_and(val.val, operand));
+          return rep<type>::cast(atomic::bit_and(this->val.val, operand));
         }
       }
       /** \copydoc fetch_add() */
@@ -471,10 +473,10 @@ namespace std
         {
         case memory_order_release:
           intrin::_ReadWriteBarrier();
-          return rep<type>::cast(atomic::bit_or(val.val, operand));
+          return rep<type>::cast(atomic::bit_or(this->val.val, operand));
         case memory_order_acquire:
         case memory_order_consume:
-          {const type r = rep<type>::cast(atomic::bit_or(val.val, operand));
+          {const type r = rep<type>::cast(atomic::bit_or(this->val.val, operand));
           intrin::_ReadWriteBarrier();
           return r;}
         default:
@@ -482,7 +484,7 @@ namespace std
         case memory_order_seq_cst:
         case memory_order_acq_rel:
         case memory_order_relaxed:
-          return rep<type>::cast(atomic::bit_or(val.val, operand));
+          return rep<type>::cast(atomic::bit_or(this->val.val, operand));
         }
       }
       /** \copydoc fetch_add() */
@@ -492,10 +494,10 @@ namespace std
         {
         case memory_order_release:
           intrin::_ReadWriteBarrier();
-          return rep<type>::cast(atomic::bit_xor(val.val, operand));
+          return rep<type>::cast(atomic::bit_xor(this->val.val, operand));
         case memory_order_acquire:
         case memory_order_consume:
-          {const type r = rep<type>::cast(atomic::bit_xor(val.val, operand));
+          {const type r = rep<type>::cast(atomic::bit_xor(this->val.val, operand));
           intrin::_ReadWriteBarrier();
           return r;}
         default:
@@ -503,7 +505,7 @@ namespace std
         case memory_order_seq_cst:
         case memory_order_acq_rel:
         case memory_order_relaxed:
-          return rep<type>::cast(atomic::bit_xor(val.val, operand));
+          return rep<type>::cast(atomic::bit_xor(this->val.val, operand));
         }
       }
 

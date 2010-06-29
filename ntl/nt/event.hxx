@@ -331,4 +331,4 @@ namespace ntl {
   }// namespace nt
 }// namespace ntl
 
-#endif //
+#endif //NTL__NT_EVENT

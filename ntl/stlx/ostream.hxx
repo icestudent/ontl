@@ -37,6 +37,7 @@ class basic_ostream
 : virtual public basic_ios<charT, traits>
 {
     typedef basic_ios<charT, traits>  this_base;
+    using ios_base::__noinittag;
 
   public:
     basic_ostream(__noinittag)
@@ -346,10 +347,10 @@ class basic_ostream
       if ( this->rdbuf() )
       {
         ///\note no sentry as it'll result in recursive call
-        if ( good() )
+        if ( this->good() )
         {
           ///\note STLPort doesn't have this line (as one above, but that doesn't matter)
-          if ( basic_ostream<charT, traits>* tiestr = tie() ) tiestr->flush();
+          if ( basic_ostream<charT, traits>* tiestr = this->tie() ) tiestr->flush();
           if ( this->rdbuf()->pubsync() == -1 )
             this->setstate(ios_base::badbit);
         }

@@ -308,7 +308,7 @@ namespace std
               file::directory_file|file::open_for_backup_intent|file::synchronous_io_nonalert);
             if(success(st)){
               io_status_block iosb;
-              byte* buf = nullptr;
+              char* buf = nullptr;
             #ifdef NTL__SUBSYSTEM_KM
               static const uint32_t multiplier = 2;
               memsize = (sizeof(file_directory_information)+32)*16; // ~32 files by default (~3KB), multiplies by 2
@@ -319,7 +319,7 @@ namespace std
               do{
                 if(buf)
                   delete[] buf;
-                buf = new (nothrow) byte[ memsize *= multiplier ];
+                buf = new (nothrow) char[ memsize *= multiplier ];
                 if(!buf){
                   ec = make_error_code(status::insufficient_resources);
                   return false;
@@ -355,7 +355,7 @@ namespace std
             //difference_type idx = 0;
             //for(fdi_t p = bdi.base.get(); p != bdi.di; p = step(p), idx++);
 
-            //base = reinterpret_cast<fdi_t>( new (nothrow) byte[memsize = bdi.memsize] );
+            //base = reinterpret_cast<fdi_t>( new (nothrow) char[memsize = bdi.memsize] );
             //if(!base)
             //  return;
 
@@ -367,7 +367,7 @@ namespace std
           void free() __ntl_nothrow
           {
             if(base){
-              delete[] reinterpret_cast<const byte*>(base);
+              delete[] reinterpret_cast<const char*>(base);
               base = di = nullptr;
               memsize = 0;
             }

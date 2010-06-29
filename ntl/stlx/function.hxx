@@ -124,6 +124,8 @@ namespace std
           arity = tuple_size<Args>::value
         };
 
+        using impl::fun_arity<R, Args>::result_type;
+
         ///\name 20.7.15.2.1, construct/copy/destroy:
         // allocator-aware:
         //template<class A> function(allocator_arg_t, const A&);

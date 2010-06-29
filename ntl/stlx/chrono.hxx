@@ -91,9 +91,9 @@ namespace std
     template <class Rep>
     struct duration_values
     {
-      static const Rep zero() { return Rep(0); }
-      static const Rep min()  { return numeric_limits<Rep>::lowest(); }
-      static const Rep max()  { return numeric_limits<Rep>::max(); }
+      static Rep zero() { return Rep(0); }
+      static Rep min()  { return numeric_limits<Rep>::lowest(); }
+      static Rep max()  { return numeric_limits<Rep>::max(); }
     };
 
     template <class ToDuration, class Rep, class Period>

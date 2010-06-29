@@ -137,12 +137,12 @@ namespace aux
       ntstatus
       _query(
       QueryInformationT             QueryInformation,
-      legacy_handle   handle,
+      legacy_handle   h,
       void *          info,
       uint32_t        info_length
       )
     {
-      return QueryInformation(handle, InformationClass::info_class_type, info, info_length, nullptr);
+      return QueryInformation(h, InformationClass::info_class_type, info, info_length, nullptr);
     }
   protected:
     InformationClass info;
@@ -179,12 +179,12 @@ namespace aux
       ntstatus
         _set(
           SetInformationT SetInformation,
-          legacy_handle   handle,
+          legacy_handle   h,
           const void *    info,
           uint32_t        info_length
           )
       {
-        return SetInformation(handle, InformationClass::info_class_type, info, info_length);
+        return SetInformation(h, InformationClass::info_class_type, info, info_length);
       }
   };
 
@@ -218,23 +218,23 @@ struct process_information_base:
 {
     typedef InformationClass info_class;
 
-    process_information_base(legacy_handle handle) __ntl_nothrow
+    process_information_base(legacy_handle h) __ntl_nothrow
     {
       static_assert((std::is_base_of<aux::write_only, InformationClass>::value == false), "Cannot query a write-only information class");
-      status_ = _query(QueryInformation, handle, &info, sizeof(info));
+      status_ = this->_query(QueryInformation, h, &this->info, sizeof(this->info));
     }
 
     process_information_base(
-      legacy_handle       handle,
+      legacy_handle       h,
       const info_class &  new_info
       ) __ntl_nothrow
     {
       static_assert(is_read_only == false, "Cannot set a read-only information class");
-      status_ = _set(SetInformation, handle, &new_info, sizeof(info_class));
+      status_ = _set(SetInformation, h, &new_info, sizeof(info_class));
     }
 
     info_class * data() { return nt::success(status_) ? &info : 0; }
-    const info_class * data() const { return nt::success(status_) ? &info : 0; }
+    const info_class * data() const { return nt::success(status_) ? &this->info : 0; }
     info_class * operator->() { return data(); }
     const info_class * operator->() const { return data(); }
 
@@ -447,23 +447,23 @@ struct thread_information_base:
 {
   typedef InformationClass info_class;
 
-  thread_information_base(legacy_handle handle) __ntl_nothrow
+  thread_information_base(legacy_handle h) __ntl_nothrow
   {
     static_assert((std::is_base_of<aux::write_only, InformationClass>::value == false), "Cannot query a write-only information class");
-    status_ = _query(QueryInformation, handle, &info, sizeof(info));
+    status_ = this->_query(QueryInformation, h, &this->info, sizeof(this->info));
   }
 
   thread_information_base(
-    legacy_handle       handle,
+    legacy_handle       h,
     const info_class &  new_info
     ) __ntl_nothrow
   {
     static_assert(is_read_only == false, "Cannot set a read-only information class");
-    status_ = _set(SetInformation, handle, &new_info, sizeof(info_class));
+    status_ = _set(SetInformation, h, &new_info, sizeof(info_class));
   }
 
-  info_class * data() { return nt::success(status_) ? &info : 0; }
-  const info_class * data() const { return nt::success(status_) ? &info : 0; }
+  info_class * data() { return nt::success(status_) ? &this->info : 0; }
+  const info_class * data() const { return nt::success(status_) ? &this->info : 0; }
   info_class * operator->() { return data(); }
   const info_class * operator->() const { return data(); }
 

@@ -158,7 +158,7 @@ namespace ntl
             const catchabletypearray* types = cxx.thrown_va<catchabletypearray*>(info->catchabletypearray);
             assert(types->size > 0);
             const catchabletype& type = *cxx.thrown_va<catchabletype*>(types->type[0]);
-            byte* obj = new byte[type.object_size]; // malloc
+            char* obj = new char[type.object_size]; // malloc
             try {
               ehrec.ExceptionInformation[1] = copyThrownObject(cxx, type, obj, true);
               original = cxx.get_object();
@@ -268,7 +268,7 @@ namespace ntl
           if(info->exception_dtor && cxx.get_object()){
             cxx.destruct_eobject(false);
           }
-          delete[] reinterpret_cast<byte*>(cxx.get_object());
+          delete[] reinterpret_cast<char*>(cxx.get_object());
         }
         delete ptr;
       }

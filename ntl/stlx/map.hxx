@@ -159,7 +159,7 @@ public:
     map(initializer_list<value_type> il, const Compare comp = Compare(), const Allocator& a = Allocator())
       :val_comp_(comp), tree_type(val_comp_, a)
     {
-      insert_range(il.begin(), il.end());
+      tree_type::insert_range(il.begin(), il.end());
     }
 
     ~map(){}
@@ -251,32 +251,32 @@ public:
 #ifdef NTL__CXX_RV
     std::pair<iterator, bool> insert(const value_type& x)
     {
-      return insert_impl(construct_node(x));
+      return tree_type::insert_impl(tree_type::construct_node(x));
     }
 
     iterator insert(const_iterator /*position*/, const value_type& x)
     {
       // TODO: implement fast insert function based on position
-      return insert_impl(construct_node(x)).first;
+      return tree_type::insert_impl(tree_type::construct_node(x)).first;
     }
 
     template<class P>
     std::pair<iterator, bool> insert(P&& x)
     {
-      return insert_reference(std::forward<P>(x));
+      return tree_type::insert_reference(std::forward<P>(x));
     }
     template<class P>
     iterator insert(const_iterator /*position*/, P&& x)
     {
       // TODO: implement fast insert function based on position
-      return insert_reference(std::forward<P>(x)).first;
+      return tree_type::insert_reference(std::forward<P>(x)).first;
     }
 #endif
 
     __forceinline
     void insert(initializer_list<value_type> il)
     {
-      insert_range(il.begin(), il.end());
+      tree_type::insert_range(il.begin(), il.end());
     }
 
     size_type erase(const key_type& x)
@@ -319,9 +319,9 @@ public:
       while ( p )
       {
         if ( val_comp_.comp(x, p->elem.first) )
-          p = p->child[left];
+          p = p->child[tree_type::left];
         else if(val_comp_.comp(p->elem.first, x))
-          p = p->child[right];
+          p = p->child[tree_type::right];
         else
           return tree_type::make_iterator(p);
       }
@@ -351,20 +351,20 @@ public:
       {
         if ( val_comp_(value_type(x, mapped_type()), p->elem) )
         {
-          if(p->child[left])
-            p = p->child[left];
+          if(p->child[tree_type::left])
+            p = p->child[tree_type::left];
           else
           {
-            iterator re(make_iterator(p));
+            iterator re(tree_type::make_iterator(p));
             return make_pair(re, re); // is a closest nodes
           }
         }
         else if ( val_comp_(p->elem, value_type(x, mapped_type())) ) // greater
-          p = p->child[right];
+          p = p->child[tree_type::right];
         else
-          return make_pair(make_iterator(p), make_iterator(next(p, tree_type::right)));
+          return make_pair(tree_type::make_iterator(p), tree_type::make_iterator(next(p, tree_type::right)));
       }
-      iterator re(tree_type::make_iterator(NULL));
+      iterator re(tree_type::make_iterator(nullptr));
       return make_pair(re, re);
     }
 

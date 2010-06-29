@@ -1644,7 +1644,7 @@ namespace cxxruntime {
       #pragma pack(push,1)
       struct jump_thunk
       {
-        byte      jmp;
+        uint8_t  jmp;
         int32_t  offset;
       };
       static_assert(sizeof(jump_thunk) == 5, "something wrong..");

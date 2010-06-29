@@ -43,6 +43,7 @@ using std::uintptr_t;
 using std::intmax_t;
 using std::uintmax_t;
 
-typedef std::uint8_t byte;
+///\move this elsewhere
+//typedef std::uint8_t byte;
 
 #endif//#ifndef NTL__STDINT

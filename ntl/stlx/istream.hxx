@@ -27,6 +27,7 @@ template <class charT, class traits /*= char_traits<charT>*/ >
 class basic_istream : virtual public basic_ios<charT, traits>
 {
     typedef basic_ios<charT, traits> this_base;
+    using ios_base::__noinittag;
 
   public:
     basic_istream(__noinittag)

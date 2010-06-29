@@ -246,9 +246,9 @@ protected:
       s = buffer, n = 1;
 
     if(write_only)
-      setp(s, s+n);
+      this->setp(s, s+n);
     else
-      setg(s, s, s);
+      this->setg(s, s, s);
     return this;
   }
 
@@ -256,9 +256,9 @@ protected:
   {
     if(!outh) return -1;
 
-    streamsize size = pptr() - pbase();
+    streamsize size = this->pptr() - this->pbase();
     if(size){
-      size = write(pbase(), size);
+      size = write(this->pbase(), size);
       reset();
     }
     return static_cast<int>(size);
@@ -284,25 +284,25 @@ protected:
     // backup:  gptr-eback [begin,pos) (already readed)
     // pending: egptr-gptr [pos,end)
 
-    streamsize avail = egptr()-gptr();
+    streamsize avail = this->egptr() - this->gptr();
     if(avail > 0)
       // just return it
-      return traits_type::to_int_type(*gptr());
+      return traits_type::to_int_type(*this->gptr());
 
     streamsize cb;
-    char_type* p = eback();
+    char_type* p = this->eback();
 
-    if(egptr() == p){
+    if(this->egptr() == p){
       // first call
       cb = 128;
     }else{
-      avail = gptr()-eback();
+      avail = this->gptr() - this->eback();
       avail = avail > 32 ? 16 : (avail <= 1 ? 0 : 1); // leave 16 characters for backup seq if avail
       cb = buffer_size - avail;
       if(avail){
-        traits_type::move(p, gptr()-1, avail);
+        traits_type::move(p, this->gptr()-1, avail);
         p += avail;
-        setg(buffer, p, p); // temporary set read position to the end of backup
+        this->setg(buffer, p, p); // temporary set read position to the end of backup
       }
     }
     //if(is_console_handle)
@@ -315,9 +315,9 @@ protected:
       return eof;
 
     // [back|pos|readed]
-    setg(eback(), p, p+avail);
+    this->setg(this->eback(), p, p+avail);
 
-    return traits_type::to_int_type(*gptr());
+    return traits_type::to_int_type(*this->gptr());
   }
 
   virtual streamsize xsgetn(char_type* s, streamsize n)
@@ -326,7 +326,7 @@ protected:
     for (streamsize copied = 0;;){
       if(n <= 0)
         return copied;
-      const streamsize ravail = gend - gnext;
+      const streamsize ravail = this->gend - this->gnext;
       if(ravail <= 0)
       {
         if(traits_type::eq_int_type(eof, do_underflow(n)))
@@ -335,10 +335,10 @@ protected:
       }
       //__assume(n >= 0 && ravail >= 0);
       const size_t chunksize = static_cast<size_t>(std::min(n, ravail));
-      traits_type::copy(s, gnext, chunksize);
+      traits_type::copy(s, this->gnext, chunksize);
       s += chunksize;
       copied += chunksize;
-      gnext += chunksize;
+      this->gnext += chunksize;
       n -= chunksize;
     }
   }
@@ -348,13 +348,13 @@ protected:
   {
     const int_type eof = traits_type::eof();
     const bool eofc = traits_type::eq_int_type(c, traits_type::eof());
-    if(write_only == false || !outh || (!pbase() && eofc))
+    if(write_only == false || !outh || (!this->pbase() && eofc))
       return eof;
 
     bool ok = true;
-    if(pbase()){
-      const streamsize pending = pptr() - pbase();
-      ok = write(pbase(), pending) == pending;
+    if(this->pbase()){
+      const streamsize pending = this->pptr() - this->pbase();
+      ok = write(this->pbase(), pending) == pending;
       if(ok)
         reset();
     }
@@ -379,10 +379,10 @@ protected:
   void reset()
   {
     if(write_only)
-      setp(pbase(), epptr());
+      this->setp(this->pbase(), this->epptr());
     else{
-      char_type* g = eback();
-      setg(g, g, g);
+      char_type* g = this->eback();
+      this->setg(g, g, g);
     }
   }
 
@@ -402,7 +402,7 @@ protected:
   streamsize file_write(const char_type* data, streamsize n)
   {
     typedef std::codecvt<char_type,char,traits::state_type> codecvt;
-    static const codecvt& cvt = std::use_facet<codecvt>(getloc());
+    static const codecvt& cvt = std::use_facet<codecvt>(this->getloc());
 
     using std::codecvt_base;
     traits::state_type state;
@@ -471,7 +471,7 @@ protected:
   {
     typedef char fromT;
     typedef std::codecvt<char_type,char,traits::state_type> codecvt;
-    static const codecvt& cvt = std::use_facet<codecvt>(getloc());
+    static const codecvt& cvt = std::use_facet<codecvt>(this->getloc());
 
     using std::codecvt_base;
 

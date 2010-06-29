@@ -474,8 +474,9 @@ namespace {
 } // namespace
 
 
-// extern "C" void* __cdecl __RTCastToVoid (const void* object)
-extern "C" void* __cdecl __RTCastToVoid (void* object) __ntl_throws(...)
+///\note throw(...) is to avoid error C2382: redefinition; different exception specifications
+/// as this is predefined C++ type
+extern "C" void* __cdecl __RTCastToVoid (void* object) throw(...)
 {
   if(!object)
     return nullptr;
@@ -494,7 +495,7 @@ extern "C" void* __cdecl __RTCastToVoid (void* object) __ntl_throws(...)
 }
 
 // extern "C" const std::type_info* __cdecl __RTtypeid(const void* object)
-extern "C" void* __cdecl __RTtypeid(void* object) __ntl_throws(...)
+extern "C" void* __cdecl __RTtypeid(void* object) throw(...)
 {
   if(!object){
     __ntl_throw(std::bad_typeid(/*"A typeid of nullptr pointer attempted"*/));
@@ -529,7 +530,7 @@ extern "C" void* __cdecl __RTtypeid(void* object) __ntl_throws(...)
 
 #include "../stlx/stdexcept.hxx"
 
-extern "C" void* __cdecl __RTDynamicCast(void* object, int32_t vfdelta, void* srctype, void* desttype, int isreference) __ntl_throws(...)
+extern "C" void* __cdecl __RTDynamicCast(void* object, int32_t vfdelta, void* srctype, void* desttype, int isreference) throw(...)
 {
   if(!object)
     return nullptr;

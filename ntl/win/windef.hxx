@@ -54,48 +54,6 @@ typedef long bool_t;
 
 struct lasterror
 {
-  enum type;
-
-  static void set(uint32_t value)
-  {
-    ntl::nt::teb::instance().LastErrorValue = value;
-  }
-
-  static type get()
-  {
-    return static_cast<type>(ntl::nt::teb::instance().LastErrorValue);
-  }
-
-  lasterror()
-    :err_(get())
-  {}
-
-  lasterror(type error)
-    :err_(error)
-  {
-    set(error);
-  }
-
-  lasterror(uint32_t error)
-    :err_(static_cast<type>(error))
-  {
-    set(error);
-  }
-
-  lasterror& operator=(const type error)
-  {
-    err_ = static_cast<type>(error);
-    set(error);
-    return *this;
-  }
-
-  operator type() const { return err_; }
-  operator bool() const { return err_ == success; }
-  bool operator!() const { return err_ != success; }
-
-  type err_;
-
-
   enum type {
     success                                               = 0,
     invalid_function,
@@ -1763,6 +1721,46 @@ struct lasterror
     ipsec_ike_negotiation_disabled,
     ipsec_ike_neg_status_end,
   };
+
+  static void set(uint32_t value)
+  {
+    ntl::nt::teb::instance().LastErrorValue = value;
+  }
+
+  static type get()
+  {
+    return static_cast<type>(ntl::nt::teb::instance().LastErrorValue);
+  }
+
+  lasterror()
+    :err_(get())
+  {}
+
+  lasterror(type error)
+    :err_(error)
+  {
+    set(error);
+  }
+
+  lasterror(uint32_t error)
+    :err_(static_cast<type>(error))
+  {
+    set(error);
+  }
+
+  lasterror& operator=(const type error)
+  {
+    err_ = static_cast<type>(error);
+    set(error);
+    return *this;
+  }
+
+  operator type() const { return err_; }
+  operator bool() const { return err_ == success; }
+  bool operator!() const { return err_ != success; }
+
+  type err_;
+
 };
 
 /**@} winapi_types_support */

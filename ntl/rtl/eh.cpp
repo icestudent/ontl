@@ -80,10 +80,10 @@ extern "C" __declspec(naked) void _alloca_probe_16()
     push ecx
     lea  ecx,[esp+8]
     sub  ecx,eax
-    and  ecx,15
+    And  ecx,15
     add  eax,ecx
     sbb  ecx,ecx
-    or   eax,ecx
+    Or   eax,ecx
     pop  ecx
     jmp  _chkstk
   }

@@ -30,6 +30,10 @@ namespace std
   {
     R T::*pm;
   public:
+
+    typedef typename unary_function::result_type    result_type;
+    typedef typename unary_function::argument_type  argument_type;
+    
     explicit mem_pm_t(R T::*pm)
       :pm(pm)
     {}
@@ -90,6 +94,9 @@ namespace std
   {
     Functor pmf;
   public:
+
+    using __::memfun_arity<R, T, Args>::result_type;
+
     explicit mem_fn_t(Functor f)
       :pmf(f)
     {}
