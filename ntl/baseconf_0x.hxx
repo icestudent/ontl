@@ -27,8 +27,8 @@
   #define NTL__CXX_CHARS_TYPES
   // unicode string literals (u'' / U"")
   #define NTL__CXX_CHARS
-  // concepts, concept_map, requires
-  #define NTL__CXX_CONCEPT
+  // concepts, concept_map, requires (removed from c++0x)
+  // #define NTL__CXX_CONCEPT
   // constexpr
   #define NTL__CXX_CONSTEXPR
   // decltype (typeof)
@@ -73,7 +73,7 @@
 #if _MSC_VER >= 1600
 
 /** VC10's partial C++0x support */
-// _MSC_FULL_VER: 160011001 (CTP), 160020506 (beta1), 160021003 (beta2)
+// _MSC_FULL_VER: 160011001 (CTP), 160020506 (beta1), 160021003 (beta2), 160030128 (rc)
 
 #define NTL__CXX_AUTO
 #if _MSC_FULL_VER >= 160020506 // beta1
