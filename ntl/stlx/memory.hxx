@@ -240,14 +240,22 @@ class allocator
     #define NTL_DEFINE_CONSTRUCT(n,aux) \
     template <class U NTL_SPP_COMMA_IF(n) NTL_SPP_ARGS(1,n,class A)> \
     void construct(U* p NTL_SPP_COMMA_IF(n) NTL_SPP_AARGS(1,n,&& a)) { __assume(p); ::new( (void*)p ) T(NTL_SPP_LOOP(1,n,NTL_X,a)); }
+    #define NTL_DEFINE_CONSTRUCT0(aux) NTL_DEFINE_CONSTRUCT(0,aux)
 #else
     #define NTL_X
     #define NTL_DEFINE_CONSTRUCT(n,aux) \
     template <class U NTL_SPP_COMMA_IF(n) NTL_SPP_ARGS(1,n,class A)> \
-    void construct(U* p NTL_SPP_COMMA_IF(n) NTL_SPP_AARGS(1,n,const& a)) { __assume(p); ::new( (void*)p ) T(NTL_SPP_ARGS(1,n,a)); }
+    void construct(U* p NTL_SPP_COMMA_IF(n) NTL_SPP_AARGS(1,n,const& a)) { __assume(p); ::new( (void*)p ) T(NTL_SPP_ARGS(1,n,a)); }\
+    template <class U NTL_SPP_COMMA_IF(n) NTL_SPP_ARGS(1,n,class A)> \
+    void construct(U* p NTL_SPP_COMMA_IF(n) NTL_SPP_AARGS(1,n,& a))      { __assume(p); ::new( (void*)p ) T(NTL_SPP_ARGS(1,n,a)); }
+    
+    #define NTL_DEFINE_CONSTRUCT0(aux) \
+    template <class U> \
+    void construct(U* p) { __assume(p); ::new( (void*)p ) T(); }
+
 #endif
 
-    NTL_DEFINE_CONSTRUCT(0,)
+    NTL_DEFINE_CONSTRUCT0(NTL_SPP_EMPTY)
     NTL_DEFINE_CONSTRUCT(1,)
     NTL_DEFINE_CONSTRUCT(2,)
     NTL_DEFINE_CONSTRUCT(3,)
@@ -624,6 +632,14 @@ namespace __ {
         allocator<T>().construct(p, a1, a2, a3);
       return p;
     }
+    template<class A1>
+    static T* get_object(A1& a1)
+    {
+      T* p = get_buffer();
+      if(!check_constructed(p, true))
+        allocator<T>().construct(p, a1);
+      return p;
+    }
     /** schedules object destruction at program exit */
     static void schedule_destruction(T*) { atexit(dtor); }
 
@@ -665,8 +681,8 @@ namespace __ {
     // marks the object and returns previous state
     static int check_constructed(T* p, bool mark)
     {
-      int re = *reinterpret_cast<int*>(p+1);
-      *reinterpret_cast<int*>(p+1) += mark ? 1 : -1;
+      int re = *reinterpret_cast<const int*>(p+1);
+      *(int*)(p+1) += mark ? 1 : -1;
       return re;
     }
   };

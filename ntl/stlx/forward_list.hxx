@@ -75,8 +75,8 @@ namespace std {
       Alloc::template rebind<T>::other              allocator;
     typedef typename  allocator::pointer            pointer;
     typedef typename  allocator::const_pointer      const_pointer;
-    typedef typename  allocator::reference          reference;
-    typedef typename  allocator::const_reference    const_reference;
+    typedef       value_type&                       reference;
+    typedef const value_type&                       const_reference;
     typedef typename  allocator::size_type          size_type;
     typedef typename  allocator::difference_type    difference_type;
 
@@ -600,7 +600,7 @@ namespace std {
 
   // Comparison operators
   template <class T, class Alloc>
-  bool operator==(const forward_list<T,Alloc>& x, const forward_list<T,Alloc>& y)
+  inline bool operator==(const forward_list<T,Alloc>& x, const forward_list<T,Alloc>& y)
   {
     for(typename forward_list<T, Alloc>::const_iterator x1 = x.cbegin(), y1 = y.cbegin(), x2 = x.cend(), y2 = y.cend();
         x1 != x2 && y1 != y2;
@@ -613,31 +613,31 @@ namespace std {
   }
 
   template <class T, class Alloc>
-  bool operator< (const forward_list<T,Alloc>& x, const forward_list<T,Alloc>& y)
+  inline bool operator< (const forward_list<T,Alloc>& x, const forward_list<T,Alloc>& y)
   {
     return lexicographical_compare(x.cbegin(), x.cend(), y.cbegin(), y.cend());
   }
 
   template <class T, class Alloc>
-  bool operator!=(const forward_list<T,Alloc>& x, const forward_list<T,Alloc>& y)
+  inline bool operator!=(const forward_list<T,Alloc>& x, const forward_list<T,Alloc>& y)
   {
     return rel_ops::operator !=(x, y);
   }
 
   template <class T, class Alloc>
-  bool operator> (const forward_list<T,Alloc>& x, const forward_list<T,Alloc>& y)
+  inline bool operator> (const forward_list<T,Alloc>& x, const forward_list<T,Alloc>& y)
   {
     return rel_ops::operator >(x, y);
   }
 
   template <class T, class Alloc>
-  bool operator>=(const forward_list<T,Alloc>& x, const forward_list<T,Alloc>& y)
+  inline bool operator>=(const forward_list<T,Alloc>& x, const forward_list<T,Alloc>& y)
   {
     return rel_ops::operator >=(x, y);
   }
 
   template <class T, class Alloc>
-  bool operator<=(const forward_list<T,Alloc>& x, const forward_list<T,Alloc>& y)
+  inline bool operator<=(const forward_list<T,Alloc>& x, const forward_list<T,Alloc>& y)
   {
     return rel_ops::operator <=(x, y);
   }
@@ -645,20 +645,20 @@ namespace std {
 
   // 23.2.3.6 specialized algorithms:
   template <class T, class Alloc>
-  void swap(forward_list<T,Alloc>& x, forward_list<T,Alloc>& y)
+  inline void swap(forward_list<T,Alloc>& x, forward_list<T,Alloc>& y)
   {
     x.swap(y);
   }
   
 #ifdef NTL__CXX_RV
   template <class T, class Alloc>
-  void swap(forward_list<T,Alloc>&& x, forward_list<T,Alloc>& y)
+  inline void swap(forward_list<T,Alloc>&& x, forward_list<T,Alloc>& y)
   {
     x.swap(y);
   }
 
   template <class T, class Alloc>
-  void swap(forward_list<T,Alloc>& x, forward_list<T,Alloc>&& y)
+  inline void swap(forward_list<T,Alloc>& x, forward_list<T,Alloc>&& y)
   {
     x.swap(y);
   }

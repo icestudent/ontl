@@ -43,7 +43,7 @@ namespace std {
 
 #if defined(NTL__CXX_NULLPTR)
   typedef decltype(nullptr) nullptr_t;
-#elif defined(__DOXYGEN__)
+#elif defined(NTL__DOC)
   struct nullptr_t {};
 #endif
 

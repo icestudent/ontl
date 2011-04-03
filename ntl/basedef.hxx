@@ -28,6 +28,8 @@ namespace ntl {
  *@{*/
 
 ///\name  Exact-width integer types
+typedef std::uint8_t byte;
+
 using std::int8_t;
 using std::uint8_t;
 using std::int16_t;

@@ -1690,6 +1690,17 @@ bool success(const ntstatus s)
   return s >= 0;
 }
 
+struct last_status_t
+{
+#ifdef NTL__CXX_EXPLICITOP
+  explicit operator ntstatus() const { return last_status_; }
+#endif
+  ntstatus last_status() const volatile { return last_status_; }
+protected:
+  mutable volatile ntstatus last_status_;
+};
+
+
 /**@} native_types_support */
 
 

@@ -88,16 +88,16 @@ struct array
     const_reverse_iterator  rend() const
       { return const_reverse_iterator(begin()); }
 
-    const_iterator cbegin() const { return begin(); }
-    const_iterator cend() const   { return end(); }
-    const_reverse_iterator crbegin() const { return rbegin(); }
-    const_reverse_iterator crend() const   { return rend(); }
+    const_iterator          cbegin() const { return begin(); }
+    const_iterator          cend() const   { return end(); }
+    const_reverse_iterator  crbegin() const{ return rbegin(); }
+    const_reverse_iterator  crend() const  { return rend(); }
 
     ///\name  capacity
 
-    size_type size() const      { return N; }
-    size_type max_size() const  { return N; }
-    bool empty() const          { return N != 0; }
+    size_type               size() const      { return N; }
+    size_type               max_size() const  { return N; }
+    bool                    empty() const     { return N != 0; }
 
     ///\name  element access
 

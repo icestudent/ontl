@@ -29,7 +29,6 @@ static inline legacy_handle current_thread()
   return current_thread;
 }
 
-
 NTL__EXTERNAPI
 ntstatus __stdcall
 NtDuplicateObject(
@@ -43,16 +42,14 @@ NtDuplicateObject(
     );
 
 // wait functions
-struct wait_type_def
+__class_enum(wait_type)
 {
-  enum type { WaitAll, WaitAny };
-};
-typedef class_enum<wait_type_def> wait_type;
+  WaitAll,
+  WaitAny
+};};
 
-struct kwait_reason_def
+__class_enum(kwait_reason)
 {
-  enum type
-  {
     Executive,
     FreePage,
     PageIn,
@@ -91,9 +88,7 @@ struct kwait_reason_def
     WrGuardedMutex,
     WrRundown,
     MaximumWaitReason
-  };
-};
-typedef ntl::class_enum<kwait_reason_def> kwait_reason;
+};};
 
 static inline const systime_t& infinite_timeout()
 {

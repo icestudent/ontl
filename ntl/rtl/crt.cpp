@@ -208,6 +208,11 @@ std::new_handler std::set_new_handler(std::new_handler new_p) __ntl_nothrow
   return ntl::atomic::generic_op::exchange(ntl::__new_handler, prev);
 }
 
+std::new_handler std::get_new_handler() __ntl_nothrow
+{
+  return ntl::__new_handler;
+}
+
 /************************************************************************/
 /* `terminate` handler                                                  */
 /************************************************************************/
@@ -215,6 +220,11 @@ std::terminate_handler __ntl_std_terminate_handler = 0;
 
 namespace std
 {
+  terminate_handler get_terminate() __ntl_nothrow
+  {
+    return __ntl_std_terminate_handler;
+  }
+
   terminate_handler set_terminate(terminate_handler f) __ntl_nothrow
   {
     assert(f != nullptr);

@@ -38,6 +38,20 @@ namespace std
     class overflow_error;
     class underflow_error;
 
+
+  class error_category;
+  class error_code;
+  class error_condition;
+  class system_error;
+
+  inline const error_category& generic_category();
+  inline const error_category& system_category();
+
+  error_code& throws();
+  error_code& throw_system_error(const error_code& actual, error_code& holder);
+  void        throw_system_error(error_code& ec);
+
+
   ///\name exception helpers
   inline void __throw_out_of_range(const char* msg = "out of range");
   inline void __throw_length_error(const char* msg = "length exceeds its maximum allowable size");

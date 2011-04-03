@@ -56,7 +56,7 @@ namespace std
   template <class> class packaged_task; // undefined
 
   ///\name 30.5.2 Error handling [futures.errors]
-#if defined(NTL__CXX_ENUM) || defined(__DOXYGEN__)
+#if defined(NTL__CXX_ENUM) || defined(NTL__DOC)
   /// Futures error codes
   enum class future_errc {
     /** Indicates that promise is broken */
@@ -67,7 +67,7 @@ namespace std
     promise_already_satisfied,
     /** Uninitialized future use */
     future_uninitialized
-  #ifndef __DOXYGEN__
+  #ifndef NTL__DOC
     ,__maximum_errc
   #endif
   };

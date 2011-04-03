@@ -117,7 +117,8 @@ namespace ntl {
      **/
     class user_event:
       public handle,
-      public device_traits<user_event>
+      public device_traits<user_event>,
+      public last_status_t
     {
     public:
       /** Manual-reset event: an event object whose state remains signaled until it is explicitly reset to nonsignaled by the reset() function. */
@@ -125,47 +126,37 @@ namespace ntl {
       /** Auto-reset event: an event object whose state remains signaled until a single waiting thread is released, 
           at which time the system automatically sets the state to nonsignaled.  */
       static const event_type SynchronizationEvent = SynchronizationEvent;
+
+      static const event_type manual_reset = NotificationEvent,
+        auto_reset = SynchronizationEvent;
     public:
       
       /**
        *	@brief Creates a named event object
        *
-       *	@param[in] event_name     name of the event object
-       *	@param[in] EventType      type of the event object, can be NotificationEvent or SynchronizationEvent
+       *	@param[in] EventType      name of the event object
+       *	@param[in] ManualReset    type of the event object, can be NotificationEvent or SynchronizationEvent
        *	@param[in] InitialState   initial state of event, signaled or nonsignaled
        *	@param[in] DesiredAccess  desired types of access for the event object
        **/
       explicit user_event(
-        const const_unicode_string& event_name,
+        const const_unicode_string& EventName,
         event_type          EventType,
         bool                InitialState = false,
         access_mask         DesiredAccess = all_access
         )
       {
-        const object_attributes oa(event_name);
-        last_status_ = create(this, DesiredAccess, &oa, EventType, InitialState);
+        const object_attributes oa(EventName);
+        last_status_ = NtCreateEvent(this, DesiredAccess, &oa, EventType, InitialState);
       }
-
-      /**
-       *	@brief Creates a named event object
-       *
-       *	@param[in] event_name     name of the event object
-       *	@param[in] EventType      type of the event object, can be NotificationEvent or SynchronizationEvent
-       *  @param[out] IsOpened      if the named event object already existed before, IsOpened will be setted to true
-       *	@param[in] InitialState   initial state of event, signaled or nonsignaled
-       *	@param[in] DesiredAccess  desired types of access for the event object
-       **/
       explicit user_event(
-        const const_unicode_string& event_name,
+        const object_attributes& EventName,
         event_type          EventType,
-        bool&               IsOpened,
         bool                InitialState = false,
         access_mask         DesiredAccess = all_access
         )
       {
-        const object_attributes oa(event_name, object_attributes::case_insensitive | object_attributes::openif);
-        last_status_ = create(this, DesiredAccess, &oa, EventType, InitialState);
-        IsOpened = last_status_ == status::object_name_exists;
+        last_status_ = NtCreateEvent(this, DesiredAccess, &EventName, EventType, InitialState);
       }
 
       /**
@@ -181,23 +172,23 @@ namespace ntl {
         access_mask         DesiredAccess = all_access
         )
       {
-        last_status_ = create(this, DesiredAccess, NULL, EventType, InitialState);
+        last_status_ = NtCreateEvent(this, DesiredAccess, NULL, EventType, InitialState);
       }
 
 
       /**
        *	@brief Opens a named event object
        *
-       *	@param[in] event_name     name of the event object
+       *	@param[in] EventName      name of the event object
        *	@param[in] DesiredAccess  desired types of access for the event object
        **/
       explicit user_event(
-        const const_unicode_string& event_name,
+        const const_unicode_string& EventName,
         access_mask                 DesiredAccess = modify_state
         )
       {
-        const object_attributes oa(event_name);
-        last_status_ = open(this, &oa, DesiredAccess);
+        const object_attributes oa(EventName);
+        last_status_ = NtOpenEvent(this, DesiredAccess, &oa);
       }
 
       /**
@@ -207,11 +198,11 @@ namespace ntl {
        *	@param[in] DesiredAccess    desired types of access for the event object
        **/
       explicit user_event(
-        const object_attributes&  ObjectAttributes,
+        const object_attributes&  EventName,
         access_mask               DesiredAccess = modify_state
         )
       {
-        last_status_ = open(this, &ObjectAttributes, DesiredAccess);
+        last_status_ = NtOpenEvent(this, DesiredAccess, &EventName);
       }
 
 
@@ -322,10 +313,6 @@ namespace ntl {
       {
         return last_status_ = NtWaitForSingleObject(get(), alertable, system_time::infinite());
       }
-
-      ntstatus last_status() const volatile { return last_status_; }
-    private:
-      mutable volatile ntstatus last_status_;
     };
 
   }// namespace nt

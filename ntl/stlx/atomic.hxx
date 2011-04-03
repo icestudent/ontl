@@ -638,7 +638,7 @@ namespace std
   inline bool atomic_compare_exchange_weak_explicit(volatile atomic_bool* object, bool* expected, bool desired, memory_order smo, memory_order fmo) { return object->compare_exchange_weak(*expected,desired,smo,fmo); }
   inline bool atomic_compare_exchange_strong_explicit(volatile atomic_bool* object, bool* expected, bool desired, memory_order smo, memory_order fmo) { return object->compare_exchange_weak(*expected,desired,smo,fmo); }
 
-#ifdef __DOXYGEN__
+#ifdef NTL__DOC
   /**
    *	@brief %atomic integral type
    *
@@ -870,7 +870,7 @@ namespace std
    **/
   template<class T> struct atomic;
 
-#if __DOXYGEN__
+#if NTL__DOC
 
   /**
    *	@brief There is a generic class template atomic<T>.
@@ -1081,7 +1081,7 @@ namespace std
     friend void swap(volatile atomic_flag& x, volatile atomic_flag& y) { ntl::atomic::exchange(x.val_, y.val_); }
 
   //private:
-  #ifndef __DOXYGEN__
+  #ifndef NTL__DOC
     uint32_t val_;
   #endif
   };

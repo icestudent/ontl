@@ -698,7 +698,8 @@ typedef basic_file<file_handler> file;
 
 class section:
   public handle,
-  public device_traits<section>
+  public device_traits<section>,
+  public last_status_t
 {
 public:
   // create unnamed section
@@ -854,11 +855,8 @@ public:
     return NtOpenSection(SectionHandle, DesiredAccess, ObjectAttributes);
   }
 
-  ntstatus last_status() const { return last_status_; }
-
 private:
   void* base_;
-  ntstatus last_status_;
 };
 
 }//namespace nt

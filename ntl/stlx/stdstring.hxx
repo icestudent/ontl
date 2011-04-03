@@ -260,13 +260,13 @@ struct char_traits<wchar_t>
     typedef typename allocator_traits::allocator_type  allocator_type;
     typedef typename allocator_traits::size_type       size_type;
     typedef typename allocator_traits::difference_type difference_type;
-    typedef typename allocator_traits::reference       reference;
-    typedef typename allocator_traits::const_reference const_reference;
     typedef typename allocator_traits::pointer         pointer;
     typedef typename allocator_traits::const_pointer   const_pointer;
-    
-    typedef pointer         iterator;
-    typedef const_pointer   const_iterator;
+
+    typedef value_type&       reference;
+    typedef const value_type& const_reference;
+    typedef pointer           iterator;
+    typedef const_pointer     const_iterator;
 
     typedef std::reverse_iterator<iterator>            reverse_iterator;
     typedef std::reverse_iterator<const_iterator>      const_reverse_iterator;
@@ -1859,10 +1859,6 @@ bool
 ///\name  swap [21.3.8.8 string.special]
 template<class charT, class traits, class Allocator>
 inline void swap(basic_string<charT,traits,Allocator>&  lhs, basic_string<charT,traits,Allocator>&  rhs) { lhs.swap(rhs); }
-
-template <class charT, class traits, class Allocator>
-struct constructible_with_allocator_suffix<
-  basic_string<charT, traits, Allocator> > : true_type { };
 
 
 ///\name  Inserters and extractors [21.3.7.9 string.io]

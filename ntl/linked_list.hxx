@@ -191,7 +191,6 @@ struct containing_adaptor
       containing(const member_type* mt) { return containing_adaptor(mt); }
 
   private:
-
     const member_type * m;
 };
 

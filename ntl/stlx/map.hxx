@@ -102,8 +102,8 @@ class map:
 
     typedef typename  allocator::pointer              pointer;
     typedef typename  allocator::const_pointer        const_pointer;
-    typedef typename  allocator::reference            reference;
-    typedef typename  allocator::const_reference      const_reference;
+    typedef       value_type&                         reference;
+    typedef const value_type&                         const_reference;
     typedef typename  allocator::size_type            size_type;
     typedef typename  allocator::difference_type      difference_type;
 
@@ -429,10 +429,6 @@ template <class Key, class T, class Compare, class Allocator>
 void swap(map<Key,T, Compare, Allocator>& x, map<Key,T, Compare, Allocator>&& y) { x.swap(y); }
 #endif
 
-template <class Key, class T, class Compare, class Allocator>
-struct constructible_with_allocator_suffix< map<Key, T, Compare, Allocator> >
-  :false_type
-{};
 
 /// [23.3.2 multimap]
 template <class Key, class T, class Compare = less<Key>, class Allocator = allocator<pair<const Key, T> > >
@@ -472,11 +468,6 @@ void swap(multimap<Key,T,Compare,Allocator&& x,
 template <class Key, class T, class Compare, class Allocator>
 void swap(multimap<Key,T,Compare,Allocator& x,
           multimap<Key,T,Compare,Allocator>&& y);
-
-template <class Key, class T, class Compare, class Allocator>
-struct constructible_with_allocator_suffix<
-  multimap<Key, T, Compare, Allocator> >
-  : false_type { };
 
 #endif
 ///@}

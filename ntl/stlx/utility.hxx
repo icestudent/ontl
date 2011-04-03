@@ -98,6 +98,18 @@ bool operator>=(const T & x, const T & y) { return !(x < y); }
   }
 # endif // rvalue ref v2
 
+  template <class T> typename conditional<
+    !has_nothrow_move_constructor<T>::value && has_copy_constructor<T>::value,
+    const T&, T&&>::type move_if_noexcept(T& x)
+  {
+    return std::move(x);
+  }
+
+  /** 20.2.4 Function template declval */
+  template <class T>
+  typename add_rvalue_reference<T>::type declval() __ntl_nothrow;
+
+
 #else
   template <class T>
   struct identity
@@ -136,7 +148,17 @@ bool operator>=(const T & x, const T & y) { return !(x < y); }
   template <class T>
   inline const T& move(const T& t) { return t; }
 # endif
+
+  template <class T> typename conditional<
+    !has_nothrow_move_constructor<T>::value && has_copy_constructor<T>::value,
+    const T&, T&>::type move_if_noexcept(T& x)
+  {
+    return std::move(x);
+  }
+
 #endif
+
+
 #pragma endregion
 
 #pragma region pairs
@@ -187,49 +209,40 @@ struct pair
 #endif
 
 #ifdef NTL__CXX_VT
-    template<class U, class... Args>
-    pair(U&& x, Args&&... args)
-      :first(forward<U>(x), second(forward<Args>(args))
-    {}
+    template<class Args1, class... Args2>
+    pair(piecewise_construct_t, tuple<Args1...> a, tuple<Args2...> b);
 #endif
 
     // allocator-extended constructors
     template <class Alloc> pair(allocator_arg_t, const Alloc& a);
     template <class Alloc> pair(allocator_arg_t, const Alloc& a, const T1& x, const T2& y);
 
-#ifdef NTL__CXX_RV
-    template <class U, class V, class Alloc>
-    pair(allocator_arg_t, const Alloc& a, U&& x, V&& y);
+    pair& operator=(const pair& p)
+    {
+      first = p.first, second = p.second;
+      return *this;
+    }
 
-    template <class Alloc> pair(allocator_arg_t, const Alloc&, pair&& p);
-#endif
-
-    template <class U, class V, class Alloc>
-    pair(allocator_arg_t, const Alloc& a, const pair<U, V>& p);
-
-#ifdef NTL__CXX_RV
-    template <class U, class V, class Alloc>
-    pair(allocator_arg_t, const Alloc& a, pair<U, V>&& p);
-#endif
-
-#ifdef NTL__CXX_VT
-    template <class U, class... Args, class Alloc>
-    pair(allocator_arg_t, const Alloc& a, U&& x, Args&&... args);
-#endif
+    template<class U, class V>
+    pair& operator =(const pair<U,V>& p)
+    {
+      first = p.first, second = p.second;
+      return *this;
+    }
 
 #ifdef NTL__CXX_RV
     pair& operator=(pair&& p)
     {
-      first = move(p.first);
-      second = move(p.second);
+      first = forward<first_type>(p.first);
+      second = forward<second_type>(p.second);
       return *this;
     }
 
     template<class U, class V>
     pair& operator=(pair<U, V>&& p)
     {
-      first = move(p.first);
-      second = move(p.second);
+      first = forward<U>(p.first);
+      second = forward<V>(p.second);
       return *this;
     }
 
@@ -248,19 +261,6 @@ struct pair
 #endif
 };
 #pragma warning(pop)
-
-// forward declarations
-template<class T, class Alloc> struct uses_allocator;
-template <class T> struct constructible_with_allocator_suffix;
-template <class T> struct constructible_with_allocator_prefix;
-
-// 20.2.3.2
-template <class T1, class T2, class Alloc>
-struct uses_allocator<pair<T1, T2>, Alloc>: true_type {};
-
-// 20.2.3.3
-template <class T1, class T2>
-struct constructible_with_allocator_prefix<pair<T1, T2> >: true_type {};
 
 ///\name  Comparisons
 template<class T1, class T2>
@@ -365,7 +365,18 @@ template <class InputIterator>
 inline InputIterator begin(const std::pair<InputIterator, InputIterator>& p) { return p.first; }
 template <class InputIterator>
 inline InputIterator end(const std::pair<InputIterator, InputIterator>& p)   { return p.second;}
+
+///\name 20.3.5.5 Piecewise construction [pair.piecewise]
+struct piecewise_construct_t { };
+
+#ifdef NTL__CXX_CONSTEXPR
+constexpr piecewise_construct_t piecewise_construct = piecewise_construct_t();
+#else
+extern __declspec(selectany) piecewise_construct_t piecewise_construct = {};
+#endif
 ///\}
+
+
 
 #pragma endregion
 

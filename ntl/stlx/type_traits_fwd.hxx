@@ -139,13 +139,28 @@ template <class T> struct is_empty;
 template <class T> struct is_polymorphic;
 template <class T> struct is_abstract;
 
+template <class T> struct has_default_constructor;
+template <class T> struct has_copy_constructor;
+template <class T> struct has_copy_assign;
+template <class T> struct has_move_constructor;
+template <class T> struct has_move_assign;
+
 template <class T> struct has_trivial_default_constructor;
 template <class T> struct has_trivial_copy_constructor;
+template <class T> struct has_trivial_move_constructor;
 template <class T> struct has_trivial_assign;
+template <class T> struct has_trivial_copy_assign;
+template <class T> struct has_trivial_move_assign;
+
 template <class T> struct has_trivial_destructor;
 template <class T> struct has_nothrow_default_constructor;
 template <class T> struct has_nothrow_copy_constructor;
+template <class T> struct has_nothrow_move_constructor;
+
 template <class T> struct has_nothrow_assign;
+template <class T> struct has_nothrow_copy_assign;
+template <class T> struct has_nothrow_move_assign;
+
 template <class T> struct has_virtual_destructor;
 
 template <class T> struct is_signed;

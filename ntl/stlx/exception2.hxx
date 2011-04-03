@@ -324,7 +324,7 @@ namespace std
   inline void rethrow_exception(exception_ptr e);
 
   template<class E>
-  inline exception_ptr copy_exception(E e)
+  inline exception_ptr make_exception_ptr(E e)
   {
   #if STLX__USE_EXCEPTIONS == 1
     try {
@@ -367,10 +367,16 @@ namespace std
     {}
   #endif
 
-    /** @throws exception_ptr the stored %exception captured by this object */
+    /**
+      @throws exception_ptr the stored %exception captured by this object
+      @note If nested_ptr() returns a null pointer, the function calls terminate().
+     */
     void rethrow_nested() const
     {
-      rethrow_exception(e);
+      if(e)
+        rethrow_exception(e);
+      else
+        std::terminate();
     }
 
     /** @return the stored %exception captured by this object */

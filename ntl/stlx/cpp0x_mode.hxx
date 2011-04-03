@@ -36,7 +36,7 @@
   #endif
   static_assert(alignof(int)==alignof(unsigned int), "wierd platform");
 
-  #ifndef __func__
+  #ifndef NTL__CXX_FUNC
     #ifdef _MSC_VER
       #define __func__ __FUNCSIG__
     #else

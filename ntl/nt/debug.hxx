@@ -10,7 +10,8 @@
 
 #include "basedef.hxx"
 #include "string.hxx"
-#include "../stlx/cstdlib.hxx"
+//#include "../stlx/cstdlib.hxx"
+#include "../stlx/cstdio.hxx"
 
 namespace ntl {
   namespace nt {
@@ -53,7 +54,36 @@ namespace ntl {
       ...
       );
 
+    NTL__EXTERNAPI void __stdcall OutputDebugStringA(const char* OutputString);
 
+// set NTL__USE_DBGPRINT to use default DbgPrint/DbgPrintEx in usermode
+
+#if defined(NTL__DEBUG) && !defined(NTL__SUBSYSTEM_KM) && !defined(NTL__USE_DBGPRINT)
+    namespace __ {
+      inline void shared_dbgprint(const char* msg)
+      {
+        OutputDebugStringA(msg);
+      }
+      inline void shared_dbgprintf(const char msg_format[], ...)
+      {
+        char buffer[4096];
+        va_list va;
+        va_start(va, msg_format);
+        _vsnprintf(buffer, _countof(buffer), msg_format, va);
+        OutputDebugStringA(buffer);
+      }
+    } // __
+
+#ifndef KdPrint
+# define KdPrint(X) ntl::nt::__::shared_dbgprintf X
+#endif
+#ifndef KdPrintEx
+# define KdPrintEx(X)
+#endif
+#ifndef NTL__DEBUG_2K
+#define NTL__DEBUG_2K
+#endif
+#endif
 
     //warning C4100: 'XXX' : unreferenced formal parameter
 #pragma warning(push)
@@ -249,7 +279,7 @@ namespace ntl {
     namespace dbg {
 
 #ifdef NTL_DBG_FILTER
-      const dbgprint<dpfltr::__identifier(default)>   error;
+      const dbgprint<dpfltr::error>   error;
       const dbgprint<dpfltr::warning> warning;
       const dbgprint<dpfltr::trace>   trace;
       const dbgprint<dpfltr::info>    info;

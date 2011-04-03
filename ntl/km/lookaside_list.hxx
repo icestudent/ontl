@@ -146,7 +146,7 @@ struct npaged_lookaside_list : public general_lookaside
 
 
 NTL__EXTERNAPI
-void
+void __stdcall
   ExInitializeNPagedLookasideList(
     general_lookaside *                       Lookaside,
     general_lookaside::allocate_function_t *  Allocate  __optional,
@@ -158,7 +158,7 @@ void
     );
 
 NTL__EXTERNAPI
-void
+void __stdcall
   ExDeleteNPagedLookasideList(
     general_lookaside * Lookaside);
 

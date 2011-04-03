@@ -262,13 +262,24 @@ namespace ntl {
           return status::invalid_handle;
  
         // wait
-        ntstatus st;
-        systime_t period = timeout;
+        ntstatus st = try_acquire() ? status::success : status::timeout;
         systime_t const interval = -1i64*std::chrono::duration_cast<system_duration>( std::chrono::milliseconds(50)).count();
-        do{
-          st = NtDelayExecution(alertable, interval);
-          period -= interval;
-        }while(st == status::timeout && period > 0);
+        if(timeout < 0){
+          // relative time
+          systime_t const end_time = user_shared_data::instance().InterruptTime.get() + (-timeout);
+          do{
+            NtDelayExecution(alertable, interval);
+            st = try_acquire() ? status::success : status::timeout;
+          }while(st == status::timeout && user_shared_data::instance().InterruptTime.get() < end_time);
+
+        }else if(timeout > 0){
+          // absolute time
+          systime_t const end_time = timeout;
+          do {
+            NtDelayExecution(alertable, interval);
+            st = try_acquire() ? status::success : status::timeout;
+          }while(st == status::timeout && query_system_time() < end_time);
+        }
         return st;
       }
  

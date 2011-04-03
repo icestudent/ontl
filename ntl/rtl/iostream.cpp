@@ -101,7 +101,7 @@ static void destroy_iostream_objects()
   }
 }
 
-static int32_t _iostreams_init_count = 0;
+static volatile int32_t _iostreams_init_count = 0;
 
 void __cdecl __init_iostream_objects(bool init)
 {

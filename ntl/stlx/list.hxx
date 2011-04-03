@@ -79,8 +79,8 @@ class list
     typedef           Allocator                   allocator_type;
     typedef typename  allocator::pointer          pointer;
     typedef typename  allocator::const_pointer    const_pointer;
-    typedef typename  allocator::reference        reference;
-    typedef typename  allocator::const_reference  const_reference;
+    typedef       value_type&                     reference;
+    typedef const value_type&                     const_reference;
     typedef typename  allocator::size_type        size_type;
     typedef typename  allocator::difference_type  difference_type;
 
@@ -230,7 +230,7 @@ class list
     }
     #endif
     
-    list(initializer_list<T> il, Allocator& a = Allocator())
+    list(initializer_list<T> il, const Allocator& a = Allocator())
       :node_allocator(a)
     {
       init_head();
@@ -648,10 +648,6 @@ void swap(list<T,Allocator>&& x, list<T,Allocator>& y) { x.swap(y); }
 template <class T, class Allocator>
 void swap(list<T,Allocator>& x, list<T,Allocator>&& y) { x.swap(y); }
 #endif
-
-template <class T, class Alloc>
-struct constructible_with_allocator_suffix<list<T, Alloc> >
-  : false_type { };
 
 ///@}
 /**@} lib_sequence */

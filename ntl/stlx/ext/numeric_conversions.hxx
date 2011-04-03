@@ -175,8 +175,10 @@ namespace ntl { namespace numeric {
       unsigned digit;
       if(detail::mini_ctype::is(detail::mini_ctype::alpha, c))
         digit = (c & ~(1 << 5)) - 'A' + 10;
-      else
+      else if(detail::mini_ctype::is(detail::mini_ctype::digit, c))
         digit = c - '0';
+      else
+        break;
       if(digit >= base)
         break;
 
@@ -227,7 +229,7 @@ namespace ntl { namespace numeric {
 
     do {
       char c = static_cast<char>( value % base );
-      c = c + (c > 10 ? 'a' : '0');
+      c = c + (c >= 10 ? 'a'-10 : '0');
       *p++ = c;
     }while((value /= base) != 0);
 

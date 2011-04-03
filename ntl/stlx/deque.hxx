@@ -30,8 +30,8 @@ namespace std {
     typedef Allocator                               allocator_type;
     typedef typename  allocator::pointer            pointer;
     typedef typename  allocator::const_pointer      const_pointer;
-    typedef typename  allocator::reference          reference;
-    typedef typename  allocator::const_reference    const_reference;
+    typedef       value_type&                       reference;
+    typedef const value_type&                       const_reference;
     typedef typename  allocator::size_type          size_type;
     typedef typename  allocator::difference_type    difference_type;
 
@@ -705,10 +705,6 @@ namespace std {
   #endif
   
   
-  template <class T, class Alloc>
-  struct constructible_with_allocator_suffix<deque<T, Alloc> >
-    : true_type { };
-
   /**@} lib_sequence */
   /**@} lib_containers */
 }//namespace std

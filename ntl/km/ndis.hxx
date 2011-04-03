@@ -15,7 +15,8 @@
 #include "miniport.hxx"
 #include "string.hxx"
 #include "device_object.hxx"
-
+#include "time.hxx"
+#include "mm.hxx"
 
 namespace ntl {
 namespace km {
@@ -854,9 +855,19 @@ class ndis
       work_queue_item WorkItem;
     };
 
+    struct object_header
+    {
+      uint8_t   Type;
+      uint8_t   Revision;
+      uint16_t  Size;
+    };
+
     struct common_open_block
     {
-      void *              MacHandle;
+      union {
+        void *              MacHandle;
+        object_header       Header;
+      };
       handle              BindingHandle;
       miniport_block *    MiniportHandle;
       protocol::block *   ProtocolHandle;
@@ -864,6 +875,7 @@ class ndis
       common_open_block * MiniportNextOpen;
       common_open_block * ProtocolNextOpen;
       void *              MiniportAdapterContext;
+
       uint8_t             Reserved1;
       uint8_t             Reserved2;
       uint8_t             Reserved3;
@@ -1354,6 +1366,56 @@ class ndis
       /*<thisrel this+0xd8>*/ /*|0x4|*/ unsigned long DriverVersion;
     };
     //STATIC_ASSERT(sizeof(m_driver_block_51)==0xdc);
+
+    struct m_driver_block_60;
+    struct miniport_block_60
+    {
+      object_header       Header;
+      miniport_block_60*  NextMiniport;
+      miniport_block_60*  BaseMiniport;
+      ndis::handle        MiniportAdapterContext;
+
+      uint8_t             reserved1[0xE8-16];
+      // this+0xe8
+      filter_packet_indication_handler_t * PacketIndicateHandler;
+      m_send_complete_handler_t * SendCompleteHandler;
+      uint8_t             reserved2[0x164-0xe8-4*2];
+      // this+0x164
+      eth_rcv_indicate_handler_t * EthRxIndicateHandler;
+      uint8_t             reserved3[0x184-0x164-4];
+      // this+0x184
+      m_td_complete_handler_t * TDCompleteHandler;
+      uint8_t             reserved4[0x9ec-0x184-4];
+      // this+0x09EC
+      m_driver_block_60*  DriverHandle;
+      uint8_t             reserved5[0xa30-0x9ec-4];
+      // this+0x0A30
+      unicode_string      BaseName;
+      unicode_string      MiniportName;
+    };
+    static_assert((offsetof(miniport_block_60,PacketIndicateHandler) == 0xe8), "wrong place");
+    static_assert((offsetof(miniport_block_60,BaseName) == 0x0a30), "wrong place");
+
+    struct m_driver_block_60
+    {
+      object_header  Header;
+      m_driver_block_60*  NextDriver;
+      miniport_block_60*  MiniportQueue;
+      uint8_t             MajorNdisVersion;
+      uint8_t             MinorNdisVersion;
+      uint16_t            Flags;
+      void*               NdisDriverInfo;
+      driver_object*      DriverObject;
+      unicode_string      ServiceRegPath;
+      void*               MiniportDriverContext;
+      struct protocol_block* AssotiatedProtocol;
+      list_entry          DeviceList;
+      struct pending_im_instance* PendingDeviceList;
+      void  (__stdcall*UnloadHandler)(driver_object*);
+      miniport_characteristics_51 MiniportCharacteristics;
+      kevent              MiniportsRemovedEvent;
+      reference           Ref;
+    };
 
     struct packet_pool
     {

@@ -23,9 +23,8 @@
 namespace ntl {
   namespace nt {
 
-    struct thread_state_def
+    __class_enum(thread_state)
     {
-      enum type {
         Initialized,
         Ready,
         Running,
@@ -34,17 +33,13 @@ namespace ntl {
         Wait,
         Transition,
         Unknown
-      };
-    };
-    typedef ntl::class_enum<thread_state_def> thread_state;
+    };};
 
 struct initial_tib;
 
+/** Thread start prototype */
 typedef
-uint32_t __stdcall
-thread_start_routine_t(
-   void* Parameter
-   );
+uint32_t __stdcall thread_start_routine_t(void* Parameter);
 
 typedef
 ntstatus __stdcall
@@ -239,13 +234,15 @@ void __stdcall
 /************************************************************************/
 class user_thread:
   public handle,
-  public device_traits<user_thread>
+  public device_traits<user_thread>,
+  public last_status_t
 {
   ////////////////////////////////////////////////////////////////////////////
 public:
 
   typedef thread_start_routine_t start_routine_t;
 
+  /** Create thread */
   explicit
     user_thread(
     start_routine_t *   start_routine,
@@ -256,16 +253,17 @@ public:
     size_t              commited_stack_size = 0,
     security_descriptor* thread_security = 0)
   {
-    create(this, current_process(), start_routine, start_context, maximum_stack_size, commited_stack_size,
+    last_status_ = create(this, current_process(), start_routine, start_context, maximum_stack_size, commited_stack_size,
       create_suspended, client, thread_security);
   }
 
+  /** Open thread */
   user_thread(
     access_mask      DesiredAccess,
     const client_id& ClientId,
     bool             InheritHandle = false)
   {
-    open(this, DesiredAccess, InheritHandle, &ClientId);
+    last_status_ = open(this, DesiredAccess, InheritHandle, &ClientId);
   }
 
   static ntstatus
@@ -328,34 +326,34 @@ public:
 
   ntstatus control(bool suspend) const volatile
   {
-    return (suspend ? NtSuspendThread : NtResumeThread)(get(), NULL);
+    return last_status_ = (suspend ? NtSuspendThread : NtResumeThread)(get(), NULL);
   }
 
   ntstatus suspend(uint32_t* PreviousSuspendCount = 0) const volatile
   {
-    return NtSuspendThread(get(), PreviousSuspendCount);
+    return last_status_ = NtSuspendThread(get(), PreviousSuspendCount);
   }
 
   ntstatus resume(bool alert = false, uint32_t* PreviousSuspendCount = 0) const volatile
   {
-    return (alert ? NtAlertResumeThread : NtResumeThread)(get(), PreviousSuspendCount);
+    return last_status_ = (alert ? NtAlertResumeThread : NtResumeThread)(get(), PreviousSuspendCount);
   }
 
   template <class Clock, class Duration>
   ntstatus wait_until(const std::chrono::time_point<Clock, Duration>& abs_time, bool alertable = true) const volatile
   {
-    return NtWaitForSingleObject(get(), alertable, std::chrono::duration_cast<system_duration>(abs_time.time_since_epoch()).count());
+    return last_status_ = NtWaitForSingleObject(get(), alertable, std::chrono::duration_cast<system_duration>(abs_time.time_since_epoch()).count());
   }
 
   template <class Rep, class Period>
   ntstatus wait_for(const std::chrono::duration<Rep, Period>& rel_time, bool alertable = true) const volatile
   {
-    return NtWaitForSingleObject(get(), alertable, -1i64*std::chrono::duration_cast<system_duration>(rel_time).count());
+    return last_status_ = NtWaitForSingleObject(get(), alertable, -1i64*std::chrono::duration_cast<system_duration>(rel_time).count());
   }
 
   ntstatus wait(bool alertable = true) const volatile
   {
-    return NtWaitForSingleObject(get(), alertable, system_time::infinite());
+    return last_status_ = NtWaitForSingleObject(get(), alertable, system_time::infinite());
   }
 
   static legacy_handle get_current() { return current_thread(); }
@@ -459,15 +457,15 @@ public:
 }; // class user_thread
 
   template <class Clock, class Duration>
-  static inline void sleep_until(const std::chrono::time_point<Clock, Duration>& abs_time, bool alertable = false)
+  static inline ntstatus sleep_until(const std::chrono::time_point<Clock, Duration>& abs_time, bool alertable = false)
   {
-    NtDelayExecution(alertable, std::chrono::duration_cast<system_duration>(abs_time.time_since_epoch()).count());
+    return NtDelayExecution(alertable, std::chrono::duration_cast<system_duration>(abs_time.time_since_epoch()).count());
   }
 
   template <class Rep, class Period>
-  static inline void sleep_for(const std::chrono::duration<Rep, Period>& rel_time, bool alertable = false)
+  static inline ntstatus sleep_for(const std::chrono::duration<Rep, Period>& rel_time, bool alertable = false)
   {
-    NtDelayExecution(alertable, -1i64*std::chrono::duration_cast<system_duration>(rel_time).count());
+    return NtDelayExecution(alertable, -1i64*std::chrono::duration_cast<system_duration>(rel_time).count());
   }
 
  } // namespace nt

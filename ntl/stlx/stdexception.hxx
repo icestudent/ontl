@@ -74,6 +74,8 @@ class bad_exception : public exception
   /// @note an unexpected_handler shall not return.
   typedef void (*unexpected_handler)();
 
+  unexpected_handler get_unexpected() __ntl_nothrow;
+
   /**
    *	@brief set_unexpected [18.8.2.3 set.unexpected]
    *  @details Establishes the function designated by \c f as the current \c unexpected_handler.
@@ -97,6 +99,8 @@ class bad_exception : public exception
    *  @details The type of a handler function to be called by terminate() when terminating %exception processing.
    **/
   typedef void (*terminate_handler)();
+
+  terminate_handler get_terminate() __ntl_nothrow;
 
   /**
    *	@brief set_terminate [18.8.3.2 set.terminate]

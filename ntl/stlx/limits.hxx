@@ -134,6 +134,7 @@ class numeric_limits<bool>
     static const  T     __min             = false;
     static const  T     __max             = true;
     static const  T     __lowest          = false;
+    ///\}
 }; //template class numeric_limits<bool>
 
 template<> class numeric_limits<char>
@@ -177,6 +178,7 @@ template<> class numeric_limits<char>
     static const  T     __min             = CHAR_MIN;
     static const  T     __max             = CHAR_MAX;
     static const  T     __lowest          = CHAR_MIN;
+    ///\}
 }; //template class numeric_limits<char>
 
 template<> class numeric_limits<wchar_t>
@@ -296,6 +298,7 @@ template<> class numeric_limits<short>
     static const  T     __min             = SHRT_MIN;
     static const  T     __max             = SHRT_MAX;
     static const  T     __lowest          = SHRT_MIN;
+    ///\}
 }; //template class numeric_limits<short>
 
 template<> class numeric_limits<int>
@@ -339,6 +342,7 @@ template<> class numeric_limits<int>
     static const  T     __min             = INT_MIN;
     static const  T     __max             = INT_MAX;
     static const  T     __lowest          = INT_MIN;
+    ///\}
 }; //template class numeric_limits<int>
 
 template<> class numeric_limits<long>
@@ -382,6 +386,7 @@ template<> class numeric_limits<long>
     static const  T     __min             = LONG_MIN;
     static const  T     __max             = LONG_MAX;
     static const  T     __lowest          = LONG_MIN;
+    ///\}
 }; //template class numeric_limits<long>
 
 template<> class numeric_limits<long long>
@@ -425,6 +430,7 @@ template<> class numeric_limits<long long>
     static const  T     __min             = LLONG_MIN;
     static const  T     __max             = LLONG_MAX;
     static const  T     __lowest          = LLONG_MIN;
+    ///\}
 }; //template class numeric_limits<long long>
 
 template<> class numeric_limits<unsigned char>
@@ -468,6 +474,7 @@ template<> class numeric_limits<unsigned char>
     static const  T     __min             = 0;
     static const  T     __max             = UCHAR_MAX;
     static const  T     __lowest          = 0;
+    ///\}
 }; //template class numeric_limits<unsigned char>
 
 template<> class numeric_limits<unsigned short>
@@ -511,6 +518,7 @@ template<> class numeric_limits<unsigned short>
     static const  T     __min             = 0;
     static const  T     __max             = USHRT_MAX;
     static const  T     __lowest          = 0;
+    ///\}
 }; //template class numeric_limits<unsigned shrt>
 
 template<> class numeric_limits<unsigned int>
@@ -554,6 +562,7 @@ template<> class numeric_limits<unsigned int>
     static const  T     __min             = 0;
     static const  T     __max             = UINT_MAX;
     static const  T     __lowest          = 0;
+    ///\}
 }; //template class numeric_limits<unsigned int>
 
 template<> class numeric_limits<unsigned long>
@@ -597,6 +606,7 @@ template<> class numeric_limits<unsigned long>
     static const  T     __min             = 0;
     static const  T     __max             = ULONG_MAX;
     static const  T     __lowest          = 0;
+    ///\}
 }; //template class numeric_limits<unsigned long>
 
 template<> class numeric_limits<unsigned long long>
@@ -640,6 +650,7 @@ template<> class numeric_limits<unsigned long long>
     static const  T     __min             = 0;
     static const  T     __max             = ULLONG_MAX;
     static const  T     __lowest          = 0;
+    ///\}
 }; //template class numeric_limits<unsigned long long>
 
 namespace __
@@ -901,6 +912,7 @@ public:
   static const  T     __min             = 0;
   static const  T     __max             = ~(T)0;
   static const  T     __lowest          = 0;
+  ///\}
 }; //template class numeric_limits<char16_t>
 
 template<> class numeric_limits<char32_t>
@@ -944,6 +956,7 @@ public:
   static const  T     __min             = 0;
   static const  T     __max             = ~(T)0;
   static const  T     __lowest          = 0;
+  ///\}
 }; //template class numeric_limits<char32_t>
 
 #endif

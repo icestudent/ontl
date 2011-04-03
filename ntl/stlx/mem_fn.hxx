@@ -224,7 +224,7 @@ namespace std
 #endif
   };
 
-#if 1 && !defined __DOXYGEN__
+#if 1 && !defined NTL__DOC
 
   // ARGC == 0
 #define NTL_DEFINE_MEMFN0(cv) \

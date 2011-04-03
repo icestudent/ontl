@@ -56,7 +56,7 @@ namespace std {
     typedef Hash                    hasher;
     typedef Pred                    key_equal;
     typedef Allocator               allocator_type;
-#ifdef __DOXYGEN__
+#ifdef NTL__DOC
     typedef typename allocator_type::pointer          pointer;
     typedef typename allocator_type::const_pointer    const_pointer;
     typedef typename allocator_type::reference        reference;
@@ -144,7 +144,7 @@ namespace std {
     /** Returns a copy of used %allocator */
     allocator_type get_allocator() const { return allocator_type(nalloc); }
 
-#ifdef __DOXYGEN__
+#ifdef NTL__DOC
     ///\name size and capacity
     /** Returns \c true if container is empty */
     bool empty() const;
@@ -168,7 +168,7 @@ namespace std {
     template <class... Args> iterator emplace_hint(const_iterator position, Args&&... args);
 #endif
 
-#ifdef __DOXYGEN__
+#ifdef NTL__DOC
     /** Inserts value if container doesn't have element with the specified key.
         @return Pair of iterator, which points to the given element, and flag, which indicates whether the insertion takes place */
     std::pair<iterator, bool> insert(const value_type& obj);
@@ -284,7 +284,7 @@ namespace std {
     typedef Hash                    hasher;
     typedef Pred                    key_equal;
     typedef Allocator               allocator_type;
-#ifdef __DOXYGEN__
+#ifdef NTL__DOC
     typedef typename allocator_type::pointer          pointer;
     typedef typename allocator_type::const_pointer    const_pointer;
     typedef typename allocator_type::reference        reference;
@@ -373,7 +373,7 @@ namespace std {
     /** Returns a copy of used %allocator */
     allocator_type get_allocator() const { return allocator_type(nalloc); }
 
-#ifdef __DOXYGEN__
+#ifdef NTL__DOC
     ///\name size and capacity
     /** Returns \c true if container is empty */
     bool empty() const;
@@ -397,7 +397,7 @@ namespace std {
     template <class... Args> iterator emplace_hint(const_iterator position, Args&&... args);
 #endif
 
-#ifdef __DOXYGEN__
+#ifdef NTL__DOC
     /** Inserts value if container doesn't have element with the specified key.
         @return Pair of iterator, which points to the given element, and flag, which indicates whether the insertion takes place */
     std::pair<iterator, bool> insert(const value_type& obj);

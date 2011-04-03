@@ -357,6 +357,10 @@
 						Name="tr2"
 						>
 						<File
+							RelativePath=".\stlx\ext\tr2\buffer.hxx"
+							>
+						</File>
+						<File
 							RelativePath=".\stlx\ext\tr2\filesystem.hxx"
 							>
 						</File>
@@ -368,23 +372,119 @@
 							RelativePath=".\stlx\ext\tr2\fs_operations.hxx"
 							>
 						</File>
+						<File
+							RelativePath=".\stlx\ext\tr2\io_service.hxx"
+							>
+						</File>
+						<File
+							RelativePath=".\stlx\ext\tr2\network.hxx"
+							>
+						</File>
+						<File
+							RelativePath=".\stlx\ext\tr2\timer.hxx"
+							>
+						</File>
 						<Filter
 							Name="network"
 							>
 							<File
-								RelativePath=".\stlx\ext\tr2\buffer.hxx"
+								RelativePath=".\stlx\ext\tr2\network\basic_datagram_socket.hxx"
 								>
 							</File>
 							<File
-								RelativePath=".\stlx\ext\tr2\io_service.hxx"
+								RelativePath=".\stlx\ext\tr2\network\basic_io_object.hxx"
 								>
 							</File>
 							<File
-								RelativePath=".\stlx\ext\tr2\network.hxx"
+								RelativePath=".\stlx\ext\tr2\network\basic_socket.hxx"
 								>
 							</File>
 							<File
-								RelativePath=".\stlx\ext\tr2\timer.hxx"
+								RelativePath=".\stlx\ext\tr2\network\network_error.hxx"
+								>
+							</File>
+							<File
+								RelativePath=".\stlx\ext\tr2\network\network_fwd.hxx"
+								>
+							</File>
+							<File
+								RelativePath=".\stlx\ext\tr2\network\socket_base.hxx"
+								>
+							</File>
+							<Filter
+								Name="impl"
+								>
+								<File
+									RelativePath=".\stlx\ext\tr2\network\datagram_socket_service.hxx"
+									>
+								</File>
+								<Filter
+									Name="winsock"
+									>
+									<File
+										RelativePath=".\stlx\ext\tr2\network\winsock\service_resolve.hxx"
+										>
+									</File>
+									<File
+										RelativePath=".\stlx\ext\tr2\network\winsock\service_sockets.hxx"
+										>
+									</File>
+									<File
+										RelativePath=".\stlx\ext\tr2\network\winsock\sockets.hxx"
+										>
+									</File>
+									<File
+										RelativePath=".\stlx\ext\tr2\network\system_network.hxx"
+										>
+									</File>
+								</Filter>
+							</Filter>
+							<Filter
+								Name="IP"
+								>
+								<File
+									RelativePath=".\stlx\ext\tr2\network\basic_endpoint.hxx"
+									>
+								</File>
+								<File
+									RelativePath=".\stlx\ext\tr2\network\basic_resolver.hxx"
+									>
+								</File>
+								<File
+									RelativePath=".\stlx\ext\tr2\network\ip_address.hxx"
+									>
+								</File>
+								<File
+									RelativePath=".\stlx\ext\tr2\network\ip_protocol.hxx"
+									>
+								</File>
+								<File
+									RelativePath=".\stlx\ext\tr2\network\resolver_base.hxx"
+									>
+								</File>
+								<File
+									RelativePath=".\stlx\ext\tr2\network\resolver_service.hxx"
+									>
+								</File>
+							</Filter>
+						</Filter>
+						<Filter
+							Name="I/O"
+							>
+							<File
+								RelativePath=".\stlx\ext\tr2\network\buffer.hxx"
+								>
+							</File>
+							<File
+								RelativePath=".\stlx\ext\tr2\network\io_service.hxx"
+								>
+							</File>
+							<File
+								RelativePath=".\stlx\ext\tr2\network\io_service_fwd.hxx"
+								>
+							</File>
+							<File
+								RelativePath=".\stlx\ext\tr2\network\timer.hxx"
 								>
 							</File>
 						</Filter>
@@ -1083,6 +1183,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\nt\strerror.hxx"
+					>
+				</File>
+				<File
 					RelativePath=".\nt\string.hxx"
 					>
 				</File>
@@ -1107,7 +1211,15 @@
 					>
 				</File>
 				<File
+					RelativePath=".\nt\timer.hxx"
+					>
+				</File>
+				<File
 					RelativePath=".\nt\virtualmem.hxx"
+					>
+				</File>
+				<File
+					RelativePath=".\nt\win32_error.hxx"
 					>
 				</File>
 			</Filter>

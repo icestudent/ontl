@@ -152,7 +152,7 @@ namespace ntl {
 
 
 
-
+#ifdef NTL__STLX_SYSTEM_ERROR
 #pragma warning(disable:4127) // conditional expression is constant
 
     /// STL default base mutex object
@@ -238,6 +238,8 @@ namespace ntl {
     };
 
 #pragma warning(default:4127)
+#endif // NTL__STLX_SYSTEM_ERROR
+
   }
 }
 #endif // NTL__NT_MUTEX

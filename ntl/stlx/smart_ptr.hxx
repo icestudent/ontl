@@ -1155,7 +1155,12 @@ namespace std
     template<class T, class U>
     inline bool operator<(shared_ptr<T> const& a, shared_ptr<U> const& b) __ntl_nothrow
     {
+    #ifdef NTL__CXX_TYPEOF
+      typedef decltype(a.get() < b.get()) V;
+      return std::less<V>()(a.get(), b.get());
+    #else
       return a.get() < b.get();
+    #endif
     }
 
     template<class T> inline void swap(shared_ptr<T>& a, shared_ptr<T>& b) __ntl_nothrow

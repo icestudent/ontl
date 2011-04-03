@@ -37,7 +37,7 @@ class basic_ostream
 : virtual public basic_ios<charT, traits>
 {
     typedef basic_ios<charT, traits>  this_base;
-    using ios_base::__noinittag;
+    typedef ios_base::__noinittag __noinittag;
 
   public:
     basic_ostream(__noinittag)

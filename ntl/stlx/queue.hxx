@@ -146,10 +146,6 @@ namespace std {
   struct uses_allocator<queue<T, Container>, Alloc>
     : uses_allocator<Container, Alloc>::type { };
 
-  template <class T, class Container>
-  struct constructible_with_allocator_suffix<queue<T, Container> >
-    : true_type { };
-
   /**@} lib_container_adaptors */
   /**@} lib_sequence */
   /**@} lib_containers */

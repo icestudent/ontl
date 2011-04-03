@@ -75,11 +75,15 @@ __declspec(selectany) extern const nothrow_t nothrow;
  extern const nothrow_t nothrow;
 #endif
 
-/// Type new_handler [18.6.2.2 lib.new.handler]
+/// Type new_handler [18.6.2.3 new.handler]
 typedef void (*new_handler)();
 
-/// set_new_handler [18.6.2.3 lib.set.new.handler]
+/// set_new_handler [18.6.2.4 set.new.handler]
 new_handler set_new_handler(new_handler new_p) __ntl_nothrow;
+
+/// set_new_handler [18.6.2.5 get.new.handler]
+new_handler get_new_handler() __ntl_nothrow;
+
 
 /**@} lib_alloc_errors */
 /**@} lib_support_dynamic */

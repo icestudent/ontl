@@ -30,7 +30,7 @@
 
 // !fr3@K!
 // === public interface ===
-
+#define NTL_SPP_EMPTY
 #define NTL_SPP_COMMA ,
 #define NTL_SPP_CAT(lhs, rhs) lhs##rhs
 #define NTL_SPP_NEST2(x) x

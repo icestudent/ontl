@@ -180,6 +180,96 @@ NtQueryObject(
 		int32_t* ResultLength
 	  );
 
+
+
+///\name Directory objects
+NTL__EXTERNAPI
+ntstatus __stdcall
+NtCreateDirectoryObject(
+    handle*         DirectoryHandle,
+    uint32_t        DesiredAccess,
+    const object_attributes& ObjectAttributes
+    );
+
+NTL__EXTERNAPI
+ntstatus __stdcall
+NtOpenDirectoryObject(
+    handle*         DirectoryHandle,
+    uint32_t        DesiredAccess,
+    const object_attributes& ObjectAttributes
+    );
+
+NTL__EXTERNAPI
+ntstatus __stdcall
+NtQueryDirectoryObject(
+    legacy_handle   DirectoryHandle,
+    void*           Buffer,
+    uint32_t        Length,
+    bool            ReturnSingleEntry,
+    bool            RestartScan,
+    uint32_t&       Context,
+    uint32_t*       ReturnedLength
+    );
+
+struct object_directory_information
+{
+  unicode_string  Name;
+  unicode_string  TypeName;
+};
+
+class directory_object;
+} // namespace nt
+
+template<>
+struct device_traits<nt::directory_object>:
+  public device_traits<>
+{
+  enum access_mask {
+    query = 1,
+    traverse = 2,
+    create_object = 4,
+    create_subdirectory = 8,
+    all_access = standard_rights_required | 0x0F
+  };
+
+  friend access_mask operator | (access_mask m, access_mask m2)
+  {
+    return bitwise_or(m, m2);
+  }
+
+  friend access_mask operator | (access_mask m, nt::access_mask m2)
+  {
+    return m | static_cast<access_mask>(m2);
+  }
+
+  friend access_mask operator | (nt::access_mask m, access_mask m2)
+  {
+    return m2 | m;
+  }
+};
+
+namespace nt {
+  class directory_object:
+    public handle,
+    public device_traits<directory_object>,
+    public last_status_t
+  {
+  public:
+    // create or open
+    explicit directory_object(const const_unicode_string& ObjectName, bool open = true, access_mask DesiredAccess = all_access)
+    {
+      const object_attributes oa(ObjectName);
+      last_status_ = (open ? NtOpenDirectoryObject : NtCreateDirectoryObject)(this, DesiredAccess, oa);
+    }
+
+    // query child objects
+    ntstatus query_children(void* Buffer, uint32_t Length, bool ReturnSingleEntry, bool RestartScan, uint32_t& EntryIndex, uint32_t* ReturnedLength)
+    {
+      return last_status_ = NtQueryDirectoryObject(get(), Buffer, Length, ReturnSingleEntry, RestartScan, EntryIndex, ReturnedLength);
+    }
+  };
+
+
 ///\name Symbolic link objects
 
 NTL__EXTERNAPI
@@ -238,21 +328,30 @@ struct device_traits<nt::symbolic_link>:
 namespace nt {
   class symbolic_link:
     public handle,
-    public device_traits<symbolic_link>
+    public device_traits<symbolic_link>,
+    public last_status_t
   {
   public:
     // create
     explicit symbolic_link(const const_unicode_string& Object, const const_unicode_string& Target, access_mask DesiredAccess = all_access)
     {
       const object_attributes oa(Object);
-      st = NtCreateSymbolicLinkObject(this, DesiredAccess, oa, Target);
+      last_status_ = NtCreateSymbolicLinkObject(this, DesiredAccess, oa, Target);
+    }
+    explicit symbolic_link(const object_attributes& Object, const const_unicode_string& Target, access_mask DesiredAccess = all_access)
+    {
+      last_status_ = NtCreateSymbolicLinkObject(this, DesiredAccess, Object, Target);
     }
 
     // open
     explicit symbolic_link(const const_unicode_string& Object, access_mask DesiredAccess = query_access)
     {
       const object_attributes oa(Object);
-      st = NtOpenSymbolicLinkObject(this, DesiredAccess, oa);
+      last_status_ = NtOpenSymbolicLinkObject(this, DesiredAccess, oa);
+    }
+    explicit symbolic_link(const object_attributes& Object, access_mask DesiredAccess = query_access)
+    {
+      last_status_ = NtOpenSymbolicLinkObject(this, DesiredAccess, Object);
     }
 
     std::wstring query() const
@@ -260,20 +359,16 @@ namespace nt {
       std::wstring ws;
       unicode_string us;
       uint32_t len = 0;
-      st = NtQuerySymbolicLinkObject(get(), us, &len);
+      last_status_ = NtQuerySymbolicLinkObject(get(), us, &len);
       if(len){
         ws.resize(len/sizeof(wchar_t));
         unicode_string us2(ws);
-        st = NtQuerySymbolicLinkObject(get(), us2, nullptr);
-        if(!success(st))
+        last_status_ = NtQuerySymbolicLinkObject(get(), us2, nullptr);
+        if(!success(last_status_))
           ws.clear();
       }
       return ws;
     }
-
-    operator ntstatus() const { return st; }
-  private:
-    mutable ntstatus st;
   };
 
 }//namespace nt

@@ -41,6 +41,8 @@
   #define NTL__CXX_ASSERT
   // thread_local
   #define NTL__CXX_THREADL
+  // __func__
+  #define NTL__CXX_FUNC
 
   // C++0x attributes
   #define NTL__CXX_ATTRIBUTES
@@ -73,7 +75,7 @@
 #if _MSC_VER >= 1600
 
 /** VC10's partial C++0x support */
-// _MSC_FULL_VER: 160011001 (CTP), 160020506 (beta1), 160021003 (beta2), 160030128 (rc)
+// _MSC_FULL_VER: 160011001 (CTP), 160020506 (beta1), 160021003 (beta2), 160030128 (rc), 160040219 (sp1)
 
 #define NTL__CXX_AUTO
 #if _MSC_FULL_VER >= 160020506 // beta1
@@ -82,15 +84,13 @@
 #endif
 #if _MSC_FULL_VER >= 160021003 // beta2
 # define NTL__CXX_NULLPTR
+# define NTL__CXX_RVFIX
 #endif
 
 #define NTL__CXX_ASSERT
 #define NTL__CXX_LAMBDA
 
 #define NTL__CXX_RV
-#if _MSC_FULL_VER >= 160021003 // beta2
-# define NTL__CXX_RVFIX
-#endif
 #endif // _MSC_VER >= 1600
 
 #elif defined(__BCPLUSPLUS__)
@@ -119,6 +119,16 @@
 #define NTL__CXX_ASSERT
 #define NTL__CXX_EXTPL
 #define NTL__CXX_LAMBDA
+
+#if __ICL >= 1200
+#define NTL__CXX_FUNC
+#define NTL__CXX_EF
+#define NTL__CXX_ENUM
+#define NTL__CXX_TYPEOF
+#define NTL__CXX_RV
+#define NTL__CXX_RVFIX
+#endif
+
 #endif // __ICL
 
 #elif defined(__GNUC__) && defined(__GXX_EXPERIMENTAL_CXX0X__)
@@ -135,6 +145,7 @@
 #define NTL__CXX_IL
 #define NTL__CXX_RV
 #define NTL__CXX_VT
+#define NTL__CXX_FUNC
 
 #if((__GNUC__*10+__GNUC_MINOR__) >= 45)
 # define NTL__CXX_EXPLICITOP	// 4.5

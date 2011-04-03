@@ -36,6 +36,11 @@ namespace dbg = ntl::nt::dbg;
 /// RTL poiner to the current unexpected_handler
 volatile std::unexpected_handler __ntl_std_unexpected_handler;
 
+std::unexpected_handler std::get_unexpected() __ntl_nothrow
+{
+  return __ntl_std_unexpected_handler;
+};
+
 std::unexpected_handler std::set_unexpected(std::unexpected_handler f) __ntl_nothrow
 {
   assert(f != nullptr);

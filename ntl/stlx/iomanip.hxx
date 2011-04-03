@@ -17,7 +17,7 @@
 
 namespace std {
 
-namespace impl {
+namespace __ {
 struct resetiosflags
 {
   resetiosflags(ios_base::fmtflags mask) : mask(mask) {/**/}
@@ -30,7 +30,7 @@ struct resetiosflags
 template<typename charT, typename traits>
 __forceinline
 basic_istream<charT, traits>&
-  operator>>(basic_istream<charT, traits>& in, const impl::resetiosflags & mask)
+  operator>>(basic_istream<charT, traits>& in, const __::resetiosflags & mask)
 {
   in.setf(ios_base::fmtflags(0), mask);
   return in;
@@ -39,20 +39,20 @@ basic_istream<charT, traits>&
 template<typename charT, typename traits>
 __forceinline
 basic_ostream<charT, traits>&
-  operator<<(basic_ostream<charT, traits>& out, const impl::resetiosflags & mask)
+  operator<<(basic_ostream<charT, traits>& out, const __::resetiosflags & mask)
 {
   out.setf(ios_base::fmtflags(0), mask);
   return out;
 }
 
 __forceinline
-impl::resetiosflags resetiosflags(ios_base::fmtflags mask)
+__::resetiosflags resetiosflags(ios_base::fmtflags mask)
 {
-  return impl::resetiosflags(mask);
+  return __::resetiosflags(mask);
 }
 
 
-namespace impl {
+namespace __ {
 struct setiosflags
 {
   setiosflags(ios_base::fmtflags mask) : mask(mask) {/**/}
@@ -65,7 +65,7 @@ struct setiosflags
 template<typename charT, typename traits>
 __forceinline
 basic_istream<charT, traits>&
-  operator>>(basic_istream<charT, traits>& in, const impl::setiosflags & mask)
+  operator>>(basic_istream<charT, traits>& in, const __::setiosflags & mask)
 {
   in.setf(mask);
   return in;
@@ -74,20 +74,20 @@ basic_istream<charT, traits>&
 template<typename charT, typename traits>
 __forceinline
 basic_ostream<charT, traits>&
-  operator<<(basic_ostream<charT, traits>& out, const impl::setiosflags & mask)
+  operator<<(basic_ostream<charT, traits>& out, const __::setiosflags & mask)
 {
   out.setf(mask);
   return out;
 }
 
 __forceinline
-impl::setiosflags setiosflags(ios_base::fmtflags mask)
+__::setiosflags setiosflags(ios_base::fmtflags mask)
 {
-  return impl::setiosflags(mask);
+  return __::setiosflags(mask);
 }
 
 
-namespace impl {
+namespace __ {
 struct setbase
 {
   setbase(int base) : base(base) {/**/}
@@ -100,7 +100,7 @@ struct setbase
 template<typename charT, typename traits>
 __forceinline
 basic_istream<charT, traits>&
-  operator>>(basic_istream<charT, traits>& in, const impl::setbase & base)
+  operator>>(basic_istream<charT, traits>& in, const __::setbase & base)
 {
   in.setf(base == 8 ? ios_base::oct :
           base == 10 ? ios_base::dec :
@@ -113,7 +113,7 @@ basic_istream<charT, traits>&
 template<typename charT, typename traits>
 __forceinline
 basic_ostream<charT, traits>&
-  operator<<(basic_ostream<charT, traits>& out, const impl::setbase & base)
+  operator<<(basic_ostream<charT, traits>& out, const __::setbase & base)
 {
   out.setf(base == 8 ? ios_base::oct :
           base == 10 ? ios_base::dec :
@@ -124,12 +124,12 @@ basic_ostream<charT, traits>&
 }
 
 __forceinline
-impl::setbase setbase(int base)
+__::setbase setbase(int base)
 {
-  return impl::setbase(base);
+  return __::setbase(base);
 }
 
-namespace impl {
+namespace __ {
 template<typename charT> struct setfill
 {
   setfill(charT fill) : fill(fill) {/**/}
@@ -142,7 +142,7 @@ template<typename charT> struct setfill
 template<typename charT, typename traits>
 __forceinline
 basic_istream<charT, traits>&
-  operator>>(basic_istream<charT, traits>& in, const impl::setfill<charT> & fill)
+  operator>>(basic_istream<charT, traits>& in, const __::setfill<charT> & fill)
 {
   in.fill(fill);
   return in;
@@ -151,17 +151,17 @@ basic_istream<charT, traits>&
 template<typename charT, typename traits>
 __forceinline
 basic_ostream<charT, traits>&
-  operator<<(basic_ostream<charT, traits>& out, const impl::setfill<charT> & fill)
+  operator<<(basic_ostream<charT, traits>& out, const __::setfill<charT> & fill)
 {
   out.fill(fill);
   return out;
 }
 
 template<typename charT>
-impl::setfill<charT>
+__::setfill<charT>
   setfill(charT c);
 
-namespace impl {
+namespace __ {
 struct setprecision
 {
   setprecision(int n) : n(n) {/**/}
@@ -174,7 +174,7 @@ struct setprecision
 template<typename charT, typename traits>
 __forceinline
 basic_istream<charT, traits>&
-  operator>>(basic_istream<charT, traits>& in, const impl::setprecision & n)
+  operator>>(basic_istream<charT, traits>& in, const __::setprecision & n)
 {
   in.precision(n);
   return in;
@@ -183,20 +183,20 @@ basic_istream<charT, traits>&
 template<typename charT, typename traits>
 __forceinline
 basic_ostream<charT, traits>&
-  operator<<(basic_ostream<charT, traits>& out, const impl::setprecision & n)
+  operator<<(basic_ostream<charT, traits>& out, const __::setprecision & n)
 {
   out.precision(n);
   return out;
 }
 
 __forceinline
-impl::setprecision setprecision(int n)
+__::setprecision setprecision(int n)
 {
-  return impl::setprecision(n);
+  return __::setprecision(n);
 }
 
 
-namespace impl {
+namespace __ {
 struct setw
 {
   setw(int n) : n(n) {/**/}
@@ -209,7 +209,7 @@ struct setw
 template<typename charT, typename traits>
 __forceinline
 basic_istream<charT, traits>&
-  operator>>(basic_istream<charT, traits>& in, const impl::setw & n)
+  operator>>(basic_istream<charT, traits>& in, const __::setw & n)
 {
   in.width(n);
   return in;
@@ -218,16 +218,16 @@ basic_istream<charT, traits>&
 template<typename charT, typename traits>
 __forceinline
 basic_ostream<charT, traits>&
-  operator<<(basic_ostream<charT, traits>& out, const impl::setw & n)
+  operator<<(basic_ostream<charT, traits>& out, const __::setw & n)
 {
   out.width(n);
   return out;
 }
 
 __forceinline
-impl::setw setw(int n)
+__::setw setw(int n)
 {
-  return impl::setw(n);
+  return __::setw(n);
 }
 
 

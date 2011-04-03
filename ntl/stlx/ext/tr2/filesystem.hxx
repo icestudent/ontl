@@ -525,7 +525,7 @@ namespace std
       inline void swap(basic_path<String, Traits> & lhs, basic_path<String, Traits>&& rhs) { lhs.swap(rhs); }
     #endif
 
-    #ifndef __DOXYGEN__
+    #ifndef NTL__DOC
       template<class String, class Traits> inline bool operator<(basic_path<String, Traits>& a, basic_path<String, Traits>& b) { return lexicographical_compare(a.begin(), a.end(), b.begin(), b.end()); }
       template<class String, class Traits> bool operator==(basic_path<String, Traits>& a, basic_path<String, Traits>& b);
       template<class String, class Traits> inline bool operator!=(basic_path<String, Traits>& a, basic_path<String, Traits>& b){ return rel_ops::operator !=(a,b); }
@@ -648,7 +648,7 @@ namespace std
       /** Specialization of basic_filesystem_error for wpath */
       typedef basic_filesystem_error<wpath> wfilesystem_error;
 
-      #ifndef __DOXYGEN__
+      #ifndef NTL__DOC
       //////////////////////////////////////////////////////////////////////////
       // IMPLEMENTATION
       /************************************************************************/
@@ -1065,7 +1065,7 @@ namespace std
         return move(is);
       }
 
-      #endif // __DOXYGEN__
+      #endif // NTL__DOC
 
 
       ///\name Path creation helpers

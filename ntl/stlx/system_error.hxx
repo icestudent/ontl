@@ -43,6 +43,9 @@ namespace std
   inline const error_category& generic_category();
   inline const error_category& system_category();
 
+  error_code& throws();
+  error_code& throw_system_error(const error_code& actual, error_code& holder);
+  void        throw_system_error(error_code& ec);
 
   template<class T>
   struct is_error_code_enum: public false_type {};
@@ -194,7 +197,7 @@ private:
     }
 
     template<typename ErrorConditionEnum>
-    typename enable_if<is_error_condition_enum<ErrorConditionEnum>::value, error_code>::type& operator= (ErrorConditionEnum e) __ntl_nothrow
+    typename enable_if<is_error_condition_enum<ErrorConditionEnum>::value, error_condition>::type& operator= (ErrorConditionEnum e) __ntl_nothrow
     {
       return *this = make_error_code(e);
     }
@@ -487,6 +490,25 @@ private:
   {
     static error_code* tec = 0;
     return *tec;
+  }
+
+  /** Throws system_error with specified error code if provided. */
+  __forceinline void throw_system_error(error_code& ec)
+  {
+    assert(&ec != &throws());
+    if(ec)
+      __ntl_throw(system_error(ec));
+  }
+  __forceinline error_code& throw_system_error(const error_code& actual, error_code& holder)
+  {
+    const bool throwable = &holder == &throws();
+    if(actual){
+      if(throwable)
+        __ntl_throw(system_error(actual));
+    }
+    if(!throwable)
+      holder = actual;
+    return holder;
   }
 
   //////////////////////////////////////////////////////////////////////////

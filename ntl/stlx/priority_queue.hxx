@@ -118,10 +118,6 @@ namespace std {
   struct uses_allocator<priority_queue<T, Container, Compare>, Alloc>
     : uses_allocator<Container, Alloc>::type { };
   
-  template <class T, class Container, class Compare>
-  struct constructible_with_allocator_suffix<
-    priority_queue<T, Container, Compare> >
-    : true_type { };
 
   /**@} lib_container_adaptors */
   /**@} lib_sequence */

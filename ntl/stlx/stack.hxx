@@ -133,10 +133,6 @@ template <class T, class Container, class Alloc>
 struct uses_allocator<stack<T, Container>, Alloc>
   : uses_allocator<Container, Alloc>::type { };
 
-template <class T, class Container>
-struct constructible_with_allocator_suffix<stack<T, Container> >
-  : true_type { };
-
 
 /**@} lib_container_adaptors */
 /**@} lib_sequence */
