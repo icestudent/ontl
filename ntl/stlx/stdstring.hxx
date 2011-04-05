@@ -1154,7 +1154,7 @@ struct char_traits<wchar_t>
     /// 4 Returns: find(basic_string<charT,traits,Allocator>(s,n),pos).
     size_type find(const charT* s, size_type pos, size_type n) const
     {
-      size_type cursize = size();
+      const size_type cursize = size();
       if(pos > cursize || pos+n > cursize) return npos;
       const charT* const beg = begin();
       for ( size_type xpos = pos; xpos + n <= cursize; ++xpos )
@@ -1180,7 +1180,8 @@ next_xpos:;
     size_type find(charT c, size_type pos = 0) const
     {
       const charT* const beg = begin();
-      for ( size_type xpos = pos; xpos < size(); ++xpos )
+      const size_type cursize = size();
+      for ( size_type xpos = pos; xpos < cursize; ++xpos )
         if ( traits_type::eq(*(beg + xpos), c) )
           return xpos;
       return npos;
@@ -1204,10 +1205,11 @@ next_xpos:;
     /// 4 Returns: rfind(basic_string<charT,traits,Allocator>(s,n),pos).
     size_type rfind(const charT* s, size_type pos, size_type n) const
     {
-      if(!n) return min(pos,size());
+      const size_type cursize = size();
+      if(!n) return min(pos,cursize);
       size_type & xpos = pos;
-      if ( xpos > size() || xpos + n > size() )
-        xpos = size() - n;
+      if ( xpos > cursize || xpos + n > cursize )
+        xpos = cursize - n;
       const charT* const beg = begin();
       while ( xpos + n > 0 )
       {
@@ -1234,7 +1236,8 @@ next_xpos:
       ///\note  Standard claims the use of at() member function, but
       ///       we stick to an exception-safe way
       const charT* const beg = begin();
-      for ( size_type xpos = pos < size() ? pos + 1 : size(); xpos; )
+      const size_type cursize = size();
+      for ( size_type xpos = pos < cursize ? pos + 1 : cursize; xpos; )
         if ( traits_type::eq(*(beg + --xpos), c) )
           return xpos;
       return npos;
@@ -1361,7 +1364,8 @@ next_xpos:
     size_type find_first_not_of(const charT* s, size_type pos, size_type n) const
     {
       const charT* const beg = begin();
-      for ( size_type xpos = pos; xpos < size(); ++xpos )
+      const size_type cursize = size();
+      for ( size_type xpos = pos; xpos < cursize; ++xpos )
       {
         for ( size_type i = 0; i != n; ++i )
           if ( traits_type::eq(*(beg + xpos), *(s + i)) )
@@ -1383,7 +1387,8 @@ next_xpos:;
     size_type find_first_not_of(charT c, size_type pos = 0) const
     {
       const charT* const beg = begin();
-      for ( size_type xpos = pos; xpos < size(); ++xpos )
+      const size_type cursize = size();
+      for ( size_type xpos = pos; xpos < cursize; ++xpos )
         if ( !traits_type::eq(*(beg + xpos), c) )
           return xpos;
       return npos;
@@ -1408,7 +1413,8 @@ next_xpos:;
     size_type find_last_not_of(const charT* s, size_type pos, size_type n) const
     {
       const charT* const beg = begin();
-      for ( size_type xpos = pos < size() ? pos + 1 : size(); xpos; )
+      const size_type cursize = size();
+      for ( size_type xpos = pos < cursize ? pos + 1 : cursize; xpos; )
       {
         --xpos;
         for ( size_type i = 0; i != n; ++i )
@@ -1431,7 +1437,8 @@ next_xpos:;
     size_type find_last_not_of(charT c, size_type pos = npos) const
     {
       const charT* const beg = begin();
-      for ( size_type xpos = pos < size() ? pos + 1 : size(); xpos; )
+      const size_type cursize = size();
+      for ( size_type xpos = pos < cursize ? pos + 1 : cursize; xpos; )
         if ( !traits_type::eq(*(beg + --xpos), c) )
           return xpos;
       return npos;
@@ -1465,7 +1472,7 @@ next_xpos:;
 
     int compare(size_type pos, size_type n, const basic_string& str) const
     {
-      if(pos+n >= size())
+      if(pos+n > size())
         return -1;
       const size_t rlen = std::min(n, str.size());
       if(!rlen)
@@ -1476,9 +1483,9 @@ next_xpos:;
 
     int compare(size_type pos1, size_type n1, const basic_string& str, size_type pos2, size_type n2) const
     {
-      if(pos1+n1 >= size())
+      if(pos1+n1 > size())
         return -1;
-      else if(pos2+n2 >= str.size())
+      else if(pos2+n2 > str.size())
         return 1;
       const size_t rlen = std::min(n1, n2);
       if(!rlen)
@@ -1501,19 +1508,19 @@ next_xpos:;
 
     int compare(size_type pos, size_type n, const charT* s) const
     {
-      if(!s || pos+n >= size())
+      if(!s || pos+n > size())
         return -1;
       const int r = traits_type::compare(begin()+pos, s, n);
       if(r) return r;
       const size_type rlen = traits_type::length(s);
-      return static_cast<int>(size() - rlen);
+      return static_cast<int>(n - rlen);
     }
 
     int compare(size_type pos1, size_type n1, const charT* s, size_type n2) const
     {
       if(n1 != n2)
         return static_cast<int>(n1 - n2);
-      else if(pos1+n1 >= size())
+      else if(pos1+n1 > size())
         return -1;
       const int r = traits_type::compare(begin()+pos1, s, min(n1, n2));
       return r != 0 ? r : static_cast<int>(n1 - n2);
@@ -1926,7 +1933,7 @@ namespace __
     size_t l;
     typedef typename conditional<(sizeof(T) > sizeof(long)), unsigned long long, unsigned long>::type storage_type;
     storage_type value;
-    ntl::numeric::convresult re = ntl::numeric::str2num<storage_type, typename make_signed<storage_type>::type>(value, str, length, base, numeric_limits<T>::__max, numeric_limits<T>::__min, &l);
+    ntl::numeric::convresult re = ntl::numeric::str2num<storage_type, typename make_signed<storage_type>::type>(value, str, static_cast<ssize_t>(length), base, numeric_limits<T>::__max, numeric_limits<T>::__min, &l);
     if(idx) *idx = l;
     if(re <= ntl::numeric::conv_result::bad_format){
   #if STLX__USE_EXCEPTIONS

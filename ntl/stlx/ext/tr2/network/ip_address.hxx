@@ -110,8 +110,8 @@ namespace std { namespace tr2 { namespace network {
       }
 
       static address_v4 any()       { return address_v4(); }
-      static address_v4 loopback()  { return address_v4(0x7f000001); }
-      static address_v4 broadcast() { return address_v4(0xffffffff); }
+      static address_v4 loopback()  { return address_v4(loopback_val1); }
+      static address_v4 broadcast() { return address_v4(broadcast_val); }
       static address_v4 broadcast(const address_v4& addr, const address_v4& mask)
       {
         return address_v4(addr.to_ulong() | ~mask.to_ulong());
@@ -126,7 +126,7 @@ namespace std { namespace tr2 { namespace network {
         else if(addr.is_class_c())
           mask = 0xFFFFFF00;
         else
-          mask = 0xFFFFFFFF;
+          mask = 0xFFFFFFFF; //-V112
         return address_v4(mask);
       }
 
@@ -144,7 +144,8 @@ namespace std { namespace tr2 { namespace network {
         classB_mask = 3U << 30, classB_val = classA_mask,
         classC_mask = 7U << 29, classC_val = classB_mask,
         classD_mask = 15U<< 28, classD_val = classC_mask,
-        loopback_mask = 0x7F000000;
+        loopback_mask = 0x7F000000, loopback_val1 = 0x7f000001,
+        broadcast_val = 0xffffffff; //-V112
 
       ntl::network::in_addr v;  // in network byte order (big-endian)
     };
@@ -447,15 +448,15 @@ namespace std { namespace tr2 { namespace network {
       }
 
       ///\name address_v6 comparisons:
-      friend inline bool operator==(const address_v6& a, const address_v6& b) { return a.scope == b.scope && memcmp(a.v.bytes, b.v.bytes, addr_size) == 0; }
+      friend inline bool operator==(const address_v6& a, const address_v6& b) { return a.scope == b.scope && memcmp(a.v.bytes, b.v.bytes, addr_size) == 0; } //-V106
       friend inline bool operator!=(const address_v6& a, const address_v6& b) { return rel_ops::operator!=(a, b); }
-      friend inline bool operator< (const address_v6& a, const address_v6& b) { return a.to_bytes() < b.to_bytes() || (memcmp(a.v.bytes, b.v.bytes, addr_size) == 0 && a.scope < b.scope); }
+      friend inline bool operator< (const address_v6& a, const address_v6& b) { return a.to_bytes() < b.to_bytes() || (memcmp(a.v.bytes, b.v.bytes, addr_size) == 0 && a.scope < b.scope); } //-V106
       friend inline bool operator> (const address_v6& a, const address_v6& b) { return rel_ops::operator> (a, b); }
       friend inline bool operator<=(const address_v6& a, const address_v6& b) { return rel_ops::operator<=(a, b); }
       friend inline bool operator>=(const address_v6& a, const address_v6& b) { return rel_ops::operator>=(a, b); }
       ///\}
     private:
-      enum { addr_size = 16 };
+      enum { addr_size = 16U };
       ntl::network::in_addr6 v;
       unsigned long scope;
     };

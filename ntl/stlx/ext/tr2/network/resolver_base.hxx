@@ -1,6 +1,6 @@
 /**\file*********************************************************************
  *                                                                     \brief
- *  Network
+ *  IP Name resolver base classes
  *
  ****************************************************************************
  */
@@ -105,7 +105,6 @@ namespace std { namespace tr2 { namespace network {
         :response()
       {}
 
-
       ///\name forward iterator members
       reference operator*() const
       {
@@ -162,6 +161,9 @@ namespace std { namespace tr2 { namespace network {
 
     /**
      *	@brief 5.9.9. Class template ip::basic_resolver_query
+     *
+     *  @note Without \c host_name <tt>basic_resolver::resolve("0")</tt> returns "[::]:0",
+     *  but with empty \c host_name <tt>basic_resolver::resolve("", "0")</tt> returns endpoints from all network interfaces ("eth0:0", "eth1:0", etc.)
      **/
     template<class InternetProtocol>
     class basic_resolver_query:
@@ -173,10 +175,10 @@ namespace std { namespace tr2 { namespace network {
 
       ///\name constructors:
       basic_resolver_query()
-        :hint()
+        :hint(), host_exists(false)
       {}
       basic_resolver_query(const string& service_name, flags f = passive | address_configured)
-        :hint(), service(service_name)
+        :hint(), service(service_name), host_exists(false)
       {
         const typename protocol_type::endpoint p;
         set_proto(p.protocol());
@@ -184,13 +186,13 @@ namespace std { namespace tr2 { namespace network {
         hint.family = ntl::network::constants::af_unspec;
       }
       basic_resolver_query(const InternetProtocol& proto, const string& service_name, flags f = passive | address_configured)
-        :hint(), service(service_name)
+        :hint(), service(service_name), host_exists(false)
       {
         set_proto(proto);
         hint.flags = f;
       }
       basic_resolver_query(const string& host_name,  const string& service_name, flags f = address_configured)
-        :hint(), host(host_name), service(service_name)
+        :hint(), host(host_name), service(service_name), host_exists(true)
       {
         const typename protocol_type::endpoint p;
         set_proto(p.protocol());
@@ -198,7 +200,7 @@ namespace std { namespace tr2 { namespace network {
         hint.family = ntl::network::constants::af_unspec;
       }
       basic_resolver_query(const InternetProtocol& proto, const string& host_name, const string& service_name, flags f = address_configured)
-        :hint(), host(host_name), service(service_name)
+        :hint(), host(host_name), service(service_name), host_exists(true)
       {
         set_proto(proto);
         hint.flags = f;
@@ -214,6 +216,7 @@ namespace std { namespace tr2 { namespace network {
     public:
       string host, service;
       ntl::network::addrinfo hint;
+      bool host_exists;
     };
 
   } // ip

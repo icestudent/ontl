@@ -168,12 +168,12 @@ namespace ntl { namespace network {
 
       struct overlapped
       {
-        uint32_t      Internal, InternalHigh;
+        uintptr_t     Internal, InternalHigh;
         union {
           struct { 
             uint32_t  Offset, OffsetHigh;
           };
-          void*       Pointer;
+          void*       Pointer; //-V117
         };
         legacy_handle hEvent;
 
@@ -239,6 +239,8 @@ namespace ntl { namespace network {
     typedef int __stdcall shutdown_t(socket s, int how);
     typedef int __stdcall closesocket_t(socket s);
     typedef int __stdcall connect_t(socket s, const sockaddr* name, int namelen);
+    typedef int __stdcall bind_t(socket s, const sockaddr* name, int namelen);
+    typedef int __stdcall listen_t(socket s, int backlog);
     typedef int __stdcall send_t(socket s, const char* buf, int len, int flags);
     typedef int __stdcall recv_t(socket s, char* buf, int len, int flags);
     typedef int __stdcall sendto_t(socket s, const char* buf, int len, int flags, const sockaddr* name, int namelen);
@@ -249,6 +251,9 @@ namespace ntl { namespace network {
     typedef const char* __stdcall inet_ntoa_t(const in_addr in);
     typedef uint32_t __stdcall inet_addr_t(const char* addr);
     typedef int gethostname_t(char* name, int namelen);
+
+    typedef int __stdcall getsockname_t(socket s, sockaddr* addr, int* addrlen);
+    typedef int __stdcall getpeername_t(socket s, sockaddr* addr, int* addrlen);
 
     namespace wsa
     {
@@ -276,6 +281,11 @@ namespace ntl { namespace network {
       
       connect_t* connect;
       shutdown_t* shutdown;
+      bind_t* bind;
+      listen_t* listen;
+
+      getsockname_t* getsockname;
+      getpeername_t* getpeername;
 
       gethostname_t* gethostname;
       getnameinfo_t* getnameinfo;
@@ -295,39 +305,20 @@ namespace ntl { namespace network {
     };
 
 
-    class winsock_service_base
-    {
-    protected:
-      static const int socket_error = -1;
-
-      static bool check_error(std::error_code& ec, int re)
-      {
-        if(re != socket_error)
-          ec.clear();
-        else
-          sockerror(ec);
-        return re != socket_error;
-      }
-      static std::error_code success(std::error_code& ec)
-      {
-        return ec.clear(), ec;
-      }
-      static std::error_code sockerror(std::error_code& ec)
-      {
-        // TODO: map win32 errors to network
-        const winsock::sockerror::type errc = winsock::sockerror::get();
-        return ec = std::tr2::network::network_error::make_error_code(static_cast<std::tr2::network::network_error::error_type>(errc));
-      }
-    };
-
     class winsock_runtime
     {
     public:
       static functions_t* winsock_runtime::instance()
       {
-        return check_wsa(true);
+        functions_t* funcs = std::__::static_storage<functions_t>::get_buffer();
+        assert(funcs != nullptr);
+        return funcs;
       }
 
+      static void setup()
+      {
+        check_wsa(true);
+      }
       static void cleanup()
       {
         check_wsa(false);
@@ -366,14 +357,20 @@ namespace ntl { namespace network {
           NTL_IMP(getaddrinfo);
           NTL_IMP(freeaddrinfo);
           NTL_IMP(gethostname);
+          NTL_IMP(bind);
+          NTL_IMP(listen);
+          NTL_IMP(getsockname);
+          NTL_IMP(getpeername);
           #undef NTL_IMP
 
           // check import
           const void **first = (const void**)&funcs, **last = (const void**)&funcs.initialized;
           bool ok = true;
           do{
-            if(!*first)
+            if(!*first){
+              assert(("no function at",*first));
               ok = false;
+            }
           }while(++first != last);
           funcs.initialized = true;
         }
@@ -398,6 +395,42 @@ namespace ntl { namespace network {
           }
         }
         return funcs;
+      }
+    };
+
+
+    class winsock_service_base
+    {
+    protected:
+      static const int socket_error = -1;
+
+      // false if error
+      static bool check_error(std::error_code& ec, int re)
+      {
+        if(re != socket_error)
+          ec.clear();
+        else
+          sockerror(ec);
+        return re != socket_error;
+      }
+      static std::error_code success(std::error_code& ec)
+      {
+        return ec.clear(), ec;
+      }
+      static std::error_code sockerror(std::error_code& ec)
+      {
+        // TODO: map win32 errors to network
+        const winsock::sockerror::type errc = winsock::sockerror::get();
+        return ec = std::make_error_code(static_cast<std::tr2::network::error::error_type>(errc));
+      }
+    public:
+      winsock_service_base()
+      {
+        winsock_runtime::setup();
+      }
+      void shutdown_service()
+      {
+        winsock_runtime::cleanup();
       }
     };
 

@@ -119,7 +119,7 @@ struct tib
   /* 0x0C */  void                    * SubSystemTib;
               union
               {
-  /* 0x10 */    void                  * FiberData;
+  /* 0x10 */    void                  * FiberData; //-V117
   /* 0x10 */    uint32_t                Version;
               };
   /* 0x14 */  void                    * ArbitraryUserPointer;

@@ -12,7 +12,7 @@ namespace ntl { namespace network {
   {
 
     class resolver_service_base:
-      protected winsock_service_base
+      public winsock_service_base
     {
     public:
       struct implementation_type
@@ -25,14 +25,8 @@ namespace ntl { namespace network {
       {
         impl.funcs = *winsock_runtime::instance();
       }
-
       void destroy(implementation_type& impl)
-      {
-        winsock_runtime::cleanup();
-      }
-
-    protected:
-
+      {}
     };
 
     template<class InternetProtocol>
@@ -53,7 +47,6 @@ namespace ntl { namespace network {
       resolver_service(ios::io_service&)
       {}
 
-      void shutdown_service(){}
 
       std::error_code cancel(implementation_type& impl, std::error_code& ec);
 
@@ -61,9 +54,13 @@ namespace ntl { namespace network {
       {
         resolve_result re;
         addrinfo* response;
-        if(!check_error(ec, impl.funcs.getaddrinfo(q.host.c_str(), q.service.c_str(), &q.hint, &response)))
-          return re;
-
+        {
+          const int err = impl.funcs.getaddrinfo(q.host_exists ? q.host.c_str() : nullptr, q.service.c_str(), &q.hint, &response);
+          if(err != 0){
+            sockerror(ec);
+            return re;
+          }
+        }
 
         const InternetProtocol proto = endpoint_type().protocol();
         const int query_af = proto.family(), 
@@ -88,7 +85,7 @@ namespace ntl { namespace network {
             continue;
           }
           std::memcpy(ep.data(), ai->addr, ai->addrlen);
-          ep.port(ai->addr->port);
+          //ep.port(ai->addr->port);
 
           entries->push_back(entry_t(ep, ai->canonname ? std::string(ai->canonname) : q.host, q.service));
         }
@@ -103,7 +100,7 @@ namespace ntl { namespace network {
       {
         resolve_result entries;
         char svc[32], host[1025];
-        if(!check_error(ec, impl.funcs.getnameinfo(reinterpret_cast<const sockaddr*>(ep.data()), ep.size(), 
+        if(!check_error(ec, impl.funcs.getnameinfo(ep.data(), static_cast<int>(ep.size()),
           host, _countof(host), svc, _countof(svc), 0)))
           return entries;
         entries.reset(new entries_t());

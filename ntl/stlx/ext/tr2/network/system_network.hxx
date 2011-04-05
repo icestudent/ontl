@@ -7,7 +7,7 @@ namespace ntl {
 
   namespace constants
   {
-    static const int so_maxconn = 0x7fffffff; // numeric_limits<int>
+    static const int so_maxconn = 0x7fffffff; // numeric_limits<int> //-V112
 
     enum family_type {
       af_unspec,
@@ -102,6 +102,17 @@ namespace ntl {
     };
 
     enum socket_option_name {
+      fioasync       = 0x8004667D,
+      fionbio        = 0x8004667E,
+      fionread       = 0x4004667f,
+
+      siocshiwat     = 0x80047300,
+      siocghiwat     = 0x40047301,
+      siocslowat     = 0x40047302,
+      siocglowat     = 0x40047303,
+      siocatmark     = 0x40047307,
+
+
       so_debug        = 0x0001,
       so_acceptconn   = 0x0002,
       so_reuseaddr    = 0x0004,
@@ -272,7 +283,7 @@ namespace ntl {
       sa_family_t  __ss_family;
       char      __ss_pad1[_SS_PAD1SIZE];
       int64_t   __ss_align;
-      char      __ss_pad2[_SS_PAD2SIZE];
+      char      __ss_pad2[_SS_PAD2SIZE]; //-V119
   };
 #undef sa_family_t
 #undef _SS_MAXSIZE

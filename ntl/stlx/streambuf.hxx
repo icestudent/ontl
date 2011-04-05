@@ -140,7 +140,7 @@ class basic_streambuf
     {
       // If xnext is not a null pointer and xnext < xend for an input sequence,
       // then a read position is available.
-      const streamsize ravail = gend - gnext;
+      const streamsize ravail = gend - gnext; //-V103
       return 0 < ravail ? ravail : showmanyc();
     }
 
@@ -153,13 +153,13 @@ class basic_streambuf
     __forceinline
     int_type sbumpc()
     {
-      const streamsize ravail = gend - gnext;
+      const streamsize ravail = gend - gnext; //-V103
       return !(0 < ravail) ? uflow() : traits_type::to_int_type(*gnext++);
     }
 
     int_type sgetc()
     {
-      const streamsize ravail = gend - gnext;
+      const streamsize ravail = gend - gnext; //-V103
       return !(0 < ravail) ? underflow() : traits_type::to_int_type(*gnext);
     }
 
@@ -172,14 +172,14 @@ class basic_streambuf
 
     int_type sputbackc(char_type c)
     {
-      const streamsize pbavail = gnext - gbeg;
+      const streamsize pbavail = gnext - gbeg; //-V103
       return !(0 < pbavail) || !traits_type::eq(c ,gnext[-1])
         ? pbackfail(traits_type::to_int_type(c)) : traits_type::to_int_type(*--gnext);
     }
 
     int_type sungetc()
     {
-      const streamsize pbavail = gnext - gbeg;
+      const streamsize pbavail = gnext - gbeg; //-V103
       return !(0 < pbavail) ? pbackfail() : traits_type::to_int_type(*--gnext);
     }
 
@@ -188,7 +188,7 @@ class basic_streambuf
     int_type sputc(char_type c)
     {
       const int_type ic = traits_type::to_int_type(c);
-      const streamsize wavail = pend - pnext;
+      const streamsize wavail = pend - pnext; //-V103
       return !(0 < wavail) ? overflow(ic) : *pnext++ = c, ic;
     }
 
@@ -207,7 +207,7 @@ class basic_streambuf
     char_type* eback() const  { return gbeg;  }
     char_type* gptr()  const  { return gnext; }
     char_type* egptr() const  { return gend;  }
-    void gbump(int n)         { gnext += n;   }
+    void gbump(int n)         { gnext += n;   } //-V102
 
     void setg(char_type* gbeg, char_type* gnext, char_type* gend)
     {
@@ -219,7 +219,7 @@ class basic_streambuf
     char_type* pbase() const { return pbeg;   }
     char_type* pptr()  const { return pnext;  }
     char_type* epptr() const { return pend;   }
-    void pbump(int n)        { pnext += n;    }
+    void pbump(int n)        { pnext += n;    } //-V102
 
     void setp(char_type* pbeg, char_type* pend)
     {
@@ -278,7 +278,7 @@ class basic_streambuf
       for ( streamsize copied = 0; ; )
       {
         if ( !(0 < n) ) return copied;
-        const streamsize ravail = gend - gnext;
+        const streamsize ravail = gend - gnext; //-V103
         if ( !(0 < ravail) )
         {
           if ( traits_type::eq_int_type(traits_type::eof(), underflow()) )
@@ -286,8 +286,8 @@ class basic_streambuf
           continue;
         }
         //__assume(n >= 0 && ravail >= 0);
-        const size_t chunksize = static_cast<size_t>(min(n, ravail));
-        traits_type::copy(s, gnext, chunksize);
+        const streamsize chunksize = min(n, ravail);
+        traits_type::copy(s, gnext, static_cast<size_t>(chunksize));
         s += chunksize;
         copied += chunksize;
         gnext += chunksize;
@@ -336,7 +336,7 @@ class basic_streambuf
       for ( streamsize copied = 0; ; )
       {
         if ( !(0 < n) ) return copied;
-        const streamsize wavail = pend - pnext;
+        const streamsize wavail = pend - pnext; //-V103
         if ( !(0 < wavail) )
         {
           const char_type c = *s;
@@ -350,8 +350,8 @@ class basic_streambuf
           continue;
         }
         //__assume(n >= 0 && ravail >= 0);
-        const size_t chunksize = static_cast<size_t>(min(n, wavail));
-        traits_type::copy(pnext, s, chunksize);
+        const streamsize chunksize = min(n, wavail);
+        traits_type::copy(pnext, s, static_cast<size_t>(chunksize));
         s += chunksize;
         copied += chunksize;
         pnext += chunksize;

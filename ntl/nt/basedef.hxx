@@ -77,8 +77,8 @@ namespace ntl {
     ///\name Native list types
     struct list_entry
     {
-      union { list_entry * Flink; list_entry * next; };
-      union { list_entry * Blink; list_entry * prev; };
+      union { list_entry * Flink; list_entry * next; }; //-V117
+      union { list_entry * Blink; list_entry * prev; }; //-V117
 
       void link(list_entry * prev, list_entry * next)
       {
@@ -197,7 +197,7 @@ namespace ntl {
     #pragma warning(disable:4201) // nameless union
     struct io_status_block
     {
-      union { ntstatus  Status; void * Pointer; };
+      union { ntstatus  Status; void * Pointer; }; //-V117
       uintptr_t Information;
     };
     #pragma warning(default:4201)

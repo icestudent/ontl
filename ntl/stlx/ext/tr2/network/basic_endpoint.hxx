@@ -1,6 +1,6 @@
 /**\file*********************************************************************
  *                                                                     \brief
- *  Network
+ *  IP address endpoint
  *
  ****************************************************************************
  */
@@ -26,6 +26,7 @@ namespace std { namespace tr2 {
     template<class InternetProtocol>
     class basic_endpoint
     {
+      typedef ntl::network::sockaddr addr_type;
     public:
       ///\name types:
       typedef InternetProtocol protocol_type;
@@ -40,12 +41,12 @@ namespace std { namespace tr2 {
       {
         memset(&storage, 0, sizeof(storage));
         sa.family = proto.family();
-        sa.port = port_num;
+        sa.port = ntl::big_endian(port_num);
       }
       basic_endpoint(const ip::address& addr, unsigned short port_num)
       {
         memset(&storage, 0, sizeof(storage));
-        sa.port = port_num;
+        sa.port = ntl::big_endian(port_num);
         address(addr);
       }
 
@@ -73,7 +74,7 @@ namespace std { namespace tr2 {
       void address(const ip::address& addr)
       {
         // explicit clear storage
-        uint16_t portnum = sa.port;
+        const uint16_t portnum = sa.port;
         memset(&storage, 0, sizeof(storage));
         sa.port = portnum;
         if(addr.is_v4()){
@@ -89,8 +90,8 @@ namespace std { namespace tr2 {
         }
       }
 
-      unsigned short port() const { return sa.port; }
-      void port(unsigned short port_num) { sa.port = port_num; }
+      unsigned short port() const { return ntl::big_endian(sa.port); }
+      void port(unsigned short port_num) { sa.port = ntl::big_endian(port_num); }
 
       string to_string(error_code& ec = throws()) const
       {
@@ -104,7 +105,7 @@ namespace std { namespace tr2 {
           }
           s.append(1, ':');
           char pb[16];
-          ntl::numeric::itoa(sa.port, pb);
+          ntl::numeric::itoa(ntl::big_endian(sa.port), pb);
           s.append(pb);
         }
         throw_system_error(e, ec);
@@ -119,7 +120,7 @@ namespace std { namespace tr2 {
         basic_endpoint empty;
         if(str.empty())
           return empty;
-        const error_code inv_code = std::make_error_code(std::tr2::network::network_error::invalid_argument);
+        const error_code inv_code = std::make_error_code(std::tr2::network::error::invalid_argument);
 
         string::size_type pos = str.rfind(':');
         if(pos == string::npos || pos < 4){   // [::]:1
@@ -131,7 +132,7 @@ namespace std { namespace tr2 {
         // make copy for modifications
         string str2 = str;
         const char *p = str2.c_str()+pos+1, *dst;
-        uint32_t portnum = ntl::numeric::strtoul(p, &dst, 10);
+        const uint32_t portnum = ntl::numeric::strtoul(p, &dst, 10);
         if(dst == p || portnum > std::numeric_limits<uint16_t>::max()){
           // invalid port
           throw_system_error(inv_code, ec);
@@ -162,10 +163,10 @@ namespace std { namespace tr2 {
       }
 
       ///\name extensible
-      void*       data()            { return &storage; }
-      const void* data()      const { return &storage; }
-      size_t      size()      const { return sa.family == af4 ? sizeof(v4) : sizeof(v6); }
-      size_t      capacity()  const { return sizeof(storage); }
+      addr_type*        data()            { return &sa; }
+      const addr_type*  data()      const { return &sa; }
+      size_t            size()      const { return sa.family == af4 ? sizeof(v4) : sizeof(v6); }
+      size_t            capacity()  const { return sizeof(storage); }
       void resize(size_t s) __ntl_throws(std::length_error)
       {
         if(s == sizeof(v4))

@@ -122,7 +122,7 @@ namespace std
 
 #ifdef _MSC_VER
     struct pad {};
-    pad __[sizeof(void*)/sizeof(pad)];
+    pad __[sizeof(void*)/sizeof(pad)]; //-V514
 #else
     char __[sizeof(void*)];
 #endif

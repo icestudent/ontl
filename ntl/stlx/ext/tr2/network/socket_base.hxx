@@ -37,8 +37,8 @@ namespace std { namespace tr2 { namespace network {
       // extensible
       template<class Protocol> int level(const Protocol& p) const             { return p.family() == ntl::network::constants::af_inet6 ? level6 : level4; }
       template<class Protocol> int name(const Protocol& p) const              { return p.family() == ntl::network::constants::af_inet6 ? name6 : name4; }
-      template<class Protocol> int* data(const Protocol&)                     { return static_cast<int*>(&v); }
-      template<class Protocol> const int* data(const Protocol&) const         { return static_cast<const int*>(&v); }
+      template<class Protocol> T* data(const Protocol&)                       { return &v; }
+      template<class Protocol> const T* data(const Protocol&) const           { return &v; }
       template<class Protocol> size_t size(const Protocol&) const             { return sizeof(T); }
       template<class Protocol> void resize(const Protocol&, size_t s) __ntl_throws(std::length_error)
       {
@@ -48,14 +48,13 @@ namespace std { namespace tr2 { namespace network {
 
     public:
       // for service use
-      typedef T storage_type;
+      typedef T   storage_type;
       enum {
-        level4 = L,
-        level6 = L6,
-        name4  = N,
-        name6  = N6,
+        level4  = L,
+        level6  = L6,
+        name4   = N,
+        name6   = N6,
       };
-
 
     protected:
       T v;
@@ -63,7 +62,7 @@ namespace std { namespace tr2 { namespace network {
 
     template<int L, int N, int L6 = L, int N6 = N>
     class boolean_socket_option:
-      public integral_socket_option<int, L, N, L6, N6>
+      public integral_socket_option<uint32_t, L, N, L6, N6>
     {
     public:
       boolean_socket_option()
@@ -120,6 +119,14 @@ namespace std { namespace tr2 { namespace network {
     /** Specifies the minimum number of bytes to process for socket output operations.  */
     class send_low_watermark;
 
+    ///\name socket control commands
+
+    /** Specifies if nonblocking mode should be enabled */
+    class nonblocking_io;
+    /** Determine whether or not all OOB data has been read. */
+    class at_oob_mark;
+    ///\}
+
     /** Different ways a socket may be shutdown. */
     enum shutdown_type {
       /// Shutdown the receive side of the socket.
@@ -142,6 +149,7 @@ namespace std { namespace tr2 { namespace network {
       message_do_not_route
     };
 #else
+    // socket options
     typedef __::network::boolean_socket_option<ntl::network::constants::sol_socket, ntl::network::constants::so_broadcast> broadcast;
     typedef __::network::boolean_socket_option<ntl::network::constants::sol_socket, ntl::network::constants::so_debug>     debug;
     typedef __::network::boolean_socket_option<ntl::network::constants::sol_socket, ntl::network::constants::so_dontroute> do_not_route;
@@ -153,6 +161,10 @@ namespace std { namespace tr2 { namespace network {
     typedef __::network::integral_socket_option<int, ntl::network::constants::sol_socket, ntl::network::constants::so_rcvlowat>receive_low_watermark;
     typedef __::network::integral_socket_option<int, ntl::network::constants::sol_socket, ntl::network::constants::so_sndbuf>  send_buffer_size;
     typedef __::network::integral_socket_option<int, ntl::network::constants::sol_socket, ntl::network::constants::so_sndlowat>send_buffer_low_watermark;
+
+    // socket control codes
+    typedef __::network::boolean_socket_option<-1, ntl::network::constants::fionbio>    nonblocking_io;
+    typedef __::network::boolean_socket_option<-1, ntl::network::constants::siocatmark> at_mark;
 
     typedef ntl::network::constants::shutdown_type shutdown_type;
     static const ntl::network::constants::shutdown_type shutdown_receive = ntl::network::constants::shutdown_receive;

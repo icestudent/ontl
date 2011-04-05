@@ -661,12 +661,12 @@ namespace ntl {
           while ( h >= l )
           {
             const uint32_t m = (l + h) / 2;
-            const int r = std::strcmp(pe->va<char*>(name_table[m]), name);
+            const int r = std::strcmp(pe->va<char*>(name_table[m]), name); //-V106
             if ( ! r ) return (pe->va<const uint16_t*>(AddressOfNameOrdinals))[m];
             else if ( r > 0) h = m - 1;
             else if ( r < 0) l = m + 1;
           }
-          return 0xffffffff;
+          return 0xffffffff; //-V112
         }
 
         uint32_t ordinal(const image * /*pe*/, uint16_t ordinal) const
@@ -677,7 +677,7 @@ namespace ntl {
         void * function(const image * pe, uint32_t ordinal) const
         {
           return ordinal < NumberOfFunctions
-            ? pe->va<void*>(pe->va<uint32_t*>(AddressOfFunctions)[ordinal]) : 0;
+            ? pe->va<void*>(pe->va<uint32_t*>(AddressOfFunctions)[ordinal]) : 0; //-V106
         }
 
         template<class Functor>
@@ -689,7 +689,7 @@ namespace ntl {
             if(finder(pe->va<const char*>(name_table[n])))
               return pe->va<const uint16_t*>(AddressOfNameOrdinals)[n];
           }
-          return 0xffffffff;
+          return 0xffffffff; //-V112
         }
 
       }; // struct export_directory
@@ -703,10 +703,10 @@ namespace ntl {
         const data_directory * const export_table =
           get_data_directory(data_directory::export_table);
         if ( ! export_table || ! export_table->VirtualAddress ) return 0;
-        export_directory * exports = va<export_directory*>(export_table->VirtualAddress);
+        export_directory * exports = va<export_directory*>(export_table->VirtualAddress); //-V106
         void * const f = exports->function(this, exports->ordinal(this, exp));
         const uintptr_t ex = reinterpret_cast<uintptr_t>(exports);
-        return in_range(ex, ex + export_table->Size, f) ? 0 : f;
+        return in_range(ex, ex + export_table->Size, f) ? 0 : f; //-V104
       }
 
       template<typename DllFinder>
@@ -715,7 +715,7 @@ namespace ntl {
         const data_directory * const export_table =
           get_data_directory(data_directory::export_table);
         if ( ! export_table || ! export_table->VirtualAddress ) return 0;
-        export_directory * exports = va<export_directory*>(export_table->VirtualAddress);
+        export_directory * exports = va<export_directory*>(export_table->VirtualAddress); //-V106
         #ifdef __ICL
         # pragma warning(disable: 810) // conversion from const char* to uint16_t may lose significant bits
         #endif
@@ -727,7 +727,7 @@ namespace ntl {
         #endif
         void * const f = exports->function(this, ordinal);
         const uintptr_t ex = reinterpret_cast<uintptr_t>(exports);
-        if ( !in_range(ex, ex + export_table->Size, f) )
+        if ( !in_range(ex, ex + export_table->Size, f) ) //-V104
           return f;
 
         // forward export
@@ -797,7 +797,7 @@ namespace ntl {
 
         uintptr_t * find(const image * const img, const char * const import_name) const
         {
-          uintptr_t * iat = img->va<uintptr_t*>(FirstThunk);
+          uintptr_t * iat = img->va<uintptr_t*>(FirstThunk); //-V106
           for (intptr_t * hint_name = img->va<intptr_t*>(OriginalFirstThunk);
             *hint_name && *hint_name >= 0;
             ++hint_name, ++iat)
@@ -811,7 +811,7 @@ namespace ntl {
 
         uintptr_t * find(const image * const img, uint16_t import_ordinal) const
         {
-          uintptr_t * iat = img->va<uintptr_t*>(FirstThunk);
+          uintptr_t * iat = img->va<uintptr_t*>(FirstThunk); //-V106
           for (intptr_t * hint_name = img->va<intptr_t*>(OriginalFirstThunk);
             *hint_name && *hint_name < 0;
             ++hint_name, ++iat)
@@ -825,7 +825,7 @@ namespace ntl {
         template<class Functor>
         uintptr_t * find(const image* const img, Functor finder) const
         {
-          uintptr_t* iat = img->va<uintptr_t*>(FirstThunk);
+          uintptr_t* iat = img->va<uintptr_t*>(FirstThunk); //-V106
           for (intptr_t * hint_name = img->va<intptr_t*>(OriginalFirstThunk);
             *hint_name && *hint_name >= 0;
             ++hint_name, ++iat)
@@ -893,7 +893,7 @@ namespace ntl {
         const data_directory * const import_table =
           get_data_directory(data_directory::import_table);
         return import_table && import_table->VirtualAddress
-          ? va<import_descriptor*>(import_table->VirtualAddress)
+          ? va<import_descriptor*>(import_table->VirtualAddress) //-V106
           : 0;
       }
 
@@ -907,7 +907,7 @@ namespace ntl {
         {
           if ( !import_entry->Name ) continue;
           // compare names case-insensitive (simpified)
-          const char * const name = va<const char*>(import_entry->Name);
+          const char * const name = va<const char*>(import_entry->Name); //-V106
           for ( unsigned i = 0; module_name[i]; ++i )
             if ( (module_name[i] ^ name[i]) & 0x5F) goto next_entry;
           return import_entry;
@@ -925,7 +925,7 @@ next_entry:;
           ++import_entry)
         {
           if (!import_entry->Name) continue;
-          const char * const name = va<const char*>(import_entry->Name);
+          const char * const name = va<const char*>(import_entry->Name); //-V106
           if(finder(name))
             return import_entry;
         }
@@ -945,7 +945,7 @@ next_entry:;
               goto next_entry;
 
             // compare names case-insensitive (simpified)
-            const char* const name = va<const char*>(import_entry->Name);
+            const char* const name = va<const char*>(import_entry->Name); //-V106
             for (unsigned i = 0; module[i]; ++i)
               if((module[i] ^ name[i]) & 0x5F)
                 goto next_entry;
@@ -966,9 +966,9 @@ next_entry:;
         {
           if ( ! import_entry->Name ) return false;
           const image * const dll =
-            find_dll(va<const char*>(import_entry->Name));
+            find_dll(va<const char*>(import_entry->Name)); //-V106
           if ( ! dll ) return false;
-          void ** iat = va<void**>(import_entry->FirstThunk);
+          void ** iat = va<void**>(import_entry->FirstThunk); //-V106
           for ( intptr_t * hint_name = va<intptr_t*>(import_entry->OriginalFirstThunk);
             *hint_name;
             ++hint_name, ++iat )
@@ -1073,7 +1073,7 @@ next_entry:;
 
       bool relocate()
       {
-        return relocate(uintptr_t(this)
+        return relocate(uintptr_t(this) //-V104
                             - get_nt_headers()->optional_header32()->ImageBase);
       }
 
@@ -1082,12 +1082,12 @@ next_entry:;
         const data_directory * const reloc_dir =
           get_data_directory(data_directory::basereloc_table);
         if ( ! reloc_dir || ! reloc_dir->VirtualAddress ) return false;
-        const base_relocation * fixups = va<base_relocation*>(reloc_dir->VirtualAddress);
-        const uintptr_t end = va(reloc_dir->VirtualAddress + reloc_dir->Size);
+        const base_relocation * fixups = va<base_relocation*>(reloc_dir->VirtualAddress); //-V106
+        const uintptr_t end = va(reloc_dir->VirtualAddress + reloc_dir->Size); //-V106
         while ( reinterpret_cast<uintptr_t>(fixups) < end )
         {
-          const uintptr_t addr = va(fixups->VirtualAddress);
-          const uintptr_t end = fixups->SizeOfBlock
+          const uintptr_t addr = va(fixups->VirtualAddress); //-V106
+          const uintptr_t end = fixups->SizeOfBlock //-V104
             + reinterpret_cast<uintptr_t>(fixups);
           const base_relocation::entry_t * entry = &fixups->entry[0];
           for ( ; reinterpret_cast<uintptr_t>(entry) < end; ++entry )
@@ -1136,7 +1136,7 @@ next_entry:;
         const data_directory* const resd = get_data_directory(data_directory::resource_table);
         if(!resd || !resd->VirtualAddress)
           return 0;
-        resource_directory* rsrc = va<resource_directory*>(resd->VirtualAddress);
+        resource_directory* rsrc = va<resource_directory*>(resd->VirtualAddress); //-V106
         return n < rsrc->NumberOfNamedEntries
           ? &reinterpret_cast<resource_directory_entry*>(uintptr_t(rsrc) + sizeof(resource_directory)) [n]
           : 0;
@@ -1147,11 +1147,11 @@ next_entry:;
         const data_directory* const resd = get_data_directory(data_directory::resource_table);
         if(!resd || !resd->VirtualAddress)
           return 0;
-        resource_directory* rsrc = va<resource_directory*>(resd->VirtualAddress);
+        resource_directory* rsrc = va<resource_directory*>(resd->VirtualAddress); //-V106
         if(!(n < rsrc->NumberOfIdEntries))
           return 0;
         resource_directory_entry* ride = reinterpret_cast<resource_directory_entry*>(
-          uintptr_t(rsrc) + sizeof(resource_directory) +
+          uintptr_t(rsrc) + sizeof(resource_directory) + //-V119
           sizeof(resource_directory_entry)*rsrc->NumberOfNamedEntries);
         return &ride[n];
         //return & reinterpret_cast<resource_directory_entry*>

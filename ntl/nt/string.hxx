@@ -255,7 +255,6 @@ class native_string
     ///}
 
   private:
-
     uint16_t  length_;
     uint16_t  maximum_length_;
     charT   * buffer_;

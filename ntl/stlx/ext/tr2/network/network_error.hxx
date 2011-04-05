@@ -1,6 +1,6 @@
 /**\file*********************************************************************
  *                                                                     \brief
- *  Network
+ *  Network errors support
  *
  ****************************************************************************
  */
@@ -17,9 +17,12 @@ namespace std { namespace tr2 {
   namespace network
   {
 
-  /// Network error codes
+  /// Network error codes (alias)
   namespace network_error
-  {
+  {}
+  /// Network error codes
+  namespace error = network_error;
+  namespace network_error {
     enum error_type {
       success = ntl::nt::win32_error::success,
 
@@ -109,18 +112,18 @@ namespace std { namespace tr2 {
       return error_condition(static_cast<int>(code), network_category());
     }
 
-  }
+  } // network_error
   
 }} 
 
   // std namespace
 
-template <> struct is_error_condition_enum<tr2::network::network_error::error_type>
+template <> struct is_error_condition_enum<tr2::network::error::error_type>
   : public true_type {};
 
   // bring this functions to the std namespace
-  using tr2::network::network_error::make_error_code;
-  using tr2::network::network_error::make_error_condition;
+  using tr2::network::error::make_error_code;
+  using tr2::network::error::make_error_condition;
 
 
 }

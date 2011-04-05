@@ -388,15 +388,15 @@
 							Name="network"
 							>
 							<File
-								RelativePath=".\stlx\ext\tr2\network\basic_datagram_socket.hxx"
-								>
-							</File>
-							<File
 								RelativePath=".\stlx\ext\tr2\network\basic_io_object.hxx"
 								>
 							</File>
 							<File
 								RelativePath=".\stlx\ext\tr2\network\basic_socket.hxx"
+								>
+							</File>
+							<File
+								RelativePath=".\stlx\ext\tr2\network\datagram_socket.hxx"
 								>
 							</File>
 							<File
@@ -411,11 +411,19 @@
 								RelativePath=".\stlx\ext\tr2\network\socket_base.hxx"
 								>
 							</File>
+							<File
+								RelativePath=".\stlx\ext\tr2\network\stream_socket.hxx"
+								>
+							</File>
 							<Filter
 								Name="impl"
 								>
 								<File
 									RelativePath=".\stlx\ext\tr2\network\datagram_socket_service.hxx"
+									>
+								</File>
+								<File
+									RelativePath=".\stlx\ext\tr2\network\stream_socket_service.hxx"
 									>
 								</File>
 								<Filter

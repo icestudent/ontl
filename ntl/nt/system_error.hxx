@@ -34,6 +34,7 @@ namespace std
 
   namespace native_error
   {
+#if 0
     class native_error_category:
       public error_category
     {
@@ -62,25 +63,30 @@ namespace std
       }
     };
 
-    inline const native_error_category& native_category()
+    inline const error_category& native_category()
     {
       return *std::__::static_storage<native_error_category>::get_object();
     }
-
+#endif
     inline error_code make_error_code(native_error::ntstatus st)
     {
-      return error_code(static_cast<int>(st), native_error::native_category());
+      return error_code(static_cast<int>(st), std::system_category());
     }
 
     inline error_condition make_error_condition(native_error::ntstatus st)
     {
-      return error_condition(static_cast<int>(st), native_error::native_category());
+      return error_condition(static_cast<int>(st), std::system_category());
     }
-  }
+  } // native_error
 
   // bring this functions to the std namespace
   using native_error::make_error_code;
   using native_error::make_error_condition;
+
+  //inline string std::__::system_error_category::message(int ev)
+  //{
+  //  return ntl::nt::strerror(static_cast<ntl::nt::ntstatus>(ev));
+  //}
 
   /** @} nt_syserr */
   /** @} syserr */

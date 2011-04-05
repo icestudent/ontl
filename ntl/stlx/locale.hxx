@@ -1617,29 +1617,29 @@ private:
       buf.first = new char_type[buf.second = 1024*1]; // 1 KB
       if(!buf.first) buf.second = 0;
     }
-    setp(buf.first, buf.first+buf.second);
+    setp(buf.first, buf.first+buf.second); //-V104
   }
   bool write(const char_type* s, streamsize n)
   {
-    return write(s, s+n);
+    return write(s, s+n); //-V104
   }
   bool write(const char_type* from, const char_type* to)
   {
     char sbuf[1024], *snext;
     const char_type  *wnext;
-    streamsize n = to-from;
+    streamsize n = to-from; //-V103
     do {
       const codecvt_base::result re = cvtptr->out(cvtstate, from, to, wnext, sbuf, sbuf+_countof(sbuf), snext);
       if(re == codecvt_base::error)
         break;
       assert(re != codecvt_base::noconv);
 
-      const streamsize write_size = snext-sbuf;
+      const streamsize write_size = snext-sbuf; //-V103
       const streamsize scb = sb->sputn(sbuf, write_size);
       if(scb != write_size)
         break;
 
-      n = to-wnext;
+      n = to-wnext; //-V103
     }while(n > 0);
     return n == 0;
   }
@@ -2178,7 +2178,7 @@ class num_put : public locale::facet
       *++fmt = 0;
 
       char buf[32]; // may not enough if large width
-      streamsize l = adjust == ios_base::internal && width
+      streamsize l = adjust == ios_base::internal && width //-V103
         ? _snprintf(buf, _countof(buf), fmtbuf, width, long_v ? v : static_cast<unsigned long>(v))
       : _snprintf(buf, _countof(buf), fmtbuf, long_v ? v : static_cast<unsigned long>(v));
 

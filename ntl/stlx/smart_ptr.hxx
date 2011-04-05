@@ -1386,7 +1386,7 @@ namespace std
     inline void shared_ptr<T>::check_shared(Y* p, const shared_ptr<T>* ptr)
     {
       if(p)
-        __::check_shared<T>::check<Y>(p, *ptr);
+        __::check_shared<T>::check<Y>(p, *ptr); //-V111
     }
 
     /**@} lib_smartptr */

@@ -1753,7 +1753,7 @@ namespace ntl { namespace nt {
 
   } // win32_error
 
-  inline const win32_error::error_category& win32_category()
+  inline const std::error_category& win32_category()
   {
     return *std::__::static_storage<win32_error::error_category>::get_object();
   }

@@ -28,12 +28,12 @@ namespace ntl { namespace nt {
   };
 
   NTL__EXTERNAPI
-    uint32_t __stdcall
-    RtlNtStatusToDosError(ntstatus Status);
+  uint32_t __stdcall
+  RtlNtStatusToDosError(ntstatus Status);
 
   NTL__EXTERNAPI
-    ntstatus __stdcall
-    RtlFindMessage(
+  ntstatus __stdcall
+  RtlFindMessage(
     const void* DllHandle,
     uint32_t MessageTableId,
     uint32_t MessageLanguageId,
@@ -42,8 +42,8 @@ namespace ntl { namespace nt {
     );
 
   NTL__EXTERNAPI
-    ntstatus __stdcall
-    RtlFormatMessage(
+  ntstatus __stdcall
+  RtlFormatMessage(
     wchar_t* MessageFormat,
     uint32_t MaximumWidth,
     bool IgnoreInserts,
@@ -100,6 +100,11 @@ namespace ntl { namespace nt {
         }else{
           re.assign((const char*)mre->Text, mre->Length);
         }
+        if(re.length() > 2){
+          const size_t p = re.length() - 2;
+          if(re.compare(p, 2, "\r\n") == 0)
+            re.erase(p);
+        }
       }
     }
 
@@ -126,7 +131,7 @@ namespace ntl { namespace nt {
     std::string re("");
     const message_resource_entry* mre = __::find_mre(Status);
     __::mre2str(mre, re);
-    return re;
+    return std::move(re);
   }
 
   inline std::wstring wstrerror(ntstatus Status)
@@ -134,7 +139,7 @@ namespace ntl { namespace nt {
     std::wstring re(L"");
     const message_resource_entry* mre = __::find_mre(Status);
     __::mre2str(mre, re);
-    return re;
+    return std::move(re);
   }
   
   inline std::string strerror(win32error ErrorCode)
@@ -142,7 +147,7 @@ namespace ntl { namespace nt {
     std::string re("");
     const message_resource_entry* mre = __::find_mre(ErrorCode);
     __::mre2str(mre, re);
-    return re;
+    return std::move(re);
   }
 
   inline std::wstring wstrerror(win32error ErrorCode)
@@ -150,7 +155,7 @@ namespace ntl { namespace nt {
     std::wstring re(L"");
     const message_resource_entry* mre = __::find_mre(ErrorCode);
     __::mre2str(mre, re);
-    return re;
+    return std::move(re);
   }
 
 #else
@@ -158,21 +163,21 @@ namespace ntl { namespace nt {
   inline std::string strerror(ntstatus Status)
   {
     char buf[32];
-    std::strcpy(buf, "native error code ");
-    _itoa(Status, buf+sizeof("native error code"), 10);
+    const char msg[] = "system error code ";
+    std::strcpy(buf, msg);
+    _itoa(Status, buf+_countof(msg), 10);
     return std::string(buf);
   }
 
   inline std::wstring wstrerror(ntstatus Status)
   {
     wchar_t buf[32];
-    std::wcscpy(buf, L"native error code ");
-    _itow(Status, buf+sizeof("native error code"), 10);
+    const wchar_t msg[] = L"system error code ";
+    std::wcscpy(buf, );
+    _itow(Status, buf+_countof(msg), 10);
     return std::wstring(buf);
   }
 
 #endif
-
 }} 
-
 #endif // NTL__NT_SYSTEMERROR

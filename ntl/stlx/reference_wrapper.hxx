@@ -52,8 +52,8 @@ namespace std
       template<typename U>
       static sfinae_failed_tag  probe_result(...);
     public:
-      static const bool  unary = sizeof( probe_unary ((T*)0) ) == sizeof(sfinae_passed_tag);
-      static const bool binary = sizeof( probe_binary((T*)0) ) == sizeof(sfinae_passed_tag);
+      static const bool  unary = sizeof( probe_unary ((T*)0) ) == sizeof(sfinae_passed_tag); //-V111
+      static const bool binary = sizeof( probe_binary((T*)0) ) == sizeof(sfinae_passed_tag); //-V111
       static const bool has_result_type = sizeof( probe_result<T>(0) ) == sizeof(sfinae_passed_tag);
 
       static const refwrap_from::type value = 

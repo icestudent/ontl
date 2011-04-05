@@ -25,6 +25,12 @@
 #endif
 #include "stdstring.hxx"
 
+#include "../nt/status.hxx"
+namespace ntl { namespace nt {
+  inline std::string strerror(ntstatus Status);
+  inline std::wstring wstrerror(ntstatus Status);
+}}
+
 namespace std 
 {
 
@@ -40,8 +46,8 @@ namespace std
   class error_condition;
   class system_error;
 
-  inline const error_category& generic_category();
-  inline const error_category& system_category();
+  inline const error_category& generic_category();  // POSIX
+  inline const error_category& system_category();   // 
 
   error_code& throws();
   error_code& throw_system_error(const error_code& actual, error_code& holder);
@@ -396,6 +402,7 @@ private:
       }
     };
 
+    /// 19.4.1.5 Error category objects [syserr.errcat.objects]
     class system_error_category:
       public error_category
     {
@@ -405,9 +412,7 @@ private:
 
       virtual string message(int ev) const
       {
-        char buf[40];
-        sprintf(buf, "system error code #%d", ev);
-        return string(buf);
+        return ntl::nt::strerror(static_cast<ntl::nt::ntstatus>(ev));
       }
 
       /**

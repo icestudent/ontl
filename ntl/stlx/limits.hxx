@@ -672,7 +672,7 @@ namespace __
   inline long double long_double_denorm_min()   { return __LDBL_DENORM_MIN__;   }
 #else
   union fvalue { uint8_t raw[sizeof(float)]; float value; };
-  STATIC_ASSERT(sizeof(fvalue) == 4);
+  static_assert(sizeof(fvalue) == 4, "unsupported float size");
   inline float float_infinity()
   {
     static const fvalue infinity      = { 0x00, 0x00, 0x80, 0x7F };

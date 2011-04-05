@@ -36,7 +36,7 @@ namespace std
 #ifndef NTL__CXX_IL
     size_t   size()  const { return 0; }
     const E* begin() const { return nullptr; }
-    const E* end()   const { return nullptr; }
+    const E* end()   const { return nullptr; } //-V524
 #else
     size_t   size()  const;
     const E* begin() const;

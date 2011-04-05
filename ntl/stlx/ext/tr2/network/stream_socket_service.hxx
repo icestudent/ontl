@@ -1,11 +1,11 @@
 /**\file*********************************************************************
  *                                                                     \brief
- *  Datagram socket service
+ *  Stream socket service
  *
  ****************************************************************************
  */
-#ifndef NTL__STLX_TR2_NETWORK_DATAGRAMSOCKETSERVICE
-#define NTL__STLX_TR2_NETWORK_DATAGRAMSOCKETSERVICE
+#ifndef NTL__STLX_TR2_NETWORK_STREAMSOCKETSERVICE
+#define NTL__STLX_TR2_NETWORK_STREAMSOCKETSERVICE
 #pragma once
 
 #include "io_service.hxx"
@@ -13,11 +13,12 @@
 
 namespace std { namespace tr2 { namespace network {
 
+
   /**
-   *	@brief 5.7.7. Class template datagram_socket_service
+   *	@brief 5.7.9. Class template stream_socket_service
    **/
   template<class Protocol>
-  class datagram_socket_service:
+  class stream_socket_service:
     public tr2::sys::io_service::service
   {
     typedef ntl::network::winsock::socket_service<Protocol> service_implementation_type;
@@ -27,12 +28,11 @@ namespace std { namespace tr2 { namespace network {
     ///\name types:
     typedef Protocol protocol_type;
     typedef typename Protocol::endpoint endpoint_type;
-
     typedef typename service_implementation_type::implementation_type implementation_type;
     typedef typename service_implementation_type::native_type native_type;
 
     ///\name constructors:
-    explicit datagram_socket_service(tr2::sys::io_service& ios)
+    explicit stream_socket_service(tr2::sys::io_service& ios)
       :service(ios), svc(ios)
     {}
 
@@ -65,18 +65,10 @@ namespace std { namespace tr2 { namespace network {
     size_t receive(implementation_type& impl, const MutableBufferSequence& buffers, socket_base::message_flags flags, error_code& ec){ return svc.receive(impl, buffers, flags, ec); }
     template<class MutableBufferSequence, class ReadHandler>
     void async_receive(implementation_type& impl, const MutableBufferSequence& buffers, socket_base::message_flags flags, ReadHandler handler){ return svc.async_receive(impl, buffers, flags, handler); }
-    template<class MutableBufferSequence>
-    size_t receive_from(implementation_type& impl, const MutableBufferSequence& buffers, endpoint_type& sender, socket_base::message_flags flags, error_code& ec){ return svc.receive_from(impl, buffers, sender, flags, ec); }
-    template<class MutableBufferSequence, class ReadHandler>
-    void async_receive_from(implementation_type& impl, const MutableBufferSequence& buffers, endpoint_type& sender, socket_base::message_flags flags, ReadHandler handler){ return svc.async_receive_from(impl, buffers, sender, flags, handler); }
     template<class ConstBufferSequence>
     size_t send(implementation_type& impl, const ConstBufferSequence& buffers, socket_base::message_flags flags, error_code& ec){ return svc.send(impl, buffers, flags, ec); }
     template<class ConstBufferSequence, class WriteHandler>
     void async_send(implementation_type& impl, const ConstBufferSequence& buffers, socket_base::message_flags flags, WriteHandler handler){ return svc.async_send(impl, buffers, flags, handler); }
-    template<class ConstBufferSequence>
-    size_t send_to(implementation_type& impl, const ConstBufferSequence& buffers, const endpoint_type& destination, socket_base::message_flags flags, error_code& ec){ return svc.send_to(impl, buffers, destination, flags, ec); }
-    template<class ConstBufferSequence, class WriteHandler>
-    void async_send_to(implementation_type& impl, const ConstBufferSequence& buffers, const endpoint_type& destination, socket_base::message_flags flags, WriteHandler handler){ return svc.async_send_to(impl, buffers, destination, flags, handler); }
     ///\}
   private:
     void shutdown_service() { svc.shutdown_service(); }
@@ -86,4 +78,4 @@ namespace std { namespace tr2 { namespace network {
   };
 
 }}}
-#endif // NTL__STLX_TR2_NETWORK_DATAGRAMSOCKETSERVICE
+#endif // NTL__STLX_TR2_NETWORK_STREAMSOCKETSERVICE

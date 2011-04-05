@@ -1,11 +1,11 @@
 /**\file*********************************************************************
  *                                                                     \brief
- *  Network
+ *  Basic datagram socket
  *
  ****************************************************************************
  */
-#ifndef NTL__STLX_TR2_NETWORK_BASIC_SOCKET
-#define NTL__STLX_TR2_NETWORK_BASIC_SOCKET
+#ifndef NTL__STLX_TR2_NETWORK_BASICSOCKET
+#define NTL__STLX_TR2_NETWORK_BASICSOCKET
 #pragma once
 
 #include "io_service.hxx"
@@ -195,4 +195,4 @@ namespace std { namespace tr2 { namespace network {
   };
 
 }}}
-#endif // NTL__STLX_TR2_NETWORK_BASIC_SOCKET
+#endif // NTL__STLX_TR2_NETWORK_BASICSOCKET

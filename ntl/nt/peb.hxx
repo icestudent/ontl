@@ -146,7 +146,7 @@ struct ldr_data_table_entry
   };
   union {
     /* 0x44 */ uint32_t           TimeDateStamp;
-    /* 0x44 */ void *             LoadedImports;
+    /* 0x44 */ void *             LoadedImports; //-V117
   };
   /* 0x48 */ void *               EntryPointActivationContext;
   /* 0x4c */ void *               PatchInformation;

@@ -14,7 +14,10 @@
 #include "network/basic_socket.hxx"
 
 #include "network/datagram_socket_service.hxx"
-#include "network/basic_datagram_socket.hxx"
+#include "network/datagram_socket.hxx"
+
+#include "network/stream_socket_service.hxx"
+#include "network/stream_socket.hxx"
 
 #include "network/ip_address.hxx"
 #include "network/basic_endpoint.hxx"

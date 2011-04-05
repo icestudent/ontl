@@ -63,8 +63,8 @@ namespace std { namespace tr2 { namespace network {
     {
     public:
       ///\name types:
-      typedef basic_endpoint<udp> endpoint;
-      typedef basic_resolver<udp> resolver;
+      typedef basic_endpoint<udp>        endpoint;
+      typedef basic_resolver<udp>        resolver;
       typedef basic_datagram_socket<udp> socket;
 
       ///\name static members:

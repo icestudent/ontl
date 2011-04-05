@@ -196,7 +196,7 @@ void zero_mem(type & object)
 {
   char * const p = reinterpret_cast<char*>(&object);
   for ( unsigned i = 0; i != sizeof(type); ++i )
-    p[i] = 0;
+    p[i] = 0; //-V108
 }
 
 /// compares object's memory

@@ -80,7 +80,7 @@ namespace std
       __forceinline operator T() const volatile { return static_cast<T>(val);  }
       __forceinline T operator=(T v) volatile   { val =  static_cast<type>(v); return v; }
       __forceinline static T cast(type v){ return static_cast<T>(v); }
-      uint32_t val;
+      type val;
     };
 
     template<typename T>
@@ -90,7 +90,7 @@ namespace std
       __forceinline operator T() const volatile { return static_cast<T>(val);  }
       __forceinline T operator=(T v) volatile   { val =  static_cast<type>(v); return v; }
       __forceinline static T cast(type v){ return static_cast<T>(v); }
-      uint64_t val;
+      type val;
     };
 
     template<>
@@ -100,18 +100,18 @@ namespace std
       operator bool() const volatile { return val != 0; }
       bool operator=(bool v) volatile{ val = v != 0; return v; }
       __forceinline static bool cast(type v){ return v != 0; }
-      uint32_t val;
+      type val;
     };
 
     template<>
-    struct rep<void*,(sizeof(void*) == sizeof(uint32_t))> /*ST: why pointer is not a small type on x64?*/
+    struct rep<void*,(sizeof(void*) == sizeof(uint32_t))>
     {
-      typedef uint32_t type;
+      typedef uintptr_t type;
       __forceinline operator void*() const volatile { return reinterpret_cast<void*>(val); }
       __forceinline void* operator=(void* p)volatile{ val = reinterpret_cast<type>(p); return p; }
       __forceinline static void* cast(type v) { return reinterpret_cast<void*>(v); }
       __forceinline static type  cast(void*v) { return reinterpret_cast<type >(v); }
-      uint32_t val;
+      type val;
     };
 
     /// Base class for %atomic fundamental type
@@ -271,6 +271,7 @@ namespace std
     protected:
       typedef rep<type>::type reptype;
       static const bool lock_free = true;
+      static_assert(sizeof(reptype) == sizeof(void*), "invalid specialization");
 
     public:
       ///\name 29.6 Operations on Atomic Types [atomics.types.operations]
@@ -293,7 +294,7 @@ namespace std
         {
         case memory_order_seq_cst:
           intrin::_ReadWriteBarrier();
-          atomic::exchange(val.val, reinterpret_cast<reptype>(value));
+          atomic::exchange(val.val, reinterpret_cast<reptype>(value)); //-V205
           intrin::_ReadWriteBarrier();
           break;
         case memory_order_release:
@@ -338,21 +339,21 @@ namespace std
         case memory_order_seq_cst:
         case memory_order_acq_rel:
           {intrin::_ReadWriteBarrier();
-          const type r = rep<type>::cast(atomic::exchange(val.val, reinterpret_cast<reptype>(value)));
+          const type r = rep<type>::cast(atomic::exchange(val.val, reinterpret_cast<reptype>(value))); //-V205
           intrin::_ReadWriteBarrier();
           return r;}
         case memory_order_release:
           intrin::_ReadWriteBarrier();
-          return rep<type>::cast(atomic::exchange(val.val, reinterpret_cast<reptype>(value)));
+          return rep<type>::cast(atomic::exchange(val.val, reinterpret_cast<reptype>(value))); //-V205
         case memory_order_acquire:
         case memory_order_consume:
-          {const type r = rep<type>::cast(atomic::exchange(val.val, reinterpret_cast<reptype>(value)));
+          {const type r = rep<type>::cast(atomic::exchange(val.val, reinterpret_cast<reptype>(value))); //-V205
           intrin::_ReadWriteBarrier();
           return r;}
         default:
           _assert_msg("invalid memory order specified");
         case memory_order_relaxed:
-          return rep<type>::cast(atomic::exchange(val.val, reinterpret_cast<reptype>(value)));
+          return rep<type>::cast(atomic::exchange(val.val, reinterpret_cast<reptype>(value))); //-V205
         }
       }
 
