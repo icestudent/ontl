@@ -577,18 +577,6 @@ class vector
     #endif
     }
 
-    #ifdef NTL__CXX_RV
-    void swap(vector<T,Allocator>&& x) __ntl_nothrow
-    {
-      if(this != &x){
-        using std::swap;
-        swap(begin_, x.begin_);
-        swap(end_, x.end_);
-        swap(capacity_, x.capacity_);
-      }
-    }
-    #endif
-    #if !defined(NTL__CXX_RV) || defined(NTL__CXX_RVFIX)
     void swap(vector<T, Allocator>& x) __ntl_nothrow
     {
       if(this != &x){
@@ -598,7 +586,6 @@ class vector
         swap(capacity_, x.capacity_);
       }
     }
-    #endif
 
     __forceinline
     void clear() __ntl_nothrow
@@ -723,13 +710,6 @@ inline bool operator<=(const vector<T, Allocator>& x, const vector<T, Allocator>
 ///\name  Vector specialized algorithms
 template <class T, class Allocator>
 inline void swap(vector<T, Allocator>& x, vector<T, Allocator>& y) __ntl_nothrow { x.swap(y); }
-#ifdef NTL__CXX_RV
-  template <class T, class Allocator>
-  inline void swap(vector<T,Allocator>&& x, vector<T,Allocator>& y) __ntl_nothrow { x.swap(y); }
-  template <class T, class Allocator>
-  inline void swap(vector<T,Allocator>& x, vector<T,Allocator>&& y) __ntl_nothrow { x.swap(y); }
-#endif
-
 
 ///@}
 /**@} lib_sequence */

@@ -287,17 +287,6 @@ public:
       return val == end() ? 0 : (erase(val), 1);
     }
 
-#ifdef NTL__CXX_RV
-    void swap(map<Key,T,Compare,Allocator>&& x)
-    {
-      if(this != &x){
-        tree_type::swap(forward<map>(x));
-        using std::swap;
-        swap(val_comp_, x.val_comp_);
-      }
-    }
-#endif
-#if !defined(NTL__CXX_RV) || defined(NTL__CXX_RVFIX)
     void swap(map<Key,T,Compare,Allocator>& x)
     {
       if(this != &x){
@@ -306,7 +295,6 @@ public:
         swap(val_comp_, x.val_comp_);
       }
     }
-#endif
 
     // observers:
     key_compare key_comp() const { return val_comp_.comp; }
@@ -419,15 +407,7 @@ inline bool operator<=(const map<Key,T,Compare,Allocator>& x, const map<Key,T,Co
 
 
 template <class Key, class T, class Compare, class Allocator>
-void swap(map<Key,T,Compare,Allocator>& x, map<Key,T,Compare,Allocator>& y) { x.swap(y); }
-
-#ifdef NTL__CXX_RV
-template <class Key, class T, class Compare, class Allocator>
-void swap(map<Key,T,Compare,Allocator>&& x, map<Key,T,Compare,Allocator>& y) { x.swap(y); }
-
-template <class Key, class T, class Compare, class Allocator>
-void swap(map<Key,T, Compare, Allocator>& x, map<Key,T, Compare, Allocator>&& y) { x.swap(y); }
-#endif
+inline void swap(map<Key,T,Compare,Allocator>& x, map<Key,T,Compare,Allocator>& y) { x.swap(y); }
 
 
 /// [23.3.2 multimap]
@@ -462,13 +442,6 @@ bool operator<=(const multimap<Key,T,Compare,Allocator>& x,
 template <class Key, class T, class Compare, class Allocator>
 void swap(multimap<Key,T,Compare,Allocator>& x,
           multimap<Key,T,Compare,Allocator>& y);
-template <class Key, class T, class Compare, class Allocator>
-void swap(multimap<Key,T,Compare,Allocator&& x,
-          multimap<Key,T,Compare,Allocator>& y);
-template <class Key, class T, class Compare, class Allocator>
-void swap(multimap<Key,T,Compare,Allocator& x,
-          multimap<Key,T,Compare,Allocator>&& y);
-
 #endif
 ///@}
 /**@} lib_associative */

@@ -91,11 +91,7 @@ class stack
     void emplace(Args&&... args);
     #endif
 
-    #ifdef NTL__CXX_RV
-    void swap(stack&& s) { c.swap(s.c); }
-    #else
     void swap(stack&  s) { c.swap(s.c); }
-    #endif
 
 
   ///////////////////////////////////////////////////////////////////////////
@@ -120,14 +116,6 @@ class stack
 
 template <class T, class Container>
 inline void swap(stack<T,Container>& x, stack<T,Container>& y)  { x.swap(y); }
-
-#ifdef NTL__CXX_RV
-template <class T, class Allocator>
-inline void swap(stack<T,Allocator>&& x, stack<T,Allocator>&  y){ x.swap(y); }
-template <class T, class Allocator>
-inline void swap(stack<T,Allocator>& x,  stack<T,Allocator>&& y){ x.swap(y); }
-#endif
-
 
 template <class T, class Container, class Alloc>
 struct uses_allocator<stack<T, Container>, Alloc>

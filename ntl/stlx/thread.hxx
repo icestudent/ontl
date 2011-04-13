@@ -219,10 +219,6 @@ namespace std
   
   /** Swaps the states of \c x and \c y */
   inline void swap(thread& x, thread& y)  __ntl_nothrow { x.swap(y); }
-#ifdef NTL__CXX_RV
-  inline void swap(thread&& x, thread& y) __ntl_nothrow { y.swap(x); }
-  inline void swap(thread& x, thread&& y) __ntl_nothrow { x.swap(y); }
-#endif
 
 
   namespace this_thread

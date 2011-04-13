@@ -636,43 +636,43 @@ namespace std
 #endif
 
   ///\name 20.8.11.4 unique_ptr specialized algorithms [unique.shared.special]
-  template <class T, class D> void swap(unique_ptr<T, D>& x, unique_ptr<T, D>& y)
+  template <class T, class D> inline void swap(unique_ptr<T, D>& x, unique_ptr<T, D>& y)
   {
     x.swap(y);
   }
 
   template <class T1, class D1, class T2, class D2>
-  bool operator==(const unique_ptr<T1, D1>& x, const unique_ptr<T2, D2>& y)
+  inline bool operator==(const unique_ptr<T1, D1>& x, const unique_ptr<T2, D2>& y)
   {
     return x.get() == y.get();
   }
 
   template <class T1, class D1, class T2, class D2>
-  bool operator!=(const unique_ptr<T1, D1>& x, const unique_ptr<T2, D2>& y)
+  inline bool operator!=(const unique_ptr<T1, D1>& x, const unique_ptr<T2, D2>& y)
   {
     return x.get() != y.get();
   }
 
   template <class T1, class D1, class T2, class D2>
-  bool operator<(const unique_ptr<T1, D1>& x, const unique_ptr<T2, D2>& y)
+  inline bool operator<(const unique_ptr<T1, D1>& x, const unique_ptr<T2, D2>& y)
   {
     return x.get() < y.get();
   }
 
   template <class T1, class D1, class T2, class D2>
-  bool operator<=(const unique_ptr<T1, D1>& x, const unique_ptr<T2, D2>& y)
+  inline bool operator<=(const unique_ptr<T1, D1>& x, const unique_ptr<T2, D2>& y)
   {
     return x.get() <= y.get();
   }
 
   template <class T1, class D1, class T2, class D2>
-  bool operator>(const unique_ptr<T1, D1>& x, const unique_ptr<T2, D2>& y)
+  inline bool operator>(const unique_ptr<T1, D1>& x, const unique_ptr<T2, D2>& y)
   {
     return x.get() > y.get();
   }
 
   template <class T1, class D1, class T2, class D2>
-  bool operator>=(const unique_ptr<T1, D1>& x, const unique_ptr<T2, D2>& y)
+  inline bool operator>=(const unique_ptr<T1, D1>& x, const unique_ptr<T2, D2>& y)
   {
     return x.get() >= y.get();
   }

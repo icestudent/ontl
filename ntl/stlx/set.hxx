@@ -176,15 +176,7 @@ namespace std {
 
   // specialized algorithms:
   template <class Key, class Compare, class Allocator>
-  void swap(set<Key,Compare,Allocator>& x, set<Key,Compare,Allocator>& y) { x.swap(y); }
-
-#ifdef NTL__CXX_RV
-  template <class Key, class Compare, class Allocator>
-  void swap(set<Key,Compare,Allocator>&& x, set<Key,Compare,Allocator>& y) { x.swap(y); }
-  template <class Key, class Compare, class Allocator>
-  void swap(set<Key,Compare,Allocator>& x, set<Key,Compare,Allocator>&& y) { x.swap(y); }
-#endif
-
+  inline void swap(set<Key,Compare,Allocator>& x, set<Key,Compare,Allocator>& y) { x.swap(y); }
 
   ///////////////////////////////////////////////////////////////////////////
 

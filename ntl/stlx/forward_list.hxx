@@ -423,7 +423,7 @@ namespace std {
   #endif
     };
     
-    void swap(list_reference x)
+    void swap(forward_list& x)
     {
       std::swap(node_allocator, x.node_allocator);
       std::swap(head.next, x.head.next);
@@ -650,20 +650,6 @@ namespace std {
     x.swap(y);
   }
   
-#ifdef NTL__CXX_RV
-  template <class T, class Alloc>
-  inline void swap(forward_list<T,Alloc>&& x, forward_list<T,Alloc>& y)
-  {
-    x.swap(y);
-  }
-
-  template <class T, class Alloc>
-  inline void swap(forward_list<T,Alloc>& x, forward_list<T,Alloc>&& y)
-  {
-    x.swap(y);
-  }
-#endif
-
   /**@} lib_sequence */
   /**@} lib_containers */
 }//namespace std

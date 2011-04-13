@@ -35,9 +35,9 @@ namespace std
    *  @{
    **/
 #if 0
-  template <class R> class unique_future;
-  template <class R> class unique_future<R&>;
-  template <>        class unique_future<void>;
+  template <class R> class future;
+  template <class R> class future<R&>;
+  template <>        class future<void>;
   
   template <class R> class shared_future;
   template <class R> class shared_future<R&>;
@@ -48,7 +48,7 @@ namespace std
   template <>        class promise<void>;
 #else
 
-  template <class R> class unique_future;
+  template <class R> class future;
   template <class R> class shared_future;
   template <class R> class promise;
 #endif
@@ -66,19 +66,43 @@ namespace std
     /** Indicates that the promise already have the associated state */
     promise_already_satisfied,
     /** Uninitialized future use */
-    future_uninitialized
+    no_state
   #ifndef NTL__DOC
     ,__maximum_errc
   #endif
   };
+
+  enum class launch {
+    async     = 0x01,
+    deferred  = 0x02,
+  };
+
+  enum class future_status {
+    ready,
+    timeout,
+    deferred
+  };
+
 #else
   __class_enum(future_errc)
   {
     broken_promise,
     future_already_retrieved,
     promise_already_satisfied,
-    future_uninitialized,
+    no_state,
     __maximum_errc
+  };};
+
+  __class_enum(launch) {
+    async     = 0x01,
+    deferred  = 0x02,
+  };};
+  __ntl_bitmask_type(launch::type,);
+
+  __class_enum(future_status) {
+    ready,
+    timeout,
+    deferred
   };};
 #endif
 
@@ -143,10 +167,6 @@ namespace std
   template <class R, class Alloc>
   struct uses_allocator<promise<R>, Alloc>: true_type {};
 
-  /** Specialization of this trait informs other library components that a promise can always be
-  constructed with an allocator prefix argument. */
-  template <class R>
-  struct constructible_with_allocator_prefix<promise<R> >: true_type {};
   ///\}
 
   namespace __
@@ -287,15 +307,19 @@ namespace std
       }
 
       template <class Rep, class Period>
-      bool wait_for(const std::chrono::duration<Rep, Period>& rel_time) const
+      future_status wait_for(const std::chrono::duration<Rep, Period>& rel_time) const
       {
-        return ready ? true : ntl::nt::success(event.wait_for(rel_time));
+        if(ready)
+          return future_status::ready;
+        return ntl::nt::success(event.wait_for(rel_time)) ? future_status::ready : future_status::timeout;
       }
 
       template <class Clock, class Duration>
       bool wait_until(const std::chrono::time_point<Clock, Duration>& abs_time) const
       {
-        return ready ? true : ntl::nt::success(event.wait_until(abs_time));
+        if(ready)
+          return future_status::ready;
+        return ntl::nt::success(event.wait_until(abs_time))? future_status::ready : future_status::timeout;
       }
 
       virtual void dispose()
@@ -413,28 +437,28 @@ namespace std
   }
 
   /**
-   *	@brief 30.5.4 Class template unique_future [futures.unique_future]
+   *	@brief 30.5.4 Class template future [futures.future]
    **/
   template <class R>
-  class unique_future 
+  class future 
   {
     typedef typename __::future_result<R>::type result_type;
     typedef unique_ptr<__::future_data<R> > unique_data_ptr;
+    future(const future& rhs) __deleted;
+    future& operator=(const future& rhs) __deleted;
   public:
-    unique_future(const unique_future& rhs) __deleted;
-    unique_future& operator=(const unique_future& rhs) __deleted;
 
-    /** Move constructs a unique_future object whose associated state is the same as the state of \p x before. */
-    unique_future(__rvalue(unique_future) x)
-      :data(move(static_cast<unique_future&>(x).data))
+    /** Move constructs a future object whose associated state is the same as the state of \p x before. */
+    future(__rvalue(future) x)
+      :data(move(static_cast<future&>(x).data))
     {}
 
     /** destroys \c *this and its associated state if no other object refers to that. */
-    ~unique_future()
+    ~future()
     {}
 
     /** Returns a value stored in the asynchronous result.
-        @note The effect of calling get() a second time on the same unique_future object is unspecified. */
+        @note The effect of calling get() a second time on the same future object is unspecified. */
     result_type get(error_code& ec = throws())
     {
       //if(data && data->is_retrieved()){
@@ -492,14 +516,14 @@ namespace std
   protected:
     friend class __::promise<R>;
     ///\cond __
-    explicit unique_future(__rvalue(unique_data_ptr) p)
+    explicit future(__rvalue(unique_data_ptr) p)
       :data(move(p))
     {}
 
     bool check(error_code& ec) const
     {
       if(!data){
-        const error_code error = make_error_code(future_errc::future_uninitialized);
+        const error_code error = make_error_code(future_errc::no_state);
         if(&ec == &throws())
           __ntl_throw(future_error(error));
         else
@@ -528,8 +552,8 @@ namespace std
     shared_future(const shared_future& x)
       :data(x.data)
     {}
-    shared_future(__rvalue(unique_future<R>) x)
-      :data(move(static_cast<unique_future<R>&>(x).data))
+    shared_future(__rvalue(future<R>) x)
+      :data(move(static_cast<future<R>&>(x).data))
     {}
     ~shared_future()
     {}
@@ -587,7 +611,7 @@ namespace std
     bool check(error_code& ec) const
     {
       if(!data){
-        const error_code error = make_error_code(future_errc::future_uninitialized);
+        const error_code error = make_error_code(future_errc::no_state);
         if(&ec == &throws())
           __ntl_throw(future_error(error));
         else
@@ -652,7 +676,7 @@ namespace std
       }
       
       ///\name retrieving the result
-      unique_future<R> get_future(error_code& ec = throws()) __ntl_throws(future_error)
+      future<R> get_future(error_code& ec = throws()) __ntl_throws(future_error)
       {
         if(retrieved){
           error_code e = make_error_code(future_errc::future_already_retrieved);
@@ -660,11 +684,11 @@ namespace std
             __ntl_throw(future_error(e));
           else
             ec = e;
-          return unique_future<R>(unique_data_ptr());
+          return future<R>(unique_data_ptr());
         }
         retrieved = true;
         check();
-        return unique_future<R>(move(data));
+        return future<R>(move(data));
       }
       
       ///\name setting the result
@@ -748,6 +772,10 @@ namespace std
       check();
       data->set(ec);
     }
+    void set_value_at_thread_exit() __ntl_throws(future_error)
+    {
+
+    }
   };
 
 
@@ -801,16 +829,16 @@ namespace std
       }
 
       // result retrieval
-      /** Returns a unique_future object associated with the result of the associated task of *this. */
+      /** Returns a future object associated with the result of the associated task of *this. */
 #ifdef NTL__CXX_RV
-      unique_future<R>
+      future<R>
 #else
-      _rvalue<unique_future<R> >
+      _rvalue<future<R> >
 #endif
         get_future(error_code& ec = throws()) __ntl_throws(bad_function_call)
       {
         error_code e;
-        unique_future<R> r = data.get_future(e);
+        future<R> r = data.get_future(e);
         if(e){
           if(&ec == &throws())
             __ntl_throw(bad_function_call());
@@ -939,6 +967,30 @@ namespace std
       call(make_tuple(a1,a2));
     }
   };
+
+
+  ///\name 30.6.8 Function template async [futures.async]
+#if defined(NTL__CXX_VT) || defined(NTL__DOC)
+  template <class F, class... Args>
+  future<typename result_of<F(Args...)>::type> async(F&& f, Args&&... args);
+  template <class F, class... Args>
+  future<typename result_of<F(Args...)>::type> async(launch policy, F&& f, Args&&... args);
+#elif defined(NTL__CXX_RV)
+  template <class F>
+  future<typename result_of<F()>::type> async(launch policy, F&& f);
+#else
+
+  template <class F>
+  future<typename result_of<F()>::type> async(launch policy, F f);
+
+  template <class F>
+  typename enable_if<!is_same<F,launch>::value,future<typename result_of<F()>::type> >::type async(F f)
+  {
+    return async(launch::async|launch::deferred, f);
+  }
+
+#endif
+  ///\}
 
   /** @} thread_futures */
   /** @} threads */

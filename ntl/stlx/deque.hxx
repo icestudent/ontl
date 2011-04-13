@@ -428,24 +428,6 @@ namespace std {
       }
     }
 
-    #ifdef NTL__CXX_RV
-    void swap(deque<T,Allocator>&& x)
-    {
-      if(this != &x){
-        using std::swap;
-        pointer l = left, r = right;
-        size_type cl = capL, cr = capR;
-        left = x.left, right = x.right;
-        capL = x.capL, capR = x.capR;
-        x.left = l, x.right = r;
-        x.capL = cl, x.capR = cr;
-        swap(alloc, x.alloc);
-        swap(base_, x.base_);
-        swap(cap_,  x.cap_);
-      }
-    }
-    #endif
-    #if !defined(NTL__CXX_RV) || defined(NTL__CXX_RVFIX)
     void swap(deque<T,Allocator>& x)
     {
       if(this != &x){
@@ -461,7 +443,6 @@ namespace std {
         swap(cap_,  x.cap_);
       }
     }
-    #endif
 
     void clear()
     {
@@ -696,14 +677,6 @@ namespace std {
   // specialized algorithms:
   template <class T, class Allocator>
   inline void swap(deque<T,Allocator>& x, deque<T,Allocator>& y)  { x.swap(y); }
-  
-  #ifdef NTL__CXX_RV
-  template <class T, class Allocator>
-  inline void swap(deque<T,Allocator>&& x, deque<T,Allocator>& y) { x.swap(y); }
-  template <class T, class Allocator>
-  inline void swap(deque<T,Allocator>& x, deque<T,Allocator>&& y) { x.swap(y); }
-  #endif
-  
   
   /**@} lib_sequence */
   /**@} lib_containers */

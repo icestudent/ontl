@@ -510,12 +510,6 @@ operator<<(basic_ostream<char, traits>&, const unsigned char*);
 ///\name Swap
 template <class charT, class traits>
 inline void swap(basic_ostream<charT, traits>& x, basic_ostream<charT, traits>& y)  { x.swap(y); }
-#if defined NTL__CXX_RV && 0 // disabled in n2857+
-template <class charT, class traits>
-inline void swap(basic_ostream<charT, traits>&& x, basic_ostream<charT, traits>& y) { x.swap(y); }
-template <class charT, class traits>
-inline void swap(basic_ostream<charT, traits>& x, basic_ostream<charT, traits>&& y) { x.swap(y); }
-#endif
 
 
 ///\name  27.6.2.7 Standard basic_ostream manipulators [lib.ostream.manip]

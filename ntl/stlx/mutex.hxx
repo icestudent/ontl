@@ -378,14 +378,7 @@ namespace std
 
 
   template <class Mutex>
-  void swap(unique_lock<Mutex>& x, unique_lock<Mutex>& y)  { x.swap(y); }
-#ifdef NTL__CXX_RV
-  template <class Mutex>
-  void swap(unique_lock<Mutex>&& x, unique_lock<Mutex>& y) { x.swap(y); }
-  template <class Mutex>
-  void swap(unique_lock<Mutex>& x, unique_lock<Mutex>&& y) { x.swap(y); }
-#endif
-
+  inline void swap(unique_lock<Mutex>& x, unique_lock<Mutex>& y)  { x.swap(y); }
 
 #ifdef NTL__CXX_VT
   template <class L1, class L2, class... L3> 

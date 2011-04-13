@@ -44,7 +44,8 @@ namespace std {
  *@{*/
 /**\addtogroup  lib_c_strings_cwchar Extended multibyte and wide character utilities
  *@{*/
-
+  using ::mbstate_t;
+  using ::wint_t;
 
   ///\name Formatted wide character input/output functions
   NTL__EXTERNAPI

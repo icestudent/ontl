@@ -903,13 +903,6 @@ class basic_iostream:
 template <class charT, class traits>
 void swap(basic_iostream<charT, traits>& x, basic_iostream<charT, traits>& y)  { x.swap(y); }
 
-#ifdef NTL__CXX_RV__0 // disabled in N2857+
-template <class charT, class traits>
-void swap(basic_iostream<charT, traits>&& x, basic_iostream<charT, traits>& y) { x.swap(y); }
-template <class charT, class traits>
-void swap(basic_iostream<charT, traits>& x, basic_iostream<charT, traits>&& y) { x.swap(y); }
-#endif
-
 #ifdef NTL__CXX_RVFIX
 /// 27.7.1.6 Rvalue stream extraction [istream.rvalue]
 template <class charT, class traits, class T>

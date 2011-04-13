@@ -75,7 +75,7 @@ namespace std
     template<typename R, class T, class Args>
     struct memfun_arity<R,T,Args,1>: binary_function<T*, typename tuple_element<0, Args>::type, R>{};
   }
-#ifndef __DOXYGEN__
+#ifndef NTL__DOC
 #define NTL_DEFINE_MEMFNARG(n,aux), typename __::arg_t<NTL_SPP_DEC(n), Args>::type a ## n
 #define NTL_DEFINE_MEMFNARGT(n,aux), typename __::arg_t<NTL_SPP_DEC(n), Args>::type 
 
@@ -84,7 +84,7 @@ namespace std
   result_type operator()(U&& obj TTL_REPEAT(n, NTL_DEFINE_MEMFNARG, NTL_DEFINE_MEMFNARG, aux)) const \
   { \
     static_assert(tuple_size<Args>::value == n, "wrong count of arguments"); \
-    return __::func::invoke<result_type>(pmf, typename __::tmap<U&& TTL_REPEAT(n, NTL_DEFINE_MEMFNARGT, NTL_DEFINE_MEMFNARGT, aux)>::type(obj, NTL_SPP_NEST( NTL_SPP_ARGS(1,n,a) ) )); \
+    return __::func::invoke<result_type>(pmf, typename __::tmap<U&& TTL_REPEAT(n, NTL_DEFINE_MEMFNARGT, NTL_DEFINE_MEMFNARGT, aux)>::type(forward<U>(obj), NTL_SPP_NEST( NTL_SPP_ARGS(1,n,a) ) )); \
   } 
 #endif
 
@@ -105,21 +105,21 @@ namespace std
     result_type operator()(U&& obj) const
     {
       static_assert(tuple_size<Args>::value == 0, "wrong count of arguments");
-      return func::invoke<result_type>(pmf, typename __::tmap<U&&>::type(obj));
+      return func::invoke<result_type>(pmf, typename __::tmap<U&&>::type(forward<U>(obj)));
     }
-#if 0
+#if 1
     template<typename U>
     result_type operator()(U&& obj, typename __::arg_t<0, Args>::type a1) const
     {
       static_assert(tuple_size<Args>::value == 1, "wrong count of arguments");
-      return func::invoke<result_type>(pmf, typename __::tmap<U&&, typename __::arg_t<0, Args>::type>::type(obj, a1));
+      return __::func::invoke<result_type>(pmf, typename __::tmap<U&&, typename __::arg_t<0, Args>::type>::type(forward<U>(obj), a1));
     }
 #else
     TTL_REPEAT_NEST(TTL_MAX_TEMPLATE_PARAMS,NTL_DEFINE_MEMFNOP,NTL_DEFINE_MEMFNOP,)
 #endif
   };
 
-#if 1 && !defined(__DOXYGEN__)
+#if 0 && !defined(NTL__DOC)
 
   // ARGC == 0
 #define NTL_DEFINE_MEMFN0(cv) \

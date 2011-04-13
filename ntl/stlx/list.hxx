@@ -449,16 +449,6 @@ class list
       return last.p;
     }
 
-    #ifdef NTL__CXX_RV
-    void swap(list<T,Allocator>&& x)
-    {
-      using std::swap;
-      swap(head.next, x.head.next);
-      swap(head.prev, x.head.prev);
-      swap(node_allocator, x.node_allocator);
-    }
-    #endif
-    #if !defined(NTL__CXX_RV) || defined(NTL__CXX_RVFIX)
     void swap(list<T, Allocator>& x)
     {
       using std::swap;
@@ -466,7 +456,6 @@ class list
       swap(head.prev, x.head.prev);
       swap(node_allocator, x.node_allocator);
     }
-    #endif
 
     __forceinline
     void clear() { erase(begin(), end()); }
@@ -599,37 +588,37 @@ class list
 ///\name  List comparisons
 
 template <class T, class Allocator>
-bool operator==(const list<T,Allocator>& x, const list<T,Allocator>& y) __ntl_nothrow
+inline bool operator==(const list<T,Allocator>& x, const list<T,Allocator>& y) __ntl_nothrow
 {
   return equal(x.begin(), x.end(), y.begin());
 }
 
 template <class T, class Allocator>
-bool operator< (const list<T,Allocator>& x, const list<T,Allocator>& y) __ntl_nothrow
+inline bool operator< (const list<T,Allocator>& x, const list<T,Allocator>& y) __ntl_nothrow
 {
   return lexicographical_compare(x.begin(), x.end(), y.begin(), y.end());
 }
 
 template <class T, class Allocator>
-bool operator!=(const list<T,Allocator>& x, const list<T,Allocator>& y) __ntl_nothrow
+inline bool operator!=(const list<T,Allocator>& x, const list<T,Allocator>& y) __ntl_nothrow
 {
   return ! (x == y);
 }
 
 template <class T, class Allocator>
-bool operator> (const list<T,Allocator>& x, const list<T,Allocator>& y) __ntl_nothrow
+inline bool operator> (const list<T,Allocator>& x, const list<T,Allocator>& y) __ntl_nothrow
 {
   return y < x;
 }
 
 template <class T, class Allocator>
-bool operator>=(const list<T,Allocator>& x, const list<T,Allocator>& y) __ntl_nothrow
+inline bool operator>=(const list<T,Allocator>& x, const list<T,Allocator>& y) __ntl_nothrow
 {
   return ! (x < y);
 }
 
 template <class T, class Allocator>
-bool operator<=(const list<T,Allocator>& x, const list<T,Allocator>& y) __ntl_nothrow
+inline bool operator<=(const list<T,Allocator>& x, const list<T,Allocator>& y) __ntl_nothrow
 {
   return ! (y < x);
 }
@@ -637,17 +626,10 @@ bool operator<=(const list<T,Allocator>& x, const list<T,Allocator>& y) __ntl_no
 ///\name  List specialized algorithms [23.2.4.5]
 
 template <class T, class Allocator>
-void swap(list<T, Allocator>& x, list<T, Allocator>& y) __ntl_nothrow
+inline void swap(list<T, Allocator>& x, list<T, Allocator>& y) __ntl_nothrow
 {
   x.swap(y);
 }
-
-#ifdef NTL__CXX_RV
-template <class T, class Allocator>
-void swap(list<T,Allocator>&& x, list<T,Allocator>& y) { x.swap(y); }
-template <class T, class Allocator>
-void swap(list<T,Allocator>& x, list<T,Allocator>&& y) { x.swap(y); }
-#endif
 
 ///@}
 /**@} lib_sequence */

@@ -140,7 +140,7 @@ class basic_streambuf
     {
       // If xnext is not a null pointer and xnext < xend for an input sequence,
       // then a read position is available.
-      const streamsize ravail = gend - gnext; //-V103
+      const streamsize ravail = gend - gnext;
       return 0 < ravail ? ravail : showmanyc();
     }
 
@@ -153,13 +153,13 @@ class basic_streambuf
     __forceinline
     int_type sbumpc()
     {
-      const streamsize ravail = gend - gnext; //-V103
+      const streamsize ravail = gend - gnext;
       return !(0 < ravail) ? uflow() : traits_type::to_int_type(*gnext++);
     }
 
     int_type sgetc()
     {
-      const streamsize ravail = gend - gnext; //-V103
+      const streamsize ravail = gend - gnext;
       return !(0 < ravail) ? underflow() : traits_type::to_int_type(*gnext);
     }
 
@@ -172,14 +172,14 @@ class basic_streambuf
 
     int_type sputbackc(char_type c)
     {
-      const streamsize pbavail = gnext - gbeg; //-V103
+      const streamsize pbavail = gnext - gbeg;
       return !(0 < pbavail) || !traits_type::eq(c ,gnext[-1])
         ? pbackfail(traits_type::to_int_type(c)) : traits_type::to_int_type(*--gnext);
     }
 
     int_type sungetc()
     {
-      const streamsize pbavail = gnext - gbeg; //-V103
+      const streamsize pbavail = gnext - gbeg;
       return !(0 < pbavail) ? pbackfail() : traits_type::to_int_type(*--gnext);
     }
 
@@ -188,7 +188,7 @@ class basic_streambuf
     int_type sputc(char_type c)
     {
       const int_type ic = traits_type::to_int_type(c);
-      const streamsize wavail = pend - pnext; //-V103
+      const streamsize wavail = pend - pnext;
       return !(0 < wavail) ? overflow(ic) : *pnext++ = c, ic;
     }
 
@@ -278,7 +278,7 @@ class basic_streambuf
       for ( streamsize copied = 0; ; )
       {
         if ( !(0 < n) ) return copied;
-        const streamsize ravail = gend - gnext; //-V103
+        const streamsize ravail = gend - gnext;
         if ( !(0 < ravail) )
         {
           if ( traits_type::eq_int_type(traits_type::eof(), underflow()) )
@@ -336,7 +336,7 @@ class basic_streambuf
       for ( streamsize copied = 0; ; )
       {
         if ( !(0 < n) ) return copied;
-        const streamsize wavail = pend - pnext; //-V103
+        const streamsize wavail = pend - pnext;
         if ( !(0 < wavail) )
         {
           const char_type c = *s;

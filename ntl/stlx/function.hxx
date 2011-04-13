@@ -287,11 +287,7 @@ namespace std
         ///\name 20.7.15.2.2, function modifiers:
 
         /** Swaps this target with the target of \c r */
-    #ifdef NTL__CXX_RV
-        void swap(function&& r) __ntl_nothrow
-    #else
         void swap(function&  r) __ntl_nothrow
-    #endif
         {
           std::swap(caller, r.caller);
         }

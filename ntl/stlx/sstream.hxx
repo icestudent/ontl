@@ -474,27 +474,6 @@ namespace std {
   template <class charT, class traits, class Allocator>
   inline void swap(basic_stringstream <charT, traits, Allocator>& x, basic_stringstream <charT, traits, Allocator>& y) { x.swap(y); }
 
-#ifdef NTL__CXX_RV__0 // disabled in N2857+
-  template <class charT, class traits, class Allocator>
-  inline void swap(basic_stringbuf<charT, traits, Allocator>&& x, basic_stringbuf<charT, traits, Allocator>& y) { x.swap(y); }
-  template <class charT, class traits, class Allocator>
-  inline void swap(basic_stringbuf<charT, traits, Allocator>& x, basic_stringbuf<charT, traits, Allocator>&& y) { x.swap(y); }
-
-  template <class charT, class traits, class Allocator>
-  inline void swap(basic_istringstream<charT, traits, Allocator>&& x, basic_istringstream<charT, traits, Allocator>& y) { x.swap(y); }
-  template <class charT, class traits, class Allocator>
-  inline void swap(basic_istringstream<charT, traits, Allocator>& x, basic_istringstream<charT, traits, Allocator>&& y) { x.swap(y); }
-
-  template <class charT, class traits, class Allocator>
-  inline void swap(basic_ostringstream<charT, traits, Allocator>&& x, basic_ostringstream<charT, traits, Allocator>& y) { x.swap(y); }
-  template <class charT, class traits, class Allocator>
-  inline void swap(basic_ostringstream<charT, traits, Allocator>& x, basic_ostringstream<charT, traits, Allocator>&& y) { x.swap(y); }
-
-  template <class charT, class traits, class Allocator>
-  inline void swap(basic_stringstream<charT, traits, Allocator>&& x, basic_stringstream<charT, traits, Allocator>& y) { x.swap(y); }
-  template <class charT, class traits, class Allocator>
-  inline void swap(basic_stringstream<charT, traits, Allocator>& x, basic_stringstream<charT, traits, Allocator>&& y) { x.swap(y); }
-#endif
   ///\}
   /**@} lib_string_streams */
   /**@} lib_input_output */

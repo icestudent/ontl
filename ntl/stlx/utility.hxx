@@ -66,36 +66,24 @@ bool operator>=(const T & x, const T & y) { return !(x < y); }
 #pragma region forward
 ///\name 20.3.3 forward/move helpers [forward]
 #ifdef NTL__CXX_RV
+#ifdef NTL__CXX_RVFIX
+
+  // rvalue ref v2
+  template <class T> inline T&& forward(typename std::remove_reference<T>::type& t) { return static_cast<T&&>(t); }
+  template <class T> inline T&& forward(typename std::remove_reference<T>::type&& t){ return static_cast<T&&>(t); }
+  template <class T> inline typename std::remove_reference<T>::type&& move(T&& t) { return static_cast<typename std::remove_reference<T>::type&&>(t); }
+#else
   template <class T>
   struct identity
   {
     typedef T type;
     const T& operator()(const T& x) const { return x; }
   };
-# if defined(_MSC_VER) && defined(NTL__CXX_RVFIX)
   template <class T>
-  inline T&& forward(typename identity<T>::type& t)
-  {
-    return static_cast<T&&>(t);
-  }
-
-  template <class T>
-  inline typename remove_reference<T>::type&& move(T&& t)
-  {
-    return static_cast<typename remove_reference<T>::type&&>(t);
-  }
-# else
-  template <class T>
-  inline T&& forward(typename identity<T>::type&& t)
-  {
-    return t;
-  }
+  inline T&& forward(typename identity<T>::type&& t) { return t; }
 
   template <class T> 
-  inline typename remove_reference<T>::type&& move(T&& t)
-  {
-    return t;
-  }
+  inline typename remove_reference<T>::type&& move(T&& t) { return t; }
 # endif // rvalue ref v2
 
   template <class T> typename conditional<
@@ -181,10 +169,12 @@ struct pair
     T2  second;
 
 
-    pair() : first(T1()), second(T2()) 
+    pair()
+      :first(), second() 
     {}
 
-    pair(const T1 & x, const T2 & y) : first(x), second(y) 
+    pair(const T1 & x, const T2 & y)
+      :first(x), second(y) 
     {}
 
     template<class U, class V>
@@ -204,7 +194,7 @@ struct pair
 
     template<class U, class V>
     pair(pair<U, V>&& p)
-      :first(move(p.first)), second(move(p.second))
+      :first(forward<U>(p.first)), second(forward<V>(p.second))
     {}
 #endif
 
@@ -245,20 +235,12 @@ struct pair
       second = forward<V>(p.second);
       return *this;
     }
-
-    void swap(pair&& p)
-    {
-      std::swap(first, p.first);
-      std::swap(second, p.second);
-    }
 #endif
-#if !defined(NTL__CXX_RV) || defined(NTL__CXX_RVFIX)
     void swap(pair& p)
     {
       std::swap(first, p.first);
       std::swap(second, p.second);
     }
-#endif
 };
 #pragma warning(pop)
 
@@ -313,10 +295,6 @@ bool
 }
 
 template<class T1, class T2> inline void swap(pair<T1, T2>&  x, pair<T1, T2>&  y) { x.swap(y); }
-#ifdef NTL__CXX_RV
-template<class T1, class T2> inline void swap(pair<T1, T2>&& x, pair<T1, T2>&  y) { x.swap(y); }
-template<class T1, class T2> inline void swap(pair<T1, T2>&  x, pair<T1, T2>&& y) { x.swap(y); }
-#endif
 
 ///\name Make pair
 #ifdef NTL__CXX_RV
