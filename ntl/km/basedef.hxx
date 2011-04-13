@@ -115,6 +115,10 @@ kirql_t __stdcall
   KeGetCurrentIrql();
 
 NTL__EXTERNAPI
+kirql_t __stdcall
+  KeRaiseIrqlToDpcLevel(void);
+
+NTL__EXTERNAPI
 kirql_t __fastcall
   KfLowerIrql(kirql_t NewIrql);
 

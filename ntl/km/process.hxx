@@ -1307,7 +1307,7 @@ legacy_handle __stdcall
 
 ///\note XP+ only
 NTL__EXTERNAPI
-int8_t * __stdcall
+char * __stdcall
   PsGetProcessImageFileName(kprocess *);
 
 

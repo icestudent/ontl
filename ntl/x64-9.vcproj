@@ -6,7 +6,7 @@
 	ProjectGUID="{081E6E33-CC33-4BBF-81E8-2865B1D8FD67}"
 	RootNamespace=".ntl"
 	Keyword="Win32Proj"
-	TargetFrameworkVersion="131072"
+	TargetFrameworkVersion="0"
 	>
 	<Platforms>
 		<Platform
@@ -307,6 +307,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\stlx\cpp0x_mode.hxx"
+						>
+					</File>
+					<File
 						RelativePath=".\stlx\ext\fib.hxx"
 						>
 					</File>
@@ -354,6 +358,10 @@
 						Name="tr2"
 						>
 						<File
+							RelativePath=".\stlx\ext\tr2\buffer.hxx"
+							>
+						</File>
+						<File
 							RelativePath=".\stlx\ext\tr2\filesystem.hxx"
 							>
 						</File>
@@ -365,23 +373,127 @@
 							RelativePath=".\stlx\ext\tr2\fs_operations.hxx"
 							>
 						</File>
+						<File
+							RelativePath=".\stlx\ext\tr2\io_service.hxx"
+							>
+						</File>
+						<File
+							RelativePath=".\stlx\ext\tr2\network.hxx"
+							>
+						</File>
+						<File
+							RelativePath=".\stlx\ext\tr2\timer.hxx"
+							>
+						</File>
 						<Filter
 							Name="network"
 							>
 							<File
-								RelativePath=".\stlx\ext\tr2\buffer.hxx"
+								RelativePath=".\stlx\ext\tr2\network\basic_io_object.hxx"
 								>
 							</File>
 							<File
-								RelativePath=".\stlx\ext\tr2\io_service.hxx"
+								RelativePath=".\stlx\ext\tr2\network\basic_socket.hxx"
 								>
 							</File>
 							<File
-								RelativePath=".\stlx\ext\tr2\network.hxx"
+								RelativePath=".\stlx\ext\tr2\network\datagram_socket.hxx"
 								>
 							</File>
 							<File
-								RelativePath=".\stlx\ext\tr2\timer.hxx"
+								RelativePath=".\stlx\ext\tr2\network\network_error.hxx"
+								>
+							</File>
+							<File
+								RelativePath=".\stlx\ext\tr2\network\network_fwd.hxx"
+								>
+							</File>
+							<File
+								RelativePath=".\stlx\ext\tr2\network\socket_base.hxx"
+								>
+							</File>
+							<File
+								RelativePath=".\stlx\ext\tr2\network\stream_socket.hxx"
+								>
+							</File>
+							<Filter
+								Name="impl"
+								>
+								<File
+									RelativePath=".\stlx\ext\tr2\network\datagram_socket_service.hxx"
+									>
+								</File>
+								<File
+									RelativePath=".\stlx\ext\tr2\network\stream_socket_service.hxx"
+									>
+								</File>
+								<Filter
+									Name="winsock"
+									>
+									<File
+										RelativePath=".\stlx\ext\tr2\network\winsock\service_resolve.hxx"
+										>
+									</File>
+									<File
+										RelativePath=".\stlx\ext\tr2\network\winsock\service_sockets.hxx"
+										>
+									</File>
+									<File
+										RelativePath=".\stlx\ext\tr2\network\winsock\sockets.hxx"
+										>
+									</File>
+									<File
+										RelativePath=".\stlx\ext\tr2\network\system_network.hxx"
+										>
+									</File>
+								</Filter>
+							</Filter>
+							<Filter
+								Name="IP"
+								>
+								<File
+									RelativePath=".\stlx\ext\tr2\network\basic_endpoint.hxx"
+									>
+								</File>
+								<File
+									RelativePath=".\stlx\ext\tr2\network\basic_resolver.hxx"
+									>
+								</File>
+								<File
+									RelativePath=".\stlx\ext\tr2\network\ip_address.hxx"
+									>
+								</File>
+								<File
+									RelativePath=".\stlx\ext\tr2\network\ip_protocol.hxx"
+									>
+								</File>
+								<File
+									RelativePath=".\stlx\ext\tr2\network\resolver_base.hxx"
+									>
+								</File>
+								<File
+									RelativePath=".\stlx\ext\tr2\network\resolver_service.hxx"
+									>
+								</File>
+							</Filter>
+						</Filter>
+						<Filter
+							Name="I/O"
+							>
+							<File
+								RelativePath=".\stlx\ext\tr2\network\buffer.hxx"
+								>
+							</File>
+							<File
+								RelativePath=".\stlx\ext\tr2\network\io_service.hxx"
+								>
+							</File>
+							<File
+								RelativePath=".\stlx\ext\tr2\network\io_service_fwd.hxx"
+								>
+							</File>
+							<File
+								RelativePath=".\stlx\ext\tr2\network\timer.hxx"
 								>
 							</File>
 						</Filter>
@@ -479,7 +591,7 @@
 						>
 					</File>
 					<File
-						RelativePath=".\stlx\string.hxx"
+						RelativePath=".\stlx\stdstring.hxx"
 						>
 					</File>
 					<File
@@ -507,11 +619,23 @@
 						>
 					</File>
 					<File
+						RelativePath=".\stlx\cfenv.hxx"
+						>
+					</File>
+					<File
 						RelativePath=".\stlx\cfloat.hxx"
 						>
 					</File>
 					<File
+						RelativePath=".\stlx\cinttypes.hxx"
+						>
+					</File>
+					<File
 						RelativePath=".\stlx\climits.hxx"
+						>
+					</File>
+					<File
+						RelativePath=".\stlx\cmath.hxx"
 						>
 					</File>
 					<File
@@ -559,6 +683,10 @@
 					Name="runtime"
 					>
 					<File
+						RelativePath=".\stlx\atomic.hxx"
+						>
+					</File>
+					<File
 						RelativePath=".\stlx\chrono.hxx"
 						>
 					</File>
@@ -568,14 +696,6 @@
 					</File>
 					<File
 						RelativePath=".\stlx\condition_variable.hxx"
-						>
-					</File>
-					<File
-						RelativePath=".\stlx\cstdatomic.hxx"
-						>
-					</File>
-					<File
-						RelativePath=".\stlx\exception.hxx"
 						>
 					</File>
 					<File
@@ -608,6 +728,10 @@
 					</File>
 					<File
 						RelativePath=".\stlx\stdexcept.hxx"
+						>
+					</File>
+					<File
+						RelativePath=".\stlx\stdexception.hxx"
 						>
 					</File>
 					<File
@@ -672,6 +796,10 @@
 					</File>
 					<File
 						RelativePath=".\stlx\memory.hxx"
+						>
+					</File>
+					<File
+						RelativePath=".\stlx\move.hxx"
 						>
 					</File>
 					<File
@@ -1080,6 +1208,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\nt\strerror.hxx"
+					>
+				</File>
+				<File
 					RelativePath=".\nt\string.hxx"
 					>
 				</File>
@@ -1104,7 +1236,15 @@
 					>
 				</File>
 				<File
+					RelativePath=".\nt\timer.hxx"
+					>
+				</File>
+				<File
 					RelativePath=".\nt\virtualmem.hxx"
+					>
+				</File>
+				<File
+					RelativePath=".\nt\win32_error.hxx"
 					>
 				</File>
 			</Filter>
@@ -1120,6 +1260,34 @@
 				Name="rtl"
 				>
 				<File
+					RelativePath=".\rtl\consoleapp.cpp"
+					>
+					<FileConfiguration
+						Name="debug|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
 					RelativePath=".\rtl\crt.cpp"
 					>
 					<FileConfiguration
@@ -1132,6 +1300,14 @@
 					</FileConfiguration>
 					<FileConfiguration
 						Name="debug|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -1158,6 +1334,50 @@
 							Name="VCCLCompilerTool"
 						/>
 					</FileConfiguration>
+					<FileConfiguration
+						Name="release|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath=".\rtl\ehptr.cpp"
+					>
+					<FileConfiguration
+						Name="debug|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath=".\rtl\ehsup.asm"
@@ -1172,6 +1392,14 @@
 					</FileConfiguration>
 					<FileConfiguration
 						Name="debug|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="MASM"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -1198,6 +1426,42 @@
 							Name="VCCLCompilerTool"
 						/>
 					</FileConfiguration>
+					<FileConfiguration
+						Name="release|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath=".\rtl\math.cpp"
+					>
+					<FileConfiguration
+						Name="debug|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath=".\rtl\rtti.cpp"
@@ -1216,6 +1480,42 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath=".\rtl\safeseh.asm"
+					>
+					<FileConfiguration
+						Name="debug|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="MASM"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="MASM"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="MASM"
 						/>
 					</FileConfiguration>
 				</File>
@@ -1238,6 +1538,14 @@
 							Name="VCCLCompilerTool"
 						/>
 					</FileConfiguration>
+					<FileConfiguration
+						Name="release|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath=".\rtl\wchar_mask_data.cpp"
@@ -1252,6 +1560,14 @@
 					</FileConfiguration>
 					<FileConfiguration
 						Name="debug|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -1296,6 +1612,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\baseconf.hxx"
+					>
+				</File>
+				<File
+					RelativePath=".\baseconf_0x.hxx"
+					>
+				</File>
+				<File
 					RelativePath=".\basedef.hxx"
 					>
 				</File>
@@ -1333,6 +1657,10 @@
 				</File>
 				<File
 					RelativePath=".\linked_ptr.hxx"
+					>
+				</File>
+				<File
+					RelativePath=".\nativeapp.hxx"
 					>
 				</File>
 				<File

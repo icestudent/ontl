@@ -365,11 +365,7 @@
 							>
 						</File>
 						<File
-							RelativePath=".\stlx\ext\tr2\fs_directory.hxx"
-							>
-						</File>
-						<File
-							RelativePath=".\stlx\ext\tr2\fs_operations.hxx"
+							RelativePath=".\stlx\ext\tr2\filesystem_v3.hxx"
 							>
 						</File>
 						<File
@@ -493,6 +489,30 @@
 							</File>
 							<File
 								RelativePath=".\stlx\ext\tr2\network\timer.hxx"
+								>
+							</File>
+						</Filter>
+						<Filter
+							Name="filesystem"
+							>
+							<File
+								RelativePath=".\stlx\ext\tr2\fs_directory.hxx"
+								>
+							</File>
+							<File
+								RelativePath=".\stlx\ext\tr2\fs_directory_v3.hxx"
+								>
+							</File>
+							<File
+								RelativePath=".\stlx\ext\tr2\fs_operations.hxx"
+								>
+							</File>
+							<File
+								RelativePath=".\stlx\ext\tr2\fs_operations_v3.hxx"
+								>
+							</File>
+							<File
+								RelativePath=".\stlx\ext\tr2\fs_traits.hxx"
 								>
 							</File>
 						</Filter>

@@ -369,8 +369,10 @@ struct system_processes: public system_process_information
   const system_process_information *
   find_process(const const_unicode_string & image_name) const
   {
+    const wchar_t* const name = image_name.data();
+    const size_t nsize = image_name.length();
     for ( const_iterator it = cbegin(); it != cend(); ++it )
-      if ( image_name == it->ImageName )
+      if ( _wcsnicmp(name, it->ImageName.data(), nsize) == 0 )
         return &*it;
     return 0;
   }
@@ -450,7 +452,7 @@ struct system_modules_information //RTL_PROCESS_MODULES
     find_module(const std::string & file_name) const
   {
     for ( uint32_t i = 0; i != NumberOfModules; ++i )
-      if ( file_name == Modules[i].file_name() )
+      if ( ! _strnicmp(file_name.data(), Modules[i].file_name(), file_name.size())  )
         return &Modules[i];
     return 0;
   }

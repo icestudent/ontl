@@ -1,3 +1,4 @@
+.386
 .model flat,stdcall
 
 public _tls_array
