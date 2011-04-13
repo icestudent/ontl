@@ -130,7 +130,7 @@ namespace __ {
 }
 
 template<class T> struct is_trivial;
-template <class T> struct is_trivially_copyable;
+template<class T> struct is_trivially_copyable;
 template<class T> struct is_standard_layout;
 
 template <class T> struct is_pod;
@@ -139,6 +139,9 @@ template <class T> struct is_empty;
 template <class T> struct is_polymorphic;
 template <class T> struct is_abstract;
 
+template <class T> struct has_virtual_destructor;
+
+// old type traits
 template <class T> struct has_default_constructor;
 template <class T> struct has_copy_constructor;
 template <class T> struct has_copy_assign;
@@ -148,11 +151,12 @@ template <class T> struct has_move_assign;
 template <class T> struct has_trivial_default_constructor;
 template <class T> struct has_trivial_copy_constructor;
 template <class T> struct has_trivial_move_constructor;
+
 template <class T> struct has_trivial_assign;
 template <class T> struct has_trivial_copy_assign;
 template <class T> struct has_trivial_move_assign;
-
 template <class T> struct has_trivial_destructor;
+
 template <class T> struct has_nothrow_default_constructor;
 template <class T> struct has_nothrow_copy_constructor;
 template <class T> struct has_nothrow_move_constructor;
@@ -161,7 +165,40 @@ template <class T> struct has_nothrow_assign;
 template <class T> struct has_nothrow_copy_assign;
 template <class T> struct has_nothrow_move_assign;
 
-template <class T> struct has_virtual_destructor;
+// new type traits
+
+template <class T, class U> struct is_assignable;
+template <class T> struct is_copy_assignable;
+template <class T> struct is_move_assignable;
+template <class T> struct is_destructible;
+
+template <class T, class U> struct is_nothrow_assignable;
+template <class T> struct is_nothrow_copy_assignable;
+template <class T> struct is_nothrow_move_assignable;
+template <class T> struct is_nothrow_destructible;
+
+template <class T, class U> struct is_trivially_assignable;
+template <class T> struct is_trivially_copy_assignable;
+template <class T> struct is_trivially_move_assignable;
+template <class T> struct is_trivially_destructible;
+
+#ifdef NTL__CXX_VT
+template <class T, class... Args> struct is_constructible;
+template <class T> struct is_default_constructible;
+template <class T> struct is_copy_constructible;
+template <class T> struct is_move_constructible;
+
+template <class T, class... Args> struct is_trivially_constructible;
+template <class T> struct is_trivially_default_constructible;
+template <class T> struct is_trivially_copy_constructible;
+template <class T> struct is_trivially_move_constructible;
+
+template <class T, class... Args> struct is_nothrow_constructible;
+template <class T> struct is_nothrow_default_constructible;
+template <class T> struct is_nothrow_copy_constructible;
+template <class T> struct is_nothrow_move_constructible;
+#endif
+
 
 template <class T> struct is_signed;
 template <class T> struct is_unsigned;

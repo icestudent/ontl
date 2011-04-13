@@ -519,6 +519,12 @@ bool, is_scalar<typename remove_extent<T>::type>::value ||
       __is_pod(typename remove_extent<T>::type) // __is_pod will return false on fundamental types
     >
 {};
+template<class T> 
+struct is_standard_layout:
+  public is_pod<T>
+{};
+
+
 
 NTL__STLX_DEF_TRAIT(is_empty)
 
@@ -526,20 +532,19 @@ NTL__STLX_DEF_TRAIT(is_polymorphic)
 
 NTL__STLX_DEF_TRAIT(is_abstract)
 
+NTL__STLX_DEF_TRAIT2(has_copy_constructor,has_copy)
+NTL__STLX_DEF_TRAIT2(has_copy_assign,has_assign)
+
 NTL__STLX_DEF_TRAIT2(has_trivial_default_constructor, has_trivial_constructor)
-
 NTL__STLX_DEF_TRAIT2(has_trivial_copy_constructor, has_trivial_copy)
-
 NTL__STLX_DEF_TRAIT(has_trivial_assign)
-
 NTL__STLX_DEF_TRAIT(has_trivial_destructor)
 
 NTL__STLX_DEF_TRAIT2(has_nothrow_default_constructor, has_nothrow_constructor)
-
 NTL__STLX_DEF_TRAIT2(has_nothrow_copy_constructor, has_nothrow_copy)
-
 NTL__STLX_DEF_TRAIT(has_nothrow_assign)
 
+NTL__STLX_DEF_TRAIT2(is_destructible, has_user_destructor)
 NTL__STLX_DEF_TRAIT(has_virtual_destructor)
 
 template <class T> struct is_signed
