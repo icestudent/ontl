@@ -444,22 +444,6 @@ namespace std
           return pos == end() ? 0 : (erase(pos), 1);
         }
 
-    #ifdef NTL__CXX_RV
-        void swap(rb_tree<T, Compare, Allocator>&& tree)
-        {
-          if ( this != &tree )
-          {
-            using std::swap;
-            swap(root_, tree.root_);
-            swap(first_, tree.first_);
-            swap(last_, tree.last_);
-            swap(count_, tree.count_);
-            swap(comparator_, tree.comparator_);
-            swap(node_allocator, tree.node_allocator);
-          }
-        }
-    #endif
-    #if !defined(NTL__CXX_RV) || defined(NTL__CXX_RVFIX)
         void swap(rb_tree<T, Compare, Allocator>& tree)
         {
           if ( this != &tree )
@@ -473,7 +457,6 @@ namespace std
             swap(node_allocator, tree.node_allocator);
           }
         }
-    #endif
 
         void clear()
         {
@@ -666,44 +649,44 @@ namespace std
       };
 
       template<class T, class Compare, class Allocator>
-      bool operator == (const rb_tree<T, Compare, Allocator>& x, const rb_tree<T, Compare, Allocator>& y)
+      inline bool operator == (const rb_tree<T, Compare, Allocator>& x, const rb_tree<T, Compare, Allocator>& y)
       {
         return x.size() == y.size() && equal(x.cbegin(), x.cend(), y.cbegin());
       }
 
       template<class T, class Compare, class Allocator>
-      bool operator != (const rb_tree<T, Compare, Allocator>& x, const rb_tree<T, Compare, Allocator>& y)
+      inline bool operator != (const rb_tree<T, Compare, Allocator>& x, const rb_tree<T, Compare, Allocator>& y)
       {
         return std::rel_ops::operator !=(x, y);
       }
 
       template<class T, class Compare, class Allocator>
-      bool operator < (const rb_tree<T, Compare, Allocator>& x, const rb_tree<T, Compare, Allocator>& y)
+      inline bool operator < (const rb_tree<T, Compare, Allocator>& x, const rb_tree<T, Compare, Allocator>& y)
       {
         return lexicographical_compare(x.cbegin(), x.cend(), y.cbegin(), y.cend());
       }
 
       template<class T, class Compare, class Allocator>
-      bool operator > (const rb_tree<T, Compare, Allocator>& x, const rb_tree<T, Compare, Allocator>& y)
+      inline bool operator > (const rb_tree<T, Compare, Allocator>& x, const rb_tree<T, Compare, Allocator>& y)
       {
         return std::rel_ops::operator >(x, y);
       }
 
       template<class T, class Compare, class Allocator>
-      bool operator <= (const rb_tree<T, Compare, Allocator>& x, const rb_tree<T, Compare, Allocator>& y)
+      inline bool operator <= (const rb_tree<T, Compare, Allocator>& x, const rb_tree<T, Compare, Allocator>& y)
       {
         return std::rel_ops::operator <=(x, y);
       }
 
       template<class T, class Compare, class Allocator>
-      bool operator >= (const rb_tree<T, Compare, Allocator>& x, const rb_tree<T, Compare, Allocator>& y)
+      inline bool operator >= (const rb_tree<T, Compare, Allocator>& x, const rb_tree<T, Compare, Allocator>& y)
       {
         return std::rel_ops::operator >=(x, y);
       }
 
       // specialized algorithms
       template<class T, class Compare, class Allocator>
-      void swap(rb_tree<T, Compare, Allocator>& x, rb_tree<T, Compare, Allocator>& y)
+      inline void swap(rb_tree<T, Compare, Allocator>& x, rb_tree<T, Compare, Allocator>& y)
       {
         x.swap(y);
       }

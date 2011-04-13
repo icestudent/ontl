@@ -92,12 +92,8 @@ namespace std
             this->p = move(p), this->st = st, lst = symlink_st;
           }
 
-          friend void swap(basic_directory_entry&&x, basic_directory_entry& y) { x.swap(y); }
-          friend void swap(basic_directory_entry& x, basic_directory_entry&&y) { x.swap(y); }
-          void swap(basic_directory_entry&& r)
-#else
-          void swap(basic_directory_entry& r)
 #endif
+          void swap(basic_directory_entry& r)
           {
             p.swap(r.p);
             std::swap(st,r.st);
@@ -257,10 +253,8 @@ namespace std
             r.di = nullptr;
             return *this;
           }
-          void swap(basic_directory_iterator&& r)
-#else
-          void swap(basic_directory_iterator& r)
 #endif
+          void swap(basic_directory_iterator& r)
           {
             dp.swap(r.dp);
             base.swap(r.base);
@@ -418,12 +412,6 @@ namespace std
 
         template <class Path>
         inline void swap(basic_directory_iterator<Path>& x, basic_directory_iterator<Path>& y) { x.swap(y); }
-#ifdef NTL__CXX_RV
-        template <class Path>
-        inline void swap(basic_directory_iterator<Path>&&x, basic_directory_iterator<Path>& y) { x.swap(y); }
-        template <class Path>
-        inline void swap(basic_directory_iterator<Path>& x, basic_directory_iterator<Path>&&y) { x.swap(y); }
-#endif
         //////////////////////////////////////////////////////////////////////////
         /**
          *	@brief Class template basic_recursive_directory_iterator
@@ -498,12 +486,8 @@ namespace std
             rhs.recursive = false; // reset
             swap(depth, rhs.depth);
           }
-          friend void swap(basic_recursive_directory_iterator&&x, basic_recursive_directory_iterator& y) { x.swap(y); }
-          friend void swap(basic_recursive_directory_iterator& x, basic_recursive_directory_iterator&&y) { x.swap(y); }
-          void swap(basic_recursive_directory_iterator&& r)
-#else
-          void swap(basic_recursive_directory_iterator& r)
 #endif
+          void swap(basic_recursive_directory_iterator& r)
           {
             swap(depth,r.depth);
             swap(recursive,r.recursive);
