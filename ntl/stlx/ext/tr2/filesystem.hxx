@@ -260,11 +260,7 @@ namespace std
         /** Clears the path */
         void clear() { path_.clear(); }
         /** Swaps the paths */
-      #ifdef NTL__CXX_RV
-        void swap(basic_path&& rhs)
-      #else
         void swap(basic_path& rhs)
-      #endif
         {
           std::swap(path_, rhs.path_);
         }
@@ -518,13 +514,6 @@ namespace std
       template<class String, class Traits>
       inline void swap(basic_path<String, Traits> & lhs, basic_path<String, Traits> & rhs) { lhs.swap(rhs); }
       
-    #ifdef NTL__CXX_RV
-      template<class String, class Traits>
-      inline void swap(basic_path<String, Traits>&& lhs, basic_path<String, Traits> & rhs) { lhs.swap(rhs); }
-      template<class String, class Traits>
-      inline void swap(basic_path<String, Traits> & lhs, basic_path<String, Traits>&& rhs) { lhs.swap(rhs); }
-    #endif
-
     #ifndef NTL__DOC
       template<class String, class Traits> inline bool operator<(basic_path<String, Traits>& a, basic_path<String, Traits>& b) { return lexicographical_compare(a.begin(), a.end(), b.begin(), b.end()); }
       template<class String, class Traits> bool operator==(basic_path<String, Traits>& a, basic_path<String, Traits>& b);
