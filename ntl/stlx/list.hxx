@@ -177,7 +177,7 @@ class list
     explicit list(      size_type   n,
                   const T&          value,
                   const Allocator&  a     = Allocator())
-    : node_allocator(a), size_(0)
+    : node_allocator(a)
     {
       init_head();
       insert(begin(), n, value);

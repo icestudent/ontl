@@ -333,7 +333,6 @@ namespace std
 
   public:
     static const ratio_t value = a * b;
-
   };
 
   /**
@@ -353,6 +352,7 @@ namespace std
       >::value,
       ratio_checked_multiply<R1::den,   R2::den / dens_gcd>::value
                  > type;
+    static const ratio_t num = type::num, den = type::den;
   };
 
   /** static substraction with overflow detection and simplification */
@@ -361,6 +361,7 @@ namespace std
   {
     typedef typename
       ratio_add<R1, ratio<-R2::num, R2::den> >::type type;
+    static const ratio_t num = type::num, den = type::den;
   };
 
   /** static multiplication with overflow detection and simplification */
@@ -375,6 +376,7 @@ namespace std
       ratio_checked_multiply<R1::num / gcd1, R2::num / gcd2>::value,
       ratio_checked_multiply<R1::den / gcd2, R2::den / gcd1>::value
                  > type;
+    static const ratio_t num = type::num, den = type::den;
   };
 
   /** static division with overflow detection and simplification */
@@ -384,6 +386,7 @@ namespace std
     static_assert(R2::num != 0, "division by zero");
 
     typedef typename ratio_multiply<R1, ratio<R2::den, R2::num> >::type type;
+    static const ratio_t num = type::num, den = type::den;
   };
 
 

@@ -108,7 +108,7 @@ namespace ntl
 // null pointer constant
 namespace std
 {
-#ifndef NTL__CXX_NULLPTR
+#if !defined(NTL__CXX_NULLPTR) && !defined(NTL__DOC)
   //based on SC22/WG21/N2431 = J16/07-0301
   struct nullptr_t
   {

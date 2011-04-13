@@ -1523,34 +1523,6 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath=".\rtl\syserr.cpp"
-					>
-					<FileConfiguration
-						Name="debug|x64"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="debug|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="release|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-						/>
-					</FileConfiguration>
-				</File>
-				<File
 					RelativePath=".\rtl\wchar_mask_data.cpp"
 					>
 					<FileConfiguration

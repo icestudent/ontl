@@ -25,11 +25,11 @@
 #endif
 #include "stdstring.hxx"
 
-#include "../nt/status.hxx"
-namespace ntl { namespace nt {
-  inline std::string strerror(ntstatus Status);
-  inline std::wstring wstrerror(ntstatus Status);
-}}
+#include "../nt/strerror.hxx"
+//namespace ntl { namespace nt {
+//  inline std::string strerror(ntstatus Status);
+//  inline std::wstring wstrerror(ntstatus Status);
+//}}
 
 namespace std 
 {

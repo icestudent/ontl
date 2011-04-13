@@ -86,7 +86,7 @@ namespace ntl { namespace nt {
       return find_mre(static_cast<win32error>(errcode));
     }
 
-    void mre2str(const message_resource_entry* mre, std::string& re)
+    inline void mre2str(const message_resource_entry* mre, std::string& re)
     {
       if(mre){
         if(mre->IsUnicode){
@@ -108,7 +108,7 @@ namespace ntl { namespace nt {
       }
     }
 
-    void mre2str(const message_resource_entry* mre, std::wstring& re)
+    inline void mre2str(const message_resource_entry* mre, std::wstring& re)
     {
       if(mre){
         if(!mre->IsUnicode){
@@ -180,4 +180,4 @@ namespace ntl { namespace nt {
 
 #endif
 }} 
-#endif // NTL__NT_SYSTEMERROR
+#endif // NTL__NT_STRERROR

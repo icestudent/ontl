@@ -119,11 +119,17 @@ namespace std
     class duration
     {
       template<class NotRatio>
-      struct is_ratio: false_type
-      {};
+      struct is_ratio: false_type{};
       template <ratio_t Num, ratio_t Den>
-      struct is_ratio<ratio<Num, Den> >: true_type
-      {};
+      struct is_ratio<ratio<Num, Den> >: true_type{};
+      template<class R1,class R2>
+      struct is_ratio<ratio_add<R1,R2> >:true_type{};
+      template<class R1,class R2>
+      struct is_ratio<ratio_subtract<R1,R2> >:true_type{};
+      template<class R1,class R2>
+      struct is_ratio<ratio_multiply<R1,R2> >:true_type{};
+      template<class R1,class R2>
+      struct is_ratio<ratio_divide<R1,R2> >:true_type{};
     public:
       static_assert(is_arithmetic<Rep>::value, "Rep shall be an arithmetic type or a class emulating an arithmetic type");
       static_assert(is_ratio<Period>::value,   "Period shall be a specialization of ratio");
@@ -142,18 +148,29 @@ namespace std
       explicit duration(const Rep& r)
         :rep_(r)
       {}
-
+#ifdef NTL__DOC
       template <class Rep2>
       explicit duration(const Rep2& r)
         :rep_(static_cast<rep>(r))
       {
-        static_assert((is_convertible<Rep2, rep>::value && (treat_as_floating_point<rep>::value || !treat_as_floating_point<Rep2>::value)), "20.8.3.1/6");
+        static_assert((is_convertible<Rep2, rep>::value && (treat_as_floating_point<rep>::value || !treat_as_floating_point<Rep2>::value)), "20.11.5.1/1");
       }
-
       template <class Rep2, class Period2>
       duration(const duration<Rep2, Period2>& d)
         :rep_(duration_cast<duration>(d).count())
+      {
+        static_assert((treat_as_floating_point<rep>::value || (!treat_as_floating_point<Rep2>::value && ratio_divide<Period2,period>::den == 1)), "20.11.5.1/4");
+      }
+#else
+      template <class Rep2>
+      explicit duration(const Rep2& r, typename enable_if<is_convertible<Rep2,rep>::value && (treat_as_floating_point<rep>::value || !treat_as_floating_point<Rep2>::value)>::type* = 0)
+        :rep_(static_cast<rep>(r))
       {}
+      template <class Rep2, class Period2>
+      duration(const duration<Rep2, Period2>& d, typename enable_if<treat_as_floating_point<rep>::value || (!treat_as_floating_point<Rep2>::value && ratio_divide<Period2,period>::den == 1)>::type* =0)
+        :rep_(duration_cast<duration>(d).count())
+      {}
+#endif
 
 #ifdef NTL__CXX_EF
       ~duration() = default;
@@ -219,10 +236,29 @@ namespace std
         rep_ -= d.rep_; return *this;
       }
 
+#ifdef NTL__DOC
       duration& operator%=(const duration& d)
       {
         rep_ %= d.rep_; return *this;
       }
+      duration& operator%=(const rep& rhs)
+      {
+        rep_ %= rhs; return *this;
+      }
+#else
+      template<typename Rep2>
+      typename enable_if<is_same<Rep2, rep>::value && !is_floating_point<rep>::value, duration&>::type
+        operator%=(const duration<Rep2, period>& d)
+      {
+        rep_ %= d.rep_; return *this;
+      }
+      template<typename Rep2>
+      typename enable_if<is_same<Rep2, rep>::value && !is_floating_point<rep>::value, duration&>::type
+        operator%=(const rep& rhs)
+      {
+        rep_ %= rhs; return *this;
+      }
+#endif
 
       duration& operator*=(const rep& rhs)
       {
@@ -232,11 +268,6 @@ namespace std
       duration& operator/=(const rep& rhs)
       {
         rep_ /= rhs; return *this;
-      }
-
-      duration& operator%=(const rep& rhs)
-      {
-        rep_ %= rhs; return *this;
       }
 
 

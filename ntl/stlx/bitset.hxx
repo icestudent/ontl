@@ -9,7 +9,8 @@
 #pragma once
 
 #include "cstddef.hxx"
-#include "stdexcept.hxx" // for string and exceptions
+#include "stdexcept.hxx"
+#include "stdstring.hxx"
 #ifndef NTL__STLX_IOSFWD
 #include "iosfwd.hxx"    // for ios
 #endif
@@ -281,10 +282,24 @@ namespace std {
       return to_T<unsigned long long>();
     }
 
-    template <class charT = char, class traits = char_traits<charT>, class Allocator = allocator<charT> >
+    template <class charT, class traits, class Allocator>
     basic_string<charT, traits, Allocator> to_string(charT zero = charT('0'), charT one = charT('1')) const
     {
       return to_stringT<charT, traits, Allocator>(zero, one);
+    }
+    template <class charT, class traits>
+    basic_string<charT, traits, allocator<charT> > to_string(charT zero = charT('0'), charT one = charT('1')) const
+    {
+      return to_stringT<charT, traits, allocator<charT> >(zero, one);
+    }
+    template <class charT>
+    basic_string<charT, char_traits<charT>, allocator<charT> > to_string(charT zero = charT('0'), charT one = charT('1')) const
+    {
+      return to_stringT<charT, char_traits<charT>, allocator<charT> >(zero, one);
+    }
+    basic_string<char, char_traits<char>, allocator<char> > to_string() const
+    {
+      return to_stringT<char, char_traits<char>, allocator<char> >('0', '1');
     }
 
     size_t count() const
