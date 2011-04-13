@@ -37,7 +37,7 @@ namespace std
     bool operator!=(const type_index& rhs) const  { return *target != *rhs.target; }
     bool operator< (const type_index& rhs) const  { return target->before(*rhs.target); }
     bool operator<= (const type_index& rhs)const  { return !rhs.target->before(*target); }
-    bool operator> (const type_index& rhs) const  { return rhs.target->before(*rhs.target); }
+    bool operator> (const type_index& rhs) const  { return rhs.target->before(*target); }
     bool operator>= (const type_index& rhs)const  { return !target->before(*rhs.target); }
     ///\}
 
