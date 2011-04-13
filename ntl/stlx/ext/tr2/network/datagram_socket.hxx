@@ -8,11 +8,9 @@
 #define NTL__STLX_TR2_NETWORK_DATAGRAMSOCKET
 #pragma once
 
-#include "network_fwd.hxx"
 #include "basic_socket.hxx"
 
 namespace std { namespace tr2 { namespace network {
-
 
   /**
    *	@brief 5.7.8. Class template basic_datagram_socket

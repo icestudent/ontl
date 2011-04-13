@@ -258,7 +258,6 @@ namespace ntl { namespace network {
           impl.funcs.closesocket(impl.s);
           impl.s = 0;
         }
-        winsock_runtime::cleanup();
       }
 
       bool is_open(const implementation_type& impl) const

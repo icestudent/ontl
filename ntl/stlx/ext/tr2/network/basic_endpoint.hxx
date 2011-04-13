@@ -8,7 +8,6 @@
 #define NTL__STLX_TR2_NETWORK_BASICENDPOINT
 #pragma once
 
-#include "network_fwd.hxx"
 #include "ip_address.hxx"
 
 namespace std { namespace tr2 {

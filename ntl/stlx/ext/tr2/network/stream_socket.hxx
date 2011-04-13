@@ -1,6 +1,6 @@
 /**\file*********************************************************************
  *                                                                     \brief
- *  Satagram socket
+ *  Stream socket
  *
  ****************************************************************************
  */
@@ -8,7 +8,6 @@
 #define NTL__STLX_TR2_NETWORK_STREAMSOCKET
 #pragma once
 
-#include "network_fwd.hxx"
 #include "basic_socket.hxx"
 
 namespace std { namespace tr2 { namespace network {

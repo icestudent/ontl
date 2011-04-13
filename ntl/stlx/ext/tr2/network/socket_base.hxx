@@ -1,6 +1,6 @@
 /**\file*********************************************************************
  *                                                                     \brief
- *  Network
+ *  Socket base declarations
  *
  ****************************************************************************
  */
@@ -9,7 +9,6 @@
 #pragma once
 
 #include "system_network.hxx"
-#include "network_fwd.hxx"
 
 namespace std { namespace tr2 { namespace network {
 
@@ -120,8 +119,9 @@ namespace std { namespace tr2 { namespace network {
     class send_low_watermark;
 
     ///\name socket control commands
-
-    /** Specifies if nonblocking mode should be enabled */
+    /** Determine amount of data that can be read without blocking. */
+    class bytes_readable;
+    /** Specifies if nonblocking mode should be enabled. */
     class nonblocking_io;
     /** Determine whether or not all OOB data has been read. */
     class at_oob_mark;
@@ -163,8 +163,9 @@ namespace std { namespace tr2 { namespace network {
     typedef __::network::integral_socket_option<int, ntl::network::constants::sol_socket, ntl::network::constants::so_sndlowat>send_buffer_low_watermark;
 
     // socket control codes
-    typedef __::network::boolean_socket_option<-1, ntl::network::constants::fionbio>    nonblocking_io;
-    typedef __::network::boolean_socket_option<-1, ntl::network::constants::siocatmark> at_mark;
+    typedef __::network::boolean_socket_option<-1, ntl::network::constants::fionbio>              nonblocking_io;
+    typedef __::network::boolean_socket_option<-1, ntl::network::constants::siocatmark>           at_mark;
+    typedef __::network::integral_socket_option<uint32_t, -1, ntl::network::constants::fionread>  bytes_readable;
 
     typedef ntl::network::constants::shutdown_type shutdown_type;
     static const ntl::network::constants::shutdown_type shutdown_receive = ntl::network::constants::shutdown_receive;
@@ -220,7 +221,7 @@ namespace std { namespace tr2 { namespace network {
     std::pair<uint16_t, uint16_t> v;
   };
 
-
+#ifndef NTL__DOC
   namespace ip
   {
     /**
@@ -255,7 +256,8 @@ namespace std { namespace tr2 { namespace network {
         ntl::network::constants::sol_ipv6, ntl::network::constants::ipv6_multicast_loop> enable_loopback;
     }
 
-  }
+  } // ip
+#endif
 
 }}}
 #endif // NTL__STLX_TR2_NETWORK_SOCKET_BASE

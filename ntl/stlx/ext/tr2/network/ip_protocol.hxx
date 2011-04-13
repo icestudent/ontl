@@ -1,6 +1,6 @@
 /**\file*********************************************************************
  *                                                                     \brief
- *  Network
+ *  Network IP protocols
  *
  ****************************************************************************
  */
@@ -8,7 +8,6 @@
 #define NTL__STLX_TR2_NETWORK_PROTOCOL
 #pragma once
 
-#include "network_fwd.hxx"
 #include "system_network.hxx"
 #include "basic_endpoint.hxx"
 
@@ -89,6 +88,46 @@ namespace std { namespace tr2 { namespace network {
     };
 
 
+
+    /**
+     *	@brief Class ip::icmp
+     **/
+    class icmp
+    {
+    public:
+      ///\name types:
+      typedef basic_endpoint<icmp>        endpoint;
+      typedef basic_resolver<icmp>        resolver;
+      typedef basic_datagram_socket<icmp> socket;
+
+      ///\name static members:
+      static icmp v4() { return icmp(ntl::network::constants::af_inet); }
+      static icmp v6() { return icmp(ntl::network::constants::af_inet6); }
+
+      ///\name extensible icmp
+      int family() const  { return af; }
+      int type() const    { return ntl::network::constants::sock_raw; }
+      int protocol() const
+      {
+        return af == ntl::network::constants::af_inet6 
+        ? ntl::network::constants::ipproto_icmpv6
+        : ntl::network::constants::ipproto_icmp;
+      }
+
+      ///\name icmp comparisons:
+      friend inline bool operator==(const icmp& a, const icmp& b) { return a.af == b.af; }
+      friend inline bool operator!=(const icmp& a, const icmp& b) { return a.af != b.af; }
+      ///\}
+    protected:
+      explicit icmp(ntl::network::constants::family_type af)
+        :af(af)
+      {}
+    private:
+      ntl::network::constants::family_type af;
+    };
+
+
+#ifndef NTL__DOC
     namespace multicast
     {
       /**
@@ -152,10 +191,8 @@ namespace std { namespace tr2 { namespace network {
           v6.interface = network_interface;
         }
       };
-    }
-
-
-
-  }
+    } // multicast
+#endif // NTL__DOC
+  } // ip
 }}}
 #endif // NTL__STLX_TR2_NETWORK_PROTOCOL

@@ -17,6 +17,37 @@ namespace std { namespace tr2 {
   /// TR2 Network library
   namespace network
   {
+#ifdef NTL__DOC
+    /// Internet protocol
+    namespace ip
+    {
+      /** Socket option for determining whether an IPv6 socket supports IPv6 communication only. */
+      class v6_only;
+
+      /// IP Unicast socket options
+      namespace unicast
+      {
+        /** Socket option for time-to-live associated with outgoing unicast packets. */
+        class hops;
+      } // unicast
+
+      /// IP Multicast socket options
+      namespace multicast
+      {
+        /** Socket option to join a multicast group on a specified interface. */
+        class join_group;
+        /** Socket option to leave a multicast group on a specified interface. */
+        class leave_group;
+        /** Socket option for local interface to use for outgoing multicast packets. */
+        class outbound_interface;
+        /** Socket option for time-to-live associated with outgoing multicast packets. */
+        class hops;
+        /** Socket option determining whether outgoing multicast packets will be received
+          on the same socket if it is a member of the multicast group. */
+        class enable_loopback;
+      }
+    } // ip
+#else
 
   // Sockets:
   class socket_base;
@@ -130,30 +161,11 @@ namespace std { namespace tr2 {
     bool operator<=(const udp& a, const udp& b);
     bool operator>=(const udp& a, const udp& b);
 
-#ifdef NTL__DOC
-    class v6_only;
-
-    /// IP Unicast socket options
-    namespace unicast
-    {
-      class hops;
-    } // unicast
-
-    /// IP Multicast socket options
-    namespace multicast
-    {
-      class join_group;
-      class leave_group;
-      class outbound_interface;
-      class hops;
-      class enable_loopback;
-    } // multicast
-#else
     namespace unicast
     {}
     namespace multicast
     {}
-#endif 
   } // ip
+#endif  // NTL__DOC
 }}}
 #endif // NTL__STLX_TR2_NETWORKFWD

@@ -10,7 +10,8 @@
 
 #include "../../../atomic.hxx"
 #include "io_service_fwd.hxx"
-//#include "../../../forward_list.hxx"
+#include "../../../forward_list.hxx"
+#include "../../../typeindex.hxx"
 
 namespace std { namespace tr2 { namespace sys {
 
@@ -61,6 +62,27 @@ namespace std { namespace tr2 { namespace sys {
     }
   }} // __
 
+  ///\name service access exceptions
+  class service_already_exists:
+    public logic_error
+  {
+  public:
+    service_already_exists()
+      :logic_error("io service already exists")
+    {}
+  };
+  class invalid_service_owner:
+    public logic_error
+  {
+  public:
+    invalid_service_owner()
+      :logic_error("invalid io service owner")
+    {}
+  };
+  ///\}
+
+
+
   /**
    *	@brief 5.3.3. Class io_service
    *  @details Class io_service implements an extensible, type-safe, polymorphic set of <i>IO services, indexed by service/type</i>.
@@ -88,8 +110,8 @@ namespace std { namespace tr2 { namespace sys {
     };
 
     ///\name constructors/destructor:
-    io_service(){}
-    ~io_service(){}
+    io_service(){svcNo = 0;}
+    ~io_service();
 
     ///\name members:
     size_t run(error_code& ec = throws())
@@ -124,41 +146,82 @@ namespace std { namespace tr2 { namespace sys {
     //template<class Handler>
     //unspecified wrap(Handler handler);
     ///\}
+  protected:
+    struct service_node
+    {
+      type_index  key;
+      service*    val;
+      io_service* owner;
+      size_t      id;
+    };
+    typedef forward_list<service_node> services_t;
+    services_t services;
+    size_t svcNo;
+
+    struct finder:
+      unary_function<service_node, bool>
+    {
+      type_index key;
+      finder(type_index key)
+        :key(key)
+      {}
+      result_type operator()(const service_node& node) const
+      {
+        return node.key == key;
+      }
+    };
+    template<class Service> friend Service& use_service(io_service&);
+    template<class Service> friend void add_service(io_service&, Service*);
+    template<class Service> friend bool has_service(io_service&);
+
+    template<class Service> void do_add_service(io_service& ios, Service* svc)
+    {
+      type_index key(typeid(Service));
+      services_t::const_iterator it = find_if(services.cbegin(), services.cend(), finder(key));
+      if(it != services.cend()){
+        __ntl_throw(service_already_exists());
+        return;
+      }
+      service_node node = {key, svc, this, ++svcNo};
+      services.push_front(node);
+    }
+    template<class Service> bool do_has_service(io_service& ios) const
+    {
+      type_index key(typeid(Service));
+      services_t::const_iterator it = find_if(services.cbegin(), services.cend(), finder(key));
+      return it != services.cend();
+    }
+    template<class Service> Service& do_use_service(io_service& ios)
+    {
+      type_index key(typeid(Service));
+      services_t::const_iterator it = find_if(services.cbegin(), services.cend(), finder(key));
+      if(it != services.cend()){
+        if(it->owner != this)
+          __ntl_throw(invalid_service_owner());
+        return static_cast<Service&>(*it->val);
+      }
+      Service* svc = new Service(*this);
+      service_node node = {key, svc, this, ++svcNo};
+      services.push_front(node);
+      return *svc;
+    }
+
+    
   private:
     io_service(const io_service&) __deleted;
     void operator=(const io_service&) __deleted;
   };
 
-  // service access:
-  class service_already_exists:
-    public logic_error
-  {
-  public:
-    service_already_exists()
-      :logic_error("io service already exists")
-    {}
-  };
-  class invalid_service_owner:
-    public logic_error
-  {
-  public:
-    invalid_service_owner()
-      :logic_error("invalid io service owner")
-    {}
-  };
+
 
   /**
    *	Service objects may be explicitly added to an io_service using the function template add_service<Service>(). If the 
    *  Service is already present, the service_already_exists exception is thrown. If the owner of the service is not the same 
    *  object as the io_service parameter, the invalid_service_owner exception is thrown. 
    **/
-  template<class Service> void add_service(io_service& ios, Service* svc);
-  template<class Service> bool has_service(io_service& ios);
-  template<class Service> 
-  inline Service& use_service(io_service& ios)
-  {
-    return *std::__::static_storage<Service>::get_object(ios);
-  }
+   template<class Service> inline void add_service(io_service& ios, Service* svc) { ios.do_add_service<Service>(ios, svc); }
+   template<class Service> inline bool has_service(io_service& ios) { return ios.do_has_service<Service>(ios); }
+   template<class Service> inline Service& use_service(io_service& ios) { return ios.do_use_service<Service>(ios); }
 
 
   /**
@@ -183,11 +246,21 @@ namespace std { namespace tr2 { namespace sys {
     /** A service's shutdown_service member function must cause all copies of user-defined handler objects that are held by the 
       service to be destroyed.  */
     virtual void shutdown_service() = 0;
-
     friend io_service::~io_service();
+
     service(const service&) __deleted;
     void operator=(const service&) __deleted;
   };
+
+  inline io_service::~io_service()
+  {
+    for(services_t::iterator it = services.begin(), end = services.end(); it != end; ++it, svcNo--){
+      assert(svcNo == it->id);
+      it->val->shutdown_service();
+      delete it->val;
+    }
+    assert(svcNo == 0);
+  }
 
   /**
    *	@brief 5.3.6 Class io_service::work

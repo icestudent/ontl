@@ -2,6 +2,8 @@
 
 #include "../system_network.hxx"
 #include "../../../../nt/win32_error.hxx"
+#include "../../../../nt/debug.hxx"
+
 
 namespace ntl { namespace network {
 

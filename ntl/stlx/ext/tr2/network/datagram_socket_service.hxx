@@ -15,6 +15,8 @@ namespace std { namespace tr2 { namespace network {
 
   /**
    *	@brief 5.7.7. Class template datagram_socket_service
+   *
+   *  Default service implementation for a datagram socket.
    **/
   template<class Protocol>
   class datagram_socket_service:

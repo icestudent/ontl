@@ -1,6 +1,6 @@
 /**\file*********************************************************************
  *                                                                     \brief
- *  Basic datagram socket
+ *  Basic socket
  *
  ****************************************************************************
  */
@@ -13,8 +13,6 @@
 #include "basic_io_object.hxx"
 
 namespace std { namespace tr2 { namespace network {
-
-
 
   /**
    *	@brief 5.7.6. Class template basic_socket
@@ -193,6 +191,52 @@ namespace std { namespace tr2 { namespace network {
     {}
     ///\}
   };
+
+
+
+  ///\name Connection list support
+  template<class Protocol, class SocketService, class EndpointIterator>
+  inline EndpointIterator connect(basic_socket<Protocol, SocketService>& sock, EndpointIterator begin, EndpointIterator end, error_code& ec = throws())
+  {
+    error_code e = make_error_code(error::not_found);
+    for(;e && begin != end; ++begin){
+      sock.close(e);
+      sock.connect(*begin, e);
+    }
+    throw_system_error(e, ec);
+    return begin;
+  }
+  template<class Protocol, class SocketService, class EndpointIterator, class ConnectionCondition>
+  inline EndpointIterator connect(basic_socket<Protocol, SocketService>& sock, EndpointIterator begin, EndpointIterator end, ConnectionCondition predicate, error_code& ec = throws())
+  {
+    error_code e;
+    for(;begin != end; ++begin){
+      begin = predicate(e, begin);
+      if(begin == end)
+        break;
+      sock.close(e);
+      sock.connect(*begin, e);
+      if(!e)
+        break;
+    }
+    throw_system_error(e, ec);
+    return begin;
+  }
+
+  template<class Protocol, class SocketService, class EndpointIterator>
+  inline EndpointIterator connect(basic_socket<Protocol, SocketService>& sock, EndpointIterator begin, error_code& ec = throws())
+  {
+    EndpointIterator end;
+    return connect<Protocol, SocketService, EndpointIterator>(sock, begin, end, ec);
+  }
+
+  template<class Protocol, class SocketService, class EndpointIterator, class ConnectionCondition>
+  inline EndpointIterator connect(basic_socket<Protocol, SocketService>& sock, EndpointIterator begin, ConnectionCondition predicate, error_code& ec = throws())
+  {
+    EndpointIterator end;
+    return connect<Protocol, SocketService, EndpointIterator>(sock, begin, end, predicate, ec);
+  }
+  ///\}
 
 }}}
 #endif // NTL__STLX_TR2_NETWORK_BASICSOCKET

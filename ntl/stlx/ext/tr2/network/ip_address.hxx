@@ -1,6 +1,6 @@
 /**\file*********************************************************************
  *                                                                     \brief
- *  Network
+ *  Network IP address
  *
  ****************************************************************************
  */
@@ -8,13 +8,12 @@
 #define NTL__STLX_TR2_NETWORK_IPADDRESS
 #pragma once
 
-#include "network_fwd.hxx"
-#include "system_network.hxx"
 #include "../../../../stdlib.hxx"
 #include "../../../array.hxx"
 #include "../../../stdstring.hxx"
 #include "../../numeric_conversions.hxx"
-#include "network_error.hxx"
+#include "system_network.hxx"
+//#include "network_error.hxx"
 
 namespace std { namespace tr2 { namespace network {
 
