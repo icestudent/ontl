@@ -30,6 +30,7 @@
 #include "cwctype.hxx"
 
 #include "../nt/string.hxx"
+#include "cstdlib.hxx"
 
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -212,6 +213,12 @@ template <class charT> inline bool isalnum(charT c, const locale& loc)
 template <class charT> inline bool isgraph(charT c, const locale& loc)
 {
   return use_facet<ctype<charT> >(loc).is(ctype_base::graph, c);
+}
+
+/** Returns true if character is a blank character, excluding space */
+template <class charT> inline bool isblank(charT c, const locale& loc)
+{
+  return use_facet<ctype<charT> >(loc).is(ctype_base::blank, c);
 }
 ///\}
 
@@ -481,7 +488,9 @@ class ctype_base
       /** is alphanumeric */
       alnum = alpha|digit,
       /** is graphic character, excluding space */
-      graph = alnum|punct;
+      graph = alnum|punct,
+      /** is blank character */
+      blank = __ct_blank;
 };
 
 /**
@@ -1520,7 +1529,7 @@ class wbuffer_convert:
   typedef typename traits::off_type off_type;
   typedef traits                    traits_type;
 public:
-  typedef typename Tr::state_type state_type;
+  typedef typename Codecvt::state_type state_type;
 
   wbuffer_convert(std::streambuf *bytebuf = 0, Codecvt *pcvt = new Codecvt, state_type state = state_type())
     :sb(bytebuf), cvtptr(pcvt), cvtstate(state)
@@ -1699,7 +1708,7 @@ class numpunct : public locale::facet
     _NTL_LOC_VIRTUAL char_type do_thousands_sep() const { return ','; }
 
     /// 3 Returns: A basic_string<char> vec used as a vector of integer values,
-    ///   in which each element vec[i] represents the number of digits246)
+    ///   in which each element vec[i] represents the number of digits
     ///   in the group at position i, starting with position 0 as the rightmost
     ///   group. If vec.size() <= i, the number is the same as group (i-1);
     ///   if (i<0 || vec[i]<=0 || vec[i]==CHAR_MAX), the size of the digit group
@@ -1895,19 +1904,19 @@ class num_get : public locale::facet
       v = get_int<unsigned long long, signed long long>(in,end,f,err, numeric_limits<unsigned long long>::__max, numeric_limits<unsigned long long>::__min);
       return in;
     }
-    _NTL_LOC_VIRTUAL iter_type do_get(iter_type in, iter_type, ios_base&, ios_base::iostate&, float& v) const
+    _NTL_LOC_VIRTUAL iter_type do_get(iter_type in, iter_type end, ios_base& f, ios_base::iostate& err, float& v) const
     {
-      (void)v;
+      v = static_cast<float>(get_float(in, end, f, err, numeric_limits<float>::max(), numeric_limits<float>::min()));
       return in;
     }
-    _NTL_LOC_VIRTUAL iter_type do_get(iter_type in, iter_type , ios_base& , ios_base::iostate& , double& v) const
+    _NTL_LOC_VIRTUAL iter_type do_get(iter_type in, iter_type end, ios_base& f, ios_base::iostate& err, double& v) const
     {
-      (void)v;
+      v = static_cast<double>(get_float(in, end, f, err, numeric_limits<double>::max(), numeric_limits<double>::min()));
       return in;
     }
-    _NTL_LOC_VIRTUAL iter_type do_get(iter_type in, iter_type , ios_base& , ios_base::iostate& , long double& v) const
+    _NTL_LOC_VIRTUAL iter_type do_get(iter_type in, iter_type end, ios_base& f, ios_base::iostate& err, long double& v) const
     {
-      (void)v;
+      v = static_cast<long double>(get_float(in, end, f, err, numeric_limits<long double>::max(), numeric_limits<long double>::min()));
       return in;
     }
     _NTL_LOC_VIRTUAL iter_type do_get(iter_type in, iter_type end, ios_base& f, ios_base::iostate& err, void*& v) const
@@ -1923,7 +1932,90 @@ class num_get : public locale::facet
     }
     ///\}
 private:
-  template<typename storage_type, typename signed_storage_type> // this function will instantiated only tro times: for 64bit and all other types
+  static long double get_float(iter_type in, iter_type end, ios_base& str, ios_base::iostate& err, long double max_val, long double min_val)
+  {
+    if(in == end){
+      err |= ios_base::eofbit;
+      return 0;
+    }
+
+    // initialization
+    const numpunct<char_type>& np = use_facet< numpunct<char_type> >(str.getloc());
+    const ctype<char_type>& check = use_facet< ctype<char_type> >(str.getloc());
+
+    const ios_base::fmtflags flags = str .flags();
+    const ios_base::fmtflags basefield = (flags & ios_base::basefield);
+
+    const char_type thousands_sep = np.thousands_sep(), decimal_sep = np.decimal_point();
+    const size_t group_width = np.grouping().length();
+
+    const unsigned base = basefield == ios_base::oct ? 8 : basefield == ios_base::hex ? 16 : 10;
+    ctype_base::mask base_mask = ctype_base::xdigit;
+
+    bool dec_extracted = false;
+    char valuebuf[128], *pval = valuebuf;
+    size_t ic = 0;
+    do {
+      char_type ct = *in;
+      if(in == end)
+        break;
+      char c = static_cast<char>(ct);
+      bool discard = ct == thousands_sep && group_width > 0;
+      if(discard){
+        if(!dec_extracted)
+          continue;
+        // thousand sep isn't valid in decimal part
+        ic = 0;
+        break;
+      }
+      if(ct == decimal_sep) {
+        c = '.', dec_extracted = true;
+        base_mask = ctype_base::digit;
+      } else if(ct != '-' && ct != '+') {
+        // check is it a valid digit
+        if(dec_extracted && (c == 'e' || c == 'E')){
+          // ok
+        }else {
+          // check digit
+          if(!check.is(base_mask, c))
+            break;
+          // check base
+          unsigned digit;
+          if(check.is(ctype_base::alpha, c))
+            //digit = ct.toupper(c) - 'A' + 10;
+            digit = (c & ~(1 << 5)) - 'A' + 10;
+          else
+            digit = c - '0';
+          if(digit >= base)
+            break;
+        }
+      }
+      ++ic;
+      *pval++ = c;
+    } while(++in, true);
+
+    // NOTE: may be bad/fail bit on format error?
+    static const ios_base::iostate bad_format = ios_base::failbit;
+
+    if(ic == 0)
+      err |= bad_format;
+    if(in == end)
+      err |= ios_base::eofbit;
+
+    // extract
+    *pval = 0;
+    long double value = 0;
+    if(ic){
+      value = std::strtod(valuebuf, &pval);
+      if(value > max_val)
+        value = max_val;
+      else if (value < min_val)
+        value = min_val;
+    }
+    return value;
+  }
+
+  template<typename storage_type, typename signed_storage_type> // this function will instantiated only two times: for 64bit and all other types
   static storage_type get_int(iter_type in, iter_type end, ios_base& str, ios_base::iostate& err, storage_type max_val, signed_storage_type min_val)
   {
     if(in == end){
@@ -2118,13 +2210,13 @@ class num_put : public locale::facet
     {
       return put_int(out, str, fill, v, false, true);
     }
-    _NTL_LOC_VIRTUAL iter_type do_put(iter_type out, ios_base&, char_type, double) const
+    _NTL_LOC_VIRTUAL iter_type do_put(iter_type out, ios_base& str, char_type fill, double v) const
     {
-      return out;
+      return put_float(out, str, fill, v);
     }
-    _NTL_LOC_VIRTUAL iter_type do_put(iter_type out, ios_base&, char_type, long double) const
+    _NTL_LOC_VIRTUAL iter_type do_put(iter_type out, ios_base& str, char_type fill, long double v) const
     {
-      return out;
+      return return put_float(out, str, fill, v);
     }
     _NTL_LOC_VIRTUAL iter_type do_put(iter_type out, ios_base& str, char_type fill, const void* v) const
     {
@@ -2142,7 +2234,6 @@ class num_put : public locale::facet
       const bool               showpos = (flags & ios_base::showpos) != 0;
       const bool               showbase = (flags & ios_base::showbase) != 0;
 
-      const streamsize width = str.width();
 
       // [dec, oct, hex] = [0, 2, 4]
       static const char bases[] = {'u', 'o', 'x'};
@@ -2151,16 +2242,10 @@ class num_put : public locale::facet
       char fmtbuf[16];
       char* fmt = fmtbuf;
       *fmt++ = '%';
-
       if(showpos)
         *fmt++ = '+';
       if(showbase && !pointer_v) // pointer have a custom prefix always
         *fmt++ = '#';
-      if(adjust == ios_base::internal){
-        *fmt++ = '0';
-        if(width)
-          *fmt++ = '*';
-      }
 
       if(pointer_v){
         *fmt = 'p';
@@ -2177,30 +2262,147 @@ class num_put : public locale::facet
       }
       *++fmt = 0;
 
-      char buf[32]; // may not enough if large width
-      streamsize l = adjust == ios_base::internal && width //-V103
-        ? _snprintf(buf, _countof(buf), fmtbuf, width, long_v ? v : static_cast<unsigned long>(v))
-      : _snprintf(buf, _countof(buf), fmtbuf, long_v ? v : static_cast<unsigned long>(v));
+      char buf[128], *valuebuf = buf; // may not enough if large width
+      streamsize l = _snprintf(buf, _countof(buf), fmtbuf, long_v ? v : static_cast<unsigned long>(v));
 
       // adjust
+      const streamsize width = str.width();
       if(width && width > l){
         streamsize pad = width - l;
         if(pointer_v)
           pad -= 2;
-        if(adjust != ios_base::left && adjust != ios_base::internal) // before
+
+        // pad before
+        if(adjust == ios_base::internal && l > 0){
+          if(valuebuf[0] == '-' || valuebuf[0] == '+'){
+            // copy only sign
+            out = copy_n(valuebuf, 1, out);
+            valuebuf++, l--;
+          }else if(basefield == ios_base::hex && showbase){
+            // copy '0x'
+            out = copy_n(valuebuf, 2, out);
+            valuebuf += 2, l -= 2;
+          } else if(pointer_v){
+            out = copy_n("0x",2,out);
+            pointer_v = false;
+          }
+        }
+        if(adjust != ios_base::left)
           out = __::fill_n(out, pad, fill);
 
         if(pointer_v)
           out = copy_n("0x",2,out);
-        out = copy_n(buf,l,out);
 
+        out = copy_n(valuebuf, l, out);
+
+        // pad after
         if(adjust == ios_base::left)
           out = __::fill_n(out, pad, fill);
       }else{
         if(pointer_v)
           out = copy_n("0x",2,out);
-        out = copy_n(buf,l,out);
+        out = copy_n(valuebuf, l, out);
       }
+      str.width(0);
+      return out;
+    }
+
+    static iter_type put_float(iter_type out, ios_base& str, char_type fill, double v)
+    {
+      const ios_base::fmtflags flags = str.flags(),
+        floatfield = flags & ios_base::floatfield,
+        adjust = flags & ios_base::adjustfield;
+
+      static const char type[] = {'g', 'f', 'e', 'a'};
+      // %
+      char fmtbuf[16], *fmt = fmtbuf;
+      *fmt++ = '%';
+      if(flags & ios_base::showpos)
+        *fmt++ = '+';
+      if(flags & ios_base::showpoint)
+        *fmt++ = '#';
+
+      // precision
+      if(floatfield != ios_base::floatfield){
+        *fmt++ = '.';
+        size_t n;
+        ntl::numeric::itoa(str.precision(), fmt, _countof(fmtbuf), 10, &n);
+        fmt += n;
+      }
+      // type
+      *fmt = type[floatfield >> 11];
+      if(flags & ios_base::uppercase)
+        *fmt -= 'a'-'A';
+      fmt[1] = 0;
+
+      char floatbuf[128];
+      size_t len = ntl::msvcrt::snprintf(floatbuf, _countof(floatbuf), fmtbuf, v);
+
+      charT value[128], *valuebuf = value;
+      if(len > 0)
+      {
+        // group & sep
+        const numpunct<charT>& punct = use_facet< numpunct<charT> >(str.getloc());
+        const basic_string<charT> vec = punct.grouping();
+        const charT ts = punct.thousands_sep(),
+          ds = punct.decimal_point();
+
+        int group = 0, groupsize = 0, groups = static_cast<int>(vec.size()), i = 0;
+        size_t to = _countof(value) - 1;
+
+        bool nogroup = vec.empty() || memchr(floatbuf, '.', len) != nullptr;
+        if(!nogroup)
+          groupsize = vec[0];
+        
+        for(ssize_t from = len-1; from >= 0; from--, to--, i++){
+          const char c = floatbuf[from];
+          if(nogroup){
+            value[to] = c != '.' ? c : ds;
+
+            if(c == '.'){
+              // setup grouping
+              nogroup = vec.empty();
+              if(!nogroup)
+                groupsize = vec[group];
+              i = -1;
+            }
+            continue;
+          }
+          if(i == groupsize && groupsize > 0 && groupsize != CHAR_MAX 
+            && c != '+' && c != '-'){ // prevent "-,123,456"
+            // new group
+            value[to--] = ts;
+            if(group+1 < groups){
+              groupsize = vec[++group];
+            }
+            i = 0;
+          }
+          value[to] = c;
+        }
+        to++;
+        len = _countof(value) - to;
+        valuebuf = &value[to];
+      }
+
+      // adjust
+      const size_t width = str.width();
+      const bool need_adjust = width && width > len;
+      streamsize pad = width - len;
+      if(need_adjust){
+        // pad before
+        if(adjust == ios_base::internal && len > 0 && (valuebuf[0] == '-' || valuebuf[0] == '+') ){
+          // copy only sign
+          out = copy_n(valuebuf, 1, out);
+          valuebuf++, len--;
+        }
+        if(adjust != ios_base::left)
+          out = __::fill_n(out, pad, fill);
+      }
+
+      out = copy_n(valuebuf, len, out);
+
+      if(need_adjust && adjust == ios_base::left)    // after
+        out = __::fill_n(out, pad, fill);
       str.width(0);
       return out;
     }
