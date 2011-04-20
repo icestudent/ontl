@@ -1,0 +1,864 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="ntl">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="ntl\crypto">
+      <UniqueIdentifier>{0bd25d1c-43c2-4bca-bdcd-a8b75a455529}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ntl\stlx">
+      <UniqueIdentifier>{9617ebed-202b-4535-a318-add5546cf4b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ntl\stlx\.ext">
+      <UniqueIdentifier>{eeb3375b-70dc-4fc5-b4fe-c0a6bb66931f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ntl\stlx\.ext\spp">
+      <UniqueIdentifier>{8b4661bf-1b6a-4710-842d-6c4daf75026d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ntl\stlx\.ext\tr2">
+      <UniqueIdentifier>{b8c8d877-a980-400e-b80b-723be127626b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ntl\stlx\.ext\tr2\network">
+      <UniqueIdentifier>{ebf10560-d591-48ce-a04d-0b05bd004b87}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ntl\stlx\.ext\tr2\network\impl">
+      <UniqueIdentifier>{7addf2e2-8f7c-4933-bfe5-663259ad48e0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ntl\stlx\.ext\tr2\network\impl\winsock">
+      <UniqueIdentifier>{bd52381f-c5fa-46a5-b896-186ecabc200c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ntl\stlx\.ext\tr2\network\IP">
+      <UniqueIdentifier>{48217793-e02e-4328-b309-17b7468cbad9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ntl\stlx\.ext\tr2\I/O">
+      <UniqueIdentifier>{a9be248d-feef-4cb6-886b-c5dbef6caffe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ntl\stlx\.ext\tr2\filesystem">
+      <UniqueIdentifier>{6a92d8dd-f3bf-47ae-81b0-e8f84bc2c672}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ntl\stlx\.ext\ttl">
+      <UniqueIdentifier>{2fdf049d-719a-4161-bddd-20ed49d24be2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ntl\stlx\.ext\ttl\pp">
+      <UniqueIdentifier>{29a9b5af-8f6e-45ad-a593-86683cf19483}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ntl\stlx\.ext\tr1">
+      <UniqueIdentifier>{7db5862a-c282-43f9-9dbe-64e0aaef0c72}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ntl\stlx\containers">
+      <UniqueIdentifier>{b2a32599-1b6b-4115-ad06-abb03b3d9060}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ntl\stlx\c-compat">
+      <UniqueIdentifier>{1edd1494-0d16-4862-8deb-a845e4b036af}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ntl\stlx\runtime">
+      <UniqueIdentifier>{6ed3fb12-43aa-44a3-962f-cfc89212dee5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ntl\stlx\io">
+      <UniqueIdentifier>{efc3bff3-0a6a-4405-8300-d9fbc60592e8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ntl\stlx\utility">
+      <UniqueIdentifier>{9b9392a5-df87-4505-9cc8-4c43fea4182f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ntl\stlx\utility\functional">
+      <UniqueIdentifier>{cd5deadf-810d-4314-9c9a-c48452fa58ac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ntl\stlx\algo">
+      <UniqueIdentifier>{1daabf95-2f6d-4da6-8bb4-645b92edb9c0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ntl\km">
+      <UniqueIdentifier>{21ceed77-c221-4228-97b5-a2e05889bd83}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ntl\km\net">
+      <UniqueIdentifier>{4bf677df-46ba-4011-9e92-3b03ac29b648}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ntl\nt">
+      <UniqueIdentifier>{502a4581-78e9-4960-9177-f3b1459db576}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ntl\pe">
+      <UniqueIdentifier>{de61716c-b4bb-4381-96d5-537ce4927ad5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ntl\rtl">
+      <UniqueIdentifier>{bff127e2-0d40-4290-abc1-50edf4a6cebf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ntl\win">
+      <UniqueIdentifier>{3d936361-d107-47c1-b596-742789919a17}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ntl\.root">
+      <UniqueIdentifier>{da8f4112-a5d0-42a0-8237-ca1c02cef558}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="crypto\sha.hxx">
+      <Filter>ntl\crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\0order.hxx">
+      <Filter>ntl\stlx</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\ext\circular_buffer.hxx">
+      <Filter>ntl\stlx\.ext</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\cpp0x_mode.hxx">
+      <Filter>ntl\stlx\.ext</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\ext\fib.hxx">
+      <Filter>ntl\stlx\.ext</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\ext\hashtable.hxx">
+      <Filter>ntl\stlx\.ext</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\ext\numeric_conversions.hxx">
+      <Filter>ntl\stlx\.ext</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\ext\rbtree.hxx">
+      <Filter>ntl\stlx\.ext</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\ext\typelist.hxx">
+      <Filter>ntl\stlx\.ext</Filter>
+    </ClInclude>
+    <ClInclude Include="spp\args.hxx">
+      <Filter>ntl\stlx\.ext\spp</Filter>
+    </ClInclude>
+    <ClInclude Include="spp\control.hxx">
+      <Filter>ntl\stlx\.ext\spp</Filter>
+    </ClInclude>
+    <ClInclude Include="spp\loop.hxx">
+      <Filter>ntl\stlx\.ext\spp</Filter>
+    </ClInclude>
+    <ClInclude Include="spp\math.hxx">
+      <Filter>ntl\stlx\.ext\spp</Filter>
+    </ClInclude>
+    <ClInclude Include="spp\utility.hxx">
+      <Filter>ntl\stlx\.ext\spp</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\ext\tr2\buffer.hxx">
+      <Filter>ntl\stlx\.ext\tr2</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\ext\tr2\filesystem.hxx">
+      <Filter>ntl\stlx\.ext\tr2</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\ext\tr2\filesystem_v3.hxx">
+      <Filter>ntl\stlx\.ext\tr2</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\ext\tr2\io_service.hxx">
+      <Filter>ntl\stlx\.ext\tr2</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\ext\tr2\network.hxx">
+      <Filter>ntl\stlx\.ext\tr2</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\ext\tr2\timer.hxx">
+      <Filter>ntl\stlx\.ext\tr2</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\ext\tr2\network\basic_io_object.hxx">
+      <Filter>ntl\stlx\.ext\tr2\network</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\ext\tr2\network\basic_socket.hxx">
+      <Filter>ntl\stlx\.ext\tr2\network</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\ext\tr2\network\datagram_socket.hxx">
+      <Filter>ntl\stlx\.ext\tr2\network</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\ext\tr2\network\network_error.hxx">
+      <Filter>ntl\stlx\.ext\tr2\network</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\ext\tr2\network\network_fwd.hxx">
+      <Filter>ntl\stlx\.ext\tr2\network</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\ext\tr2\network\socket_base.hxx">
+      <Filter>ntl\stlx\.ext\tr2\network</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\ext\tr2\network\stream_socket.hxx">
+      <Filter>ntl\stlx\.ext\tr2\network</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\ext\tr2\network\datagram_socket_service.hxx">
+      <Filter>ntl\stlx\.ext\tr2\network\impl</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\ext\tr2\network\stream_socket_service.hxx">
+      <Filter>ntl\stlx\.ext\tr2\network\impl</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\ext\tr2\network\winsock\service_resolve.hxx">
+      <Filter>ntl\stlx\.ext\tr2\network\impl\winsock</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\ext\tr2\network\winsock\service_sockets.hxx">
+      <Filter>ntl\stlx\.ext\tr2\network\impl\winsock</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\ext\tr2\network\winsock\sockets.hxx">
+      <Filter>ntl\stlx\.ext\tr2\network\impl\winsock</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\ext\tr2\network\system_network.hxx">
+      <Filter>ntl\stlx\.ext\tr2\network\impl\winsock</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\ext\tr2\network\basic_endpoint.hxx">
+      <Filter>ntl\stlx\.ext\tr2\network\IP</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\ext\tr2\network\basic_resolver.hxx">
+      <Filter>ntl\stlx\.ext\tr2\network\IP</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\ext\tr2\network\ip_address.hxx">
+      <Filter>ntl\stlx\.ext\tr2\network\IP</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\ext\tr2\network\ip_protocol.hxx">
+      <Filter>ntl\stlx\.ext\tr2\network\IP</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\ext\tr2\network\resolver_base.hxx">
+      <Filter>ntl\stlx\.ext\tr2\network\IP</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\ext\tr2\network\resolver_service.hxx">
+      <Filter>ntl\stlx\.ext\tr2\network\IP</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\ext\tr2\network\buffer.hxx">
+      <Filter>ntl\stlx\.ext\tr2\I/O</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\ext\tr2\network\io_service.hxx">
+      <Filter>ntl\stlx\.ext\tr2\I/O</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\ext\tr2\network\io_service_fwd.hxx">
+      <Filter>ntl\stlx\.ext\tr2\I/O</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\ext\tr2\network\timer.hxx">
+      <Filter>ntl\stlx\.ext\tr2\I/O</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\ext\tr2\fs_directory.hxx">
+      <Filter>ntl\stlx\.ext\tr2\filesystem</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\ext\tr2\fs_directory_v3.hxx">
+      <Filter>ntl\stlx\.ext\tr2\filesystem</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\ext\tr2\fs_operations.hxx">
+      <Filter>ntl\stlx\.ext\tr2\filesystem</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\ext\tr2\fs_operations_v3.hxx">
+      <Filter>ntl\stlx\.ext\tr2\filesystem</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\ext\tr2\fs_traits.hxx">
+      <Filter>ntl\stlx\.ext\tr2\filesystem</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\ext\ttl\data_holder.hxx">
+      <Filter>ntl\stlx\.ext\ttl</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\ext\ttl\exception.hxx">
+      <Filter>ntl\stlx\.ext\ttl</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\ext\ttl\typelist.hxx">
+      <Filter>ntl\stlx\.ext\ttl</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\ext\pp\config.hxx">
+      <Filter>ntl\stlx\.ext\ttl\pp</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\ext\pp\macro_counter.hxx">
+      <Filter>ntl\stlx\.ext\ttl\pp</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\ext\pp\macro_misc.hxx">
+      <Filter>ntl\stlx\.ext\ttl\pp</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\ext\pp\macro_params.hxx">
+      <Filter>ntl\stlx\.ext\ttl\pp</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\ext\pp\macro_repeat.hxx">
+      <Filter>ntl\stlx\.ext\ttl\pp</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\ext\tr1\smart_ptr_tr1.hxx">
+      <Filter>ntl\stlx\.ext\tr1</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\array.hxx">
+      <Filter>ntl\stlx\containers</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\bitset.hxx">
+      <Filter>ntl\stlx\containers</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\deque.hxx">
+      <Filter>ntl\stlx\containers</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\forward_list.hxx">
+      <Filter>ntl\stlx\containers</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\list.hxx">
+      <Filter>ntl\stlx\containers</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\map.hxx">
+      <Filter>ntl\stlx\containers</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\priority_queue.hxx">
+      <Filter>ntl\stlx\containers</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\queue.hxx">
+      <Filter>ntl\stlx\containers</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\set.hxx">
+      <Filter>ntl\stlx\containers</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\stack.hxx">
+      <Filter>ntl\stlx\containers</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\stdstring.hxx">
+      <Filter>ntl\stlx\containers</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\unordered_map.hxx">
+      <Filter>ntl\stlx\containers</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\unordered_set.hxx">
+      <Filter>ntl\stlx\containers</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\vector.hxx">
+      <Filter>ntl\stlx\containers</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\cassert.hxx">
+      <Filter>ntl\stlx\c-compat</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\cctype.hxx">
+      <Filter>ntl\stlx\c-compat</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\cfenv.hxx">
+      <Filter>ntl\stlx\c-compat</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\cfloat.hxx">
+      <Filter>ntl\stlx\c-compat</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\cinttypes.hxx">
+      <Filter>ntl\stlx\c-compat</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\climits.hxx">
+      <Filter>ntl\stlx\c-compat</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\cmath.hxx">
+      <Filter>ntl\stlx\c-compat</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\cstdarg.hxx">
+      <Filter>ntl\stlx\c-compat</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\cstddef.hxx">
+      <Filter>ntl\stlx\c-compat</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\cstdint.hxx">
+      <Filter>ntl\stlx\c-compat</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\cstdio.hxx">
+      <Filter>ntl\stlx\c-compat</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\cstdlib.hxx">
+      <Filter>ntl\stlx\c-compat</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\cstring.hxx">
+      <Filter>ntl\stlx\c-compat</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\ctime.hxx">
+      <Filter>ntl\stlx\c-compat</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\cuchar.hxx">
+      <Filter>ntl\stlx\c-compat</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\cwchar.hxx">
+      <Filter>ntl\stlx\c-compat</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\cwctype.hxx">
+      <Filter>ntl\stlx\c-compat</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\atomic.hxx">
+      <Filter>ntl\stlx\runtime</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\chrono.hxx">
+      <Filter>ntl\stlx\runtime</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\codecvt.hxx">
+      <Filter>ntl\stlx\runtime</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\condition_variable.hxx">
+      <Filter>ntl\stlx\runtime</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\exception2.hxx">
+      <Filter>ntl\stlx\runtime</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\excptdef.hxx">
+      <Filter>ntl\stlx\runtime</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\future.hxx">
+      <Filter>ntl\stlx\runtime</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\locale.hxx">
+      <Filter>ntl\stlx\runtime</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\mutex.hxx">
+      <Filter>ntl\stlx\runtime</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\new.hxx">
+      <Filter>ntl\stlx\runtime</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\posix_error.hxx">
+      <Filter>ntl\stlx\runtime</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\stdexcept.hxx">
+      <Filter>ntl\stlx\runtime</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\stdexception.hxx">
+      <Filter>ntl\stlx\runtime</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\system_error.hxx">
+      <Filter>ntl\stlx\runtime</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\thread.hxx">
+      <Filter>ntl\stlx\runtime</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\fstream.hxx">
+      <Filter>ntl\stlx\io</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\iomanip.hxx">
+      <Filter>ntl\stlx\io</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\ios.hxx">
+      <Filter>ntl\stlx\io</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\iosfwd.hxx">
+      <Filter>ntl\stlx\io</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\iostream.hxx">
+      <Filter>ntl\stlx\io</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\istream.hxx">
+      <Filter>ntl\stlx\io</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\ostream.hxx">
+      <Filter>ntl\stlx\io</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\sstream.hxx">
+      <Filter>ntl\stlx\io</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\streambuf.hxx">
+      <Filter>ntl\stlx\io</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\strstream.hxx">
+      <Filter>ntl\stlx\io</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\initializer_list.hxx">
+      <Filter>ntl\stlx\utility</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\memory.hxx">
+      <Filter>ntl\stlx\utility</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\move.hxx">
+      <Filter>ntl\stlx\utility</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\regex.hxx">
+      <Filter>ntl\stlx\utility</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\smart_ptr.hxx">
+      <Filter>ntl\stlx\utility</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\stdexcept_fwd.hxx">
+      <Filter>ntl\stlx\utility</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\tuple.hxx">
+      <Filter>ntl\stlx\utility</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\type_traits.hxx">
+      <Filter>ntl\stlx\utility</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\type_traits_bcb.hxx">
+      <Filter>ntl\stlx\utility</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\type_traits_fwd.hxx">
+      <Filter>ntl\stlx\utility</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\type_traits_gnuc.hxx">
+      <Filter>ntl\stlx\utility</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\type_traits_msvc.hxx">
+      <Filter>ntl\stlx\utility</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\typeindex.hxx">
+      <Filter>ntl\stlx\utility</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\typeinfo.hxx">
+      <Filter>ntl\stlx\utility</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\utility.hxx">
+      <Filter>ntl\stlx\utility</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\bind.hxx">
+      <Filter>ntl\stlx\utility\functional</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\fn_caller.hxx">
+      <Filter>ntl\stlx\utility\functional</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\function.hxx">
+      <Filter>ntl\stlx\utility\functional</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\mem_fn.hxx">
+      <Filter>ntl\stlx\utility\functional</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\placeholders.hxx">
+      <Filter>ntl\stlx\utility\functional</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\reference_wrapper.hxx">
+      <Filter>ntl\stlx\utility\functional</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\result_of.hxx">
+      <Filter>ntl\stlx\utility\functional</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\algorithm.hxx">
+      <Filter>ntl\stlx\algo</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\functional.hxx">
+      <Filter>ntl\stlx\algo</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\iterator.hxx">
+      <Filter>ntl\stlx\algo</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\limits.hxx">
+      <Filter>ntl\stlx\algo</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\numeric.hxx">
+      <Filter>ntl\stlx\algo</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\random.hxx">
+      <Filter>ntl\stlx\algo</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\random_dist.hxx">
+      <Filter>ntl\stlx\algo</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\ratio.hxx">
+      <Filter>ntl\stlx\algo</Filter>
+    </ClInclude>
+    <ClInclude Include="km\apc.hxx">
+      <Filter>ntl\km</Filter>
+    </ClInclude>
+    <ClInclude Include="km\basedef.hxx">
+      <Filter>ntl\km</Filter>
+    </ClInclude>
+    <ClInclude Include="km\dbgstream.hxx">
+      <Filter>ntl\km</Filter>
+    </ClInclude>
+    <ClInclude Include="km\debug.hxx">
+      <Filter>ntl\km</Filter>
+    </ClInclude>
+    <ClInclude Include="km\device_object.hxx">
+      <Filter>ntl\km</Filter>
+    </ClInclude>
+    <ClInclude Include="km\dpc.hxx">
+      <Filter>ntl\km</Filter>
+    </ClInclude>
+    <ClInclude Include="km\driver_object.hxx">
+      <Filter>ntl\km</Filter>
+    </ClInclude>
+    <ClInclude Include="km\event.hxx">
+      <Filter>ntl\km</Filter>
+    </ClInclude>
+    <ClInclude Include="km\fast_io.hxx">
+      <Filter>ntl\km</Filter>
+    </ClInclude>
+    <ClInclude Include="km\file.hxx">
+      <Filter>ntl\km</Filter>
+    </ClInclude>
+    <ClInclude Include="km\file_information.hxx">
+      <Filter>ntl\km</Filter>
+    </ClInclude>
+    <ClInclude Include="km\file_object.hxx">
+      <Filter>ntl\km</Filter>
+    </ClInclude>
+    <ClInclude Include="km\fltmgr.hxx">
+      <Filter>ntl\km</Filter>
+    </ClInclude>
+    <ClInclude Include="km\handle.hxx">
+      <Filter>ntl\km</Filter>
+    </ClInclude>
+    <ClInclude Include="km\image.hxx">
+      <Filter>ntl\km</Filter>
+    </ClInclude>
+    <ClInclude Include="km\io.hxx">
+      <Filter>ntl\km</Filter>
+    </ClInclude>
+    <ClInclude Include="km\iocp.hxx">
+      <Filter>ntl\km</Filter>
+    </ClInclude>
+    <ClInclude Include="km\ioctl.hxx">
+      <Filter>ntl\km</Filter>
+    </ClInclude>
+    <ClInclude Include="km\irp.hxx">
+      <Filter>ntl\km</Filter>
+    </ClInclude>
+    <ClInclude Include="km\lookaside_list.hxx">
+      <Filter>ntl\km</Filter>
+    </ClInclude>
+    <ClInclude Include="km\memory.hxx">
+      <Filter>ntl\km</Filter>
+    </ClInclude>
+    <ClInclude Include="km\miniport.hxx">
+      <Filter>ntl\km</Filter>
+    </ClInclude>
+    <ClInclude Include="km\mm.hxx">
+      <Filter>ntl\km</Filter>
+    </ClInclude>
+    <ClInclude Include="km\mutex.hxx">
+      <Filter>ntl\km</Filter>
+    </ClInclude>
+    <ClInclude Include="km\new.hxx">
+      <Filter>ntl\km</Filter>
+    </ClInclude>
+    <ClInclude Include="km\object.hxx">
+      <Filter>ntl\km</Filter>
+    </ClInclude>
+    <ClInclude Include="km\pool.hxx">
+      <Filter>ntl\km</Filter>
+    </ClInclude>
+    <ClInclude Include="km\process.hxx">
+      <Filter>ntl\km</Filter>
+    </ClInclude>
+    <ClInclude Include="km\process_information.hxx">
+      <Filter>ntl\km</Filter>
+    </ClInclude>
+    <ClInclude Include="km\registry.hxx">
+      <Filter>ntl\km</Filter>
+    </ClInclude>
+    <ClInclude Include="km\string.hxx">
+      <Filter>ntl\km</Filter>
+    </ClInclude>
+    <ClInclude Include="km\system_error.hxx">
+      <Filter>ntl\km</Filter>
+    </ClInclude>
+    <ClInclude Include="km\system_information.hxx">
+      <Filter>ntl\km</Filter>
+    </ClInclude>
+    <ClInclude Include="km\thread.hxx">
+      <Filter>ntl\km</Filter>
+    </ClInclude>
+    <ClInclude Include="km\time.hxx">
+      <Filter>ntl\km</Filter>
+    </ClInclude>
+    <ClInclude Include="km\ndis.hxx">
+      <Filter>ntl\km\net</Filter>
+    </ClInclude>
+    <ClInclude Include="km\tdi.hxx">
+      <Filter>ntl\km\net</Filter>
+    </ClInclude>
+    <ClInclude Include="km\winsock.hxx">
+      <Filter>ntl\km\net</Filter>
+    </ClInclude>
+    <ClInclude Include="nt\apc.hxx">
+      <Filter>ntl\nt</Filter>
+    </ClInclude>
+    <ClInclude Include="nt\basedef.hxx">
+      <Filter>ntl\nt</Filter>
+    </ClInclude>
+    <ClInclude Include="nt\context.hxx">
+      <Filter>ntl\nt</Filter>
+    </ClInclude>
+    <ClInclude Include="nt\csr.hxx">
+      <Filter>ntl\nt</Filter>
+    </ClInclude>
+    <ClInclude Include="nt\dbgstream.hxx">
+      <Filter>ntl\nt</Filter>
+    </ClInclude>
+    <ClInclude Include="nt\debug.hxx">
+      <Filter>ntl\nt</Filter>
+    </ClInclude>
+    <ClInclude Include="nt\event.hxx">
+      <Filter>ntl\nt</Filter>
+    </ClInclude>
+    <ClInclude Include="nt\exception.hxx">
+      <Filter>ntl\nt</Filter>
+    </ClInclude>
+    <ClInclude Include="nt\file.hxx">
+      <Filter>ntl\nt</Filter>
+    </ClInclude>
+    <ClInclude Include="nt\file_information.hxx">
+      <Filter>ntl\nt</Filter>
+    </ClInclude>
+    <ClInclude Include="nt\handle.hxx">
+      <Filter>ntl\nt</Filter>
+    </ClInclude>
+    <ClInclude Include="nt\heap.hxx">
+      <Filter>ntl\nt</Filter>
+    </ClInclude>
+    <ClInclude Include="nt\iocp.hxx">
+      <Filter>ntl\nt</Filter>
+    </ClInclude>
+    <ClInclude Include="nt\ioctl.hxx">
+      <Filter>ntl\nt</Filter>
+    </ClInclude>
+    <ClInclude Include="nt\mutex.hxx">
+      <Filter>ntl\nt</Filter>
+    </ClInclude>
+    <ClInclude Include="nt\new.hxx">
+      <Filter>ntl\nt</Filter>
+    </ClInclude>
+    <ClInclude Include="nt\object.hxx">
+      <Filter>ntl\nt</Filter>
+    </ClInclude>
+    <ClInclude Include="nt\peb.hxx">
+      <Filter>ntl\nt</Filter>
+    </ClInclude>
+    <ClInclude Include="nt\process_information.hxx">
+      <Filter>ntl\nt</Filter>
+    </ClInclude>
+    <ClInclude Include="nt\registry.hxx">
+      <Filter>ntl\nt</Filter>
+    </ClInclude>
+    <ClInclude Include="nt\resource.hxx">
+      <Filter>ntl\nt</Filter>
+    </ClInclude>
+    <ClInclude Include="nt\security.hxx">
+      <Filter>ntl\nt</Filter>
+    </ClInclude>
+    <ClInclude Include="nt\service.hxx">
+      <Filter>ntl\nt</Filter>
+    </ClInclude>
+    <ClInclude Include="nt\shared_data.hxx">
+      <Filter>ntl\nt</Filter>
+    </ClInclude>
+    <ClInclude Include="nt\status.hxx">
+      <Filter>ntl\nt</Filter>
+    </ClInclude>
+    <ClInclude Include="nt\strerror.hxx">
+      <Filter>ntl\nt</Filter>
+    </ClInclude>
+    <ClInclude Include="nt\string.hxx">
+      <Filter>ntl\nt</Filter>
+    </ClInclude>
+    <ClInclude Include="nt\system_error.hxx">
+      <Filter>ntl\nt</Filter>
+    </ClInclude>
+    <ClInclude Include="nt\system_information.hxx">
+      <Filter>ntl\nt</Filter>
+    </ClInclude>
+    <ClInclude Include="nt\teb.hxx">
+      <Filter>ntl\nt</Filter>
+    </ClInclude>
+    <ClInclude Include="nt\thread.hxx">
+      <Filter>ntl\nt</Filter>
+    </ClInclude>
+    <ClInclude Include="nt\time.hxx">
+      <Filter>ntl\nt</Filter>
+    </ClInclude>
+    <ClInclude Include="nt\timer.hxx">
+      <Filter>ntl\nt</Filter>
+    </ClInclude>
+    <ClInclude Include="nt\virtualmem.hxx">
+      <Filter>ntl\nt</Filter>
+    </ClInclude>
+    <ClInclude Include="nt\win32_error.hxx">
+      <Filter>ntl\nt</Filter>
+    </ClInclude>
+    <ClInclude Include="pe\image.hxx">
+      <Filter>ntl\pe</Filter>
+    </ClInclude>
+    <ClInclude Include="win\application.hxx">
+      <Filter>ntl\win</Filter>
+    </ClInclude>
+    <ClInclude Include="win\console.hxx">
+      <Filter>ntl\win</Filter>
+    </ClInclude>
+    <ClInclude Include="win\handle.hxx">
+      <Filter>ntl\win</Filter>
+    </ClInclude>
+    <ClInclude Include="win\library.hxx">
+      <Filter>ntl\win</Filter>
+    </ClInclude>
+    <ClInclude Include="win\scm.hxx">
+      <Filter>ntl\win</Filter>
+    </ClInclude>
+    <ClInclude Include="win\windef.hxx">
+      <Filter>ntl\win</Filter>
+    </ClInclude>
+    <ClInclude Include="atomic.hxx">
+      <Filter>ntl\.root</Filter>
+    </ClInclude>
+    <ClInclude Include="baseconf.hxx">
+      <Filter>ntl\.root</Filter>
+    </ClInclude>
+    <ClInclude Include="baseconf_0x.hxx">
+      <Filter>ntl\.root</Filter>
+    </ClInclude>
+    <ClInclude Include="basedef.hxx">
+      <Filter>ntl\.root</Filter>
+    </ClInclude>
+    <ClInclude Include="consoleapp.hxx">
+      <Filter>ntl\.root</Filter>
+    </ClInclude>
+    <ClInclude Include="cpu.hxx">
+      <Filter>ntl\.root</Filter>
+    </ClInclude>
+    <ClInclude Include="device_traits.hxx">
+      <Filter>ntl\.root</Filter>
+    </ClInclude>
+    <ClInclude Include="dllapp.hxx">
+      <Filter>ntl\.root</Filter>
+    </ClInclude>
+    <ClInclude Include="file.hxx">
+      <Filter>ntl\.root</Filter>
+    </ClInclude>
+    <ClInclude Include="format.hxx">
+      <Filter>ntl\.root</Filter>
+    </ClInclude>
+    <ClInclude Include="handle.hxx">
+      <Filter>ntl\.root</Filter>
+    </ClInclude>
+    <ClInclude Include="linked_list.hxx">
+      <Filter>ntl\.root</Filter>
+    </ClInclude>
+    <ClInclude Include="linked_ptr.hxx">
+      <Filter>ntl\.root</Filter>
+    </ClInclude>
+    <ClInclude Include="nativeapp.hxx">
+      <Filter>ntl\.root</Filter>
+    </ClInclude>
+    <ClInclude Include="stdint.h">
+      <Filter>ntl\.root</Filter>
+    </ClInclude>
+    <ClInclude Include="stdlib.hxx">
+      <Filter>ntl\.root</Filter>
+    </ClInclude>
+    <ClInclude Include="winapp.hxx">
+      <Filter>ntl\.root</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="stlx\tt_isfunc.inl">
+      <Filter>ntl\stlx\utility\functional</Filter>
+    </None>
+    <None Include="stlx\tt_isfuncc.inl">
+      <Filter>ntl\stlx\utility\functional</Filter>
+    </None>
+    <None Include="stlx\tt_ismemptr.inl">
+      <Filter>ntl\stlx\utility\functional</Filter>
+    </None>
+    <None Include="copying.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="rtl\consoleapp.cpp">
+      <Filter>ntl\rtl</Filter>
+    </ClCompile>
+    <ClCompile Include="rtl\crt.cpp">
+      <Filter>ntl\rtl</Filter>
+    </ClCompile>
+    <ClCompile Include="rtl\eh.cpp">
+      <Filter>ntl\rtl</Filter>
+    </ClCompile>
+    <ClCompile Include="rtl\ehptr.cpp">
+      <Filter>ntl\rtl</Filter>
+    </ClCompile>
+    <ClCompile Include="rtl\iostream.cpp">
+      <Filter>ntl\rtl</Filter>
+    </ClCompile>
+    <ClCompile Include="rtl\math.cpp">
+      <Filter>ntl\rtl</Filter>
+    </ClCompile>
+    <ClCompile Include="rtl\msvcrt.cpp">
+      <Filter>ntl\rtl</Filter>
+    </ClCompile>
+    <ClCompile Include="rtl\rtti.cpp">
+      <Filter>ntl\rtl</Filter>
+    </ClCompile>
+    <ClCompile Include="rtl\wchar_mask_data.cpp">
+      <Filter>ntl\rtl</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <MASM Include="rtl\ehsup.asm">
+      <Filter>ntl\rtl</Filter>
+    </MASM>
+    <MASM Include="rtl\safeseh.asm">
+      <Filter>ntl\rtl</Filter>
+    </MASM>
+  </ItemGroup>
+</Project>

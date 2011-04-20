@@ -40,9 +40,10 @@ namespace std {
     explicit queue(Container&& c = Container())
       :c(move(c))
     {}
-    queue(queue&& q)
-      :c(move(q.c))
-    {}
+    // removed at n3291
+    //queue(queue&& q)
+    //  :c(move(q.c))
+    //{}
     #endif
 
     template <class Alloc>
@@ -68,7 +69,8 @@ namespace std {
 
     
     #ifdef NTL__CXX_RV
-    queue& operator=(queue&& q) { c = move(q.c); return *this; }
+    // removed at n3291
+    //queue& operator=(queue&& q) { c = move(q.c); return *this; }
     #else
     queue& operator=(queue& q) { c.swap(q.c); return *this; }
     #endif

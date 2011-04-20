@@ -1,6 +1,6 @@
 /**\file*********************************************************************
  *                                                                     \brief
- *  Class template bitset [20.3.7 template.bitset]
+ *  Class template bitset [20.5 template.bitset]
  *
  ****************************************************************************
  */
@@ -20,10 +20,9 @@ namespace std {
   /**\addtogroup  lib_utilities *** 20 General utilities library [utilities]
   *@{*/
 
-  /**\addtogroup  lib_utility ***** 20.3 Utility components [utility]
+  /**\addtogroup  lib_bitset *****  20.5 Class template bitset [template.bitset]
   *@{*/
 
-  /// Class template bitset [20.3.7 template.bitset]
   template<size_t N>
   class bitset
   {
@@ -73,7 +72,7 @@ namespace std {
       const size_t pos_;
     };
 
-    /// @name constructors [20.3.7.1]
+    /// @name constructors [20.5.1]
     constexpr bitset()
     {
       reset();
@@ -103,21 +102,21 @@ namespace std {
     {
       typedef basic_string<charT,traits,Allocator> string_type;
 
-      // 20.3.7.1/4
+      // 20.5.1/4
       if(pos > str.size())
         __ntl_throw(out_of_range("pos > str.size()"));
 
-      // 20.3.7.1/5
+      // 20.5.1/5
       const unsigned rlen = static_cast<unsigned>(min(n, str.size()-pos));
 
-      // 20.3.7.1/7
+      // 20.5.1/7
       if(rlen < elements_count_*element_size_)
         reset();
 
       const unsigned count = min(rlen, static_cast<unsigned>(N));
       for(unsigned i = 0, rpos = static_cast<unsigned>(pos) + count - 1; i < count; ++i, --rpos){
         const typename traits::char_type c = str[rpos];
-        // 20.3.7.1/5.2
+        // 20.5.1/5.2
         if(!(c == zero || c == one))
           __ntl_throw(invalid_argument("str"));
 
@@ -134,7 +133,7 @@ namespace std {
       }
     }
 
-    /// @name bitset operations [20.3.7.2]
+    /// @name bitset operations [20.5.2]
     bitset<N>& operator&=(const bitset<N>& rhs)
     {
       for(unsigned i = 0; i < elements_count_; ++i)
@@ -475,7 +474,7 @@ namespace std {
   };
 
 
-  // 20.3.7.3 bitset operators:
+  // 20.5.3 bitset operators:
   template <size_t N>
   bitset<N> operator&(const bitset<N>& lhs, const bitset<N>& rhs)
   {
@@ -518,8 +517,7 @@ namespace std {
     return os << x.template to_string<charT,traits,allocator<char> >(ct.widen('0'),ct.widen('1'));
   }
 
-  ///@}
-  /**@} lib_utility */
+  /**@} lib_bitset */
   /**@} lib_utilities */
 } // namespace std
 #endif // NTL__STLX_BITSET

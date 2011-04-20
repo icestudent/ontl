@@ -57,6 +57,11 @@ class stack
       :c(a)
     {}
 
+    template <class Alloc> 
+    stack(const stack& s, const Alloc& a)
+      :c(c,a)
+    {}
+
     template <class Alloc>
     stack(const Container& c, const Alloc& a)
       :c(c,a)

@@ -354,10 +354,7 @@ struct char_traits<wchar_t>
     /// - capacity() is at least as large as size().
     basic_string(const charT* s, const Allocator& a = Allocator())
       :alloc(a), length_(), capacity_(), buffer_()
-    {
-      if(!assert_ptr(s)) return;
-      append(s);
-    }
+    { if(!assert_ptr(s)) return; append(s); } // one line for simplifing tracing
 
     /// 12 Requires: n < npos
     /// 13 Effects: Constructs an object of class basic_string and determines

@@ -323,7 +323,7 @@ namespace std
       return CD(lhs) -= rhs;
     }
 
-    template <class Rep1, class Period, class Rep2>
+    template <class Rep1, class Rep2, class Period>
     inline duration<typename common_type<Rep1, Rep2>::type, Period>
       operator* (const duration<Rep1, Period>& d, const Rep2& s)
     {

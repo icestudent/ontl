@@ -172,7 +172,9 @@ class vector
     vector(vector&& x)
       :begin_(), end_(), capacity_()
     {
-      swap(forward<vector>(x));
+      std::swap(begin_, x.begin_);
+      std::swap(end_, x.end_);
+      std::swap(capacity_, x.capacity_);
     }
 
     vector(vector&& x, const Allocator& a)

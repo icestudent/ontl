@@ -9,6 +9,7 @@
 #pragma once
 
 #include "ios.hxx"
+#include "istream.hxx"
 
 namespace std {
 
@@ -55,6 +56,9 @@ namespace std {
     typedef typename add_rvalue_reference<basic_stringbuf>::type rvalue;
 
     static const size_t initial_output_size = 64;
+  private:
+    basic_stringbuf(const basic_stringbuf& rhs) __deleted;
+    basic_stringbuf&operator=(const basic_stringbuf& rhs) __deleted;
   public:
     ///\name Types
     typedef charT char_type;
@@ -348,6 +352,9 @@ namespace std {
     ///\}
   private:
     basic_stringbuf<charT,traits,Allocator> sb;
+
+    basic_istringstream(const basic_istringstream& rhs) __deleted;
+    basic_istringstream& operator=(const basic_istringstream& rhs) __deleted;
   };
 
 
@@ -406,6 +413,9 @@ namespace std {
     ///\}
   private:
     basic_stringbuf<charT,traits,Allocator> sb;
+
+    basic_ostringstream(const basic_ostringstream& rhs) __deleted;
+    basic_ostringstream& operator=(const basic_ostringstream& rhs) __deleted;
   };
 
 
@@ -461,6 +471,9 @@ namespace std {
     ///\}
   private:
      basic_stringbuf<charT, traits> sb;
+
+     basic_stringstream(const basic_stringstream& rhs) __deleted;
+     basic_stringstream& operator=(const basic_stringstream& rhs) __deleted;
   };
 
 

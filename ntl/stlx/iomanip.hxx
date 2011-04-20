@@ -158,8 +158,10 @@ basic_ostream<charT, traits>&
 }
 
 template<typename charT>
-__::setfill<charT>
-  setfill(charT c);
+__forceinline __::setfill<charT> setfill(charT c)
+{
+  return __::setfill<charT>(c);
+}
 
 namespace __ {
 struct setprecision
@@ -230,6 +232,54 @@ __::setw setw(int n)
   return __::setw(n);
 }
 
+/** Saves i/o stream state. */
+class saveiostate
+{
+  // eliminate `virtual` functions
+  struct irestore 
+  {
+    ios_base::fmtflags fmtfl;
+    streamsize wide, prec;
+    typedef void (irestore::* prestore_t)();
+    prestore_t prestore;
+    void restore()
+    {
+      (this->*prestore)();
+    }
+  };
+  template<class ios_t>
+  struct restore_t: irestore
+  {
+    restore_t(ios_t& ios)
+    {
+      fmtfl = ios.flags(), fillc = ios.fill(), 
+        wide = ios.width(), prec = ios.precision();
+      this->ios = &ios;
+      prestore = static_cast<prestore_t>(&restore_t::do_restore);
+    }
+    void do_restore()
+    {
+      ios->flags(fmtfl), ios->fill(fillc),
+        ios->width(wide), ios->precision(prec);
+    }
+    ios_t* ios;
+    typename ios_t::char_type fillc;
+  };
+  char buf[sizeof(irestore)+sizeof(void*)+sizeof(uint64_t)];
+  irestore* pi;
+public:
+  template<typename charT, class traits>
+  saveiostate(basic_ios<charT, traits>& ios)
+  {
+    typedef restore_t<basic_ios<charT, traits> > type;
+    pi = new (buf) type(ios);
+  }
+  ~saveiostate()
+  {
+    pi->restore();
+  }
+
+};
 
 }//namespace std
 

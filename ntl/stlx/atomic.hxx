@@ -579,6 +579,18 @@ namespace std
 #define ATOMIC_INTEGRAL_LOCK_FREE 2
   /** The macros indicate the general lock-free property of address %atomic type. */
 #define ATOMIC_ADDRESS_LOCK_FREE 2
+// TODO:
+//#define ATOMIC_BOOL_LOCK_FREE unspecified
+//#define ATOMIC_CHAR_LOCK_FREE unspecified
+//#define ATOMIC_CHAR16_T_LOCK_FREE unspecified
+//#define ATOMIC_CHAR32_T_LOCK_FREE unspecified
+//#define ATOMIC_WCHAR_T_LOCK_FREE unspecified
+//#define ATOMIC_SHORT_LOCK_FREE unspecified
+//#define ATOMIC_INT_LOCK_FREE unspecified
+//#define ATOMIC_LONG_LOCK_FREE unspecified
+//#define ATOMIC_LLONG_LOCK_FREE unspecified
+//#define ATOMIC_LLONG_LOCK_FREE unspecified
+//#define ATOMIC_POINTER_LOCK_FREE unspecified
 /** @} lib_atomic_4 */
 
   /**\defgroup lib_atomic_5 29.5 Atomic Types [atomics.types]

@@ -19,6 +19,7 @@
 
 NTL__EXTERNAPI size_t __cdecl
   sprintf(char *buffer, const char *format, ...);
+#pragma deprecated(sprintf)
 
 NTL__EXTERNAPI size_t __cdecl
   _snprintf(char *buffer, size_t count, const char *format, ...);
@@ -47,7 +48,17 @@ namespace std {
 
   typedef long long fpos_t;
 
-  using ::_snprintf; using ::_vsnprintf;
+  //using ::_snprintf; using ::_vsnprintf;
+  inline size_t NTL__CRTCALL snprintf(char *buffer, size_t count, const char *format, ...)
+  {
+    va_list va;
+    va_start(va, format);
+    return _vsnprintf(buffer, count, format, va);
+  }
+  inline size_t NTL__CRTCALL vsnprintf(char *buffer, size_t count, const char *format, va_list argptr)
+  {
+    return _vsnprintf(buffer, count, format, argptr);
+  }
 
 
 /**@} lib_general_utilities
@@ -55,5 +66,15 @@ namespace std {
 /**@} lib_language_support */
 
 }//namespace std
+
+/// external CRT
+namespace ntl { namespace msvcrt
+{
+  size_t NTL__CRTCALL snprintf(char *buffer, size_t count, const char *format, ...);
+  size_t NTL__CRTCALL vsnprintf(char *buffer, size_t count, const char *format, va_list argptr);
+
+  int NTL__CRTCALL sscanf(const char* string, const char* format, ...);
+  int NTL__CRTCALL vsscanf(const char* string, const char* format, va_list argptr);
+}}
 
 #endif //#ifndef NTL__STLX_CSTDIO

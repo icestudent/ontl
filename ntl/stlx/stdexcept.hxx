@@ -57,6 +57,10 @@ namespace std
 
 namespace std
 {
+/**\addtogroup lib_diagnostics 19 Diagnostics library [diagnostics]
+ *@{*/
+/**\addtogroup std_exceptions  19.2 Exception classes [std.exceptions]
+ *@{*/
 
 
 /// 19.2.1 Class logic_error [logic.error]
@@ -178,5 +182,7 @@ __::exstring::exstring(const std::__::exstring& r)
 #endif
 ///\}
 
+/**@} std_exceptions */
+/**@} lib_diagnostics */
 }//namespace std
 #endif//#ifndef NTL__STLX_STDEXCEPT

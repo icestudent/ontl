@@ -1,0 +1,1 @@
+#define __alignas_is_defined 1

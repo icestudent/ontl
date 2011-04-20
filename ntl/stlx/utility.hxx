@@ -1,6 +1,6 @@
 /**\file*********************************************************************
  *                                                                     \brief
- *  Utility components [20.2 lib.utility]
+ *  Utility components [20.3 lib.utility]
  *
  ****************************************************************************
  */
@@ -64,7 +64,7 @@ bool operator>=(const T & x, const T & y) { return !(x < y); }
 #pragma endregion
 
 #pragma region forward
-///\name 20.3.3 forward/move helpers [forward]
+///\name 20.2.3 forward/move helpers [forward]
 #ifdef NTL__CXX_RV
 #ifdef NTL__CXX_RVFIX
 
@@ -154,7 +154,8 @@ bool operator>=(const T & x, const T & y) { return !(x < y); }
   template<class T>
   inline void swap(T& a, T& b);
 
-///\name Pairs [20.3.4 pairs]
+/**\addtogroup  lib_pairs *****  20.3 Pairs [pairs]
+ *@{*/
 
 #pragma warning(push)
 #pragma warning(disable:4512) // assignment operator could not be generated if either T is const
@@ -355,7 +356,7 @@ extern __declspec(selectany) piecewise_construct_t piecewise_construct = {};
 ///\}
 
 
-
+/**@} lib_pairs */
 #pragma endregion
 
 ///\name 20.2.x.1 class noncopyable [utility.noncopyable] 
@@ -366,7 +367,6 @@ extern __declspec(selectany) piecewise_construct_t piecewise_construct = {};
 using ntl::noncopyable;
 
 ///\}
-
 /**@} lib_utility */
 /**@} lib_utilities */
 

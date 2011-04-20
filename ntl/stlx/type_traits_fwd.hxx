@@ -219,9 +219,8 @@ struct common_type;
 
 #endif
 
-// N2947:
 /// The member typedef type shall name the underlying type of the enum T.
-template <class T> struct enum_base;
+template <class T> struct underlying_type;
 
 /**@} lib_typetraits */
 /**@} lib_utilities */

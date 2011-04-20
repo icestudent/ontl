@@ -1,6 +1,6 @@
 /**\file*********************************************************************
  *                                                                     \brief
- *  N3000 20.8 Memory [memory]
+ *  N3000 20.6 Memory [memory]
  *
  ****************************************************************************
  */
@@ -35,10 +35,10 @@ namespace std
 
 /**\addtogroup  lib_utilities ********** 20 General utilities library [utilities]
  *@{*/
-/**\addtogroup  lib_memory ************* 20.8 Memory [memory]
+/**\addtogroup  lib_memory ************* 20.6 Memory [memory]
  *@{*/
 
-///\name 20.8.3 Allocator-related traits [allocator.traits]
+///\name 20.6.3 Allocator-related traits [allocator.traits]
 /**
  *	Automatically detects whether \c T has a nested \c allocator_type that is convertible from \c Alloc.
  **/
@@ -49,7 +49,7 @@ template<class T, class Alloc> struct uses_allocator
 
 
   /**
-   *	@brief 20.8.6 Pointer traits [pointer.traits]
+   *	@brief 20.6.3 Pointer traits [pointer.traits]
    *  @details The template class pointer_traits supplies a uniform interface to certain attributes of pointer-like types.
    **/
   template<class Ptr>
@@ -84,13 +84,13 @@ template<class T, class Alloc> struct uses_allocator
 
 
   /**
-   *	@brief 20.8.7 Allocator traits [allocator.traits]
+   *	@brief 20.6.7 Allocator traits [allocator.traits]
    *  @details The template class allocator_traits supplies a uniform interface to all allocator types.
    **/
   template <class Alloc>
   struct allocator_traits
   {
-    ///\name 20.8.7.1 Allocator traits member types [allocator.traits.types]
+    ///\name 20.6.7.1 Allocator traits member types [allocator.traits.types]
     typedef Alloc                           allocator_type;
     typedef typename Alloc::value_type      value_type;
     
@@ -113,7 +113,7 @@ template<class T, class Alloc> struct uses_allocator
     template <class T> struct rebind_alloc { typedef typename Alloc::template rebind<T>::other type; };
     template <class T> struct rebind_traits { typedef allocator_traits<rebind_alloc<T> > type; };
     
-    ///\name 20.8.7.2 Allocator traits static member functions [allocator.traits.members]
+    ///\name 20.6.7.2 Allocator traits static member functions [allocator.traits.members]
     static pointer allocate(Alloc& a, size_type n) { return a.allocate(n); }
     static pointer allocate(Alloc& a, size_type n, const_void_pointer hint) { return a.allocate(n, hint); }
 
@@ -149,7 +149,7 @@ template<class T, class Alloc> struct uses_allocator
     ///\}
   };
 
-/// 20.8.8 The default allocator [default.allocator]
+/// 20.6.8 The default allocator [default.allocator]
 template<class T> class allocator;
 
 /// specialize for void
@@ -183,7 +183,7 @@ class allocator
     template<class U> allocator(const allocator<U> &) __ntl_nothrow {}
     ~allocator() __ntl_nothrow {}
 
-    ///\name  20.8.8.1 allocator members [allocator.members]
+    ///\name  20.6.8.1 allocator members [allocator.members]
 
 #ifndef NTL_STLEXT
     pointer address(typename add_reference<typename remove_const<typename remove_reference<reference>::type>::type>::type x) const
@@ -270,7 +270,7 @@ class allocator
 };//class allocator
 
 
-///\name  20.8.8.2 allocator globals [allocator.globals]
+///\name  20.6.8.2 allocator globals [allocator.globals]
 
 template<class T, class U>
 inline bool operator==(const allocator<T>&, const allocator<U>&) __ntl_nothrow
@@ -286,7 +286,7 @@ inline bool operator!=(const allocator<T>&, const allocator<U>&) __ntl_nothrow
 
 ///\}
 
-///\ 20.8.6 Scoped allocator adaptor [allocator.adaptor]
+///\ 20.6.6 Scoped allocator adaptor [allocator.adaptor]
 template <class OuterA, class InnerA = void>
 class scoped_allocator_adaptor;
 
@@ -438,7 +438,7 @@ inline bool operator!=(const scoped_allocator_adaptor<OuterA1,InnerA>& a, const 
 
 
 
-/// 20.8.7 Raw storage iterator [storage.iterator]
+/// 20.6.7 Raw storage iterator [storage.iterator]
 template<class OutputIterator, class T>
 class raw_storage_iterator
 : public iterator<output_iterator_tag, void, void, void, void>
@@ -461,7 +461,7 @@ class raw_storage_iterator
 };
 
 
-///\name  20.8.8 Temporary buffers [temporary.buffer]
+///\name  20.6.8 Temporary buffers [temporary.buffer]
 template<class T1, class T2> struct pair;
 
 template <class T>
@@ -478,20 +478,20 @@ __forceinline
 void
   return_temporary_buffer(T* p)
 {
-  // 20.8.1.1/7  n shall equal the value passed as the first argument
+  // 20.6.1.1/7  n shall equal the value passed as the first argument
   //             to the invocation of allocate which returned p.
   // but allocator::deallocate() does not use n
   typename allocator<T>::size_type const n = 0;
   allocator<T>().deallocate(p, n);
 }
 
-///\name  20.8.10 Specialized algorithms [specialized.algorithms]
+///\name  20.6.10 Specialized algorithms [specialized.algorithms]
 
-/// 20.8.13.1 addressof [specialized.addressof ]
+/// 20.6.13.1 addressof [specialized.addressof ]
 template <class T>
 inline T* addressof(T& r) __ntl_nothrow { return &r; }
 
-/// 20.8.10.1 uninitialized_copy [uninitialized.copy]
+/// 20.6.10.1 uninitialized_copy [uninitialized.copy]
 template <class InputIterator, class ForwardIterator>
 __forceinline
 ForwardIterator uninitialized_copy(InputIterator first, InputIterator last, ForwardIterator result)
@@ -548,7 +548,7 @@ ForwardIterator uninitialized_move_n(InputIterator first, Size n,
   return result;
 }
 
-/// 20.8.10.2 uninitialized_fill [uninitialized.fill]
+/// 20.6.10.2 uninitialized_fill [uninitialized.fill]
 template <class ForwardIterator, class T>
 __forceinline
 void uninitialized_fill(ForwardIterator first, ForwardIterator last, const T& x)
@@ -563,7 +563,7 @@ void uninitialized_fill(ForwardIterator first, ForwardIterator last, const T& x)
   ///@todo separate function for scalar types ?
 }
 
-/// 20.8.10.3 uninitialized_fill_n [uninitialized.fill.n]
+/// 20.6.10.3 uninitialized_fill_n [uninitialized.fill.n]
 template <class ForwardIterator, class Size, class T>
 __forceinline
 void uninitialized_fill_n(ForwardIterator first, Size n, const T& x)

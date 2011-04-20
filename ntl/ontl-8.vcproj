@@ -1,12 +1,11 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="8,00"
 	Name=".ntl"
 	ProjectGUID="{081E6E33-CC33-4BBF-81E8-2865B1D8FD67}"
 	RootNamespace=".ntl"
 	Keyword="Win32Proj"
-	TargetFrameworkVersion="0"
 	>
 	<Platforms>
 		<Platform
@@ -366,11 +365,7 @@
 							>
 						</File>
 						<File
-							RelativePath=".\stlx\ext\tr2\fs_directory.hxx"
-							>
-						</File>
-						<File
-							RelativePath=".\stlx\ext\tr2\fs_operations.hxx"
+							RelativePath=".\stlx\ext\tr2\filesystem_v3.hxx"
 							>
 						</File>
 						<File
@@ -494,6 +489,30 @@
 							</File>
 							<File
 								RelativePath=".\stlx\ext\tr2\network\timer.hxx"
+								>
+							</File>
+						</Filter>
+						<Filter
+							Name="filesystem"
+							>
+							<File
+								RelativePath=".\stlx\ext\tr2\fs_directory.hxx"
+								>
+							</File>
+							<File
+								RelativePath=".\stlx\ext\tr2\fs_directory_v3.hxx"
+								>
+							</File>
+							<File
+								RelativePath=".\stlx\ext\tr2\fs_operations.hxx"
+								>
+							</File>
+							<File
+								RelativePath=".\stlx\ext\tr2\fs_operations_v3.hxx"
+								>
+							</File>
+							<File
+								RelativePath=".\stlx\ext\tr2\fs_traits.hxx"
 								>
 							</File>
 						</Filter>
@@ -811,10 +830,6 @@
 						>
 					</File>
 					<File
-						RelativePath=".\stlx\smart_ptr_rv.hxx"
-						>
-					</File>
-					<File
 						RelativePath=".\stlx\stdexcept_fwd.hxx"
 						>
 					</File>
@@ -862,15 +877,7 @@
 							>
 						</File>
 						<File
-							RelativePath=".\stlx\bind_rv.hxx"
-							>
-						</File>
-						<File
 							RelativePath=".\stlx\fn_caller.hxx"
-							>
-						</File>
-						<File
-							RelativePath=".\stlx\fn_caller_rv.hxx"
 							>
 						</File>
 						<File
@@ -879,10 +886,6 @@
 						</File>
 						<File
 							RelativePath=".\stlx\mem_fn.hxx"
-							>
-						</File>
-						<File
-							RelativePath=".\stlx\mem_fn_rv.hxx"
 							>
 						</File>
 						<File
@@ -936,6 +939,10 @@
 					</File>
 					<File
 						RelativePath=".\stlx\random.hxx"
+						>
+					</File>
+					<File
+						RelativePath=".\stlx\random_dist.hxx"
 						>
 					</File>
 					<File
@@ -1464,6 +1471,42 @@
 					</FileConfiguration>
 				</File>
 				<File
+					RelativePath=".\rtl\msvcrt.cpp"
+					>
+					<FileConfiguration
+						Name="debug|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
 					RelativePath=".\rtl\rtti.cpp"
 					>
 					<FileConfiguration
@@ -1516,34 +1559,6 @@
 						>
 						<Tool
 							Name="MASM"
-						/>
-					</FileConfiguration>
-				</File>
-				<File
-					RelativePath=".\rtl\syserr.cpp"
-					>
-					<FileConfiguration
-						Name="debug|x64"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="debug|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="release|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
 						/>
 					</FileConfiguration>
 				</File>

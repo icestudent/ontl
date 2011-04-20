@@ -60,7 +60,7 @@ inline error_condition make_error_condition(io_errc e)
 string __::iostream_error_category::message(int ev) const
 {
   char buf[40];
-  sprintf(buf, "iostream error code #%d%s", ev, ev == io_errc::stream ? ": 'stream'" : "");
+  snprintf(buf, _countof(buf), "iostream error code #%d%s", ev, ev == io_errc::stream ? ": 'stream'" : "");
   return string(buf);
 }
 ///\}
@@ -94,6 +94,7 @@ class ios_base
 
     /// 27.4.2.1.2 Type ios_base::fmtflags [ios::fmtflags]
     typedef uint16_t fmtflags;
+
     /// flushes output after each output operation
     static const fmtflags unitbuf     = 1 << 0;
 
@@ -125,11 +126,12 @@ class ios_base
     /// insert and extract bool type in alphabetic format
     static const fmtflags boolalpha   = 1 << 10;
     
-    /// generate floating-point output in fixed-point notation
+    /// generates floating-point output in fixed-point notation
     static const fmtflags fixed       = 1 << 11;
     /// generates floating-point output in scientific notation
     static const fmtflags scientific  = 1 << 12;
     static const fmtflags floatfield  = scientific | fixed;
+
     /// generates a decimal-point character unconditionally in generated floating-point output
     static const fmtflags showpoint   = 1 << 13;
     
@@ -258,10 +260,7 @@ class ios_base
     }
 
     ///\note empty locale is always used to avoid lots of stuff
-    locale getloc() const
-    {
-      return locale();
-    }
+    locale getloc() const { return locale(); }
 
     ///\name  27.4.2.4 ios_base static members [ios.members.static]
     /// not implemented as stdio is
@@ -543,6 +542,7 @@ class basic_ios : public ios_base
 
 ///\name  27.4.5.1 fmtflags manipulators [fmtflags.manip]
 
+/** Displays a boolean values as %string representation in %stream. */
 inline
 ios_base&
   boolalpha(ios_base& str)
@@ -551,6 +551,7 @@ ios_base&
   return str;
 }
 
+/** Displays a boolean values as bumber representation in %stream. */
 inline
 ios_base&
   noboolalpha(ios_base& str)
@@ -559,6 +560,7 @@ ios_base&
   return str;
 }
 
+/** Generates a prefix indicating the numeric base of generated integer output */
 inline
 ios_base&
   showbase(ios_base& str)
@@ -567,6 +569,7 @@ ios_base&
   return str;
 }
 
+/** Disables generating a prefix indicating the numeric base of generated integer output */
 inline
 ios_base&
   noshowbase(ios_base& str)
@@ -575,6 +578,7 @@ ios_base&
   return str;
 }
 
+/** Generates a decimal-point character unconditionally in generated floating-point output */
 inline
 ios_base&
   showpoint(ios_base& str)
@@ -583,6 +587,7 @@ ios_base&
   return str;
 }
 
+/** Disables generating a decimal-point character unconditionally in generated floating-point output */
 inline
 ios_base&
   noshowpoint(ios_base& str)
@@ -591,6 +596,7 @@ ios_base&
   return str;
 }
 
+/** Generates a + sign in non-negative generated numeric output */
 inline
 ios_base&
   showpos(ios_base& str)
@@ -599,6 +605,7 @@ ios_base&
   return str;
 }
 
+/** Disables generating a + sign in non-negative generated numeric output */
 inline
 ios_base&
   noshowpos(ios_base& str)
@@ -607,6 +614,7 @@ ios_base&
   return str;
 }
 
+/** Skips leading whitespace before certain input operations */
 inline
 ios_base&
   skipws(ios_base& str)
@@ -615,6 +623,7 @@ ios_base&
   return str;
 }
 
+/** Do not skips leading whitespace before certain input operations */
 inline
 ios_base&
   noskipws(ios_base& str)
@@ -623,6 +632,7 @@ ios_base&
   return str;
 }
 
+/** Replaces certain lowercase letters with their uppercase equivalents in generated output */
 inline
 ios_base&
   uppercase(ios_base& str)
@@ -631,6 +641,7 @@ ios_base&
   return str;
 }
 
+/** Do not replaces certain lowercase letters with their uppercase equivalents in generated output */
 inline
 ios_base&
   nouppercase(ios_base& str)
@@ -639,6 +650,7 @@ ios_base&
   return str;
 }
 
+/** Flushes output after each output operation */
 inline
 ios_base& unitbuf(ios_base& str)
 {
@@ -646,6 +658,7 @@ ios_base& unitbuf(ios_base& str)
   return str;
 }
 
+/** Do not flushes output after each output operation */
 inline
 ios_base&
   nounitbuf(ios_base& str)
@@ -656,6 +669,7 @@ ios_base&
 
 ///\name  27.4.5.2 adjustfield manipulators [adjustfield.manip]
 
+/** Calls str.setf(ios_base::internal, ios_base::adjustfield) */
 inline
 ios_base&
   internal(ios_base& str)
@@ -664,6 +678,7 @@ ios_base&
   return str;
 }
 
+/** Calls str.setf(ios_base::left, ios_base::adjustfield) */
 inline
 ios_base&
   left(ios_base& str)
@@ -672,6 +687,7 @@ ios_base&
   return str;
 }
 
+/** Calls str.setf(ios_base::right, ios_base::adjustfield) */
 inline
 ios_base&
   right(ios_base& str)
@@ -682,6 +698,7 @@ ios_base&
 
 ///\name  27.4.5.3 basefield manipulators [basefield.manip]
 
+/** Converts integer input or generates integer output in decimal base */
 inline
 ios_base&
   dec(ios_base& str)
@@ -690,6 +707,7 @@ ios_base&
   return str;
 }
 
+/** Converts integer input or generates integer output in hexadecimal base */
 inline
 ios_base&
   hex(ios_base& str)
@@ -698,6 +716,7 @@ ios_base&
   return str;
 }
 
+/** Converts integer input or generates integer output in octal base */
 inline
 ios_base&
   oct(ios_base& str)
@@ -707,7 +726,7 @@ ios_base&
 }
 
 ///\name  27.4.5.4 floatfield manipulators [floatfield.manip]
-
+/** Generates floating-point output in fixed-point notation */
 inline
 ios_base&
   fixed(ios_base& str)
@@ -716,6 +735,7 @@ ios_base&
   return str;
 }
 
+/** Generates floating-point output in scientific notation */
 inline
 ios_base&
   scientific(ios_base& str)

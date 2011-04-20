@@ -429,7 +429,7 @@ namespace std
             return ec = make_error_code(status::object_path_invalid);
 
           file_handler f;
-          st = f.open(const_unicode_string(file), (file::access_mask)file::delete_access|synchronize, file::share_read|file::share_write|file::share_delete,file::open_reparse_point|file::creation_options_default|file::open_for_backup_intent);
+          st = f.open(const_unicode_string(file), (file::access_mask)file::delete_access|synchronize, file::share_valid_flags,file::open_reparse_point|file::creation_options_default|file::open_for_backup_intent);
           if(success(st)){
             file_information<file_link_information> fi(f.get(), const_unicode_string(link), false);
             st = fi;

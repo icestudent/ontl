@@ -189,7 +189,9 @@ void NTL__CRTCALL _Exit(int code)
 //#ifndef NTL__SUBSYSTEM_KM
 extern "C" void __cdecl abort()
 {
+#pragma warning(disable:4127)
   assert(false);
+#pragma warning(default:4127)
   //raise(SIGABRT);
   //ntl::nt::user_thread::exit_process(ntl::nt::status::unsuccessful);
 }

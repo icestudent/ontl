@@ -1,6 +1,6 @@
 /**\file*********************************************************************
  *                                                                     \brief
- *  19.4 System error support [syserr] (N2960)
+ *  19.5 System error support [syserr]
  *
  ****************************************************************************
  */
@@ -33,9 +33,11 @@
 
 namespace std 
 {
+/**\addtogroup lib_diagnostics 19 Diagnostics library [diagnostics]
+ *@{*/
 
   /**
-   *	@defgroup syserr 19.4 System error support [syserr]
+   *	@addtogroup syserr 19.5 System error support [syserr]
    *  This subclause describes components that the standard library and C++ programs may use to report error
    *  conditions originating from the operating system or other low-level application program interfaces.
    *  @{
@@ -61,7 +63,7 @@ namespace std
 
 
   /**
-   *	@brief 19.4.1 Class error_category [syserr.errcat]
+   *	@brief 19.5.1 Class error_category [syserr.errcat]
    *
    *  The class error_category serves as a base class for types used to identify the source and encoding of a
    *  particular category of error code.
@@ -111,7 +113,7 @@ namespace std
   };
 
   /**
-   *	@brief 19.4.2 Class error_code [syserr.errcode]
+   *	@brief 19.5.2 Class error_code [syserr.errcode]
    *
    *  The class error_code describes an object used to hold error code values, such as those originating from the
    *  operating system or other low-level application program interfaces.
@@ -120,7 +122,7 @@ namespace std
   class error_code
   {
   public:
-    // 19.4.2.2 constructors:
+    // 19.5.2.2 constructors:
     error_code() __ntl_nothrow
       :v(0), c(&system_category())
     {}
@@ -134,7 +136,7 @@ namespace std
       *this = make_error_code(e);
     }
 
-    // 19.4.2.3 modifers:
+    // 19.5.2.3 modifers:
     void assign(int val, const error_category& cat) __ntl_nothrow
     {
       v = val, c = &cat;
@@ -151,7 +153,7 @@ namespace std
       v = 0, c = &system_category();
     }
 
-    // 19.4.2.4 observers:
+    // 19.5.2.4 observers:
     int value() const  __ntl_nothrow { return v; }
 
     const error_category& category() const  __ntl_nothrow { return *c; }
@@ -173,15 +175,15 @@ private:
 
 
   /**
-   *	@brief 19.4.3 Class error_condition [syserr.errcondition]
+   *	@brief 19.5.3 Class error_condition [syserr.errcondition]
    *
    *  The class error_condition describes an object used to hold values identifying error conditions.
-   *  @note error_condition values are portable abstractions, while error_code values (19.4.2) are implementation specific.
+   *  @note error_condition values are portable abstractions, while error_code values (19.5.2) are implementation specific.
    **/
   class error_condition
   {
   public:
-    // 19.4.3.2 constructors:
+    // 19.5.3.2 constructors:
     error_condition() __ntl_nothrow
       :v(0), c(&generic_category())
     {}
@@ -196,7 +198,7 @@ private:
       *this = make_error_condition(e);
     }
 
-    // 19.4.3.3 modifers:
+    // 19.5.3.3 modifers:
     void assign(int val, const error_category& cat) __ntl_nothrow
     {
       v = val, c = &cat;
@@ -213,7 +215,7 @@ private:
       v = 0, c = &generic_category();
     }
 
-    // 19.4.3.4 observers:
+    // 19.5.3.4 observers:
     int value() const __ntl_nothrow { return v; }
 
     const error_category& category() const __ntl_nothrow { return *c; }
@@ -227,7 +229,7 @@ private:
   };
 
   /**
-   *	@brief 19.4.5 Class system_error [syserr.syserr]
+   *	@brief 19.5.5 Class system_error [syserr.syserr]
    *
    *  The class system_error describes an exception object used to report error conditions that have an associated error code. 
    *  Such error conditions typically originate from the operating system or other low-level application program interfaces.
@@ -289,7 +291,7 @@ private:
 
 
   //////////////////////////////////////////////////////////////////////////
-  // 19.4.2.5 non-member functions:
+  // 19.5.2.5 non-member functions:
   inline error_condition error_category::default_error_condition(int ev) const __ntl_nothrow
   {
     return error_condition(ev, *this);
@@ -321,13 +323,13 @@ private:
     return os << ec.category().name() << ':' << ec.value();
   }
   
-  // 19.4.3.5 non-member functions:
+  // 19.5.3.5 non-member functions:
   inline bool operator<(const error_condition& lhs, const error_condition& rhs) __ntl_nothrow
   {
     return lhs.category() < rhs.category() || lhs.category() == rhs.category() && lhs.value() < rhs.value();
   }
 
-  // 19.4.4 Comparison operators [syserr.compare]
+  // 19.5.4 Comparison operators [syserr.compare]
   inline bool operator==(const error_code& lhs, const error_code& rhs) __ntl_nothrow
   {
     return &lhs == &rhs || (&lhs && &rhs && lhs.category() == rhs.category() && lhs.value() == rhs.value());
@@ -373,7 +375,7 @@ private:
   error_code& throws();
   namespace __ 
   {
-    /// 19.4.1.5 Error category objects [syserr.errcat.objects]
+    /// 19.5.1.5 Error category objects [syserr.errcat.objects]
     class generic_error_category:
       public error_category
     {
@@ -384,7 +386,7 @@ private:
       virtual string message(int ev) const
       {
         char buf[40];
-        sprintf(buf, "generic error code #%d", ev);
+        std::snprintf(buf, _countof(buf), "generic error code #%d", ev);
         return string(buf);
       }
 
@@ -402,7 +404,7 @@ private:
       }
     };
 
-    /// 19.4.1.5 Error category objects [syserr.errcat.objects]
+    /// 19.5.1.5 Error category objects [syserr.errcat.objects]
     class system_error_category:
       public error_category
     {
@@ -465,7 +467,7 @@ private:
     };
   }
   //////////////////////////////////////////////////////////////////////////
-  /// 19.4.1.5 Error category objects [syserr.errcat.objects]
+  /// 19.5.1.5 Error category objects [syserr.errcat.objects]
   /** Returns a reference to an object of a type derived from class error_category. */
   inline const error_category& generic_category()
   {
@@ -533,7 +535,8 @@ private:
      }
    };
 
-  /** @} syserr */
+  /**@} syserr */
+  /**@} lib_diagnostics */
 } // std
 
 #include "posix_error.hxx"

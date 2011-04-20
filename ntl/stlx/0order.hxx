@@ -18,14 +18,21 @@
 \defgroup lib_support_runtime     18.10 Other runtime support [support.runtime]
 @} */
 
+/**\defgroup lib_diagnostics 19 Diagnostics library [diagnostics]
+@{
+\defgroup std_exceptions          19.2 Exception classes [std.exceptions]
+\defgroup assertions              19.3 Assertions [assertions]
+\defgroup errno                   19.4 Error numbers [errno]
+\defgroup syserr                  19.5 System error support [syserr]
+@} */
 
 /**\defgroup  lib_utilities ********* 20 General utilities library [utilities]
  *  Components used by other elements of the Standard C + + library.
 @{
-\defgroup  lib_utility ************** 20.3 Utility components [utility]
-\defgroup  lib_ratio **************** 20.4 Compile-time rational arithmetic [ratio]
-\defgroup  lib_tuple **************** 20.5 Tuples [tuple]
-\defgroup  lib_typetraits *********** 20.6 Metaprogramming and type traits [meta]
+\defgroup  lib_utility ************** 20.2 Utility components [utility]
+\defgroup  lib_pairs **************** 20.3 Pairs [pairs]
+\defgroup  lib_tuple **************** 20.4 Tuples [tuple]
+\defgroup  lib_bitset **************  20.5 Class template bitset [template.bitset]
 \defgroup  lib_function_objects ***** 20.7 Function objects [function.objects]
 @{
 \defgroup  lib_func_def ************* 20.7.01 Definitions [func.def]
@@ -46,6 +53,8 @@
 \defgroup  lib_hash ******************** 20.7.16 Class template hash [unord.hash]
 \defgroup  lib_binders ***************** D.8 Binders [depr.lib.binders]
 @}
+\defgroup  lib_typetraits *********** 20.9 Metaprogramming and type traits [meta]
+\defgroup  lib_ratio **************** 20.10 Compile-time rational arithmetic [ratio]
 
 \defgroup  lib_memory *************** 20.8 Memory [memory]
 @{

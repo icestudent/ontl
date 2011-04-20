@@ -1,0 +1,451 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="debug|Win32">
+      <Configuration>debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="debug|x64">
+      <Configuration>debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="release|Win32">
+      <Configuration>release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="release|x64">
+      <Configuration>release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectName>.ntl</ProjectName>
+    <ProjectGuid>{081E6E33-CC33-4BBF-81E8-2865B1D8FD67}</ProjectGuid>
+    <RootNamespace>.ntl</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\masm.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='debug|x64'">$(Platform)\$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='debug|x64'">$(Platform)\$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='release|x64'">$(Platform)\$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='release|x64'">$(Platform)\$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='release|Win32'">$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='release|Win32'">$(Configuration)\</IntDir>
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='debug|x64'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='debug|x64'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='debug|x64'" />
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='release|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='release|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='release|Win32'" />
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='release|x64'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='release|x64'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='release|x64'" />
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'">
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_M_X64;_M_AMD64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'">
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release|Win32'">
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="crypto\sha.hxx" />
+    <ClInclude Include="stlx\0order.hxx" />
+    <ClInclude Include="stlx\ext\circular_buffer.hxx" />
+    <ClInclude Include="stlx\cpp0x_mode.hxx" />
+    <ClInclude Include="stlx\ext\fib.hxx" />
+    <ClInclude Include="stlx\ext\hashtable.hxx" />
+    <ClInclude Include="stlx\ext\numeric_conversions.hxx" />
+    <ClInclude Include="stlx\ext\rbtree.hxx" />
+    <ClInclude Include="stlx\ext\typelist.hxx" />
+    <ClInclude Include="spp\args.hxx" />
+    <ClInclude Include="spp\control.hxx" />
+    <ClInclude Include="spp\loop.hxx" />
+    <ClInclude Include="spp\math.hxx" />
+    <ClInclude Include="spp\utility.hxx" />
+    <ClInclude Include="stlx\ext\tr2\buffer.hxx" />
+    <ClInclude Include="stlx\ext\tr2\filesystem.hxx" />
+    <ClInclude Include="stlx\ext\tr2\filesystem_v3.hxx" />
+    <ClInclude Include="stlx\ext\tr2\io_service.hxx" />
+    <ClInclude Include="stlx\ext\tr2\network.hxx" />
+    <ClInclude Include="stlx\ext\tr2\timer.hxx" />
+    <ClInclude Include="stlx\ext\tr2\network\basic_io_object.hxx" />
+    <ClInclude Include="stlx\ext\tr2\network\basic_socket.hxx" />
+    <ClInclude Include="stlx\ext\tr2\network\datagram_socket.hxx" />
+    <ClInclude Include="stlx\ext\tr2\network\network_error.hxx" />
+    <ClInclude Include="stlx\ext\tr2\network\network_fwd.hxx" />
+    <ClInclude Include="stlx\ext\tr2\network\socket_base.hxx" />
+    <ClInclude Include="stlx\ext\tr2\network\stream_socket.hxx" />
+    <ClInclude Include="stlx\ext\tr2\network\datagram_socket_service.hxx" />
+    <ClInclude Include="stlx\ext\tr2\network\stream_socket_service.hxx" />
+    <ClInclude Include="stlx\ext\tr2\network\winsock\service_resolve.hxx" />
+    <ClInclude Include="stlx\ext\tr2\network\winsock\service_sockets.hxx" />
+    <ClInclude Include="stlx\ext\tr2\network\winsock\sockets.hxx" />
+    <ClInclude Include="stlx\ext\tr2\network\system_network.hxx" />
+    <ClInclude Include="stlx\ext\tr2\network\basic_endpoint.hxx" />
+    <ClInclude Include="stlx\ext\tr2\network\basic_resolver.hxx" />
+    <ClInclude Include="stlx\ext\tr2\network\ip_address.hxx" />
+    <ClInclude Include="stlx\ext\tr2\network\ip_protocol.hxx" />
+    <ClInclude Include="stlx\ext\tr2\network\resolver_base.hxx" />
+    <ClInclude Include="stlx\ext\tr2\network\resolver_service.hxx" />
+    <ClInclude Include="stlx\ext\tr2\network\buffer.hxx" />
+    <ClInclude Include="stlx\ext\tr2\network\io_service.hxx" />
+    <ClInclude Include="stlx\ext\tr2\network\io_service_fwd.hxx" />
+    <ClInclude Include="stlx\ext\tr2\network\timer.hxx" />
+    <ClInclude Include="stlx\ext\tr2\fs_directory.hxx" />
+    <ClInclude Include="stlx\ext\tr2\fs_directory_v3.hxx" />
+    <ClInclude Include="stlx\ext\tr2\fs_operations.hxx" />
+    <ClInclude Include="stlx\ext\tr2\fs_operations_v3.hxx" />
+    <ClInclude Include="stlx\ext\tr2\fs_traits.hxx" />
+    <ClInclude Include="stlx\ext\ttl\data_holder.hxx" />
+    <ClInclude Include="stlx\ext\ttl\exception.hxx" />
+    <ClInclude Include="stlx\ext\ttl\typelist.hxx" />
+    <ClInclude Include="stlx\ext\pp\config.hxx" />
+    <ClInclude Include="stlx\ext\pp\macro_counter.hxx" />
+    <ClInclude Include="stlx\ext\pp\macro_misc.hxx" />
+    <ClInclude Include="stlx\ext\pp\macro_params.hxx" />
+    <ClInclude Include="stlx\ext\pp\macro_repeat.hxx" />
+    <ClInclude Include="stlx\ext\tr1\smart_ptr_tr1.hxx" />
+    <ClInclude Include="stlx\array.hxx" />
+    <ClInclude Include="stlx\bitset.hxx" />
+    <ClInclude Include="stlx\deque.hxx" />
+    <ClInclude Include="stlx\forward_list.hxx" />
+    <ClInclude Include="stlx\list.hxx" />
+    <ClInclude Include="stlx\map.hxx" />
+    <ClInclude Include="stlx\priority_queue.hxx" />
+    <ClInclude Include="stlx\queue.hxx" />
+    <ClInclude Include="stlx\set.hxx" />
+    <ClInclude Include="stlx\stack.hxx" />
+    <ClInclude Include="stlx\stdstring.hxx" />
+    <ClInclude Include="stlx\unordered_map.hxx" />
+    <ClInclude Include="stlx\unordered_set.hxx" />
+    <ClInclude Include="stlx\vector.hxx" />
+    <ClInclude Include="stlx\cassert.hxx" />
+    <ClInclude Include="stlx\cctype.hxx" />
+    <ClInclude Include="stlx\cfenv.hxx" />
+    <ClInclude Include="stlx\cfloat.hxx" />
+    <ClInclude Include="stlx\cinttypes.hxx" />
+    <ClInclude Include="stlx\climits.hxx" />
+    <ClInclude Include="stlx\cmath.hxx" />
+    <ClInclude Include="stlx\cstdarg.hxx" />
+    <ClInclude Include="stlx\cstddef.hxx" />
+    <ClInclude Include="stlx\cstdint.hxx" />
+    <ClInclude Include="stlx\cstdio.hxx" />
+    <ClInclude Include="stlx\cstdlib.hxx" />
+    <ClInclude Include="stlx\cstring.hxx" />
+    <ClInclude Include="stlx\ctime.hxx" />
+    <ClInclude Include="stlx\cuchar.hxx" />
+    <ClInclude Include="stlx\cwchar.hxx" />
+    <ClInclude Include="stlx\cwctype.hxx" />
+    <ClInclude Include="stlx\atomic.hxx" />
+    <ClInclude Include="stlx\chrono.hxx" />
+    <ClInclude Include="stlx\codecvt.hxx" />
+    <ClInclude Include="stlx\condition_variable.hxx" />
+    <ClInclude Include="stlx\exception2.hxx" />
+    <ClInclude Include="stlx\excptdef.hxx" />
+    <ClInclude Include="stlx\future.hxx" />
+    <ClInclude Include="stlx\locale.hxx" />
+    <ClInclude Include="stlx\mutex.hxx" />
+    <ClInclude Include="stlx\new.hxx" />
+    <ClInclude Include="stlx\posix_error.hxx" />
+    <ClInclude Include="stlx\stdexcept.hxx" />
+    <ClInclude Include="stlx\stdexception.hxx" />
+    <ClInclude Include="stlx\system_error.hxx" />
+    <ClInclude Include="stlx\thread.hxx" />
+    <ClInclude Include="stlx\fstream.hxx" />
+    <ClInclude Include="stlx\iomanip.hxx" />
+    <ClInclude Include="stlx\ios.hxx" />
+    <ClInclude Include="stlx\iosfwd.hxx" />
+    <ClInclude Include="stlx\iostream.hxx" />
+    <ClInclude Include="stlx\istream.hxx" />
+    <ClInclude Include="stlx\ostream.hxx" />
+    <ClInclude Include="stlx\sstream.hxx" />
+    <ClInclude Include="stlx\streambuf.hxx" />
+    <ClInclude Include="stlx\strstream.hxx" />
+    <ClInclude Include="stlx\initializer_list.hxx" />
+    <ClInclude Include="stlx\memory.hxx" />
+    <ClInclude Include="stlx\move.hxx" />
+    <ClInclude Include="stlx\regex.hxx" />
+    <ClInclude Include="stlx\smart_ptr.hxx" />
+    <ClInclude Include="stlx\stdexcept_fwd.hxx" />
+    <ClInclude Include="stlx\tuple.hxx" />
+    <ClInclude Include="stlx\type_traits.hxx" />
+    <ClInclude Include="stlx\type_traits_bcb.hxx" />
+    <ClInclude Include="stlx\type_traits_fwd.hxx" />
+    <ClInclude Include="stlx\type_traits_gnuc.hxx" />
+    <ClInclude Include="stlx\type_traits_msvc.hxx" />
+    <ClInclude Include="stlx\typeindex.hxx" />
+    <ClInclude Include="stlx\typeinfo.hxx" />
+    <ClInclude Include="stlx\utility.hxx" />
+    <ClInclude Include="stlx\bind.hxx" />
+    <ClInclude Include="stlx\fn_caller.hxx" />
+    <ClInclude Include="stlx\function.hxx" />
+    <ClInclude Include="stlx\mem_fn.hxx" />
+    <ClInclude Include="stlx\placeholders.hxx" />
+    <ClInclude Include="stlx\reference_wrapper.hxx" />
+    <ClInclude Include="stlx\result_of.hxx" />
+    <ClInclude Include="stlx\algorithm.hxx" />
+    <ClInclude Include="stlx\functional.hxx" />
+    <ClInclude Include="stlx\iterator.hxx" />
+    <ClInclude Include="stlx\limits.hxx" />
+    <ClInclude Include="stlx\numeric.hxx" />
+    <ClInclude Include="stlx\random.hxx" />
+    <ClInclude Include="stlx\random_dist.hxx" />
+    <ClInclude Include="stlx\ratio.hxx" />
+    <ClInclude Include="km\apc.hxx" />
+    <ClInclude Include="km\basedef.hxx" />
+    <ClInclude Include="km\dbgstream.hxx" />
+    <ClInclude Include="km\debug.hxx" />
+    <ClInclude Include="km\device_object.hxx" />
+    <ClInclude Include="km\dpc.hxx" />
+    <ClInclude Include="km\driver_object.hxx" />
+    <ClInclude Include="km\event.hxx" />
+    <ClInclude Include="km\fast_io.hxx" />
+    <ClInclude Include="km\file.hxx" />
+    <ClInclude Include="km\file_information.hxx" />
+    <ClInclude Include="km\file_object.hxx" />
+    <ClInclude Include="km\fltmgr.hxx" />
+    <ClInclude Include="km\handle.hxx" />
+    <ClInclude Include="km\image.hxx" />
+    <ClInclude Include="km\io.hxx" />
+    <ClInclude Include="km\iocp.hxx" />
+    <ClInclude Include="km\ioctl.hxx" />
+    <ClInclude Include="km\irp.hxx" />
+    <ClInclude Include="km\lookaside_list.hxx" />
+    <ClInclude Include="km\memory.hxx" />
+    <ClInclude Include="km\miniport.hxx" />
+    <ClInclude Include="km\mm.hxx" />
+    <ClInclude Include="km\mutex.hxx" />
+    <ClInclude Include="km\new.hxx" />
+    <ClInclude Include="km\object.hxx" />
+    <ClInclude Include="km\pool.hxx" />
+    <ClInclude Include="km\process.hxx" />
+    <ClInclude Include="km\process_information.hxx" />
+    <ClInclude Include="km\registry.hxx" />
+    <ClInclude Include="km\string.hxx" />
+    <ClInclude Include="km\system_error.hxx" />
+    <ClInclude Include="km\system_information.hxx" />
+    <ClInclude Include="km\thread.hxx" />
+    <ClInclude Include="km\time.hxx" />
+    <ClInclude Include="km\ndis.hxx" />
+    <ClInclude Include="km\tdi.hxx" />
+    <ClInclude Include="km\winsock.hxx" />
+    <ClInclude Include="nt\apc.hxx" />
+    <ClInclude Include="nt\basedef.hxx" />
+    <ClInclude Include="nt\context.hxx" />
+    <ClInclude Include="nt\csr.hxx" />
+    <ClInclude Include="nt\dbgstream.hxx" />
+    <ClInclude Include="nt\debug.hxx" />
+    <ClInclude Include="nt\event.hxx" />
+    <ClInclude Include="nt\exception.hxx" />
+    <ClInclude Include="nt\file.hxx" />
+    <ClInclude Include="nt\file_information.hxx" />
+    <ClInclude Include="nt\handle.hxx" />
+    <ClInclude Include="nt\heap.hxx" />
+    <ClInclude Include="nt\iocp.hxx" />
+    <ClInclude Include="nt\ioctl.hxx" />
+    <ClInclude Include="nt\mutex.hxx" />
+    <ClInclude Include="nt\new.hxx" />
+    <ClInclude Include="nt\object.hxx" />
+    <ClInclude Include="nt\peb.hxx" />
+    <ClInclude Include="nt\process_information.hxx" />
+    <ClInclude Include="nt\registry.hxx" />
+    <ClInclude Include="nt\resource.hxx" />
+    <ClInclude Include="nt\security.hxx" />
+    <ClInclude Include="nt\service.hxx" />
+    <ClInclude Include="nt\shared_data.hxx" />
+    <ClInclude Include="nt\status.hxx" />
+    <ClInclude Include="nt\strerror.hxx" />
+    <ClInclude Include="nt\string.hxx" />
+    <ClInclude Include="nt\system_error.hxx" />
+    <ClInclude Include="nt\system_information.hxx" />
+    <ClInclude Include="nt\teb.hxx" />
+    <ClInclude Include="nt\thread.hxx" />
+    <ClInclude Include="nt\time.hxx" />
+    <ClInclude Include="nt\timer.hxx" />
+    <ClInclude Include="nt\virtualmem.hxx" />
+    <ClInclude Include="nt\win32_error.hxx" />
+    <ClInclude Include="pe\image.hxx" />
+    <ClInclude Include="win\application.hxx" />
+    <ClInclude Include="win\console.hxx" />
+    <ClInclude Include="win\handle.hxx" />
+    <ClInclude Include="win\library.hxx" />
+    <ClInclude Include="win\scm.hxx" />
+    <ClInclude Include="win\windef.hxx" />
+    <ClInclude Include="atomic.hxx" />
+    <ClInclude Include="baseconf.hxx" />
+    <ClInclude Include="baseconf_0x.hxx" />
+    <ClInclude Include="basedef.hxx" />
+    <ClInclude Include="consoleapp.hxx" />
+    <ClInclude Include="cpu.hxx" />
+    <ClInclude Include="device_traits.hxx" />
+    <ClInclude Include="dllapp.hxx" />
+    <ClInclude Include="file.hxx" />
+    <ClInclude Include="format.hxx" />
+    <ClInclude Include="handle.hxx" />
+    <ClInclude Include="linked_list.hxx" />
+    <ClInclude Include="linked_ptr.hxx" />
+    <ClInclude Include="nativeapp.hxx" />
+    <ClInclude Include="stdint.h" />
+    <ClInclude Include="stdlib.hxx" />
+    <ClInclude Include="winapp.hxx" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="stlx\tt_isfunc.inl" />
+    <None Include="stlx\tt_isfuncc.inl" />
+    <None Include="stlx\tt_ismemptr.inl" />
+    <None Include="copying.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="rtl\consoleapp.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="rtl\crt.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="rtl\eh.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="rtl\ehptr.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="rtl\iostream.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="rtl\math.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="rtl\msvcrt.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="rtl\rtti.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="rtl\wchar_mask_data.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <MASM Include="rtl\ehsup.asm">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release|Win32'">true</ExcludedFromBuild>
+    </MASM>
+    <MASM Include="rtl\safeseh.asm">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release|Win32'">true</ExcludedFromBuild>
+    </MASM>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\masm.targets" />
+  </ImportGroup>
+</Project>

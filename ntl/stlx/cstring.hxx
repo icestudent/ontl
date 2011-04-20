@@ -227,7 +227,7 @@ const void * NTL__CRTCALL memchr(const void * const mem, const int c, size_t n)
 __forceinline
 void * NTL__CRTCALL memchr(void * const mem, const int c, size_t n)
 {
-  return const_cast<void*>(memchr(mem, c, n));
+  return const_cast<void*>(memchr(const_cast<const void* const>(mem), c, n));
 }
 
 __forceinline

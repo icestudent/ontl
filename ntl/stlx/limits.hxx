@@ -791,6 +791,7 @@ template<> class numeric_limits<float>
     static const  bool  traps             = true;
     static const  bool  tinyness_before   = true;
     static const  float_round_style round_style = round_to_nearest;
+    ///\}
 }; //template class numeric_limits<float>
 
 template<> class numeric_limits<double>

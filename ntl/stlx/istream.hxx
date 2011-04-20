@@ -897,6 +897,9 @@ class basic_iostream:
       basic_istream::swap(rhs);
     }
     ///\}
+private:
+    basic_iostream(const basic_iostream& rhs) __deleted;
+    basic_iostream& operator=(const basic_iostream& rhs) __deleted;
 };
 
 /// 3 Effects: x.swap(y).

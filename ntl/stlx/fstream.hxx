@@ -56,6 +56,9 @@ namespace std {
     /** 16 KB default buffer size */
     static const streamsize default_file_buffer_size = 1024 * 16;
     typedef typename traits::state_type state_type;
+
+    basic_filebuf(const basic_filebuf& rhs) __deleted;
+    basic_filebuf& operator=(const basic_filebuf& rhs) __deleted;
   public:
     typedef charT                     char_type;
     typedef typename traits::int_type int_type;
@@ -558,7 +561,7 @@ namespace std {
         // try to read bom when text mode & file isn't truncated
         using namespace NTL__SUBSYSTEM_NS;
         file_handler fh;
-        if(success(fh.open(fname)) && success(fh.read(&bom,sizeof(bom))))
+        if(success(fh.open(fname, native_file::access_mask_default, native_file::share_valid_flags)) && success(fh.read(&bom,sizeof(bom))))
           bom_size = static_cast<uint32_t>(fh.get_io_status_block().Information);
         fh.close();
       }
@@ -566,18 +569,21 @@ namespace std {
       // open file
       native_file::creation_disposition cd;
       native_file::access_mask am;
+      native_file::share_mode sm;
 
       if(mode & ios_base::out){
         // write
         cd = mode & ios_base::trunc ? native_file::overwrite_if : native_file::create_if;
         am = native_file::generic_write;
+        sm = native_file::share_read | native_file::share_write; // don't allow delete file when writing
       }else{
         // read
         cd =  native_file::open_existing;
         am = native_file::generic_read;
+        sm = native_file::share_valid_flags;
       }
       using namespace NTL__SUBSYSTEM_NS;
-      bool ok = success(f.create(name.external_file_string(), cd, am));
+      bool ok = success(f.create(name.external_file_string(), cd, am, sm));
       if(!ok)
         return false;
 
@@ -712,8 +718,8 @@ namespace std {
     }
 
   private:
-    typedef ntl::nt::file_handler native_file;  // for intellisense
-    //typedef NTL__SUBSYSTEM_NS::file_handler native_file;
+    //typedef ntl::nt::file_handler native_file;  // for intellisense
+    typedef NTL__SUBSYSTEM_NS::file_handler native_file;
 
     native_file f;
     pair<char_type*, streamsize> buf;
