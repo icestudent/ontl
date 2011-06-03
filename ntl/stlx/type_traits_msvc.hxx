@@ -64,10 +64,17 @@ template <class T> struct add_lvalue_reference<T&> { typedef T& type; };
 template <class T> struct add_rvalue_reference     { typedef T&& type; };
 template <class T> struct add_rvalue_reference<T&> { typedef T&& type; };
 template <class T> struct add_rvalue_reference<T&&>{ typedef T&& type; };
+
+template <class T> struct _add_rvalue_reference     { typedef T&& type; };
+template <class T> struct _add_rvalue_reference<T&> { typedef T&& type; };
+template <class T> struct _add_rvalue_reference<T&&>{ typedef T&& type; };
 #else
-template <class T> struct add_rvalue_reference     { typedef _rvalue<T> type; };
-template <class T> struct add_rvalue_reference<T&> { typedef _rvalue<T> type; };
-template <class T> struct add_rvalue_reference<_rvalue<T> > { typedef _rvalue<T> type; };
+template <class T> struct _add_rvalue_reference     { typedef _rvalue<T> type; };
+template <class T> struct _add_rvalue_reference<T&> { typedef _rvalue<T> type; };
+template <class T> struct _add_rvalue_reference<_rvalue<T> > { typedef _rvalue<T> type; };
+
+template <class T> struct add_rvalue_reference     { typedef T type; };
+template <class T> struct add_rvalue_reference<T&> { typedef T type; };
 #endif
 
 template <class T> struct add_reference : public add_lvalue_reference<T> {};
@@ -638,13 +645,8 @@ namespace __
   template<typename T1, typename T2> struct select_type
   {
   private:
-  #ifdef NTL__CXX_RV
-    static T1&& __t();
-    static T2&& __u();
-  #else
-    static T1 __t();
-    static T2 __u();
-  #endif
+    static typename add_rvalue_reference<T1>::type __t();
+    static typename add_rvalue_reference<T2>::type __u();
 
     static char test(T1);
     static int  test(T2);
@@ -662,13 +664,8 @@ struct common_type<T, U, void, void>
   static_assert(sizeof(T) > 0, "U shall be complete");
 
 private:
-#ifdef NTL__CXX_RV
-  static T&& __t();
-  static U&& __u();
-#else
-  static T __t();
-  static U __u();
-#endif
+  static typename add_rvalue_reference<T>::type __t();
+  static typename add_rvalue_reference<U>::type __u();
 
 public:
 #ifdef NTL__CXX_TYPEOF

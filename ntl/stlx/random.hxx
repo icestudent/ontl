@@ -439,8 +439,8 @@ namespace std
         result_type x = state[i-1];
         x ^= x >> (word_size-2);
         x *= initialization_multiplier;
-        const result_type v1 = __::safe_mod<UIntType, state_size>::eval(i); // x += i
-        const result_type v2 = i;
+        const result_type v1 = __::safe_mod<UIntType, state_size>::eval( static_cast<UIntType>(i) ); // x += i
+        const result_type v2 = static_cast<UIntType>(i);
         assert(v1 == v2);
         x += v1;
         state[i] = modw::eval(x);

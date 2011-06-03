@@ -74,7 +74,7 @@ namespace std
     template<class URNG>
     result_type operator()(URNG& g)
     {
-      this->operator()(g, param_type(0, numeric_limits<IntType>::max()));
+      return this->operator()(g, param_type(0, numeric_limits<IntType>::max()));
     }
     template<class URNG>
     result_type operator()(URNG& g, const param_type& parm)
@@ -83,28 +83,28 @@ namespace std
       typedef typename make_unsigned<typename URNG::result_type>::type UR;
       typedef typename conditional<( sizeof(R) > sizeof(UR) ), R, UR>::type T;
 
-      const T min = g.min(), max = g.max(), uspace = max-min, space = max()-min();
+      const T umin = g.min(), umax = g.max(), uspace = umax-umin, space = max()-min();
       T re;
       if(uspace > space){
         // zoom out
         const T scale = uspace / (space+1),
           up = uspace * scale;
         do {
-          re = static_cast<T>(g()) - min;
+          re = static_cast<T>(g()) - umin;
         } while(re >= up);
         re /= scale;
       }else if(uspace < space){
         // zoom in
         T x, us = uspace+1;
         do{
-          x = us * this->operator()(g, param_type(0, space / us));
-          re = x + (static_cast<T>(g()) - min);
+          x = us * this->operator()(g, param_type(0, static_cast<IntType>(space / us)));
+          re = x + (static_cast<T>(g()) - umin);
         } while(re > space || re < x);
 
       }else{
-        re = static_cast<T>(g()) - min;
+        re = static_cast<T>(g()) - umin;
       }
-      return re + p.first;
+      return static_cast<IntType>(re + p.first);
     }
 
     ///\name property functions
@@ -245,7 +245,7 @@ namespace std
     template<class URNG>
     result_type operator()(URNG& g)
     {
-      return this->operator ()(g, param_type(0,1));
+      return this->operator ()(g, p);
     }
     template<class URNG>
     result_type operator()(URNG& g, const param_type& parm)
