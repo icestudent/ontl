@@ -2055,7 +2055,7 @@ private:
         continue;
 
       if(c == '-' || c == '+'){
-        if(sign_extracted)
+        if(sign_extracted || ic > 0)  // break on second sign or in the middle of number ("+123-456" == 123, -456)
           break;
         sign_extracted = true;
         minus = c == '-';
@@ -2073,7 +2073,7 @@ private:
       }
 
       if(base == 16 && (c == 'x' || c == 'X')){
-        if(prefix_extracted)
+        if(prefix_extracted || ic > 0)  // break on 'x' ("0x123x")
           break;
         continue;
       }
