@@ -179,6 +179,21 @@ namespace std { namespace tr2 { namespace network {
     static const ntl::network::constants::message_flags message_do_not_route = ntl::network::constants::message_do_not_route;
 #endif
 
+    /** Waitable socket checks for */
+    enum wait_type {
+      wait_none,
+
+      /** readability */
+      read    = 0x01,
+      /** writability */
+      write   = 0x02,
+      /** errors */
+      except  = 0x04,
+      /** errors */
+      error   = except,
+    };
+    __ntl_bitmask_type(wait_type, friend inline);
+
 
     /** The maximum length of the queue of pending incoming connections. */
     static const int max_connections = std::numeric_limits<int>::__max;

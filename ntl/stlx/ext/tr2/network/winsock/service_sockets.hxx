@@ -56,11 +56,11 @@ namespace ntl { namespace network {
     public:
       explicit buffer_sequence(const Buffers& buffers)
       {
-        for(typename buffers_t::const_iterator i = buffers.begin(), e = buffers.end(); i != e && buf_count < max_count; ++i, ++count)
+        for(typename buffers_t::const_iterator i = buffers.begin(), e = buffers.end(); i != e && buf_count < max_count; ++i, ++buf_count)
         {
           const buffer_t buf(*i);
-          init_buffer(this->buffs[count], buf);
-          buf_size += stdnet::buffer_size(buf);
+          init_buffer(this->buffs[buf_count], buf);
+          buf_size += sys::buffer_size(buf);
         }
         native_buffers = buffs;
       }
@@ -308,6 +308,50 @@ namespace ntl { namespace network {
         return re != 0;
       }
 
+      bool wait(const implementation_type& impl, socket_base::wait_type check, std::error_code& ec)
+      {
+        if(!check_open(impl, ec))
+          return ec;
+        fd_set r, w, e;
+        if(check & socket_base::read)
+          r.set(impl.s);
+        if(check & socket_base::write)
+          w.set(impl.s);
+        if(check & socket_base::error)
+          e.set(impl.s);
+
+        int re = impl.funcs.select(1, &r, &w, &e, nullptr);
+        check_error(ec, re);
+        if(re == 0)
+          ec = std::make_error_code(stdnet::network_error::timed_out);
+        return re == 1;
+      }
+
+      template <class Rep, class Period>
+      bool wait_for(const implementation_type& impl, socket_base::wait_type check, const std::chrono::duration<Rep, Period>& rel_time, std::error_code& ec)
+      {
+        if(!check_open(impl, ec))
+          return ec;
+        fd_set r, w, e;
+        if(check & socket_base::read)
+          r.set(impl.s);
+        if(check & socket_base::write)
+          w.set(impl.s);
+        if(check & socket_base::error)
+          e.set(impl.s);
+        
+        timeval time;
+        const std::chrono::seconds sec = std::chrono::duration_cast<std::chrono::seconds>(rel_time);
+        time.sec  = (long)sec.count();
+        time.usec = (long)std::chrono::duration_cast<std::chrono::seconds>(rel_time - sec).count();
+
+        int re = impl.funcs.select(1, &r, &w, &e, &time);
+        check_error(ec, re);
+        if(re == 0)
+          ec = std::make_error_code(stdnet::network_error::timed_out);
+        return re == 1;
+      }
+
     protected:
       // false if not open
       static bool check_open(const implementation_type& impl, std::error_code& ec)
@@ -316,7 +360,6 @@ namespace ntl { namespace network {
           ec = error::make_error_code(error::bad_file_descriptor);
         return impl.s != 0;
       }
-
 
     protected:
       std::error_code open(implementation_type& impl, int af, int type, int protocol, std::error_code& ec)

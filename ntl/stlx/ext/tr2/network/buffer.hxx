@@ -183,7 +183,7 @@ namespace std { namespace tr2 { namespace sys {
 
 
   /** 5.5.9. Class transfer_all */
-  class transfer_all :
+  class transfer_all:
     public binary_function<error_code, size_t, bool>
   {
   public:
@@ -194,7 +194,7 @@ namespace std { namespace tr2 { namespace sys {
   };
 
   /** 5.5.10. Class transfer_at_least */
-  class transfer_at_least :
+  class transfer_at_least:
     public binary_function<error_code, size_t, bool>
   {
   public:

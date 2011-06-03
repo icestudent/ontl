@@ -198,7 +198,7 @@ namespace std { namespace tr2 {
     template<class InternetProtocol>
     inline bool operator< (const basic_endpoint<InternetProtocol>& a, const basic_endpoint<InternetProtocol>& b)
     {
-      return a.address() < b.address() || ((!b.address() < a.address()) && a.port() < b.port());
+      return a.address() < b.address() || ((!(b.address() < a.address())) && a.port() < b.port());
     }
     template<class InternetProtocol>
     inline bool operator> (const basic_endpoint<InternetProtocol>& a, const basic_endpoint<InternetProtocol>& b) { return rel_ops::operator> (a, b); }

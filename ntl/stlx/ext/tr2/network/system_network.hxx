@@ -210,7 +210,7 @@ namespace ntl {
       message_do_not_route  = 0x04,
       message_wait_all      = 0x08,
     };
-    __ntl_bitmask_type(message_flags, );
+    __ntl_bitmask_type(message_flags, inline);
 
   } // constants
 
@@ -321,6 +321,13 @@ namespace ntl {
     sockaddr* addr;
     addrinfo* next;
   };
+
+  struct timeval
+  {
+    long sec;
+    long usec;
+  };
+
 #pragma warning(pop)
 
 }}

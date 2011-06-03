@@ -11,6 +11,8 @@
 #include "io_service.hxx"
 #include "socket_base.hxx"
 #include "basic_io_object.hxx"
+#include "../../../chrono.hxx"
+//#include "../../../unordered_map.hxx"
 
 namespace std { namespace tr2 { namespace network {
 
@@ -157,6 +159,24 @@ namespace std { namespace tr2 { namespace network {
       service.async_connect(impl, endpoint, handler);
     }
 
+    bool wait(socket_base::wait_type check, std::error_code& ec)
+    {
+      error_code e;
+      bool re = service.wait(impl, check, e);
+      throw_system_error(e, ec);
+      return re;
+    }
+
+    template <class Rep, class Period>
+    bool wait_for(socket_base::wait_type check, const std::chrono::duration<Rep, Period>& rel_time, std::error_code& ec)
+    {
+      error_code e;
+      bool re = service.wait_for(impl, check, rel_time, e);
+      throw_system_error(e, ec);
+      return re;
+    }
+
+
   protected:
     ///\name constructors:
     explicit basic_socket(tr2::sys::io_service& ios)
@@ -237,6 +257,58 @@ namespace std { namespace tr2 { namespace network {
     return connect<Protocol, SocketService, EndpointIterator>(sock, begin, end, predicate, ec);
   }
   ///\}
+
+#if 0
+  /** Waitable sockets check */
+  template<class Rep, class Period>
+  inline size_t wait_for(sys::io_service& ios, std::unordered_map<typename Socket::native_type, socket_base::wait_type>& sockets, 
+    const std::chrono::duration<Rep, Period>& rel_time, error_code& ec = throws())
+  {
+    typename Socket::service_type svc(ios);
+    typename Socket::implementation_type impl;
+    svc.construct(impl);
+
+    using namespace ntl::network::winsock;
+    typedef std::unordered_map<typename Socket::native_type, socket_base::wait_type> map;
+
+    // map socket set to fd_sets
+    fd_set r,w,e;
+    for(map::iterator i = sockets.begin(), end = sockets.end(); i != end; ++i){
+      if(i->second & socket_base::read)
+        r.set(i->first);
+      if(i->second & socket_base::write)
+        w.set(i->first);
+      if(i->second & socket_base::error)
+        e.set(i->first);
+      i->second = socket_base::wait_none;
+    }
+
+    // construct time
+    timeval time;
+    const std::chrono::seconds sec = std::chrono::duration_cast<std::chrono::seconds>(rel_time);
+    time.sec  = sec.count();
+    time.usec = std::chrono::duration_cast<std::chrono::seconds>(rel_time - sec).count();
+
+    std::error_code err;
+    int re = 123;
+    if(re == -1){
+      const sockerror::type errc = sockerror::get();
+      err = std::make_error_code(static_cast<std::tr2::network::error::error_type>(errc));
+    }else{
+      // map back a fd_sets to the socket set 
+      for(uint32_t i = 0; i < r.count; i++)
+        sockets[ r.array[i] ] |= socket_base::read;
+      for(uint32_t i = 0; i < w.count; i++)
+        sockets[ w.array[i] ] |= socket_base::write;
+      for(uint32_t i = 0; i < e.count; i++)
+        sockets[ e.array[i] ] |= socket_base::error;
+    }
+    svc.destroy(impl);
+
+    throw_system_error(err, ec);
+    return static_cast<size_t>(re);
+  }
+#endif
 
 }}}
 #endif // NTL__STLX_TR2_NETWORK_BASICSOCKET

@@ -18,6 +18,49 @@ namespace ntl { namespace network {
     typedef ntl::nt::legacy_handle legacy_handle;
     typedef uintptr_t socket;
 
+    struct fd_set
+    {
+      static const size_t size = 64;
+      uint32_t  count;
+      socket    array[size];
+
+      fd_set()
+        :count(0)
+      {}
+
+      void zero() { count = 0; }
+      void set(socket s)
+      {
+        uint32_t i;
+        for(i = 0; i < count; i++)
+          if(array[i] == s)
+            break;
+        if(i == count && i < size){
+          array[i] = s;
+          count++;
+        }
+      }
+      bool isset(socket s)
+      {
+        for(uint32_t i = 0; i < count; i++)
+          if(array[i] == s)
+            return true;
+        return false;
+      }
+      void clear(socket s)
+      {
+        for(uint32_t i = 0; i < count; i++){
+          if(array[i] == s){
+            while(i < (count-1))
+              array[i] = array[i+1];
+            count--;
+            break;
+          }
+        }
+      }
+    };
+
+
 #pragma warning(push, 4)
 #pragma warning(disable: 4201)
 
@@ -237,6 +280,7 @@ namespace ntl { namespace network {
     typedef int __stdcall  getnameinfo_t(const sockaddr* sa, int salen, char* host, uint32_t hostlen, char* serv, uint32_t servlen, int flags);
     typedef int __stdcall  getaddrinfo_t(const char* nodename, const char* servname, const addrinfo* hints, addrinfo** result);
     typedef void __stdcall freeaddrinfo_t(addrinfo* ai);
+
     typedef socket __stdcall socket_t(int af, int type, int protocol);
     typedef int __stdcall shutdown_t(socket s, int how);
     typedef int __stdcall closesocket_t(socket s);
@@ -250,6 +294,8 @@ namespace ntl { namespace network {
     typedef int __stdcall ioctlsocket_t(socket s, long cmd, unsigned long* argp);
     typedef int __stdcall getsockopt_t(socket s, int level, int optname, byte* optval, int* optlen);
     typedef int __stdcall setsockopt_t(socket s, int level, int optname, const byte* optval, int optlen);
+    typedef int __stdcall select_t(int nfds, fd_set* read, fd_set* write, fd_set* except, const timeval* timeout);
+
     typedef const char* __stdcall inet_ntoa_t(const in_addr in);
     typedef uint32_t __stdcall inet_addr_t(const char* addr);
     typedef int gethostname_t(char* name, int namelen);
@@ -302,6 +348,8 @@ namespace ntl { namespace network {
       recv_t* recv;
       sendto_t* sendto;
       recvfrom_t* recvfrom;
+
+      select_t* select;
       
       bool initialized;
     };
@@ -363,6 +411,7 @@ namespace ntl { namespace network {
           NTL_IMP(listen);
           NTL_IMP(getsockname);
           NTL_IMP(getpeername);
+          NTL_IMP(select);
           #undef NTL_IMP
 
           // check import

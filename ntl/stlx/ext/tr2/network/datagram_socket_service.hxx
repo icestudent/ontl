@@ -79,6 +79,9 @@ namespace std { namespace tr2 { namespace network {
     size_t send_to(implementation_type& impl, const ConstBufferSequence& buffers, const endpoint_type& destination, socket_base::message_flags flags, error_code& ec){ return svc.send_to(impl, buffers, destination, flags, ec); }
     template<class ConstBufferSequence, class WriteHandler>
     void async_send_to(implementation_type& impl, const ConstBufferSequence& buffers, const endpoint_type& destination, socket_base::message_flags flags, WriteHandler handler){ return svc.async_send_to(impl, buffers, destination, flags, handler); }
+    bool wait(const implementation_type& impl, socket_base::wait_type check, std::error_code& ec) { return svc.wait(impl, check, ec); }
+    template <class Rep, class Period>
+    bool wait_for(const implementation_type& impl, socket_base::wait_type check, const std::chrono::duration<Rep, Period>& rel_time, std::error_code& ec) { return svc.wait_for(impl, check, rel_time, ec); }
     ///\}
   private:
     void shutdown_service() { svc.shutdown_service(); }
