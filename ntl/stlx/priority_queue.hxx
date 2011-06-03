@@ -81,7 +81,8 @@ namespace std {
     void swap(priority_queue& x)
     {
       c.swap(x.c);
-      std::swap(comp, x.comp);
+      using std::swap;
+      swap(comp, x.comp);
     }
 
   protected:

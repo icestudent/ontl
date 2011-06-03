@@ -72,8 +72,9 @@ struct linked_ptr
 
     void swap(this_type & r)
     {
+      using std::swap;
       links.swap(&r.links);
-      std::swap(ptr, r.ptr);
+      swap(ptr, r.ptr);
     }
 
   private:

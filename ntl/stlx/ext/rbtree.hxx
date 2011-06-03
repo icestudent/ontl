@@ -413,7 +413,8 @@ namespace std
 
           if ( succ != erasable )
           {
-            std::swap(succ->elem, erasable->elem);
+            using std::swap;
+            swap(succ->elem, erasable->elem);
           }
           if ( succ->color() == node::black && x )
           {

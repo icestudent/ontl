@@ -70,8 +70,9 @@ struct array
     void swap(array<T, N> & y)
     {
       //swap_ranges(x.begin(), x.end(), y.begin() );
+      using std::swap;
       for ( size_t i = 0; i != size(); ++i )
-        std::swap(__elems[i], y.__elems[i]);
+        swap(__elems[i], y.__elems[i]);
     }
 
     ///\name  iterators

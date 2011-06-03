@@ -425,8 +425,9 @@ namespace std {
     
     void swap(forward_list& x)
     {
-      std::swap(node_allocator, x.node_allocator);
-      std::swap(head.next, x.head.next);
+      using std::swap;
+      swap(node_allocator, x.node_allocator);
+      swap(head.next, x.head.next);
     }
     
     void resize(size_type sz)

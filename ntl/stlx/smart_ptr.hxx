@@ -178,8 +178,9 @@ namespace std
 
     void swap(unique_ptr& u) __ntl_nothrow
     {
-      std::swap(ptr, u.ptr);
-      std::swap(deleter, u.deleter);
+      using std::swap;
+      swap(ptr, u.ptr);
+      swap(deleter, u.deleter);
     }
 
     ///\}
@@ -408,8 +409,9 @@ namespace std
 
     void swap(unique_ptr& u) const  __ntl_nothrow
     {
-      std::swap(ptr, u.ptr);
-      std::swap(deleter, u.deleter);
+      using std::swap;
+      swap(ptr, u.ptr);
+      swap(deleter, u.deleter);
     }
 
     ///\}
@@ -999,10 +1001,7 @@ namespace std
         return get_reference<T>(is_void<T>());
       }
 
-      T* operator->() const __ntl_nothrow
-      {
-        return ptr;
-      }
+      T* operator->() const __ntl_nothrow { return ptr; }
       
       long use_count() const __ntl_nothrow
       {
