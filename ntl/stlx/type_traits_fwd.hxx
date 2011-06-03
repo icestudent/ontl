@@ -51,6 +51,11 @@ template <class T> struct add_lvalue_reference;
 template <class T> struct add_rvalue_reference;
 template <class T> struct add_reference;
 
+#ifndef NTL__DOC
+  template <class T>
+  typename add_rvalue_reference<T>::type declval() __ntl_nothrow;
+#endif
+
 // 20.6.6.3 Sign modifications [meta.trans.sign]
 template <class T> struct make_signed;
 template <class T> struct make_unsigned;

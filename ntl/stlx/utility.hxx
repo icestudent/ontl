@@ -92,11 +92,11 @@ bool operator>=(const T & x, const T & y) { return !(x < y); }
   {
     return std::move(x);
   }
-
+#ifdef NTL__DOC   // declaration in <type_traits_fwd.hxx>
   /** 20.2.4 Function template declval */
   template <class T>
   typename add_rvalue_reference<T>::type declval() __ntl_nothrow;
-
+#endif
 
 #else
   template <class T>
@@ -143,6 +143,10 @@ bool operator>=(const T & x, const T & y) { return !(x < y); }
   {
     return std::move(x);
   }
+
+  // declaration in <type_traits_fwd.hxx>
+  //template <class T>
+  //T declval() __ntl_nothrow;
 
 #endif
 
@@ -239,8 +243,9 @@ struct pair
 #endif
     void swap(pair& p)
     {
-      std::swap(first, p.first);
-      std::swap(second, p.second);
+      using std::swap;
+      swap(first, p.first);
+      swap(second, p.second);
     }
 };
 #pragma warning(pop)
