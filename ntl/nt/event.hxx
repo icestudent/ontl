@@ -267,7 +267,7 @@ namespace ntl {
       /** Returns the current event object's state */
       bool is_ready() const volatile
       {
-        return success(last_status_ = wait_for(system_duration(0), false));
+        return (last_status_ = wait_for(system_duration(0), false)) == status::wait_0;
       }
 
       /** Returns event object's type */

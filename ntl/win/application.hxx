@@ -13,6 +13,7 @@
 #include "pe/image.hxx"
 #include "stlx/iterator.hxx"
 
+
 namespace ntl {
 namespace win {
 /**\addtogroup  winapi_types_support *** Win32 API support library **********
@@ -144,6 +145,32 @@ class application: noncopyable
 
       static inline char_type * get();
 
+    public:
+      /**
+       *	@brief command line option
+       *  @code Usage:
+       *  
+       **/
+      struct option
+      {
+        std::pair<const char_type*, size_t> name;
+
+        template<size_t N>
+        option(const char_type (&name)[N])
+          :name(name, N)
+        {}
+
+        bool operator()(const char_type* opt) const;
+        bool operator()(const std::basic_string<char_type>& opt) const { return opt.compare(0, name.second-1, name.first) == 0; }
+
+        const char_type* value(const char_type* opt) const { return opt + name.second; }
+        std::basic_string<char_type> value(const std::basic_string<char_type>& opt) const
+        {
+          return opt.substr(name.second);
+        }
+      };
+
+
       command_line()
       {
         parse();
@@ -203,6 +230,17 @@ wchar_t *
 application<wchar_t>::command_line::get()
 {
   return GetCommandLineW();
+}
+
+template<>
+bool application<char>::command_line::option::operator()(const char* opt) const
+{
+  return std::strncmp(opt, name.first, name.second-1) == 0;
+}
+template<>
+bool application<wchar_t>::command_line::option::operator()(const wchar_t* opt) const
+{
+  return std::wcsncmp(opt, name.first, name.second-1) == 0;
 }
 
 
