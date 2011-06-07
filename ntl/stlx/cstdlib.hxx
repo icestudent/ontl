@@ -128,28 +128,16 @@ inline void NTL__CRTCALL srand(unsigned int seed)
 ///\name  7.20.3 Memory management functions
 
 /// 7.20.3.1 The calloc function
-__noalias
-void* __restrict 
-NTL__CRTCALL
-  calloc(size_t nmemb, size_t size);
+__noalias void* __restrict  NTL__CRTCALL calloc(size_t nmemb, size_t size);
 
 /// 7.20.3.2 The free function
-__noalias
-void
-NTL__CRTCALL
-  free(void *ptr);
+__noalias void NTL__CRTCALL free(void *ptr);
 
 /// 7.20.3.3 The malloc function
-__noalias
-void* __restrict 
-NTL__CRTCALL
-  malloc(size_t size);
+__noalias void* __restrict  NTL__CRTCALL malloc(size_t size);
 
 /// 7.20.3.4 The realloc function
-__noalias
-void* __restrict
-NTL__CRTCALL
-  realloc(void *ptr, size_t size);
+__noalias void* __restrict NTL__CRTCALL realloc(void *ptr, size_t size);
 
 
 ///\name  7.20.4 Communication with the environment
@@ -186,16 +174,14 @@ NTL__CRTCALL
 ///\name  7.20.5 Searching and sorting utilities
 
 /// 7.20.5.1 The bsearch function
-void *
-NTL__CRTCALL
+NTL__EXTERNAPI void * NTL__CRTIMP
   bsearch(const void *key, const void *base, size_t nmemb, size_t size,
-              int (*compar)(const void *, const void *));
+              int (NTL__CRTIMP *compar)(const void *, const void *));
 
 /// 7.20.5.2 The qsort function
-void
-NTL__CRTCALL
+NTL__EXTERNAPI void NTL__CRTIMP
   qsort(void *base, size_t nmemb, size_t size,
-           int (*compar)(const void *, const void *));
+           int (NTL__CRTIMP *compar)(const void *, const void *));
 
 
 ///\name  7.20.6 Integer arithmetic functions

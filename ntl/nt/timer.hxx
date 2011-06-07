@@ -148,6 +148,7 @@ class timer:
 public:
   /** Manual-reset timer: a timer whose state remains signaled until a new due time was established. */
   static const timer_type NotificationTimer = NotificationTimer;
+
   /** Auto-reset timer: a timer whose state remains signaled until a thread completes a wait operation on the timer object. */
   static const timer_type SynchronizationTimer = SynchronizationTimer;
 
@@ -190,14 +191,14 @@ public:
 
   /** Activates the specified waitable timer. */
   template <class Clock, class Duration>
-  bool set(const std::chrono::time_point<Clock, Duration>& abs_time, timer_apc_routine* TimerApcRoutine, void* TimerContext)
+  bool set(const std::chrono::time_point<Clock, Duration>& abs_time, timer_apc_routine* TimerApcRoutine, void* TimerContext) volatile
   {
     assert(get());
     return success(last_status_ = NtSetTimer(get(), std::chrono::duration_cast<system_duration>(abs_time.time_since_epoch()).count(), TimerApcRoutine, TimerContext, true, 0, nullptr));
   }
 
   template <class Clock, class Duration, class PeriodRep, class PeriodType>
-  bool set(const std::chrono::time_point<Clock, Duration>& abs_time, timer_apc_routine* TimerApcRoutine, void* TimerContext, const std::chrono::duration<PeriodRep, PeriodType>& Period)
+  bool set(const std::chrono::time_point<Clock, Duration>& abs_time, timer_apc_routine* TimerApcRoutine, void* TimerContext, const std::chrono::duration<PeriodRep, PeriodType>& Period) volatile
   {
     assert(get());
     int32_t ms = std::chrono::duration_cast<std::chrono::milliseconds>(Period).count();
@@ -206,14 +207,14 @@ public:
 
   /** Activates the specified waitable timer. */
   template <class Rep, class Period>
-  bool set(const std::chrono::duration<Rep, Period>& rel_time, timer_apc_routine* TimerApcRoutine, void* TimerContext)
+  bool set(const std::chrono::duration<Rep, Period>& rel_time, timer_apc_routine* TimerApcRoutine, void* TimerContext) volatile
   {
     assert(get());
     return success(last_status_ = NtSetTimer(get(), -1i64*std::chrono::duration_cast<system_duration>(rel_time).count(), TimerApcRoutine, TimerContext, true, 0, nullptr));
   }
 
   template <class Rep, class Period, class PeriodRep, class PeriodType>
-  bool set(const std::chrono::duration<Rep, Period>& rel_time, const std::chrono::duration<PeriodRep, PeriodType>& Period, timer_apc_routine* TimerApcRoutine, void* TimerContext)
+  bool set(const std::chrono::duration<Rep, Period>& rel_time, const std::chrono::duration<PeriodRep, PeriodType>& Period, timer_apc_routine* TimerApcRoutine, void* TimerContext) volatile
   {
     assert(get());
     int64_t ms = std::chrono::duration_cast<std::chrono::milliseconds>(Period).count();
@@ -221,7 +222,7 @@ public:
   }
 
   /** Sets the specified waitable timer to the inactive state. */
-  bool cancel()
+  bool cancel() volatile
   {
     assert(get());
     bool re = false;
@@ -229,7 +230,7 @@ public:
   }
 
   /** Queries the state and remaining time of waitable timer. */
-  bool query(int64_t& remaining, bool& state) const
+  bool query(int64_t& remaining, bool& state) const volatile
   {
     assert(get());
     timer_basic_information tbi;

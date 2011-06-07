@@ -115,7 +115,7 @@ char *ctime(const time_t* timer);
  *  specified time cannot be converted to UTC
  *  @note This function is not required to avoid data races.
  **/
-tm *gmtime(const time_t* timer);
+tm *gmtime(const time_t* timer, tm result = tm());
 
 /**
  *	The localtime function converts the calendar time pointed to by \c timer into a
@@ -124,7 +124,7 @@ tm *gmtime(const time_t* timer);
  *  the specified time cannot be converted to local time.
  *  @note This function is not required to avoid data races.
  **/
-tm *localtime(const time_t* timer);
+tm *localtime(const time_t* timer, tm result = tm());
 
 /**
  *	The strftime function places characters into the array pointed to by s as controlled by the string pointed to by format.
@@ -201,7 +201,7 @@ tm* localtime_r(const time_t *__restrict timer, tm *__restrict result)
 }
 
 __forceinline
-tm* localtime(const time_t *__restrict timer, tm result = tm())
+tm* localtime(const time_t *__restrict timer, tm result)
 {
   return localtime_r(timer, &result);
 }
@@ -213,7 +213,7 @@ tm* gmtime_r(const time_t *__restrict timer, tm *__restrict result)
 }
 
 __forceinline
-tm* gmtime(const time_t *__restrict timer, tm result = tm())
+tm* gmtime(const time_t *__restrict timer, tm result)
 {
   return gmtime_r(timer, &result);
 }

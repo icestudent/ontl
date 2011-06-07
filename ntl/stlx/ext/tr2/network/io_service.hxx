@@ -174,7 +174,7 @@ namespace std { namespace tr2 { namespace sys {
     template<class Service> friend void add_service(io_service&, Service*);
     template<class Service> friend bool has_service(io_service&);
 
-    template<class Service> void do_add_service(io_service& ios, Service* svc)
+    template<class Service> void do_add_service(Service* svc)
     {
       type_index key(typeid(Service));
       services_t::const_iterator it = find_if(services.cbegin(), services.cend(), finder(key));
@@ -185,13 +185,13 @@ namespace std { namespace tr2 { namespace sys {
       service_node node = {key, svc, this, ++svcNo};
       services.push_front(node);
     }
-    template<class Service> bool do_has_service(io_service& ios) const
+    template<class Service> bool do_has_service() const
     {
       type_index key(typeid(Service));
       services_t::const_iterator it = find_if(services.cbegin(), services.cend(), finder(key));
       return it != services.cend();
     }
-    template<class Service> Service& do_use_service(io_service& ios)
+    template<class Service> Service& do_use_service()
     {
       type_index key(typeid(Service));
       services_t::const_iterator it = find_if(services.cbegin(), services.cend(), finder(key));
@@ -219,9 +219,9 @@ namespace std { namespace tr2 { namespace sys {
    *  Service is already present, the service_already_exists exception is thrown. If the owner of the service is not the same 
    *  object as the io_service parameter, the invalid_service_owner exception is thrown. 
    **/
-   template<class Service> inline void add_service(io_service& ios, Service* svc) { ios.do_add_service<Service>(ios, svc); }
-   template<class Service> inline bool has_service(io_service& ios) { return ios.do_has_service<Service>(ios); }
-   template<class Service> inline Service& use_service(io_service& ios) { return ios.do_use_service<Service>(ios); }
+   template<class Service> inline void add_service(io_service& ios, Service* svc) { ios.do_add_service<Service>(svc); }
+   template<class Service> inline bool has_service(io_service& ios) { return ios.do_has_service<Service>(); }
+   template<class Service> inline Service& use_service(io_service& ios) { return ios.do_use_service<Service>(); }
 
 
   /**

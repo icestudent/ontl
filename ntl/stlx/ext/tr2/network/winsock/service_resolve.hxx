@@ -25,7 +25,7 @@ namespace ntl { namespace network {
       {
         impl.funcs = *winsock_runtime::instance();
       }
-      void destroy(implementation_type& impl)
+      void destroy(implementation_type& /*impl*/)
       {}
     };
 

@@ -43,15 +43,6 @@ void __stdcall
     );
 
 
-#if defined(UNICODE) || defined(_UNICODE)
-typedef wchar_t tchar_t;
-#else
-typedef char    tchar_t;
-#endif
-
-typedef long boolean;
-
-
 typedef pe::image * hinstance;
 
 /**\addtogroup  application ****** Application support library **************
@@ -163,10 +154,14 @@ class application: noncopyable
         bool operator()(const char_type* opt) const;
         bool operator()(const std::basic_string<char_type>& opt) const { return opt.compare(0, name.second-1, name.first) == 0; }
 
-        const char_type* value(const char_type* opt) const { return opt + name.second; }
+        const char_type* value(const char_type* opt) const
+        {
+          static const char_type null = '\0';
+          return opt[name.second-1] == '=' ? opt + name.second : &null;
+        }
         std::basic_string<char_type> value(const std::basic_string<char_type>& opt) const
         {
-          return opt.substr(name.second);
+          return name.second < opt.length() && opt[name.second-1] == '=' ? opt.substr(name.second) : std::basic_string<char_type>();
         }
       };
 

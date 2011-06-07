@@ -126,6 +126,7 @@
 #endif
 
 ///\name SAL macroses
+#ifndef NTL__NO_SAL
 #ifndef __in
 # define __in
 #endif
@@ -156,6 +157,7 @@
 #ifndef __deref_out_opt
 # define __deref_out_opt
 #endif
+#endif // NTL__NO_SAL
 ///\}
 
 #if !(defined(_MSC_VER) && _MSC_VER >= 1400)

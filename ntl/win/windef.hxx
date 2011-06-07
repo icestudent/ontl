@@ -51,6 +51,14 @@ using nt::DllMainReason;
 
 // win32 bool
 typedef long bool_t;
+typedef long boolean;
+
+#if defined(UNICODE) || defined(_UNICODE)
+  typedef wchar_t tchar_t;
+#else
+  typedef char    tchar_t;
+#endif
+
 
 struct lasterror
 {

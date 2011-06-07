@@ -789,14 +789,29 @@ ForwardIterator partition_point(ForwardIterator first,
 ///\name 25.3, sorting and related operations:
 ///\name 25.3.1, sorting:
 template<class RandomAccessIterator>
-inline
-void
-  sort(RandomAccessIterator first, RandomAccessIterator last);
+inline void sort(RandomAccessIterator first, RandomAccessIterator last)
+{
+  typedef typename iterator_traits<RandomAccessIterator>::value_type value_type;
+  sort (first, last, less<value_type>());
+}
 
 template<class RandomAccessIterator, class Compare>
-inline
-void
-  sort(RandomAccessIterator first, RandomAccessIterator last, Compare comp);
+inline void sort(RandomAccessIterator first, RandomAccessIterator last, Compare /*comp*/)
+{
+  typedef typename iterator_traits<RandomAccessIterator>::value_type value_type;
+  typedef const value_type* const_pointer;
+
+  struct proxy
+  {
+    static int NTL__CRTIMP qsort(const void* a, const void* b)
+    {
+      const_pointer x = reinterpret_cast<const_pointer>(a), y = reinterpret_cast<const_pointer>(b);
+      Compare comp;
+      return comp(*x, *y) ? -1 : (comp(*y,*x) ? 1 : 0);
+    }
+  };
+  qsort(first, distance(first, last), sizeof(value_type), &proxy::qsort);
+}
 
 template<class RandomAccessIterator>
 inline

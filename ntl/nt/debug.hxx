@@ -39,15 +39,15 @@ namespace ntl {
     };
 
     NTL__EXTERNAPI
-      ntstatus
-      DbgPrint(
+    ntstatus
+    DbgPrint(
       const char  Format[],
       ...
       );
 
     NTL__EXTERNAPI
-      ntstatus
-      DbgPrintEx(
+    ntstatus
+    DbgPrintEx(
       dpfltr::type  ComponentId,
       dpfltr::level Level,
       const char    Format[],
@@ -83,7 +83,8 @@ namespace ntl {
 #ifndef NTL__DEBUG_2K
 #define NTL__DEBUG_2K
 #endif
-#endif
+
+#endif // NTL__USE_DBGPRINT
 
     //warning C4100: 'XXX' : unreferenced formal parameter
 #pragma warning(push)
