@@ -211,11 +211,6 @@ inline const T& get(const array<T, N>& a)
 }
 ///\}
 
-///\name 24.6.5 range access [iterator.range]
-template <class T, size_t N> inline T* begin(T (&v_array)[N]) { return v_array;     }
-template <class T, size_t N> inline T* end  (T (&v_array)[N]) { return v_array + N; }
-///\}
-
 /**@} lib_sequence */
 /**@} lib_containers */
 
