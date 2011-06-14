@@ -782,16 +782,19 @@ class ostreambuf_iterator
 // NOTE: available when any of the containers header are included.
 
 #ifdef NTL__CXX_AUTORET
-  template <class C> inline auto begin(C& c) -> decltype(c.begin());
-  template <class C> inline auto begin(const C& c) -> decltype(c.begin());
-  template <class C> inline auto end(C& c) -> decltype(c.end());
-  template <class C> inline auto end(const C& c) -> decltype(c.end());
+  template <class C> inline auto begin(C& c)      -> decltype(c.begin())  { return c.begin(); }
+  template <class C> inline auto begin(const C& c)-> decltype(c.begin())  { return c.begin(); }
+  template <class C> inline auto end(C& c)        -> decltype(c.end())    { return c.end();   }
+  template <class C> inline auto end(const C& c)  -> decltype(c.end())    { return c.end();   }
 #else
   template <class C> inline typename C::iterator        begin(C& c)       { return c.begin(); }
   template <class C> inline typename C::const_iterator  begin(const C& c) { return c.begin(); }
   template <class C> inline typename C::iterator        end(C& c)         { return c.end();   }
   template <class C> inline typename C::const_iterator  end(const C& c)   { return c.end();   }
 #endif
+
+  template <class T, size_t N> inline T* begin  (T (&array)[N])           { return array;     }
+  template <class T, size_t N> inline T* end    (T (&array)[N])           { return array+N;   }
 ///\}
 
 /**@} lib_iterators */
