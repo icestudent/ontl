@@ -7,14 +7,14 @@
  *
  ****************************************************************************
  */
-#ifndef NTL__SHA
-#define NTL__SHA
+#ifndef NTL__CRYPTO_SHA
+#define NTL__CRYPTO_SHA
 #pragma once
 
 #include <stdint.h>
 #include <stdlib.hxx>
 
-namespace ntl
+namespace ntl { namespace crypto
 {
 
 #ifdef _MSC_VER
@@ -225,6 +225,6 @@ class sha1
 #pragma warning(pop)
 #endif
 
-}//namespace ntl
+}}//namespace ntl.crypto
 
-#endif//#ifndef NTL__SHA
+#endif//#ifndef NTL__CRYPTO_SHA
