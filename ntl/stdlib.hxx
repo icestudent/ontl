@@ -199,6 +199,14 @@ void zero_mem(type & object)
     p[i] = 0; //-V108
 }
 
+template<typename type>
+static inline void bzero(type& object)
+{
+  char * const p = reinterpret_cast<char*>(&object);
+  for ( unsigned i = 0; i != sizeof(type); ++i )
+    p[i] = 0; //-V108
+}
+
 /// compares object's memory
 template<typename type>
 static inline
@@ -229,13 +237,13 @@ T align_down(T what, T2 alignment)
 template<typename T, typename U>
 inline T padd(T p, U offset)
 {
-  return (T)( uintptr_t(p) + uintptr_t(offset) );
+  return (T)( uintptr_t(p) + intptr_t(offset) );
 }
 
 template<typename R, typename T, typename U>
 inline R padd(T p, U offset)
 {
-  return (R)( uintptr_t(p) + uintptr_t(offset) );
+  return (R)( uintptr_t(p) + intptr_t(offset) );
 }
 
 ///@}
