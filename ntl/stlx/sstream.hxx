@@ -70,7 +70,7 @@ namespace std {
 
     ///\name 27.7.1.1 Constructors:
     explicit basic_stringbuf(ios_base::openmode which = ios_base::in | ios_base::out)
-      :mode_(which)
+      :mode_(which), himark()
     {}
 
     explicit basic_stringbuf(const basic_string<charT,traits,Allocator>& s, ios_base::openmode which = ios_base::in | ios_base::out)
@@ -94,9 +94,11 @@ namespace std {
     void swap(basic_stringbuf& rhs)
     {
       if(this != &rhs){
+        using std::swap;
         basic_streambuf::swap(rhs);
-        std::swap(str_, rhs.str_);
-        std::swap(mode_, rhs.mode_);
+        swap(str_, rhs.str_);
+        swap(mode_, rhs.mode_);
+        swap(himark, rhs.himark);
       }
     }
 
@@ -111,11 +113,13 @@ namespace std {
       then the resultant basic_string contains the character sequence in the range [pbase(),high_mark),
       where high_mark represents the position one past the highest initialized character in the buffer.
        */
+
       const char_type * const beg = mode_ & ios_base::out ? this->pbase()
         : mode_ & ios_base::in ? this->eback() : 0;
-      const char_type * const end = mode_ & ios_base::out ? this->pptr()
-        : mode_ & ios_base::in ? this->egptr() : 0;
-      return basic_string<charT,traits,Allocator>(beg, end);
+      //const char_type * const end = mode_ & ios_base::out ? this->pptr()
+      //  : mode_ & ios_base::in ? this->egptr() : 0;
+      const char_type * const endp = pptr(), * const endg = egptr();  // select highest initialized
+      return basic_string<charT,traits,Allocator>(beg, std::max(endp,endg));
     }
 
     void str(const basic_string<charT,traits,Allocator>& s)
@@ -194,11 +198,11 @@ namespace std {
           str_.resize(str_.capacity(), '\0'); // we are also buffer, so lets use all memory
 
         char_type* newbeg = str_.begin();
-        setp(newbeg, str_.end());
+        setp(newbeg, newbeg+str_.capacity());
         pbump(static_cast<int>(pp)); // NOTE: there is an issue in "C++ Standard Library Issues List" about this
 
         // 27.8.1.4/8
-        if(mode_ & ios_base::in)
+        //if(mode_ & ios_base::in)
           setg(newbeg, newbeg+gp, pptr());
         *pptr() = cc;
         pbump(1);
@@ -270,15 +274,24 @@ namespace std {
     /// set stream poiners according to mode. \see str.
     void set_ptrs()
     {
+      char_type* p = str_.begin();
       if ( mode_ & ios_base::out )
       {
         if(str_.empty())
-          str_.resize(initial_output_size); // characters by default
-        this->setp(str_.begin(), str_.end());
+          str_.reserve(initial_output_size); // characters by default
+        this->setp(p, p + str_.capacity());
+
+        if(!(mode_ & ios_base::in)){
+          p += str_.size();
+          this->setg(p, p, p);
+          return;
+        }
       }
-      if ( mode_ & ios_base::in )
-        this->setg(str_.begin(), str_.begin(), str_.end());
+      if ( mode_ & ios_base::in ) {
+        this->setg(p, p, str_.end());
+      }
     }
+
     void syncg()
     {
       char_type* const p = pptr();
@@ -291,6 +304,7 @@ namespace std {
     }
   private:
     basic_string<charT, traits> str_;
+    char_type* himark;
     ios_base::openmode mode_;
   };
 

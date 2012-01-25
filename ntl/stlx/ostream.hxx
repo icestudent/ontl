@@ -15,6 +15,9 @@
 #ifndef NTL__STLX_LOCALE
 #include "locale.hxx"
 #endif
+#ifndef NTL__STLX_STREAMBUF
+#include "streambuf.hxx"
+#endif
 
 namespace std
 {

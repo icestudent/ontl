@@ -10,6 +10,7 @@
 
 #include "chrono.hxx"
 #include "system_error.hxx"
+#include "../nt/system_error.hxx"
 
 #ifndef NTL__SUBSYSTEM_KM
   // UM implementation
@@ -205,6 +206,13 @@ namespace std
     friend basic_ostream<charT, traits>& operator<< (basic_ostream<charT, traits>& out, thread::id id)
     {
       return out << reinterpret_cast<uint32_t>(id.tid_);
+    }
+
+    operator ntl::nt::client_id() const
+    {
+      using namespace ntl::nt;
+      client_id cid = {teb::get(&teb::ClientId).UniqueProcess, tid_};
+      return cid;
     }
   protected:
     id(native_handle_type tid)

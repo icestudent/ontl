@@ -88,8 +88,8 @@ namespace std
     {
       assert("pure virtual function called");
     }
-#pragma warning(pop)
     static void (__cdecl *__pchandler__)() = &purecall_handler;
+#pragma warning(pop)
   }
 }
 #ifdef _M_X64

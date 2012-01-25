@@ -324,7 +324,8 @@ class reverse_iterator
                     const reverse_iterator<Iterator2>& y)
       { return x.current >= y.base(); }
 
-#ifdef NTL__CXX_AUTORET
+#if defined(NTL__CXX_AUTORET) && 0
+  // isn't used anymore
   template<typename Iterator2>
   friend auto operator-(const reverse_iterator<Iterator>& x, const reverse_iterator<Iterator2>& y) -> decltype(y.current-x.current)
   { return y.base() - x.current; }
@@ -543,7 +544,7 @@ public:
   friend bool operator<=(const move_iterator<Iterator>& x, const move_iterator<Iterator2>& y)
   { return x.current <= y.current; }
 
-#ifdef NTL__CXX_AUTORET
+#if defined(NTL__CXX_AUTORET) && 0
   template<typename Iterator2>
   friend auto operator-(const move_iterator<Iterator>& x, const move_iterator<Iterator2>& y) -> decltype(y.current-x.current)
   { return y.current - x.current; }

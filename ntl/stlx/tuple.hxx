@@ -1,6 +1,6 @@
 /**\file*********************************************************************
  *                                                                     \brief
- *  Tuples [20.5 tuple]
+ *  Tuples [20.4 tuple]
  *
  ****************************************************************************
  */
@@ -24,23 +24,23 @@ namespace std
  *@{
  */
 
-/**\addtogroup  lib_tuple ******* 20.5 Tuples [tuple]
+/**\addtogroup  lib_tuple ******* 20.4 Tuples [tuple]
  *
  *   Tuple library that provides a tuple type as the class template tuple that can be instantiated with any number of arguments.
  *@{
  */
 
-  /// 20.5.1 Class template tuple [tuple.tuple]
+  /// 20.4.1 Class template tuple [tuple.tuple]
   /// \note Maximum tuple arguments is 5.
   /// \internal Extensible places marked as TUPLE_EXT
   template<typename T1 = ttl::meta::empty_type, typename T2 = ttl::meta::empty_type, typename T3 = ttl::meta::empty_type, typename T4 = ttl::meta::empty_type, typename T5 = ttl::meta::empty_type>
   class tuple;
 
-  /// 20.5.1.4 Tuple helper classes [tuple.helper]
+  /// 20.4.1.4 Tuple helper classes [tuple.helper]
   template<typename T1 = ttl::meta::empty_type, typename T2 = ttl::meta::empty_type, typename T3 = ttl::meta::empty_type, typename T4 = ttl::meta::empty_type, typename T5 = ttl::meta::empty_type>
   struct tuple_size;
 
-  /// 20.5.1.4 Tuple helper classes [tuple.helper]
+  /// 20.4.1.4 Tuple helper classes [tuple.helper]
   template<size_t I, typename T1 = ttl::meta::empty_type, typename T2 = ttl::meta::empty_type, typename T3 = ttl::meta::empty_type, typename T4 = ttl::meta::empty_type, typename T5 = ttl::meta::empty_type>
   struct tuple_element;
 
@@ -655,7 +655,7 @@ namespace std
 #endif
   }; // class tuple
 
-  ///\name 20.5.1.3, tuple creation functions:
+  ///\name 20.4.1.3, tuple creation functions:
   template <class T> class reference_wrapper;
 
   namespace __
@@ -885,7 +885,7 @@ namespace std
   }
 
 
-  ///\name 20.5.1.4, tuple helper classes:
+  ///\name 20.4.1.4, tuple helper classes:
   // tuple size
   // TUPLE_EXT:
   template<typename T1, typename T2, typename T3, typename T4, typename T5>
@@ -902,7 +902,7 @@ namespace std
     typedef typename ttl::meta::get<typename tuple_t::types, I>::type type;
   };
 
-  ///\name 20.5.1.5, element access:
+  ///\name 20.4.1.5, element access:
   // get(tuple<>)
   namespace __
   {
@@ -974,7 +974,7 @@ namespace std
 
 
 #ifdef STLX_ENABLE_TUPLE_RELATIONS
-  ///\name 20.5.1.6, relational operators:
+  ///\name 20.4.1.6, relational operators:
   inline bool operator== (const tuple<>&, const tuple<>&) {  return true; }
   inline bool operator!= (const tuple<>&, const tuple<>&) {  return false; }
   inline bool operator<  (const tuple<>&, const tuple<>&) {  return false; }
@@ -1072,7 +1072,7 @@ namespace std
   }
   ///\}
 
-  ///\name 20.5.2.10 tuple range access [tuple.range]
+  ///\name 20.4.2.10 tuple range access [tuple.range]
   /** @note Is only two-types tuple can be here? */
   template <class InputIterator>
   inline InputIterator begin(const std::tuple<InputIterator, InputIterator>& t) { return get<0>(t); }

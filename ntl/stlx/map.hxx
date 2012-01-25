@@ -93,7 +93,7 @@ class map:
     ///\name  types
     typedef Key                                       key_type;
     typedef T                                         mapped_type;
-    typedef pair</*const*/ Key, T>                        value_type;
+    typedef pair</*const*/ Key, T>                    value_type;
     typedef Compare                                   key_compare;
 
     typedef Allocator                                 allocator_type;

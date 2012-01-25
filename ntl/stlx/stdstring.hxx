@@ -366,7 +366,8 @@ struct char_traits<wchar_t>
     /// - size() = n;
     /// - capacity() is at least as large as size().
     basic_string(size_type n, charT c, const Allocator& a = Allocator())
-      :alloc(a), length_(), capacity_(), buffer_()
+      :length_(), capacity_(), buffer_(), 
+      alloc(a)
     {
       assert_pos(n);
       if(n < npos)
@@ -406,7 +407,8 @@ struct char_traits<wchar_t>
 #ifdef NTL__CXX_RV
     __forceinline
       basic_string(basic_string&& str)
-      :alloc(str.alloc), length_(), capacity_(), buffer_()
+      :length_(), capacity_(), buffer_(),
+      alloc(str.alloc)
     {
       swap(str);
     }
@@ -421,6 +423,7 @@ struct char_traits<wchar_t>
         allocator_traits::deallocate(alloc, buffer_, capacity_);
         #ifdef NTL__DEBUG
         length_ = 0;
+        buffer_ = 0;
         #endif
       }
     }

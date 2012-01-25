@@ -22,9 +22,9 @@ namespace std
       exstring()
         :msg(), len()
       {}
-      explicit exstring(const char* s)
-        :msg(s), len()
-      {}
+      inline explicit exstring(const char* s);
+      //  :msg(s), len()
+      //{}
       inline explicit exstring(const std::string& s);
 
     #ifdef NTL__CXX_RV
@@ -168,6 +168,22 @@ __::exstring::exstring(const std::__::exstring& r)
     msg = new char[len+1];
     char* const dest = const_cast<char*>(msg);
     strncpy(dest, r.msg, len);
+    dest[len] = 0;
+  }else{
+    msg = 0, len = 0;
+  }
+}
+
+// it should be always copyable due to such cases:
+// runtime_error err ( string(...).c_str() ); throw err;
+// 
+__::exstring::exstring(const char* r)
+{
+  if(r){
+    len = strlen(r);
+    msg = new char[len+1];
+    char* const dest = const_cast<char*>(msg);
+    strncpy(dest, r, len);
     dest[len] = 0;
   }else{
     msg = 0, len = 0;

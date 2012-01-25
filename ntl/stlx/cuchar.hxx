@@ -25,13 +25,13 @@
 # endif
 #endif
 
-namespace std {
-
 #ifndef NTL__CXX_CHARS_TYPES
-  typedef uint_least16_t char16_t;
-  typedef uint_least32_t char32_t;
+typedef std::uint_least16_t char16_t;
+typedef std::uint_least32_t char32_t;
 #endif
 
+namespace std
+{
   inline size_t c16rtomb(char *__restrict s, char16_t wc, mbstate_t *__restrict)
   {
     return wcstombs(s, reinterpret_cast<const wchar_t*>(&wc), 1);

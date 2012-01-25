@@ -2045,6 +2045,8 @@ private:
     // NOTE: may be bad/fail bit on format error?
     static const ios_base::iostate bad_format = ios_base::failbit;
 
+    prefix_extracted = base != 8 && base != 16; // 8 & 16 have special prefix
+
     size_t ic = 0; // number of digits extracted
     do{
       char_type c = *in;
@@ -2073,10 +2075,13 @@ private:
       }
 
       if(base == 16 && (c == 'x' || c == 'X')){
-        if(prefix_extracted || ic > 0)  // break on 'x' ("0x123x")
+        if(prefix_extracted || ic > 1)  // break on 'x' ("0x123x")
           break;
+        ic--;
         continue;
       }
+
+
       prefix_extracted = true;
 
       // check is it a valid digit
@@ -2264,6 +2269,9 @@ class num_put : public locale::facet
 
       char buf[128], *valuebuf = buf; // may not enough if large width
       streamsize l = _snprintf(buf, _countof(buf), fmtbuf, long_v ? v : static_cast<unsigned long>(v));
+
+      if(basefield == ios_base::hex && showbase && v == 0)
+        pointer_v = true;
 
       // adjust
       const streamsize width = str.width();

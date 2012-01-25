@@ -58,7 +58,7 @@ namespace ntl
       }
 
       __noreturn
-        void rethrow()
+      void rethrow()
       {
         if(this == nullptr){
           __ntl_throw(std::bad_exception());
@@ -79,7 +79,6 @@ namespace ntl
             rec.ExceptionInformation[1] = copyThrownObject(cxx, *type, objplace);
             rec.raise();
           }
-
         }
       }
 

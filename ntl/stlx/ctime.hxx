@@ -186,7 +186,7 @@ tm *__gettime(const time_t *__restrict timer, tm *__restrict result)
   result->tm_hour = TimeFields.Hour;
   result->tm_mday = TimeFields.Day;
   result->tm_mon  = TimeFields.Month;
-  result->tm_year = TimeFields.Year;
+  result->tm_year = TimeFields.Year ? (TimeFields.Year - 1900) : 0;
   result->tm_wday = TimeFields.Weekday;
   result->tm_yday;
   result->tm_isdst;

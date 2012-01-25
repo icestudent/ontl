@@ -387,7 +387,7 @@ namespace std
   void lock(L1&, L2&, L3&...);
 #else
   template <class L1, class L2, class L3> 
-  int try_lock(L1& m1, L2& m2, L3& m3)
+  inline int try_lock(L1& m1, L2& m2, L3& m3)
   {
     if(!m1.try_lock()){
       return 0;
@@ -403,7 +403,7 @@ namespace std
   }
 
   template <class L1, class L2, class L3> 
-  void lock(L1& m1, L2& m2, L3& m3)
+  inline void lock(L1& m1, L2& m2, L3& m3)
   {
     if(!m1.lock()){
       return 0;
@@ -494,7 +494,7 @@ namespace std
 
   // 30.3.5.2 Function call_once [thread.once.callonce]
   template<class Callable>
-  void call_once(once_flag& flag, Callable func)
+  inline void call_once(once_flag& flag, Callable func)
   {
     static_assert(std::is_member_function_pointer<Callable>::value == false, "must not be a member function pointer");
     if(flag.ready())
@@ -508,7 +508,7 @@ namespace std
   }
 
   template<class Callable, class Arg1>
-  void call_once(once_flag& flag, Callable func, Arg1 a1)
+  inline void call_once(once_flag& flag, Callable func, Arg1 a1)
   {
     if(flag.ready())
       return;
@@ -521,7 +521,7 @@ namespace std
   }
 
   template<class Callable, class Arg1, class Arg2>
-  void call_once(once_flag& flag, Callable func, Arg1 a1, Arg2 a2)
+  inline void call_once(once_flag& flag, Callable func, Arg1 a1, Arg2 a2)
   {
     if(flag.ready())
       return;
@@ -534,7 +534,7 @@ namespace std
   }
 
   template<class Callable, class Arg1, class Arg2, class Arg3>
-  void call_once(once_flag& flag, Callable func, Arg1 a1, Arg2 a2, Arg1 a3)
+  inline void call_once(once_flag& flag, Callable func, Arg1 a1, Arg2 a2, Arg1 a3)
   {
     if(flag.ready())
       return;

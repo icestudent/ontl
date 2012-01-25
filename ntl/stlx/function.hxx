@@ -270,12 +270,12 @@ namespace std
 
         result_type operator()() const __ntl_throws(bad_function_call)
         { if(!caller) __ntl_throw(bad_function_call()); return (*caller)(Args()); }
-
         result_type operator()(typename __::arg_t<0, Args>::type a1) const __ntl_throws(bad_function_call)
         { if(!caller) __ntl_throw(bad_function_call()); return (*caller)(Args(a1)); }
-
         result_type operator()(typename __::arg_t<0, Args>::type a1, typename __::arg_t<1, Args>::type a2) const __ntl_throws(bad_function_call)
         { if(!caller) __ntl_throw(bad_function_call()); return (*caller)(Args(a1,a2)); }
+        result_type operator()(typename __::arg_t<0, Args>::type a1, typename __::arg_t<1, Args>::type a2, typename __::arg_t<2, Args>::type a3) const __ntl_throws(bad_function_call)
+        { if(!caller) __ntl_throw(bad_function_call()); return (*caller)(Args(a1,a2,a3)); }
 
 
         ///\name 20.7.15.2.3 function capacity
@@ -376,7 +376,7 @@ namespace std
 
     /** function<> specialization for 0 arguments. \sa v1::function */
     template<class R>
-    class function<R()>: 
+    class function< R()>: 
       public __::func::detail::function<R>
     {
       typedef __::func::detail::function<R> base;
@@ -387,16 +387,16 @@ namespace std
       {}
       explicit function() __ntl_nothrow {}
       function(nullptr_t) __ntl_nothrow {}
-      function(function& r)
-        :base(static_cast<base&>(r)){}
-      function& operator=(function& r) { base::operator=(static_cast<base&>(r)); return *this; }
+      function(const function& r)
+        :base(static_cast<const base&>(r)){}
+      function& operator=(const function& r) { base::operator=(static_cast<const base&>(r)); return *this; }
       function& operator=(nullptr_t) { clear(); return *this; }
       template<class F> function& operator=(F f) { base::operator=(forward<F>(f)); return *this; }
     };
 
     /** function<> specialization for 1 argument */
     template<class R, class A1>
-    class function<R(A1)>:
+    class function< R(A1)>:
       public __::func::detail::function<R, FUNARGS(A1)>
     {
       typedef __::func::detail::function<R, FUNARGS(A1)> base;
@@ -407,16 +407,16 @@ namespace std
       {}
       explicit function() __ntl_nothrow {}
       function(nullptr_t) __ntl_nothrow {}
-      function(function& r)
-        :base(static_cast<base&>(r)){}
-      function& operator=(function& r) { base::operator=(static_cast<base&>(r)); return *this; }
+      function(const function& r)
+        :base(static_cast<const base&>(r)){}
+      function& operator=(const function& r) { base::operator=(static_cast<const base&>(r)); return *this; }
       function& operator=(nullptr_t) { clear(); return *this; }
       template<class F> function& operator=(F f) { base::operator=(forward<F>(f)); return *this; }
     };
 
     /** function<> specialization for 2 arguments */
     template<class R, class A1, class A2>
-    class function<R(A1, A2)>: 
+    class function< R(A1, A2)>: 
       public __::func::detail::function<R, FUNARGS(A1,A2)>
     {
       typedef __::func::detail::function<R, FUNARGS(A1,A2)> base;
@@ -427,9 +427,29 @@ namespace std
       {}
       explicit function() __ntl_nothrow {}
       function(nullptr_t) __ntl_nothrow {}
-      function(function& r)
-        :base(static_cast<base&>(r)){}
-      function& operator=(function& r) { base::operator=(static_cast<base&>(r)); return *this; }
+      function(const function& r)
+        :base(static_cast<const base&>(r)){}
+      function& operator=(const function& r) { base::operator=(static_cast<const base&>(r)); return *this; }
+      function& operator=(nullptr_t) { clear(); return *this; }
+      template<class F> function& operator=(F f) { base::operator=(forward<F>(f)); return *this; }
+    };
+
+    /** function<> specialization for 3 arguments */
+    template<class R, class A1, class A2, class A3>
+    class function< R(A1, A2, A3)>: 
+      public __::func::detail::function<R, FUNARGS(A1,A2,A3)>
+    {
+      typedef __::func::detail::function<R, FUNARGS(A1,A2,A3)> base;
+    public:
+      template<typename F>
+      explicit function(F f)
+        :base(forward<F>(f))
+      {}
+      explicit function() __ntl_nothrow {}
+      function(nullptr_t) __ntl_nothrow {}
+      function(const function& r)
+        :base(static_cast<const base&>(r)){}
+      function& operator=(const function& r) { base::operator=(static_cast<const base&>(r)); return *this; }
       function& operator=(nullptr_t) { clear(); return *this; }
       template<class F> function& operator=(F f) { base::operator=(forward<F>(f)); return *this; }
     };

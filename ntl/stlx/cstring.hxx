@@ -203,10 +203,12 @@ strncmp(const char * s1, const char * s2, size_t n)
 {
   assert(s1 || n == 0);
   assert(s2 || n == 0);
-  for ( ; n; --n, ++s1, ++s2 )
-    if ( !*s1 || *s1 != *s2 )
+  for ( ; n; --n, ++s1, ++s2 ){
+    if ( !*s1 || *s1 != *s2 ){
       return  *reinterpret_cast<const unsigned char*>(s1)
       - *reinterpret_cast<const unsigned char*>(s2);
+    }
+  }
   return static_cast<int>(n); // n == 0
 }
 
@@ -234,17 +236,17 @@ __forceinline
 const char * NTL__CRTCALL strchr(const char * const s, int c)
 {
   assert(s);
-  while ( *s )
-    if ( static_cast<unsigned char>(c)
-      == *reinterpret_cast<const unsigned char*>(s) )
-      return s;
+  const char* p = s;
+  while ( *p )
+    if ( static_cast<unsigned char>(c) != *p ) ++p;
+    else return p;
   return 0;
 }
 
 __forceinline
 char * NTL__CRTCALL strchr(char * const s, int c)
 {
-  return const_cast<char*>(strchr(s,c));
+  return const_cast<char*>(strchr(const_cast<const char*>(s),c));
 }
 
 size_t NTL__CRTCALL strcspn(const char *s1, const char *s2);
@@ -294,6 +296,10 @@ strlen(const char * const s)
 }
 #endif
 
+__forceinline void NTL__CRTCALL bzero(void* s, size_t n)
+{
+  memset(s,0,n);
+}
 
 char* NTL__CRTCALL strdup(const char* s);
 
@@ -335,6 +341,26 @@ int NTL__CRTIMP
     const wchar_t * s2,
     size_t          n
     );
+
+  namespace std
+  {
+    inline int NTL__CRTCALL stricmp(const char* s1, const char* s2)
+    {
+      return _stricmp(s1,s2);
+    }
+    inline int NTL__CRTCALL wcsicmp(const wchar_t* s1, const wchar_t* s2)
+    {
+      return _wcsicmp(s1,s2);
+    }
+    inline int NTL__CRTCALL strnicmp(const char* s1, const char* s2, size_t n)
+    {
+      return _strnicmp(s1,s2,n);
+    }
+    inline int NTL__CRTCALL  wcsnicmp(const wchar_t* s1, const wchar_t* s2, size_t n)
+    {
+      return _wcsnicmp(s1,s2,n);
+    }
+  }
 
 #endif // #ifndef _INC_STDLIB
 

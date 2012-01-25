@@ -161,9 +161,31 @@ bool operator>=(const T & x, const T & y) { return !(x < y); }
 /**\addtogroup  lib_pairs *****  20.3 Pairs [pairs]
  *@{*/
 
+  ///\name 20.3.5 Piecewise construction [pair.piecewise]
+  struct piecewise_construct_t { };
+
+#ifdef NTL__CXX_CONSTEXPR
+  constexpr piecewise_construct_t piecewise_construct = piecewise_construct_t();
+#else
+  extern __declspec(selectany) piecewise_construct_t piecewise_construct = {};
+#endif
+  ///\}
+
+
+
+  // forward
+#ifdef NTL__CXX_VT_DONE
+  // will be enabled when new tuple implemented
+  template<typename...>
+  class tuple;
+#endif
+
+
+
 #pragma warning(push)
 #pragma warning(disable:4512) // assignment operator could not be generated if either T is const
 
+  ///\name 20.3.2 Class template pair [pairs.pair]
 template<class T1, class T2>
 struct pair
 {
@@ -203,8 +225,8 @@ struct pair
     {}
 #endif
 
-#ifdef NTL__CXX_VT
-    template<class Args1, class... Args2>
+#ifdef NTL__CXX_VT_DONE
+    template<class... Args1, class... Args2>
     pair(piecewise_construct_t, tuple<Args1...> a, tuple<Args2...> b);
 #endif
 
@@ -350,15 +372,6 @@ inline InputIterator begin(const std::pair<InputIterator, InputIterator>& p) { r
 template <class InputIterator>
 inline InputIterator end(const std::pair<InputIterator, InputIterator>& p)   { return p.second;}
 
-///\name 20.3.5.5 Piecewise construction [pair.piecewise]
-struct piecewise_construct_t { };
-
-#ifdef NTL__CXX_CONSTEXPR
-constexpr piecewise_construct_t piecewise_construct = piecewise_construct_t();
-#else
-extern __declspec(selectany) piecewise_construct_t piecewise_construct = {};
-#endif
-///\}
 
 
 /**@} lib_pairs */

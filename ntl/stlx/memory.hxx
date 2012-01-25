@@ -125,8 +125,38 @@ template<class T, class Alloc> struct uses_allocator
     template <class T>
     static void destroy(Alloc& a, T* p) { a.destroy(p); }
 
-    //template <class T, class... Args>
-    //static void construct(Alloc& a, T* p, Args&&... args);
+#ifdef NTL__CXX_VT
+
+  private:
+    template<class Tp, class... Args>
+    struct check_construct
+    {
+      template<typename Alloc2,
+        typename = decltype(std::declval<Alloc2*>()->construct(
+        std::declval<Tp*>(), std::declval<Args>()...))>
+        static true_type __test(int);
+
+      template<typename>
+      static false_type __test(...);
+
+      typedef decltype(__test<Alloc>(0)) type;
+      static const bool value = type::value;
+    };
+  public:
+
+    template <class T, class... Args>
+    static typename enable_if<check_construct<T, Args...>::value, void>::type construct(Alloc& a, T* p, Args&&... args)
+    {
+      a.construct(p, std::forward<Args>(args)...);
+    }
+    template <class T, class... Args>
+    static typename enable_if<!check_construct<T, Args...>::value, void>::type construct(Alloc& a, T* p, Args&&... args)
+    {
+      ::new((void*)p) T(std::forward<Args>(args)...);
+    }
+
+#else
+
 #ifdef NTL__CXX_RV
     #define NTL_X(n,p) NTL_SPP_COMMA forward<NTL_SPP_CAT(A,n)>(NTL_SPP_CAT(p,n))
     #define NTL_DEFINE_CONSTRUCT(n,aux) \
@@ -146,6 +176,9 @@ template<class T, class Alloc> struct uses_allocator
     NTL_DEFINE_CONSTRUCT(5,)
 #undef NTL_X
 #undef NTL_DEFINE_CONSTRUCT
+
+#endif // VT
+
     ///\}
   };
 
@@ -692,5 +725,10 @@ namespace __ {
 /**@} lib_utilities */
 
 }//namespace std
+
+namespace ntl
+{
+  using std::__::static_storage;
+}
 
 #endif//#ifndef NTL__STLX_MEMORY
