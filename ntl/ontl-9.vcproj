@@ -6,6 +6,7 @@
 	ProjectGUID="{081E6E33-CC33-4BBF-81E8-2865B1D8FD67}"
 	RootNamespace=".ntl"
 	Keyword="Win32Proj"
+	TargetFrameworkVersion="0"
 	>
 	<Platforms>
 		<Platform
@@ -287,6 +288,10 @@
 				Name="crypto"
 				>
 				<File
+					RelativePath=".\crypto\md5.hxx"
+					>
+				</File>
+				<File
 					RelativePath=".\crypto\sha.hxx"
 					>
 				</File>
@@ -404,6 +409,10 @@
 								>
 							</File>
 							<File
+								RelativePath=".\stlx\ext\tr2\network\socket_acceptor.hxx"
+								>
+							</File>
+							<File
 								RelativePath=".\stlx\ext\tr2\network\socket_base.hxx"
 								>
 							</File>
@@ -416,6 +425,10 @@
 								>
 								<File
 									RelativePath=".\stlx\ext\tr2\network\datagram_socket_service.hxx"
+									>
+								</File>
+								<File
+									RelativePath=".\stlx\ext\tr2\network\socket_acceptor_service.hxx"
 									>
 								</File>
 								<File
@@ -830,11 +843,19 @@
 						>
 					</File>
 					<File
+						RelativePath=".\stlx\smart_ptr_rv.hxx"
+						>
+					</File>
+					<File
 						RelativePath=".\stlx\stdexcept_fwd.hxx"
 						>
 					</File>
 					<File
 						RelativePath=".\stlx\tuple.hxx"
+						>
+					</File>
+					<File
+						RelativePath=".\stlx\tuple_vt.hxx"
 						>
 					</File>
 					<File
@@ -877,7 +898,19 @@
 							>
 						</File>
 						<File
+							RelativePath=".\stlx\bind_rv.hxx"
+							>
+						</File>
+						<File
+							RelativePath=".\stlx\bind_vt.hxx"
+							>
+						</File>
+						<File
 							RelativePath=".\stlx\fn_caller.hxx"
+							>
+						</File>
+						<File
+							RelativePath=".\stlx\fn_caller_rv.hxx"
 							>
 						</File>
 						<File
@@ -885,7 +918,15 @@
 							>
 						</File>
 						<File
+							RelativePath=".\stlx\function_vt.hxx"
+							>
+						</File>
+						<File
 							RelativePath=".\stlx\mem_fn.hxx"
+							>
+						</File>
+						<File
+							RelativePath=".\stlx\mem_fn_rv.hxx"
 							>
 						</File>
 						<File
@@ -1305,6 +1346,26 @@
 							Name="VCCLCompilerTool"
 						/>
 					</FileConfiguration>
+					<FileConfiguration
+						Name="debug|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath=".\rtl\dbgstream.cpp"
+					>
 					<FileConfiguration
 						Name="debug|Win32"
 						ExcludedFromBuild="true"

@@ -80,12 +80,16 @@ class application: noncopyable
       uint32_t        usesize           : 1;
       uint32_t        useposition       : 1;
       uint32_t        usecountchars     : 1;
+
       uint32_t        usefillattribute  : 1;
       uint32_t        runfullscreen     : 1;
       uint32_t        forceonfeedback   : 1;
       uint32_t        forceofffeedback  : 1;
+
       uint32_t        usestdhandles     : 1;
       uint32_t        usehotkey         : 1;
+      uint32_t                          : 1;
+      uint32_t        titleshortcut     : 1;
 
       uint16_t        wShowWindow;
       uint16_t        cbReserved2;
@@ -166,9 +170,11 @@ class application: noncopyable
       };
 
 
-      command_line()
+      command_line(bool parse_default = true)
+        :argc(0)
       {
-        parse();
+        if(parse_default)
+          parse();
       }
 
       int parse(char_type * p = get())
@@ -214,28 +220,30 @@ class application: noncopyable
 
 
 template<>
-char *
-application<char>::command_line::get()
+inline char* application<char>::command_line::get()
 {
   return GetCommandLineA();
 }
 
 template<>
-wchar_t *
-application<wchar_t>::command_line::get()
+inline wchar_t* application<wchar_t>::command_line::get()
 {
   return GetCommandLineW();
 }
 
 template<>
-bool application<char>::command_line::option::operator()(const char* opt) const
+inline bool application<char>::command_line::option::operator()(const char* opt) const
 {
-  return std::strncmp(opt, name.first, name.second-1) == 0;
+  const size_t len = std::strlen(opt);
+  return std::strncmp(opt, name.first, name.second-1) == 0 && 
+    ( len == name.second-1 || (len > name.second && opt[name.second-1] == '=') );
 }
 template<>
-bool application<wchar_t>::command_line::option::operator()(const wchar_t* opt) const
+inline bool application<wchar_t>::command_line::option::operator()(const wchar_t* opt) const
 {
-  return std::wcsncmp(opt, name.first, name.second-1) == 0;
+  const size_t len = std::wcslen(opt);
+  return std::wcsncmp(opt, name.first, name.second-1) == 0 && 
+    ( len == name.second-1 || (len > name.second && opt[name.second-1] == '=') );
 }
 
 
@@ -252,13 +260,13 @@ NTL__EXTERNAPI
 void __stdcall GetStartupInfoW(startupinfow *);
 
 template<>
-void startupinfoa::get()
+inline void startupinfoa::get()
 {
   GetStartupInfoA(this);
 }
 
 template<>
-void startupinfow::get()
+inline void startupinfow::get()
 {
   GetStartupInfoW(this);
 }

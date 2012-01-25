@@ -20,7 +20,6 @@ class basic_file : public traits
 {
   ///////////////////////////////////////////////////////////////////////////
   public:
-
     typedef typename traits::size_type            size_type;
     typedef typename traits::access_mask          access_mask;
     typedef typename traits::creation_disposition creation_disposition;
@@ -28,6 +27,14 @@ class basic_file : public traits
     typedef typename traits::creation_options     creation_options;
     typedef typename traits::attributes           attributes;
 
+    typedef typename FileDevice::Origin Origin;
+
+    static const Origin file_begin = FileDevice::file_begin, 
+      file_current = FileDevice::file_current, 
+      file_end = FileDevice::file_end;
+
+
+  public:
     inline basic_file() : f() {}
 
     operator explicit_bool_type() const { return f.operator explicit_bool_type(); } 
@@ -69,9 +76,10 @@ class basic_file : public traits
     }
     */
 
-    bool read(void * out, const uint32_t out_size) __ntl_nothrow
+    uint32_t read(void * out, const uint32_t out_size) __ntl_nothrow
     {
-      return success(f.read(out, out_size));
+      const bool ok = success(f.read(out, out_size));
+      return ok ? f.get_io_status_block().Information : 0;
     }
 
     bool write(const void * in, const uint32_t in_size) __ntl_nothrow
@@ -87,6 +95,16 @@ class basic_file : public traits
     bool size(const size_type & new_size) __ntl_nothrow
     {
       return success(f.size(new_size));
+    }
+
+    size_type tell() const __ntl_nothrow
+    {
+      return f.tell();
+    }
+
+    bool seek(const size_type& offset, typename FileDevice::Origin how)
+    {
+      return success(f.seek(offset, how));
     }
 
     bool erase()

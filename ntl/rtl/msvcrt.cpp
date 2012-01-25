@@ -4,10 +4,12 @@
 #include "../nt/peb.hxx"
 #include "../pe/image.hxx"
 
+#include "../stlx/cmath.hxx"
+
 namespace
 {
   // CRT stubs
-  vfv_t *imp_strtod, *imp_vsnprintf;
+  vfv_t *imp_strtod, *imp_vsnprintf, *imp_acos, *imp_atan, *imp_tan;
 }
 
 // CRT forwards
@@ -32,6 +34,20 @@ double NTL__CRTCALL atof(const char *nptr)
   char* end;
   return strtod(nptr, &end);
 }
+
+#define FPFUNC(func, type) \
+  type NTL__CRTCALL std::func(type d)\
+  {\
+    typedef type __cdecl f_t(type);\
+    return reinterpret_cast<f_t*>(imp_ ## func)(d);\
+  }
+
+  FPFUNC(acos, float)
+  FPFUNC(atan, float)
+  FPFUNC(tan,  float)
+  FPFUNC(acos, double)
+  FPFUNC(atan, double)
+  FPFUNC(tan,  double)
 
 
 namespace ntl { namespace msvcrt
@@ -93,6 +109,9 @@ namespace
 #define NTL_IMP(func) imp_ ## func = msvcrt->find_export<vfv_t*>(#func)
     NTL_IMP(strtod);
     NTL_IMP(vsnprintf);
+    NTL_IMP(acos);
+    NTL_IMP(atan);
+    NTL_IMP(tan);
 #undef NTL_IMP
 
     return msvcrt;

@@ -10,6 +10,7 @@
 #include "../win/console.hxx"
 #include "../atomic.hxx"
 
+#include "wchar_mask_data.cpp"
 
 extern "C" void __cdecl __init_iostream_objects(bool init);
 
@@ -39,12 +40,12 @@ namespace
     // recreate the objects
     for(unsigned i = 0; i < _countof(noss); i++){
       legacy_handle h = console::handle(types[i]);
-      if(h){
+      //if(h){
         *bn[i] = new buffer_n(h);
         *bw[i] = new buffer_w(h);
         new(noss[i]) ostream(*bn[i]);
         new(woss[i]) wostream(*bw[i]);
-      }
+      //}
     }
 
     cinb = new buffer_n(console::stdin, false);

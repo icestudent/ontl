@@ -29,9 +29,10 @@ extern "C"
 
 
 #ifdef _MSC_VER
-#pragma intrinsic(acos,asin,atan,atan2,cosh,cos,exp,floor,fmod,log,log10,pow,sin,sinh,sqrt,tan,tanh)
+#pragma intrinsic(atan2,floor,fmod,log,pow,sin,sqrt)
+//#pragma intrinsic(acos,cos,asin,atan,exp,log10,sinh,tan,tanh)
 # ifdef _M_X64
-  #pragma intrinsic(ceil)
+  #pragma intrinsic(ceil, tan, atan)
 # else
 double __cdecl ceil(double x) { return floor(x+1.0); }
 # endif
@@ -182,9 +183,9 @@ namespace std
   //FPFUNC(sinh)
   FPFUNC(sqrt)
   //FPFUNC(tanh)
+  //FPFUNC(tan)
+  //FPFUNC(atan)
 #ifdef _M_X64
-  FPFUNC(atan)
-  FPFUNC(tan)
 #endif
 #undef FPFUNC
 

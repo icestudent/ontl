@@ -287,6 +287,10 @@
 				Name="crypto"
 				>
 				<File
+					RelativePath=".\crypto\md5.hxx"
+					>
+				</File>
+				<File
 					RelativePath=".\crypto\sha.hxx"
 					>
 				</File>
@@ -404,6 +408,10 @@
 								>
 							</File>
 							<File
+								RelativePath=".\stlx\ext\tr2\network\socket_acceptor.hxx"
+								>
+							</File>
+							<File
 								RelativePath=".\stlx\ext\tr2\network\socket_base.hxx"
 								>
 							</File>
@@ -416,6 +424,10 @@
 								>
 								<File
 									RelativePath=".\stlx\ext\tr2\network\datagram_socket_service.hxx"
+									>
+								</File>
+								<File
+									RelativePath=".\stlx\ext\tr2\network\socket_acceptor_service.hxx"
 									>
 								</File>
 								<File
@@ -1136,6 +1148,10 @@
 				</File>
 				<File
 					RelativePath=".\nt\debug.hxx"
+					>
+				</File>
+				<File
+					RelativePath=".\nt\environ.hxx"
 					>
 				</File>
 				<File
