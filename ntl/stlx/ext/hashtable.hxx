@@ -187,9 +187,9 @@ namespace std
 
           void increment()
           {
-            if(p->next && p->next->hkey != p->hkey)
-              p = nullptr; // end of bucket
-            else
+            //if(p->next && p->next->hkey != p->hkey)
+            //  p = nullptr; // end of bucket
+            //else
               p = p->next;
           }
 
@@ -429,7 +429,7 @@ namespace std
       public:
         ///\name Construct/copy/destroy
         explicit chained_hashtable(size_type n, const hasher& hf = hasher(), const key_equal& eql = key_equal(), const allocator_type& a = allocator_type())
-          :nalloc(a), balloc(a), hash_(hf), equal_(eql), count_(0), max_factor(1.0f)
+          :nalloc(a), balloc(a), hash_(hf), equal_(eql), count_(0), max_factor(1.0f), head_()
         {
           init_table(n);
         }
@@ -438,12 +438,12 @@ namespace std
           clear();
         }
         chained_hashtable(const chained_hashtable& r)
-          :nalloc(r.nalloc), balloc(r.balloc), hash_(r.hash_), equal_(r.equal_), count_(0), max_factor(r.max_factor)
+          :nalloc(r.nalloc), balloc(r.balloc), hash_(r.hash_), equal_(r.equal_), count_(0), max_factor(r.max_factor), head_()
         {
           copy_from(r.buckets_);
         }
         chained_hashtable(const chained_hashtable& r, const allocator_type& a)
-          :nalloc(a), balloc(a), hash_(r.hash_), equal_(r.equal_), count_(0), max_factor(r.max_factor)
+          :nalloc(a), balloc(a), hash_(r.hash_), equal_(r.equal_), count_(0), max_factor(r.max_factor), head_()
         {
           copy_from(r.buckets_);
         }
@@ -455,13 +455,14 @@ namespace std
         }
 #ifdef NTL__CXX_RV
         chained_hashtable(chained_hashtable&& r)
-          :nalloc(std::move(r.nalloc)), balloc(std::move(r.balloc)), hash_(std::move(r.hash_)), equal_(std::move(r.equal_)), buckets_(std::move(r.buckets_)), count_(r.count_), max_factor(r.max_factor)
+          :nalloc(std::move(r.nalloc)), balloc(std::move(r.balloc)), hash_(std::move(r.hash_)), equal_(std::move(r.equal_)),
+          buckets_(std::move(r.buckets_)), count_(r.count_), max_factor(r.max_factor), head_(std::move(r.head_))
         {
           r.count_ = 0;
           r.buckets_ = table();
         }
         chained_hashtable(chained_hashtable&& r, const allocator_type& a)
-          :nalloc(a), balloc(a), hash_(r.hash_), equal_(r.equal_), count_(0), max_factor(r.max_factor)
+          :nalloc(a), balloc(a), hash_(r.hash_), equal_(r.equal_), count_(0), max_factor(r.max_factor), head_()
         {
           if(r.nalloc == nalloc){
             swap(r);
@@ -824,14 +825,8 @@ namespace std
           return p;
         }
 
-        template<class V> static const key_type& value2key(const V& x, true_type)
-        {
-          return x.first;
-        }
-        template<class V> static const key_type& value2key(const V& x, false_type)
-        {
-          return x;
-        }
+        template<class V> static const key_type& value2key(const V& x, true_type)   { return x.first; }
+        template<class V> static const key_type& value2key(const V& x, false_type)  { return x; }
 
       protected:
 
@@ -848,7 +843,12 @@ namespace std
          **/
         size_type mapkey(hash_t h) const
         {
-          return h % (buckets_.second-buckets_.first);
+          const size_type max = buckets_.second-buckets_.first;
+          const size_type mask = max-1;
+          size_type n = h & mask;
+          if (n >= max)
+            n -= mask / 2 + 1;
+          return n;
         }
 
         size_type capacity_factor(size_type n) const

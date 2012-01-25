@@ -432,6 +432,11 @@ namespace std
 
         iterator erase(const_iterator first, const_iterator last)
         {
+          if(first == cbegin() && last == cend()){
+            clear();
+            return end();
+          }
+            
           while(first != last)
             first = erase(first);
           return empty() ? end() : make_iterator(const_cast<node*>(last.p));
@@ -461,8 +466,35 @@ namespace std
 
         void clear()
         {
-          if(!empty())
-            erase(begin(), end());
+          if(empty())
+            return;
+          while(first_){
+            node* erasable = first_;
+            assert(!erasable->child[left]);
+
+            while(erasable->child[right]){
+              // goto left bottom
+              erasable = erasable->child[right];
+              while(erasable->child[left])
+                erasable = erasable->child[left];
+            }
+            assert(!erasable->child[right]);
+
+            // free the daddy from me
+            node* succ = erasable->parent();
+            if(succ){
+              succ->child[left] = 0;
+              if(erasable == succ->child[right])
+                succ->child[right] = 0;
+            }
+            first_ = succ;
+
+            node_allocator.destroy(erasable);
+            node_allocator.deallocate(erasable, 1);
+          }
+
+          first_ = last_ = root_ = nullptr;
+          count_ = 0;
         }
 
         // observes

@@ -57,6 +57,16 @@ namespace ttl
     //using namespace meta_rel_ops;
 
     //internal implementation
+#ifdef NTL__CXX_VT
+      namespace impl
+      {
+        struct typelist_traits
+        {
+          typedef typelist_traits
+        };
+
+      }
+#else
     namespace impl
     {
       ////////////////////////////////////////////////////////////
@@ -112,7 +122,7 @@ namespace ttl
       TTL_REPEAT( TTL_MAX_TYPELIST_PARAMS, TTL_META_TYPELIST_GET, TTL_META_TYPELIST_GET, type )
 
 #undef TTL_META_TYPELIST_GET
-    }
+    } // impl
 
     template < TTL_TPARAMS_DEF(TTL_MAX_TYPELIST_PARAMS, empty_type) >
     struct typelist
@@ -124,6 +134,7 @@ namespace ttl
       enum { length = list_traits::length };
       typedef typename list_traits::largest_type largest_type;
     };
+#endif
 
     ////////////////////////////////////////////////////////////
     template < typename L >
