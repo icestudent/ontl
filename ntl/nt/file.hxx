@@ -684,7 +684,7 @@ class file_handler : public handle, public device_traits<file_handler>
       return file_info;
     }
 
-    const io_status_block & get_io_status_block() { return iosb; }
+    const io_status_block & get_io_status_block() const { return iosb; }
 
   ////////////////////////////////////////////////////////////////////////////
   private:

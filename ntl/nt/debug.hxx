@@ -173,6 +173,15 @@ namespace ntl {
 #endif
       }
 
+      template <typename T1, typename T2, typename T3, typename T4, typename T5, typename T6>
+      void printf(const char format[], T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6) const
+      {
+#ifdef NTL__DEBUG_2K
+        KdPrint((format, arg1, arg2, arg3, arg4, arg5, arg6));
+#else
+        KdPrintEx((type, DefaultLevel, format, arg1, arg2, arg3, arg4, arg5, arg6));
+#endif
+      }
       void operator()(const char msg[]) const
       {
         printf(msg);
@@ -284,7 +293,7 @@ namespace ntl {
       const dbgprint<dpfltr::warning> warning;
       const dbgprint<dpfltr::trace>   trace;
       const dbgprint<dpfltr::info>    info;
-  #else
+#else
   #ifndef __BCPLUSPLUS__
       const dbgprint<dpfltr::__identifier(default)>   error;
       const dbgprint<dpfltr::__identifier(default)>   warning;
@@ -298,8 +307,7 @@ namespace ntl {
   #endif
 #endif
 
-      static __forceinline
-        void bp()
+      static __forceinline void bp()
       {
       #ifdef NTL__DEBUG
         intrinsic::debugbreak();

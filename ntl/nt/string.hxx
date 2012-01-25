@@ -278,9 +278,9 @@ typedef native_string<const char>     const_ansi_string;
 template<typename char_type>
 struct raw_native_string
 {
-  uint16_t    length_;
-  uint16_t    max_length_;
-  char_type*  buffer_;
+  uint16_t    length;
+  uint16_t    max_length;
+  char_type*  buffer;
 };
 
 typedef raw_native_string<char>     raw_ansi_string;

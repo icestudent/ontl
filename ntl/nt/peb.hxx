@@ -58,8 +58,8 @@ private:
   void patch_string(unicode_string& us)
   {
     raw_unicode_string& rus = reinterpret_cast<raw_unicode_string&>(us);
-    if(rus.buffer_)
-      rus.buffer_ = ntl::padd(rus.buffer_, this);
+    if(rus.buffer)
+      rus.buffer = ntl::padd(rus.buffer, this);
   }
 public:
   void normalize()
