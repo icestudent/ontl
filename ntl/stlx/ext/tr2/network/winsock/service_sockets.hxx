@@ -218,7 +218,7 @@ namespace ntl { namespace network {
       typedef socket native_type;
       struct implementation_type
       {
-        functions_t funcs;
+        functions_t* funcs;
         socket s;
 
         // ip::protocol emulation
@@ -248,14 +248,14 @@ namespace ntl { namespace network {
       void construct(implementation_type& impl)
       {
         std::memset(&impl, 0, sizeof(impl));
-        impl.funcs = *winsock_runtime::instance();
+        impl.funcs = winsock_runtime::instance();
         impl.s = 0;
       }
 
       void destroy(implementation_type& impl)
       {
         if(impl.s) {
-          impl.funcs.closesocket(impl.s);
+          impl.funcs->closesocket(impl.s);
           impl.s = 0;
         }
       }
@@ -269,7 +269,7 @@ namespace ntl { namespace network {
       {
         if(is_open(impl)){
           // cancel pending async operations
-          if(check_error(ec, impl.funcs.closesocket(impl.s))){
+          if(check_error(ec, impl.funcs->closesocket(impl.s))){
             impl.s = 0;
           }else{
             return sockerror(ec);
@@ -282,7 +282,15 @@ namespace ntl { namespace network {
       {
         if(!check_open(impl, ec))
           return ec;
-        check_error(ec, impl.funcs.shutdown(impl.s, static_cast<int>(how)));
+        check_error(ec, impl.funcs->shutdown(impl.s, static_cast<int>(how)));
+        return ec;
+      }
+
+      std::error_code listen(implementation_type& impl, int backlog, std::error_code& ec)
+      {
+        if(!check_open(impl, ec))
+          return ec;
+        check_error(ec, impl.funcs->listen(impl.s, backlog ));
         return ec;
       }
 
@@ -296,7 +304,7 @@ namespace ntl { namespace network {
         if(!check_open(impl, ec))
           return 0;
         uint32_t re = 0;
-        check_error(ec, impl.funcs.ioctlsocket(impl.s, constants::fionread, &re));
+        check_error(ec, impl.funcs->ioctlsocket(impl.s, constants::fionread, &re));
         return re; //-V109
       }
       bool at_mark(const implementation_type& impl, std::error_code& ec) const
@@ -304,7 +312,7 @@ namespace ntl { namespace network {
         if(!check_open(impl, ec))
           return 0;
         uint32_t re = 0;
-        check_error(ec, impl.funcs.ioctlsocket(impl.s, constants::siocatmark, &re));
+        check_error(ec, impl.funcs->ioctlsocket(impl.s, constants::siocatmark, &re));
         return re != 0;
       }
 
@@ -320,7 +328,7 @@ namespace ntl { namespace network {
         if(check & socket_base::error)
           e.set(impl.s);
 
-        int re = impl.funcs.select(1, &r, &w, &e, nullptr);
+        int re = impl.funcs->select(1, &r, &w, &e, nullptr);
         check_error(ec, re);
         if(re == 0)
           ec = std::make_error_code(stdnet::network_error::timed_out);
@@ -345,7 +353,7 @@ namespace ntl { namespace network {
         time.sec  = (long)sec.count();
         time.usec = (long)std::chrono::duration_cast<std::chrono::seconds>(rel_time - sec).count();
 
-        int re = impl.funcs.select(1, &r, &w, &e, &time);
+        int re = impl.funcs->select(1, &r, &w, &e, &time);
         check_error(ec, re);
         if(re == 0)
           ec = std::make_error_code(stdnet::network_error::timed_out);
@@ -368,7 +376,7 @@ namespace ntl { namespace network {
         if(is_open(impl)){
           return ec = error::make_error_code(error::already_open);
         }
-        impl.s = impl.funcs.socket(af, type, protocol);
+        impl.s = impl.funcs->socket(af, type, protocol);
         if(impl.s == invalid_socket){
           impl.s = 0;
           return sockerror(ec);
@@ -403,8 +411,8 @@ namespace ntl { namespace network {
           uint32_t offset = 0;
           do {
             int re = addr
-              ? impl.funcs.sendto(impl.s, buf->buf + offset, buf->len - offset, flags, addr, static_cast<int>(addrlen))
-              : impl.funcs.send(impl.s, buf->buf + offset, buf->len - offset, flags);
+              ? impl.funcs->sendto(impl.s, buf->buf + offset, buf->len - offset, flags, addr, static_cast<int>(addrlen))
+              : impl.funcs->send(impl.s, buf->buf + offset, buf->len - offset, flags);
             if(!check_error(ec, re))
               return transfered;
             assert(re >= 0);
@@ -431,8 +439,8 @@ namespace ntl { namespace network {
           uint32_t offset = 0;
           do {
             int re = addr
-              ? impl.funcs.recvfrom(impl.s, buf->buf + offset, buf->len - offset, flags, addr, &addrlen)
-              : impl.funcs.recv(impl.s, buf->buf + offset, buf->len - offset, flags);
+              ? impl.funcs->recvfrom(impl.s, buf->buf + offset, buf->len - offset, flags, addr, &addrlen)
+              : impl.funcs->recv(impl.s, buf->buf + offset, buf->len - offset, flags);
             sockerror(ec);
             if(re == 0){
               if(!addr) // recv should fail with eof
@@ -504,7 +512,7 @@ namespace ntl { namespace network {
             impl.proto_type = protocol.type(),
             impl.proto_protocol = protocol.protocol(),
             impl.ipv6 = impl.proto_family == constants::af_inet6,
-            impl.is_stream = type == constants::sock_stream || constants::sock_seqpacket;
+            impl.is_stream = protocol.type() == constants::sock_stream || constants::sock_seqpacket;
         }
         return ec;
       }
@@ -517,7 +525,7 @@ namespace ntl { namespace network {
         static_assert(SettableSocketOption::level4 != -1, "socket control code should not be used as socket option!");
         if(!check_open(impl, ec))
           return ec;
-        check_error(ec, impl.funcs.setsockopt(impl.s, option.level(impl.proto), option.name(impl.proto), 
+        check_error(ec, impl.funcs->setsockopt(impl.s, option.level(impl.proto), option.name(impl.proto), 
           reinterpret_cast<const byte*>(option.data(impl.proto)), static_cast<int>(option.size(impl.proto))));
         return ec;
       }
@@ -529,7 +537,7 @@ namespace ntl { namespace network {
         if(!check_open(impl, ec))
           return ec;
         int len = static_cast<int>(option.size(impl.proto));
-        check_error(ec, impl.funcs.getsockopt(impl.s, option.level(impl.proto), option.name(impl.proto), 
+        check_error(ec, impl.funcs->getsockopt(impl.s, option.level(impl.proto), option.name(impl.proto), 
           reinterpret_cast<byte*>(option.data(impl.proto)), &len));
         return ec;
       }
@@ -540,7 +548,7 @@ namespace ntl { namespace network {
         static_assert(IoControlCommand::level4 == -1, "socket option code should not be used as socket control!");
         if(!check_open(impl, ec))
           return ec;
-        check_error(ec, impl.funcs.ioctlsocket(impl.s, command.name(impl.proto), command.data(impl.proto)));
+        check_error(ec, impl.funcs->ioctlsocket(impl.s, command.name(impl.proto), command.data(impl.proto)));
         return ec;
       }
 
@@ -548,7 +556,7 @@ namespace ntl { namespace network {
       {
         if(!check_open(impl, ec))
           return ec;
-        check_error(ec, impl.funcs.bind(impl.s, endpoint.data(), static_cast<int>(endpoint.size()) ));
+        check_error(ec, impl.funcs->bind(impl.s, endpoint.data(), static_cast<int>(endpoint.size()) ));
         return ec;
       }
 
@@ -558,7 +566,7 @@ namespace ntl { namespace network {
         if(!check_open(impl, ec))
           return ep;
         int size = static_cast<int>(ep.capacity());
-        check_error(ec, impl.funcs.getsockname(impl.s, ep.data(), &size));
+        check_error(ec, impl.funcs->getsockname(impl.s, ep.data(), &size));
         return ep;
       }
 
@@ -568,7 +576,7 @@ namespace ntl { namespace network {
         if(!check_open(impl, ec))
           return ep;
         int size = static_cast<int>(ep.capacity());
-        check_error(ec, impl.funcs.getpeername(impl.s, ep.data(), &size));
+        check_error(ec, impl.funcs->getpeername(impl.s, ep.data(), &size));
         return ep;
       }
 
@@ -576,9 +584,30 @@ namespace ntl { namespace network {
       {
         if(!check_open(impl, ec))
           return ec;
-        check_error(ec, impl.funcs.connect(impl.s, endpoint.data(), static_cast<int>(endpoint.size()) ));
+        check_error(ec, impl.funcs->connect(impl.s, endpoint.data(), static_cast<int>(endpoint.size()) ));
         return ec;
       }
+
+      std::error_code accept(implementation_type& impl, implementation_type& socket, endpoint_type* endpoint, std::error_code& ec)
+      {
+        if(!check_open(impl, ec))
+          return ec;
+        if(socket.s != 0)
+          return ec = std::make_error_code(error::already_open);
+        
+        endpoint_type ep;
+        int epsize = static_cast<int>(ep.size());
+        socket.s = impl.funcs->accept(impl.s, ep.data(), &epsize);
+        check_error(ec, static_cast<int>(socket.s));
+        if(ec)
+          socket.s = 0;
+        else if(endpoint)
+          *endpoint = ep;
+        return ec;
+      }
+
+      template<class AcceptHandler>
+      void async_accept(implementation_type& impl, implementation_type& socket, endpoint_type* endpoint, AcceptHandler handler);
 
       template<class ConnectHandler>
       void async_connect(implementation_type& impl, const endpoint_type& endpoint, ConnectHandler handler);

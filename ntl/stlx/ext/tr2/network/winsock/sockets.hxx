@@ -287,6 +287,7 @@ namespace ntl { namespace network {
     typedef int __stdcall connect_t(socket s, const sockaddr* name, int namelen);
     typedef int __stdcall bind_t(socket s, const sockaddr* name, int namelen);
     typedef int __stdcall listen_t(socket s, int backlog);
+    typedef socket __stdcall accept_t(socket s, sockaddr* sa, int* salen);
     typedef int __stdcall send_t(socket s, const char* buf, int len, int flags);
     typedef int __stdcall recv_t(socket s, char* buf, int len, int flags);
     typedef int __stdcall sendto_t(socket s, const char* buf, int len, int flags, const sockaddr* name, int namelen);
@@ -295,6 +296,7 @@ namespace ntl { namespace network {
     typedef int __stdcall getsockopt_t(socket s, int level, int optname, byte* optval, int* optlen);
     typedef int __stdcall setsockopt_t(socket s, int level, int optname, const byte* optval, int optlen);
     typedef int __stdcall select_t(int nfds, fd_set* read, fd_set* write, fd_set* except, const timeval* timeout);
+
 
     typedef const char* __stdcall inet_ntoa_t(const in_addr in);
     typedef uint32_t __stdcall inet_addr_t(const char* addr);
@@ -319,7 +321,8 @@ namespace ntl { namespace network {
 
     }
 
-    struct functions_t
+    struct functions_t:
+      private ntl::noncopyable
     {
       wsa::Startup_t* startup;
       wsa::Cleanup_t* cleanup;
@@ -331,6 +334,7 @@ namespace ntl { namespace network {
       shutdown_t* shutdown;
       bind_t* bind;
       listen_t* listen;
+      accept_t* accept;
 
       getsockname_t* getsockname;
       getpeername_t* getpeername;
@@ -352,16 +356,19 @@ namespace ntl { namespace network {
       select_t* select;
       
       bool initialized;
+    private:
+      functions_t& operator=(const functions_t&) __deleted;
     };
 
 
     class winsock_runtime
     {
+      static nt::critical_section lock;
     public:
       static functions_t* winsock_runtime::instance()
       {
         functions_t* funcs = std::__::static_storage<functions_t>::get_buffer();
-        assert(funcs != nullptr);
+        assert(funcs != nullptr && funcs->initialized);
         return funcs;
       }
 
@@ -409,6 +416,7 @@ namespace ntl { namespace network {
           NTL_IMP(gethostname);
           NTL_IMP(bind);
           NTL_IMP(listen);
+          NTL_IMP(accept);
           NTL_IMP(getsockname);
           NTL_IMP(getpeername);
           NTL_IMP(select);
@@ -429,22 +437,29 @@ namespace ntl { namespace network {
 
       static functions_t* check_wsa(bool init)
       {
-        static int refcount = 0;
+        static int32_t refcount = 0;
         functions_t* funcs = std::__::static_storage<functions_t>::get_buffer();
+        //lock.acquire();
         if(init){
-          if(refcount++ == 0){
-            if(!funcs->initialized)
+          if(ntl::atomic::exchange_add(refcount, 1) == 0){
+            if(!funcs->initialized){
               bind_import(*funcs);
-            wsa::wsadata_t info;
-            if(funcs->startup)
-              funcs->startup(wsa::wsadata_t::CurrentVersion, info);
+              wsa::wsadata_t info;
+              if(funcs->startup)
+                funcs->startup(wsa::wsadata_t::CurrentVersion, info);
+            }
           }
+          assert(funcs->initialized);
         }else{
-          if(--refcount == 0){
-            if(funcs->cleanup)
-              funcs->cleanup();
+          if(ntl::atomic::exchange_add(refcount, -1) == 0){
+            if(funcs->initialized){
+              if(funcs->cleanup)
+                funcs->cleanup();
+              funcs->initialized = false;
+            }
           }
         }
+        //lock.release();
         return funcs;
       }
     };

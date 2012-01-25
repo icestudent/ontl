@@ -17,13 +17,13 @@ namespace ntl { namespace network {
     public:
       struct implementation_type
       {
-        functions_t funcs;
+        functions_t* funcs;
       };
 
     public:
       void construct(implementation_type& impl)
       {
-        impl.funcs = *winsock_runtime::instance();
+        impl.funcs = winsock_runtime::instance();
       }
       void destroy(implementation_type& /*impl*/)
       {}
@@ -55,7 +55,7 @@ namespace ntl { namespace network {
         resolve_result re;
         addrinfo* response;
         {
-          const int err = impl.funcs.getaddrinfo(q.host_exists ? q.host.c_str() : nullptr, q.service.c_str(), &q.hint, &response);
+          const int err = impl.funcs->getaddrinfo(q.host_exists ? q.host.c_str() : nullptr, q.service.c_str(), &q.hint, &response);
           if(err != 0){
             sockerror(ec);
             return re;
@@ -89,7 +89,7 @@ namespace ntl { namespace network {
 
           entries->push_back(entry_t(ep, ai->canonname ? std::string(ai->canonname) : q.host, q.service));
         }
-        impl.funcs.freeaddrinfo(response);
+        impl.funcs->freeaddrinfo(response);
 
         if(entries->empty())
           ec = error::make_error_code(error::address_family_not_supported);
@@ -100,7 +100,7 @@ namespace ntl { namespace network {
       {
         resolve_result entries;
         char svc[32], host[1025];
-        if(!check_error(ec, impl.funcs.getnameinfo(ep.data(), static_cast<int>(ep.size()),
+        if(!check_error(ec, impl.funcs->getnameinfo(ep.data(), static_cast<int>(ep.size()),
           host, _countof(host), svc, _countof(svc), 0)))
           return entries;
         entries.reset(new entries_t());

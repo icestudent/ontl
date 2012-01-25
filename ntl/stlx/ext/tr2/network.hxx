@@ -25,5 +25,5 @@
 #include "network/ip_protocol.hxx"
 
 #include "network/basic_resolver.hxx"
-
+#include "network/socket_acceptor.hxx"
 #endif // NTL__STLX_TR2_NETWORK

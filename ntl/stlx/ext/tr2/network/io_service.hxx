@@ -12,6 +12,7 @@
 #include "io_service_fwd.hxx"
 #include "../../../forward_list.hxx"
 #include "../../../typeindex.hxx"
+#include "../../../mutex.hxx"
 
 namespace std { namespace tr2 { namespace sys {
 
@@ -154,7 +155,10 @@ namespace std { namespace tr2 { namespace sys {
       io_service* owner;
       size_t      id;
     };
+    typedef std::unique_lock<std::mutex> services_lock;
     typedef forward_list<service_node> services_t;
+    
+    std::mutex lock;
     services_t services;
     size_t svcNo;
 
@@ -176,6 +180,7 @@ namespace std { namespace tr2 { namespace sys {
 
     template<class Service> void do_add_service(Service* svc)
     {
+      services_lock _(lock);
       type_index key(typeid(Service));
       services_t::const_iterator it = find_if(services.cbegin(), services.cend(), finder(key));
       if(it != services.cend()){
@@ -187,12 +192,14 @@ namespace std { namespace tr2 { namespace sys {
     }
     template<class Service> bool do_has_service() const
     {
+      services_lock _(lock);
       type_index key(typeid(Service));
       services_t::const_iterator it = find_if(services.cbegin(), services.cend(), finder(key));
       return it != services.cend();
     }
     template<class Service> Service& do_use_service()
     {
+      services_lock _(lock);
       type_index key(typeid(Service));
       services_t::const_iterator it = find_if(services.cbegin(), services.cend(), finder(key));
       if(it != services.cend()){
