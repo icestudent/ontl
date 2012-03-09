@@ -13,7 +13,7 @@
 #include "cpp0x_mode.hxx"
 
 // NTL LIB signature
-#define NTL__CPPLIB
+#define NTL_CPPLIB
 
 namespace std {
 
@@ -41,9 +41,9 @@ namespace std {
 /**\addtogroup  lib_support_types ****** 18.2 Types [support.types]
  *@{*/
 
-#if defined(NTL__CXX_NULLPTR)
+#if defined(NTL_CXX_NULLPTR)
   typedef decltype(nullptr) nullptr_t;
-#elif defined(NTL__DOC)
+#elif defined(NTL_DOC)
   struct nullptr_t {};
 #endif
 

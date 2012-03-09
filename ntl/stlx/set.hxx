@@ -64,7 +64,7 @@ namespace std {
     set(const set<Key,Compare,Allocator>& x)
       :tree_type(x)
     {}
-    #ifdef NTL__CXX_RV
+    #ifdef NTL_CXX_RV
     set(set<Key,Compare,Allocator>&& x)
       :tree_type(x)
     {}
@@ -77,7 +77,7 @@ namespace std {
       :tree_type(x, a)
     {}
 
-    #ifdef NTL__CXX_RV
+    #ifdef NTL_CXX_RV
     set(set&& x, const Allocator& a)
       :tree_type(x, a)
     {}
@@ -96,7 +96,7 @@ namespace std {
       return *this;
     }
 
-    #ifdef NTL__CXX_RV
+    #ifdef NTL_CXX_RV
     set<Key,Compare,Allocator>& operator= (set<Key,Compare,Allocator>&& x)
     {
       assign(x);
@@ -105,12 +105,12 @@ namespace std {
     #endif
 
     // modifiers:
-    #ifdef NTL__CXX_VT
+    #ifdef NTL_CXX_VT
     template <class... Args> pair<iterator, bool> emplace(Args&&... args);
     template <class... Args> iterator emplace(const_iterator position, Args&&... args);
     #endif
 
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
     std::pair<iterator, bool> insert(const value_type& x)
     {
       return tree_type::insert_impl(construct_node(x));

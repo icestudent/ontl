@@ -83,56 +83,56 @@ namespace ntl {
 
     typedef ntstatus __stdcall critical_section_control_t(rtl::critical_section* CriticalSection);
 
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
       critical_section_control_t
         RtlInitializeCriticalSection,
         RtlDeleteCriticalSection,
         RtlEnterCriticalSection,
         RtlLeaveCriticalSection;
 
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
       ntstatus __stdcall RtlInitializeCriticalSectionAndSpinCount(
         rtl::critical_section* CriticalSection,
         uint32_t               SpinCount
         );
 
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
       uint32_t __stdcall RtlTryEnterCriticalSection(rtl::critical_section* CriticalSection);
 
     /** These begins with WS2003SP1 
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
       uint32_t __stdcall RtlIsCriticalSectionLocked(rtl::critical_section* CriticalSection);
 
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
       uint32_t __stdcall RtlIsCriticalSectionLockedByThread(rtl::critical_section* CriticalSection);
     */
 
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
       uint32_t __stdcall RtlGetCriticalSectionRecursionCount(const rtl::critical_section* CriticalSection);
 
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
       uint32_t __stdcall RtlSetCriticalSectionSpinCount(rtl::critical_section* CriticalSection, uint32_t SpinCount);
 
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
       void __stdcall RtlEnableEarlyCriticalSectionEventCreation();
 
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
       void __stdcall RtlCheckForOrphanedCriticalSections(legacy_handle Thread);
 
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
       void __stdcall RtlpWaitForCriticalSection(rtl::critical_section* CriticalSection);
 
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
       void __stdcall RtlpUnWaitCriticalSection(rtl::critical_section* CriticalSection);
 
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
       void __stdcall RtlpNotOwnerCriticalSection(rtl::critical_section* CriticalSection);
 
     // run once
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
       void RtlRunOnceInitialize(rtl::run_once* RunOnce);
 
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
       uint32_t RtlRunOnceExecuteOnce(
         rtl::run_once*        RunOnce,
         rtl::run_once_init_t  InitFn,
@@ -140,14 +140,14 @@ namespace ntl {
         void**                Context
       );
 
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
       uint32_t RtlRunOnceBeginInitialize(
         rtl::run_once*        RunOnce,
         uint32_t              Flags,
         void**                Context
       );
 
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
       uint32_t RtlRunOnceComplete(
         rtl::run_once*        RunOnce,
         uint32_t              Flags,
@@ -158,7 +158,7 @@ namespace ntl {
 
     typedef void __stdcall resource_control_t(rtl::resource*);
    
-    NTL__EXTERNAPI 
+    NTL_EXTERNAPI 
       resource_control_t
       RtlInitializeResource,
       RtlReleaseResource,

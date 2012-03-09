@@ -5,7 +5,7 @@
 #include "../nt/exception.hxx"
 #include "../nt/status.hxx"
 
-#ifdef NTL__SUBSYSTEM_KM
+#ifdef NTL_SUBSYSTEM_KM
 # include "../km/new.hxx"
 #else
 # include "../nt/new.hxx"
@@ -19,7 +19,7 @@
 #endif
 #endif
 
-#if !STLX__USE_RTTI
+#if !STLX_USE_RTTI
 #pragma message("This file needed only for ENABLED RTTI (see /GR).")
 #endif
 
@@ -103,7 +103,7 @@ const char* std::type_info::name() const __ntl_nothrow
 
 #pragma region dynamic_cast implementation
 
-//#if STLX__USE_RTTI
+//#if STLX_USE_RTTI
 
 namespace ntl { namespace cxxruntime
 {
@@ -466,7 +466,7 @@ namespace {
     }
     __except(exception_code == nt::status::access_violation ? exception_execute_handler : exception_continue_search){
       __ntl_throw(std::bad_typeid(/*"A typeid of bad pointer attempted"*/));
-    #if STLX__USE_EXCEPTIONS == 0
+    #if STLX_USE_EXCEPTIONS == 0
       return nullptr;
     #endif
     }
@@ -488,7 +488,7 @@ extern "C" void* __cdecl __RTCastToVoid (void* object) throw(...)
   }
   __except(exception_code == nt::status::access_violation ? exception_execute_handler : exception_continue_search){
     __ntl_throw(std::bad_typeid(/*"A typeid of bad pointer attempted"*/));
-    #if STLX__USE_EXCEPTIONS == 0
+    #if STLX_USE_EXCEPTIONS == 0
       return nullptr;
     #endif
   }
@@ -498,7 +498,7 @@ extern "C" void* __cdecl __RTtypeid(void* object) throw(...)
 {
   if(!object){
     __ntl_throw(std::bad_typeid(/*"A typeid of nullptr pointer attempted"*/));
-    #if STLX__USE_EXCEPTIONS == 0
+    #if STLX_USE_EXCEPTIONS == 0
       return nullptr;
     #endif
   }
@@ -512,7 +512,7 @@ extern "C" void* __cdecl __RTtypeid(void* object) throw(...)
     if(!locator.type || !(pe = pe::image::base_from(&locator), pe)){
       pe = pe::image::this_module();
     //  __ntl_throw(std::bad_typeid(/*"A typeid of bad pointer attempted"*/));
-    //#if STLX__USE_EXCEPTIONS == 0
+    //#if STLX_USE_EXCEPTIONS == 0
     //  return nullptr;
     //#endif
     }
@@ -521,7 +521,7 @@ extern "C" void* __cdecl __RTtypeid(void* object) throw(...)
   }
   __except(exception_code == nt::status::access_violation ? exception_execute_handler : exception_continue_search){
     __ntl_throw(std::bad_typeid(/*"A typeid of bad pointer attempted"*/));
-    #if STLX__USE_EXCEPTIONS == 0
+    #if STLX_USE_EXCEPTIONS == 0
       return nullptr;
     #endif
   }

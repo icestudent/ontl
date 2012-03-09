@@ -170,7 +170,7 @@ ntstatus __stdcall
     uint32_t OutputBufferLength
     );
 
-NTL__EXTERNAPI control_file_t NtDeviceIoControlFile, NtFsControlFile;
+NTL_EXTERNAPI control_file_t NtDeviceIoControlFile, NtFsControlFile;
 
 
 }//namespace nt

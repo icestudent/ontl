@@ -443,7 +443,7 @@ inline BidirectionalIterator2
 template<class T>
 inline void swap(T& a, T& b)
 {
-#ifndef NTL__CXX_RV
+#ifndef NTL_CXX_RV
   T temp( a );
   a = b;
   b = temp;
@@ -738,7 +738,7 @@ inline
 void
   random_shuffle(RandomAccessIterator first, RandomAccessIterator last);
 
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
 template<class RandomAccessIterator, class RandomNumberGenerator>
 inline
 void
@@ -803,7 +803,7 @@ inline void sort(RandomAccessIterator first, RandomAccessIterator last, Compare 
 
   struct proxy
   {
-    static int NTL__CRTIMP qsort(const void* a, const void* b)
+    static int NTL_CRTIMP qsort(const void* a, const void* b)
     {
       const_pointer x = reinterpret_cast<const_pointer>(a), y = reinterpret_cast<const_pointer>(b);
       Compare comp;
@@ -1117,7 +1117,7 @@ __forceinline const T& min(const T& a, const T& b, Compare comp)
   return comp(b, a) ? b : a;
 }
 
-#ifdef NTL__CXX_VT
+#ifdef NTL_CXX_VT
 template<class T, class... Args>
 const T& min(const T& a, const Args&... args);
 template<class T, class Compare>
@@ -1145,7 +1145,7 @@ __forceinline const T& max(const T& a, const T& b, Compare comp)
   return comp(a, b) ? b : a;
 }
 
-#ifdef NTL__CXX_VT
+#ifdef NTL_CXX_VT
 template<class T, class... Args>
 const T& max(const T& a, const Args&... args);
 template<class T, class Compare>
@@ -1182,7 +1182,7 @@ pair<const T&, const T&> minmax(initializer_list<T> t);
 template<class T, class Compare>
 pair<const T&, const T&> minmax(initializer_list<T> t, Compare comp);
 
-#ifdef NTL__CXX_VT
+#ifdef NTL_CXX_VT
 template<class T, class... Args>
 pair<const T&, const T&> minmax(const T& a, const Args&... args);
 template<class T, class Compare>

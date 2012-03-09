@@ -170,7 +170,7 @@ struct object_session_information
 	uint32_t SessionId;
 };
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall
 NtQueryObject(
 		legacy_handle ObjectHandle,
@@ -183,7 +183,7 @@ NtQueryObject(
 
 
 ///\name Directory objects
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall
 NtCreateDirectoryObject(
     handle*         DirectoryHandle,
@@ -191,7 +191,7 @@ NtCreateDirectoryObject(
     const object_attributes& ObjectAttributes
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall
 NtOpenDirectoryObject(
     handle*         DirectoryHandle,
@@ -199,7 +199,7 @@ NtOpenDirectoryObject(
     const object_attributes& ObjectAttributes
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall
 NtQueryDirectoryObject(
     legacy_handle   DirectoryHandle,
@@ -272,7 +272,7 @@ namespace nt {
 
 ///\name Symbolic link objects
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall
 NtCreateSymbolicLinkObject(
     handle*         LinkHandle,
@@ -281,7 +281,7 @@ NtCreateSymbolicLinkObject(
     const const_unicode_string& LinkTarget
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall
 NtOpenSymbolicLinkObject(
     handle*         LinkHandle,
@@ -289,7 +289,7 @@ NtOpenSymbolicLinkObject(
     const object_attributes& ObjectAttributes
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall
 NtQuerySymbolicLinkObject(
     legacy_handle   LinkHandle,

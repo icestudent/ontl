@@ -72,7 +72,7 @@ namespace std
           {
             child[left] = child[right] = nullptr;
           }
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
           node(T&& elem)
           : elem(std::forward<T>(elem)), parent_and_color(0 | red)
           {
@@ -132,7 +132,7 @@ namespace std
         struct const_iterator_impl:
           std::iterator<std::bidirectional_iterator_tag, value_type, difference_type, const_pointer, const_reference>
         {
-#ifdef NTL__DEBUG
+#ifdef NTL_DEBUG
           const_iterator_impl()
             :p(), tree_()
           {}
@@ -197,7 +197,7 @@ namespace std
           insert_range(x.cbegin(), x.cend());
         }
 
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
         rb_tree(rb_tree&& x)
           :root_(), first_(), last_(), count_(), node_allocator(), comparator_()
         {
@@ -221,7 +221,7 @@ namespace std
           return *this;
         }
 
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
         rb_tree& operator=(rb_tree&& x)
         {
           if(this != &x){
@@ -289,7 +289,7 @@ namespace std
           }
         }
 
-  #ifdef NTL__CXX_RV
+  #ifdef NTL_CXX_RV
         void assign(rb_tree&& x)
         {
           if(this != x){
@@ -307,7 +307,7 @@ namespace std
           return np;
         }
 
-    #ifdef NTL__CXX_RV
+    #ifdef NTL_CXX_RV
         node_type* construct_node(value_type&& x)
         {
           node_type* const np = node_allocator.allocate(1);

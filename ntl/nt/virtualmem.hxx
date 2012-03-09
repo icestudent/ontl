@@ -91,7 +91,7 @@ namespace ntl {
 
 
 
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
       ntstatus __stdcall
       NtAllocateVirtualMemory(
         legacy_handle ProcessHandle,
@@ -102,7 +102,7 @@ namespace ntl {
         uint32_t      Protect
         );
 
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
       ntstatus __stdcall
       NtFreeVirtualMemory(
         legacy_handle ProcessHandle,
@@ -111,7 +111,7 @@ namespace ntl {
         uint32_t      FreeType
         );
 
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
       ntstatus __stdcall
       NtFlushVirtualMemory(
         legacy_handle ProcessHandle,
@@ -120,7 +120,7 @@ namespace ntl {
         io_status_block* IoStatus
         );
 
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
       ntstatus __stdcall
       NtLockVirtualMemory(
         legacy_handle ProcessHandle,
@@ -129,7 +129,7 @@ namespace ntl {
         map_type      LockOption
         );
 
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
       ntstatus __stdcall
       NtProtectVirtualMemory(
         legacy_handle ProcessHandle,
@@ -139,7 +139,7 @@ namespace ntl {
         uint32_t*     OldAccessProtection
         );
 
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
       ntstatus __stdcall
       NtQueryVirtualMemory(
         legacy_handle ProcessHandle,
@@ -150,7 +150,7 @@ namespace ntl {
         uint32_t*     ResultLength
         );
 
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
       ntstatus __stdcall
       NtUnlockVirtualMemory(
         legacy_handle ProcessHandle,

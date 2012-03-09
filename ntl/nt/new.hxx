@@ -48,7 +48,7 @@ void* __cdecl operator new(std::size_t size) throw(std::bad_alloc)
     ptr = ntl::nt::heap::alloc(ntl::nt::process_heap(), size); if(ptr) return ptr;
 
     std::new_handler nh = ntl::__new_handler;
-  #if STLX__USE_EXCEPTIONS
+  #if STLX_USE_EXCEPTIONS
     if(!nh)
       __ntl_throw(std::bad_alloc());
   #else
@@ -69,7 +69,7 @@ void __cdecl operator delete(void* ptr) __ntl_nothrow
 #ifndef NTL_NO_NEW_HANDLERS
 inline void __safe_call_new_handler(std::new_handler nh)
 {
-#if STLX__USE_EXCEPTIONS == 1
+#if STLX_USE_EXCEPTIONS == 1
     try {
       nh();
     } 

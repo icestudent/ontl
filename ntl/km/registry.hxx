@@ -79,7 +79,7 @@ ntstatus __stdcall
     int64_t *             Cookie
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 cm_register_callback_t CmRegisterCallback;
 
 typedef
@@ -88,7 +88,7 @@ ntstatus __stdcall
     int64_t *             Cookie
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 cm_unregister_callback_t CmUnRegisterCallback;
 
 

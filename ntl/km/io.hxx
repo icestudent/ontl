@@ -30,7 +30,7 @@ namespace km {
   typedef interrupt_mode::mode kinterrupt_mode;
 
   // imports
-  NTL__EXTERNAPI
+  NTL_EXTERNAPI
   ntstatus __stdcall
   IoConnectInterrupt(
     kinterrupt** InterruptObject,
@@ -46,11 +46,11 @@ namespace km {
     bool FloatingSave
     );
 
-  NTL__EXTERNAPI void __stdcall IoDisconnectInterrupt(kinterrupt* InterruptObject);
+  NTL_EXTERNAPI void __stdcall IoDisconnectInterrupt(kinterrupt* InterruptObject);
 
-  NTL__EXTERNAPI ntstatus __stdcall IoConnectInterruptEx(io_connect_interrupt_parameters* Parameters);
+  NTL_EXTERNAPI ntstatus __stdcall IoConnectInterruptEx(io_connect_interrupt_parameters* Parameters);
 
-  NTL__EXTERNAPI void __stdcall IoDisconnectInterruptEx(io_connect_interrupt_parameters* Parameters);
+  NTL_EXTERNAPI void __stdcall IoDisconnectInterruptEx(io_connect_interrupt_parameters* Parameters);
 
 
   // types

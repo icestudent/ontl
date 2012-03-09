@@ -38,14 +38,14 @@ namespace ntl {
       };
     };
 
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
     ntstatus
     DbgPrint(
       const char  Format[],
       ...
       );
 
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
     ntstatus
     DbgPrintEx(
       dpfltr::type  ComponentId,
@@ -54,11 +54,11 @@ namespace ntl {
       ...
       );
 
-    NTL__EXTERNAPI void __stdcall OutputDebugStringA(const char* OutputString);
+    NTL_EXTERNAPI void __stdcall OutputDebugStringA(const char* OutputString);
 
-// set NTL__USE_DBGPRINT to use default DbgPrint/DbgPrintEx in usermode
+// set NTL_USE_DBGPRINT to use default DbgPrint/DbgPrintEx in usermode
 
-#if defined(NTL__DEBUG) && !defined(NTL__SUBSYSTEM_KM) && !defined(NTL__USE_DBGPRINT)
+#if defined(NTL_DEBUG) && !defined(NTL_SUBSYSTEM_KM) && !defined(NTL_USE_DBGPRINT)
     namespace __ {
       inline void shared_dbgprint(const char* msg)
       {
@@ -84,13 +84,13 @@ namespace ntl {
 #define NTL__DEBUG_2K
 #endif
 
-#endif // NTL__USE_DBGPRINT
+#endif // NTL_USE_DBGPRINT
 
     //warning C4100: 'XXX' : unreferenced formal parameter
 #pragma warning(push)
 #pragma warning(disable:4100)
 
-#ifdef NTL__DEBUG
+#ifdef NTL_DEBUG
 #	define KdBreakPoint() intrinsic::debugbreak()
 # ifndef KdPrint
 #	  define KdPrint(X) DbgPrint X
@@ -309,7 +309,7 @@ namespace ntl {
 
       static __forceinline void bp()
       {
-      #ifdef NTL__DEBUG
+      #ifdef NTL_DEBUG
         intrinsic::debugbreak();
       #endif
       }

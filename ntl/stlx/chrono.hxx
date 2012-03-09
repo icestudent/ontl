@@ -148,7 +148,7 @@ namespace std
       explicit duration(const Rep& r)
         :rep_(r)
       {}
-#ifdef NTL__DOC
+#ifdef NTL_DOC
       template <class Rep2>
       explicit duration(const Rep2& r)
         :rep_(static_cast<rep>(r))
@@ -172,7 +172,7 @@ namespace std
       {}
 #endif
 
-#ifdef NTL__CXX_EF
+#ifdef NTL_CXX_EF
       ~duration() = default;
 #else
       // using the default destructor
@@ -236,7 +236,7 @@ namespace std
         rep_ -= d.rep_; return *this;
       }
 
-#ifdef NTL__DOC
+#ifdef NTL_DOC
       duration& operator%=(const duration& d)
       {
         rep_ %= d.rep_; return *this;
@@ -638,7 +638,7 @@ namespace std
       // NOTE: see the Table 54 (20.8.1), system time can be adjusted back.
       static const bool is_monotonic = false;
     public:
-#ifdef NTL__CXX_CONSTEXPR
+#ifdef NTL_CXX_CONSTEXPR
       static_assert(duration::min() < duration::zero(), "20.8.5.1.2");
 #else
       static_assert(numeric_limits<duration::rep>::is_signed, "20.8.5.1.2");
@@ -685,7 +685,7 @@ namespace std
 
       static const bool is_monotonic = true;
     public:
-#ifdef NTL__CXX_CONSTEXPR
+#ifdef NTL_CXX_CONSTEXPR
       static_assert(duration::min() < duration::zero(), "20.8.5.1.2");
 #else
       static_assert(numeric_limits<duration::rep>::is_signed, "20.8.5.1.2");

@@ -15,7 +15,7 @@ namespace ntl { namespace nt {
 
   enum io_completion_information_class;
 
-  NTL__EXTERNAPI
+  NTL_EXTERNAPI
     ntstatus __stdcall
     ZwCreateIoCompletion (
       handle* IoCompletionHandle,
@@ -24,7 +24,7 @@ namespace ntl { namespace nt {
       uint32_t Count
       );
 
-  NTL__EXTERNAPI
+  NTL_EXTERNAPI
     ntstatus __stdcall
     ZwOpenIoCompletion (
       handle* IoCompletionHandle,
@@ -32,7 +32,7 @@ namespace ntl { namespace nt {
       const object_attributes* ObjectAttributes
       );
 
-  NTL__EXTERNAPI
+  NTL_EXTERNAPI
     ntstatus __stdcall
     ZwQueryIoCompletion (
       legacy_handle IoCompletionHandle,
@@ -42,7 +42,7 @@ namespace ntl { namespace nt {
       uint32_t* ReturnLength
       );
   
-  NTL__EXTERNAPI
+  NTL_EXTERNAPI
     ntstatus __stdcall
     ZwSetIoCompletion (
       legacy_handle IoCompletionHandle,
@@ -52,7 +52,7 @@ namespace ntl { namespace nt {
       uintptr_t IoStatusInformation
       );
 
-  NTL__EXTERNAPI
+  NTL_EXTERNAPI
     ntstatus __stdcall
     ZwRemoveIoCompletion (
       legacy_handle IoCompletionHandle,

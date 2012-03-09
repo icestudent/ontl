@@ -2,7 +2,7 @@
 #define NTL__STLX_MOVE
 #pragma once
 
-#ifndef NTL__CXX_RV
+#ifndef NTL_CXX_RV
 
 /// move emulation support
 template<typename U>
@@ -23,7 +23,7 @@ private:
 #endif // rv
 
 
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
 # define __rvalue(T) T&&
 # define __lvalue(rhs) (&rhs)
 #else

@@ -33,7 +33,7 @@ using nt::duplicate_same_access;
 using nt::duplicate_same_attributes;
 
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 int __stdcall
   DuplicateHandle(
     legacy_handle   hSourceProcessHandle,
@@ -65,7 +65,7 @@ legacy_handle
 }
 
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 int __stdcall
   CloseHandle(legacy_handle hObject);
 

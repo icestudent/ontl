@@ -79,7 +79,7 @@ typedef void
                                    uint32_t Count
                                    );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 void __stdcall
 IoRegisterBootDriverReinitialization(
                                      driver_object* DriverObject,
@@ -87,7 +87,7 @@ IoRegisterBootDriverReinitialization(
                                      void* Context
                                      );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 void __stdcall
 IoRegisterDriverReinitialization(
                                  driver_object* DriverObject,

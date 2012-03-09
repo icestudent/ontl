@@ -27,7 +27,7 @@ typedef rtl_heap * heap_ptr;
 struct rtl_heap_parameters;
 
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 __declspec(restrict)
 heap_ptr __stdcall
   RtlCreateHeap(
@@ -39,13 +39,13 @@ heap_ptr __stdcall
     rtl_heap_parameters * Parameters  __optional
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall
   RtlDestroyHeap(
     heap_ptr HeapHandle
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 __declspec(restrict)
 void * __stdcall
   RtlAllocateHeap(
@@ -54,7 +54,7 @@ void * __stdcall
     size_t    Size
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 bool __stdcall
   RtlFreeHeap(
     heap_ptr      HeapHandle,
@@ -62,7 +62,7 @@ bool __stdcall
     const void *  BaseAddress
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 size_t
 __stdcall
 RtlSizeHeap(
@@ -71,7 +71,7 @@ RtlSizeHeap(
     const void* BaseAddress
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus
 __stdcall
 RtlZeroHeap(
@@ -79,7 +79,7 @@ RtlZeroHeap(
     uint32_t Flags
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 void
 __stdcall
 RtlProtectHeap(
@@ -87,21 +87,21 @@ RtlProtectHeap(
     bool MakeReadOnly
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 bool
 __stdcall
 RtlLockHeap(
     heap_ptr  HeapHandle
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 bool
 __stdcall
 RtlUnlockHeap(
     heap_ptr  HeapHandle
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 void*
 __stdcall
 RtlReAllocateHeap(
@@ -111,7 +111,7 @@ RtlReAllocateHeap(
     size_t Size
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 bool
 __stdcall
 RtlGetUserInfoHeap(
@@ -122,7 +122,7 @@ RtlGetUserInfoHeap(
     uint32_t* UserFlags __optional
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 bool
 __stdcall
 RtlSetUserValueHeap(
@@ -132,7 +132,7 @@ RtlSetUserValueHeap(
     void* UserValue
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 bool
 __stdcall
 RtlSetUserFlagsHeap(
@@ -151,7 +151,7 @@ struct rtl_heap_tag_info
 };
 
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 uint32_t
 __stdcall
 RtlCreateTagHeap(
@@ -161,7 +161,7 @@ RtlCreateTagHeap(
     wchar_t* TagNames
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 wchar_t*
 __stdcall
 RtlQueryTagHeap(
@@ -172,7 +172,7 @@ RtlQueryTagHeap(
     rtl_heap_tag_info* TagInfo __optional
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus
 __stdcall
 RtlExtendHeap(
@@ -182,7 +182,7 @@ RtlExtendHeap(
     size_t Size
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 size_t
 __stdcall
 RtlCompactHeap(
@@ -190,7 +190,7 @@ RtlCompactHeap(
     uint32_t Flags
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 bool
 __stdcall
 RtlValidateHeap(
@@ -199,12 +199,12 @@ RtlValidateHeap(
     const void* BaseAddress
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 bool
 __stdcall
 RtlValidateProcessHeaps();
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 uint32_t
 __stdcall
 RtlGetProcessHeaps(
@@ -220,7 +220,7 @@ typedef
     void* Parameter
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus
 __stdcall
 RtlEnumProcessHeaps(
@@ -249,7 +249,7 @@ struct rtl_heap_usage {
     uintptr_t Reserved[ 8 ];
 };
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus
 __stdcall
 RtlUsageHeap(
@@ -281,7 +281,7 @@ struct rtl_heap_walk_entry
     };
 };
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus
 __stdcall
 RtlWalkHeap(
@@ -359,7 +359,7 @@ struct rtl_heap_parameters
   uint32_t Reserved[2];
 };
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus
 __stdcall
 RtlSetHeapInformation (
@@ -369,7 +369,7 @@ RtlSetHeapInformation (
     size_t HeapInformationLength __optional
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus
 __stdcall
 RtlQueryHeapInformation (
@@ -495,7 +495,7 @@ public:
 
   ~heap() { destroy(h); }
 
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
   heap(heap&& rh)
     :h(rh.h)
   {

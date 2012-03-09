@@ -85,7 +85,7 @@ namespace std
       typedef typename add_rvalue_reference<const T>::type rparam_type;
     };
 
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
     template<typename T>
     struct traits<T&&>
     {
@@ -159,7 +159,7 @@ namespace std
       typedef meta::empty_type type;
     };
 
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
 
     template<class Types, size_t i, bool = (i < Types::length)>
     struct rparam
@@ -240,7 +240,7 @@ namespace std
         return *this;
       }
 
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
 #if 0
       // TUPLE_EXT:
     protected:
@@ -340,7 +340,7 @@ namespace std
       tuples& operator=(const tuples<meta::typelist<U1,U2,U3,U4,U5>, Idx>&)
       { return *this; }
 
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
       template<typename U1, typename U2, typename U3, typename U4, typename U5>
       tuples(tuples<meta::typelist<U1,U2,U3,U4,U5>, Idx>&&)
       {}
@@ -367,7 +367,7 @@ namespace std
       {}
       explicit tuples(meta::empty_type, meta::empty_type, meta::empty_type, meta::empty_type, meta::empty_type)
       {}
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
       explicit tuples(rvtag, meta::empty_type)
       {}
       explicit tuples(rvtag, meta::empty_type, meta::empty_type)
@@ -414,7 +414,7 @@ namespace std
 
 #define NTL_TUPLE_GET(n,aux) tail.
 
-#ifndef NTL__CXX_RV_DEPRECATED__
+#ifndef NTL_CXX_RV_DEPRECATED__
 
     template<typename R, size_t N>
     struct field2
@@ -505,7 +505,7 @@ namespace std
     typedef typename __::tuple_param<types,3>::type ltype4;
     typedef typename __::tuple_param<types,4>::type ltype5;
     
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
     typedef typename __::rparam<types,0>::type rtype1;
     typedef typename __::rparam<types,1>::type rtype2;
     typedef typename __::rparam<types,2>::type rtype3;
@@ -565,7 +565,7 @@ namespace std
     }
 
 
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
 
     // template <class... UTypes> explicit tuple(UTypes&&... u);
     // BUG: compiler selects 'tuple(U1&&) instead of 'tuple(const tuple&)', e.g. tuple<int> x1, x2(x1);
@@ -638,7 +638,7 @@ namespace std
       return *this = tuple<U1,U2>(p);
     }
 
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
     template <class U1, class U2>
     tuple(pair<U1, U2>&& p)
       :base(forward<U1>(p.first), forward<U2>(p.second))
@@ -705,7 +705,7 @@ namespace std
   }
 
   // TUPLE_EXT:
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
   template<typename T1>
   inline typename __::tmap<T1>::type make_tuple(T1&& p1)
   {

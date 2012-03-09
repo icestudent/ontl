@@ -108,7 +108,7 @@ class vector
     {
       end_ = begin_ = array_allocator.allocate(n);
       // TODO: detect move constructor existance and split this implementation in two other (common and move)
-#if !defined(NTL__CXX_RV) || defined(NTL__CXX_RVFIX)
+#if !defined(NTL_CXX_RV) || defined(NTL_CXX_RVFIX)
       while(n--)
         array_allocator.construct(end_++, T());
 #else
@@ -168,7 +168,7 @@ class vector
       }
     }
 
-    #ifdef NTL__CXX_RV
+    #ifdef NTL_CXX_RV
     vector(vector&& x)
       :begin_(), end_(), capacity_()
     {
@@ -215,7 +215,7 @@ class vector
       return *this;
     }
 
-    #ifdef NTL__CXX_RV
+    #ifdef NTL_CXX_RV
     vector<T,Allocator>& operator=(vector<T,Allocator>&& x)
     {
       if(this != &x){
@@ -396,7 +396,7 @@ class vector
         //new_end += difference_type(new_mem - old_mem);        // dangerous alignment
         iterator dest = begin_ = new_mem;
         // this is safe for begin_ == 0 && end_ == 0, but keep vector() intact
-        //#ifndef NTL__CXX_RV
+        //#ifndef NTL_CXX_RV
         for ( iterator src = old_mem; src != position; ++src, ++dest )
           move(dest, src);
         //#else
@@ -424,7 +424,7 @@ class vector
       return r_dest;
     }
 
-    #ifdef NTL__CXX_RV
+    #ifdef NTL_CXX_RV
     iterator insert__impl(const_iterator position, size_type n, T&& x)
     {
       iterator r_dest = insert__blank_space(position, n);
@@ -474,11 +474,11 @@ class vector
 
     ///\name  modifiers [23.2.6.4]
 
-    #ifdef NTL__CXX_VT
+    #ifdef NTL_CXX_VT
     template <class... Args> void emplace_back(Args&&... args);
     #endif
 
-    #ifdef NTL__CXX_RV
+    #ifdef NTL_CXX_RV
     void push_back(T&& x)
     {
       if ( size() == capacity() ) realloc(capacity_factor());
@@ -496,7 +496,7 @@ class vector
 
     void pop_back() __ntl_nothrow { array_allocator.destroy(--end_); }
 
-    #ifdef NTL__CXX_VT
+    #ifdef NTL_CXX_VT
     template <class... Args> iterator emplace(const_iterator position, Args&&... args);
     #endif
 
@@ -505,7 +505,7 @@ class vector
       return insert__impl(position, 1, x);
     }
 
-    #ifdef NTL__CXX_RV
+    #ifdef NTL_CXX_RV
     iterator insert(const_iterator position, T&& x)
     {
       return insert__impl(position, 1, forward<value_type>((x)));
@@ -539,7 +539,7 @@ class vector
       do move(i, i + 1); while ( ++i != end_ );
     #else
       if(position + 1 != end()){
-        #ifdef NTL__CXX_RV
+        #ifdef NTL_CXX_RV
           std::move
         #else
           std::copy
@@ -569,7 +569,7 @@ class vector
         if ( !no_dtor::value )
           for ( iterator i = last_; i != first_;  ) array_allocator.destroy(--i);
 
-        #ifdef NTL__CXX_RV
+        #ifdef NTL_CXX_RV
         end_ = std::move(last_, end(), first_);
         #else
         end_ = std::copy(last_, end(), first_);
@@ -640,7 +640,7 @@ class vector
 
     void move(const iterator to, const iterator from) const
     {
-      #ifndef NTL__CXX_RV
+      #ifndef NTL_CXX_RV
       array_allocator.construct(to, *from);
       #else
       array_allocator.construct(to, forward<value_type>(*from));

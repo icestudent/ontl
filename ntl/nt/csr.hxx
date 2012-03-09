@@ -418,7 +418,7 @@ STATIC_ASSERT(offsetof(base_api_msg_64, ReturnValue) == 0x34);
 
 //////////////////////////////////////////////////////////////////////////
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall
 CsrClientConnectToServer(
     wchar_t* ObjectDirectory,
@@ -429,7 +429,7 @@ CsrClientConnectToServer(
     uint32_t* CalledFromServer
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall
 CsrClientCallServer(
     csr_api_msg* m,
@@ -438,7 +438,7 @@ CsrClientCallServer(
     uint32_t ArgLength
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 csr_capture_header* __stdcall
 CsrAllocateCaptureBuffer(
     uint32_t CountMessagePointers,
@@ -446,13 +446,13 @@ CsrAllocateCaptureBuffer(
     uint32_t Size
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 void __stdcall
 CsrFreeCaptureBuffer(
     csr_capture_header* CaptureBuffer
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 uint32_t __stdcall
 CsrAllocateMessagePointer(
     csr_capture_header* CaptureBuffer,
@@ -460,7 +460,7 @@ CsrAllocateMessagePointer(
     void** Pointer
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 uint32_t __stdcall
 CsrAllocateCapturePointer(
     csr_capture_header* CaptureBuffer,
@@ -468,7 +468,7 @@ CsrAllocateCapturePointer(
     void** Pointer
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 void __stdcall
 CsrCaptureMessageBuffer(
     csr_capture_header* CaptureBuffer,
@@ -477,7 +477,7 @@ CsrCaptureMessageBuffer(
     void** CapturedBuffer
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 void __stdcall
 CsrCaptureMessageString(
     csr_capture_header* CaptureBuffer,
@@ -487,14 +487,14 @@ CsrCaptureMessageString(
     ansi_string* CapturedString
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 int64_t* __stdcall
 CsrCaptureTimeout(
     uint32_t Milliseconds,
     int64_t* Timeout
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 void __stdcall
 CsrProbeForWrite(
     void* Address,
@@ -502,7 +502,7 @@ CsrProbeForWrite(
     uint32_t Alignment
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 void __stdcall
 CsrProbeForRead(
     void* Address,
@@ -510,15 +510,15 @@ CsrProbeForRead(
     uint32_t Alignment
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall
 CsrNewThread();
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall
 CsrIdentifyAlertableThread();
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall
 CsrSetPriorityClass(
     legacy_handle ProcessHandle,

@@ -43,10 +43,10 @@ ntstatus __stdcall
     );
 
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 set_remove_load_image_notify_routine_t  PsSetLoadImageNotifyRoutine;
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 set_remove_load_image_notify_routine_t  PsRemoveLoadImageNotifyRoutine;
 
 

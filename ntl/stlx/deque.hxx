@@ -51,7 +51,7 @@ namespace std {
       if(n){
         reserve(n);
         capR -= n;
-      #if !defined(NTL__CXX_RV) || defined(NTL__CXX_RVFIX)
+      #if !defined(NTL_CXX_RV) || defined(NTL_CXX_RVFIX)
         while(n--)
           alloc.construct(right++, T());
       #else
@@ -97,7 +97,7 @@ namespace std {
       assign(il.begin(), il.end(), forward_iterator_tag());
     }
 
-    #ifdef NTL__CXX_RV
+    #ifdef NTL_CXX_RV
     deque(deque&& x)
       :alloc(), left(), right(), capL(), capR(), base_(), cap_()
     {
@@ -140,7 +140,7 @@ namespace std {
       return *this;
     }
     
-    #ifdef NTL__CXX_RV
+    #ifdef NTL_CXX_RV
     deque<T,Allocator>& operator=(deque<T,Allocator>&& x)
     {
       if(&x != this){
@@ -209,7 +209,7 @@ namespace std {
     
     void resize(size_type sz)
     {
-    #ifndef NTL__CXX_RV
+    #ifndef NTL_CXX_RV
       resize(sz, value_type());
       return;
     #else
@@ -221,7 +221,7 @@ namespace std {
         if(sz > capR)
           reallocate(sz/*-capR*/);
         capR -= sz;
-      #if !defined(NTL__CXX_RV) || defined(NTL__CXX_RVFIX)
+      #if !defined(NTL_CXX_RV) || defined(NTL_CXX_RVFIX)
         while(sz--)
           alloc.construct(right++, T());
       #else
@@ -272,13 +272,13 @@ namespace std {
     const_reference back() const  { return *(right-1); }
     
     ///\name 23.2.2.3 modifiers:
-    #ifdef NTL__CXX_VT
+    #ifdef NTL_CXX_VT
     template <class... Args> void emplace_front(Args&&... args);
     template <class... Args> void emplace_back(Args&&... args);
     template <class... Args> iterator emplace(const_iterator position, Args&&... args);
     #endif
 
-    #ifdef NTL__CXX_RV
+    #ifdef NTL_CXX_RV
     void push_front(T&& x)
     {
       if(empty())
@@ -332,7 +332,7 @@ namespace std {
       validate();
     }
 
-    #ifdef NTL__CXX_RV
+    #ifdef NTL_CXX_RV
     iterator insert(const_iterator position, T&& x)
     {
       assert(position >= left && position <= right);

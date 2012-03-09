@@ -28,7 +28,7 @@ namespace nt {
 //#pragma warning(push)
 //#pragma warning(disable:4190)// C-linkage specified, but returns UDT 'identifier2' which is incompatible with C
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall
   NtCreateFile(
     handle *                  FileHandle,
@@ -44,7 +44,7 @@ ntstatus __stdcall
     uint32_t                  EaLength
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall
   NtOpenFile(
     handle *                  FileHandle,
@@ -56,7 +56,7 @@ ntstatus __stdcall
     );
 
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall
   NtReadFile(
     legacy_handle     FileHandle,
@@ -70,7 +70,7 @@ ntstatus __stdcall
     const uint32_t *  Key           __optional
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall
   NtWriteFile(
     legacy_handle     FileHandle,
@@ -84,33 +84,33 @@ ntstatus __stdcall
     const uint32_t *  Key           __optional
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall NtFlushBuffersFile(legacy_handle FileHandle, io_status_block* IoStatusBlock);
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall NtQueryAttributesFile(const object_attributes& ObjectAttributes, file_basic_information& FileInformation);
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall NtQueryFullAttributesFile(const object_attributes& ObjectAttributes, file_network_open_information& FileInformation);
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall ZwQueryFullAttributesFile(const object_attributes& ObjectAttributes, file_network_open_information& FileInformation);
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall NtDeleteFile(const object_attributes& ObjectAttributes);
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall ZwDeleteFile(const object_attributes& ObjectAttributes);
 
 //////////////////////////////////////////////////////////////////////////
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 uint32_t __stdcall RtlGetCurrentDirectory_U(uint32_t nBufferLength, wchar_t* lpBuffer);
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall RtlSetCurrentDirectory_U(const const_unicode_string& PathName);
 
 //////////////////////////////////////////////////////////////////////////
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall
   NtQueryDirectoryFile(
     legacy_handle  FileHandle,
@@ -126,7 +126,7 @@ ntstatus __stdcall
     bool RestartScan
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall
   ZwQueryDirectoryFile(
     legacy_handle  FileHandle,
@@ -144,7 +144,7 @@ ntstatus __stdcall
 
 //////////////////////////////////////////////////////////////////////////
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall
   NtCreateSection(
     handle*                     SectionHandle,
@@ -156,7 +156,7 @@ ntstatus __stdcall
     legacy_handle               FileHandle    __optional
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall
   NtOpenSection(
     handle*                   SectionHandle,
@@ -164,7 +164,7 @@ ntstatus __stdcall
     const object_attributes*  ObjectAttributes
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall
   NtMapViewOfSection(
     legacy_handle               SectionHandle,
@@ -179,7 +179,7 @@ ntstatus __stdcall
     page_protection::type       Win32Protect
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall
   NtUnmapViewOfSection(
     legacy_handle   ProcessHandle,
@@ -211,7 +211,7 @@ struct rtl_relative_name
   {}
 };
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 bool __stdcall RtlDosPathNameToNtPathName_U(
     const wchar_t*  DosFileName,
     unicode_string* NtFileName,
@@ -220,7 +220,7 @@ bool __stdcall RtlDosPathNameToNtPathName_U(
     );
 
 // 2k3sp1+
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall RtlDosPathNameToNtPathName_U_WithStatus(
     const wchar_t*  DosFileName,
     unicode_string* NtFileName,
@@ -228,7 +228,7 @@ ntstatus __stdcall RtlDosPathNameToNtPathName_U_WithStatus(
     rtl_relative_name* // reserved
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 bool __stdcall RtlDosPathNameToRelativeNtPathName_U(
     const wchar_t*  DosFileName,
     unicode_string* NtFileName,
@@ -236,7 +236,7 @@ bool __stdcall RtlDosPathNameToRelativeNtPathName_U(
     rtl_relative_name* RelativeName
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall RtlDosPathNameToRelativeNtPathName_U_WithStatus(
     const wchar_t*  DosFileName,
     unicode_string* NtFileName,
@@ -244,7 +244,7 @@ ntstatus __stdcall RtlDosPathNameToRelativeNtPathName_U_WithStatus(
     rtl_relative_name* RelativeName
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 void __stdcall RtlReleaseRelativeName(rtl_relative_name*);
 
 namespace rtl
@@ -316,7 +316,7 @@ namespace rtl
 
 typedef rtl::path_type::type rtl_path_type;
 
-NTL__EXTERNAPI rtl_path_type __stdcall RtlDetermineDosPathNameType_U(const wchar_t* DosFileName);
+NTL_EXTERNAPI rtl_path_type __stdcall RtlDetermineDosPathNameType_U(const wchar_t* DosFileName);
 
 //#pragma warning(pop)
 

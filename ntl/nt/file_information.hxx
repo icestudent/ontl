@@ -114,7 +114,7 @@ ntstatus __stdcall
     uint32_t                FileInformationClass
     );
 
-NTL__EXTERNAPI query_information_file_t NtQueryInformationFile;
+NTL_EXTERNAPI query_information_file_t NtQueryInformationFile;
 
 typedef
 ntstatus __stdcall
@@ -126,7 +126,7 @@ ntstatus __stdcall
     file_information_class  FileInformationClass
     );
 
-NTL__EXTERNAPI set_information_file_t NtSetInformationFile;
+NTL_EXTERNAPI set_information_file_t NtSetInformationFile;
 
 
 template <class                     InformationClass,
@@ -544,8 +544,8 @@ typedef ntstatus __stdcall
     fs_information_class  FsInformationClass
     );
 
-NTL__EXTERNAPI query_information_file_t NtQueryVolumeInformationFile;
-NTL__EXTERNAPI set_information_file_t NtSetVolumeInformationFile;
+NTL_EXTERNAPI query_information_file_t NtQueryVolumeInformationFile;
+NTL_EXTERNAPI set_information_file_t NtSetVolumeInformationFile;
 
 template<class InformationClass>
 struct volume_information:

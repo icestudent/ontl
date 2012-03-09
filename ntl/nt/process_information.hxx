@@ -107,8 +107,8 @@ ntstatus __stdcall
     uint32_t                  ProcessInformationLength
     );
 
-NTL__EXTERNAPI query_process_information_t NtQueryInformationProcess;
-NTL__EXTERNAPI set_process_information_t   NtSetInformationProcess;
+NTL_EXTERNAPI query_process_information_t NtQueryInformationProcess;
+NTL_EXTERNAPI set_process_information_t   NtSetInformationProcess;
 
 //////////////////////////////////////////////////////////////////////////
 namespace aux
@@ -435,8 +435,8 @@ set_thread_information_t (
                           uint32_t          ThreadInformationLength
                           );
 
-NTL__EXTERNAPI query_thread_information_t NtQueryInformationThread;
-NTL__EXTERNAPI set_thread_information_t   NtSetInformationThread;
+NTL_EXTERNAPI query_thread_information_t NtQueryInformationThread;
+NTL_EXTERNAPI set_thread_information_t   NtSetInformationThread;
 
 template <class                       InformationClass,
           query_thread_information_t QueryInformation,

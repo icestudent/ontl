@@ -50,7 +50,7 @@ namespace std {
         :comp(x.comp)
       {}
 
-      #ifdef NTL__CXX_RV
+      #ifdef NTL_CXX_RV
       __forceinline
       value_compare(value_compare&& x)
         :comp(move(x.comp))
@@ -133,7 +133,7 @@ public:
       :val_comp_(x.val_comp_), tree_type(static_cast<const tree_type&>(x))
     {}
 
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
     map(map<Key,T,Compare,Allocator>&& x)
       // Compare must be a CopyConstructible
       :val_comp_(x.val_comp_), tree_type(val_comp_, x.get_allocator())
@@ -150,7 +150,7 @@ public:
       :val_comp_(x.val_comp_), tree_type(val_comp_, a)
     {}
 
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
     map(map&& x, const Allocator& a)
       :val_comp_(x.val_comp_), tree_type(val_comp_, a)
     {}
@@ -173,7 +173,7 @@ public:
       return *this;
     }
 
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
     map<Key,T,Compare,Allocator>& operator=(map<Key,T,Compare,Allocator>&& x)
     {
       if(this != &x){
@@ -216,7 +216,7 @@ public:
       return iter->second;
     }
 
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
     T& operator[](key_type&& x)
     {
       iterator iter = find(x);
@@ -243,12 +243,12 @@ public:
     }
 
     // modifiers:
-#ifdef NTL__CXX_VT
+#ifdef NTL_CXX_VT
     template <class... Args> pair<iterator, bool> emplace(Args&&... args);
     template <class... Args> iterator emplace(const_iterator position, Args&&... args);
 #endif
 
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
     std::pair<iterator, bool> insert(const value_type& x)
     {
       return tree_type::insert_impl(tree_type::construct_node(x));

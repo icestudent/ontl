@@ -51,8 +51,8 @@ namespace ntl { namespace km {
     };
 
 
-    NTL__EXTERNAPI void __stdcall FltObjectDereference(object*);
-    NTL__EXTERNAPI void __stdcall FltObjectReference(object*);
+    NTL_EXTERNAPI void __stdcall FltObjectDereference(object*);
+    NTL_EXTERNAPI void __stdcall FltObjectReference(object*);
 
     namespace aux 
     {
@@ -521,8 +521,8 @@ namespace ntl { namespace km {
       unicode_string  ParentDir;
     };
 
-    NTL__EXTERNAPI ntstatus __stdcall FltGetFileNameInformation(callback_data*, file_name_info::options, file_name_info**);
-    NTL__EXTERNAPI void __stdcall FltReleaseFileNameInformation(file_name_info*);
+    NTL_EXTERNAPI ntstatus __stdcall FltGetFileNameInformation(callback_data*, file_name_info::options, file_name_info**);
+    NTL_EXTERNAPI void __stdcall FltReleaseFileNameInformation(file_name_info*);
 
     struct related_objects
     {
@@ -667,13 +667,13 @@ namespace ntl { namespace km {
 #endif // FLT_MGR_LONGHORN
     };
 
-    NTL__EXTERNAPI ntstatus __stdcall FltGetFilterFromName(const const_unicode_string&, filter_handle*);
-    NTL__EXTERNAPI ntstatus __stdcall FltRegisterFilter(driver_object*, const registration*, filter_handle*);
-    NTL__EXTERNAPI ntstatus __stdcall FltStartFiltering(object*);
-    NTL__EXTERNAPI ntstatus __stdcall FltUnregisterFilter(object*);
+    NTL_EXTERNAPI ntstatus __stdcall FltGetFilterFromName(const const_unicode_string&, filter_handle*);
+    NTL_EXTERNAPI ntstatus __stdcall FltRegisterFilter(driver_object*, const registration*, filter_handle*);
+    NTL_EXTERNAPI ntstatus __stdcall FltStartFiltering(object*);
+    NTL_EXTERNAPI ntstatus __stdcall FltUnregisterFilter(object*);
 
-    NTL__EXTERNAPI ntstatus __stdcall FltGetVolumeFromName(object* Filter, const const_unicode_string&, filter_handle* Volume);
-    NTL__EXTERNAPI ntstatus __stdcall FltGetVolumeName(const object* Volume, unicode_string*, uint32_t*);
+    NTL_EXTERNAPI ntstatus __stdcall FltGetVolumeFromName(object* Filter, const const_unicode_string&, filter_handle* Volume);
+    NTL_EXTERNAPI ntstatus __stdcall FltGetVolumeName(const object* Volume, unicode_string*, uint32_t*);
 
 
     //////////////////////////////////////////////////////////////////////////
@@ -803,7 +803,7 @@ namespace ntl { namespace km {
       }
     }
 #ifdef SYSTEM_ERROR_SUPPORT
-# if STLX__USE_EXCEPTIONS
+# if STLX_USE_EXCEPTIONS
     __ntl_try {
       flt::volume vol2(myfilter, L"Z:"); // if 'Z:' volume doesn't exists, 
       std::wstring name = vol2.name();
@@ -822,7 +822,7 @@ namespace ntl { namespace km {
     std::wstring name3 = vol3.name();
     assert(!name.empty());
 
-#endif  // STLX__USE_EXCEPTIONS
+#endif  // STLX_USE_EXCEPTIONS
 #endif // SYSTEM_ERROR_SUPPORT
   }
 #endif // NTL_TEST

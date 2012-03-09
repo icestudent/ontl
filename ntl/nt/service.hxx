@@ -18,13 +18,13 @@ namespace nt {
  *@{*/
 
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall
   NtLoadDriver(
     const const_unicode_string *  DriverServiceName
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall
   NtUnloadDriver(
     const const_unicode_string *  DriverServiceName

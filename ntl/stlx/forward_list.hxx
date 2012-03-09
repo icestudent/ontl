@@ -30,7 +30,7 @@ namespace std {
       T elem;
 
       node(const T& elem) : elem(elem)   {}
-      #ifdef NTL__CXX_RV
+      #ifdef NTL_CXX_RV
       node(T&& elem) : elem(forward<T>(elem))  {}
       node(node&& x): elem(move(x.elem))
       {}
@@ -61,7 +61,7 @@ namespace std {
     typedef typename  
       Alloc::template rebind<node_type>::other      node_allocator_type;
 
-  #ifdef NTL__CXX_RV
+  #ifdef NTL_CXX_RV
     typedef forward_list<T, Alloc>&& list_reference;
   #else
     typedef forward_list<T, Alloc>&  list_reference;
@@ -183,7 +183,7 @@ namespace std {
       insert_after(cbefore_begin(), x.begin(), x.end());
     }
 
-  #ifdef NTL__CXX_RV
+  #ifdef NTL_CXX_RV
     forward_list(forward_list<T,Alloc>&& x)
       :node_allocator()
     {
@@ -211,7 +211,7 @@ namespace std {
       return *this;
     }
 
-  #ifdef NTL__CXX_RV
+  #ifdef NTL_CXX_RV
     forward_list<T,Alloc>& operator=(forward_list<T,Alloc>&& x)
     {
       if(this != &x){
@@ -285,13 +285,13 @@ namespace std {
     
     // 23.2.3.4 modifiers:
     
-  #ifdef NTL__CXX_VT
+  #ifdef NTL_CXX_VT
     template <class... Args>
     void emplace_front(Args&&... args)
     {
       insert_after(cbefore_begin(), forward<Args>(args)...);
     }
-  #elif defined(NTL__CXX_RV)
+  #elif defined(NTL_CXX_RV)
 
     template<class Arg1>
     void emplace_front(Arg1&& arg1)
@@ -321,9 +321,9 @@ namespace std {
       erase_after(cbefore_begin());
     }
     
-  #ifdef NTL__CXX_VT
+  #ifdef NTL_CXX_VT
     template <class... Args> iterator emplace_after(const_iterator position, Args&&... args);
-  #elif defined NTL__CXX_RV
+  #elif defined NTL_CXX_RV
     template <class Arg1>
     iterator emplace_after(const_iterator position, Arg1&& arg1)
     {

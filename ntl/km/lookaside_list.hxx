@@ -16,14 +16,14 @@ namespace ntl {
 namespace km {
 
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 slist_entry *  __fastcall
   ExInterlockedPopEntrySList(
     slist_header *  ListHead,
     kspin_lock *    Lock
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 slist_entry *  __fastcall
   ExInterlockedPushEntrySList(
     slist_header *  ListHead,
@@ -145,7 +145,7 @@ struct npaged_lookaside_list : public general_lookaside
 };
 
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 void __stdcall
   ExInitializeNPagedLookasideList(
     general_lookaside *                       Lookaside,
@@ -157,7 +157,7 @@ void __stdcall
     uint16_t            Depth
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 void __stdcall
   ExDeleteNPagedLookasideList(
     general_lookaside * Lookaside);

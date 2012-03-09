@@ -759,7 +759,7 @@ namespace std
         }
         const void* get_deleter(const type_info& ti) const __ntl_nothrow
         {
-        #if STLX__USE_RTTI
+        #if STLX_USE_RTTI
             return typeid(D) == ti ? reinterpret_cast<const void*>(&deleter) : nullptr;
         #else
             return reinterpret_cast<const void*>(&deleter);
@@ -1071,7 +1071,7 @@ namespace std
 
     //////////////////////////////////////////////////////////////////////////
     // 20.8.12.2.6, shared_ptr creation
-  #ifdef NTL__CXX_VT
+  #ifdef NTL_CXX_VT
     template<class T, class... Args> shared_ptr<T> make_shared(Args&&... args);
     template<class T, class A, class... Args>
     shared_ptr<T> allocate_shared(const A& a, Args&&... args);
@@ -1154,7 +1154,7 @@ namespace std
     template<class T, class U>
     inline bool operator<(shared_ptr<T> const& a, shared_ptr<U> const& b) __ntl_nothrow
     {
-    #ifdef NTL__CXX_TYPEOF
+    #ifdef NTL_CXX_TYPEOF
       typedef decltype(a.get() < b.get()) V;
       return std::less<V>()(a.get(), b.get());
     #else
@@ -1392,7 +1392,7 @@ namespace std
 
 
   /// 20.8.12.6 Pointer safety [util.dynamic.safety]
-#ifdef NTL__CXX_ENUM
+#ifdef NTL_CXX_ENUM
   enum class pointer_safety { relaxed, preferred, strict };
 #else
   /**
@@ -1422,7 +1422,7 @@ namespace std
 
 
   /// 20.8.13 Align [ptr.align]
-#ifndef NTL__CXX_ALIGN
+#ifndef NTL_CXX_ALIGN
   inline void * align(size_t alignment, size_t size, void* &ptr, size_t& space)
   {
     uintptr_t & uptr = reinterpret_cast<uintptr_t&>(ptr);

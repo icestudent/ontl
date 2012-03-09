@@ -9,7 +9,7 @@
 #pragma once
 
 // VC compiler always under NT and for NT (if not for KM)
-#if defined _MSC_VER && !defined(NTL__SUBSYSTEM_KM)
+#if defined _MSC_VER && !defined(NTL_SUBSYSTEM_KM)
 # define NTL__SUBSYSTEM_NT
 #endif
 #ifndef NTL__SUBSYSTEM_NS
@@ -257,7 +257,7 @@ namespace ntl {
       DllThreadDetach
     };};
 
-NTL__EXTERNAPI ntstatus __stdcall ZwYieldExecution();
+NTL_EXTERNAPI ntstatus __stdcall ZwYieldExecution();
 
 static inline ntstatus yield_execution()
 {
@@ -267,7 +267,7 @@ static inline ntstatus yield_execution()
 // system_time::type
 typedef int64_t systime_t;
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall
   NtDelayExecution(
     bool              Alertable,
@@ -320,7 +320,7 @@ namespace compression
 
 } // compression
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall
   RtlGetCompressionWorkSpaceSize (
     uint16_t CompressionFormatAndEngine,
@@ -328,7 +328,7 @@ ntstatus __stdcall
     uint32_t* CompressFragmentWorkSpaceSize
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall
   RtlCompressBuffer (
     uint16_t CompressionFormatAndEngine,
@@ -341,7 +341,7 @@ ntstatus __stdcall
     void* WorkSpace
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall
   RtlDecompressFragment (
     uint16_t CompressionFormat,
@@ -354,7 +354,7 @@ ntstatus __stdcall
     void* WorkSpace
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall
   RtlDecompressBuffer (
     uint16_t CompressionFormat,
@@ -365,10 +365,10 @@ ntstatus __stdcall
     uint32_t* FinalUncompressedSize
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
   uint32_t __stdcall RtlUniform(uint32_t* Seed);
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
   uint32_t __stdcall RtlRandom(uint32_t* Seed);
 
 namespace harderror
@@ -415,7 +415,7 @@ namespace harderror
 
 } // harderror
 
-NTL__EXTERNAPI harderror::raise_hard_error_t NtRaiseHardError;
+NTL_EXTERNAPI harderror::raise_hard_error_t NtRaiseHardError;
 
   }//namespace nt
 }//namespace ntl

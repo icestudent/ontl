@@ -59,11 +59,11 @@ namespace ntl {
 **/
 
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall RtlSetEnvironmentVariable(void** Environment, const const_unicode_string& Name, const const_unicode_string& Value);
 
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall RtlQueryEnvironmentVariable_U(void* Environment, const const_unicode_string& Name, unicode_string& Value);
 
 

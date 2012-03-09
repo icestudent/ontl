@@ -41,19 +41,19 @@ struct timer_basic_information
 
 
 // timers
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall NtCreateTimer(handle* TimerHandle, uint32_t DesiredAccess, const object_attributes* ObjectAttributes, timer_type TimerType);
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall NtOpenTimer(handle* TimerHandle, uint32_t DesiredAccess, const object_attributes* ObjectAttributes);
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall NtSetTimer(legacy_handle TimerHandle, const int64_t& DueTime, timer_apc_routine* TimerApcRoutine, void* TimerContext, bool ResumeTimer, int32_t Period, bool* PreviousState);
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall NtCancelTimer(legacy_handle TimerHandle, bool* CurrentState);
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall NtQueryTimer(legacy_handle TimerHandle, timer_information_class TimerInformationClass, void* TimerInformation, uint32_t TimerInformationLength, uint32_t* ReturnLength);
 
 
@@ -77,10 +77,10 @@ struct worker_thread
 typedef worker_thread::flags_t worker_thread_flags;
 
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall RtlCreateTimerQueue(handle* TimerQueueHandle);
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall RtlCreateTimer(
                     legacy_handle         Queue,
                     handle*               TimerHandle,
@@ -91,16 +91,16 @@ ntstatus __stdcall RtlCreateTimer(
                     worker_thread_flags   Flags
                     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall RtlUpdateTimer(legacy_handle TimerQueueHandle, legacy_handle TimerHandle, uint32_t DueTime, uint32_t Period);
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall RtlDeleteTimer(legacy_handle TimerQueueHandle, legacy_handle TimerHandle, legacy_handle CompletionEvent);
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall RtlDeleteTimerQueue(legacy_handle TimerQueueHandle);
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall RtlDeleteTimerQueueEx(legacy_handle TimerQueueHandle, legacy_handle CompletionEvent);
 
 

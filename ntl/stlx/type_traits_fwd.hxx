@@ -51,7 +51,7 @@ template <class T> struct add_lvalue_reference;
 template <class T> struct add_rvalue_reference;
 template <class T> struct add_reference;
 
-#ifndef NTL__DOC
+#ifndef NTL_DOC
   template <class T>
   typename add_rvalue_reference<T>::type declval() __ntl_nothrow;
 #endif
@@ -78,7 +78,7 @@ template <std::size_t Align>struct aligner;
 template <std::size_t Len, std::size_t Align = alignof(void*)>
 struct aligned_storage;
 
-#ifdef NTL__CXX_VT
+#ifdef NTL_CXX_VT
 template <std::size_t Len, class... Types> struct aligned_union;
 #endif
 
@@ -187,7 +187,7 @@ template <class T> struct is_trivially_copy_assignable;
 template <class T> struct is_trivially_move_assignable;
 template <class T> struct is_trivially_destructible;
 
-#ifdef NTL__CXX_VT
+#ifdef NTL_CXX_VT
 template <class T, class... Args> struct is_constructible;
 template <class T> struct is_default_constructible;
 template <class T> struct is_copy_constructible;
@@ -213,11 +213,11 @@ template <class T, unsigned I = 0> struct extent;
 template<class T> struct is_trivial;
 
 // 20.6.7.2 Other transformations [meta.trans.other]
-#if defined(NTL__CXX_VT) && defined(NTL__CXX_TYPEOF)
+#if defined(NTL_CXX_VT) && defined(NTL_CXX_TYPEOF)
 
 template <class ...T> struct common_type;
 
-#else // NTL__CXX
+#else // NTL_CXX
 
 template<class T, class U = void, class V = void, class W = void>
 struct common_type;

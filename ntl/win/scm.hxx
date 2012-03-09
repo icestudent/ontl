@@ -27,7 +27,7 @@ namespace win {
 typedef const struct _opaque { } * legacy_sc_handle;
 enum sc_status_type { sc_status_process_info };
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 legacy_sc_handle __stdcall
   OpenSCManagerW(
     const wchar_t * lpMachineName,
@@ -35,7 +35,7 @@ legacy_sc_handle __stdcall
     uint32_t        dwDesiredAccess
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 legacy_sc_handle __stdcall
   OpenServiceW(
     legacy_sc_handle  hSCManager,
@@ -43,13 +43,13 @@ legacy_sc_handle __stdcall
     uint32_t          dwDesiredAccess
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 int __stdcall
   CloseServiceHandle(
     legacy_sc_handle hSCObject
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 legacy_sc_handle __stdcall
   CreateServiceW(
     legacy_sc_handle  hSCManager,
@@ -67,13 +67,13 @@ legacy_sc_handle __stdcall
     const wchar_t *   lpPassword
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 int __stdcall
   DeleteService(
     legacy_sc_handle hService
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 int __stdcall
   StartServiceW(
     legacy_sc_handle  hService,
@@ -81,7 +81,7 @@ int __stdcall
     const wchar_t *   lpServiceArgVectors
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 int __stdcall
   ControlService(
     legacy_sc_handle      hService,
@@ -89,7 +89,7 @@ int __stdcall
     nt::service::status * lpServiceStatus
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 int __stdcall
   QueryServiceStatusEx(
     legacy_sc_handle      hService,

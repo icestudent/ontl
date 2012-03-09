@@ -26,7 +26,7 @@ struct kprocess;
 struct eprocess;
 struct object_name_information;
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 kprocess * __stdcall
   IoGetCurrentProcess();
 
@@ -1291,27 +1291,27 @@ struct eprocess61: eprocess60 {};
 
 
 ///\note XP+ only, use IoGetCurrentProcess instead
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 kprocess * __stdcall
   PsGetCurrentProcess();
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 legacy_handle __stdcall
   PsGetCurrentProcessId();
 
 ///\note XP+ only
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 legacy_handle __stdcall
   PsGetCurrentProcessSessionId();
 
 
 ///\note XP+ only
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 char * __stdcall
   PsGetProcessImageFileName(kprocess *);
 
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall
   PsLookupProcessByProcessId(
     legacy_handle ProcessId,
@@ -1336,14 +1336,14 @@ void dereference_object(kprocess * process)
 
 
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 void __stdcall
   KeStackAttachProcess(
     kprocess *    Process,
     kapc_state *  ApcState
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 void __stdcall
   KeUnstackDetachProcess(
     kapc_state *  ApcState
@@ -1356,7 +1356,7 @@ nt::peb * __stdcall
   get_process_peb_t(kprocess const* Process);
 
 // XP+ only
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 get_process_peb_t PsGetProcessPeb;
 
 
@@ -1377,21 +1377,21 @@ typedef void
                                         );
 
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall
 PsSetCreateProcessNotifyRoutine(
                                 PCreateProcessNotifyRoutine NotifyRoutine,
                                 bool Remove
                                 );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall
 PsSetCreateThreadNotifyRoutine(
                                PCreateThreadNotifyRoutine NotifyRoutine
                                );
 
 #if (NTDDI_VERSION >= NTDDI_WINXP)
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall
 PsRemoveCreateThreadNotifyRoutine (
                                    PCreateThreadNotifyRoutine NotifyRoutine

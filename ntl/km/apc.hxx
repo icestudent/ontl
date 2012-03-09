@@ -47,7 +47,7 @@ void __stdcall
     );
 
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 bool __stdcall
   KeInsertQueueApc(
     kapc *    Apc,
@@ -135,7 +135,7 @@ struct apc : kapc
 STATIC_ASSERT(sizeof(kapc) == 0x30 || sizeof(kapc) == 0x58);
 
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 void __stdcall
   KeInitializeApc(
     kapc *              Apc,

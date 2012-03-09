@@ -43,7 +43,7 @@ sec(".CRT$XTZ") vfv_t* __xt_z[]= {0};
 
 #include "../stlx/vector.hxx"
 
-#ifdef NTL__SUBSYSTEM_KM
+#ifdef NTL_SUBSYSTEM_KM
 # include "../km/new.hxx"
 #else
 # include "../nt/new.hxx"
@@ -121,7 +121,7 @@ namespace ntl
   {
     if(init){
       // init exception support on current thread
-      #if STLX__USE_EXCEPTIONS
+      #if STLX_USE_EXCEPTIONS
       cxxruntime::_initptd();
       #endif
 
@@ -163,20 +163,20 @@ extern "C" int __cdecl at_quick_exit(vfv_t* f)
   return -1;
 }
 
-void NTL__CRTCALL exit(int status)
+void NTL_CRTCALL exit(int status)
 {
   doexit(status, false, true);
   _Exit(status);
 }
 
-void NTL__CRTCALL quick_exit(int status)
+void NTL_CRTCALL quick_exit(int status)
 {
   doexit(status, true,true);
   _Exit(status);
 }
 
-#ifndef NTL__SUBSYSTEM_KM
-void NTL__CRTCALL _Exit(int code)
+#ifndef NTL_SUBSYSTEM_KM
+void NTL_CRTCALL _Exit(int code)
 {
   using ntl::nt::status;
   ntl::nt::user_thread::exit_process(code == EXIT_SUCCESS ? status::success : (code == EXIT_FAILURE ? status::unsuccessful : static_cast<ntl::nt::ntstatus>(code)) );
@@ -186,7 +186,7 @@ void NTL__CRTCALL _Exit(int code)
 /************************************************************************/
 /* `abort`                                                              */
 /************************************************************************/
-//#ifndef NTL__SUBSYSTEM_KM
+//#ifndef NTL_SUBSYSTEM_KM
 extern "C" void __cdecl abort()
 {
 #pragma warning(disable:4127)

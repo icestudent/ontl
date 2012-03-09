@@ -41,7 +41,7 @@ namespace ntl {
       *TickCount = user_shared_data::instance().TickCountQuad;
     }
 
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
       void __stdcall
       ExSystemTimeToLocalTime(systime_t* SystemTime, systime_t* LocalTime);
 

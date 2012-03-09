@@ -65,8 +65,8 @@ bool operator>=(const T & x, const T & y) { return !(x < y); }
 
 #pragma region forward
 ///\name 20.2.3 forward/move helpers [forward]
-#ifdef NTL__CXX_RV
-#ifdef NTL__CXX_RVFIX
+#ifdef NTL_CXX_RV
+#ifdef NTL_CXX_RVFIX
 
   // rvalue ref v2
   template <class T> inline T&& forward(typename std::remove_reference<T>::type& t) { return static_cast<T&&>(t); }
@@ -92,7 +92,7 @@ bool operator>=(const T & x, const T & y) { return !(x < y); }
   {
     return std::move(x);
   }
-#ifdef NTL__DOC   // declaration in <type_traits_fwd.hxx>
+#ifdef NTL_DOC   // declaration in <type_traits_fwd.hxx>
   /** 20.2.4 Function template declval */
   template <class T>
   typename add_rvalue_reference<T>::type declval() __ntl_nothrow;
@@ -164,7 +164,7 @@ bool operator>=(const T & x, const T & y) { return !(x < y); }
   ///\name 20.3.5 Piecewise construction [pair.piecewise]
   struct piecewise_construct_t { };
 
-#ifdef NTL__CXX_CONSTEXPR
+#ifdef NTL_CXX_CONSTEXPR
   constexpr piecewise_construct_t piecewise_construct = piecewise_construct_t();
 #else
   extern __declspec(selectany) piecewise_construct_t piecewise_construct = {};
@@ -174,7 +174,7 @@ bool operator>=(const T & x, const T & y) { return !(x < y); }
 
 
   // forward
-#ifdef NTL__CXX_VT_DONE
+#ifdef NTL_CXX_VT_DONE
   // will be enabled when new tuple implemented
   template<typename...>
   class tuple;
@@ -209,7 +209,7 @@ struct pair
       :first(p.first), second(p.second)
     {}
 
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
     template<class U, class V> 
     pair(U&& x, V&& y)
       :first(forward<U>(x)), second(forward<V>(y))
@@ -225,7 +225,7 @@ struct pair
     {}
 #endif
 
-#ifdef NTL__CXX_VT_DONE
+#ifdef NTL_CXX_VT_DONE
     template<class... Args1, class... Args2>
     pair(piecewise_construct_t, tuple<Args1...> a, tuple<Args2...> b);
 #endif
@@ -247,7 +247,7 @@ struct pair
       return *this;
     }
 
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
     pair& operator=(pair&& p)
     {
       first = forward<first_type>(p.first);
@@ -325,7 +325,7 @@ bool
 template<class T1, class T2> inline void swap(pair<T1, T2>&  x, pair<T1, T2>&  y) { x.swap(y); }
 
 ///\name Make pair
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
 template<typename T>
 class reference_wrapper;
 

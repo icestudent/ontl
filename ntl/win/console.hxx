@@ -21,17 +21,17 @@ namespace ntl {
 namespace win {
 
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 boolean __stdcall AllocConsole();
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 boolean __stdcall AttachConsole(uint32_t);
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 boolean __stdcall FreeConsole();
 
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 boolean __stdcall
   WriteConsoleA(
     legacy_handle ConsoleOutput,
@@ -41,7 +41,7 @@ boolean __stdcall
     void *        Reserved
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 boolean __stdcall
   WriteConsoleW(
     legacy_handle ConsoleOutput,
@@ -51,7 +51,7 @@ boolean __stdcall
     void *        Reserved
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 boolean __stdcall
   ReadConsoleA(
     legacy_handle ConsoleInput,
@@ -61,7 +61,7 @@ boolean __stdcall
     void*         InputControl
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 boolean __stdcall
   ReadConsoleW(
     legacy_handle ConsoleInput,
@@ -71,10 +71,10 @@ boolean __stdcall
     void*         InputControl
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 boolean __stdcall GetConsoleMode(legacy_handle ConsoleHandle, uint32_t* Mode);
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 boolean __stdcall SetConsoleMode(legacy_handle ConsoleHandle, uint32_t  Mode);
 
 /**\addtogroup  console *********** Console support *************************

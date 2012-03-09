@@ -21,7 +21,7 @@ namespace ntl {
     struct kevent { dispatcher_header Header; };
 
 
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
     void __stdcall
       KeInitializeEvent(
         kevent *    Event,
@@ -29,7 +29,7 @@ namespace ntl {
         bool        State
         );
 
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
     long __stdcall
       KeSetEvent(
         kevent *  Event,
@@ -37,9 +37,9 @@ namespace ntl {
         bool      Wait
         );
 
-    NTL__EXTERNAPI void __stdcall KeClearEvent(kevent* Event);
-    NTL__EXTERNAPI long __stdcall KeResetEvent(kevent* Event);
-    NTL__EXTERNAPI long __stdcall KeReadStateEvent(kevent* Event);
+    NTL_EXTERNAPI void __stdcall KeClearEvent(kevent* Event);
+    NTL_EXTERNAPI long __stdcall KeResetEvent(kevent* Event);
+    NTL_EXTERNAPI long __stdcall KeReadStateEvent(kevent* Event);
 
 
 

@@ -42,12 +42,12 @@ enum pool_type
 };
 
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 __noalias
 void * __restrict __stdcall
   ExAllocatePoolWithTag(pool_type, size_t, unsigned long tag);
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 __noalias
 void __stdcall
   ExFreePoolWithTag(void * p, unsigned long tag);

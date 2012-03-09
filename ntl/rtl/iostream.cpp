@@ -1,4 +1,4 @@
-#ifdef NTL__SUBSYSTEM_KM
+#ifdef NTL_SUBSYSTEM_KM
 # include "../km/basedef.hxx"
 # include "../km/new.hxx"
 #else
@@ -14,7 +14,7 @@
 
 extern "C" void __cdecl __init_iostream_objects(bool init);
 
-#ifndef NTL__SUBSYSTEM_KM
+#ifndef NTL_SUBSYSTEM_KM
 
 namespace
 {

@@ -103,14 +103,14 @@ namespace ntl {
         device_object *PhysicalDeviceObject
         );
 
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
     void __fastcall
       IofCompleteRequest(
         irp* Irp,
         int8_t PriorityBoost
         );
 
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
     void __stdcall
       IoSetCompletionRoutine(
         irp* Irp,
@@ -122,17 +122,17 @@ namespace ntl {
         );
 
 
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
     irp * __stdcall
       IoAllocateIrp(
         uint32_t  StackSize,  ///\note original type is char
         bool      ChargeQuota
         );
 
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
     void __stdcall IoFreeIrp(irp* Irp);
 
-    NTL__EXTERNAPI void __stdcall IoReuseIrp(irp* Irp, ntstatus Iostatus);
+    NTL_EXTERNAPI void __stdcall IoReuseIrp(irp* Irp, ntstatus Iostatus);
 
 
 #if defined(_M_IX86)

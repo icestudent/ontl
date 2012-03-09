@@ -9,10 +9,10 @@
 #pragma once
 
 #ifndef NTL__STLX_CSTDDEF
-#include "cstddef.hxx" // for STLX__USE_EXCEPTIONS
+#include "cstddef.hxx" // for STLX_USE_EXCEPTIONS
 #endif
 
-#if STLX__USE_EXCEPTIONS == 1
+#if STLX_USE_EXCEPTIONS == 1
   // C++ exceptions
   #define __ntl_try       try
   #define __ntl_catch     catch
@@ -21,7 +21,7 @@
   #define __ntl_throws(...) throw(__VA_ARGS__)
   #define __ntl_nothrow   throw()
 
-#elif STLX__USE_EXCEPTIONS == 2
+#elif STLX_USE_EXCEPTIONS == 2
   // SEH exceptions
 
   template<class E>

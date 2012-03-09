@@ -36,13 +36,13 @@ namespace std
   // "The compiler may call the function and not replace the function call
   // with inline instructions, _if_it_will_result_in_better_performance_"
   // And this is right in some cases.
-  NTL__EXTERNAPI int    __cdecl memcmp(const void * s1, const void * s2, size_t n);
-  NTL__EXTERNAPI void * __cdecl memcpy(void * const dst, const void * const src, size_t n);
-  NTL__EXTERNAPI void * __cdecl memset(void * const s, int c, size_t n);
-  NTL__EXTERNAPI int    __cdecl strcmp(const char * s1, const char * s2);
-  NTL__EXTERNAPI char * __cdecl strcpy(char * const dst, const char * const src);
-  NTL__EXTERNAPI size_t __cdecl strlen(const char * const s);
-  NTL__EXTERNAPI char * __cdecl strcat(char * const dst, const char * const src);
+  NTL_EXTERNAPI int    __cdecl memcmp(const void * s1, const void * s2, size_t n);
+  NTL_EXTERNAPI void * __cdecl memcpy(void * const dst, const void * const src, size_t n);
+  NTL_EXTERNAPI void * __cdecl memset(void * const s, int c, size_t n);
+  NTL_EXTERNAPI int    __cdecl strcmp(const char * s1, const char * s2);
+  NTL_EXTERNAPI char * __cdecl strcpy(char * const dst, const char * const src);
+  NTL_EXTERNAPI size_t __cdecl strlen(const char * const s);
+  NTL_EXTERNAPI char * __cdecl strcat(char * const dst, const char * const src);
 #pragma intrinsic(memcmp, memcpy, memset, strcmp, strcpy, strlen, strcat)
 #endif
 
@@ -65,7 +65,7 @@ void *
 #ifndef _MSC_VER
 __forceinline
 void *
-NTL__CRTCALL
+NTL_CRTCALL
   memcpy(void * const dst, const void * const src, size_t n)
 {
   assert(dst || n == 0);
@@ -90,7 +90,7 @@ void *
 
 __forceinline
 void *
-NTL__CRTCALL
+NTL_CRTCALL
   memmove(void * const dst, const void * const src, size_t n)
 {
   assert(dst || n == 0);
@@ -113,7 +113,7 @@ namespace ext {
 #ifndef _MSC_VER
 __forceinline
 char *
-NTL__CRTCALL
+NTL_CRTCALL
 strcpy(char * const dst, const char * const src)
 {
   assert(dst);
@@ -125,7 +125,7 @@ strcpy(char * const dst, const char * const src)
 #endif
 
 __forceinline
-char* NTL__CRTCALL strncpy(char* dst, const char* src, size_t n)
+char* NTL_CRTCALL strncpy(char* dst, const char* src, size_t n)
 {
   assert(dst || n == 0);
   assert(src || n == 0);
@@ -152,7 +152,7 @@ char *
 #ifndef _MSC_VER
 __forceinline
 char *
-NTL__CRTCALL
+NTL_CRTCALL
   strcat(char * const dst, const char * const src)
 {
   assert(dst);
@@ -162,13 +162,13 @@ NTL__CRTCALL
 }
 #endif
 
-NTL__EXTERNAPI char* NTL__CRTIMP strncat(char * __restrict s1, const char * __restrict s2, size_t n);
+NTL_EXTERNAPI char* NTL_CRTIMP strncat(char * __restrict s1, const char * __restrict s2, size_t n);
 
 ///\name Comparison functions
 #ifndef _MSC_VER
 __forceinline
 int
-NTL__CRTCALL
+NTL_CRTCALL
 memcmp(const void * s1, const void * s2, size_t n)
 {
   assert(s1 || n == 0);
@@ -182,7 +182,7 @@ memcmp(const void * s1, const void * s2, size_t n)
 
 __forceinline
 int
-NTL__CRTCALL
+NTL_CRTCALL
 strcmp(const char * s1, const char * s2)
 {
   assert(s1);
@@ -194,11 +194,11 @@ strcmp(const char * s1, const char * s2)
 }
 #endif
 
-int NTL__CRTCALL strcoll(const char *s1, const char *s2);
+int NTL_CRTCALL strcoll(const char *s1, const char *s2);
 
 __forceinline
 int
-NTL__CRTCALL
+NTL_CRTCALL
 strncmp(const char * s1, const char * s2, size_t n)
 {
   assert(s1 || n == 0);
@@ -212,11 +212,11 @@ strncmp(const char * s1, const char * s2, size_t n)
   return static_cast<int>(n); // n == 0
 }
 
-size_t NTL__CRTCALL strxfrm(char * __restrict s1, const char * __restrict s2, size_t n);
+size_t NTL_CRTCALL strxfrm(char * __restrict s1, const char * __restrict s2, size_t n);
 
 ///\name Search functions
 __forceinline
-const void * NTL__CRTCALL memchr(const void * const mem, const int c, size_t n)
+const void * NTL_CRTCALL memchr(const void * const mem, const int c, size_t n)
 {
   assert(mem || n == 0);
   const unsigned char * p = reinterpret_cast<const unsigned char*>(mem);
@@ -227,13 +227,13 @@ const void * NTL__CRTCALL memchr(const void * const mem, const int c, size_t n)
 }
 
 __forceinline
-void * NTL__CRTCALL memchr(void * const mem, const int c, size_t n)
+void * NTL_CRTCALL memchr(void * const mem, const int c, size_t n)
 {
   return const_cast<void*>(memchr(const_cast<const void* const>(mem), c, n));
 }
 
 __forceinline
-const char * NTL__CRTCALL strchr(const char * const s, int c)
+const char * NTL_CRTCALL strchr(const char * const s, int c)
 {
   assert(s);
   const char* p = s;
@@ -244,19 +244,19 @@ const char * NTL__CRTCALL strchr(const char * const s, int c)
 }
 
 __forceinline
-char * NTL__CRTCALL strchr(char * const s, int c)
+char * NTL_CRTCALL strchr(char * const s, int c)
 {
   return const_cast<char*>(strchr(const_cast<const char*>(s),c));
 }
 
-size_t NTL__CRTCALL strcspn(const char *s1, const char *s2);
-char * NTL__CRTCALL strpbrk(const char *s1, const char *s2);
+size_t NTL_CRTCALL strcspn(const char *s1, const char *s2);
+char * NTL_CRTCALL strpbrk(const char *s1, const char *s2);
 
-NTL__EXTERNAPI char * NTL__CRTIMP strrchr(const char *s, int c);
-NTL__EXTERNAPI size_t NTL__CRTIMP strspn(const char *s1, const char *s2);
-NTL__EXTERNAPI char * NTL__CRTIMP strstr(const char *s1, const char *s2);
+NTL_EXTERNAPI char * NTL_CRTIMP strrchr(const char *s, int c);
+NTL_EXTERNAPI size_t NTL_CRTIMP strspn(const char *s1, const char *s2);
+NTL_EXTERNAPI char * NTL_CRTIMP strstr(const char *str, const char *substr);
 
-char * NTL__CRTCALL strtok(char * __restrict s1, const char * __restrict s2);
+char * NTL_CRTCALL strtok(char * __restrict s1, const char * __restrict s2);
 
 ///\name Miscellaneous functions
 namespace ext {
@@ -274,7 +274,7 @@ void *
 #ifndef _MSC_VER
 __forceinline
 void *
-NTL__CRTCALL
+NTL_CRTCALL
   memset(void * const s, int c, size_t n)
 {
   assert(s || n == 0);
@@ -286,7 +286,7 @@ NTL__CRTCALL
 
 __forceinline
 size_t
-NTL__CRTCALL
+NTL_CRTCALL
 strlen(const char * const s)
 {
   assert(s);
@@ -296,12 +296,12 @@ strlen(const char * const s)
 }
 #endif
 
-__forceinline void NTL__CRTCALL bzero(void* s, size_t n)
+__forceinline void NTL_CRTCALL bzero(void* s, size_t n)
 {
   memset(s,0,n);
 }
 
-char* NTL__CRTCALL strdup(const char* s);
+char* NTL_CRTCALL strdup(const char* s);
 
 /**@} lib_c_strings_cstring */
 /**@} lib_c_strings */
@@ -312,30 +312,30 @@ char* NTL__CRTCALL strdup(const char* s);
 // functions exported by ntdll.dll and ntoskrnl.exe
 #ifndef _INC_STDLIB// MSVC compatibility
 
-NTL__EXTERNAPI
-int NTL__CRTIMP
+NTL_EXTERNAPI
+int NTL_CRTIMP
   _stricmp(
     const char * s1,
     const char * s2
     );
 
-NTL__EXTERNAPI
-int NTL__CRTIMP
+NTL_EXTERNAPI
+int NTL_CRTIMP
   _wcsicmp(
     const wchar_t * s1,
     const wchar_t * s2
     );
 
-NTL__EXTERNAPI
-int NTL__CRTIMP
+NTL_EXTERNAPI
+int NTL_CRTIMP
   _strnicmp(
     const char *  s1,
     const char *  s2,
     size_t        n
     );
 
-NTL__EXTERNAPI
-int NTL__CRTIMP
+NTL_EXTERNAPI
+int NTL_CRTIMP
   _wcsnicmp(
     const wchar_t * s1,
     const wchar_t * s2,
@@ -344,19 +344,19 @@ int NTL__CRTIMP
 
   namespace std
   {
-    inline int NTL__CRTCALL stricmp(const char* s1, const char* s2)
+    inline int NTL_CRTCALL stricmp(const char* s1, const char* s2)
     {
       return _stricmp(s1,s2);
     }
-    inline int NTL__CRTCALL wcsicmp(const wchar_t* s1, const wchar_t* s2)
+    inline int NTL_CRTCALL wcsicmp(const wchar_t* s1, const wchar_t* s2)
     {
       return _wcsicmp(s1,s2);
     }
-    inline int NTL__CRTCALL strnicmp(const char* s1, const char* s2, size_t n)
+    inline int NTL_CRTCALL strnicmp(const char* s1, const char* s2, size_t n)
     {
       return _strnicmp(s1,s2,n);
     }
-    inline int NTL__CRTCALL  wcsnicmp(const wchar_t* s1, const wchar_t* s2, size_t n)
+    inline int NTL_CRTCALL  wcsnicmp(const wchar_t* s1, const wchar_t* s2, size_t n)
     {
       return _wcsnicmp(s1,s2,n);
     }

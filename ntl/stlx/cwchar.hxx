@@ -48,20 +48,20 @@ namespace std {
   using ::wint_t;
 
   ///\name Formatted wide character input/output functions
-  NTL__EXTERNAPI
-    size_t NTL__CRTIMP
+  NTL_EXTERNAPI
+    size_t NTL_CRTIMP
     _snwprintf(wchar_t*buffer, size_t count, const wchar_t*format, ...);
 
   ///\warning not available in W2K ntoskrnl
-  NTL__EXTERNAPI
-    size_t NTL__CRTIMP
+  NTL_EXTERNAPI
+    size_t NTL_CRTIMP
     _vsnwprintf(wchar_t*buffer, size_t count, const wchar_t*format, va_list argptr);
 
   ///\name General wide string utilities
 
   ///\name Wide string numeric conversion functions
-  int NTL__CRTCALL _wtoi(const wchar_t* str);
-  long int NTL__CRTCALL _wtol(const wchar_t*nptr);
+  int NTL_CRTCALL _wtoi(const wchar_t* str);
+  long int NTL_CRTCALL _wtol(const wchar_t*nptr);
 
   double wcstod(const wchar_t* __restrict nptr, wchar_t** __restrict endptr);
   float wcstof(const wchar_t* __restrict nptr, wchar_t** __restrict endptr);
@@ -74,16 +74,16 @@ namespace std {
 
   ///\name Wide string copying functions
 #ifdef _MSC_VER
-  NTL__EXTERNAPI int      __cdecl wcscmp(const wchar_t * s1, const wchar_t * s2);
-  NTL__EXTERNAPI wchar_t* __cdecl wcscpy(wchar_t * const dst, const wchar_t * const src);
-  NTL__EXTERNAPI size_t   __cdecl wcslen(const wchar_t * const s);
-  NTL__EXTERNAPI wchar_t* __cdecl wcscat(wchar_t * const dst, const wchar_t * const src);
+  NTL_EXTERNAPI int      __cdecl wcscmp(const wchar_t * s1, const wchar_t * s2);
+  NTL_EXTERNAPI wchar_t* __cdecl wcscpy(wchar_t * const dst, const wchar_t * const src);
+  NTL_EXTERNAPI size_t   __cdecl wcslen(const wchar_t * const s);
+  NTL_EXTERNAPI wchar_t* __cdecl wcscat(wchar_t * const dst, const wchar_t * const src);
 #pragma intrinsic(wcscmp,wcscpy,wcslen,wcscat)
 #endif
 
 #ifndef _MSC_VER
 __forceinline
-wchar_t* NTL__CRTCALL wcscpy(wchar_t* dst, const wchar_t* src)
+wchar_t* NTL_CRTCALL wcscpy(wchar_t* dst, const wchar_t* src)
 {
   assert(dst);
   assert(src);
@@ -93,7 +93,7 @@ wchar_t* NTL__CRTCALL wcscpy(wchar_t* dst, const wchar_t* src)
 #endif
 
 __forceinline
-wchar_t* NTL__CRTCALL wcsncpy(wchar_t* dst, const wchar_t* src, size_t n)
+wchar_t* NTL_CRTCALL wcsncpy(wchar_t* dst, const wchar_t* src, size_t n)
 {
   assert(dst);
   assert(src);
@@ -105,14 +105,14 @@ wchar_t* NTL__CRTCALL wcsncpy(wchar_t* dst, const wchar_t* src, size_t n)
 }
 
 __forceinline
-wchar_t* NTL__CRTCALL wmemcpy(wchar_t* __restrict s1, const wchar_t* __restrict s2, size_t n)
+wchar_t* NTL_CRTCALL wmemcpy(wchar_t* __restrict s1, const wchar_t* __restrict s2, size_t n)
 {
   memcpy(s1, s2, n*sizeof(wchar_t));
   return s1;
 }
 
 __forceinline
-wchar_t* NTL__CRTCALL wmemmove(wchar_t*s1, const wchar_t*s2, size_t n)
+wchar_t* NTL_CRTCALL wmemmove(wchar_t*s1, const wchar_t*s2, size_t n)
 {
   memmove(s1, s2, n*sizeof(wchar_t));
   return s1;
@@ -120,14 +120,14 @@ wchar_t* NTL__CRTCALL wmemmove(wchar_t*s1, const wchar_t*s2, size_t n)
 
 ///\name Wide string concatenation functions
 #ifndef _MSC_VER
-NTL__EXTERNAPI wchar_t* NTL__CRTIMP wcscat(wchar_t* __restrict s1, const wchar_t* __restrict s2);
+NTL_EXTERNAPI wchar_t* NTL_CRTIMP wcscat(wchar_t* __restrict s1, const wchar_t* __restrict s2);
 #endif
-NTL__EXTERNAPI wchar_t* NTL__CRTIMP wcsncat(wchar_t* __restrict s1, const wchar_t* __restrict s2, size_t n);
+NTL_EXTERNAPI wchar_t* NTL_CRTIMP wcsncat(wchar_t* __restrict s1, const wchar_t* __restrict s2, size_t n);
 
 ///\name Wide string comparison functions
 #ifndef _MSC_VER
 __forceinline
-int NTL__CRTCALL wcscmp(const wchar_t*s1, const wchar_t*s2)
+int NTL_CRTCALL wcscmp(const wchar_t*s1, const wchar_t*s2)
 {
   assert(s1);
   assert(s2);
@@ -135,10 +135,10 @@ int NTL__CRTCALL wcscmp(const wchar_t*s1, const wchar_t*s2)
 }
 #endif
 
-int NTL__CRTCALL wcscoll(const wchar_t*s1, const wchar_t*s2);
+int NTL_CRTCALL wcscoll(const wchar_t*s1, const wchar_t*s2);
 
 __forceinline
-int NTL__CRTCALL wcsncmp(const wchar_t* s1, const wchar_t* s2, size_t n)
+int NTL_CRTCALL wcsncmp(const wchar_t* s1, const wchar_t* s2, size_t n)
 {
   assert(s1);
   assert(s2);
@@ -146,36 +146,36 @@ int NTL__CRTCALL wcsncmp(const wchar_t* s1, const wchar_t* s2, size_t n)
   return static_cast<int>(n); // n == 0
 }
 
-size_t NTL__CRTCALL wcsxfrm(wchar_t* __restrict s1, const wchar_t* __restrict s2, size_t n);
+size_t NTL_CRTCALL wcsxfrm(wchar_t* __restrict s1, const wchar_t* __restrict s2, size_t n);
 
 __forceinline
-int NTL__CRTCALL wmemcmp(const wchar_t* s1, const wchar_t* s2, size_t n)
+int NTL_CRTCALL wmemcmp(const wchar_t* s1, const wchar_t* s2, size_t n)
 {
   return memcmp(s1, s2, n*sizeof(wchar_t));
 }
 
 ///\name Wide string search functions
-NTL__EXTERNAPI wchar_t* NTL__CRTIMP wcschr(const wchar_t*s, wchar_t c);
+NTL_EXTERNAPI wchar_t* NTL_CRTIMP wcschr(const wchar_t*s, wchar_t c);
 
-NTL__EXTERNAPI size_t   NTL__CRTIMP wcscspn(const wchar_t*s1, const wchar_t*s2);
+NTL_EXTERNAPI size_t   NTL_CRTIMP wcscspn(const wchar_t*s1, const wchar_t*s2);
 
-wchar_t* NTL__CRTCALL wcspbrk(const wchar_t*s1, const wchar_t*s2);
+wchar_t* NTL_CRTCALL wcspbrk(const wchar_t*s1, const wchar_t*s2);
 
-NTL__EXTERNAPI wchar_t* NTL__CRTIMP wcsrchr(const wchar_t*s, wchar_t c);
+NTL_EXTERNAPI wchar_t* NTL_CRTIMP wcsrchr(const wchar_t*s, wchar_t c);
 
-NTL__EXTERNAPI size_t   NTL__CRTIMP wcsspn(const wchar_t*s1, const wchar_t*s2);
+NTL_EXTERNAPI size_t   NTL_CRTIMP wcsspn(const wchar_t*s1, const wchar_t*s2);
 
-NTL__EXTERNAPI wchar_t* NTL__CRTIMP wcsstr(const wchar_t*s1, const wchar_t*s2);
+NTL_EXTERNAPI wchar_t* NTL_CRTIMP wcsstr(const wchar_t* str, const wchar_t* substr);
 
-wchar_t* NTL__CRTCALL wcstok(wchar_t* __restrict s1, const wchar_t* __restrict s2, wchar_t** __restrict ptr);
+wchar_t* NTL_CRTCALL wcstok(wchar_t* __restrict s1, const wchar_t* __restrict s2, wchar_t** __restrict ptr);
 
-wchar_t* NTL__CRTCALL wmemchr(const wchar_t*s, wchar_t c, size_t n);
+wchar_t* NTL_CRTCALL wmemchr(const wchar_t*s, wchar_t c, size_t n);
 
 ///\name Miscellaneous functions
 
 #ifndef _MSC_VER
 __forceinline
-size_t NTL__CRTCALL wcslen(const wchar_t* const s)
+size_t NTL_CRTCALL wcslen(const wchar_t* const s)
 {
   assert(s);
   size_t count = 0;
@@ -185,7 +185,7 @@ size_t NTL__CRTCALL wcslen(const wchar_t* const s)
 #endif
 
 __forceinline
-wchar_t* NTL__CRTCALL wmemset(wchar_t*s, wchar_t c, size_t n)
+wchar_t* NTL_CRTCALL wmemset(wchar_t*s, wchar_t c, size_t n)
 {
   memset(s, c, n*sizeof(wchar_t));
   return s;
@@ -195,9 +195,9 @@ wchar_t* NTL__CRTCALL wmemset(wchar_t*s, wchar_t c, size_t n)
 
 ///\name Multibyte/wide string conversion functions
 
-NTL__EXTERNAPI size_t NTL__CRTIMP mbstowcs(wchar_t* __restrict wcstr, const char* __restrict mbstr, size_t count);
+NTL_EXTERNAPI size_t NTL_CRTIMP mbstowcs(wchar_t* __restrict wcstr, const char* __restrict mbstr, size_t count);
 
-NTL__EXTERNAPI size_t NTL__CRTIMP wcstombs(char* __restrict mbstr, const wchar_t* __restrict wcstr, size_t count);
+NTL_EXTERNAPI size_t NTL_CRTIMP wcstombs(char* __restrict mbstr, const wchar_t* __restrict wcstr, size_t count);
 
 ///\}
 

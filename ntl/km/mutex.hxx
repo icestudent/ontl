@@ -20,15 +20,15 @@ namespace ntl {
     struct fast_mutex;
     typedef void(__fastcall *fast_mutex_control_routine)(fast_mutex* FastMutex);
 
-    NTL__EXTERNVAR fast_mutex_control_routine ExAcquireFastMutexUnsafe, ExReleaseFastMutexUnsafe;
+    NTL_EXTERNVAR fast_mutex_control_routine ExAcquireFastMutexUnsafe, ExReleaseFastMutexUnsafe;
 
 
 #if defined(_NTHAL_) && defined(_M_IX86)
-    NTL__EXTERNVAR fast_mutex_control_routine ExiAcquireFastMutex, ExiReleaseFastMutex;
-    NTL__EXTERNAPI bool __fastcall ExiTryToAcquireFastMutex (fast_mutex* FastMutex);
+    NTL_EXTERNVAR fast_mutex_control_routine ExiAcquireFastMutex, ExiReleaseFastMutex;
+    NTL_EXTERNAPI bool __fastcall ExiTryToAcquireFastMutex (fast_mutex* FastMutex);
 #else
-    NTL__EXTERNVAR fast_mutex_control_routine ExAcquireFastMutex, ExReleaseFastMutex;
-    NTL__EXTERNAPI bool __fastcall ExTryToAcquireFastMutex (fast_mutex* FastMutex);
+    NTL_EXTERNVAR fast_mutex_control_routine ExAcquireFastMutex, ExReleaseFastMutex;
+    NTL_EXTERNAPI bool __fastcall ExTryToAcquireFastMutex (fast_mutex* FastMutex);
 #endif // _NTHAL_ && _M_IX86
 
 
@@ -38,9 +38,9 @@ namespace ntl {
     struct kguarded_mutex;
     typedef void(__fastcall *guarded_mutex_control_routine)(kguarded_mutex* Mutex);
 
-    NTL__EXTERNVAR guarded_mutex_control_routine KeInitializeGuardedMutex, KeAcquireGuardedMutex, KeReleaseGuardedMutex;
-    NTL__EXTERNVAR guarded_mutex_control_routine KeAcquireGuardedMutexUnsafe, KeReleaseGuardedMutexUnsafe;
-    NTL__EXTERNAPI bool __fastcall KeTryToAcquireGuardedMutex(kguarded_mutex* Mutex);
+    NTL_EXTERNVAR guarded_mutex_control_routine KeInitializeGuardedMutex, KeAcquireGuardedMutex, KeReleaseGuardedMutex;
+    NTL_EXTERNVAR guarded_mutex_control_routine KeAcquireGuardedMutexUnsafe, KeReleaseGuardedMutexUnsafe;
+    NTL_EXTERNAPI bool __fastcall KeTryToAcquireGuardedMutex(kguarded_mutex* Mutex);
 
     struct kthread;
     struct fast_mutex
@@ -83,9 +83,9 @@ namespace ntl {
     //
     typedef struct kmutant kmutex;
 
-    NTL__EXTERNAPI void __stdcall KeInitializeMutex (kmutex* Mutex, uint32_t Level);
-    NTL__EXTERNAPI int32_t __stdcall KeReadStateMutex(kmutex* Mutex);
-    NTL__EXTERNAPI int32_t __stdcall KeReleaseMutex (kmutex* Mutex, bool Wait);
+    NTL_EXTERNAPI void __stdcall KeInitializeMutex (kmutex* Mutex, uint32_t Level);
+    NTL_EXTERNAPI int32_t __stdcall KeReadStateMutex(kmutex* Mutex);
+    NTL_EXTERNAPI int32_t __stdcall KeReleaseMutex (kmutex* Mutex, bool Wait);
 
     struct kmutant
     {

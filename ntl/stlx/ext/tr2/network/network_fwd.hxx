@@ -17,7 +17,7 @@ namespace std { namespace tr2 {
   /// TR2 Network library
   namespace network
   {
-#ifdef NTL__DOC
+#ifdef NTL_DOC
     /// Internet protocol
     namespace ip
     {
@@ -166,6 +166,6 @@ namespace std { namespace tr2 {
     namespace multicast
     {}
   } // ip
-#endif  // NTL__DOC
+#endif  // NTL_DOC
 }}}
 #endif // NTL__STLX_TR2_NETWORKFWD

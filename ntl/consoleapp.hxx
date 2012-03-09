@@ -74,7 +74,7 @@ int _Consoleapp_entry()
 
 //////////////////////////////////////////////////////////////////////////
 namespace win {
-NTL__EXTERNAPI __noreturn void __stdcall ExitProcess(ntl::nt::ntstatus);
+NTL_EXTERNAPI __noreturn void __stdcall ExitProcess(ntl::nt::ntstatus);
 }
 
 extern"C" void __cdecl __console_abort()

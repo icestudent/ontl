@@ -41,10 +41,10 @@ typedef ntstatus __stdcall io_set_information_file_t(
   void*                   FileInformation
   );
 
-NTL__EXTERNAPI query_information_file_t ZwQueryInformationFile;
-NTL__EXTERNAPI set_information_file_t   ZwSetInformationFile;
-NTL__EXTERNAPI io_query_information_file_t IoQueryFileInformation;
-NTL__EXTERNAPI io_set_information_file_t   IoSetInformation;
+NTL_EXTERNAPI query_information_file_t ZwQueryInformationFile;
+NTL_EXTERNAPI set_information_file_t   ZwSetInformationFile;
+NTL_EXTERNAPI io_query_information_file_t IoQueryFileInformation;
+NTL_EXTERNAPI io_set_information_file_t   IoSetInformation;
 
 using nt::file_basic_information;
 using nt::file_standard_information;
@@ -142,8 +142,8 @@ struct file_information<file_link_information>:
 
 /**@} file_information */
 
-NTL__EXTERNAPI query_information_file_t ZwQueryVolumeInformationFile;
-NTL__EXTERNAPI set_information_file_t ZwSetVolumeInformationFile;
+NTL_EXTERNAPI query_information_file_t ZwQueryVolumeInformationFile;
+NTL_EXTERNAPI set_information_file_t ZwSetVolumeInformationFile;
 
 using nt::fs_information_class;
 

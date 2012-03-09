@@ -12,7 +12,7 @@
 #include "system_error.hxx"
 #include "../nt/system_error.hxx"
 
-#ifndef NTL__SUBSYSTEM_KM
+#ifndef NTL_SUBSYSTEM_KM
   // UM implementation
 # include "../nt/teb.hxx"
 # include "../nt/system_information.hxx"
@@ -129,7 +129,7 @@ namespace std
      **/
     template <class F> explicit thread(F f);
 
-  #ifdef NTL__CXX_VT
+  #ifdef NTL_CXX_VT
     template <class F, class ...Args> thread(F&& f, Args&&... args);
   #else
     template <class F, class A1> thread(F f, A1 a1);
@@ -234,7 +234,7 @@ namespace std
     /** Returns an object of type thread::id that uniquely identifies the current %thread of execution. */
     inline thread::id get_id() __ntl_nothrow
     {
-    #ifndef NTL__SUBSYSTEM_KM
+    #ifndef NTL_SUBSYSTEM_KM
       return ntl::nt::teb::instance().ClientId.UniqueThread;
     #else
       return ntl::km::PsGetCurrentThreadId();
@@ -267,7 +267,7 @@ namespace std
     static int threads = -1;
     if(threads == -1){
       threads = 0;
-    #ifndef NTL__SUBSYSTEM_KM
+    #ifndef NTL_SUBSYSTEM_KM
       using namespace ntl::nt;
       system_information<system_basic_information> basicInfo;
       if(basicInfo)
@@ -377,7 +377,7 @@ namespace std
     //  NTL__SUBSYSTEM_NS::close(tp->handle);
     //}
     delete tp;
-  #ifdef NTL__SUBSYSTEM_KM
+  #ifdef NTL_SUBSYSTEM_KM
     ntl::km::system_thread::exit(ntl::nt::status::success);
   #endif
   }
@@ -386,7 +386,7 @@ namespace std
   inline bool thread::alive() const __ntl_nothrow
   {
     return 
-#ifndef NTL__SUBSYSTEM_KM
+#ifndef NTL_SUBSYSTEM_KM
       ntl::nt::user_thread
 #else
       ntl::km::system_thread
@@ -421,7 +421,7 @@ namespace std
 
   inline void thread::start(__::thread_params_base* tp)
   {
-#ifndef NTL__SUBSYSTEM_KM
+#ifndef NTL_SUBSYSTEM_KM
     ntl::nt::user_thread systhread(start_routine, tp);
     tid = systhread.get_id();
 #else

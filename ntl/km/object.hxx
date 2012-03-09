@@ -33,7 +33,7 @@ struct file_object;
 struct object_type;
 struct access_state;
 
-NTL__EXTERNVAR object_type **IoDeviceObjectType, **IoDriverObjectType, **IoFileObjectType, **IoCompletionObjectType, **IoDeviceHandlerObjectType;
+NTL_EXTERNVAR object_type **IoDeviceObjectType, **IoDriverObjectType, **IoFileObjectType, **IoCompletionObjectType, **IoDeviceHandlerObjectType;
 
 struct object_attributes:
   public nt::object_attributes
@@ -92,7 +92,7 @@ private:
 };
 
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall
   IoGetDeviceObjectPointer(
     const const_unicode_string *  ObjectName,
@@ -140,7 +140,7 @@ struct object_handle_information
 };
 
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall
   ObReferenceObjectByHandle (
     legacy_handle               Handle,
@@ -182,7 +182,7 @@ ObjectType *
                                         desired_access, obj_type, access_mode);
 }
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall
   ObReferenceObjectByName(
     const const_unicode_string& ObjectName,
@@ -209,7 +209,7 @@ ObjectType* reference_object(
 
 
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 void __fastcall
   ObfDereferenceObject(void * Object);
 

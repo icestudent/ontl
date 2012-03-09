@@ -17,7 +17,7 @@
 namespace ntl {
   namespace nt {
 #ifdef _M_X64
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
       void *__stdcall
         RtlPcToFileHeader(const void *PcValue, void **pBaseOfImage);
 #endif

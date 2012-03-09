@@ -79,12 +79,12 @@ namespace std {
       str(s);
     }
 
-  #ifdef NTL__CXX_RV
+  #ifdef NTL_CXX_RV
     basic_stringbuf(basic_stringbuf&& rhs);
   #endif
 
     ///\name 27.7.1.2 Assign and swap:
-  #ifdef NTL__CXX_RV
+  #ifdef NTL_CXX_RV
     basic_stringbuf& operator=(basic_stringbuf&& rhs)
     {
       swap(rhs); return *this;
@@ -130,7 +130,7 @@ namespace std {
         str_.reserve(s.size() + initial_output_size);
       }
       str_.assign(s);
-      #ifdef NTL__DEBUG
+      #ifdef NTL_DEBUG
       str_.c_str(); // pretty view
       #endif
       set_ptrs();
@@ -338,7 +338,7 @@ namespace std {
       :basic_istream<charT,traits>(&sb), sb(str, which | ios_base::in)
     {}
 
-  #ifdef NTL__CXX_RV
+  #ifdef NTL_CXX_RV
     basic_istringstream(basic_istringstream&& rhs);
 
     ///\name 27.7.2.2 Assign and swap:
@@ -401,7 +401,7 @@ namespace std {
       : basic_ostream<charT,traits>(&sb), sb(str, which | ios_base::out)
     {}
 
-  #ifdef NTL__CXX_RV
+  #ifdef NTL_CXX_RV
     basic_ostringstream(basic_ostringstream&& rhs);
 
     ///\name 27.7.3.2 Assign/swap:
@@ -464,12 +464,12 @@ namespace std {
       :sb(str, which), base_type(&sb)
     {}
 
-  #ifdef NTL__CXX_RV
+  #ifdef NTL_CXX_RV
     basic_stringstream(basic_stringstream&& rhs);
   #endif
 
     ///\name 27.7.5.1 Assign/swap:
-  #ifdef NTL__CXX_RV
+  #ifdef NTL_CXX_RV
     basic_stringstream& operator=(basic_stringstream&& rhs);
   #endif
 

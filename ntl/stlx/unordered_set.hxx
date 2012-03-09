@@ -56,7 +56,7 @@ namespace std {
     typedef Hash                    hasher;
     typedef Pred                    key_equal;
     typedef Allocator               allocator_type;
-#ifdef NTL__DOC
+#ifdef NTL_DOC
     typedef typename allocator_type::pointer          pointer;
     typedef typename allocator_type::const_pointer    const_pointer;
     typedef typename allocator_type::reference        reference;
@@ -98,7 +98,7 @@ namespace std {
       :base(r,a)
     {}
 
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
     /** Transfers the contents of unordered_set */
     unordered_set(unordered_set&& r)
       :base(forward<base>(r))
@@ -144,7 +144,7 @@ namespace std {
     /** Returns a copy of used %allocator */
     allocator_type get_allocator() const { return allocator_type(nalloc); }
 
-#ifdef NTL__DOC
+#ifdef NTL_DOC
     ///\name size and capacity
     /** Returns \c true if container is empty */
     bool empty() const;
@@ -163,12 +163,12 @@ namespace std {
 #endif
 
     ///\name modifiers
-#ifdef NTL__CXX_VT
+#ifdef NTL_CXX_VT
     template <class... Args> pair<iterator, bool> emplace(Args&&... args);
     template <class... Args> iterator emplace_hint(const_iterator position, Args&&... args);
 #endif
 
-#ifdef NTL__DOC
+#ifdef NTL_DOC
     /** Inserts value if container doesn't have element with the specified key.
         @return Pair of iterator, which points to the given element, and flag, which indicates whether the insertion takes place */
     std::pair<iterator, bool> insert(const value_type& obj);
@@ -284,7 +284,7 @@ namespace std {
     typedef Hash                    hasher;
     typedef Pred                    key_equal;
     typedef Allocator               allocator_type;
-#ifdef NTL__DOC
+#ifdef NTL_DOC
     typedef typename allocator_type::pointer          pointer;
     typedef typename allocator_type::const_pointer    const_pointer;
     typedef typename allocator_type::reference        reference;
@@ -326,7 +326,7 @@ namespace std {
       :base(r,a)
     {}
 
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
     /** Transfers the contents of unordered_multiset */
     unordered_multiset(unordered_multiset&& r)
       :base(forward<base>(r))
@@ -373,7 +373,7 @@ namespace std {
     /** Returns a copy of used %allocator */
     allocator_type get_allocator() const { return allocator_type(nalloc); }
 
-#ifdef NTL__DOC
+#ifdef NTL_DOC
     ///\name size and capacity
     /** Returns \c true if container is empty */
     bool empty() const;
@@ -392,12 +392,12 @@ namespace std {
 #endif
 
     ///\name modifiers
-#ifdef NTL__CXX_VT
+#ifdef NTL_CXX_VT
     template <class... Args> pair<iterator, bool> emplace(Args&&... args);
     template <class... Args> iterator emplace_hint(const_iterator position, Args&&... args);
 #endif
 
-#ifdef NTL__DOC
+#ifdef NTL_DOC
     /** Inserts value if container doesn't have element with the specified key.
         @return Pair of iterator, which points to the given element, and flag, which indicates whether the insertion takes place */
     std::pair<iterator, bool> insert(const value_type& obj);

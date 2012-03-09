@@ -51,7 +51,7 @@ template <class T> struct add_cv { typedef const volatile T type; };
 
 template <class T> struct remove_reference     { typedef T type; };
 template <class T> struct remove_reference<T&> { typedef T type; };
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
 template <class T> struct remove_reference<T&&> { typedef T type; };
 #endif
 
@@ -305,7 +305,7 @@ template <class T, unsigned I = 0> struct extent: public integral_constant<size_
 
 
 // 20.6.7.2 Other transformations [meta.trans.other]
-#ifdef NTL__CXX_VT
+#ifdef NTL_CXX_VT
 
 template <class ...T> struct common_type;
 
@@ -328,7 +328,7 @@ struct common_type<T, U, V...>
   typedef typename common_type<typename common_type<T, U>::type, V...>::type type;
 };
 
-#else // NTL__CXX_VT
+#else // NTL_CXX_VT
 
 template<class T, class U = void, class V = void, class W = void>
 struct common_type;
@@ -345,7 +345,7 @@ namespace __
   template<typename T1, typename T2> struct select_type
   {
   private:
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
     static T1&& __t();
     static T2&& __u();
 #else
@@ -369,7 +369,7 @@ struct common_type<T, U, void, void>
   static_assert(sizeof(T) > 0, "U shall be complete");
 
 private:
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
   static T&& __t();
   static U&& __u();
 #else
@@ -378,7 +378,7 @@ private:
 #endif
 
 public:
-#ifdef NTL__CXX_TYPEOF
+#ifdef NTL_CXX_TYPEOF
   typedef decltype(true ? __t() : __u()) type;
 #else
   typedef typename __::select_type<T,U>::type type;

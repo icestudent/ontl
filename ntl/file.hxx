@@ -79,7 +79,7 @@ class basic_file : public traits
     uint32_t read(void * out, const uint32_t out_size) __ntl_nothrow
     {
       const bool ok = success(f.read(out, out_size));
-      return ok ? f.get_io_status_block().Information : 0;
+      return ok ? static_cast<uint32_t>(f.get_io_status_block().Information) : 0;
     }
 
     bool write(const void * in, const uint32_t in_size) __ntl_nothrow

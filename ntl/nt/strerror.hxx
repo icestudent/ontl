@@ -27,11 +27,11 @@ namespace ntl { namespace nt {
     uint8_t  Text[1];
   };
 
-  NTL__EXTERNAPI
+  NTL_EXTERNAPI
   uint32_t __stdcall
   RtlNtStatusToDosError(ntstatus Status);
 
-  NTL__EXTERNAPI
+  NTL_EXTERNAPI
   ntstatus __stdcall
   RtlFindMessage(
     const void* DllHandle,
@@ -41,7 +41,7 @@ namespace ntl { namespace nt {
     message_resource_entry **MessageEntry
     );
 
-  NTL__EXTERNAPI
+  NTL_EXTERNAPI
   ntstatus __stdcall
   RtlFormatMessage(
     wchar_t* MessageFormat,
@@ -55,7 +55,7 @@ namespace ntl { namespace nt {
     uint32_t* ReturnLength
     );
 
-#ifndef NTL__SUBSYSTEM_KM
+#ifndef NTL_SUBSYSTEM_KM
   namespace __
   {
     inline const message_resource_entry* find_mre(win32error ErrorCode)

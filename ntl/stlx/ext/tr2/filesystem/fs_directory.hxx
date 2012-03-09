@@ -5,7 +5,7 @@
  ****************************************************************************
  */
 #ifndef NTL__STLX_TR2_FILESYSTEM
-#error internal header
+# error internal header
 #endif
 
 #include "../../stack.hxx"
@@ -74,7 +74,7 @@ namespace std
             :p(p),st(st), lst(symlink_st)
           {}
 
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
           explicit basic_directory_entry(path_type&& p, file_status st = file_status(), file_status symlink_st = file_status())
             :p(forward<path_type>(p)),st(st), lst(symlink_st)
           {}
@@ -223,7 +223,7 @@ namespace std
           }
           ~basic_directory_iterator() __ntl_nothrow
           {}
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
           explicit basic_directory_iterator(Path&& dp) __ntl_nothrow
             :dp(forward<Path>(dp)), di(), base(), memsize()
           {
@@ -303,7 +303,7 @@ namespace std
             if(success(st)){
               io_status_block iosb;
               char* buf = nullptr;
-            #ifdef NTL__SUBSYSTEM_KM
+            #ifdef NTL_SUBSYSTEM_KM
               static const uint32_t multiplier = 2;
               memsize = (sizeof(file_directory_information)+32)*16; // ~32 files by default (~3KB), multiplies by 2
             #else
@@ -462,7 +462,7 @@ namespace std
           }
           ~basic_recursive_directory_iterator()
           {}
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
           explicit basic_recursive_directory_iterator(Path&& dp, error_code& ec = throws())
             :recursive(true)
           {

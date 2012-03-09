@@ -43,7 +43,7 @@ class list
       { 
         prev->next = next;
         next->prev = prev;
-        #ifdef NTL__DEBUG
+        #ifdef NTL_DEBUG
         prev = next = nullptr;
         #endif
       }
@@ -55,7 +55,7 @@ class list
     {
         T elem;
         node(const T& elem) : elem(elem)   {}
-        #ifdef NTL__CXX_RV
+        #ifdef NTL_CXX_RV
         node(T&& elem) : elem(forward<T>(elem))  {}
         node(node&& x): elem(move(x.elem))
         {}
@@ -207,7 +207,7 @@ class list
       insert(begin(), x.begin(), x.end());
     }
     
-    #ifdef NTL__CXX_RV
+    #ifdef NTL_CXX_RV
     list(list&& x)
     : node_allocator()
     {
@@ -245,7 +245,7 @@ class list
       assign(x.begin(), x.end());
       return *this;
     }
-    #ifdef NTL__CXX_RV
+    #ifdef NTL_CXX_RV
     list<T,Allocator>& operator=(list<T,Allocator>&& x)
     {
       if(this != &x){
@@ -365,13 +365,13 @@ class list
 
     ///\name modifiers [23.2.4.3]
 
-    #ifdef NTL__CXX_VT
+    #ifdef NTL_CXX_VT
     template <class... Args> void emplace_front(Args&&... args);
     template <class... Args> void emplace_back(Args&&... args);
     template <class... Args> iterator emplace(const_iterator position, Args&&... args);
     #endif
 
-    #ifdef NTL__CXX_RV
+    #ifdef NTL_CXX_RV
     __forceinline
     void push_front(T&& x) { insert(begin(), move(x)); }
     __forceinline
@@ -401,7 +401,7 @@ class list
       return p;
     }
 
-    #ifdef NTL__CXX_RV
+    #ifdef NTL_CXX_RV
     __forceinline
     iterator insert(const_iterator position, T&& x)
     {
@@ -482,7 +482,7 @@ class list
 
     ///\name list operations [23.2.4.4]
 
-    #ifdef NTL__CXX_RV
+    #ifdef NTL_CXX_RV
     void splice(const_iterator position, list<T,Allocator>&& x);
     void splice(const_iterator position, list<T,Allocator>&& x, const_iterator i);
     void splice(const_iterator position, list<T,Allocator>&& x, const_iterator first, const_iterator last);
@@ -546,7 +546,7 @@ class list
       while ( i != begin() );
     }
 
-    #ifdef NTL__CXX_RV
+    #ifdef NTL_CXX_RV
     void merge(list<T,Allocator>&& x);
     template <class Compare>
     void merge(list<T,Allocator>&& x, Compare comp);

@@ -293,23 +293,23 @@ typedef raw_native_string<wchar_t>  raw_unicode_string;
  *@{*/
 
 ///\name String-integer conversion
-NTL__EXTERNAPI ntstatus __stdcall RtlIntegerToUnicodeString(uint32_t Value, uint32_t Base, unicode_string& String);
-NTL__EXTERNAPI ntstatus __stdcall RtlInt64ToUnicodeString(uint64_t Value, uint32_t Base, unicode_string& String);
-NTL__EXTERNAPI ntstatus __stdcall RtlUnicodeStringToInteger(const const_unicode_string& String, uint32_t Base, uint32_t& Value);
+NTL_EXTERNAPI ntstatus __stdcall RtlIntegerToUnicodeString(uint32_t Value, uint32_t Base, unicode_string& String);
+NTL_EXTERNAPI ntstatus __stdcall RtlInt64ToUnicodeString(uint64_t Value, uint32_t Base, unicode_string& String);
+NTL_EXTERNAPI ntstatus __stdcall RtlUnicodeStringToInteger(const const_unicode_string& String, uint32_t Base, uint32_t& Value);
 
 ///\name String conversion
-NTL__EXTERNAPI ntstatus __stdcall RtlUnicodeStringToAnsiString(ansi_string& DestinationString, const const_unicode_string& SourceString, bool AllocateDestination);
-NTL__EXTERNAPI uint32_t __stdcall RtlUnicodeStringToAnsiSize(const const_unicode_string& SourceString);
+NTL_EXTERNAPI ntstatus __stdcall RtlUnicodeStringToAnsiString(ansi_string& DestinationString, const const_unicode_string& SourceString, bool AllocateDestination);
+NTL_EXTERNAPI uint32_t __stdcall RtlUnicodeStringToAnsiSize(const const_unicode_string& SourceString);
 
-NTL__EXTERNAPI ntstatus __stdcall RtlAnsiStringToUnicodeString(unicode_string& DestinationString, const const_ansi_string& SourceString, bool AllocateDestination);
-NTL__EXTERNAPI uint32_t __stdcall RtlAnsiStringToUnicodeSize(const const_ansi_string& SourceString);
+NTL_EXTERNAPI ntstatus __stdcall RtlAnsiStringToUnicodeString(unicode_string& DestinationString, const const_ansi_string& SourceString, bool AllocateDestination);
+NTL_EXTERNAPI uint32_t __stdcall RtlAnsiStringToUnicodeSize(const const_ansi_string& SourceString);
 
-NTL__EXTERNAPI ntstatus __stdcall RtlMultiByteToUnicodeSize(uint32_t& BytesInUnicodeString, const char* MultiByteString, uint32_t BytesInMultiByteString);
-NTL__EXTERNAPI ntstatus __stdcall RtlUnicodeToMultiByteSize(uint32_t& BytesInMultiByteString, const wchar_t* UnicodeString, uint32_t BytesInUnicodeString);
-NTL__EXTERNAPI ntstatus __stdcall RtlMultiByteToUnicodeN(wchar_t* UnicodeString, uint32_t MaxBytesInUnicodeString, uint32_t* BytesInUnicodeString __optional, const char* MultiByteString, uint32_t BytesInMultiByteString);
-NTL__EXTERNAPI ntstatus __stdcall RtlUnicodeToMultiByteN(char* MultiByteString, uint32_t MaxBytesInMultiByteString, uint32_t* BytesInMultiByteString __optional, const wchar_t* UnicodeString, uint32_t BytesInUnicodeString);
+NTL_EXTERNAPI ntstatus __stdcall RtlMultiByteToUnicodeSize(uint32_t& BytesInUnicodeString, const char* MultiByteString, uint32_t BytesInMultiByteString);
+NTL_EXTERNAPI ntstatus __stdcall RtlUnicodeToMultiByteSize(uint32_t& BytesInMultiByteString, const wchar_t* UnicodeString, uint32_t BytesInUnicodeString);
+NTL_EXTERNAPI ntstatus __stdcall RtlMultiByteToUnicodeN(wchar_t* UnicodeString, uint32_t MaxBytesInUnicodeString, uint32_t* BytesInUnicodeString __optional, const char* MultiByteString, uint32_t BytesInMultiByteString);
+NTL_EXTERNAPI ntstatus __stdcall RtlUnicodeToMultiByteN(char* MultiByteString, uint32_t MaxBytesInMultiByteString, uint32_t* BytesInMultiByteString __optional, const wchar_t* UnicodeString, uint32_t BytesInUnicodeString);
 
-NTL__EXTERNAPI wchar_t __stdcall RtlAnsiCharToUnicodeChar(unsigned char**);
+NTL_EXTERNAPI wchar_t __stdcall RtlAnsiCharToUnicodeChar(unsigned char**);
 
 __forceinline wchar_t __fastcall widen(char c)
 {
@@ -318,13 +318,13 @@ __forceinline wchar_t __fastcall widen(char c)
 }
 
 ///\name String case mapping conversion
-NTL__EXTERNAPI wchar_t __stdcall RtlUpcaseUnicodeChar(wchar_t);
-NTL__EXTERNAPI ntstatus __stdcall RtlUpcaseUnicodeString(unicode_string& DestinationString, const_unicode_string const& SourceString, bool AllocateDestination);
-NTL__EXTERNAPI ntstatus __stdcall RtlDowncaseUnicodeString(unicode_string& DestinationString, const_unicode_string const& SourceString, bool AllocateDestination);
-NTL__EXTERNAPI void __stdcall RtlUpperString(ansi_string& DestinationString, const_ansi_string const& SourceString);
+NTL_EXTERNAPI wchar_t __stdcall RtlUpcaseUnicodeChar(wchar_t);
+NTL_EXTERNAPI ntstatus __stdcall RtlUpcaseUnicodeString(unicode_string& DestinationString, const_unicode_string const& SourceString, bool AllocateDestination);
+NTL_EXTERNAPI ntstatus __stdcall RtlDowncaseUnicodeString(unicode_string& DestinationString, const_unicode_string const& SourceString, bool AllocateDestination);
+NTL_EXTERNAPI void __stdcall RtlUpperString(ansi_string& DestinationString, const_ansi_string const& SourceString);
 
-#ifndef NTL__SUBSYSTEM_KM
-NTL__EXTERNAPI wchar_t __stdcall RtlDowncaseUnicodeChar(wchar_t);
+#ifndef NTL_SUBSYSTEM_KM
+NTL_EXTERNAPI wchar_t __stdcall RtlDowncaseUnicodeChar(wchar_t);
 #else
 extern "C" inline wchar_t __stdcall RtlDowncaseUnicodeChar(wchar_t c)
 {
@@ -338,11 +338,11 @@ extern "C" inline wchar_t __stdcall RtlDowncaseUnicodeChar(wchar_t c)
 
 
 ///\name String comparation
-NTL__EXTERNAPI int32_t __stdcall RtlCompareUnicodeStrings(const wchar_t* String1, size_t String1Length, const wchar_t* String2, size_t String2Length);
-NTL__EXTERNAPI int32_t __stdcall RtlCompareUnicodeString (const const_unicode_string& String1, const const_unicode_string& String2, bool CaseInSensitive);
-NTL__EXTERNAPI int32_t __stdcall RtlCompareString (const const_ansi_string& String1, const const_ansi_string& String2, bool CaseInSensitive);
-NTL__EXTERNAPI bool    __stdcall RtlEqualUnicodeString(const const_unicode_string& String1, const const_unicode_string& String2);
-NTL__EXTERNAPI bool    __stdcall RtlEqualString(const const_ansi_string& String1, const const_ansi_string& String2);
+NTL_EXTERNAPI int32_t __stdcall RtlCompareUnicodeStrings(const wchar_t* String1, size_t String1Length, const wchar_t* String2, size_t String2Length);
+NTL_EXTERNAPI int32_t __stdcall RtlCompareUnicodeString (const const_unicode_string& String1, const const_unicode_string& String2, bool CaseInSensitive);
+NTL_EXTERNAPI int32_t __stdcall RtlCompareString (const const_ansi_string& String1, const const_ansi_string& String2, bool CaseInSensitive);
+NTL_EXTERNAPI bool    __stdcall RtlEqualUnicodeString(const const_unicode_string& String1, const const_unicode_string& String2);
+NTL_EXTERNAPI bool    __stdcall RtlEqualString(const const_ansi_string& String1, const const_ansi_string& String2);
 
 namespace hash_string_algorithm
 {
@@ -352,7 +352,7 @@ namespace hash_string_algorithm
     invalid = -1
   };
 }
-NTL__EXTERNAPI ntstatus __stdcall RtlHashUnicodeString(const const_unicode_string& String, bool CaseInSensitive, hash_string_algorithm::type HashAlgorithm, uint32_t& HashValue);
+NTL_EXTERNAPI ntstatus __stdcall RtlHashUnicodeString(const const_unicode_string& String, bool CaseInSensitive, hash_string_algorithm::type HashAlgorithm, uint32_t& HashValue);
 
 inline uint32_t hash_string(const const_unicode_string& String, bool CaseInSensetive = true, hash_string_algorithm::type Algorithm = hash_string_algorithm::def)
 {
@@ -362,8 +362,8 @@ inline uint32_t hash_string(const const_unicode_string& String, bool CaseInSense
 }
 
 ///\name String allocation
-NTL__EXTERNAPI void __stdcall RtlFreeAnsiString(ansi_string& UnicodeString);
-NTL__EXTERNAPI void __stdcall RtlFreeUnicodeString(unicode_string& UnicodeString);
+NTL_EXTERNAPI void __stdcall RtlFreeAnsiString(ansi_string& UnicodeString);
+NTL_EXTERNAPI void __stdcall RtlFreeUnicodeString(unicode_string& UnicodeString);
 ///\}
 
 /** @} native_string_support */

@@ -22,7 +22,7 @@ namespace std {
 
   using ::mbstate_t;
 
-#ifndef NTL__CXX_CHARS_TYPES
+#ifndef NTL_CXX_CHARS_TYPES
   typedef uint_least16_t char16_t;
   typedef uint_least32_t char32_t;
 #endif

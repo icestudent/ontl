@@ -25,7 +25,7 @@ namespace km {
 
 //#pragma warning(disable:4190)// C-linkage specified, but returns UDT 'identifier2' which is incompatible with C
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall
   ZwCreateFile(
     handle *                  FileHandle,
@@ -41,7 +41,7 @@ ntstatus __stdcall
     uint32_t                  EaLength
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall
   ZwOpenFile(
     handle *                  FileHandle,
@@ -53,7 +53,7 @@ ntstatus __stdcall
     );
 
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall
   ZwReadFile(
     legacy_handle     FileHandle,
@@ -67,7 +67,7 @@ ntstatus __stdcall
     const uint32_t *  Key           __optional
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall
   ZwWriteFile(
     legacy_handle     FileHandle,
@@ -81,7 +81,7 @@ ntstatus __stdcall
     const uint32_t *  Key           __optional
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall ZwFlushBuffersFile(legacy_handle FileHandle, io_status_block* IoStatusBlock);
 
 using nt::ZwQueryFullAttributesFile;

@@ -27,7 +27,7 @@ namespace std
       //{}
       inline explicit exstring(const std::string& s);
 
-    #ifdef NTL__CXX_RV
+    #ifdef NTL_CXX_RV
       exstring(exstring&& r)
         :msg(r.msg), len(r.len)
       {
@@ -148,7 +148,7 @@ class underflow_error : public runtime_error
 };
 
 //////////////////////////////////////////////////////////////////////////
-#if STLX__USE_EXCEPTIONS
+#if STLX_USE_EXCEPTIONS
 ///\name exception helpers
 void __throw_out_of_range(const char* msg)      { __ntl_throw(out_of_range(msg)); }
 void __throw_length_error(const char* msg)      { __ntl_throw(length_error(msg)); }

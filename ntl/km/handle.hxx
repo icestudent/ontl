@@ -21,7 +21,7 @@ using nt::handle_attributes;
 using nt::kwait_reason;
 using nt::infinite_timeout;
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall
   KeWaitForSingleObject(
     void *          Object,
@@ -57,7 +57,7 @@ ntstatus
 }
 
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall
 ZwDuplicateObject(
     legacy_handle   SourceProcessHandle,
@@ -89,7 +89,7 @@ legacy_handle
 }
 
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall
   ZwClose(legacy_handle Handle);
 

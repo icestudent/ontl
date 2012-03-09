@@ -663,7 +663,7 @@ NTL_HASH_IMPL(long long);
 NTL_HASH_IMPL(unsigned long long);
 #endif
 
-#ifdef NTL__CXX_CHARS
+#ifdef NTL_CXX_CHARS
 NTL_HASH_IMPL(char16_t);
 NTL_HASH_IMPL(char32_t);
 #endif

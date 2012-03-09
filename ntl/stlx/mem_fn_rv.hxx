@@ -8,7 +8,7 @@
 #define NTL_MEMFN_RV
 #pragma once
 
-#ifdef NTL__CXX_RV__WORKS
+#ifdef NTL_CXX_RV__WORKS
 # include "fn_caller_rv.hxx"
 #else
 # include "fn_caller.hxx"
@@ -75,7 +75,7 @@ namespace std
     template<typename R, class T, class Args>
     struct memfun_arity<R,T,Args,1>: binary_function<T*, typename tuple_element<0, Args>::type, R>{};
   }
-#ifndef NTL__DOC
+#ifndef NTL_DOC
 #define NTL_DEFINE_MEMFNARG(n,aux), typename __::arg_t<NTL_SPP_DEC(n), Args>::type a ## n
 #define NTL_DEFINE_MEMFNARGT(n,aux), typename __::arg_t<NTL_SPP_DEC(n), Args>::type 
 
@@ -119,7 +119,7 @@ namespace std
 #endif
   };
 
-#if 0 && !defined(NTL__DOC)
+#if 0 && !defined(NTL_DOC)
 
   // ARGC == 0
 #define NTL_DEFINE_MEMFN0(cv) \

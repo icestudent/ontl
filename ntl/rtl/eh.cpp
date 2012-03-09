@@ -24,7 +24,7 @@
 
 namespace dbg = ntl::nt::dbg;
 
-#ifdef NTL__DEBUG
+#ifdef NTL_DEBUG
 # include "../nt/debug.hxx"
   void dbg_pause()
   {

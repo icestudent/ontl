@@ -612,7 +612,7 @@ namespace std
   struct atomic_bool:
     public __atomic_v1::base<bool, true>
   {
-  #ifdef NTL__CXX_EF
+  #ifdef NTL_CXX_EF
     atomic_bool() = default;
   #else
     /** Initializes the object with the default value. */
@@ -651,7 +651,7 @@ namespace std
   inline bool atomic_compare_exchange_weak_explicit(volatile atomic_bool* object, bool* expected, bool desired, memory_order smo, memory_order fmo) { return object->compare_exchange_weak(*expected,desired,smo,fmo); }
   inline bool atomic_compare_exchange_strong_explicit(volatile atomic_bool* object, bool* expected, bool desired, memory_order smo, memory_order fmo) { return object->compare_exchange_weak(*expected,desired,smo,fmo); }
 
-#ifdef NTL__DOC
+#ifdef NTL_DOC
   /**
    *	@brief %atomic integral type
    *
@@ -761,7 +761,7 @@ namespace std
   NTL_MAKE_ATOMIC_ITYPE(llong,int64_t);
   NTL_MAKE_ATOMIC_ITYPE(ullong, uint64_t);
   NTL_MAKE_ATOMIC_ITYPE(wchar_t, wchar_t);
-#ifdef NTL__CXX_CHARS
+#ifdef NTL_CXX_CHARS
   NTL_MAKE_ATOMIC_ITYPE(char16_t,char16_t);
   NTL_MAKE_ATOMIC_ITYPE(char32_t,char32_t);
 #endif
@@ -808,7 +808,7 @@ namespace std
   struct atomic_address:
     public __atomic_v1::base<void*, true>
   {
-  #ifdef NTL__CXX_EF
+  #ifdef NTL_CXX_EF
     atomic_address() = default;
   #else
     /** Initializes the object with the default value. */
@@ -883,7 +883,7 @@ namespace std
    **/
   template<class T> struct atomic;
 
-#if NTL__DOC
+#if NTL_DOC
 
   /**
    *	@brief There is a generic class template atomic<T>.
@@ -927,7 +927,7 @@ namespace std
     atomic(const atomic&) __deleted;
     atomic& operator=(const atomic&) __deleted;
   public:
-  #ifdef NTL__CXX_EF
+  #ifdef NTL_CXX_EF
     atomic() = default;
   #else
     /** Initializes the object with the default value. */
@@ -1009,7 +1009,7 @@ namespace std
   NTL_MAKE_ATOMIC(llong,int64_t);
   NTL_MAKE_ATOMIC(ullong, uint64_t);
   NTL_MAKE_ATOMIC(wchar_t, wchar_t);
-#ifdef NTL__CXX_CHARS
+#ifdef NTL_CXX_CHARS
   NTL_MAKE_ATOMIC(char16_t,char16_t);
   NTL_MAKE_ATOMIC(char32_t,char32_t);
 #endif
@@ -1085,7 +1085,7 @@ namespace std
       }
     }
 
-  #ifdef NTL__CXX_EF
+  #ifdef NTL_CXX_EF
     atomic_flag() = default;
     atomic_flag(const atomic_flag&) __deleted;
     atomic_flag& operator=(const atomic_flag&) __deleted;
@@ -1094,7 +1094,7 @@ namespace std
     friend void swap(volatile atomic_flag& x, volatile atomic_flag& y) { ntl::atomic::exchange(x.val_, y.val_); }
 
   //private:
-  #ifndef NTL__DOC
+  #ifndef NTL_DOC
     uint32_t val_;
   #endif
   };

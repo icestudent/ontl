@@ -870,7 +870,7 @@ template<> class numeric_limits<long double>
     static const  float_round_style round_style = round_to_nearest;
 }; //template class numeric_limits<long double>
 
-#ifdef NTL__CXX_CHARS
+#ifdef NTL_CXX_CHARS
 
 template<> class numeric_limits<char16_t>
 {

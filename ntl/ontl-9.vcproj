@@ -366,6 +366,10 @@
 							>
 						</File>
 						<File
+							RelativePath=".\stlx\ext\tr2\files.hxx"
+							>
+						</File>
+						<File
 							RelativePath=".\stlx\ext\tr2\filesystem.hxx"
 							>
 						</File>
@@ -509,23 +513,31 @@
 							Name="filesystem"
 							>
 							<File
-								RelativePath=".\stlx\ext\tr2\fs_directory.hxx"
+								RelativePath=".\stlx\ext\tr2\filesystem\fs_directory.hxx"
 								>
 							</File>
 							<File
-								RelativePath=".\stlx\ext\tr2\fs_directory_v3.hxx"
+								RelativePath=".\stlx\ext\tr2\filesystem\fs_operations.hxx"
 								>
 							</File>
 							<File
-								RelativePath=".\stlx\ext\tr2\fs_operations.hxx"
+								RelativePath=".\stlx\ext\tr2\filesystem\fs_traits.hxx"
+								>
+							</File>
+						</Filter>
+						<Filter
+							Name="filesystem_v3"
+							>
+							<File
+								RelativePath=".\stlx\ext\tr2\filesystem\fs_directory_v3.hxx"
 								>
 							</File>
 							<File
-								RelativePath=".\stlx\ext\tr2\fs_operations_v3.hxx"
+								RelativePath=".\stlx\ext\tr2\filesystem\fs_operations_v3.hxx"
 								>
 							</File>
 							<File
-								RelativePath=".\stlx\ext\tr2\fs_traits.hxx"
+								RelativePath=".\stlx\ext\tr2\filesystem\fs_path.hxx"
 								>
 							</File>
 						</Filter>

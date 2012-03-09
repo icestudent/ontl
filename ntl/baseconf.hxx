@@ -50,31 +50,31 @@
 /************************************************************************/
 /* Debugging support                                                    */
 /************************************************************************/
-#ifndef NTL__DEBUG
+#ifndef NTL_DEBUG
   #if defined(NDEBUG)
   #elif defined(_DEBUG) || defined(DBG)
-  # define NTL__DEBUG
+  # define NTL_DEBUG
   #endif
 #endif
 
 /************************************************************************/
 /* Exceptions configuration                                             */
 /************************************************************************/
-#ifndef STLX__USE_EXCEPTIONS
+#ifndef STLX_USE_EXCEPTIONS
   #if defined(_MSC_VER) || defined(__BCPLUSPLUS__)
     #ifdef _CPPUNWIND
-      #define STLX__USE_EXCEPTIONS 1
+      #define STLX_USE_EXCEPTIONS 1
     #else
-      #define STLX__USE_EXCEPTIONS 0
+      #define STLX_USE_EXCEPTIONS 0
     #endif
   #elif defined(__GNUC__)
     #ifdef __EXCEPTIONS
-      #define STLX__USE_EXCEPTIONS 1
+      #define STLX_USE_EXCEPTIONS 1
     #else
-      #define STLX__USE_EXCEPTIONS 0
+      #define STLX_USE_EXCEPTIONS 0
     #endif
   #else
-    #error define STLX__USE_EXCEPTIONS
+    #error define STLX_USE_EXCEPTIONS
   #endif
 #endif
 
@@ -83,21 +83,21 @@
 /************************************************************************/
 /* RTTI configuration                                                   */
 /************************************************************************/
-#ifndef STLX__USE_RTTI
+#ifndef STLX_USE_RTTI
   #if defined(_MSC_VER)
     #ifdef _CPPRTTI
-      #define STLX__USE_RTTI 1
+      #define STLX_USE_RTTI 1
     #else
-      #define STLX__USE_RTTI 0
+      #define STLX_USE_RTTI 0
     #endif
   #elif defined(__GNUC__)
     #ifdef __GXX_RTTI
-      #define STLX__USE_RTTI 1
+      #define STLX_USE_RTTI 1
     #else
-      #define STLX__USE_RTTI 0
+      #define STLX_USE_RTTI 0
     #endif
   #else
-    #error define STLX__USE_RTTI
+    #error define STLX_USE_RTTI
   #endif
 #endif
 
@@ -126,7 +126,7 @@
 #endif
 
 ///\name SAL macroses
-#ifndef NTL__NO_SAL
+#ifndef NTL_NO_SAL
 #ifndef __in
 # define __in
 #endif
@@ -157,7 +157,7 @@
 #ifndef __deref_out_opt
 # define __deref_out_opt
 #endif
-#endif // NTL__NO_SAL
+#endif // NTL_NO_SAL
 ///\}
 
 #if !(defined(_MSC_VER) && _MSC_VER >= 1400)
@@ -206,30 +206,30 @@
  #define __fastcall __attribute__((fastcall))
 #endif
 
-#ifndef NTL__CRTCALL
-# ifdef NTL__STLX_FORCE_CDECL
+#ifndef NTL_CRTCALL
+# ifdef NTL_STLX_FORCE_CDECL
   #ifdef _MSC_VER
-    #define NTL__CRTCALL __cdecl
+    #define NTL_CRTCALL __cdecl
   #elif defined(__BCPLUSPLUS__)
-    #define NTL__CRTCALL __cdecl
+    #define NTL_CRTCALL __cdecl
   #endif
 # else
-  #define NTL__CRTCALL
+  #define NTL_CRTCALL
 # endif
 #endif
 
-#define NTL__CRTIMP __cdecl
+#define NTL_CRTIMP __cdecl
 
-#ifndef NTL__EXTERNAPI
+#ifndef NTL_EXTERNAPI
   #ifdef  _MSC_VER
-    #define NTL__EXTERNAPI extern "C" __declspec(dllimport) __declspec(nothrow)
-    #define NTL__EXTERNVAR extern "C" __declspec(dllimport)
+    #define NTL_EXTERNAPI extern "C" __declspec(dllimport) __declspec(nothrow)
+    #define NTL_EXTERNVAR extern "C" __declspec(dllimport)
   #elif defined(__BCPLUSPLUS__)
-    #define NTL__EXTERNAPI extern "C" __declspec(dllimport) __declspec(nothrow)
-    #define NTL__EXTERNVAR extern "C" __declspec(dllimport)
+    #define NTL_EXTERNAPI extern "C" __declspec(dllimport) __declspec(nothrow)
+    #define NTL_EXTERNVAR extern "C" __declspec(dllimport)
   #elif defined(__GNUC__)
-    #define NTL__EXTERNAPI extern "C"
-    #define NTL__EXTERNVAR extern "C"
+    #define NTL_EXTERNAPI extern "C"
+    #define NTL_EXTERNVAR extern "C"
   #endif
 #endif
 

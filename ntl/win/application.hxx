@@ -24,19 +24,19 @@ namespace win {
 #endif
 
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 char * __stdcall
   GetCommandLineA();
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 wchar_t * __stdcall
   GetCommandLineW();
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 uint32_t __stdcall
   GetLastError();
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 void __stdcall
   SetLastError(
     uint32_t dwErrCode
@@ -253,10 +253,10 @@ typedef application<char>::startupinfo    startupinfoa;
 typedef application<wchar_t>::startupinfo startupinfow;
 
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 void __stdcall GetStartupInfoA(startupinfoa *);
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 void __stdcall GetStartupInfoW(startupinfow *);
 
 template<>

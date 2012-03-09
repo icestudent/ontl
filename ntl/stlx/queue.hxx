@@ -36,7 +36,7 @@ namespace std {
       :c(c)
     {}
     
-    #ifdef NTL__CXX_RV
+    #ifdef NTL_CXX_RV
     explicit queue(Container&& c = Container())
       :c(move(c))
     {}
@@ -56,7 +56,7 @@ namespace std {
       :c(c, a)
     {}
     
-    #ifdef NTL__CXX_RV
+    #ifdef NTL_CXX_RV
     template <class Alloc>
     queue(Container&& c, const Alloc& a)
       :c(move(c),a)
@@ -68,7 +68,7 @@ namespace std {
     #endif
 
     
-    #ifdef NTL__CXX_RV
+    #ifdef NTL_CXX_RV
     // removed at n3291
     //queue& operator=(queue&& q) { c = move(q.c); return *this; }
     #else
@@ -83,11 +83,11 @@ namespace std {
     const_reference back() const { return c.back(); }
 
     
-    #ifdef NTL__CXX_RV
+    #ifdef NTL_CXX_RV
     void push(value_type&& x) { c.push_back(move(x)); }
     #endif
 
-    #ifdef NTL__CXX_VT
+    #ifdef NTL_CXX_VT
     template <class... Args>
     void emplace(Args&&... args) { c.emplace_back(forward<Args>(args)...); }
     #endif

@@ -59,7 +59,7 @@ namespace std
   ///\}
 }
 
-#if STLX__USE_EXCEPTIONS
+#if STLX_USE_EXCEPTIONS
 # ifndef NTL__STLX_STDEXCEPT
 #  include "stdexcept.hxx"
 # endif

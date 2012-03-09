@@ -23,7 +23,7 @@
 // implementation
 #include "../../../nt/string.hxx"
 
-#ifndef NTL__SUBSYSTEM_KM
+#ifndef NTL_SUBSYSTEM_KM
 # include "../../../nt/new.hxx"
 #else
 # include "../../../km/new.hxx"
@@ -111,7 +111,7 @@ namespace std
         static inline external_string_type to_external(const wpath&, const internal_string_type& is) { return is; }
         /** \a xs, converted by the \c m_locale \c codecvt facet to to internal_string_type. */
         static inline internal_string_type to_internal(const wpath&, const external_string_type& xs) { return xs; }
-    #ifdef NTL__CXX_RV
+    #ifdef NTL_CXX_RV
         static inline external_string_type to_external(const wpath&, internal_string_type&& is)      { return move(is); }
         static inline internal_string_type to_internal(const wpath&, external_string_type&& xs)      { return move(xs); }
     #endif
@@ -178,7 +178,7 @@ namespace std
         {
           operator /=(s);
         }
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
         basic_path(basic_path&& p)
           :path_(forward<string_type>(p.path_))
         {}
@@ -225,7 +225,7 @@ namespace std
           path_.clear();
           return operator /=(s);
         }
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
         basic_path& operator=(basic_path&& p)
         {
           path_.clear();
@@ -249,7 +249,7 @@ namespace std
         basic_path& operator/=(const basic_path& rhs) { return append(rhs.string().c_str(), rhs.string().size()); }
         basic_path& operator/=(const string_type& s)  { return append(s.c_str(), s.size()); }
         basic_path& operator/=(const value_type* s)   { return append(s, s ? string_type::traits_type::length(s) : 0); }
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
         // useless
         basic_path& operator/=(basic_path&& rhs) { return append(rhs.string().c_str(), rhs.string().size()); }
         basic_path& operator/=(string_type&& s)  { return append(s.c_str(), s.size()); }
@@ -379,7 +379,7 @@ namespace std
             :path(), pos(), element()
           {}
 
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
           iterator(iterator&& r)
             :name(forward<string_type>(r.name)), path(r.path), pos(r.pos), element(r.element)
           {
@@ -514,7 +514,7 @@ namespace std
       template<class String, class Traits>
       inline void swap(basic_path<String, Traits> & lhs, basic_path<String, Traits> & rhs) { lhs.swap(rhs); }
       
-    #ifndef NTL__DOC
+    #ifndef NTL_DOC
       template<class String, class Traits> inline bool operator<(basic_path<String, Traits>& a, basic_path<String, Traits>& b) { return lexicographical_compare(a.begin(), a.end(), b.begin(), b.end()); }
       template<class String, class Traits> bool operator==(basic_path<String, Traits>& a, basic_path<String, Traits>& b);
       template<class String, class Traits> inline bool operator!=(basic_path<String, Traits>& a, basic_path<String, Traits>& b){ return rel_ops::operator !=(a,b); }
@@ -637,7 +637,7 @@ namespace std
       /** Specialization of basic_filesystem_error for wpath */
       typedef basic_filesystem_error<wpath> wfilesystem_error;
 
-      #ifndef NTL__DOC
+      #ifndef NTL_DOC
       //////////////////////////////////////////////////////////////////////////
       // IMPLEMENTATION
       /************************************************************************/
@@ -906,7 +906,7 @@ namespace std
           path_ += *p == backslash ? slashval : *p;
           p++;
         }
-#ifdef NTL__DEBUG
+#ifdef NTL_DEBUG
         path_.c_str();
 #endif
         return *this;
@@ -962,7 +962,7 @@ namespace std
         name = p.substr(cur, pos-cur);
         if(pos != static_cast<pos_type>(size))
           pos++;
-      #ifdef NTL__DEBUG
+      #ifdef NTL_DEBUG
         name.c_str();
       #endif
         return *this;
@@ -1054,7 +1054,7 @@ namespace std
         return move(is);
       }
 
-      #endif // NTL__DOC
+      #endif // NTL_DOC
 
 
       ///\name Path creation helpers
@@ -1062,7 +1062,7 @@ namespace std
       inline path  make_path(const string& spath)  { return path (spath); }
       inline wpath make_path(const wchar_t* spath) { return wpath(spath); }
       inline wpath make_path(const wstring& spath) { return wpath(spath); }
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
       inline path  make_path(string&& spath)  { return path (move(spath)); }
       inline wpath make_path(wstring&& spath) { return wpath(move(spath)); }
 #endif
@@ -1076,7 +1076,7 @@ namespace std
   } // tr2
 }// std
 
-#include "fs_operations.hxx"
-#include "fs_directory.hxx"
+#include "filesystem/fs_operations.hxx"
+#include "filesystem/fs_directory.hxx"
 
 #endif

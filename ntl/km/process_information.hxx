@@ -18,8 +18,8 @@ namespace ntl { namespace km {
   using nt::set_thread_information_t;
   using nt::thread_information_base;
 
-NTL__EXTERNAPI query_thread_information_t ZwQueryInformationThread;
-NTL__EXTERNAPI set_thread_information_t   ZwSetInformationThread;
+NTL_EXTERNAPI query_thread_information_t ZwQueryInformationThread;
+NTL_EXTERNAPI set_thread_information_t   ZwSetInformationThread;
 
 
 template<class ThreadInformationClass>

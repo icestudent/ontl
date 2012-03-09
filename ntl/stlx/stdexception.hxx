@@ -22,7 +22,7 @@
 #pragma warning(disable:4290)
 #endif
 
-#if STLX__USE_EXCEPTIONS == 0
+#if STLX_USE_EXCEPTIONS == 0
 # pragma push_macro("__noreturn")
 # undef __noreturn
 # define __noreturn
@@ -41,7 +41,7 @@ namespace std {
 class exception
 {
   public:
-#if STLX__USE_EXCEPTIONS
+#if STLX_USE_EXCEPTIONS
     exception() __ntl_nothrow {}
     exception(const exception&) __ntl_nothrow {}
     exception& operator=(const exception&) __ntl_nothrow { return *this; }

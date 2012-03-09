@@ -134,8 +134,8 @@ ntstatus __stdcall
     uint32_t                  SystemInformationLength
     );
 
-NTL__EXTERNAPI query_system_information_t NtQuerySystemInformation;
-NTL__EXTERNAPI set_system_information_t NtSetSystemInformation;
+NTL_EXTERNAPI query_system_information_t NtQuerySystemInformation;
+NTL_EXTERNAPI set_system_information_t NtSetSystemInformation;
 
 
 ///\note  most of SystemInformationClasses have either big or variable size,

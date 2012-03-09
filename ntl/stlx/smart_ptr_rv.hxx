@@ -196,16 +196,8 @@ namespace std
     unique_ptr(const unique_ptr&) __deleted;
     unique_ptr& operator=(const unique_ptr&) __deleted;
 
-    template <class U, class E> unique_ptr(const unique_ptr<U, E>&) __deleted
-    {
-      static_assert(false, "buggy compiler");
-    }
-
-    template <class U, class E> unique_ptr& operator=(const unique_ptr<U, E>&) __deleted
-    {
-      static_assert(false, "buggy compiler");
-      return *this;
-    }
+    template <class U, class E> unique_ptr(const unique_ptr<U, E>&) __deleted;
+    template <class U, class E> unique_ptr& operator=(const unique_ptr<U, E>&) __deleted;
   };//template class unique_ptr
 
 
@@ -313,19 +305,9 @@ namespace std
     // disable copy from lvalue
     unique_ptr(const unique_ptr&) __deleted;
     unique_ptr& operator=(const unique_ptr&) __deleted;
-    template <class U> unique_ptr(const unique_ptr<U>&) __deleted
-    {
-      static_assert(false, "buggy compiler");
-    }
-    template <class U, class E> unique_ptr(const unique_ptr<U, E>&) __deleted
-    {
-      static_assert(false, "buggy compiler");
-    }
-    template <class U, class E> unique_ptr& operator=(const unique_ptr<U, E>&) __deleted
-    {
-      static_assert(false, "buggy compiler");
-      return *this;
-    }
+    template <class U> unique_ptr(const unique_ptr<U>&) __deleted;
+    template <class U, class E> unique_ptr(const unique_ptr<U, E>&) __deleted;
+    template <class U, class E> unique_ptr& operator=(const unique_ptr<U, E>&) __deleted;
   };//template class unique_ptr
 #endif
 
@@ -678,7 +660,7 @@ namespace std
     x.swap(y);
   }
 
-#ifndef NTL__CXX_RVFIX
+#ifndef NTL_CXX_RVFIX
   template <class T, class D> void swap(unique_ptr<T, D>&& x, unique_ptr<T, D>& y)
   {
     x.swap(y);
@@ -807,7 +789,7 @@ namespace std
       }
       const void* get_deleter(const type_info& ti) const __ntl_nothrow
       {
-      #if STLX__USE_RTTI
+      #if STLX_USE_RTTI
           return typeid(D) == ti ? reinterpret_cast<const void*>(&deleter) : nullptr;
       #else
           return reinterpret_cast<const void*>(&deleter);
@@ -859,16 +841,8 @@ namespace std
     template<class D, class T> 
     friend D* get_deleter(shared_ptr<T> const& p);
 
-    template <class Y, class D> explicit shared_ptr(const unique_ptr<Y, D>& r) __deleted
-    {
-      static_assert(false, "buggy compiler");
-      return *this;
-    }
-    template <class Y, class D> shared_ptr& operator=(const unique_ptr<Y, D>& r) __deleted
-    {
-      static_assert(false, "buggy compiler");
-      return *this;
-    }
+    template <class Y, class D> explicit shared_ptr(const unique_ptr<Y, D>& r) __deleted;
+    template <class Y, class D> shared_ptr& operator=(const unique_ptr<Y, D>& r) __deleted;
 
   protected:
     // *shared_ptr<void> protect
@@ -1158,11 +1132,6 @@ namespace std
 
   //////////////////////////////////////////////////////////////////////////
   // 20.7.12.2.6, shared_ptr creation
-#ifdef NTL__CXX_VT
-  template<class T, class... Args> shared_ptr<T> make_shared(Args&&... args);
-  template<class T, class A, class... Args>
-  shared_ptr<T> allocate_shared(const A& a, Args&&... args);
-#else
   namespace __
   {
     template<class T, class Alloc>
@@ -1185,6 +1154,23 @@ namespace std
       return shared_ptr<T>(p, d, a);
     }
   }
+#ifdef NTL_CXX_VT
+
+  template<class T, class... Args> 
+  inline shared_ptr<T> make_shared(Args&&... args)
+  {
+    return shared_ptr<T>(new T(forward<Args>(args)...));
+  }
+  template<class T, class Alloc, class... Args>
+  inline shared_ptr<T> allocate_shared(const Alloc& a, Args&&... args)
+  {
+    typename Alloc::template rebind<T>::other at(a);
+    T* p = at.allocate(1);
+    at.construct(p, forward<Args>(args)...);
+    return __::shared_ptr_allocate(p, at);
+  }
+
+#else
 
   template<class T>
   inline shared_ptr<T> make_shared()
@@ -1480,7 +1466,7 @@ namespace std
   /**@} lib_smartptr_rv */
 
   /// 20.7.12.6 Pointer safety [util.dynamic.safety]
-#ifdef NTL__CXX_ENUM
+#ifdef NTL_CXX_ENUM
   enum class pointer_safety { relaxed, preferred, strict };
 #else
   /**
@@ -1510,7 +1496,7 @@ namespace std
 
 
   /// 20.7.13 Align [ptr.align]
-#ifndef NTL__CXX_ALIGN
+#ifndef NTL_CXX_ALIGN
   inline void * align(size_t alignment, size_t size, void* &ptr, size_t& space)
   {
     uintptr_t & uptr = reinterpret_cast<uintptr_t&>(ptr);

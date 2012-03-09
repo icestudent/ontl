@@ -10,7 +10,7 @@
 
 #include "placeholders.hxx"
 
-#ifdef NTL__CXX_RV__WORKS // doesn't works yet
+#ifdef NTL_CXX_RV__WORKS // doesn't works yet
 # include "bind_rv.hxx"
 #else
 #include "fn_caller.hxx"

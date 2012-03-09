@@ -16,7 +16,7 @@
 namespace ntl {
 namespace km {
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall
   IoCreateDevice(
     driver_object* DriverObject,
@@ -28,23 +28,23 @@ ntstatus __stdcall
     device_object** DeviceObject
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall
   IoDeleteDevice(device_object* DeviceObject);
 
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall
   IoCreateSymbolicLink(
     const const_unicode_string& SymbolicLinkName,
     const const_unicode_string& DeviceName
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall
   IoDeleteSymbolicLink(const const_unicode_string& SymbolicLinkName);
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall
   IoEnumerateDeviceObjectList(
     const driver_object*  DriverObject,

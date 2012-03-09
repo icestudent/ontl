@@ -29,7 +29,7 @@ static inline legacy_handle current_thread()
   return current_thread;
 }
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall
 NtDuplicateObject(
     legacy_handle   SourceProcessHandle,
@@ -96,7 +96,7 @@ static inline const systime_t& infinite_timeout()
   return *p;
 }
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall
   NtWaitForSingleObject(
     legacy_handle     Handle,
@@ -104,7 +104,7 @@ ntstatus __stdcall
     const systime_t&  Timeout
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall
   NtSignalAndWaitForSingleObject(
     legacy_handle     SignalHandle,
@@ -113,7 +113,7 @@ ntstatus __stdcall
     const systime_t&  Timeout
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall
   NtWaitForMultipleObjects(
     uint32_t            Count,
@@ -171,7 +171,7 @@ legacy_handle
 }
 
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall
   NtClose(legacy_handle Handle);
 

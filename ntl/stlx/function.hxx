@@ -168,7 +168,7 @@ namespace std
           return *this;
         }
 
-    #ifdef NTL__CXX_RV
+    #ifdef NTL_CXX_RV
         ///** Constructs function wrapper from copy of callable \c f */
         //template<typename F>
         //explicit function(const F& f)
@@ -299,7 +299,7 @@ namespace std
           function(allocator_arg, f, a).swap(*this);
         }
 
-    #if STLX__USE_RTTI
+    #if STLX_USE_RTTI
         ///\name 20.7.15.2.5, function target access:
 
         /** Returns type info of the target if exists; otherwise returns <tt>typeid(void)</tt> */
@@ -332,7 +332,7 @@ namespace std
         }
         ///\endcond
 
-    #ifndef NTL__CXX_RV
+    #ifndef NTL_CXX_RV
         template<class Fn> inline void assign_impl(const Fn& f)
         {
           if(check_ptr(f, is_pointer<Fn>()))

@@ -115,7 +115,7 @@ namespace km {
     KeTryToAcquireSpinLockAtDpcLevel
    **/
 
-  NTL__EXTERNAPI
+  NTL_EXTERNAPI
   void __stdcall
   KeInitializeDpc(
       kdpc* Dpc,
@@ -123,7 +123,7 @@ namespace km {
       void* DeferredContext
       );
 
-  NTL__EXTERNAPI
+  NTL_EXTERNAPI
   void __stdcall
   KeInitializeThreadedDpc(
       kdpc* Dpc,
@@ -131,7 +131,7 @@ namespace km {
       void* DeferredContext
       );
 
-  NTL__EXTERNAPI
+  NTL_EXTERNAPI
   bool __stdcall
   KeInsertQueueDpc (
     kdpc* Dpc,
@@ -139,40 +139,40 @@ namespace km {
     void* SystemArgument2
     );
 
-  NTL__EXTERNAPI
+  NTL_EXTERNAPI
   bool __stdcall
   KeRemoveQueueDpc (
     kdpc* Dpc
     );
 
-  NTL__EXTERNAPI
+  NTL_EXTERNAPI
   void __stdcall
   KeSetImportanceDpc (
     kdpc* Dpc,
     kdpc::DpcImportance Importance
     );
 
-  NTL__EXTERNAPI
+  NTL_EXTERNAPI
   void __stdcall
     KeSetTargetProcessorDpc (
     kdpc*  Dpc,
     int8_t Number
     );
 
-  NTL__EXTERNAPI
+  NTL_EXTERNAPI
   void __stdcall KeFlushQueuedDpcs();
 
-  NTL__EXTERNAPI
+  NTL_EXTERNAPI
   void __stdcall
   KeGenericCallDpc (
     kdpc::deferred_routine_t* Routine,
     void* Context
     );
 
-  NTL__EXTERNAPI
+  NTL_EXTERNAPI
   void __stdcall KeSignalCallDpcDone(void* SystemArgument1);
 
-  NTL__EXTERNAPI
+  NTL_EXTERNAPI
   uint32_t __stdcall KeSignalCallDpcSynchronize(void* SystemArgument2);
 
 

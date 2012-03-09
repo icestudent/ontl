@@ -125,7 +125,7 @@ template<class T, class Alloc> struct uses_allocator
     template <class T>
     static void destroy(Alloc& a, T* p) { a.destroy(p); }
 
-#ifdef NTL__CXX_VT
+#ifdef NTL_CXX_VT
 
   private:
     template<class Tp, class... Args>
@@ -157,7 +157,7 @@ template<class T, class Alloc> struct uses_allocator
 
 #else
 
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
     #define NTL_X(n,p) NTL_SPP_COMMA forward<NTL_SPP_CAT(A,n)>(NTL_SPP_CAT(p,n))
     #define NTL_DEFINE_CONSTRUCT(n,aux) \
     template <class T NTL_SPP_COMMA_IF(n) NTL_SPP_ARGS(1,n,class A)> \
@@ -258,7 +258,7 @@ class allocator
       p->T::/*< workaround MSVC's weird `scalar deleting destructor'*/ ~T();
     }
 
-#if defined(NTL__CXX_VT)
+#if defined(NTL_CXX_VT)
 
     template<class... Args>
     void construct(pointer p, Args&&... args)
@@ -268,7 +268,7 @@ class allocator
     }
 #else
 
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
     #define NTL_X(n,p) forward<NTL_SPP_CAT(A,n)>(NTL_SPP_CAT(p,n))
     #define NTL_DEFINE_CONSTRUCT(n,aux) \
     template <class U NTL_SPP_COMMA_IF(n) NTL_SPP_ARGS(1,n,class A)> \
@@ -348,15 +348,15 @@ public:
   };
 
   scoped_allocator_adaptor();
-  #ifdef NTL__CXX_RV
+  #ifdef NTL_CXX_RV
   scoped_allocator_adaptor(scoped_allocator_adaptor&&);
   #endif
   scoped_allocator_adaptor(const scoped_allocator_adaptor&);
-  #ifdef NTL__CXX_RV
+  #ifdef NTL_CXX_RV
   scoped_allocator_adaptor(Alloc&& outerAlloc);
   #endif
   scoped_allocator_adaptor(const Alloc& outerAlloc);
-  #ifdef NTL__CXX_RV
+  #ifdef NTL_CXX_RV
   template <typename OuterA2>
   scoped_allocator_adaptor(scoped_allocator_adaptor<OuterA2, void>&&);
   #endif
@@ -374,7 +374,7 @@ public:
 
   size_type max_size() const;
 
-  #ifdef NTL__CXX_VT
+  #ifdef NTL_CXX_VT
   template <class... Args>
   void construct(pointer p, Args&&... args);
   #else
@@ -411,17 +411,17 @@ public:
   };
 
   scoped_allocator_adaptor();
-  #ifdef NTL__CXX_RV
+  #ifdef NTL_CXX_RV
   scoped_allocator_adaptor(outer_allocator_type&& outerAlloc,
     inner_allocator_type&& innerAlloc);
   #endif
   scoped_allocator_adaptor(const outer_allocator_type& outerAlloc,
     const inner_allocator_type& innerAlloc);
-  #ifdef NTL__CXX_RV
+  #ifdef NTL_CXX_RV
   scoped_allocator_adaptor(scoped_allocator_adaptor&& other);
   #endif
   scoped_allocator_adaptor(const scoped_allocator_adaptor& other);
-  #ifdef NTL__CXX_RV
+  #ifdef NTL_CXX_RV
   template <typename OuterAlloc2>
   scoped_allocator_adaptor(
     scoped_allocator_adaptor<OuterAlloc2&,InnerA>&&);
@@ -442,7 +442,7 @@ public:
   size_type max_size() const;
 
 
-  #ifdef NTL__CXX_VT
+  #ifdef NTL_CXX_VT
   template <class... Args>
   void construct(pointer p, Args&&... args);
   #else

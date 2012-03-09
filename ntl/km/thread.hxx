@@ -34,13 +34,13 @@ struct kqueue;
 struct kthread;
 struct kgate;
 
-NTL__EXTERNAPI kthread * __stdcall KeGetCurrentThread();
+NTL_EXTERNAPI kthread * __stdcall KeGetCurrentThread();
 
 ///\note XP+ only, use KeGetCurrentThread instead
-NTL__EXTERNAPI kthread * __stdcall PsGetCurrentThread();
-NTL__EXTERNAPI legacy_handle __stdcall PsGetCurrentThreadId();
+NTL_EXTERNAPI kthread * __stdcall PsGetCurrentThread();
+NTL_EXTERNAPI legacy_handle __stdcall PsGetCurrentThreadId();
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall
   PsLookupThreadByThreadId(
     legacy_handle ThreadId,
@@ -66,7 +66,7 @@ typedef
 nt::tib * __stdcall
   get_thread_teb_t(const kthread * Thread);
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 get_thread_teb_t PsGetThreadTeb;
 
 
@@ -622,7 +622,7 @@ struct kpcr:
 //
 #if defined(_M_IX86)
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 bool __stdcall
 KeIsExecutingDpc();
 
@@ -1019,7 +1019,7 @@ struct device_traits<km::system_thread> : private device_traits<>
 
 namespace km {
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall
   PsCreateSystemThread(
     handle *            ThreadHandle,
@@ -1031,7 +1031,7 @@ ntstatus __stdcall
     void *              StartContext
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall
   PsTerminateSystemThread(
     ntstatus  ExitStatus

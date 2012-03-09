@@ -56,7 +56,7 @@ namespace std
   template <class> class packaged_task; // undefined
 
   ///\name 30.5.2 Error handling [futures.errors]
-#if defined(NTL__CXX_ENUM) || defined(NTL__DOC)
+#if defined(NTL_CXX_ENUM) || defined(NTL_DOC)
   /// Futures error codes
   enum class future_errc {
     /** Indicates that promise is broken */
@@ -67,7 +67,7 @@ namespace std
     promise_already_satisfied,
     /** Uninitialized future use */
     no_state
-  #ifndef NTL__DOC
+  #ifndef NTL_DOC
     ,__maximum_errc
   #endif
   };
@@ -286,7 +286,7 @@ namespace std
         lock_guard g(data_guard);
         if(!ready){
           error = make_error_code(future_errc::broken_promise);
-        #if STLX__USE_EXCEPTIONS
+        #if STLX_USE_EXCEPTIONS
           exception = copy_exception(future_error(error));
         #endif
           mark_ready();
@@ -830,7 +830,7 @@ namespace std
 
       // result retrieval
       /** Returns a future object associated with the result of the associated task of *this. */
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
       future<R>
 #else
       _rvalue<future<R> >
@@ -970,12 +970,12 @@ namespace std
 
 
   ///\name 30.6.8 Function template async [futures.async]
-#if defined(NTL__CXX_VT) || defined(NTL__DOC)
+#if defined(NTL_CXX_VT) || defined(NTL_DOC)
   template <class F, class... Args>
   future<typename result_of<F(Args...)>::type> async(F&& f, Args&&... args);
   template <class F, class... Args>
   future<typename result_of<F(Args...)>::type> async(launch policy, F&& f, Args&&... args);
-#elif defined(NTL__CXX_RV)
+#elif defined(NTL_CXX_RV)
   template <class F>
   future<typename result_of<F()>::type> async(launch policy, F&& f);
 #else

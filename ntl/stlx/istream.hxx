@@ -49,7 +49,7 @@ class basic_istream : virtual public basic_ios<charT, traits>
       basic_ios::init(sb);
     }
 
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
     basic_istream(basic_istream&& rhs)
       :ccount(rhs.ccount)
     {
@@ -63,7 +63,7 @@ class basic_istream : virtual public basic_ios<charT, traits>
 
     // 27.6.1.1.2 Class basic_istream assign and swap [istream.assign]
 
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
     basic_istream& operator=(basic_istream&& rhs)
     {
       swap(rhs); return *this;
@@ -865,7 +865,7 @@ class basic_iostream:
     : basic_istream<charT, traits>(sb), basic_ostream<charT, traits>(sb)
     {;}
 
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
     /// 3 Effects: Move constructs from the rvalue \p rhs by constructing
     ///   the basic_istream base class with <tt>move(rhs)</tt>.
     basic_iostream(basic_iostream&& rhs)
@@ -882,7 +882,7 @@ class basic_iostream:
     virtual ~basic_iostream() {;}
 
     ///\name 27.6.1.5.3 basic_iostream assign and swap [iostream.assign]
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
 
     /// 1 Effects: swap(rhs).
     basic_iostream& operator=(basic_iostream&& rhs)
@@ -906,7 +906,7 @@ private:
 template <class charT, class traits>
 void swap(basic_iostream<charT, traits>& x, basic_iostream<charT, traits>& y)  { x.swap(y); }
 
-#ifdef NTL__CXX_RVFIX
+#ifdef NTL_CXX_RVFIX
 /// 27.7.1.6 Rvalue stream extraction [istream.rvalue]
 template <class charT, class traits, class T>
 inline basic_istream<charT, traits>& operator>>(basic_istream<charT, traits>&& is, T& x)

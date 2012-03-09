@@ -12,16 +12,16 @@
 /************************************************************************/
 /* Emulation                                                            */
 /************************************************************************/
-#ifndef NTL__CXX // __cplusplus <= 199711L
+#ifndef NTL_CXX // __cplusplus <= 199711L
 
-  #ifndef NTL__CXX_ASSERT
+  #ifndef NTL_CXX_ASSERT
     #define static_assert(e, Msg) STATIC_ASSERT(e)
   #else
     #undef STATIC_ASSERT
     #define STATIC_ASSERT(e) static_assert(e, #e)
   #endif
 
-  #ifndef NTL__CXX_ALIGNAS
+  #ifndef NTL_CXX_ALIGNAS
     #ifdef _MSC_VER
       #define alignas(X) __declspec(align(X))
     #else
@@ -29,14 +29,14 @@
     #endif
   #endif
 
-  #ifndef NTL__CXX_ALIGNOF
+  #ifndef NTL_CXX_ALIGNOF
     #if defined(__ICL) || _MSC_VER <= 1600
       #define alignof(X) __alignof(X)
     #endif
   #endif
   static_assert(alignof(int)==alignof(unsigned int), "wierd platform");
 
-  #ifndef NTL__CXX_FUNC
+  #ifndef NTL_CXX_FUNC
     #ifdef _MSC_VER
       #define __func__ __FUNCSIG__
     #else
@@ -62,7 +62,7 @@
 /* Common declarations                                                  */
 /************************************************************************/
 
-#ifdef NTL__CXX_ATTRIBUTES
+#ifdef NTL_CXX_ATTRIBUTES
 # define __noreturn [[noreturn]]
 #else
   // __declspec-aware compilers only
@@ -70,7 +70,7 @@
 #endif
 
 // explicit function definition
-#ifdef NTL__CXX_EF
+#ifdef NTL_CXX_EF
   #define __deleted = delete
   #define __default = default
 #else
@@ -78,7 +78,7 @@
   #define __default
 #endif
 
-#ifdef NTL__CXX_EXPLICITOP
+#ifdef NTL_CXX_EXPLICITOP
 # define __explicit_operator_bool() explicit operator bool()
 # define __explicit_bool(...) __VA_ARGS__
 #else
@@ -108,13 +108,13 @@ namespace ntl
 // null pointer constant
 namespace std
 {
-#if !defined(NTL__CXX_NULLPTR) && !defined(NTL__DOC)
+#if !defined(NTL_CXX_NULLPTR) && !defined(NTL_DOC)
   //based on SC22/WG21/N2431 = J16/07-0301
   struct nullptr_t
   {
     template<typename any> operator any * () const { return 0; }
     template<class any, typename T> operator T any:: * () const { return 0; }
-#ifdef NTL__CXX_EXPLICITOP
+#ifdef NTL_CXX_EXPLICITOP
     explicit operator bool() const { return false; }
 #else
     operator ntl::explicit_bool_type() const { return ntl::explicit_bool(false); }

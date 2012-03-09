@@ -135,7 +135,7 @@ struct check_meta_trans_cv
 
 struct check_meta_trans_ref
 {
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
   _CHECK_TRAIT((is_same<remove_reference<int&>::type, int&>::value) == 0);
   _CHECK_TRAIT((is_same<remove_reference<int&>::type, int>::value));
 #endif

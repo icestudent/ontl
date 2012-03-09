@@ -80,9 +80,9 @@ namespace ntl {
 
     /// common declarations
 
-    NTL__EXTERNVAR void *     MmHighestUserAddress;
-    NTL__EXTERNVAR void *     MmSystemRangeStart;
-    NTL__EXTERNVAR uintptr_t  MmUserProbeAddress;
+    NTL_EXTERNVAR void *     MmHighestUserAddress;
+    NTL_EXTERNVAR void *     MmSystemRangeStart;
+    NTL_EXTERNVAR uintptr_t  MmUserProbeAddress;
 
     enum memory_caching_type {
       MmNonCached,
@@ -118,15 +118,15 @@ namespace ntl {
     };
 
 
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
       physical_address __stdcall
       MmGetPhysicalAddress(const void * BaseAddress);
 
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
       void* __stdcall
       MmGetVirtualForPhysical(const physical_address PhysicalAddress);
 
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
       void* __stdcall
       MmMapIoSpace(
         const physical_address PhysicalAddress,
@@ -134,7 +134,7 @@ namespace ntl {
         memory_caching_type CacheType
         );
 
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
       void __stdcall
       MmUnmapIoSpace(
         const void* BaseAddress,
@@ -142,33 +142,33 @@ namespace ntl {
         );
 
 
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
       void* __stdcall
       MmAllocateNonCachedMemory(
         uint32_t NumberOfBytes
         );
 
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
       void __stdcall
       MmFreeNonCachedMemory(
         const void* BaseAddress,
         uint32_t NumberOfBytes
         );
 
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
       void* __stdcall
       MmAllocateContiguousMemory(
         uint32_t NumberOfBytes,
         physical_address HighestAcceptableAddress
         );
 
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
       void __stdcall
       MmFreeContiguousMemory(
         const void* BaseAddress
         );
 
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
       void* __stdcall
       MmAllocateContiguousMemorySpecifyCache(
         uint32_t NumberOfBytes,
@@ -178,7 +178,7 @@ namespace ntl {
         memory_caching_type CacheType
         );
 
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
       void __stdcall
       MmFreeContiguousMemorySpecifyCache(
         const void* BaseAddress,
@@ -190,21 +190,21 @@ namespace ntl {
     struct mdl;
     struct irp;
 
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
       void * __stdcall
       MmMapLockedPages(
         const mdl *     MemoryDescriptorList,
         kprocessor_mode AccessMode
         );
 
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
       void * __stdcall
       MmUnmapLockedPages(
         void *      BaseAddress,
         const mdl * MemoryDescriptorList
         );
 
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
       mdl * __stdcall
       IoAllocateMdl(
         void *    VirtualAddress,
@@ -214,13 +214,13 @@ namespace ntl {
         irp *     Irp             __optional
         );
 
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
       void  __stdcall
       IoFreeMdl(
         mdl * Mdl
         );
 
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
       void  __stdcall
       MmBuildMdlForNonPagedPool(
         mdl * MemoryDescriptorList

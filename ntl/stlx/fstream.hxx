@@ -11,7 +11,7 @@
 #include "streambuf.hxx"
 #include "istream.hxx"
 
-#ifdef NTL__SUBSYSTEM_KM
+#ifdef NTL_SUBSYSTEM_KM
 # include "../km/file.hxx"
 #else
 # include "../nt/file.hxx"
@@ -72,7 +72,7 @@ namespace std {
       :mode(), our_buffer(true),encoding(Encoding::Default)
     {}
 
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
     basic_filebuf(basic_filebuf&& rhs);
 #endif
 
@@ -87,7 +87,7 @@ namespace std {
     }
 
     ///\name 27.9.1.3 Assign and swap [filebuf.assign]
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
     basic_filebuf& operator=(basic_filebuf&& rhs)
     {
       swap(rhs); return *this;
@@ -583,7 +583,7 @@ namespace std {
         sm = native_file::share_valid_flags;
       }
       using namespace NTL__SUBSYSTEM_NS;
-      bool ok = success(f.create(name.external_file_string(), cd, am, sm));
+      bool ok = success(f.create(fname, cd, am, sm));
       if(!ok)
         return false;
 
@@ -761,7 +761,7 @@ class basic_ifstream:
     {
       open(s, mode, encoding);
     }
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
     basic_ifstream(basic_ifstream&& rhs);
 #endif
 
@@ -773,7 +773,7 @@ class basic_ifstream:
       open(name, mode, encoding);
     }
     ///\name 27.9.1.8 Assign and swap [ifstream.assign]
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
     basic_ifstream& operator=(basic_ifstream&& rhs)
     {
       swap(rhs); return *this;
@@ -851,7 +851,7 @@ class basic_ofstream:
     {
       open(s, mode, encoding);
     }
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
     basic_ofstream(basic_ofstream&& rhs);
 #endif
 
@@ -863,7 +863,7 @@ class basic_ofstream:
       open(name, mode, encoding);
     }
     ///\name 27.9.1.12 Assign and swap [ofstream.assign]
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
     basic_ofstream& operator=(basic_ofstream&& rhs)
     {
       return swap(rhs), *this;
@@ -944,7 +944,7 @@ class basic_fstream:
     {
       open(s, mode, encoding);
     }
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
     basic_fstream(basic_fstream&& rhs);
 #endif
 
@@ -956,7 +956,7 @@ class basic_fstream:
       open(name, mode, encoding);
     }
     ///\name 27.9.1.16 Assign and swap [fstream.assign]
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
     basic_fstream& operator=(basic_fstream&& rhs)
     {
       return swap(rhs), *this;

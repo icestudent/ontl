@@ -34,7 +34,7 @@ namespace std {
     typedef typename Container::const_reference const_reference;
     typedef typename Container::size_type       size_type;
   public:
-  #ifdef NTL__CXX_RV
+  #ifdef NTL_CXX_RV
     explicit priority_queue(const Compare& x = Compare(), Container&& = Container());
     template <class InputIterator>
     priority_queue(InputIterator first, InputIterator last, const Compare& x = Compare(), Container&& = Container());
@@ -55,7 +55,7 @@ namespace std {
     template <class Alloc>
     priority_queue(const Compare&, const Container&, const Alloc&);
     
-  #ifdef NTL__CXX_RV
+  #ifdef NTL_CXX_RV
     template <class Alloc>
     priority_queue(const Compare&, Container&&, const Alloc&);
     template <class Alloc>
@@ -69,10 +69,10 @@ namespace std {
     void push(const value_type& x);
     void pop();
     
-  #ifdef NTL__CXX_RV
+  #ifdef NTL_CXX_RV
     void push(value_type&& x);
   #endif
-  #ifdef NTL__CXX_VT
+  #ifdef NTL_CXX_VT
     template <class... Args>
     void emplace(Args&&... args);
   #endif

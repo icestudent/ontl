@@ -1459,7 +1459,7 @@ class ndis
 };//class ndis
 
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ndis::status::type __stdcall
   NdisAllocateMemoryWithTag(
     void **   VirtualAddress,
@@ -1467,7 +1467,7 @@ ndis::status::type __stdcall
     uint32_t  Tag
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 void __stdcall
   NdisFreeMemory(
     void *    VirtualAddress,
@@ -1488,7 +1488,7 @@ void ndis::free(void * va, size_t length, uint32_t flags)
 }
 
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 void __stdcall
   NdisRegisterProtocol(
     ndis::status::type                    * Status,
@@ -1497,7 +1497,7 @@ void __stdcall
     unsigned                                CharacteristicsLength
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 void __stdcall
   NdisDeregisterProtocol(
     ndis::status::type    * Status,
@@ -1528,7 +1528,7 @@ ndis::status::type
 }
 
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 void __stdcall
   NdisAllocatePacketPool(
     ndis::status::type *  Status,
@@ -1537,11 +1537,11 @@ void __stdcall
     uint32_t              ProtocolReservedLength
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 void __stdcall
   NdisFreePacketPool(ndis::handle PoolHandle);
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 void __stdcall
   NdisAllocatePacket(
     ndis::status::type *  Status,
@@ -1549,7 +1549,7 @@ void __stdcall
     ndis::handle          PoolHandle
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 void __stdcall NdisFreePacket(ndis::packet *  Packet);
 
 ndis::status::type
@@ -1583,7 +1583,7 @@ void ndis::packet::free()
 }
 
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 void __stdcall
   NdisAllocateBufferPool(
     ndis::status::type *  Status,
@@ -1591,12 +1591,12 @@ void __stdcall
     uint32_t              NumberOfDescriptors
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 void __stdcall
   NdisFreeBufferPool(ndis::handle PoolHandle);
 
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 void __stdcall
   NdisAllocateBuffer(
     ndis::status::type *  Status,
@@ -1634,7 +1634,7 @@ ndis::buffer *
 }
 
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 void __stdcall
   NdisOpenAdapter(
     ndis::status::type *  Status,
@@ -1651,7 +1651,7 @@ void __stdcall
     );
 
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 void __stdcall
   NdisCloseAdapter(
     ndis::status::type *  Status,

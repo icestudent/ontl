@@ -39,7 +39,7 @@ class stack
     typedef          Container              container_type;
 
     
-    #ifdef NTL__CXX_RV
+    #ifdef NTL_CXX_RV
     explicit stack(const Container& c)
       :c(c)
     {}
@@ -67,7 +67,7 @@ class stack
       :c(c,a)
     {}
     
-    #ifdef NTL__CXX_RV
+    #ifdef NTL_CXX_RV
     template <class Alloc>
     stack(Container&& c, const Alloc& a)
       :c(forward<Container>(c), a)
@@ -85,13 +85,13 @@ class stack
     void              push(const value_type& x) { c.push_back(x); }
     void              pop()                     { c.pop_back(); }
 
-    #ifdef NTL__CXX_RV
+    #ifdef NTL_CXX_RV
     void push(value_type&& x)
     {
       c.push_back(move(x));
     }
     #endif
-    #ifdef NTL__CXX_VT
+    #ifdef NTL_CXX_VT
     template <class... Args>
     void emplace(Args&&... args);
     #endif

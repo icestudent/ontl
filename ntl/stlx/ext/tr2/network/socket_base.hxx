@@ -95,7 +95,7 @@ namespace std { namespace tr2 { namespace network {
   public:
     ///\name socket options
     class linger;
-#ifdef NTL__DOC
+#ifdef NTL_DOC
     /** Determines whether a socket permits sending of broadcast messages, if supported by the protocol. */
     class broadcast;
     /** Determines whether debugging information is recorded by the underlying protocol. */
@@ -236,7 +236,7 @@ namespace std { namespace tr2 { namespace network {
     std::pair<uint16_t, uint16_t> v;
   };
 
-#ifndef NTL__DOC
+#ifndef NTL_DOC
   namespace ip
   {
     /**

@@ -30,7 +30,7 @@ using nt::system_modules_information;
 using nt::query_system_information_t;
 //using nt::set_system_information_t;
 
-NTL__EXTERNAPI query_system_information_t ZwQuerySystemInformation;
+NTL_EXTERNAPI query_system_information_t ZwQuerySystemInformation;
 
 
 template<class InformationClass>

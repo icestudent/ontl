@@ -579,7 +579,7 @@ namespace std
     explicit discard_block_engine(const base_type& urng)
       :e(urng), n(0)
     {}
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
     explicit discard_block_engine(base_type&& urng)
       :e(std::move(urng)), n(0)
     {}
@@ -682,7 +682,7 @@ namespace std
       :e(e)
     { init(); }
 
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
     explicit shuffle_order_engine(Engine&& e)
       :e(std::move(e))
     { init(); }
@@ -812,7 +812,7 @@ namespace std
      xor_combine(const base1_type& e1, const base2_type& e2)
        :eng1(e1), eng2(e2)
      {}
-  #ifdef NTL__CXX_RV
+  #ifdef NTL_CXX_RV
      xor_combine(base1_type&& e1, base2_type&& e2)
        :eng1(std::move(e1)), eng2(std::move(e2))
      {}

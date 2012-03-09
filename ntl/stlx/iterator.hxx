@@ -324,7 +324,7 @@ class reverse_iterator
                     const reverse_iterator<Iterator2>& y)
       { return x.current >= y.base(); }
 
-#if defined(NTL__CXX_AUTORET) && 0
+#if defined(NTL_CXX_AUTORET) && 0
   // isn't used anymore
   template<typename Iterator2>
   friend auto operator-(const reverse_iterator<Iterator>& x, const reverse_iterator<Iterator2>& y) -> decltype(y.current-x.current)
@@ -366,7 +366,7 @@ class back_insert_iterator
       container->push_back(value);
       return *this;
     }
-    #ifdef NTL__CXX_RV
+    #ifdef NTL_CXX_RV
     back_insert_iterator<Container>&
       operator=(typename Container::value_type&& value)
     {
@@ -405,7 +405,7 @@ class front_insert_iterator
       container->push_front(value);
       return *this;
     }
-    #ifdef NTL__CXX_RV
+    #ifdef NTL_CXX_RV
     front_insert_iterator<Container>&
       operator=(typename Container::value_type&& value)
     {
@@ -450,7 +450,7 @@ class insert_iterator
       ++iter;
       return *this;
     }
-    #ifdef NTL__CXX_RV
+    #ifdef NTL_CXX_RV
     insert_iterator<Container>&
       operator=(typename Container::value_type&& value)
     {
@@ -479,7 +479,7 @@ insert_iterator<Container>
 }
 
 /// 24.5.3.1 Class template move_iterator [move.iterator]
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
 template <class Iterator>
 class move_iterator
 {
@@ -544,7 +544,7 @@ public:
   friend bool operator<=(const move_iterator<Iterator>& x, const move_iterator<Iterator2>& y)
   { return x.current <= y.current; }
 
-#if defined(NTL__CXX_AUTORET) && 0
+#if defined(NTL_CXX_AUTORET) && 0
   template<typename Iterator2>
   friend auto operator-(const move_iterator<Iterator>& x, const move_iterator<Iterator2>& y) -> decltype(y.current-x.current)
   { return y.current - x.current; }
@@ -596,7 +596,7 @@ class istream_iterator
     //istream_iterator(const this_type& x)
     //: in_stream(x.in_stream), value(x.value) {}
 
-  #ifdef NTL__CXX_EF
+  #ifdef NTL_CXX_EF
     istream_iterator(const this_type& x) __default;
     ~istream_iterator() __default;
   #endif
@@ -782,7 +782,7 @@ class ostreambuf_iterator
 ///\name 24.6.5 range access [iterator.range]
 // NOTE: available when any of the containers header are included.
 
-#ifdef NTL__CXX_AUTORET
+#ifdef NTL_CXX_AUTORET
   template <class C> inline auto begin(C& c)      -> decltype(c.begin())  { return c.begin(); }
   template <class C> inline auto begin(const C& c)-> decltype(c.begin())  { return c.begin(); }
   template <class C> inline auto end(C& c)        -> decltype(c.end())    { return c.end();   }

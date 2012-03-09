@@ -11,25 +11,25 @@
 #include "../nt/exception.hxx"
 #include "stdexception.hxx"
 
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
 # include "smart_ptr_rv.hxx"
 #else
 # include "smart_ptr.hxx"
 #endif
 
-#if STLX__USE_EXCEPTIONS == 0
+#if STLX_USE_EXCEPTIONS == 0
 # pragma push_macro("__noreturn")
 # undef __noreturn
 # define __noreturn
 #endif
 
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
 # define __rvtype(T) T&&
 #else
 # define __rvtype(T) const T&
 #endif
 
-#if STLX__USE_EXCEPTIONS == 1
+#if STLX_USE_EXCEPTIONS == 1
 namespace ntl
 {
   namespace intrinsic
@@ -274,7 +274,7 @@ namespace ntl
     };
   }
 }
-#elif !STLX__USE_EXCEPTIONS
+#elif !STLX_USE_EXCEPTIONS
 
 namespace ntl { namespace cxxruntime {
   struct exception_ptr
@@ -325,7 +325,7 @@ namespace std
   template<class E>
   inline exception_ptr make_exception_ptr(E e)
   {
-  #if STLX__USE_EXCEPTIONS == 1
+  #if STLX_USE_EXCEPTIONS == 1
     try {
       throw e;
     }
@@ -356,7 +356,7 @@ namespace std
       :e(current_exception())
     {}
 
-  #ifdef NTL__CXX_EF
+  #ifdef NTL_CXX_EF
     nested_exception(const nested_exception&) throw() = default;
     nested_exception& operator=(const nested_exception&) throw() = default;
     virtual ~nested_exception() = default;
@@ -385,7 +385,7 @@ namespace std
     exception_ptr e;
   };
 
-#if STLX__USE_EXCEPTIONS == 1
+#if STLX_USE_EXCEPTIONS == 1
 
   exception_ptr current_exception()
   {
@@ -468,7 +468,7 @@ namespace std
 
   ///\}
 
-#elif !STLX__USE_EXCEPTIONS
+#elif !STLX_USE_EXCEPTIONS
   inline exception_ptr current_exception() { return exception_ptr(); }
 
   inline void rethrow_exception(exception_ptr){}
@@ -481,7 +481,7 @@ namespace std
   inline void rethrow_if_nested(const E&){}
 #endif
 
-#if STLX__USE_EXCEPTIONS == 0
+#if STLX_USE_EXCEPTIONS == 0
 # pragma pop_macro("__noreturn")
 #endif
 #undef __rvtype

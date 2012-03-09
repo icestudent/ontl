@@ -135,13 +135,13 @@ template <class T> struct add_cv { typedef const volatile T type; };
 
 template <class T> struct remove_reference     { typedef T type; };
 template <class T> struct remove_reference<T&> { typedef T type; };
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
 template <class T> struct remove_reference<T&&> { typedef T type; };
 #endif
 
 template <class T> struct add_lvalue_reference     { typedef T& type; };
 template <class T> struct add_lvalue_reference<T&> { typedef T& type; };
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
 template <class T> struct add_rvalue_reference     { typedef T&& type; };
 template <class T> struct add_rvalue_reference<T&> { typedef T&& type; };
 template <class T> struct add_rvalue_reference<T&&>{ typedef T&& type; };
@@ -232,7 +232,7 @@ _CHECK_TRAIT(__alignof(aligned_storage<5, 8000>::type) == 8192);
 _CHECK_TRAIT(sizeof(aligned_storage<2, 4>::type) == 4);
 //_CHECK_TRAIT(sizeof(aligned_storage<2, 4>::type) == 2);
 
-#ifdef NTL__CXX_VT
+#ifdef NTL_CXX_VT
 template <std::size_t Len, class... Types> struct aligned_union;
 #endif
 
@@ -319,7 +319,7 @@ template <class T> struct is_lvalue_reference     : public false_type {};
 template <class T> struct is_lvalue_reference<T&> : public true_type {};
 
 template <class T> struct is_rvalue_reference     : public false_type {};
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
 template <class T> struct is_rvalue_reference<T&&>: public true_type {};
 _CHECK_TRAIT(is_rvalue_reference<volatile int&&>::value);
 #endif
@@ -606,7 +606,7 @@ bool,( has_trivial_default_constructor<T>::value &&
 
 
 // 20.6.7.2 Other transformations [meta.trans.other]
-#if defined(NTL__CXX_VT) && defined(NTL__CXX_TYPEOF)
+#if defined(NTL_CXX_VT) && defined(NTL_CXX_TYPEOF)
 
 template <class ...T> struct common_type;
 
@@ -629,7 +629,7 @@ struct common_type<T, U, V...>
   typedef typename common_type<typename common_type<T, U>::type, V...>::type type;
 };
 
-#else // NTL__CXX_VT
+#else // NTL_CXX_VT
 
 template <class T>
 struct common_type<T, void, void, void>
@@ -643,7 +643,7 @@ namespace __
   template<typename T1, typename T2> struct select_type
   {
   private:
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
     static T1&& __t();
     static T2&& __u();
 #else
@@ -667,7 +667,7 @@ struct common_type<T, U, void, void>
   static_assert(sizeof(T) > 0, "U shall be complete");
 
 private:
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
   static T&& __t();
   static U&& __u();
 #else
@@ -676,7 +676,7 @@ private:
 #endif
 
 public:
-#ifdef NTL__CXX_TYPEOF
+#ifdef NTL_CXX_TYPEOF
   typedef decltype(true ? __t() : __u()) type;
 #else
   typedef typename __::select_type<T,U>::type type;
@@ -697,7 +697,7 @@ struct common_type
   typedef typename common_type<typename common_type<T, U, V>::type, W>::type type;
 };
 
-#endif // NTL__CXX_VT
+#endif // NTL_CXX_VT
 
 }//namespace std
 

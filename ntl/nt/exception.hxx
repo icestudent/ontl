@@ -52,7 +52,7 @@ extern "C"
 
 #include "../nt/debug.hxx"
 
-#ifdef NTL__DEBUG
+#ifdef NTL_DEBUG
   void dbg_pause();
 # define dbgpause() dbg_pause()
 #else
@@ -422,13 +422,13 @@ class exception
 
 #ifdef _M_X64
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 void *__stdcall
   RtlPcToFileHeader(const void *PcValue, void **pBaseOfImage);
 
 #endif
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 __noreturn
 void __stdcall
 RtlRaiseException(
@@ -462,7 +462,7 @@ struct exception_registration
 
 /// the functopn is exported by kernel32.dll ntdll.dll & nt.exe
 ///\warning not to be called from C code since it trashes all registers
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 void __stdcall
 RtlUnwind(
     const exception_registration *  TargetFrame,    __optional
@@ -529,7 +529,7 @@ extern "C" exception_pointers * __cdecl _exception_info();
 extern "C" void * _ReturnAddress();
 #pragma intrinsic(_ReturnAddress)
 
-extern "C"//NTL__EXTERNAPI is not an option because of __declspec(dllimport)
+extern "C"//NTL_EXTERNAPI is not an option because of __declspec(dllimport)
 __noreturn
 void __stdcall
 RaiseException(ntstatus, exception_flags, uint32_t, const uintptr_t *);
@@ -1076,7 +1076,7 @@ namespace cxxruntime {
 
   STATIC_ASSERT(sizeof(ehfuncinfo_packed) == 0x28);
 
-  NTL__EXTERNAPI
+  NTL_EXTERNAPI
     nt::exception::runtime_function*  __stdcall
     RtlLookupFunctionEntry(
     const void* ControlPc,
@@ -1084,7 +1084,7 @@ namespace cxxruntime {
     nt::exception::unwind_history_table* History
     );
 
-  NTL__EXTERNAPI
+  NTL_EXTERNAPI
     void __stdcall
     RtlUnwindEx(
     uintptr_t                         TargetFrame,

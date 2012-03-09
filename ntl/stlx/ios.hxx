@@ -26,7 +26,7 @@ typedef ssize_t   streamsize;
 ///@}
 
 ///\name 27.5.5.5 Error reporting [error.reporting] (N2857)
-#ifdef NTL__CXX_ENUM
+#ifdef NTL_CXX_ENUM
 
 enum class io_errc {
   stream = 1
@@ -459,7 +459,7 @@ class basic_ios : public ios_base
       return *this;
     }
 
-  #ifdef NTL__CXX_RV
+  #ifdef NTL_CXX_RV
     void move(basic_ios&& x)
     {
       swap(x);

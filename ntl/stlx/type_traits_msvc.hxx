@@ -52,7 +52,7 @@ template <class T> struct add_cv { typedef const volatile T type; };
 
 template <class T> struct remove_reference     { typedef T type; };
 template <class T> struct remove_reference<T&> { typedef T type; };
-# ifdef NTL__CXX_RV
+# ifdef NTL_CXX_RV
 template <class T> struct remove_reference<T&&> { typedef T type; };
 # else
 template <class T> struct remove_reference<_rvalue<T> > { typedef T type; };
@@ -60,7 +60,7 @@ template <class T> struct remove_reference<_rvalue<T> > { typedef T type; };
 
 template <class T> struct add_lvalue_reference     { typedef T& type; };
 template <class T> struct add_lvalue_reference<T&> { typedef T& type; };
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
 template <class T> struct add_rvalue_reference     { typedef T&& type; };
 template <class T> struct add_rvalue_reference<T&> { typedef T&& type; };
 template <class T> struct add_rvalue_reference<T&&>{ typedef T&& type; };
@@ -238,7 +238,7 @@ struct aligned_storage
 #pragma warning(pop)
 
 //
-#ifdef NTL__CXX_VT
+#ifdef NTL_CXX_VT
 template <std::size_t Len, class... Types> struct aligned_union;
 #endif
 
@@ -316,7 +316,7 @@ template <class T> struct is_lvalue_reference     : public false_type {};
 template <class T> struct is_lvalue_reference<T&> : public true_type {};
 
 template <class T> struct is_rvalue_reference     : public false_type {};
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
 template <class T> struct is_rvalue_reference<T&&>: public true_type {};
 #else
 template <class T> struct is_rvalue_reference<_rvalue<T> >: public true_type {};
@@ -605,7 +605,7 @@ bool,( has_trivial_default_constructor<T>::value &&
 
 
 // 20.6.7.2 Other transformations [meta.trans.other]
-#if defined(NTL__CXX_VT) && defined(NTL__CXX_TYPEOF)
+#if defined(NTL_CXX_VT) && defined(NTL_CXX_TYPEOF)
 
 template <class ...T> struct common_type;
 
@@ -628,7 +628,7 @@ struct common_type<T, U, V...>
   typedef typename common_type<typename common_type<T, U>::type, V...>::type type;
 };
 
-#else // NTL__CXX_VT
+#else // NTL_CXX_VT
 
 template<class T, class U, class V, class W>
 struct common_type;
@@ -668,7 +668,7 @@ private:
   static typename add_rvalue_reference<U>::type __u();
 
 public:
-#ifdef NTL__CXX_TYPEOF
+#ifdef NTL_CXX_TYPEOF
   typedef decltype(true ? __t() : __u()) type;
 #else
   typedef typename __::select_type<T,U>::type type;
@@ -688,7 +688,7 @@ struct common_type
   typedef typename common_type<typename common_type<T, U, V>::type, W>::type type;
 };
 
-#endif // NTL__CXX_VT
+#endif // NTL_CXX_VT
 
 // N2947
 // NOTE: there are few limitations: enum_base determines the base type calculating size of enumeration type, 

@@ -23,7 +23,7 @@
 #pragma warning(push)
 #pragma warning(disable:4820) // '3' bytes padding added after data member 'type_info::mname'
 
-#if STLX__USE_RTTI
+#if STLX_USE_RTTI
 # define __ntl_typeid(T) typeid(T)
 #else
 # define __ntl_typeid(T) *reinterpret_cast<const std::type_info*>(0)
@@ -100,7 +100,7 @@ class type_info
 static_assert(sizeof _TypeDescriptor == sizeof type_info, "broken type");
 #endif
 
-#if (STLX__USE_RTTI || STLX__USE_EXCEPTIONS/*do we need another macro instead?*/) && !defined(__ICL)
+#if (STLX_USE_RTTI || STLX_USE_EXCEPTIONS/*do we need another macro instead?*/) && !defined(__ICL)
 inline type_info::~type_info()
 {}
 #endif

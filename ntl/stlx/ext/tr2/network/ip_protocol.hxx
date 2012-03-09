@@ -127,7 +127,7 @@ namespace std { namespace tr2 { namespace network {
     };
 
 
-#ifndef NTL__DOC
+#ifndef NTL_DOC
     namespace multicast
     {
       /**
@@ -192,7 +192,7 @@ namespace std { namespace tr2 { namespace network {
         }
       };
     } // multicast
-#endif // NTL__DOC
+#endif // NTL_DOC
   } // ip
 }}}
 #endif // NTL__STLX_TR2_NETWORK_PROTOCOL

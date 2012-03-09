@@ -65,7 +65,7 @@ class basic_ostream
       basic_ios<charT, traits>::init(sb);
     }
 
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
     /// 5 Effects: Move constructs from the rvalue rhs. This is accomplished
     ///   by default constructing the base class and calling
     ///   basic_ios<charT, traits>::move(rhs) to initialize the base class.
@@ -81,7 +81,7 @@ class basic_ostream
     virtual ~basic_ostream() {}
     ///@}
 
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
     ///\name 27.6.2.3 Class basic_ostream assign and swap [ostream.assign]
     basic_ostream& operator=(basic_ostream&& rhs)
     {
@@ -545,7 +545,7 @@ basic_ostream<charT, traits>&
   return os;
 }
 
-#ifdef NTL__CXX_RVFIX // VC10b1, gcc doesn't requires this
+#ifdef NTL_CXX_RVFIX // VC10b1, gcc doesn't requires this
 
 /// 27.7.2.9 Rvalue stream insertion [ostream.rvalue]
 template <class charT, class traits, typename T>

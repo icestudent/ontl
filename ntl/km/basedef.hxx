@@ -8,8 +8,8 @@
 #define NTL__KM_BASEDEF
 #pragma once
 
-#ifndef NTL__SUBSYSTEM_KM
-# define NTL__SUBSYSTEM_KM
+#ifndef NTL_SUBSYSTEM_KM
+# define NTL_SUBSYSTEM_KM
 #endif
 #undef  NTL__SUBSYSTEM_NS
 #define NTL__SUBSYSTEM_NS ntl::km
@@ -100,29 +100,29 @@ typedef long kpriority;
 typedef uintptr_t kaffinity;
 
 static const uint32_t maximum_processors = 64;
-NTL__EXTERNVAR volatile int8_t KeNumberProcessors;
+NTL_EXTERNVAR volatile int8_t KeNumberProcessors;
 
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 void* __stdcall MmGetSystemRoutineAddress(const const_unicode_string& SystemRoutineName);
 
 /// interrupt request level
 typedef uint8_t kirql_t;
 
 #if defined(_M_IX86)
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 kirql_t __stdcall
   KeGetCurrentIrql();
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 kirql_t __stdcall
   KeRaiseIrqlToDpcLevel(void);
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 kirql_t __fastcall
   KfLowerIrql(kirql_t NewIrql);
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 kirql_t __fastcall
   KfRaiseIrql(kirql_t NewIrql);
 
@@ -150,8 +150,8 @@ void KfLowerIrql(kirql_t NewIrql)
 
 #endif
 
-#ifdef NTL__DEBUG
-NTL__EXTERNAPI
+#ifdef NTL_DEBUG
+NTL_EXTERNAPI
 void __stdcall
 DbgBreakPointWithStatus(ntstatus Status);
 #endif
@@ -210,7 +210,7 @@ public:
 
   void raise(const level NewIrql)
   {
-#ifdef NTL__DEBUG
+#ifdef NTL_DEBUG
     if(KeGetCurrentIrql() > static_cast<kirql_t>(NewIrql))
       // lower irql is impossible
       // IRQL_NOT_GREATER_OR_EQUAL
@@ -220,7 +220,7 @@ public:
   }
   void raisetodpc()
   {
-#ifdef NTL__DEBUG
+#ifdef NTL_DEBUG
     if(KeGetCurrentIrql() > static_cast<kirql_t>(dispatch_level))
       // lower irql is impossible
       // IRQL_NOT_GREATER_OR_EQUAL
@@ -230,7 +230,7 @@ public:
   }
   void raisetosynch()
   {
-#ifdef NTL__DEBUG
+#ifdef NTL_DEBUG
     if(KeGetCurrentIrql() > static_cast<kirql_t>(synch_level))
       // lower irql is impossible
       // IRQL_NOT_GREATER_OR_EQUAL
@@ -357,7 +357,7 @@ extern "C" {
 #endif
 }
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 bool __stdcall
   PsGetVersion(
     uint32_t *        MajorVersion,
@@ -376,7 +376,7 @@ using nt::ZwYieldExecution;
 using nt::yield_execution;
 
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall
   KeDelayExecutionThread(
     kprocessor_mode   WaitMode,
@@ -408,7 +408,7 @@ ntstatus sleep(
 }
 #endif
 
-NTL__EXTERNAPI void __stdcall KeStallExecutionProcessor(uint32_t MicroSeconds);
+NTL_EXTERNAPI void __stdcall KeStallExecutionProcessor(uint32_t MicroSeconds);
 
 #if 0
 template<times::type TimeResolution>
@@ -419,11 +419,11 @@ static inline
 }
 #endif
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 kirql_t __fastcall
   KfAcquireSpinLock(kspin_lock * SpinLock);
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 void __fastcall
   KfReleaseSpinLock(
     kspin_lock *  SpinLock,
@@ -448,11 +448,11 @@ struct kspin_lock_at_dpc : public kspin_lock
     __forceinline void release();
 };
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 void __fastcall
   KefAcquireSpinLockAtDpcLevel(kspin_lock * SpinLock);
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 void __fastcall
   KefReleaseSpinLockFromDpcLevel(kspin_lock * SpinLock);
 
@@ -548,7 +548,7 @@ inline void ExInitializeWorkItem(work_queue_item& WorkItem, work_queue_item::rou
   WorkItem.WorkerRoutine = Routine;
 }
 
-NTL__EXTERNAPI void __stdcall ExQueueWorkItem(work_queue_item& WorkItem, work_queue_item::type QueueType);
+NTL_EXTERNAPI void __stdcall ExQueueWorkItem(work_queue_item& WorkItem, work_queue_item::type QueueType);
 
 //
 //  executive resource data structures.
@@ -661,19 +661,19 @@ static const size_t pool_small_lists = 32;
     //
     // Define executive resource function prototypes.
     //
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
       ntstatus __stdcall
       ExInitializeResourceLite (
       eresource* Resource
       );
 
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
       ntstatus __stdcall
       ExReinitializeResourceLite (
       eresource* Resource
       );
 
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
       bool __stdcall
       ExAcquireResourceSharedLite (
       eresource* Resource,
@@ -681,14 +681,14 @@ static const size_t pool_small_lists = 32;
       );
 
 #if (NTDDI_VERSION >= NTDDI_LONGHORN || NTDDI_VERSION >= NTDDI_WS03SP1)
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
       void* __stdcall
       ExEnterCriticalRegionAndAcquireResourceShared (
       eresource* Resource
       );
 #endif
 
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
       bool __stdcall
       ExAcquireResourceExclusiveLite (
       eresource* Resource,
@@ -696,21 +696,21 @@ static const size_t pool_small_lists = 32;
       );
 
 #if (NTDDI_VERSION >= NTDDI_LONGHORN || NTDDI_VERSION >= NTDDI_WS03SP1)
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
       void* __stdcall
       ExEnterCriticalRegionAndAcquireResourceExclusive (
       eresource* Resource
       );
 #endif
 
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
       bool __stdcall
       ExAcquireSharedStarveExclusive(
       eresource* Resource,
       bool Wait
       );
 
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
       bool __stdcall
       ExAcquireSharedWaitForExclusive(
       eresource* Resource,
@@ -718,7 +718,7 @@ static const size_t pool_small_lists = 32;
       );
 
 #if (NTDDI_VERSION >= NTDDI_LONGHORN || NTDDI_VERSION >= NTDDI_WS03SP1)
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
       void* __stdcall
       ExEnterCriticalRegionAndAcquireSharedWaitForExclusive (
       eresource* Resource
@@ -727,7 +727,7 @@ static const size_t pool_small_lists = 32;
 
 
 
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
       void
       __fastcall
       ExReleaseResourceLite(
@@ -750,7 +750,7 @@ static const size_t pool_small_lists = 32;
     }
 
 #if (NTDDI_VERSION >= NTDDI_LONGHORN || NTDDI_VERSION >= NTDDI_WS03SP1)
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
       void
       __fastcall
       ExReleaseResourceAndLeaveCriticalRegion(
@@ -758,51 +758,51 @@ static const size_t pool_small_lists = 32;
       );
 #endif
 
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
       void
       ExReleaseResourceForThreadLite(
       eresource* Resource,
       eresource_thread_t ResourceThreadId
       );
 
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
       void
       ExSetResourceOwnerPointer(
       eresource* Resource,
       void* OwnerPointer
       );
 
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
       void
       ExConvertExclusiveToSharedLite(
       eresource* Resource
       );
 
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
       ntstatus __stdcall
       ExDeleteResourceLite (
       eresource* Resource
       );
 
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
       uint32_t
       ExGetExclusiveWaiterCount (
       eresource* Resource
       );
 
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
       uint32_t
       ExGetSharedWaiterCount (
       eresource* Resource
       );
 
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
       bool
       ExIsResourceAcquiredExclusiveLite (
       eresource* Resource
       );
 
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
       uint32_t
       ExIsResourceAcquiredSharedLite (
       eresource* Resource
@@ -817,13 +817,13 @@ static const size_t pool_small_lists = 32;
     using nt::RtlRandom;
     using nt::RtlUniform;
 
-    NTL__EXTERNAPI void __stdcall KeBugCheckEx(uint32_t BugCheckCode, uintptr_t Param1, uintptr_t Param2, uintptr_t Param3, uintptr_t Param4);
+    NTL_EXTERNAPI void __stdcall KeBugCheckEx(uint32_t BugCheckCode, uintptr_t Param1, uintptr_t Param2, uintptr_t Param3, uintptr_t Param4);
 
-    NTL__EXTERNAPI void __stdcall KeBugCheck(uint32_t BugCheckCode);
+    NTL_EXTERNAPI void __stdcall KeBugCheck(uint32_t BugCheckCode);
 
 
     namespace harderror = nt::harderror;
-    NTL__EXTERNAPI harderror::raise_hard_error_t ExRaiseHardError;
+    NTL_EXTERNAPI harderror::raise_hard_error_t ExRaiseHardError;
 
 }//namespace km
 }//namespace ntl

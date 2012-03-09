@@ -12,7 +12,7 @@
 #include "system_error.hxx"
 #include "fn_caller.hxx"
 
-#ifndef NTL__SUBSYSTEM_KM
+#ifndef NTL_SUBSYSTEM_KM
 # include "../nt/mutex.hxx"
 #endif
 
@@ -53,7 +53,7 @@ namespace std
   __declspec(selectany) extern const adopt_lock_t adopt_lock;
 #endif
 
-#ifndef NTL__SUBSYSTEM_KM
+#ifndef NTL_SUBSYSTEM_KM
 #define NTL__BASE_MUTEX
   namespace __
   {
@@ -380,7 +380,7 @@ namespace std
   template <class Mutex>
   inline void swap(unique_lock<Mutex>& x, unique_lock<Mutex>& y)  { x.swap(y); }
 
-#ifdef NTL__CXX_VT
+#ifdef NTL_CXX_VT
   template <class L1, class L2, class... L3> 
   int try_lock(L1&, L2&, L3&...);
   template <class L1, class L2, class... L3> 
@@ -487,7 +487,7 @@ namespace std
     once_flag& operator=(const once_flag&) __deleted;
   };
 
-#ifdef NTL__CXX_VT
+#ifdef NTL_CXX_VT
   template<class Callable, class ...Args>
   void call_once(once_flag& flag, Callable func, Args&&... args);
 #else

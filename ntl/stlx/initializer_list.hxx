@@ -33,7 +33,7 @@ namespace std
     typedef const E*  iterator;
     typedef const E*  const_iterator;
 
-#ifndef NTL__CXX_IL
+#ifndef NTL_CXX_IL
     size_t   size()  const { return 0; }
     const E* begin() const { return nullptr; }
     const E* end()   const { return nullptr; } //-V524

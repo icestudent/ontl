@@ -190,21 +190,26 @@ type
 ///\name   POD object memory operations (platform-specific)
 
 /// zeroes object's memory
-template<typename type>
-static inline
-void zero_mem(type & object)
+static inline void zero_mem(void* object, size_t n)
 {
-  char * const p = reinterpret_cast<char*>(&object);
-  for ( unsigned i = 0; i != sizeof(type); ++i )
+  char * const p = reinterpret_cast<char*>(object);
+  for ( unsigned i = 0; i != n; ++i )
     p[i] = 0; //-V108
+}
+template<typename type>
+static inline void zero_mem(type & object)
+{
+  zero_mem(&object, sizeof(type));
 }
 
 template<typename type>
 static inline void bzero(type& object)
 {
-  char * const p = reinterpret_cast<char*>(&object);
-  for ( unsigned i = 0; i != sizeof(type); ++i )
-    p[i] = 0; //-V108
+  zero_mem<type>(object);
+}
+static inline void bzero(void* obj, size_t n)
+{
+  zero_mem(obj, n);
 }
 
 /// compares object's memory

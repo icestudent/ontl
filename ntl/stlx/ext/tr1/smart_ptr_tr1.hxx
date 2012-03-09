@@ -83,7 +83,7 @@ namespace std
         const void* get_deleter(const type_info& ti) const __ntl_nothrow;
       };
 
-  #if STLX__USE_RTTI
+  #if STLX_USE_RTTI
       template<class T, class D>
       inline const void* shared_ptr_deleter<T,D>::get_deleter(const type_info& ti) const __ntl_nothrow
       {

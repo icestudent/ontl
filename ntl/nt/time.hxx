@@ -35,15 +35,15 @@ systime_t inline query_system_time()
   return user_shared_data::instance().SystemTime.get();
 }
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall
   NtQuerySystemTime(systime_t* SystemTime);
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 void __stdcall
   RtlTimeToTimeFields(systime_t* Time, time_fields* TimeFields);
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall
   RtlSystemTimeToLocalTime(systime_t* SystemTime, int64_t* LocalTime);
 

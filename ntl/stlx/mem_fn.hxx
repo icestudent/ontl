@@ -8,7 +8,7 @@
 #define NTL_MEMFN_HXX
 #pragma once
 
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
 # include "mem_fn_rv.hxx"
 #else 
 
@@ -77,7 +77,7 @@ namespace std
     return mem_pm_t<R,T> (pm);
   }
 
-#ifndef NTL__CXX_VT
+#ifndef NTL_CXX_VT
 
   namespace __
   {
@@ -224,7 +224,7 @@ namespace std
 #endif
   };
 
-#if 1 && !defined NTL__DOC
+#if 1 && !defined NTL_DOC
 
   // ARGC == 0
 #define NTL_DEFINE_MEMFN0(cv) \
@@ -296,7 +296,7 @@ namespace std
   }
 
 #endif
-#endif // NTL__CXX_VT
+#endif // NTL_CXX_VT
 
   /**@} lib_member_function_adaptors */
   /**@} lib_function_objects */

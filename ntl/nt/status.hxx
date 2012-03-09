@@ -1692,7 +1692,7 @@ bool success(const ntstatus s)
 
 struct last_status_t
 {
-#ifdef NTL__CXX_EXPLICITOP
+#ifdef NTL_CXX_EXPLICITOP
   explicit operator ntstatus() const { return last_status_; }
 #endif
   ntstatus last_status() const volatile { return last_status_; }

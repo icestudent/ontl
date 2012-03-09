@@ -548,27 +548,27 @@ namespace ntl { namespace km {
 
     /**\defgroup wsk_imports wsk functions
      @{*/
-    NTL__EXTERNAPI 
+    NTL_EXTERNAPI 
     ntstatus __stdcall
       WskRegister(
       __in const client_npi* WskClientNpi,
       __out registration& WskRegistration
       );
 
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
     void __stdcall
       WskDeregister(
       __in registration& WskRegistration
       );
 
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
     ntstatus __stdcall
       WskQueryProviderCharacteristics(
       __in registration& WskRegistration,
       __out provider_characteristics* WskProviderCharacteristics
       );
 
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
     ntstatus __stdcall
       WskCaptureProviderNPI(
       __in registration& WskRegistration,
@@ -576,7 +576,7 @@ namespace ntl { namespace km {
       __out provider_npi* WskProviderNpi
       );
 
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
     void __stdcall
       WskReleaseProviderNPI(
       __in registration& WskRegistration

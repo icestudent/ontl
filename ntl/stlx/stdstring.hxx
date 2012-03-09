@@ -404,7 +404,7 @@ struct char_traits<wchar_t>
       append(il.begin(), il.end());
     }
 
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
     __forceinline
       basic_string(basic_string&& str)
       :length_(), capacity_(), buffer_(),
@@ -421,7 +421,7 @@ struct char_traits<wchar_t>
     {
       if(buffer_){
         allocator_traits::deallocate(alloc, buffer_, capacity_);
-        #ifdef NTL__DEBUG
+        #ifdef NTL_DEBUG
         length_ = 0;
         buffer_ = 0;
         #endif
@@ -441,7 +441,7 @@ struct char_traits<wchar_t>
       return this == &str ? *this : assign(str);
     }
 
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
     __forceinline
     basic_string& operator=(basic_string&& str) __ntl_nothrow
     {
@@ -698,7 +698,7 @@ struct char_traits<wchar_t>
       return *this;
     }
 
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
     basic_string& assign(basic_string&& rstr)
     {
       if(this != &rstr){
@@ -820,7 +820,7 @@ struct char_traits<wchar_t>
         traits_type::move(pc+n, pc, length_-pos);
       length_ = length_ + n;
       traits_type::assign(pc, n, c);
-      #ifdef NTL__DEBUG
+      #ifdef NTL_DEBUG
       assert(length_ < capacity_);
       buffer_[length_] = zero_char;
       #endif
@@ -854,7 +854,7 @@ struct char_traits<wchar_t>
             traits_type::move(buffer_+pos, buffer_+pos+xlen, rlen);
         }
         length_ -= xlen;
-        #ifdef NTL__DEBUG
+        #ifdef NTL_DEBUG
         assert(length_ < capacity_);
         buffer_[length_] = zero_char;
         #endif
@@ -868,7 +868,7 @@ struct char_traits<wchar_t>
       if(position >= buffer_ && pos < length_){
         traits_type::move(position, position+1, length_-pos);
         length_--; pos++;
-        #ifdef NTL__DEBUG
+        #ifdef NTL_DEBUG
         assert(length_ < capacity_);
         buffer_[length_] = zero_char;
         #endif
@@ -886,7 +886,7 @@ struct char_traits<wchar_t>
         traits_type::move(first, last, len);
         length_ -= len;
         last -= len;
-        #ifdef NTL__DEBUG
+        #ifdef NTL_DEBUG
         assert(length_ < capacity_);
         buffer_[length_] = zero_char;
         #endif
@@ -996,7 +996,7 @@ struct char_traits<wchar_t>
         traits_type::move(buffer_+pos+rlen, buffer_+pos+xlen, length_-pos);
       length_ += rlen - xlen;
 
-      #ifdef NTL__DEBUG
+      #ifdef NTL_DEBUG
       assert(length_ < capacity_);
       buffer_[length_] = zero_char;
       #endif
@@ -1023,7 +1023,7 @@ struct char_traits<wchar_t>
       if(rlen == 0 && xlen == 0)
         return end();
       length_ += rlen - xlen;
-      #ifdef NTL__DEBUG
+      #ifdef NTL_DEBUG
       assert(length_ < capacity_);
       buffer_[length_] = zero_char;
       #endif
@@ -1082,7 +1082,7 @@ struct char_traits<wchar_t>
         traits_type::move(buffer_+pos1+rlen, buffer_+pos1+xlen, length_-pos1);
 
       length_ += rlen - xlen;
-      #ifdef NTL__DEBUG
+      #ifdef NTL_DEBUG
       assert(length_ < capacity_);
       buffer_[length_] = zero_char;
       #endif
@@ -1579,7 +1579,7 @@ next_xpos:;
       return move(sum);
     }
 
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
     friend
       basic_string&& operator+(basic_string&& lhs, const basic_string& rhs)
     {
@@ -1627,7 +1627,7 @@ next_xpos:;
 
     static const charT* assert_ptr(const charT* const p)
     {
-    #if !STLX__USE_EXCEPTIONS
+    #if !STLX_USE_EXCEPTIONS
       assert(p);
     #endif
       return p;
@@ -1635,7 +1635,7 @@ next_xpos:;
 
     static bool assert_pos(const size_type pos)
     {
-    #if !STLX__USE_EXCEPTIONS
+    #if !STLX_USE_EXCEPTIONS
       assert(pos < npos);
     #endif
       return pos < npos;
@@ -1936,13 +1936,13 @@ namespace __
     ntl::numeric::convresult re = ntl::numeric::str2num<storage_type, typename make_signed<storage_type>::type>(value, str, static_cast<ssize_t>(length), base, numeric_limits<T>::__max, numeric_limits<T>::__min, &l);
     if(idx) *idx = l;
     if(re <= ntl::numeric::conv_result::bad_format){
-  #if STLX__USE_EXCEPTIONS
+  #if STLX_USE_EXCEPTIONS
       __throw_invalid_argument("stoi: no conversion could be performed");
   #else
       _assert_msg("stoi: no conversion could be performed");
   #endif
     }else if(re == ntl::numeric::conv_result::overflow){
-  #if STLX__USE_EXCEPTIONS
+  #if STLX_USE_EXCEPTIONS
       __throw_out_of_range("stoi: converted value is outside the range of representable values");
   #else
       _assert_msg("stoi: converted value is outside the range of representable values");
@@ -2101,7 +2101,7 @@ template <> struct hash<std::u32string>: __::string_hash<std::u32string>{};
 
 //////////////////////////////////////////////////////////////////////////
 // 
-#if STLX__USE_EXCEPTIONS
+#if STLX_USE_EXCEPTIONS
 std::__::exstring::exstring(const std::string& r)
 {
   len = r.length();

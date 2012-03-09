@@ -38,7 +38,7 @@ namespace ntl {
     };
 
 
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
       ntstatus __stdcall
       NtClearEvent(
         legacy_handle       EventHandle
@@ -49,9 +49,9 @@ namespace ntl {
       uint32_t*           PreviousState
       );
 
-    NTL__EXTERNAPI control_event_t NtSetEvent, NtResetEvent, NtPulseEvent;
+    NTL_EXTERNAPI control_event_t NtSetEvent, NtResetEvent, NtPulseEvent;
 
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
       ntstatus __stdcall
       NtQueryEvent(
         legacy_handle       EventHandle,
@@ -94,7 +94,7 @@ namespace ntl {
 
   namespace nt {
 
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
       ntstatus __stdcall
       NtCreateEvent(
         handle*             EventHandle,
@@ -104,7 +104,7 @@ namespace ntl {
         bool                InitialState
         );
 
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
       ntstatus __stdcall
       NtOpenEvent(
         handle*             EventHandle,

@@ -93,7 +93,7 @@ namespace std
           node(const value_type& elem, hash_t h)
             :elem(elem), hkey(h), next(), prev()
           {}
-        #ifdef NTL__CXX_RV
+        #ifdef NTL_CXX_RV
           node(value_type&& elem, hash_t h)
             :elem(forward<value_type>(elem)), hkey(h), next(), prev()
           {}
@@ -453,7 +453,7 @@ namespace std
             chained_hashtable(r).swap(*this);
           return *this;
         }
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
         chained_hashtable(chained_hashtable&& r)
           :nalloc(std::move(r.nalloc)), balloc(std::move(r.balloc)), hash_(std::move(r.hash_)), equal_(std::move(r.equal_)),
           buckets_(std::move(r.buckets_)), count_(r.count_), max_factor(r.max_factor), head_(std::move(r.head_))

@@ -24,13 +24,13 @@ namespace ntl {
     extern "C" bool* KdDebuggerNotPresent;
     extern "C" bool* KdDebuggerEnabled;
 
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
       void __stdcall
       DbgBreakPointWithStatus(
       ntstatus Status
       );
 
-    NTL__EXTERNAPI
+    NTL_EXTERNAPI
       bool __stdcall
       KdRefreshDebuggerNotPresent();
 
@@ -38,7 +38,7 @@ namespace ntl {
 #pragma warning(push)
 #pragma warning(disable:4100)
 
-#ifdef NTL__DEBUG
+#ifdef NTL_DEBUG
 #	define KdBreakPointWithStatus() DbgBreakPointWithStatus(X)
 #else
 #	define KdBreakPointWithStatus()

@@ -49,13 +49,13 @@ ntstatus __stdcall
     );
 
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 control_thread_t NtResumeThread;
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 control_thread_t NtAlertResumeThread;
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 control_thread_t NtSuspendThread;
 
 
@@ -101,7 +101,7 @@ class user_thread;
 
 namespace nt{
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall
   NtCreateThread(
     handle*         ThreadHandle,
@@ -114,7 +114,7 @@ ntstatus __stdcall
     bool            CreateSuspended
   );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall
   RtlCreateUserThread(
     legacy_handle           Process,
@@ -129,7 +129,7 @@ ntstatus __stdcall
     client_id*              ClientId
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall
   NtOpenThread(
     handle*             ThreadHandle,
@@ -138,27 +138,27 @@ ntstatus __stdcall
     const client_id*    ClientId
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall
   NtTerminateThread(
     legacy_handle       ThreadHandle,
     ntstatus            ExitStatus
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall
   NtAlertThread(
     legacy_handle       ThreadHandle
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall
   NtGetContexThread(
     legacy_handle       ThreadHandle,
     context*            ThreadContext
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall
   NtSetContexThread(
     legacy_handle       ThreadHandle,
@@ -166,7 +166,7 @@ ntstatus __stdcall
     );
 
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall
   NtQueueApcThread(
     legacy_handle       ThreadHandle,
@@ -176,7 +176,7 @@ ntstatus __stdcall
     const void *        Argument2
     );
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 //__declspec(noreturn)
 ntstatus __stdcall
   NtTerminateProcess(
@@ -186,41 +186,41 @@ ntstatus __stdcall
 
 
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall
   RtlAcquirePebLock();
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall
   RtlReleasePebLock();
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 void __stdcall
   RtlRaiseStatus(ntstatus Status);
 
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall
   LdrShutdownProcess();
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall
   LdrShutdownThread();
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 ntstatus __stdcall
   LdrUnloadDll(legacy_handle DllHandle);
 
 #ifndef NTL_SUPPRESS_IMPORT
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 __declspec(noreturn)
 void __stdcall
   RtlExitUserThread(ntstatus Status);
 
 #endif
 
-NTL__EXTERNAPI
+NTL_EXTERNAPI
 __declspec(noreturn)
 void __stdcall
   FreeLibraryAndExitThread(
@@ -420,7 +420,7 @@ public:
     }
   }
 
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
   user_thread(user_thread&& rhs)
   {
     reset(rhs.release());

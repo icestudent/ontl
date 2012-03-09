@@ -13,30 +13,30 @@ namespace
 }
 
 // CRT forwards
-double NTL__CRTCALL strtod(const char * __restrict nptr, char ** __restrict endptr)
+double NTL_CRTCALL strtod(const char * __restrict nptr, char ** __restrict endptr)
 {
   typedef double __cdecl f_t(const char*, char**);
   return reinterpret_cast<f_t*>(imp_strtod)(nptr, endptr);
 }
 
-float NTL__CRTCALL strtof(const char * __restrict nptr, char ** __restrict endptr)
+float NTL_CRTCALL strtof(const char * __restrict nptr, char ** __restrict endptr)
 {
   return (float)strtod(nptr, endptr);
 }
 
-long double NTL__CRTCALL strtold(const char * __restrict nptr, char ** __restrict endptr)
+long double NTL_CRTCALL strtold(const char * __restrict nptr, char ** __restrict endptr)
 {
   return strtod(nptr, endptr);
 }
 
-double NTL__CRTCALL atof(const char *nptr)
+double NTL_CRTCALL atof(const char *nptr)
 {
   char* end;
   return strtod(nptr, &end);
 }
 
 #define FPFUNC(func, type) \
-  type NTL__CRTCALL std::func(type d)\
+  type NTL_CRTCALL std::func(type d)\
   {\
     typedef type __cdecl f_t(type);\
     return reinterpret_cast<f_t*>(imp_ ## func)(d);\
@@ -52,25 +52,25 @@ double NTL__CRTCALL atof(const char *nptr)
 
 namespace ntl { namespace msvcrt
 {
-  size_t NTL__CRTCALL snprintf(char *buffer, size_t count, const char *format, ...)
+  size_t NTL_CRTCALL snprintf(char *buffer, size_t count, const char *format, ...)
   {
     va_list va;
     va_start(va, format);
     return vsnprintf(buffer, count, format, va);
   }
-  size_t NTL__CRTCALL vsnprintf(char *buffer, size_t count, const char *format, va_list argptr)
+  size_t NTL_CRTCALL vsnprintf(char *buffer, size_t count, const char *format, va_list argptr)
   {
     typedef size_t __cdecl f_t(char*, size_t, const char*, va_list);
     return reinterpret_cast<f_t*>(imp_vsnprintf)(buffer, count, format, argptr);
   }
 
-  //int NTL__CRTCALL sscanf(const char* string, const char* format, ...)
+  //int NTL_CRTCALL sscanf(const char* string, const char* format, ...)
   //{
   //  va_list va;
   //  va_start(va, format);
   //  return vsscanf(string, format, va);
   //}
-  //int NTL__CRTCALL vsscanf(const char* string, const char* format, va_list argptr)
+  //int NTL_CRTCALL vsscanf(const char* string, const char* format, va_list argptr)
   //{
   //  typedef int __cdecl f_t(const char*, const char*, va_list);
   //  return reinterpret_cast<f_t*>(imp_vsscanf)(string, format, argptr);
