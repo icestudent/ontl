@@ -25,8 +25,10 @@ namespace ntl
   // this used to prevent linker error if CRT initialization isn't needed
 #ifdef _M_X64
 # pragma comment(linker, "/alternatename:__init_crt=__init_crt_stub")
+# pragma comment(linker, "/alternatename:abort=__console_abort")
 #else
 # pragma comment(linker, "/alternatename:___init_crt=___init_crt_stub")
+# pragma comment(linker, "/alternatename:_abort=___console_abort")
 #endif
   extern "C" inline void __cdecl __init_crt_stub(){}
 #endif
@@ -51,4 +53,10 @@ namespace ntl
   }
 }
 #pragma warning(pop)
+
+extern"C" void __cdecl __console_abort()
+{
+  NtTerminateProcess(ntl::nt::current_process(), ntl::nt::status::unsuccessful);
+}
+
 #endif // NTL__WIN_NATIVEAPP

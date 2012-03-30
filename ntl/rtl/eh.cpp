@@ -342,7 +342,12 @@ void __stdcall _CxxThrowException(void * object, _s__ThrowInfo const * info)
 {
 #ifdef _M_IX86
   std::array<uintptr_t, 3> args = { _EH_MAGIC, (uintptr_t)object, (uintptr_t)info };
+#if _MSC_VER >= 1700
+  const throwinfo* ti = reinterpret_cast<const throwinfo*>(info);
+  if(info && ti->e8)
+    args[0] = ehmagic1994;
 #endif
+#endif // _M_IX86
 #ifdef _M_X64
   void* imagebase;
   ntl::nt::RtlPcToFileHeader(info, &imagebase);
@@ -428,4 +433,33 @@ void ntl::nt::exception::inconsistency()
 {
   __debugbreak();
   std::abort();
+}
+
+
+static int array_unwind_filter(exception_pointers* eh)
+{
+  switch(eh->ExceptionRecord->ExceptionCode)
+  {
+  case exception_record::cxxmagic:
+    std::terminate();
+    break;
+  default:
+    return exception_continue_search;
+  }
+}
+
+// Destructor support for arrays of objects
+void __stdcall __ehvec_dtor( void* ptr, unsigned size, int count, void(__thiscall *dtor)(void*) )
+{
+  __try{
+    // destroy from end to begin
+    ptr = ntl::padd(ptr, size*count);
+    int ssize = -static_cast<int>(size);
+    while(--count >= 0){
+      ptr = ntl::padd(ptr, ssize);
+      (*dtor)(ptr);
+    }
+  }
+  __except(array_unwind_filter(exception_info())){
+  }
 }

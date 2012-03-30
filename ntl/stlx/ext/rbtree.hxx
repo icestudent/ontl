@@ -277,7 +277,7 @@ namespace std
           return make_iterator(p);// returns end() if !p
         }
 
-        const_iterator find(const value_type& x) const { return find(x); }
+        const_iterator find(const value_type& x) const { return const_cast<rb_tree*>(this)->find(x); }
 
         // modifiers
       protected:

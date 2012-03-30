@@ -35,16 +35,16 @@ namespace std {
     explicit queue(const Container& c)
       :c(c)
     {}
-    
-    #ifdef NTL_CXX_RV
+
+    // default-constructed
+  #ifdef NTL_CXX_RV
     explicit queue(Container&& c = Container())
       :c(move(c))
     {}
-    // removed at n3291
-    //queue(queue&& q)
-    //  :c(move(q.c))
-    //{}
-    #endif
+  #else
+    queue()
+    {}
+  #endif
 
     template <class Alloc>
     explicit queue(const Alloc& a)

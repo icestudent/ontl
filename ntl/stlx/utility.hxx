@@ -66,7 +66,7 @@ bool operator>=(const T & x, const T & y) { return !(x < y); }
 #pragma region forward
 ///\name 20.2.3 forward/move helpers [forward]
 #ifdef NTL_CXX_RV
-#ifdef NTL_CXX_RVFIX
+#if NTL_CXX_RV >= 20
 
   // rvalue ref v2
   template <class T> inline T&& forward(typename std::remove_reference<T>::type& t) { return static_cast<T&&>(t); }

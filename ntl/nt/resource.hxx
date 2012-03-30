@@ -181,7 +181,7 @@ namespace ntl {
     *	Critical section RAII wrapper
     **/
     class critical_section:
-      protected rtl::critical_section,
+      public rtl::critical_section,
       ntl::noncopyable
     {
     public:

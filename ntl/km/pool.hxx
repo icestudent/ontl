@@ -14,7 +14,7 @@
 #define NTL__POOL_TAG 'LTN_'  // _NTL
 #endif
 
-#ifndef NTL__NO_AUTOLINK
+#ifndef NTL_NO_AUTOLINK
 # pragma comment(lib,    "ntoskrnl.lib")
 #endif
 

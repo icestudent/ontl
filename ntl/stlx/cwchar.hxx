@@ -60,8 +60,8 @@ namespace std {
   ///\name General wide string utilities
 
   ///\name Wide string numeric conversion functions
-  int NTL_CRTCALL _wtoi(const wchar_t* str);
-  long int NTL_CRTCALL _wtol(const wchar_t*nptr);
+  NTL_EXTERNAPI int NTL_CRTIMP _wtoi(const wchar_t* str);
+  NTL_EXTERNAPI long int NTL_CRTIMP _wtol(const wchar_t*nptr);
 
   double wcstod(const wchar_t* __restrict nptr, wchar_t** __restrict endptr);
   float wcstof(const wchar_t* __restrict nptr, wchar_t** __restrict endptr);

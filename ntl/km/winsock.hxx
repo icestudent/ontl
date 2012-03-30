@@ -23,7 +23,7 @@ namespace ntl { namespace km {
       Winsock Kernel (WSK) is a kernel-mode Network Programming Interface (NPI). 
      @{*/
 
-#ifndef NTL__NO_AUTOLINK
+#ifndef NTL_NO_AUTOLINK
 # pragma comment(lib, "netio.lib")
 #endif
 

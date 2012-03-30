@@ -269,7 +269,7 @@ class allocator
 #else
 
 #ifdef NTL_CXX_RV
-    #define NTL_X(n,p) forward<NTL_SPP_CAT(A,n)>(NTL_SPP_CAT(p,n))
+    #define NTL_X(n,p) NTL_SPP_COMMA_IF1(n) forward<NTL_SPP_CAT(A,n)>(NTL_SPP_CAT(p,n)) 
     #define NTL_DEFINE_CONSTRUCT(n,aux) \
     template <class U NTL_SPP_COMMA_IF(n) NTL_SPP_ARGS(1,n,class A)> \
     void construct(U* p NTL_SPP_COMMA_IF(n) NTL_SPP_AARGS(1,n,&& a)) { __assume(p); ::new( (void*)p ) T(NTL_SPP_LOOP(1,n,NTL_X,a)); }

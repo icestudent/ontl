@@ -11,8 +11,11 @@
 #include "basedef.hxx"
 #include "peb.hxx"
 
-#ifndef NTL__NO_AUTOLINK
+#ifndef NTL_NO_AUTOLINK
 # pragma comment(lib, "ntdll.lib")
+#if _MSC_VER >= 1600
+# pragma comment(lib, "ntdllp.lib")
+#endif
 #endif
 
 namespace ntl {

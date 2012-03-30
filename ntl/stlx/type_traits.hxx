@@ -92,6 +92,30 @@ namespace __ {
   template<int  i> struct index_type: integral_constant<int, i>{};
   template<bool b> struct bool_type : integral_constant<bool,b>{};
 
+  template<typename T>
+  struct __is_complete_impl
+  {
+  private:
+    static typename add_rvalue_reference<T>::type __t();
+    template<typename U>
+    static char test(U u);
+    static int test(...);
+  public:
+    typedef integral_constant<bool, sizeof(test(__t())) == sizeof(char)> result;
+  };
+
+
+  /** Is T a complete type */
+  template<typename T>
+  struct is_complete:
+    public __is_complete_impl<T>::result
+  {};
+
+  template<typename T>
+  struct no_dtor:
+    public bool_type<is_pod<T>::value || has_trivial_destructor<T>::value>
+  {};
+
 
 struct check_meta_rel
 {

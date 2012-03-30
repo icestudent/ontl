@@ -221,6 +221,14 @@ public:
     return success(last_status_ = NtSetTimer(get(), -1i64*std::chrono::duration_cast<system_duration>(rel_time).count(), TimerApcRoutine, TimerContext, true, static_cast<int32_t>(ms), nullptr));
   }
 
+  template <class PeriodRep, class PeriodType>
+  bool set_now(const std::chrono::duration<PeriodRep, PeriodType>& Period, timer_apc_routine* TimerApcRoutine, void* TimerContext) volatile
+  {
+    assert(get());
+    int64_t ms = std::chrono::duration_cast<std::chrono::milliseconds>(Period).count();
+    return success(last_status_ = NtSetTimer(get(), -1i64, TimerApcRoutine, TimerContext, true, static_cast<int32_t>(ms), nullptr));
+  }
+
   /** Sets the specified waitable timer to the inactive state. */
   bool cancel() volatile
   {

@@ -566,7 +566,7 @@ class vector
       iterator first_ = &const_cast<value_type&>(*first), last_ = &const_cast<value_type&>(*last);
       if(first_ != last_){
         // destroy objects to be erased
-        if ( !no_dtor::value )
+        if ( !__::no_dtor<T>::value )
           for ( iterator i = last_; i != first_;  ) array_allocator.destroy(--i);
 
         #ifdef NTL_CXX_RV
@@ -594,7 +594,7 @@ class vector
     {
       difference_type n = end_ - begin_;
       end_ = begin_;
-      if(!no_dtor::value)
+      if(!__::no_dtor<T>::value)
         while ( n ) array_allocator.destroy(begin_ + --n);
     }
 
@@ -631,7 +631,8 @@ class vector
 
     mutable allocator array_allocator;
 
-    typedef __::bool_type<is_pod<T>::value || has_trivial_destructor<T>::value> no_dtor;
+    // following will broke compilation if T is incomplete type:
+    //typedef __::bool_type<is_pod<T>::value || has_trivial_destructor<T>::value> no_dtor;
 
     void check_bounds(size_type n) const __ntl_throws(out_of_range)
     {

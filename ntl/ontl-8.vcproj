@@ -5,6 +5,10 @@
 	Name=".ntl"
 	ProjectGUID="{081E6E33-CC33-4BBF-81E8-2865B1D8FD67}"
 	RootNamespace=".ntl"
+	SccProjectName="Svn"
+	SccAuxPath="Svn"
+	SccLocalPath="Svn"
+	SccProvider="SubversionScc"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -365,6 +369,10 @@
 							>
 						</File>
 						<File
+							RelativePath=".\stlx\ext\tr2\files.hxx"
+							>
+						</File>
+						<File
 							RelativePath=".\stlx\ext\tr2\filesystem.hxx"
 							>
 						</File>
@@ -508,23 +516,31 @@
 							Name="filesystem"
 							>
 							<File
-								RelativePath=".\stlx\ext\tr2\fs_directory.hxx"
+								RelativePath=".\stlx\ext\tr2\filesystem\fs_directory.hxx"
 								>
 							</File>
 							<File
-								RelativePath=".\stlx\ext\tr2\fs_directory_v3.hxx"
+								RelativePath=".\stlx\ext\tr2\filesystem\fs_operations.hxx"
 								>
 							</File>
 							<File
-								RelativePath=".\stlx\ext\tr2\fs_operations.hxx"
+								RelativePath=".\stlx\ext\tr2\filesystem\fs_traits.hxx"
+								>
+							</File>
+						</Filter>
+						<Filter
+							Name="filesystem_V3"
+							>
+							<File
+								RelativePath=".\stlx\ext\tr2\filesystem\fs_path.hxx"
 								>
 							</File>
 							<File
-								RelativePath=".\stlx\ext\tr2\fs_operations_v3.hxx"
+								RelativePath=".\stlx\ext\tr2\filesystem\fs_template.hxx"
 								>
 							</File>
 							<File
-								RelativePath=".\stlx\ext\tr2\fs_traits.hxx"
+								RelativePath=".\stlx\ext\tr2\filesystem\fs_traits.hxx"
 								>
 							</File>
 						</Filter>
@@ -1135,6 +1151,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\nt\cond_variable.hxx"
+					>
+				</File>
+				<File
 					RelativePath=".\nt\context.hxx"
 					>
 				</File>
@@ -1227,6 +1247,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\nt\srwlock.hxx"
+					>
+				</File>
+				<File
 					RelativePath=".\nt\status.hxx"
 					>
 				</File>
@@ -1260,6 +1284,10 @@
 				</File>
 				<File
 					RelativePath=".\nt\timer.hxx"
+					>
+				</File>
+				<File
+					RelativePath=".\nt\transaction.hxx"
 					>
 				</File>
 				<File
@@ -1635,6 +1663,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\win\com.hxx"
+					>
+				</File>
+				<File
 					RelativePath=".\win\console.hxx"
 					>
 				</File>
@@ -1652,6 +1684,10 @@
 				</File>
 				<File
 					RelativePath=".\win\windef.hxx"
+					>
+				</File>
+				<File
+					RelativePath=".\win\xml.hxx"
 					>
 				</File>
 			</Filter>

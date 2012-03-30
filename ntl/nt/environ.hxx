@@ -72,5 +72,4 @@ ntstatus __stdcall RtlQueryEnvironmentVariable_U(void* Environment, const const_
 
   }
 }
-
 #endif //NTL__NT_ENVIRON

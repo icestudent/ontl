@@ -142,7 +142,16 @@ namespace atomic {
   static inline
     uint64_t increment(volatile uint64_t & val)
   {
-    return intrinsic::_InterlockedIncrement64(&val);
+    return intrinsic::_InterlockedIncrement64(reinterpret_cast<volatile uint64_t*>(&val));
+  }
+  static inline
+    size_t increment(volatile size_t & val)
+  {
+#ifdef _M_X64
+    return intrinsic::_InterlockedIncrement64(reinterpret_cast<volatile uint64_t*>(&val));
+#else
+    return intrinsic::_InterlockedIncrement(reinterpret_cast<volatile uint32_t*>(&val));
+#endif
   }
 
   static inline
@@ -163,6 +172,15 @@ namespace atomic {
     decrement(volatile uint64_t & val)
   {
     return intrinsic::_InterlockedDecrement64(&val);
+  }
+  static inline
+    size_t decrement(volatile size_t & val)
+  {
+#ifdef _M_X64
+    return intrinsic::_InterlockedDecrement64(reinterpret_cast<volatile uint64_t*>(&val));
+#else
+    return intrinsic::_InterlockedDecrement(reinterpret_cast<volatile uint32_t*>(&val));
+#endif
   }
 
   static inline

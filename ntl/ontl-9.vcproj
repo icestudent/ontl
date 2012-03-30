@@ -7,6 +7,10 @@
 	RootNamespace=".ntl"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="0"
+	SccProjectName="Svn"
+	SccAuxPath="Svn"
+	SccLocalPath="Svn"
+	SccProvider="SubversionScc"
 	>
 	<Platforms>
 		<Platform
@@ -1176,6 +1180,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\nt\cond_variable.hxx"
+					>
+				</File>
+				<File
 					RelativePath=".\nt\context.hxx"
 					>
 				</File>
@@ -1189,6 +1197,10 @@
 				</File>
 				<File
 					RelativePath=".\nt\debug.hxx"
+					>
+				</File>
+				<File
+					RelativePath=".\nt\environ.hxx"
 					>
 				</File>
 				<File
@@ -1264,6 +1276,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\nt\srwlock.hxx"
+					>
+				</File>
+				<File
 					RelativePath=".\nt\status.hxx"
 					>
 				</File>
@@ -1297,6 +1313,10 @@
 				</File>
 				<File
 					RelativePath=".\nt\timer.hxx"
+					>
+				</File>
+				<File
+					RelativePath=".\nt\transaction.hxx"
 					>
 				</File>
 				<File
@@ -1672,6 +1692,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\win\com.hxx"
+					>
+				</File>
+				<File
 					RelativePath=".\win\console.hxx"
 					>
 				</File>
@@ -1689,6 +1713,10 @@
 				</File>
 				<File
 					RelativePath=".\win\windef.hxx"
+					>
+				</File>
+				<File
+					RelativePath=".\win\xml.hxx"
 					>
 				</File>
 			</Filter>

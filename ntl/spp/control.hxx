@@ -260,4 +260,8 @@
 #define NTL_SPP_COMMA_IF(value) \
   NTL_SPP_IF(value)(NTL_SPP_COMMA)
 
+#define NTL_SPP_IF1(value) NTL_SPP_IF_LT(1, value)
+
+#define NTL_SPP_COMMA_IF1(value) NTL_SPP_IF1(value)(NTL_SPP_COMMA)
+
 #endif // !NTL_SPP_CONTROL_HXX

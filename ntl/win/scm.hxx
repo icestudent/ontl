@@ -11,7 +11,7 @@
 #include "windef.hxx"
 #include "../nt/service.hxx"
 
-#ifndef NTL__NO_AUTOLINK
+#ifndef NTL_NO_AUTOLINK
 # pragma comment(lib, "advapi32") // from PSDK
 #endif
 

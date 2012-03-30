@@ -60,7 +60,13 @@ inline error_condition make_error_condition(io_errc e)
 inline string __::iostream_error_category::message(int ev) const
 {
   char buf[40];
-  snprintf(buf, _countof(buf), "iostream error code #%d%s", ev, ev == io_errc::stream ? ": 'stream'" : "");
+  snprintf(buf, _countof(buf), "iostream error code #%d%s", ev, 
+#ifdef NTL_CXX_ENUM
+    static_cast<io_errc>(ev)
+#else
+    ev
+#endif
+    == io_errc::stream ? ": 'stream'" : "");
   return string(buf);
 }
 ///\}

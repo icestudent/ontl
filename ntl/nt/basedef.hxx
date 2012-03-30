@@ -28,6 +28,18 @@ extern "C" __declspec(selectany) /*C2373 volatile*/ std::uintptr_t __security_co
     0xBB40E64E;
   #endif
 
+#ifdef __ICL
+struct __s_GUID
+{
+  unsigned long Data1;
+  unsigned short Data2;
+  unsigned short Data3;
+  unsigned char Data4[8];
+};
+#endif
+//typedef __s_GUID _GUID;
+
+
 namespace ntl {
 
   namespace km {
@@ -53,15 +65,8 @@ namespace ntl {
 
     /**\addtogroup  native_types_support *** NT Types support library ***********
     *@{*/
-  #ifdef __ICL
-    struct __s_GUID
-    {
-      unsigned long Data1;
-      unsigned short Data2;
-      unsigned short Data3;
-      unsigned char Data4[8];
-    };
-  #endif
+  //#ifdef __ICL
+  //#endif
     typedef __s_GUID guid, guid_t;
 
 

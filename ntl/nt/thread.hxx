@@ -79,7 +79,7 @@ class user_thread;
 #if 0//(NTDDI_VERSION >= NTDDI_LONGHORN)
       all_access                = standard_rights_required | synchronize | 0xFFFF,
 #else
-      all_access                = standard_rights_required | synchronize | 0x3FF,
+      all_access                = (int)standard_rights_required | (int)synchronize | 0x3FF,
 #endif
     };
 

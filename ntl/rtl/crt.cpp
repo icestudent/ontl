@@ -260,3 +260,35 @@ extern "C" int __cdecl _purecall(void)
   return 0;
 }
 #endif
+
+
+
+#if _MSC_VER >= 1600
+
+#include <pe/image.hxx>
+extern "C" void __fastcall __security_check_cookie(std::uintptr_t cookie)
+{
+  assert(cookie != __security_cookie);
+}
+
+extern "C" const ntl::pe::image::section_header* __cdecl _FindPESection(ntl::pe::image* pe, std::uintptr_t rva)
+{
+  using ntl::pe::image;
+  const image::nt_headers* nth = pe->get_nt_headers();
+  for(uint32_t i = 0; i < nth->FileHeader.NumberOfSections; i++){
+    const image::section_header* sec = pe->get_section_header(i);
+    if(rva >= sec->VirtualAddress && rva < sec->VirtualAddress+sec->VirtualSize)
+      return sec;
+  }
+  return nullptr;
+}
+
+extern "C" unsigned __cdecl _ValidateImageBase(std::uintptr_t base)
+{
+  using ntl::pe::image;
+  const image* pe = image::bind(base);
+  return pe->get_dos_header()->is_valid() && pe->get_nt_headers()->is_valid() 
+    && (pe->get_nt_headers()->optional_header32()->is_valid() || pe->get_nt_headers()->optional_header64()->is_valid());
+}
+
+#endif // _MSC_VER >= 1600

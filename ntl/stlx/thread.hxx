@@ -135,6 +135,7 @@ namespace std
     template <class F, class A1> thread(F f, A1 a1);
     template <class F, class A1, class A2> thread(F f, A1 a1, A2 a2);
     template <class F, class A1, class A2, class A3> thread(F f, A1 a1, A2 a2, A3 a3);
+    template <class F, class A1, class A2, class A3, class A4> thread(F f, A1 a1, A2 a2, A3 a3, A4 a4);
   #endif
 
     thread(__rvalue(thread) r);
@@ -475,6 +476,14 @@ namespace std
   {
     typedef __::thread_params<F, FUNARGS(A1,A2,A3)> tparams;
     tparams* tp = new tparams(f, std::move(make_tuple(a1,a2,a3)));
+    start(tp);
+  }
+  template <class F, class A1, class A2, class A3, class A4>
+  inline thread::thread(F f, A1 a1, A2 a2, A3 a3, A4 a4)
+    :h(),tid()
+  {
+    typedef __::thread_params<F, FUNARGS(A1,A2,A3,A4)> tparams;
+    tparams* tp = new tparams(f, std::move(make_tuple(a1,a2,a3,a4)));
     start(tp);
   }
 

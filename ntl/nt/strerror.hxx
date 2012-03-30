@@ -12,6 +12,7 @@
 
 #include "../pe/image.hxx"
 #include "peb.hxx"
+#include "../stlx/cstdlib.hxx"
 
 namespace ntl { namespace nt { 
   
@@ -173,7 +174,7 @@ namespace ntl { namespace nt {
   {
     wchar_t buf[32];
     const wchar_t msg[] = L"system error code ";
-    std::wcscpy(buf, );
+    std::wcscpy(buf, msg);
     _itow(Status, buf+_countof(msg), 10);
     return std::wstring(buf);
   }

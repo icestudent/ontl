@@ -356,7 +356,7 @@ struct device_traits<nt::file_handler>:
       detete_child          = 0x0040,
       read_attributes       = 0x0080,
       write_attributes      = 0x0100,
-      all_access            = standard_rights_required | synchronize | 0x1FF,
+      all_access            = (int)standard_rights_required | (int)synchronize | 0x1FF,
       append                = append_data | synchronize,
 
       generic_read          = standard_rights_read | read_data | read_attributes | read_ea | synchronize,
@@ -406,7 +406,7 @@ struct device_traits<nt::file_handler>:
     does_not_exists
   };
 
-  friend creation_disposition operator | (creation_disposition m, creation_disposition m2)
+  friend inline creation_disposition operator | (creation_disposition m, creation_disposition m2)
   {
     return bitwise_or(m, m2);
   }

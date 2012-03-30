@@ -608,11 +608,11 @@ namespace cxxruntime {
 
 #ifndef _EH_MAGIC
 #if _MSC_VER >= 1400
-#define _EH_MAGIC ehmagic1400
+# define _EH_MAGIC ehmagic1400
 #elif _MSC_VER>= 1300
-#define _EH_MAGIC ehmagic1300
+# define _EH_MAGIC ehmagic1300
 #else
-#define _EH_MAGIC ehmagic1200
+# define _EH_MAGIC ehmagic1200
 #endif
 #endif
 
@@ -708,6 +708,8 @@ namespace cxxruntime {
   {
     /* 0x00 */  uint32_t  econst    : 1;
     /* 0x00 */  uint32_t  evolatile : 1;
+    /* 0x00 */  uint32_t            : 1;
+    /* 0x00 */  uint32_t  e8        : 1;
     /* 0x04 */  eobject::dtor_ptr exception_dtor;
     /* 0x08 */  exception_disposition (__cdecl * forwardcompathandler)(...);///\todo safe proto
     /* 0x0C */  ntl::cxxruntime::catchabletypearray *  catchabletypearray; ///< types able to catch the exception.

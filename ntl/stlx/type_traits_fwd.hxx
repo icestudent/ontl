@@ -96,7 +96,6 @@ namespace __
   template<bool cond1, bool cond2,
   class IfTrueType, class IfFalseType>
   struct select_or;
-
 }
 
 // 20.6.4 Unary Type Traits [meta.unary]

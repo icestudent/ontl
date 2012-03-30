@@ -2006,11 +2006,13 @@ private:
     *pval = 0;
     long double value = 0;
     if(ic){
-      value = std::strtod(valuebuf, &pval);
+      value = std::strtod(*valuebuf == '-' ? valuebuf+1 : valuebuf, &pval);
       if(value > max_val)
         value = max_val;
       else if (value < min_val)
         value = min_val;
+      else if(*valuebuf == '-')
+        value = -value; 
     }
     return value;
   }

@@ -198,8 +198,8 @@ namespace std
           "promise_already_satisfied",
           "future_uninitialized"
         };
-        static_assert(_countof(strings) == future_errc::__maximum_errc, "disparity between future_errc values and its string representation");
-        return ev >= future_errc::broken_promise && ev < future_errc::__maximum_errc ? strings[ev] : "unknown error code";
+        static_assert(_countof(strings) == static_cast<size_t>(future_errc::__maximum_errc), "disparity between future_errc values and its string representation");
+        return strings[ev];
       }
     };
   }
