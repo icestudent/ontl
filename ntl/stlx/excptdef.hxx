@@ -48,4 +48,9 @@
   inline void __ntl_throw_impl() {}
 #endif
 
+  // temporary change
+#ifdef NTL_CXX_NOEXCEPT
+# define __ntl_nothrow noexcept
+#endif
+
 #endif // NTL__STLX_EXCPTDEF

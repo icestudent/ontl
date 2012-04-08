@@ -109,7 +109,7 @@ inline int NTL_CRTCALL rand(void)
   ntl::intrinsic::_ReadBarrier();
   std::uint32_t val = ntl::nt::RtlRandom(&seed);
   ntl::atomic::exchange(__ntl_rand_seed, seed); // store new seed back. rand() is not atomic function, but it doesn't matter
-  return val;
+  return static_cast<int>(val);
 }
 
 #ifndef RAND_MAX

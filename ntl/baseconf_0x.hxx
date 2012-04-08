@@ -46,6 +46,7 @@
 
   // C++0x attributes
   #define NTL_CXX_ATTRIBUTES
+  #define NTL_CXX_NOEXCEPT
 
   // language features:
   // explicit delete/default function definition

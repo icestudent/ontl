@@ -5,12 +5,12 @@
 	Name=".ntl"
 	ProjectGUID="{081E6E33-CC33-4BBF-81E8-2865B1D8FD67}"
 	RootNamespace=".ntl"
-	Keyword="Win32Proj"
-	TargetFrameworkVersion="0"
 	SccProjectName="Svn"
 	SccAuxPath="Svn"
 	SccLocalPath="Svn"
 	SccProvider="SubversionScc"
+	Keyword="Win32Proj"
+	TargetFrameworkVersion="0"
 	>
 	<Platforms>
 		<Platform
@@ -311,15 +311,7 @@
 					Name=".ext"
 					>
 					<File
-						RelativePath=".\stlx\ext\circular_buffer.hxx"
-						>
-					</File>
-					<File
 						RelativePath=".\stlx\cpp0x_mode.hxx"
-						>
-					</File>
-					<File
-						RelativePath=".\stlx\ext\fib.hxx"
 						>
 					</File>
 					<File
@@ -387,6 +379,10 @@
 						</File>
 						<File
 							RelativePath=".\stlx\ext\tr2\network.hxx"
+							>
+						</File>
+						<File
+							RelativePath=".\stlx\ext\tr2\quoted.hxx"
 							>
 						</File>
 						<File
@@ -541,7 +537,15 @@
 								>
 							</File>
 							<File
+								RelativePath=".\stlx\ext\tr2\filesystem\fs_ops3_impl.hxx"
+								>
+							</File>
+							<File
 								RelativePath=".\stlx\ext\tr2\filesystem\fs_path.hxx"
+								>
+							</File>
+							<File
+								RelativePath=".\stlx\ext\tr2\filesystem\fs_path_impl.hxx"
 								>
 							</File>
 						</Filter>
@@ -1749,10 +1753,6 @@
 				</File>
 				<File
 					RelativePath=".\device_traits.hxx"
-					>
-				</File>
-				<File
-					RelativePath=".\dllapp.hxx"
 					>
 				</File>
 				<File

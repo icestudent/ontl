@@ -167,7 +167,7 @@ namespace ntl { namespace network {
         service_not_found          = base_error_code + 108,
         type_not_found             = base_error_code + 109,
         no_more                    = base_error_code + 110,
-        e_cancelled                = base_error_code + 111,
+        cancelled                  = base_error_code + 111,
         refused                    = base_error_code + 112,
         host_not_found             = base_error_code + 1001,
         try_again                  = base_error_code + 1002,
