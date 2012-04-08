@@ -73,8 +73,8 @@ namespace std
       public:
 
         ///\name encoding conversion
-        static std::locale imbue( const std::locale& loc );
-        static const codecvt_type & codecvt();
+        inline static std::locale imbue( const std::locale& loc ) { return std::locale::classic(); }
+        inline static const codecvt_type & codecvt();
 
         ///\name constructors and destructor
         path()
@@ -88,16 +88,21 @@ namespace std
         path(path&& p) __ntl_nothrow
           :s(std::move(p.s))
         {}
+        path& operator=(path&& p) __ntl_nothrow
+        {
+          s.clear();
+          return append(p.s);
+        }
     #endif
 
         template <class Source>
-        path(Source const& source, const codecvt_type& cvt)
+        path(Source const& source, const codecvt_type& cvt, typename enable_if<__::path_accept<Source>::value>::type* =0)
         {
           append_conv(source, cvt);
         }
 
         template <class Source>
-        path(Source const& source)
+        path(const Source& source, typename enable_if<__::path_accept<Source>::value>::type* =0)
         {
           append_conv(source);
         }
@@ -117,21 +122,16 @@ namespace std
           s.clear();
           return append(p.s);
         }
-        path& operator=(path&& p) __ntl_nothrow
-        {
-          s.clear();
-          return append(p.s);
-        }
 
         template <class Source>
-        path& operator=(Source const& source)
+        typename enable_if<__::path_accept<Source>::value, path&>::type operator=(Source const& source)
         {
           s.clear();
           return append_conv(source);
         }
 
         template <class Source>
-        path& assign(Source const& source, const codecvt_type& cvt)
+        path& assign(Source const& source, const codecvt_type& cvt, typename enable_if<__::path_accept<Source>::value>::type* =0)
         {
           s.clear();
           return append_conv(source, cvt);
@@ -151,7 +151,7 @@ namespace std
         }
 
         template <class Source>
-        path& operator/=(Source const& source)
+        typename enable_if<__::path_accept<Source>::value, path&>::type operator/=(Source const& source)
         {
           return append_conv(source);
         }
@@ -164,7 +164,7 @@ namespace std
          * * A std::filesystem::directory_entry.
          **/
         template <class Source>
-        path& append(Source const& source, const codecvt_type& cvt) { return append_conv(source, cvt); }
+        typename enable_if<__::path_accept<Source>::value, path&>::type append(Source const& source, const codecvt_type& cvt) { return append_conv(source, cvt); }
 
         template <class InputIterator>
         path& append(InputIterator begin, InputIterator end, const codecvt_type& cvt=codecvt());
@@ -172,7 +172,7 @@ namespace std
       protected:
         path& append(const string_type& s, const codecvt_type&) { return append(s.c_str(), s.size()); }
         path& append(const string_type& s) { return append(s.c_str(), s.size()); }
-        path& append(const value_type* s, size_t len);
+        inline path& append(const value_type* s, size_t len);
       
         path& append_conv(const value_type* s, size_t len) { return append(s, len); }
         path& append_conv(const value_type* s) { return append(s, std::wcslen(s)); }
@@ -280,31 +280,31 @@ namespace std
         ///\name decomposition
 
         /** extension: returns UNC server name if any */
-        path  unc_name() const;
-        path  root_name() const;
-        path  root_directory() const;
-        path  root_path() const;
-        path  relative_path() const;
-        path  parent_path() const;
-        path  filename() const;
-        path  stem() const;
-        path  extension() const;
+        inline path  unc_name() const;
+        inline path  root_name() const;
+        inline path  root_directory() const;
+        inline path  root_path() const;
+        inline path  relative_path() const;
+        inline path  parent_path() const;
+        inline path  filename() const;
+        inline path  stem() const;
+        inline path  extension() const;
 
         ///\name query
         bool empty() const { return s.empty(); }
 
-        bool has_unc_name() const;
-        bool has_drive() const;
-        bool has_root_name() const;
-        bool has_root_directory() const;
-        bool has_root_path() const;
-        bool has_relative_path() const;
-        bool has_parent_path() const;
-        bool has_filename() const;
-        bool has_stem() const;
-        bool has_extension() const;
-        bool is_absolute() const;
-        bool is_relative() const;
+        inline bool has_unc_name() const;
+        inline bool has_drive() const;
+        inline bool has_root_name() const;
+        inline bool has_root_directory() const;
+        inline bool has_root_path() const;
+        inline bool has_relative_path() const;
+        inline bool has_parent_path() const;
+        inline bool has_filename() const;
+        inline bool has_stem() const;
+        inline bool has_extension() const;
+        inline bool is_absolute() const;
+        inline bool is_relative() const;
 
         ///\name iterators
         /**
@@ -321,21 +321,21 @@ namespace std
         typedef iterator const_iterator;
 
         /** Returns an iterator for the first present element in the traversal list above. If no elements are present, the end iterator. */
-        iterator begin() const;
+        inline iterator begin() const;
         /** Returns the end iterator. */
-        iterator end()   const;
+        inline iterator end()   const;
 
         /** Returns an iterator for the first present element in the traversal list above. If no elements are present, the end iterator. */
-        const_iterator cbegin() const;
+        inline const_iterator cbegin() const;
         /** Returns the end iterator. */
-        const_iterator cend() const;
+        inline const_iterator cend() const;
         ///\}
 
         /** Compares a two path objects */
         friend inline bool operator==(const path& a, const path& b) { return a.s == b.s; }
 
       protected:
-        pos_type filename_pos() const;
+        inline pos_type filename_pos() const;
       private:
         string_type s;
 

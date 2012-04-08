@@ -39,8 +39,9 @@ namespace std
         reference operator*() const { return name;  }
         pointer operator->()  const { return &name; }
 
-        iterator& operator++();
-        iterator& operator--();
+        inline iterator& operator++();
+        inline iterator& operator--();
+
         iterator  operator++(int)
         {
           iterator tmp(*this);
@@ -107,11 +108,6 @@ namespace std
         else
           p.clear();
         return is;
-      }
-
-      std::locale path::imbue( const std::locale&)
-      {
-        return std::locale::classic();
       }
 
       const path::codecvt_type& path::codecvt()

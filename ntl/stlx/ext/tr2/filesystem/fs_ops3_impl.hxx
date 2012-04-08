@@ -255,6 +255,79 @@ namespace std
         return fst;
       }
 
+      namespace __
+      {
+        static bool create_directories(const path& p, error_code& ec)
+        {
+          ec.clear();
+          if(p.empty())
+            return false;
+
+          // check path
+          file_status fst = status(p, ec);
+          if(!ec && exists(fst)){
+            if(is_directory(fst))
+              return false;       // directory already exists
+            ec = make_error_code(posix_error::not_a_directory);
+          }
+          if(ec)
+            return false;
+
+          // convert to external
+          const path wp = native(p);
+          if(!wp.has_relative_path()){
+            ec = make_error_code(ntl::nt::status::object_path_invalid);
+            return false;
+          }
+
+          // iterate through it
+          path::const_iterator part = wp.cbegin(), pend = wp.cend();
+          path q = *part;
+          for(++part; !ec && part != pend; ++part){
+            q /= *part;
+            fst = status(q, ec);
+            if(ec) break;
+            if(is_directory(fst))
+              continue;
+            if(!exists(fst))
+              create_directory(q, ec);
+            else
+              ec = make_error_code(posix_error::not_a_directory);
+          }
+          return !ec;
+        }
+      } // impl
+
+      bool create_directories(const path& p, error_code& ec)
+      {
+        error_code e;
+        const bool re = __::create_directories(p, e);
+        const bool throwable = &ec == &throws();
+        if(!throwable)
+          ec = e;
+        else if(!re)
+          __ntl_throw(filesystem_error("create_directories()", p, e));
+        return re;
+      }
+
+      bool create_directory(const path& dp, error_code& ec)
+      {
+        using namespace NTL__SUBSYSTEM_NS;
+        file_handler f;
+        ntstatus st = f.create(const_unicode_string(native(dp)), file::create_new, file::list_directory|synchronize, file::share_read|file::share_write, 
+          file::directory_file|file::open_for_backup_intent|file::synchronous_io_nonalert, file_attribute::normal);
+        const bool throwable = &ec == &throws();
+        if(!success(st) && st != status::object_name_collision){
+          error_code e = make_error_code(st);
+          if(!throwable)
+            ec = e;
+          else
+            __ntl_throw(filesystem_error("create_directory", dp, e));
+        }else if(!throwable)
+          ec.clear();
+        return success(st);
+      }
+
 
     } // files
   } // tr2

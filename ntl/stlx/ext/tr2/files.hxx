@@ -150,6 +150,7 @@ namespace std
         add_perms, remove_perms, symlink_perms
       };
 
+#ifdef NTL_CXX_ENUM
       enum class copy_option
       {
         none,
@@ -163,6 +164,21 @@ namespace std
         no_recurse = none,
         recurse
       };
+#else
+      __class_enum(copy_option)
+      {
+        none,
+        fail_if_exists = none,
+        overwrite_if_exists
+      };};
+
+      __class_enum(symlink_option)
+      {
+        none,
+        no_recurse = none,
+        recurse
+      };};
+#endif
 
 
     } // files

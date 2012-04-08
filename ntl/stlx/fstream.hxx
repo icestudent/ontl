@@ -17,7 +17,7 @@
 # include "../nt/file.hxx"
 #endif
 
-#include "ext/tr2/filesystem.hxx"
+#include "ext/tr2/files.hxx"
 
 #ifndef STLX__CONFORMING_FSTREAM
 // turn off UCS-MBCS character conversion in file streams
@@ -38,7 +38,7 @@ namespace std {
     };
   }
   typedef Encoding::type EncodingType;
-  namespace __fs = tr2::sys::filesystem;
+  namespace __fs = tr2::files;
 
   /**\addtogroup  lib_input_output ******* 27 Input/output library [input.output]
    *@{*/
@@ -104,15 +104,14 @@ namespace std {
 
     basic_filebuf<charT,traits>* open(const string& s, ios_base::openmode mode, EncodingType encoding = Encoding::Ansi)
     {
-      return do_open(tr2::sys::filesystem::path(s), mode, encoding) ? this : nullptr;
+      return do_open(tr2::files::path(s), mode, encoding) ? this : nullptr;
     }
     basic_filebuf<charT,traits>* open(const char* s, ios_base::openmode mode, EncodingType encoding = Encoding::Ansi)
     {
-      return do_open(tr2::sys::filesystem::path(s), mode, encoding) ? this : nullptr;
+      return do_open(tr2::files::path(s), mode, encoding) ? this : nullptr;
     }
     // NTL extension
-    template<class Path>
-    basic_filebuf<charT,traits>* open(const Path& name, ios_base::openmode mode, EncodingType encoding = Encoding::Ansi, typename enable_if<__fs::is_basic_path<Path>::value>::type* =0)
+    basic_filebuf<charT,traits>* open(const __fs::path& name, ios_base::openmode mode, EncodingType encoding = Encoding::Ansi)
     {
       return do_open(name, mode, encoding) ? this : nullptr;
     }
@@ -547,14 +546,13 @@ namespace std {
     }
 
   private:
-    template<class Path>
-    bool do_open(const Path& name, ios_base::openmode mode, EncodingType enc)
+    bool do_open(const __fs::path& name, ios_base::openmode mode, EncodingType enc)
     {
       if(f)
         return false;
 
       this->mode = mode;
-      const wstring fname = name.external_file_string();
+      const wstring fname = __fs::native(name);
 
       uint32_t bom = 0, bom_size = 0;
       if(!(mode & (ios_base::binary|ios_base::trunc))){
@@ -766,8 +764,7 @@ class basic_ifstream:
 #endif
 
     // NTL extension
-    template<class Path>
-    explicit basic_ifstream(const Path& name, ios_base::openmode mode = ios_base::in, EncodingType encoding = Encoding::Ansi, typename enable_if<__fs::is_basic_path<Path>::value>::type* =0)
+    explicit basic_ifstream(const __fs::path& name, ios_base::openmode mode = ios_base::in, EncodingType encoding = Encoding::Ansi)
       :basic_istream(&sb)
     {
       open(name, mode, encoding);
@@ -801,8 +798,7 @@ class basic_ifstream:
         setstate(ios_base::failbit);
     }
     // NTL extension
-    template<class Path>
-    void open(const Path& name, ios_base::openmode mode = ios_base::in, EncodingType encoding = Encoding::Ansi, typename enable_if<__fs::is_basic_path<Path>::value>::type* =0)
+    void open(const __fs::path& name, ios_base::openmode mode = ios_base::in, EncodingType encoding = Encoding::Ansi)
     {
       if(!sb.open(name, mode|ios_base::in, encoding))
         setstate(ios_base::failbit);
@@ -856,8 +852,7 @@ class basic_ofstream:
 #endif
 
     // NTL extension
-    template<class Path>
-    explicit basic_ofstream(const Path& name, ios_base::openmode mode = ios_base::out, EncodingType encoding = Encoding::Ansi, typename enable_if<__fs::is_basic_path<Path>::value>::type* =0)
+    explicit basic_ofstream(const __fs::path& name, ios_base::openmode mode = ios_base::out, EncodingType encoding = Encoding::Ansi)
       :basic_ostream(&sb)
     {
       open(name, mode, encoding);
@@ -892,8 +887,7 @@ class basic_ofstream:
         setstate(ios_base::failbit);
     }
     // NTL extension
-    template<class Path>
-    void open(const Path& name, ios_base::openmode mode = ios_base::out, EncodingType encoding = Encoding::Ansi, typename enable_if<__fs::is_basic_path<Path>::value>::type* =0)
+    void open(const __fs::path& name, ios_base::openmode mode = ios_base::out, EncodingType encoding = Encoding::Ansi)
     {
       if(!sb.open(name, mode|ios_base::out, encoding))
         setstate(ios_base::failbit);
@@ -949,8 +943,7 @@ class basic_fstream:
 #endif
 
     // NTL extension
-    template<class Path>
-    explicit basic_fstream(const Path& name, ios_base::openmode mode = ios_base::in|ios_base::out, EncodingType encoding = Encoding::Ansi, typename enable_if<__fs::is_basic_path<Path>::value>::type* =0)
+    explicit basic_fstream(const __fs::path& name, ios_base::openmode mode = ios_base::in|ios_base::out, EncodingType encoding = Encoding::Ansi)
       :basic_iostream(&sb)
     {
       open(name, mode, encoding);
@@ -985,8 +978,7 @@ class basic_fstream:
         setstate(ios_base::failbit);
     }
     // NTL extension
-    template<class Path>
-    void open(const Path& name, ios_base::openmode mode = ios_base::in|ios_base::out, EncodingType encoding = Encoding::Ansi, typename enable_if<__fs::is_basic_path<Path>::value>::type* =0)
+    void open(const __fs::path& name, ios_base::openmode mode = ios_base::in|ios_base::out, EncodingType encoding = Encoding::Ansi)
     {
       if(!sb.open(name, mode, encoding))
         setstate(ios_base::failbit);
