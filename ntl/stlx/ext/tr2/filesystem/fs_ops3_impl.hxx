@@ -233,8 +233,10 @@ namespace std
               ft = symlink_file;
             return file_status(ft);
           }
-          if(st == status::object_name_not_found || status::object_path_not_found)
+          if(st == status::object_name_not_found || status::object_path_not_found){
+            st = status::success;
             return file_status(file_not_found);
+          }
           return file_status(status_unknown);
         }
       } // __
