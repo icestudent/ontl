@@ -179,7 +179,7 @@ void NTL_CRTCALL quick_exit(int status)
 void NTL_CRTCALL _Exit(int code)
 {
   using ntl::nt::status;
-  ntl::nt::user_thread::exit_process(code == EXIT_SUCCESS ? status::success : (code == EXIT_FAILURE ? status::unsuccessful : static_cast<ntl::nt::ntstatus>(code)) );
+  ntl::nt::this_thread::exit_process(code == EXIT_SUCCESS ? status::success : (code == EXIT_FAILURE ? status::unsuccessful : static_cast<ntl::nt::ntstatus>(code)) );
 }
 #endif
 
