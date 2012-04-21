@@ -350,7 +350,11 @@ namespace std
       {
         if(!p || size == 0 || !*p)
           return *this;
-        s.reserve(s.capacity()+size);
+
+        // eliminate shrink_to_fit() if end size will be less than current capacity
+        const size_t estimated_size = s.size()+size;
+        if(s.capacity() < estimated_size)
+          s.reserve(estimated_size);
 
         // check Native subsystem name '\??\'
         const bool native = s.empty() && size > 4 && p[0] == backslash && p[1] == qmark && p[2] == qmark && p[3] == backslash;

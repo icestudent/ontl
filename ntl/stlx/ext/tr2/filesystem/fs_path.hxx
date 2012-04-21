@@ -84,14 +84,15 @@ namespace std
           :s(p.s)
         {}
 
-    #ifdef NTL__CXX_RV
+    #ifdef NTL_CXX_RV
         path(path&& p) __ntl_nothrow
           :s(std::move(p.s))
         {}
         path& operator=(path&& p) __ntl_nothrow
         {
           s.clear();
-          return append(p.s);
+          swap(p);
+          return *this;
         }
     #endif
 

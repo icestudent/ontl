@@ -37,7 +37,7 @@ namespace std
         {
           bool throwable; error_code e;
           const bool success = handle_status(holder, st, e, throwable);
-          if(throwable)
+          if(!success && throwable)
             __ntl_throw(filesystem_error(msg, e));
           return success;
         }
@@ -45,7 +45,7 @@ namespace std
         {
           bool throwable; error_code e;
           const bool success = handle_status(holder, st, e, throwable);
-          if(throwable)
+          if(!success && throwable)
             __ntl_throw(filesystem_error(msg, p1, e));
           return success;
         }
@@ -53,7 +53,7 @@ namespace std
         {
           bool throwable; error_code e;
           const bool success = handle_status(holder, st, e, throwable);
-          if(throwable)
+          if(!success && throwable)
             __ntl_throw(filesystem_error(msg, p1, p2, e));
           return success;
         }
@@ -133,7 +133,7 @@ namespace std
       }
       bool exists(const path& p, error_code& ec /*= throws()*/)
       {
-        return exists(status(p));
+        return exists(status(p, ec));
       }
 
       uintmax_t file_size(const path& p, error_code& ec /*= throws()*/)
