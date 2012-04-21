@@ -47,7 +47,13 @@ namespace std
         struct node
         {
           enum color_type { black, red, colors };
-          node* child[colors];
+          union
+          {
+            node* child[colors];
+            struct {
+              node *left_, *right_;
+            };
+          };
           uintptr_t parent_and_color;// pointers are always aligned
           color_type color() const { return color_type(parent_and_color & 1); }
           void color(color_type c) { parent_and_color = (parent_and_color & ~1) | c; }

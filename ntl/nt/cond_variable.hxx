@@ -62,7 +62,7 @@ namespace ntl {
         rtl::RtlWakeAllConditionVariable(this);
       }
 
-      ntstatus sleep(critical_section& lock)
+      ntstatus sleep(rtl::critical_section& lock)
       {
         return rtl::RtlSleepConditionVariableCS(this, &lock, infinite_timeout());
       }
@@ -72,7 +72,7 @@ namespace ntl {
       }
 
       template <class Rep, class Period>
-      ntstatus sleep_for(const std::chrono::duration<Rep, Period>& rel_time, critical_section& lock)
+      ntstatus sleep_for(const std::chrono::duration<Rep, Period>& rel_time, rtl::critical_section& lock)
       {
         return rtl::RtlSleepConditionVariableCS(this, &lock, -1i64*std::chrono::duration_cast<system_duration>(rel_time).count());
       }
@@ -83,7 +83,7 @@ namespace ntl {
       }
 
       template <class Clock, class Duration>
-      ntstatus sleep_until(const std::chrono::time_point<Clock, Duration>& abs_time, critical_section& lock)
+      ntstatus sleep_until(const std::chrono::time_point<Clock, Duration>& abs_time, rtl::critical_section& lock)
       {
         return rtl::RtlSleepConditionVariableCS(this, &lock, std::chrono::duration_cast<system_duration>(abs_time).count());
       }

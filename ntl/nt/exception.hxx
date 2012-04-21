@@ -93,6 +93,7 @@ class exception
 
     enum flags
     {
+      continuable     = 0x00,
       noncontinuable  = 0x01,
       unwinding       = 0x02,
       exit_unwind     = 0x04,
@@ -347,6 +348,7 @@ class exception
     {
       static const int maximum_parameters = 15;
 
+      static const ntstatus vcmagic  = status::msvc_exception;
       static const ntstatus cxxmagic = status::cxx_exception;//0xE0000000|'msc';
       static const ntstatus commagic = status::com_exception;//0xE0000000|'MOC';
       static const ntstatus longjumpmagic = status::longjump;
@@ -582,7 +584,7 @@ void inline
     const ntstatus        code,
     const exception_flags flags = exception_noncontinuable)
 {
-  RaiseException(code, flags, 0, 0);
+  RaiseException(code, flags, 0, nullptr);
 }
 
 

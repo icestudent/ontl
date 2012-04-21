@@ -16,9 +16,10 @@
 #include "context.hxx"
 
 #include "../pe/image.hxx"
-
+#include "../stlx/array.hxx"
 #include "resource.hxx"
 #include "time.hxx"
+#include "exception.hxx"
 
 namespace ntl {
   namespace nt {
@@ -228,6 +229,60 @@ void __stdcall
     uint32_t      ExitCode
     );
 
+#pragma pack(push,8)
+struct thread_name
+{
+  uint32_t      type;   // 0x1000
+  const char*   name;
+  legacy_handle id;
+  uint32_t      flags;  // 0
+
+  explicit thread_name(const char* name, legacy_handle tid)
+    :name(name), id(tid),
+    type(0x1000), flags(0)
+  {}
+};
+#pragma pack(pop)
+
+/************************************************************************/
+/* current thread                                                       */
+/************************************************************************/
+namespace this_thread
+{
+  inline legacy_handle id() { return current_thread(); }
+
+  inline __declspec(noreturn) void exit(ntstatus Status)
+  {
+#ifndef NTL_SUPPRESS_IMPORT
+    RtlExitUserThread(Status);
+#else
+    LdrShutdownThread();
+    // TODO: set the 'free stack on termination'
+    NtTerminateThread(current_thread(), Status);
+#endif
+  }
+
+  inline __declspec(noreturn) void exitfree(ntstatus Status)
+  {
+    FreeLibraryAndExitThread((legacy_handle) pe::image::this_module(), Status);
+  }
+
+  inline __declspec(noreturn) void exit_process(ntstatus Status)
+  {
+    RtlAcquirePebLock();
+    __try{
+      NtTerminateProcess(NULL, Status);
+      LdrShutdownProcess();
+      base_api_msg msg;
+      msg.u.ExitProcess.uExitCode = Status;
+      CsrClientCallServer((csr_api_msg*) &msg, NULL, MAKE_API_NUMBER(1, BasepExitProcess), (uint32_t)sizeof(base_exitprocess_msg));
+      NtTerminateProcess(current_process(), Status);
+    }
+    __finally{
+      RtlReleasePebLock();
+    }
+  }
+};
 
 /************************************************************************/
 /* user_thread                                                          */
@@ -356,13 +411,6 @@ public:
     return last_status_ = NtWaitForSingleObject(get(), alertable, system_time::infinite());
   }
 
-  static legacy_handle get_current() { return current_thread(); }
-
-  static ntstatus exitstatus(legacy_handle thread_handle)
-  {
-    thread_information<thread_basic_information> info(thread_handle);
-    return info ? info->ExitStatus : info;
-  }
 
   ntstatus exitstatus () const
   {
@@ -380,44 +428,38 @@ public:
     return info ? info->ClientId.UniqueThread : 0;
   }
 
-  static __declspec(noreturn)
-  void exit(ntstatus Status)
+  static ntstatus exitstatus(legacy_handle thread_handle)
   {
-#ifndef NTL_SUPPRESS_IMPORT
-    RtlExitUserThread(Status);
-#else
-    LdrShutdownThread();
-    // TODO: set the 'free stack on termination'
-    NtTerminateThread(get_current(), Status);
-#endif
+    thread_information<thread_basic_information> info(thread_handle);
+    return info ? info->ExitStatus : info;
   }
 
-  static __declspec(noreturn)
-  void exitfree(ntstatus Status)
-  {
-    FreeLibraryAndExitThread((legacy_handle) pe::image::this_module(), Status);
-  }
 
   ntstatus term(ntstatus Status)
   {
     return NtTerminateThread(get(), Status);
   }
 
-  static __declspec(noreturn)
-  void exit_process(ntstatus Status)
+  static void setname(const char* name, legacy_handle tid)
   {
-    RtlAcquirePebLock();
+    const thread_name tn(name, tid);
+    const std::array<uintptr_t, 4> args = {0x1000, uintptr_t(name), uintptr_t(tid), 0};
     __try{
-      NtTerminateProcess(NULL, Status);
-      LdrShutdownProcess();
-      base_api_msg msg;
-      msg.u.ExitProcess.uExitCode = Status;
-      CsrClientCallServer((csr_api_msg*) &msg, NULL, MAKE_API_NUMBER(1, BasepExitProcess), (uint32_t)sizeof(base_exitprocess_msg));
-      NtTerminateProcess(current_process(), Status);
+      raise_exception(exception::record::vcmagic, exception::continuable, args);
     }
-    __finally{
-      RtlReleasePebLock();
+    __except(exception::execute_handler){
     }
+  }
+
+  void setname(const char* name)
+  {
+    setname(name, get_id());
+  }
+
+
+  void swap(user_thread& rhs)
+  {
+    handle::swap(rhs);
   }
 
 #ifdef NTL_CXX_RV
@@ -448,26 +490,50 @@ public:
     return *this;
   }
 
-  void swap(user_thread& rhs)
-  {
-    handle::swap(rhs);
-  }
 #endif
 
 }; // class user_thread
 
-  template <class Clock, class Duration>
-  static inline ntstatus sleep_until(const std::chrono::time_point<Clock, Duration>& abs_time, bool alertable = false)
+  namespace this_thread
   {
-    return NtDelayExecution(alertable, std::chrono::duration_cast<system_duration>(abs_time.time_since_epoch()).count());
-  }
+    using nt::yield_execution;
 
-  template <class Rep, class Period>
-  static inline ntstatus sleep_for(const std::chrono::duration<Rep, Period>& rel_time, bool alertable = false)
-  {
-    return NtDelayExecution(alertable, -1i64*std::chrono::duration_cast<system_duration>(rel_time).count());
-  }
+    inline void setname(const char* name)
+    {
+      user_thread::setname(name, legacy_handle(-1));
+    }
 
+    template <class Clock, class Duration>
+    static inline ntstatus sleep_until(const std::chrono::time_point<Clock, Duration>& abs_time, bool alertable = false)
+    {
+      return NtDelayExecution(alertable, std::chrono::duration_cast<system_duration>(abs_time.time_since_epoch()).count());
+    }
+
+    template <class Rep, class Period>
+    static inline ntstatus sleep_for(const std::chrono::duration<Rep, Period>& rel_time, bool alertable = false)
+    {
+      return NtDelayExecution(alertable, -1i64*std::chrono::duration_cast<system_duration>(rel_time).count());
+    }
+
+    template <size_t N>
+    inline ntstatus wait_for(const std::array<legacy_handle, N>& handles, bool wait_all = false, bool alertable = false)
+    {
+      return NtWaitForMultipleObjects(handles.size(), handles.data(), wait_all ? wait_type::WaitAll : wait_type::WaitAny, alertable, infinite_timeout());
+    }
+
+    template <size_t N, class Rep, class Period>
+    inline ntstatus wait_for(const std::array<legacy_handle, N>& handles, const std::chrono::duration<Rep, Period>& rel_time, bool wait_all = false, bool alertable = false)
+    {
+      return NtWaitForMultipleObjects(handles.size(), handles.data(), wait_all ? wait_type::WaitAll : wait_type::WaitAny, alertable, -1i64*std::chrono::duration_cast<system_duration>(rel_time).count());
+    }
+
+    template <size_t N, class Clock, class Duration>
+    inline ntstatus wait_until(const std::array<legacy_handle, N>& handles, const std::chrono::time_point<Clock, Duration>& abs_time, bool wait_all = false, bool alertable = false)
+    {
+      return NtWaitForMultipleObjects(handles.size(), handles.data(), wait_all ? wait_type::WaitAll : wait_type::WaitAny, alertable, std::chrono::duration_cast<system_duration>(abs_time).count());
+    }
+
+  } // this_thread
  } // namespace nt
 
 }

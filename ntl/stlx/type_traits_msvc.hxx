@@ -428,7 +428,7 @@ namespace __
     template<class > struct func_limits { static const bool is_integer = false, is_iec559 = false; };
 
     typedef typename remove_cv<T>::type U;
-    typedef typename conditional<is_function<U>::value, func_limits<U>, numeric_limits<U> >::type type;
+    typedef typename conditional<is_function<U>::value||is_array<U>::value, func_limits<U>, numeric_limits<U> >::type type;
   };
 }
 

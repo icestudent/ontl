@@ -37,15 +37,15 @@ systime_t inline query_system_time()
 
 NTL_EXTERNAPI
 ntstatus __stdcall
-  NtQuerySystemTime(systime_t* SystemTime);
+  NtQuerySystemTime(systime_t& SystemTime);
 
 NTL_EXTERNAPI
 void __stdcall
-  RtlTimeToTimeFields(systime_t* Time, time_fields* TimeFields);
+  RtlTimeToTimeFields(const systime_t& Time, time_fields& TimeFields);
 
 NTL_EXTERNAPI
 ntstatus __stdcall
-  RtlSystemTimeToLocalTime(systime_t* SystemTime, int64_t* LocalTime);
+  RtlSystemTimeToLocalTime(const systime_t& SystemTime, int64_t& LocalTime);
 
 
 }//namespace nt

@@ -245,21 +245,21 @@ namespace std
     /** Offers the operating system the opportunity to schedule another %thread. */
     inline void yield() __ntl_nothrow
     {
-      NTL__SUBSYSTEM_NS::yield_execution();
+      NTL__SUBSYSTEM_NS::this_thread::yield_execution();
     }
 
     /** Blocks the calling %thread at least until the time specified by \c abs_time. */
     template <class Clock, class Duration>
     inline void sleep_until(const chrono::time_point<Clock, Duration>& abs_time)
     {
-      NTL__SUBSYSTEM_NS::sleep_until(abs_time);
+      NTL__SUBSYSTEM_NS::this_thread::sleep_until(abs_time);
     }
 
     /** Blocks the calling %thread for at least the time specified by \c rel_time. */
     template <class Rep, class Period>
     inline void sleep_for(const chrono::duration<Rep, Period>& rel_time)
     {
-      NTL__SUBSYSTEM_NS::sleep_for(rel_time);
+      NTL__SUBSYSTEM_NS::this_thread::sleep_for(rel_time);
     }
   } // this_thread
 

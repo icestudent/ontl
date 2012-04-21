@@ -173,19 +173,19 @@ template<bool UTC>
 __forceinline
 tm *__gettime(const time_t *__restrict timer, tm *__restrict result)
 {
-  ntl::nt::systime_t SystemTime = ctime2ntime(*timer);
+  const ntl::nt::systime_t SystemTime = ctime2ntime(*timer);
   int64_t LocalTime;
   if ( !UTC )
   {
-    ntl::nt::RtlSystemTimeToLocalTime(&SystemTime, &LocalTime);
+    ntl::nt::RtlSystemTimeToLocalTime(SystemTime, LocalTime);
   }
   ntl::nt::time_fields TimeFields;
-  ntl::nt::RtlTimeToTimeFields(UTC? &SystemTime : &LocalTime, &TimeFields);
+  ntl::nt::RtlTimeToTimeFields(UTC? SystemTime : LocalTime, TimeFields);
   result->tm_sec  = TimeFields.Second;
   result->tm_min  = TimeFields.Minute;
   result->tm_hour = TimeFields.Hour;
   result->tm_mday = TimeFields.Day;
-  result->tm_mon  = TimeFields.Month;
+  result->tm_mon  = TimeFields.Month-1;
   result->tm_year = TimeFields.Year ? (TimeFields.Year - 1900) : 0;
   result->tm_wday = TimeFields.Weekday;
   result->tm_yday;

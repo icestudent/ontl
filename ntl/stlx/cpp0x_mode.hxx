@@ -38,7 +38,7 @@
 
   #ifndef NTL_CXX_FUNC
     #ifdef _MSC_VER
-      #define __func__ __FUNCSIG__
+      #define __func__ __FUNCTION__
     #else
       #define __func__ __FUNC__
     #endif
