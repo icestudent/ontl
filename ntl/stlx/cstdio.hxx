@@ -17,9 +17,9 @@
 
 #ifndef _INC_STDLIB// MSVC compatibility
 
-NTL_EXTERNAPI size_t __cdecl
-  sprintf(char *buffer, const char *format, ...);
-#pragma deprecated(sprintf)
+//NTL_EXTERNAPI size_t __cdecl
+//  sprintf(char *buffer, const char *format, ...);
+//#pragma deprecated(sprintf)
 
 NTL_EXTERNAPI size_t __cdecl
   _snprintf(char *buffer, size_t count, const char *format, ...);
@@ -38,7 +38,8 @@ NTL_EXTERNAPI wchar_t* __cdecl _wcslwr(wchar_t * str);
 #endif
 
 
-namespace std {
+namespace std
+{
 
 /**\addtogroup  lib_language_support *** 18 Language support library [language.support]
  *@{*/
@@ -59,6 +60,15 @@ namespace std {
   {
     return _vsnprintf(buffer, count, format, argptr);
   }
+
+  template<size_t N>
+  inline size_t NTL_CRTCALL sprintf(char (&buffer)[N], const char *format, ...)
+  {
+    va_list va;
+    va_start(va, format);
+    return _vsnprintf(buffer, N, format, va);
+  }
+  
 
 
 /**@} lib_general_utilities

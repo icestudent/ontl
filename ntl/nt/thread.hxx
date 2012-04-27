@@ -249,7 +249,7 @@ struct thread_name
 /************************************************************************/
 namespace this_thread
 {
-  inline legacy_handle id() { return current_thread(); }
+  inline legacy_handle id() { return teb::get(&teb::ClientId).UniqueThread; }
 
   inline __declspec(noreturn) void exit(ntstatus Status)
   {

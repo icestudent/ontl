@@ -1272,6 +1272,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\nt\semaphore.hxx"
+					>
+				</File>
+				<File
 					RelativePath=".\nt\service.hxx"
 					>
 				</File>

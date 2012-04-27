@@ -60,6 +60,11 @@ template <class charT,
           class Allocator = string_allocator<charT> >
 class native_string
 {
+  template<class argT>
+  struct arg_select
+  {
+
+  };
 
   ///////////////////////////////////////////////////////////////////////////
   public:
@@ -109,12 +114,21 @@ class native_string
     {/**/}
 #endif
 
+    // construct from pointer, template required to lower priority
+    template<typename Pointer>
+    native_string(const Pointer& str, typename std::enable_if<std::is_same<Pointer,pointer>::value>::type* =0)
+    : length_(size_type(traits::length(str)) * sizeof(value_type)),
+      maximum_length_(length_),
+      buffer_(str)
+    {/**/}
+
     native_string(charT* s, size_t n)
     : length_(size_type(n) * sizeof(value_type)),
       maximum_length_(size_type(n) * sizeof(value_type)),
       buffer_(s)
     {/**/}
 
+    // construct from char array
     template<uint16_t Size>
     native_string(const value_type (&str)[Size])
     : length_((Size - 1) * sizeof(value_type)),
@@ -122,10 +136,14 @@ class native_string
       buffer_(&str[0])
     {/**/}
 
+    // if we are const, calculate length for non-const args
     template<uint16_t Size>
     native_string(value_type (&str)[Size])
-    : length_((Size - 1) * sizeof(value_type)),
-      maximum_length_(length_ + sizeof(value_type)),
+      : length_(
+                sizeof(value_type) * 
+                  (std::is_const<charT>::value ? traits::length(str) : (Size-1))
+                ),
+      maximum_length_(Size*sizeof(value_type)),
       buffer_(&str[0])
     {/**/}
 
@@ -135,6 +153,15 @@ class native_string
       maximum_length_(length_ + sizeof(value_type)),
       buffer_(str.data())
     {/**/}
+
+    // if we are const, accept all args; non-const with length calculation
+    // if we are mutable, accept only non-const, with calculation
+    //template<argT, uint16_t Size>
+    //native_string(argT (&str)[Size], typename std::enable_if<std::is_same<value_type, typename std::remove_cv<argT>::type>::value)
+    //: length_((Size - 1) * sizeof(value_type)),
+    //  maximum_length_(length_ + sizeof(value_type)),
+    //  buffer_(&str[0])
+    //{/**/}
 
     ///\name  native_string connversions
 

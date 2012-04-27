@@ -127,13 +127,14 @@ namespace std {
       //str_ = s;
       if(mode_ & ios_base::out){
         // reserve additional characters for output buffer
-        str_.reserve(s.size() + initial_output_size);
+        growto(s.size() + initial_output_size);
       }
       str_.assign(s);
       #ifdef NTL_DEBUG
       str_.c_str(); // pretty view
       #endif
       set_ptrs();
+      growto(str_.size());
       if(mode_ & ios_base::ate)
         pbump(static_cast<int>(epptr()-pptr()));
     }
@@ -193,10 +194,7 @@ namespace std {
 
         const ptrdiff_t gp = gptr() - eback(), pp = pptr() - pbase();
 
-        str_.resize(max(initial_output_size, __ntl_grow_heap_block_size(str_.size())), '\0');
-        if(str_.size() < str_.capacity())
-          str_.resize(str_.capacity(), '\0'); // we are also buffer, so lets use all memory
-
+        growto(max(initial_output_size, __ntl_grow_heap_block_size(str_.size())));
         char_type* newbeg = str_.begin();
         setp(newbeg, newbeg+str_.capacity());
         pbump(static_cast<int>(pp)); // NOTE: there is an issue in "C++ Standard Library Issues List" about this
@@ -278,7 +276,7 @@ namespace std {
       if ( mode_ & ios_base::out )
       {
         if(str_.empty())
-          str_.reserve(initial_output_size); // characters by default
+          growto(initial_output_size); // characters by default
         this->setp(p, p + str_.capacity());
 
         if(!(mode_ & ios_base::in)){
@@ -301,6 +299,13 @@ namespace std {
         else
           setg(p, p, p);
       }
+    }
+
+    void growto(streamsize newsize)
+    {
+      str_.resize(newsize, '\0');
+      if(str_.size() < str_.capacity())
+        str_.resize(str_.capacity());
     }
   private:
     basic_string<charT, traits> str_;

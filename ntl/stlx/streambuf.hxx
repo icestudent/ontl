@@ -337,6 +337,7 @@ class basic_streambuf
       {
         if ( !(0 < n) ) return copied;
         const streamsize wavail = pend - pnext;
+        assert(wavail >= 0);
         if ( !(0 < wavail) )
         {
           const char_type c = *s;

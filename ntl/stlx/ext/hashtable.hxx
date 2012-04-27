@@ -440,12 +440,18 @@ namespace std
         chained_hashtable(const chained_hashtable& r)
           :nalloc(r.nalloc), balloc(r.balloc), hash_(r.hash_), equal_(r.equal_), count_(0), max_factor(r.max_factor), head_()
         {
-          copy_from(r.buckets_);
+          if(r.size())
+            copy_from(r.buckets_);
+          else
+            init_table(initial_count);
         }
         chained_hashtable(const chained_hashtable& r, const allocator_type& a)
           :nalloc(a), balloc(a), hash_(r.hash_), equal_(r.equal_), count_(0), max_factor(r.max_factor), head_()
         {
-          copy_from(r.buckets_);
+          if(r.size())
+            copy_from(r.buckets_);
+          else
+            init_table(initial_count);
         }
         chained_hashtable& operator=(const chained_hashtable& r)
         {
@@ -468,7 +474,10 @@ namespace std
             swap(r);
           }else{
             // move elements using the array_allocator
-            copy_from(r.buckets_);
+            if(r.size())
+              copy_from(r.buckets_);
+            else
+              init_table(initial_count);
             r.clear();
           }
         }
@@ -506,6 +515,7 @@ namespace std
         {
           const hash_t hkey = hash_(value2key(v, is_map()));
           const size_type n = mapkey(hkey);
+          assert(buckets_.first && n < static_cast<size_type>(buckets_.second-buckets_.first));
           bucket_type& b = buckets_.first[n];
 
           if(is_unique::value && b.elems){
@@ -779,6 +789,8 @@ namespace std
           head_ = nullptr;
           count_ = 0; // increased by following inserts
           copy_from(buckets);
+          // TODO: destroy old buckets
+          b = nullptr;
         }
         ///\}
 
@@ -794,6 +806,9 @@ namespace std
 
         void copy_from(const table& buckets)
         {
+          const size_type rcount = buckets.second-buckets.first;
+          if(size() < rcount)
+            init_table(rcount);
           bucket_type* b = buckets.first;
 
           // iterate through old table

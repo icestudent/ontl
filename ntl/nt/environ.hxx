@@ -104,12 +104,6 @@ namespace ntl {
       {
         return RtlQueryEnvironmentVariable_U(env, name, value);
       }
-      unicode_string query(const const_unicode_string& name) const
-      {
-        unicode_string us;
-        query(name, us);
-        return us;
-      }
 
       ntstatus set(const const_unicode_string& name, const const_unicode_string& value)
       {
