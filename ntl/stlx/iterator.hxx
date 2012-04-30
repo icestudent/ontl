@@ -796,6 +796,7 @@ class ostreambuf_iterator
 
   template <class T, size_t N> inline T* begin  (T (&array)[N])           { return array;     }
   template <class T, size_t N> inline T* end    (T (&array)[N])           { return array+N;   }
+
 ///\}
 
 /**@} lib_iterators */

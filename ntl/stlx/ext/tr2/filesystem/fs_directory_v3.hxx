@@ -8,7 +8,7 @@
 #error internal header
 #endif
 
-#include "../../stack.hxx"
+#include "../../../stack.hxx"
 
 namespace std
 {

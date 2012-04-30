@@ -1,5 +1,5 @@
 /** C++ library headers */
-#define NTL__STLX_EXCLUDE_DEPRECATED
+#define NTL_STLX_EXCLUDE_DEPRECATED
 #include "./algorithm"
 #include "./array"
 #include "./bitset"
@@ -12,7 +12,7 @@
 #include "./forward_list"
 #include "./fstream"
 #include "./functional"
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
 #include "./future"
 #endif
 #include "./initializer_list"

@@ -530,6 +530,11 @@ public:
     return free(h, p, flags);
   }
 
+  void* realloc(void* ptr, size_t size, flag flags = none)
+  {
+    return RtlReAllocateHeap(h, flags, ptr, size);
+  }
+
   heap_ptr get() const { return h; }
 
   // locks heap

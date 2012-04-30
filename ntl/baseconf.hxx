@@ -233,4 +233,13 @@
   #endif
 #endif
 
+#ifndef NTL_EXPORTAPI
+#if defined(_MSC_VER) && defined(_WINDLL) && (STLX_USE_EXCEPTIONS > 0)
+# define NTL_EXPORTAPI __declspec(dllexport)
+#else
+# define NTL_EXPORTAPI 
+#endif
+#endif // NTL_EXPORTAPI
+
+
 #endif // NTL__BASECONF

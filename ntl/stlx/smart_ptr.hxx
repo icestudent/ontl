@@ -15,6 +15,10 @@
 #include "../linked_ptr.hxx"
 #include "reference_wrapper.hxx"
 
+#ifdef NTL_CXX_RV
+#pragma error use smart_ptr_rv.hxx
+#endif
+
 namespace std
 {
   /**\addtogroup  lib_utilities ********** 20 General utilities library [utilities]
@@ -959,6 +963,7 @@ namespace std
       
       void swap(shared_ptr& r)
       {
+        //using namespace std;
         std::swap(shared, r.shared);
         std::swap(ptr, r.ptr);
       }

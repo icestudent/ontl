@@ -17,7 +17,7 @@ namespace std
 {
   namespace __
   {
-    struct exstring
+    struct NTL_EXPORTAPI exstring
     {
       exstring()
         :msg(), len()
@@ -64,7 +64,7 @@ namespace std
 
 
 /// 19.2.1 Class logic_error [logic.error]
-class logic_error : public exception
+class NTL_EXPORTAPI logic_error : public exception
 {
   public:
     explicit logic_error(const string& what_arg) : msg(what_arg) {}
@@ -78,7 +78,7 @@ class logic_error : public exception
 };
 
 /// 19.2.2 Class domain_error [domain.error]
-class domain_error : public logic_error
+class NTL_EXPORTAPI domain_error : public logic_error
 {
   public:
     explicit domain_error(const string& what_arg) : logic_error(what_arg) {}
@@ -86,7 +86,7 @@ class domain_error : public logic_error
 };
 
 /// 19.2.3 Class invalid_argument [invalid.argument]
-class invalid_argument : public logic_error
+class NTL_EXPORTAPI invalid_argument : public logic_error
 {
   public:
     explicit invalid_argument(const string& what_arg) : logic_error(what_arg) {}
@@ -94,7 +94,7 @@ class invalid_argument : public logic_error
 };
 
 /// 19.2.4 Class length_error [length.error]
-class length_error : public logic_error
+class NTL_EXPORTAPI length_error : public logic_error
 {
   public:
     explicit length_error(const string& what_arg) : logic_error(what_arg) {}
@@ -102,7 +102,7 @@ class length_error : public logic_error
 };
 
 /// 19.2.5 Class out_of_range [lib.out.of.range]
-class out_of_range : public logic_error
+class NTL_EXPORTAPI out_of_range : public logic_error
 {
   public:
     explicit out_of_range(const string& what_arg) : logic_error(what_arg) {}
@@ -110,7 +110,7 @@ class out_of_range : public logic_error
 };
 
 /// 19.2.6 Class runtime_error [lib.runtime.error]
-class runtime_error : public exception
+class NTL_EXPORTAPI runtime_error : public exception
 {
   public:
     explicit runtime_error(const string& what_arg) : msg(what_arg) {}
@@ -124,7 +124,7 @@ class runtime_error : public exception
 };
 
 /// 19.2.7 Class range_error [lib.range.error]
-class range_error : public runtime_error
+class NTL_EXPORTAPI range_error : public runtime_error
 {
   public:
     explicit range_error(const string& what_arg) : runtime_error(what_arg) {}
@@ -132,7 +132,7 @@ class range_error : public runtime_error
 };
 
 /// 19.2.8 Class overflow_error [lib.overflow.error]
-class overflow_error : public runtime_error
+class NTL_EXPORTAPI overflow_error : public runtime_error
 {
   public:
     explicit overflow_error(const string& what_arg) : runtime_error(what_arg) {}
@@ -140,7 +140,7 @@ class overflow_error : public runtime_error
 };
 
 /// 19.2.9 Class underflow_error [lib.underflow.error]
-class underflow_error : public runtime_error
+class NTL_EXPORTAPI underflow_error : public runtime_error
 {
   public:
     explicit underflow_error(const string& what_arg) : runtime_error(what_arg) {}

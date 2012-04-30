@@ -3,6 +3,7 @@
 #endif
 
 #include "../quoted.hxx"
+#include "../../../../nt/file.hxx"
 
 namespace std
 {
@@ -290,9 +291,9 @@ namespace std
       }
       const std::string path::generic_string() const
       {
-        const path p = generic_wstring();
+        const string_type p = generic_wstring();
         wstring_convert<codecvt_type> conv;
-        return conv.to_bytes(p.s);
+        return conv.to_bytes(p);
       }
 
       template<> inline std::string    path::string<std::string>(const codecvt_type& cvt)  const { return string(); }

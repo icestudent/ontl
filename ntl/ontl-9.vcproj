@@ -663,6 +663,10 @@
 					Name="c-compat"
 					>
 					<File
+						RelativePath=".\stlx\cstd\assert.h"
+						>
+					</File>
+					<File
 						RelativePath=".\stlx\cassert.hxx"
 						>
 					</File>
@@ -719,6 +723,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\stlx\cstd\ctype.h"
+						>
+					</File>
+					<File
 						RelativePath=".\stlx\cuchar.hxx"
 						>
 					</File>
@@ -728,6 +736,70 @@
 					</File>
 					<File
 						RelativePath=".\stlx\cwctype.hxx"
+						>
+					</File>
+					<File
+						RelativePath=".\stlx\cstd\float.h"
+						>
+					</File>
+					<File
+						RelativePath=".\stlx\cstd\inttypes.h"
+						>
+					</File>
+					<File
+						RelativePath=".\stlx\cstd\limits.h"
+						>
+					</File>
+					<File
+						RelativePath=".\stlx\cstd\math.h"
+						>
+					</File>
+					<File
+						RelativePath=".\stlx\cstd\memory.h"
+						>
+					</File>
+					<File
+						RelativePath=".\stlx\cstd\stdarg.h"
+						>
+					</File>
+					<File
+						RelativePath=".\stlx\cstd\stdbool.h"
+						>
+					</File>
+					<File
+						RelativePath=".\stlx\cstd\stddef.h"
+						>
+					</File>
+					<File
+						RelativePath=".\stlx\cstd\stdint.h"
+						>
+					</File>
+					<File
+						RelativePath=".\stlx\cstd\stdio.h"
+						>
+					</File>
+					<File
+						RelativePath=".\stlx\cstd\stdlib.h"
+						>
+					</File>
+					<File
+						RelativePath=".\stlx\cstd\string.h"
+						>
+					</File>
+					<File
+						RelativePath=".\stlx\cstd\time.h"
+						>
+					</File>
+					<File
+						RelativePath=".\stlx\cstd\uchar.h"
+						>
+					</File>
+					<File
+						RelativePath=".\stlx\cstd\wchar.h"
+						>
+					</File>
+					<File
+						RelativePath=".\stlx\cstd\wctype.h"
 						>
 					</File>
 				</Filter>
@@ -1705,6 +1777,10 @@
 				</File>
 				<File
 					RelativePath=".\win\console.hxx"
+					>
+				</File>
+				<File
+					RelativePath=".\win\error.hxx"
 					>
 				</File>
 				<File

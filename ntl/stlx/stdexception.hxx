@@ -38,7 +38,7 @@ namespace std {
  *@{*/
 
 /// 18.8.1 Class exception [exception]
-class exception
+class NTL_EXPORTAPI exception
 {
   public:
 #if STLX_USE_EXCEPTIONS
@@ -55,7 +55,7 @@ class exception
 ///\name 18.8.2 Violating exception-specifications [exception.unexpected]
 
 /// Class bad_exception [18.8.2.1 bad.exception]
-class bad_exception : public exception
+class NTL_EXPORTAPI bad_exception : public exception
 {
   public:
     bad_exception() __ntl_nothrow {}

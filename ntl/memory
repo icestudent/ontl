@@ -1,5 +1,5 @@
 #include "stlx/memory.hxx"
-#ifdef NTL__CXX_RV
+#ifdef NTL_CXX_RV
 #  include "stlx/smart_ptr_rv.hxx"
 #else
 #  include "stlx/smart_ptr.hxx"

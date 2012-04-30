@@ -660,17 +660,6 @@ namespace std
     x.swap(y);
   }
 
-#ifndef NTL_CXX_RVFIX
-  template <class T, class D> void swap(unique_ptr<T, D>&& x, unique_ptr<T, D>& y)
-  {
-    x.swap(y);
-  }
-  template <class T, class D> void swap(unique_ptr<T, D>& x, unique_ptr<T, D>&& y)
-  {
-    x.swap(y);
-  }
-#endif
-
   template <class T1, class D1, class T2, class D2>
   bool operator==(const unique_ptr<T1, D1>& x, const unique_ptr<T2, D2>& y)
   {
@@ -1013,7 +1002,7 @@ namespace std
       return *this;
     }
 
-    void swap(shared_ptr&& r) __ntl_nothrow
+    void swap(shared_ptr& r) __ntl_nothrow
     {
       if(this != &r){
         using std::swap;
@@ -1234,8 +1223,7 @@ namespace std
   }
 
   template<class T> inline void swap(shared_ptr<T>&  a, shared_ptr<T>&  b) __ntl_nothrow { a.swap(b); }
-  template<class T> inline void swap(shared_ptr<T>&& a, shared_ptr<T>&  b) __ntl_nothrow { a.swap(b); }
-  template<class T> inline void swap(shared_ptr<T>&  a, shared_ptr<T>&& b) __ntl_nothrow { a.swap(b); }
+  
   //////////////////////////////////////////////////////////////////////////
   template<class T, class U>
   inline shared_ptr<T> static_pointer_cast(shared_ptr<U> const& r) __ntl_nothrow
@@ -1341,8 +1329,9 @@ namespace std
     // modifiers
     void swap(weak_ptr& r) __ntl_nothrow
     {
-      std::swap(shared, r.shared);
-      std::swap(ptr, r.ptr);
+      using std::swap;
+      swap(shared, r.shared);
+      swap(ptr, r.ptr);
     }
 
     void reset() __ntl_nothrow
