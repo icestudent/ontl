@@ -777,6 +777,9 @@ namespace std
 
         void rehash(size_type n)
         {
+          if(bucket_count() >= n)
+            return;
+
           n = capacity_factor(n);
 
           // init the new bucket table
@@ -789,8 +792,24 @@ namespace std
           head_ = nullptr;
           count_ = 0; // increased by following inserts
           copy_from(buckets);
-          // TODO: destroy old buckets
-          b = nullptr;
+
+          // destroy old buckets
+          b = buckets.first;
+          while(b != buckets.second){
+            if(!b->elems || b->size == 0){
+              b++;
+              continue;
+            }
+            node* p = b->elems;
+            while(b->size--){
+              node* d = p;
+              p = p->next;
+              nalloc.deallocate(d, 1);
+            }
+            b->elems = nullptr;
+            b++;
+          }
+          balloc.deallocate(buckets.first, buckets.second-buckets.first);
         }
         ///\}
 
@@ -807,7 +826,7 @@ namespace std
         void copy_from(const table& buckets)
         {
           const size_type rcount = buckets.second-buckets.first;
-          if(size() < rcount)
+          if(bucket_count() < rcount)
             init_table(rcount);
           bucket_type* b = buckets.first;
 
