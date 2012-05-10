@@ -360,6 +360,8 @@ int NTL_CRTIMP
     {
       return _wcsnicmp(s1,s2,n);
     }
+
+
   }
 
 #endif // #ifndef _INC_STDLIB
@@ -370,5 +372,11 @@ int NTL_CRTIMP
 
 // MSVC winnt.h" compatibility
 }//extern "C++" {
+
+/// external CRT
+namespace ntl { namespace msvcrt
+{
+  char* NTL_CRTCALL strtok(char* string, const char* format, char** context);
+}}
 
 #endif//#ifndef NTL__STLX_CSTRING

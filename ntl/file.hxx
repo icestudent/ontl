@@ -132,7 +132,7 @@ class basic_file : public traits
         if ( ! read(file_content.begin(), data_size) )
           file_content.clear();
       }
-      return file_content;
+      return std::move(file_content);
     }
 
     const FileDevice & handler() const

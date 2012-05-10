@@ -9,7 +9,7 @@
 namespace
 {
   // CRT stubs
-  vfv_t *imp_strtod, *imp_vsnprintf, *imp_acos, *imp_atan, *imp_tan;
+  vfv_t *imp_strtod, *imp_vsnprintf, *imp_acos, *imp_atan, *imp_tan, *imp_strtok;
 }
 
 // CRT forwards
@@ -63,6 +63,11 @@ namespace ntl { namespace msvcrt
     typedef size_t __cdecl f_t(char*, size_t, const char*, va_list);
     return reinterpret_cast<f_t*>(imp_vsnprintf)(buffer, count, format, argptr);
   }
+  char* NTL_CRTCALL strtok(char* string, const char* format, char** context)
+  {
+    typedef char* __cdecl f_t(char*, const char*, char**);
+    return reinterpret_cast<f_t*>(imp_strtok)(string, format, context);
+  }
 
   //int NTL_CRTCALL sscanf(const char* string, const char* format, ...)
   //{
@@ -108,6 +113,7 @@ namespace
     // bind imports
 #define NTL_IMP(func) imp_ ## func = msvcrt->find_export<vfv_t*>(#func)
     NTL_IMP(strtod);
+    NTL_IMP(strtok);
     NTL_IMP(vsnprintf);
     NTL_IMP(acos);
     NTL_IMP(atan);

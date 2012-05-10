@@ -69,6 +69,7 @@ namespace std
     return _vsnprintf(buffer, N, format, va);
   }
   
+  NTL_EXTERNAPI int __cdecl sscanf(const char* string, const char* format, ...);
 
 
 /**@} lib_general_utilities

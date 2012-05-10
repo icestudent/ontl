@@ -54,7 +54,7 @@ namespace std
    *  Class condition_variable provides a condition variable that can only wait on a Lock, allowing maximum effciency on some platforms. 
    **/
   class condition_variable:
-    protected ntl::nt::conditional_variable
+    protected ntl::nt::condition_variable
   {
     struct monitor
     {
@@ -70,7 +70,7 @@ namespace std
       }
     };
   public:
-    typedef ntl::nt::rtl::conditional_variable* native_handle_type;
+    typedef ntl::nt::rtl::condition_variable* native_handle_type;
 
     condition_variable()
       :waiters(0)

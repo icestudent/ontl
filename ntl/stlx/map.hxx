@@ -40,10 +40,10 @@ namespace std {
               class Allocator
               >
     class value_compare:
-      public binary_function<pair<const Key, T>, pair<const Key, T>, bool>
+      public binary_function<pair</*const*/ Key, T>, pair</*const*/ Key, T>, bool>
     {
     public:
-      typedef pair<const Key, T> value_type;
+      typedef pair</*const*/ Key, T> value_type;
 
       __forceinline
       value_compare(const value_compare& x)

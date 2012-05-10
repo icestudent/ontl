@@ -9,6 +9,7 @@
 #pragma once
 
 #include "resource.hxx"
+#include "object.hxx"
 
 namespace ntl {
   namespace nt {
