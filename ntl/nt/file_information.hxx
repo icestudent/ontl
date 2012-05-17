@@ -183,9 +183,8 @@ struct file_information_base
 
   ///////////////////////////////////////////////////////////////////////////
   private:
-
-    ntstatus    status_;
     info_class  info;
+    ntstatus    status_;
 
 };//class file_information_base
 

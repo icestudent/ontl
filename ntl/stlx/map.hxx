@@ -116,7 +116,7 @@ class map:
 public:
     ///\name 23.3.1.1 construct/copy/destroy:
     explicit map(const Compare& comp = Compare(), const Allocator& a = Allocator())
-      :val_comp_(comp), tree_type(val_comp_, a)
+      :tree_type(val_comp_, a), val_comp_(comp)
     {}
 
     template <class InputIterator>
@@ -124,40 +124,40 @@ public:
         InputIterator   last,
         const Compare&  comp = Compare(),
         const Allocator& a = Allocator())
-        :val_comp_(comp), tree_type(val_comp_, a)
+        :tree_type(val_comp_, a), val_comp_(comp)
     {
       insert(first, last);
     }
 
     map(const map<Key, T, Compare, Allocator> & x)
-      :val_comp_(x.val_comp_), tree_type(static_cast<const tree_type&>(x))
+      :tree_type(static_cast<const tree_type&>(x)), val_comp_(x.val_comp_)
     {}
 
 #ifdef NTL_CXX_RV
     map(map<Key,T,Compare,Allocator>&& x)
       // Compare must be a CopyConstructible
-      :val_comp_(x.val_comp_), tree_type(val_comp_, x.get_allocator())
+      :tree_type(val_comp_, x.get_allocator()), val_comp_(x.val_comp_)
     {
       swap(x);
     };
 #endif
 
     map(const Allocator& a)
-      :val_comp_(Compare()), tree_type(val_comp_, a)
+      :tree_type(val_comp_, a), val_comp_(Compare())
     {}
 
     map(const map& x, const Allocator& a)
-      :val_comp_(x.val_comp_), tree_type(val_comp_, a)
+      :tree_type(val_comp_, a), val_comp_(x.val_comp_)
     {}
 
 #ifdef NTL_CXX_RV
     map(map&& x, const Allocator& a)
-      :val_comp_(x.val_comp_), tree_type(val_comp_, a)
+      :tree_type(val_comp_, a), val_comp_(x.val_comp_)
     {}
 #endif
 
     map(initializer_list<value_type> il, const Compare comp = Compare(), const Allocator& a = Allocator())
-      :val_comp_(comp), tree_type(val_comp_, a)
+      :tree_type(val_comp_, a), val_comp_(comp)
     {
       tree_type::insert_range(il.begin(), il.end());
     }

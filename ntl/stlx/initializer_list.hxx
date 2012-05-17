@@ -41,7 +41,26 @@ namespace std
     size_t   size()  const;
     const E* begin() const;
     const E* end()   const;
-    initializer_list();
+
+    initializer_list()
+      :i(), len()
+    {}
+
+  private:
+    iterator i;
+    size_type len;
+
+    initializer_list(iterator i, size_type l)
+      :i(i), len(l)
+    {
+      char _[0];
+    }
+    initializer_list(const_iterator begin, const_iterator end)
+      :i(begin), len(end-begin)
+    {
+      char _[0];
+    }
+   
 #endif
   };
 

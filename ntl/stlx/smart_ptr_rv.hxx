@@ -272,9 +272,15 @@ namespace std
     pointer get() const __ntl_nothrow { return ptr; }
 
     // local statics produce code bloat, shoud we replace the UD with a global static?
-    deleter_type& get_deleter() __ntl_nothrow { return *(deleter_type*)0; }
+    deleter_type& get_deleter() __ntl_nothrow { return const_cast<deleter_type&>(const_cast<const unique_ptr*>(this)->get_deleter()); }
+#ifndef __ICL
     const deleter_type& get_deleter() const __ntl_nothrow { return *(deleter_type*)0; }
-
+#else
+  private:
+    static constexpr const deleter_type __default_deleter;
+  public:
+    const deleter_type& get_deleter() const __ntl_nothrow { return __default_deleter; }
+#endif
     operator __::explicit_bool_type() const __ntl_nothrow { return __::explicit_bool(ptr); }
 
     ///\name 20.8.11.2.5 unique_ptr modifiers [unique.ptr.single.modifiers]

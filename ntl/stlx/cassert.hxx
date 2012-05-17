@@ -77,7 +77,7 @@ inline void __ntl_assert(const char* expr, const char* file, int line)
 #ifndef NTL__STLX_CASSERT
 #define NTL__STLX_CASSERT
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && !defined(__ICL)
 namespace std 
 {
   namespace __

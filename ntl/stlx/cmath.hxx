@@ -15,6 +15,7 @@ namespace std
 {
  /**\addtogroup  lib_numeric ************ 26 Numerics library [numerics]
   *@{
+  **/
  /**\addtogroup  lib_cmath   ************ 26.8 C Library [c.math]
   *@{*/
 

@@ -96,9 +96,9 @@ struct array
 
     ///\name  capacity
 
-    size_type               size() const      { return N; }
-    size_type               max_size() const  { return N; }
-    bool                    empty() const     { return N != 0; }
+    constexpr size_type     size() const      { return N; }
+    constexpr size_type     max_size() const  { return N; }
+    constexpr bool          empty() const     { return N != 0; }
 
     ///\name  element access
 

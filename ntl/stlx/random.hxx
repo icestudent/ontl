@@ -16,9 +16,9 @@
 #include "ext/numeric_conversions.hxx"
 
 #ifndef NTL_CXX_CONSTEXPR
-#pragma push_macro("constexpr")
-#undef constexpr
-#define constexpr const
+//#pragma push_macro("constexpr")
+//#undef constexpr
+//#define constexpr const
 #endif
 
 
@@ -255,19 +255,21 @@ namespace std
     typedef __::safe_mod<UIntType, m, a, c> zerom;
     typedef __::safe_mod<UIntType, m> safe_mod;
 
-    template<class T, bool small = (sizeof(result_type) <= sizeof(uint32_t))>
+    template<class T, bool small = (sizeof(UIntType) <= sizeof(uint32_t))>
     struct shift32 { static const T value = 0; };
+
     template<class T> struct shift32<T,false>
     { static const T value = T(1) << 32; };
+
   public:
     // types
     typedef UIntType result_type;
 
     ///\name engine characteristics
-    static const result_type multiplier   = a;
-    static const result_type increment    = c;
-    static const result_type modulus      = m;  // max+1 == 0
-    static const result_type default_seed = 1u;
+    static constexpr const result_type multiplier   = a;
+    static constexpr const result_type increment    = c;
+    static constexpr const result_type modulus      = m;  // max+1 == 0
+    static constexpr const result_type default_seed = 1u;
     static_assert(m == 0 || (a < m && c < m), "following relations shall hold: a < m and c < m");
 
     static constexpr result_type min() { return increment == 0u ? 1u : 0u; }
@@ -375,8 +377,9 @@ namespace std
     template<size_t w> struct shift<w, false>
     { static const size_t value = 0; };
 
-    template<class T, bool small = (sizeof(result_type) <= sizeof(uint32_t))>
+    template<class T, bool small = (sizeof(UIntType) <= sizeof(uint32_t))>
     struct shift32 { static const T value = 0; };
+
     template<class T> struct shift32<T,false>
     { static const T value = T(1) << 32; };
 
@@ -396,28 +399,29 @@ namespace std
     static_assert(f <= shift1<w>::value, "f <= (1 << w) - 1");
 
     typedef __::safe_mod<UIntType, shift<w>::value> modw;
+
   public:
     ///\name types
     typedef UIntType result_type;
 
     ///\name engine characteristics
-    static constexpr size_t      word_size                 =  w;
-    static constexpr size_t      state_size                =  n;
-    static constexpr size_t      shift_size                =  m;
-    static constexpr size_t      mask_bits                 =  r;
-    static constexpr UIntType    xor_mask                  =  a;
-    static constexpr size_t      tempering_u               =  u;
-    static constexpr UIntType    tempering_d               =  d;
-    static constexpr size_t      tempering_s               =  s;
-    static constexpr UIntType    tempering_b               =  b;
-    static constexpr size_t      tempering_t               =  t;
-    static constexpr UIntType    tempering_c               =  c;
-    static constexpr size_t      tempering_l               =  l;
-    static constexpr UIntType    initialization_multiplier =  f;
-    static constexpr result_type min()                     {  return 0; }
-    static constexpr result_type max()                     {  return shift1<w>::value; }
+    static constexpr const size_t      word_size                 =  w;
+    static constexpr const size_t      state_size                =  n;
+    static constexpr const size_t      shift_size                =  m;
+    static constexpr const size_t      mask_bits                 =  r;
+    static constexpr const UIntType    xor_mask                  =  a;
+    static constexpr const size_t      tempering_u               =  u;
+    static constexpr const UIntType    tempering_d               =  d;
+    static constexpr const size_t      tempering_s               =  s;
+    static constexpr const UIntType    tempering_b               =  b;
+    static constexpr const size_t      tempering_t               =  t;
+    static constexpr const UIntType    tempering_c               =  c;
+    static constexpr const size_t      tempering_l               =  l;
+    static constexpr const UIntType    initialization_multiplier =  f;
+    static constexpr const result_type min()                     {  return 0; }
+    static constexpr const result_type max()                     {  return shift1<w>::value; }
 
-    static constexpr result_type default_seed              =  5489u;
+    static constexpr const result_type default_seed              =  5489u;
 
 
     ///\name constructors and seeding functions
@@ -566,8 +570,8 @@ namespace std
     typedef typename base_type::result_type result_type;
 
     ///\name engine characteristics
-    static const size_t block_size = p;
-    static const size_t used_block = r;
+    static constexpr const size_t block_size = p;
+    static constexpr const size_t used_block = r;
 
     static constexpr result_type min() { return base_type::min(); }
     static constexpr result_type max() { return base_type::max(); }
@@ -668,7 +672,7 @@ namespace std
     typedef typename Engine::result_type result_type;
 
     ///\name engine characteristics
-    static constexpr size_t table_size = k;
+    static constexpr const size_t table_size = k;
     static constexpr result_type min() { return Engine::min(); }
     static constexpr result_type max() { return Engine::max(); }
 
@@ -800,8 +804,8 @@ namespace std
      typedef Eng2 base2_type;
 
      ///\name engine characteristics
-     static constexpr size_t shift1 = S1;
-     static constexpr size_t shift2 = S2;
+     static constexpr const size_t shift1 = S1;
+     static constexpr const size_t shift2 = S2;
 
      static constexpr result_type min();
      static constexpr result_type max();
@@ -1118,7 +1122,7 @@ namespace std
 #include "random_dist.hxx"
 
 #ifndef NTL_CXX_CONSTEXPR
-#pragma pop_macro("constexpr")
+//#pragma pop_macro("constexpr")
 #endif
 
 #endif // NTL__STLX_RANDOM

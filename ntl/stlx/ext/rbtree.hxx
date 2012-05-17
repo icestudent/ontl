@@ -67,32 +67,36 @@ namespace std
           T elem;
 
           explicit node(const T& elem, node* parent, node* l = nullptr, node* r = nullptr)
-          : elem(elem),
-            parent_and_color(reinterpret_cast<uintptr_t>(parent) | black)
+            :parent_and_color(reinterpret_cast<uintptr_t>(parent) | black),
+              elem(elem)
           {
             child[left] = l;
             child[right]= r;
           }
           node(const T& elem)
-          : elem(elem), parent_and_color(0 | red)
+            :parent_and_color(0 | red),
+            elem(elem)
           {
             child[left] = child[right] = nullptr;
           }
 #ifdef NTL_CXX_RV
           node(T&& elem)
-          : elem(std::forward<T>(elem)), parent_and_color(0 | red)
+            :parent_and_color(0 | red),
+            elem(std::forward<T>(elem))
           {
             child[left] = child[right] = nullptr;
           }
           node(node&& n)
-          : elem(std::forward<T>(n.elem)), parent_and_color(n.parent_and_color)
+            :parent_and_color(n.parent_and_color),
+            elem(std::forward<T>(n.elem))
           {
             child[left] = n.child[left];
             child[right]= n.child[right];
           }
 #endif
           node(const node& n)
-          : elem(n.elem), parent_and_color(n.parent_and_color)
+            :parent_and_color(n.parent_and_color),
+            elem(n.elem)
           {
             child[left] = n.child[left];
             child[right]= n.child[right];
@@ -183,29 +187,30 @@ namespace std
 
       public:
         explicit rb_tree(const Compare& comp /*= Compare()*/, const Allocator& a = Allocator())
-          :comparator_(comp), node_allocator(a),
-          root_(), first_(), last_(), count_(0)
+          :root_(), first_(), last_(), count_(0),
+          comparator_(comp), node_allocator(a)
         {}
 
         template<class InputIterator>
         rb_tree(InputIterator first, InputIterator last,
           const Compare& comp = Compare(), const Allocator& a = Allocator())
-          :comparator_(comp), node_allocator(a),
-          root_(), first_(), last_(), count_()
+          :root_(), first_(), last_(), count_(),
+          comparator_(comp), node_allocator(a)
+          
         {
           insert(first, last);
         }
 
         rb_tree(const rb_tree& x)
-          :node_allocator(x.node_allocator), comparator_(x.comparator_),
-          root_(), first_(), last_(), count_()
+          :root_(), first_(), last_(), count_(), 
+          comparator_(x.comparator_), node_allocator(x.node_allocator)
         {
           insert_range(x.cbegin(), x.cend());
         }
 
 #ifdef NTL_CXX_RV
         rb_tree(rb_tree&& x)
-          :root_(), first_(), last_(), count_(), node_allocator(), comparator_()
+          :root_(), first_(), last_(), count_(), comparator_(), node_allocator()
         {
           swap(x);
         }
@@ -214,9 +219,9 @@ namespace std
 #endif
 
         rb_tree(const rb_tree& x, const Allocator& a)
-          :node_allocator(a),
-          comparator_(x.comparator_),
-          root_(), first_(), last_(), count_()
+          :root_(), first_(), last_(), count_(),
+          comparator_(x.comparator_),node_allocator(a)
+          
         {
           insert(x.begin(), x.end());
         }
@@ -684,7 +689,6 @@ namespace std
 
         value_compare comparator_;
         typename allocator_type::template rebind<node_type>::other node_allocator;
-
       };
 
       template<class T, class Compare, class Allocator>

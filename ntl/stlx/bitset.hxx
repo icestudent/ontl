@@ -72,13 +72,13 @@ namespace std {
       const size_t pos_;
     };
 
-    /// @name constructors [20.5.1]
-    constexpr bitset()
+    ///\name constructors [20.5.1]
+    /*constexpr*/ bitset()  // can't make constexpr atm
     {
       reset();
     }
 
-    constexpr bitset(unsigned long long val)
+    /*constexpr*/ bitset(unsigned long long val)
     {
       // compiler cannot shift more than 32
       val &= tidy<N, N >= 32>::make_tidy();

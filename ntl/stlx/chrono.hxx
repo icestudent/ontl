@@ -91,9 +91,9 @@ namespace std
     template <class Rep>
     struct duration_values
     {
-      static Rep zero() { return Rep(0); }
-      static Rep min()  { return numeric_limits<Rep>::lowest(); }
-      static Rep max()  { return numeric_limits<Rep>::max(); }
+      static constexpr Rep zero() { return Rep(0); }
+      static constexpr Rep min()  { return numeric_limits<Rep>::lowest(); }
+      static constexpr Rep max()  { return numeric_limits<Rep>::max(); }
     };
 
     template <class ToDuration, class Rep, class Period>
@@ -141,11 +141,11 @@ namespace std
 
     public:
       ///\name 20.8.3.1 construct/copy/destroy
-      duration()
+      constexpr duration()
         :rep_(duration_values<rep>::zero())
       {}
 
-      explicit duration(const Rep& r)
+      constexpr explicit duration(const Rep& r)
         :rep_(r)
       {}
 #ifdef NTL_DOC
@@ -163,23 +163,23 @@ namespace std
       }
 #else
       template <class Rep2>
-      explicit duration(const Rep2& r, typename enable_if<is_convertible<Rep2,rep>::value && (treat_as_floating_point<rep>::value || !treat_as_floating_point<Rep2>::value)>::type* = 0)
+      constexpr explicit duration(const Rep2& r, typename enable_if<is_convertible<Rep2,rep>::value && (treat_as_floating_point<rep>::value || !treat_as_floating_point<Rep2>::value)>::type* = 0)
         :rep_(static_cast<rep>(r))
       {}
       template <class Rep2, class Period2>
-      duration(const duration<Rep2, Period2>& d, typename enable_if<treat_as_floating_point<rep>::value || (!treat_as_floating_point<Rep2>::value && ratio_divide<Period2,period>::den == 1)>::type* =0)
+      constexpr duration(const duration<Rep2, Period2>& d, typename enable_if<treat_as_floating_point<rep>::value || (!treat_as_floating_point<Rep2>::value && ratio_divide<Period2,period>::den == 1)>::type* =0)
         :rep_(duration_cast<duration>(d).count())
       {}
 #endif
 
 #ifdef NTL_CXX_EF
       ~duration() = default;
+      duration(const duration&) = default;
+      duration& operator=(const duration&) = default;
 #else
       // using the default destructor
       //~duration()
       //{}
-#endif
-
       duration(const duration& d)
         :rep_(d.rep_)
       {}
@@ -189,17 +189,20 @@ namespace std
         rep_ = d.rep_; return *this;
       }
 
+#endif
+
+
       ///\name 20.8.3.2 observer
-      rep count() const { return rep_; }
+      constexpr rep count() const { return rep_; }
 
 
       ///\name 20.8.3.3 arithmetic
-      duration operator+() const
+      constexpr duration operator+() const
       {
         return *this;
       }
 
-      duration operator-() const
+      constexpr duration operator-() const
       {
         return duration(-rep_);
       }
@@ -272,17 +275,17 @@ namespace std
 
 
       ///\name 20.8.3.4 special values
-      static const duration zero()
+      static constexpr const duration zero()
       {
         return duration(duration_values<rep>::zero());
       }
 
-      static const duration min()
+      static constexpr const duration min()
       {
         return duration(duration_values<rep>::min());
       }
 
-      static const duration max()
+      static constexpr const duration max()
       {
         return duration(duration_values<rep>::max());
       }
@@ -294,21 +297,21 @@ namespace std
 
     ///\name duration arithmetic
     template <class Rep, class Period>
-    inline duration<Rep, Period>
+    inline constexpr duration<Rep, Period>
       operator+ (const duration<Rep, Period>& lhs, const duration<Rep, Period>& rhs)
     {
       return duration<Rep, Period>(lhs) += rhs;
     }
 
     template <class Rep, class Period>
-    inline duration<Rep, Period>
+    inline constexpr duration<Rep, Period>
       operator- (const duration<Rep, Period>& lhs, const duration<Rep, Period>& rhs)
     {
       return duration<Rep, Period>(lhs) -= rhs;
     }
 
     template <class Rep1, class Period1, class Rep2, class Period2>
-    inline typename common_type<duration<Rep1, Period1>, duration<Rep2, Period2> >::type
+    inline constexpr typename common_type<duration<Rep1, Period1>, duration<Rep2, Period2> >::type
       operator+ (const duration<Rep1, Period1>& lhs, const duration<Rep2, Period2>& rhs)
     {
       typedef typename common_type<duration<Rep1, Period1>, duration<Rep2, Period2> >::type CD;
@@ -316,7 +319,7 @@ namespace std
     }
 
     template <class Rep1, class Period1, class Rep2, class Period2>
-    inline typename common_type<duration<Rep1, Period1>, duration<Rep2, Period2> >::type
+    inline constexpr typename common_type<duration<Rep1, Period1>, duration<Rep2, Period2> >::type
       operator- (const duration<Rep1, Period1>& lhs, const duration<Rep2, Period2>& rhs)
     {
       typedef typename common_type<duration<Rep1, Period1>, duration<Rep2, Period2> >::type CD;
@@ -324,7 +327,7 @@ namespace std
     }
 
     template <class Rep1, class Rep2, class Period>
-    inline duration<typename common_type<Rep1, Rep2>::type, Period>
+    inline constexpr duration<typename common_type<Rep1, Rep2>::type, Period>
       operator* (const duration<Rep1, Period>& d, const Rep2& s)
     {
       // TODO: CR existence diagnostics
@@ -333,7 +336,7 @@ namespace std
     }
 
     template <class Rep1, class Period, class Rep2>
-    inline duration<typename common_type<Rep1, Rep2>::type, Period>
+    inline constexpr duration<typename common_type<Rep1, Rep2>::type, Period>
       operator* (const Rep1& s, const duration<Rep2, Period>& d)
     {
       // TODO: CR existence diagnostics
@@ -341,14 +344,14 @@ namespace std
     }
 
     template <class Rep1, class Period, class Rep2>
-    inline duration<typename std::__::safe_common<Rep1, Rep2>::type, Period>
+    inline constexpr duration<typename std::__::safe_common<Rep1, Rep2>::type, Period>
       operator/ (const duration<Rep1, Period>& d, const Rep2& s)
     {
       return duration<typename common_type<Rep1, Rep2>::type, Period>(d) /= s;
     }
 
     template <class Rep1, class Period1, class Rep2, class Period2>
-    inline typename common_type<Rep1, Rep2>::type
+    inline constexpr typename common_type<Rep1, Rep2>::type
       operator/ (const duration<Rep1, Period1>& lhs, const duration<Rep2, Period2>& rhs)
     {
       typedef typename common_type<duration<Rep1, Period1>, duration<Rep2, Period2> >::type CD;
@@ -356,14 +359,14 @@ namespace std
     }
 
     template <class Rep1, class Period, class Rep2>
-    inline duration<typename std::__::safe_common<Rep1, Rep2>::type, Period>
+    inline constexpr duration<typename std::__::safe_common<Rep1, Rep2>::type, Period>
       operator% (const duration<Rep1, Period>& d, const Rep2& s)
     {
       return duration<typename common_type<Rep1, Rep2>::type, Period>(d) %= s;
     }
 
     template <class Rep1, class Period1, class Rep2, class Period2>
-    inline typename common_type<Rep1, Rep2>::type
+    inline constexpr typename common_type<Rep1, Rep2>::type
       operator% (const duration<Rep1, Period1>& lhs, const duration<Rep2, Period2>& rhs)
     {
       typedef typename common_type<duration<Rep1, Period1>, duration<Rep2, Period2> >::type CD;
@@ -372,39 +375,39 @@ namespace std
 
     ///\name duration comparisons
     template <class Rep1, class Period1, class Rep2, class Period2>
-    inline bool operator==(const duration<Rep1, Period1>& lhs, const duration<Rep2, Period2>& rhs)
+    inline constexpr bool operator==(const duration<Rep1, Period1>& lhs, const duration<Rep2, Period2>& rhs)
     {
       typedef typename common_type<const duration<Rep1, Period1>, const duration<Rep2, Period2> >::type CT;
       return CT(lhs).count() == CT(rhs).count();
     }
 
     template <class Rep1, class Period1, class Rep2, class Period2>
-    inline bool operator!=(const duration<Rep1, Period1>& lhs, const duration<Rep2, Period2>& rhs)
+    inline constexpr bool operator!=(const duration<Rep1, Period1>& lhs, const duration<Rep2, Period2>& rhs)
     {
       return !(lhs == rhs);
     }
 
     template <class Rep1, class Period1, class Rep2, class Period2>
-    inline bool operator< (const duration<Rep1, Period1>& lhs, const duration<Rep2, Period2>& rhs)
+    inline constexpr bool operator< (const duration<Rep1, Period1>& lhs, const duration<Rep2, Period2>& rhs)
     {
       typedef typename common_type<const duration<Rep1, Period1>, const duration<Rep2, Period2> >::type CT;
       return CT(lhs).count() < CT(rhs).count();
     }
 
     template <class Rep1, class Period1, class Rep2, class Period2>
-    inline bool operator<=(const duration<Rep1, Period1>& lhs, const duration<Rep2, Period2>& rhs)
+    inline constexpr bool operator<=(const duration<Rep1, Period1>& lhs, const duration<Rep2, Period2>& rhs)
     {
       return !(rhs < lhs);
     }
 
     template <class Rep1, class Period1, class Rep2, class Period2>
-    inline bool operator> (const duration<Rep1, Period1>& lhs, const duration<Rep2, Period2>& rhs)
+    inline constexpr bool operator> (const duration<Rep1, Period1>& lhs, const duration<Rep2, Period2>& rhs)
     {
       return rhs < lhs;
     }
 
     template <class Rep1, class Period1, class Rep2, class Period2>
-    inline bool operator>=(const duration<Rep1, Period1>& lhs, const duration<Rep2, Period2>& rhs)
+    inline constexpr bool operator>=(const duration<Rep1, Period1>& lhs, const duration<Rep2, Period2>& rhs)
     {
       return !(lhs < rhs);
     }
@@ -416,7 +419,7 @@ namespace std
       struct duration_cast_impl
       {
         template<class ToDuration, typename CF, typename CR, class Rep, class Period>
-        static ToDuration cast(const duration<Rep, Period>& d)
+        static constexpr ToDuration cast(const duration<Rep, Period>& d)
         {
           return ToDuration(static_cast<typename ToDuration::rep>(static_cast<CR>(d.count()) * static_cast<CR>(CF::num) / static_cast<CR>(CF::den)));
         }
@@ -426,7 +429,7 @@ namespace std
       struct duration_cast_impl<true, true>
       {
         template<class ToDuration, typename CF, typename CR, class Rep, class Period>
-        static ToDuration cast(const duration<Rep, Period>& d)
+        static constexpr ToDuration cast(const duration<Rep, Period>& d)
         {
           return ToDuration(static_cast<typename ToDuration::rep>(d.count()));
         }
@@ -436,7 +439,7 @@ namespace std
       struct duration_cast_impl<false, true>
       {
         template<class ToDuration, typename CF, typename CR, class Rep, class Period>
-        static ToDuration cast(const duration<Rep, Period>& d)
+        static constexpr ToDuration cast(const duration<Rep, Period>& d)
         {
           return ToDuration(static_cast<typename ToDuration::rep>(static_cast<CR>(d.count()) * static_cast<CR>(CF::num)));
         }
@@ -446,7 +449,7 @@ namespace std
       struct duration_cast_impl<true, false>
       {
         template<class ToDuration, typename CF, typename CR, class Rep, class Period>
-        static ToDuration cast(const duration<Rep, Period>& d)
+        static constexpr ToDuration cast(const duration<Rep, Period>& d)
         {
           return ToDuration(static_cast<typename ToDuration::rep>(static_cast<CR>(d.count()) / static_cast<CR>(CF::den)));
         }
@@ -464,7 +467,7 @@ namespace std
      *  in the widest possible representation and only converted to the destination representation at the final step.
      **/
     template <class ToDuration, class Rep, class Period>
-    inline ToDuration duration_cast(const duration<Rep, Period>& d)
+    inline constexpr ToDuration duration_cast(const duration<Rep, Period>& d)
     {
       typedef typename ratio_divide<Period, typename ToDuration::period>::type    CF;
       typedef typename common_type<typename ToDuration::rep, Rep, intmax_t>::type CR;

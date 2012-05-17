@@ -68,8 +68,8 @@ struct char_traits<char>
   typedef mbstate_t state_type;
 
   static void assign(char_type& c1, const char_type& c2) { c1 = c2; }
-  static bool eq(const char_type& c1, const char_type& c2) { return c1 == c2; }
-  static bool lt(const char_type& c1, const char_type& c2) { return c1 < c2; }
+  static constexpr bool eq(const char_type& c1, const char_type& c2) { return c1 == c2; }
+  static constexpr bool lt(const char_type& c1, const char_type& c2) { return c1 < c2; }
   static int compare(const char_type* s1, const char_type* s2, size_t n)
     { return strncmp(s1, s2, n); }
   static size_t length(const char_type* s) { return strlen(s); }
@@ -81,14 +81,14 @@ struct char_traits<char>
     { return reinterpret_cast<char_type*>(memcpy(dst, src, n)); }
   static char_type* assign(char_type* s, size_t n, char_type a)
     { for ( char_type * p = s; n; --n, ++p ) *p = a; return s; }
-  static int_type not_eof(const int_type& c) { return eof() != c ? c : 0; }
-  static char_type to_char_type(const int_type& c)
+  static constexpr int_type not_eof(const int_type& c) { return eof() != c ? c : 0; }
+  static constexpr char_type to_char_type(const int_type& c)
     { return static_cast<char_type>(static_cast<unsigned char>(c)); }
-  static int_type to_int_type(const char_type& c)
+  static constexpr int_type to_int_type(const char_type& c)
     { return static_cast<unsigned char>(c); }
-  static bool eq_int_type(const int_type& c1, const int_type& c2)
+  static constexpr bool eq_int_type(const int_type& c1, const int_type& c2)
     { return c1 == c2; }
-  static int_type eof() { return EOF; }
+  static constexpr int_type eof() { return EOF; }
 };
 
 /// 21.1.3.2 struct char_traits<char16_t> [char.traits.specializations.char16_t]
@@ -102,8 +102,8 @@ struct char_traits<char16_t>
   typedef mbstate_t       state_type;
 
   static void assign(char_type& c1, const char_type& c2) { c1 = c2; }
-  static bool eq(const char_type& c1, const char_type& c2) { return c1 == c2; }
-  static bool lt(const char_type& c1, const char_type& c2) { return c1 < c2; }
+  static constexpr bool eq(const char_type& c1, const char_type& c2) { return c1 == c2; }
+  static constexpr bool lt(const char_type& c1, const char_type& c2) { return c1 < c2; }
 
   static int compare(const char_type* s1, const char_type* s2, size_t n)
   { return wcsncmp(reinterpret_cast<const wchar_t*>(s1), reinterpret_cast<const wchar_t*>(s2), n); }
@@ -117,14 +117,14 @@ struct char_traits<char16_t>
   static char_type* assign(char_type* s, size_t n, char_type a)
   { for ( char_type * p = s; n; --n, ++p ) *p = a; return s; }
 
-  static int_type not_eof(const int_type& c) { return eof() != c ? c : 0U; }
-  static char_type to_char_type(const int_type& c)
+  static constexpr int_type not_eof(const int_type& c) { return eof() != c ? c : 0U; }
+  static constexpr char_type to_char_type(const int_type& c)
   { return static_cast<char_type>(static_cast<unsigned char>(c)); }
-  static int_type to_int_type(const char_type& c)
+  static constexpr int_type to_int_type(const char_type& c)
   { return static_cast<unsigned char>(c); }
-  static bool eq_int_type(const int_type& c1, const int_type& c2)
+  static constexpr bool eq_int_type(const int_type& c1, const int_type& c2)
   { return c1 == c2; }
-  static int_type eof() { return static_cast<int_type>(EOF); }
+  static constexpr int_type eof() { return static_cast<int_type>(EOF); }
 };
 
 
@@ -139,8 +139,8 @@ struct char_traits<char32_t>
   typedef mbstate_t       state_type;
 
   static void assign(char_type& c1, const char_type& c2) { c1 = c2; }
-  static bool eq(const char_type& c1, const char_type& c2) { return c1 == c2; }
-  static bool lt(const char_type& c1, const char_type& c2) { return c1 < c2; }
+  static constexpr bool eq(const char_type& c1, const char_type& c2) { return c1 == c2; }
+  static constexpr bool lt(const char_type& c1, const char_type& c2) { return c1 < c2; }
 
   static int compare(const char_type* s1, const char_type* s2, size_t n)
   { return memcmp(s1, s2, n*sizeof(char_type)); }
@@ -160,14 +160,14 @@ struct char_traits<char32_t>
   static char_type* assign(char_type* s, size_t n, char_type a)
   { for ( char_type * p = s; n; --n, ++p ) *p = a; return s; }
 
-  static int_type not_eof(const int_type& c) { return eof() != c ? c : 0; }
-  static char_type to_char_type(const int_type& c)
+  static constexpr int_type not_eof(const int_type& c) { return eof() != c ? c : 0; }
+  static constexpr char_type to_char_type(const int_type& c)
   { return static_cast<char_type>(static_cast<unsigned char>(c)); }
-  static int_type to_int_type(const char_type& c)
+  static constexpr int_type to_int_type(const char_type& c)
   { return static_cast<unsigned char>(c); }
-  static bool eq_int_type(const int_type& c1, const int_type& c2)
+  static constexpr bool eq_int_type(const int_type& c1, const int_type& c2)
   { return c1 == c2; }
-  static int_type eof() { return static_cast<int_type>(EOF); }
+  static constexpr int_type eof() { return static_cast<int_type>(EOF); }
 };
 #ifdef __ICL
 #pragma warning(default:2259)
@@ -184,8 +184,8 @@ struct char_traits<wchar_t>
   typedef mbstate_t   state_type;
 
   static void assign(char_type& c1, const char_type& c2) { c1 = c2; }
-  static bool eq(const char_type& c1, const char_type& c2) { return c1 == c2; }
-  static bool lt(const char_type& c1, const char_type& c2) { return c1 < c2; }
+  static constexpr bool eq(const char_type& c1, const char_type& c2) { return c1 == c2; }
+  static constexpr bool lt(const char_type& c1, const char_type& c2) { return c1 < c2; }
   static int compare(const char_type* s1, const char_type* s2, size_t n)
     { return wcsncmp(s1, s2, n); }
   static size_t length(const char_type* s) { return wcslen(s); }
@@ -197,15 +197,15 @@ struct char_traits<wchar_t>
     { return reinterpret_cast<char_type*>(memcpy(dst, src, n * sizeof(char_type))); }
   static char_type* assign(char_type* s, size_t n, char_type a)
     { for ( char_type * p = s; n; --n, ++p ) *p = a; return s; }
-  static int_type not_eof(const int_type& c)
+  static constexpr int_type not_eof(const int_type& c)
     { return eof() != c ? c : static_cast<int_type>(0); }
-  static char_type to_char_type(const int_type& c)
+  static constexpr char_type to_char_type(const int_type& c)
     { return static_cast<char_type>(c); }
-  static int_type to_int_type(const char_type& c)
+  static constexpr int_type to_int_type(const char_type& c)
     { return static_cast<int_type>(c); }
-  static bool eq_int_type(const int_type& c1, const int_type& c2)
+  static constexpr bool eq_int_type(const int_type& c1, const int_type& c2)
     { return c1 == c2; }
-  static int_type eof() { return WEOF; }
+  static constexpr int_type eof() { return WEOF; }
 };
 ///\}
 /**@} lib_char_traits */
@@ -287,7 +287,7 @@ struct char_traits<wchar_t>
     /// - size() == 0;
     /// - capacity() an unspecified value.
     explicit basic_string(const Allocator& a = Allocator())
-      :alloc(a), length_(), capacity_(), buffer_()
+      :length_(), capacity_(), buffer_(), alloc(a)
     {}
 
 
@@ -300,7 +300,8 @@ struct char_traits<wchar_t>
     /// - capacity() is at least as large as size().
     __forceinline
     basic_string(const basic_string& str)
-      :alloc(str.alloc), length_(), capacity_(), buffer_()
+      :length_(), capacity_(), buffer_(),
+      alloc(str.alloc)
     {
       append(str);
     }
@@ -337,7 +338,7 @@ struct char_traits<wchar_t>
     /// - size() == n;
     /// - capacity() is at least as large as size().
     basic_string(const charT* s, size_type n, const Allocator& a = Allocator())
-      :alloc(a), length_(), capacity_(), buffer_()
+      :length_(), capacity_(), buffer_(), alloc(a)
     {
       if(!assert_pos(n) || !assert_ptr(s)) return;
       append(s, n);
@@ -353,7 +354,7 @@ struct char_traits<wchar_t>
     /// - size() == traits::length(s);
     /// - capacity() is at least as large as size().
     basic_string(const charT* s, const Allocator& a = Allocator())
-      :alloc(a), length_(), capacity_(), buffer_()
+      :length_(), capacity_(), buffer_(), alloc(a)
     { if(!assert_ptr(s)) return; append(s); } // one line for simplifing tracing
 
     /// 12 Requires: n < npos

@@ -212,7 +212,7 @@ template <class T, unsigned I = 0> struct extent;
 template<class T> struct is_trivial;
 
 // 20.6.7.2 Other transformations [meta.trans.other]
-#if defined(NTL_CXX_VT) && defined(NTL_CXX_TYPEOF)
+#if ( defined(NTL_CXX_VT) || (defined(__EDG_VERSION__) && __EDG_VERSION__ >=403) ) && defined(NTL_CXX_TYPEOF)
 
 template <class ...T> struct common_type;
 

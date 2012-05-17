@@ -217,7 +217,7 @@ public:
   using typename std::basic_streambuf<charT, traits>::int_type;
 
   explicit console_buffer(legacy_handle outh, bool is_output = true)
-    :outh(outh), buffer(), is_console_handle(console::is_console_handle(outh)),
+    :buffer(), outh(outh), is_console_handle(console::is_console_handle(outh)),
     write_only(is_output)
   {
     if(outh)
@@ -225,7 +225,7 @@ public:
   }
 
   explicit console_buffer(console::type type, bool is_output = true)
-    :outh(console::handle(type)), buffer(), is_console_handle(console::is_console_handle(type)),
+    :buffer(), outh(console::handle(type)), is_console_handle(console::is_console_handle(type)),
     write_only(is_output)
   {
     init();

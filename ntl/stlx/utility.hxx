@@ -167,7 +167,7 @@ bool operator>=(const T & x, const T & y) { return !(x < y); }
 #ifdef NTL_CXX_CONSTEXPR
   constexpr piecewise_construct_t piecewise_construct = piecewise_construct_t();
 #else
-  extern __declspec(selectany) piecewise_construct_t piecewise_construct = {};
+  extern __declspec(selectany) const piecewise_construct_t piecewise_construct = {};
 #endif
   ///\}
 
@@ -196,7 +196,7 @@ struct pair
     T2  second;
 
 
-    pair()
+    constexpr pair()
       :first(), second() 
     {}
 

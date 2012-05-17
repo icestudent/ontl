@@ -160,7 +160,7 @@ namespace std
   template <ratio_t N, ratio_t D>
   class ratio
   {
-    static const ratio_t gcd_value = __::static_evaluation::gcd<N, D>::value;
+    static constexpr const ratio_t gcd_value = __::static_evaluation::gcd<N, D>::value;
   public:
     static_assert(D != 0, "template argument D shall not be zero");
     static_assert((N >= RATIO_MIN && N <= RATIO_MAX) && (D >= RATIO_MIN && D <= RATIO_MAX), "out of range");
@@ -171,7 +171,7 @@ namespace std
      *  \c num shall have the value \f$ \frac{sign(N)*sign(D)*abs(N)}{gcd} \f$,
      *  but \f$ sign(N)*abs(N) == N \f$.
      **/
-    static const ratio_t num = N * __::static_evaluation::sign<D>::value / gcd_value;
+    static constexpr const ratio_t num = N * __::static_evaluation::sign<D>::value / gcd_value;
 
     /**
      *	@brief Denominator of the ratio
@@ -179,7 +179,7 @@ namespace std
      *  \c den shall have the value \f$ \frac{sign(N)*sign(D)*abs(D)}{gcd} \f$, after simplification it would be
      *  \f$ \frac{D * sign(N)}{gcd} \f$, but we use \f$ \frac{abs(D)}{gcd} \f$ (see N2661).
      **/
-    static const ratio_t den = __::static_evaluation::abs<D>::value / gcd_value;
+    static constexpr const ratio_t den = __::static_evaluation::abs<D>::value / gcd_value;
 
     /** The \c ratio type */
     typedef ratio type;
@@ -300,7 +300,7 @@ namespace std
   {
     static_assert((__::check_add_flows<a, b>::value), "add overflow");
 
-    static const ratio_t value = a + b;
+    static constexpr const ratio_t value = a + b;
   };
 
   /** static substraction with underflow detection */
@@ -309,7 +309,7 @@ namespace std
   {
     static_assert((__::check_sub_flows<a, b>::value), "sub underflow");
 
-    static const ratio_t value = a - b;
+    static constexpr const ratio_t value = a - b;
   };
 
   /** static multiplication with overflow detection */
@@ -317,14 +317,14 @@ namespace std
   struct ratio_checked_multiply
   {
   private:
-    static const uratio_t absa = __::static_evaluation::abs<a>::value;
-    static const uratio_t absb = __::static_evaluation::abs<b>::value;
-    static const uratio_t c = 1LL << (sizeof(uratio_t)*4);
+    static constexpr const uratio_t absa = __::static_evaluation::abs<a>::value;
+    static constexpr const uratio_t absb = __::static_evaluation::abs<b>::value;
+    static constexpr const uratio_t c = 1LL << (sizeof(uratio_t)*4);
 
-    static const uratio_t a1 = absa % c;
-    static const uratio_t a2 = absa / c;
-    static const uratio_t b1 = absb % c;
-    static const uratio_t b2 = absb / c;
+    static constexpr const uratio_t a1 = absa % c;
+    static constexpr const uratio_t a2 = absa / c;
+    static constexpr const uratio_t b1 = absb % c;
+    static constexpr const uratio_t b2 = absb / c;
 
     static_assert(a2 == 0 || b2 == 0, "mul overflow");
     static_assert(a1 * b2 + b1 * a2 < (c >> 1), "mul overflow");
@@ -332,7 +332,7 @@ namespace std
     static_assert((a1 * b2 + b1 * a2) * c <= RATIO_MAX - a1 * b1, "mul overflow");
 
   public:
-    static const ratio_t value = a * b;
+    static constexpr const ratio_t value = a * b;
   };
 
   /**
@@ -352,7 +352,7 @@ namespace std
       >::value,
       ratio_checked_multiply<R1::den,   R2::den / dens_gcd>::value
                  > type;
-    static const ratio_t num = type::num, den = type::den;
+    static constexpr const ratio_t num = type::num, den = type::den;
   };
 
   /** static substraction with overflow detection and simplification */
@@ -361,7 +361,7 @@ namespace std
   {
     typedef typename
       ratio_add<R1, ratio<-R2::num, R2::den> >::type type;
-    static const ratio_t num = type::num, den = type::den;
+    static constexpr const ratio_t num = type::num, den = type::den;
   };
 
   /** static multiplication with overflow detection and simplification */
@@ -369,14 +369,14 @@ namespace std
   struct ratio_multiply
   {
   private:
-    static const intmax_t gcd1 = __::static_evaluation::gcd<R1::num, R2::den>::value,
+    static constexpr const intmax_t gcd1 = __::static_evaluation::gcd<R1::num, R2::den>::value,
       gcd2 = __::static_evaluation::gcd<R2::num, R1::den>::value;
   public:
     typedef ratio<
       ratio_checked_multiply<R1::num / gcd1, R2::num / gcd2>::value,
       ratio_checked_multiply<R1::den / gcd2, R2::den / gcd1>::value
                  > type;
-    static const ratio_t num = type::num, den = type::den;
+    static constexpr const ratio_t num = type::num, den = type::den;
   };
 
   /** static division with overflow detection and simplification */
@@ -386,7 +386,7 @@ namespace std
     static_assert(R2::num != 0, "division by zero");
 
     typedef typename ratio_multiply<R1, ratio<R2::den, R2::num> >::type type;
-    static const ratio_t num = type::num, den = type::den;
+    static constexpr const ratio_t num = type::num, den = type::den;
   };
 
 

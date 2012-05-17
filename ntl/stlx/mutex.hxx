@@ -44,9 +44,9 @@ namespace std
   struct adopt_lock_t   {};
   
 #ifndef __BCPLUSPLUS__
-  __declspec(selectany) extern const defer_lock_t defer_lock = {};
-  __declspec(selectany) extern const try_to_lock_t try_to_lock = {};
-  __declspec(selectany) extern const adopt_lock_t adopt_lock = {};
+  __declspec(selectany) extern const constexpr defer_lock_t defer_lock = {};
+  __declspec(selectany) extern const constexpr try_to_lock_t try_to_lock = {};
+  __declspec(selectany) extern const constexpr adopt_lock_t adopt_lock = {};
 #else
   __declspec(selectany) extern const defer_lock_t defer_lock;
   __declspec(selectany) extern const try_to_lock_t try_to_lock;

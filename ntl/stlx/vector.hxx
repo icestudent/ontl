@@ -178,8 +178,8 @@ class vector
     }
 
     vector(vector&& x, const Allocator& a)
-      :array_allocator(a),
-      begin_(), end_(), capacity_()
+      :begin_(), end_(), capacity_(),
+        array_allocator(a)
     {
       if(x.get_allocator() == a){
         swap(x);
@@ -192,7 +192,11 @@ class vector
     }
     #endif
 
-    vector(initializer_list<T> il, const Allocator& a = Allocator())
+    vector(initializer_list<T> il)
+    {
+      construct(il.begin(), il.size());
+    }
+    vector(initializer_list<T> il, const Allocator& a)
       :array_allocator(a)
     {
       construct(il.begin(), il.size());

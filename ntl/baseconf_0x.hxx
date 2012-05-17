@@ -63,7 +63,8 @@
   #define NTL_CXX_TT
   // variadic templates (implies rvalue references support)
   #define NTL_CXX_VT
-
+  // range-based for loop
+  #define NTL_CXX_FOR
 #endif // pure c++0x
 
 
@@ -143,10 +144,20 @@
 #define NTL_CXX_CHARS
 #define NTL_CXX_NULLPTR
 #define NTL_CXX_TT
-#define NTL_CXX_VT
+//#define NTL_CXX_VT
 #define NTL_CXX_ATTRIBUTES
 #undef  NTL_CXX_FUNC
 #endif
+#endif  // EDG
+
+#if __ICL >= 1300
+  /** 13.0 */
+#define NTL_CXX_CONSTEXPR
+//#define NTL_CXX_NOEXCEPT  // not work
+#define NTL_CXX_EXPLICITOP
+#define NTL_CXX_IL
+#define NTL_CXX_FOR
+#undef NTL_CXX_CHARS_TYPES  // undefined even with /Qoption,cpp,"--uliterals"
 #endif
 
 #endif // __ICL

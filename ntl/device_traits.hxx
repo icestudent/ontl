@@ -74,13 +74,14 @@ struct access_mask_t
     bool      access_aystem_acl,
     uint8_t   standard_rights,
     uint16_t  specific_rights = 0
-    ) : generic_read(static_cast<uint8_t>(generic_read)),
-        generic_write(static_cast<uint8_t>(generic_write)),
-        generic_execute(static_cast<uint8_t>(generic_execute)),
-        generic_all(static_cast<uint8_t>(generic_all)),
-        access_aystem_acl(static_cast<uint8_t>(access_aystem_acl)),
-        standard_rights(standard_rights), specific_rights(specific_rights)
-        {}
+    ) :
+  specific_rights(specific_rights), standard_rights(standard_rights), 
+    access_aystem_acl(static_cast<uint8_t>(access_aystem_acl)),
+    generic_all(static_cast<uint8_t>(generic_all)),
+    generic_execute(static_cast<uint8_t>(generic_execute)),
+    generic_write(static_cast<uint8_t>(generic_write)),
+    generic_read(static_cast<uint8_t>(generic_read))
+  {}
   operator uint32_t() { return  *reinterpret_cast<uint32_t*>(this); }
 };
 

@@ -702,7 +702,7 @@ class istreambuf_iterator
         friend proxy istreambuf_iterator::operator++(int);
     };
 
-    istreambuf_iterator()                   __ntl_nothrow : sbuf_(0) {}
+    constexpr istreambuf_iterator()                   __ntl_nothrow : sbuf_(0) {}
     istreambuf_iterator(istream_type& s)    __ntl_nothrow : sbuf_(s.rdbuf()) {}
     istreambuf_iterator(streambuf_type* s)  __ntl_nothrow : sbuf_(s) {}
     istreambuf_iterator(const proxy& p)     __ntl_nothrow : sbuf_(p.sbuf()) {}

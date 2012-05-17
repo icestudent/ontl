@@ -70,7 +70,7 @@ namespace std {
 
     ///\name 27.7.1.1 Constructors:
     explicit basic_stringbuf(ios_base::openmode which = ios_base::in | ios_base::out)
-      :mode_(which), himark()
+      :mode_(which)
     {}
 
     explicit basic_stringbuf(const basic_string<charT,traits,Allocator>& s, ios_base::openmode which = ios_base::in | ios_base::out)
@@ -80,7 +80,11 @@ namespace std {
     }
 
   #ifdef NTL_CXX_RV
-    basic_stringbuf(basic_stringbuf&& rhs);
+    basic_stringbuf(basic_stringbuf&& rhs)
+      :mode_()
+    {
+      swap(rhs);
+    }
   #endif
 
     ///\name 27.7.1.2 Assign and swap:
@@ -98,7 +102,6 @@ namespace std {
         basic_streambuf::swap(rhs);
         swap(str_, rhs.str_);
         swap(mode_, rhs.mode_);
-        swap(himark, rhs.himark);
       }
     }
 
@@ -309,7 +312,6 @@ namespace std {
     }
   private:
     basic_string<charT, traits> str_;
-    char_type* himark;
     ios_base::openmode mode_;
   };
 
@@ -462,20 +464,27 @@ namespace std {
 
     ///\name constructors/destructors
     explicit basic_stringstream(ios_base::openmode which = ios_base::out|ios_base::in)
-      : sb(which), base_type(&sb)
+      :base_type(&sb),  sb(which)
     {}
 
     explicit basic_stringstream(const basic_string<charT,traits,Allocator>& str, ios_base::openmode which = ios_base::out|ios_base::in)
-      :sb(str, which), base_type(&sb)
+      :base_type(&sb), sb(str, which)
     {}
 
   #ifdef NTL_CXX_RV
-    basic_stringstream(basic_stringstream&& rhs);
+    basic_stringstream(basic_stringstream&& rhs)
+      :base_type(&sb)
+    {
+      swap(rhs);
+    }
   #endif
 
     ///\name 27.7.5.1 Assign/swap:
   #ifdef NTL_CXX_RV
-    basic_stringstream& operator=(basic_stringstream&& rhs);
+    basic_stringstream& operator=(basic_stringstream&& rhs)
+    {
+      swap(rhs); return *this;
+    }
   #endif
 
     void swap(basic_stringstream& rhs)

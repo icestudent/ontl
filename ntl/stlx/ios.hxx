@@ -102,64 +102,64 @@ class ios_base
     typedef uint16_t fmtflags;
 
     /// flushes output after each output operation
-    static const fmtflags unitbuf     = 1 << 0;
+    static constexpr const fmtflags unitbuf     = 1 << 0;
 
     /// replaces certain lowercase letters with their uppercase equivalents in generated output
-    static const fmtflags uppercase   = 1 << 1;
+    static constexpr const fmtflags uppercase   = 1 << 1;
     
     /// adds fill characters at a designated internal point in certain generated
     /// output, or identical to right if no such point is designated
-    static const fmtflags internal    = 1 << 2;
+    static constexpr const fmtflags internal    = 1 << 2;
     /// adds fill characters on the right (final positions) of certain generated output
-    static const fmtflags left        = 1 << 3;
+    static constexpr const fmtflags left        = 1 << 3;
     /// adds fill characters on the left (initial positions) of certain generated output
-    static const fmtflags right       = 1 << 4;
-    static const fmtflags adjustfield = left | right | internal;
+    static constexpr const fmtflags right       = 1 << 4;
+    static constexpr const fmtflags adjustfield = left | right | internal;
     
     /// converts integer input or generates integer output in decimal base
-    static const fmtflags dec         = 1 << 5;
+    static constexpr const fmtflags dec         = 1 << 5;
     /// converts integer input or generates integer output in octal base
-    static const fmtflags oct         = 1 << 6;
+    static constexpr const fmtflags oct         = 1 << 6;
     /// converts integer input or generates integer output in hexadecimal base
-    static const fmtflags hex         = 1 << 7;
-    static const fmtflags basefield   = dec | oct | hex;
+    static constexpr const fmtflags hex         = 1 << 7;
+    static constexpr const fmtflags basefield   = dec | oct | hex;
     
     /// generates a prefix indicating the numeric base of generated integer output
-    static const fmtflags showbase    = 1 << 8;
+    static constexpr const fmtflags showbase    = 1 << 8;
     /// generates a + sign in non-negative generated numeric output
-    static const fmtflags showpos     = 1 << 9;
+    static constexpr const fmtflags showpos     = 1 << 9;
     
     /// insert and extract bool type in alphabetic format
-    static const fmtflags boolalpha   = 1 << 10;
+    static constexpr const fmtflags boolalpha   = 1 << 10;
     
     /// generates floating-point output in fixed-point notation
-    static const fmtflags fixed       = 1 << 11;
+    static constexpr const fmtflags fixed       = 1 << 11;
     /// generates floating-point output in scientific notation
-    static const fmtflags scientific  = 1 << 12;
-    static const fmtflags floatfield  = scientific | fixed;
+    static constexpr const fmtflags scientific  = 1 << 12;
+    static constexpr const fmtflags floatfield  = scientific | fixed;
 
     /// generates a decimal-point character unconditionally in generated floating-point output
-    static const fmtflags showpoint   = 1 << 13;
+    static constexpr const fmtflags showpoint   = 1 << 13;
     
     /// skips leading whitespace before certain input operations
-    static const fmtflags skipws      = 1 << 14;
+    static constexpr const fmtflags skipws      = 1 << 14;
 
     /// 27.4.2.1.3 Type ios_base::iostate [ios::iostate]
     typedef uint8_t iostate;
     /** indicates a good state */
-    static const iostate goodbit  = 0;
+    static constexpr const iostate goodbit  = 0;
     /** indicates a loss of integrity in an input or output sequence (such as an irrecoverable read error from a file) */
-    static const iostate badbit   = 1 << 0;
+    static constexpr const iostate badbit   = 1 << 0;
     /** indicates that an input operation reached the end of an input sequence */
-    static const iostate eofbit   = 1 << 1;
+    static constexpr const iostate eofbit   = 1 << 1;
     /** indicates that an input operation failed to read the expected characters, or
     that an output operation failed to generate the desired characters */
-    static const iostate failbit  = 1 << 2;
+    static constexpr const iostate failbit  = 1 << 2;
 
     static
     const char * __get_iostate_c_str(iostate state)
     {
-      static const char * const msg[8] =
+      static constexpr const char * const msg[8] =
       {
         "goodbit",        // 0
         "badbit",         // 1
@@ -176,17 +176,17 @@ class ios_base
     /// 27.4.2.1.4 Type ios_base::openmode [ios::openmode]
     typedef uint8_t openmode;
     /** seek to end before each write (0x01) */
-    static const openmode app     = 1 << 0;
+    static constexpr const openmode app     = 1 << 0;
     /** open and seek to end immediately after opening (0x02) */
-    static const openmode ate     = 1 << 1;
+    static constexpr const openmode ate     = 1 << 1;
     /** truncate an existing stream when opening (0x04) */
-    static const openmode trunc   = 1 << 2;
+    static constexpr const openmode trunc   = 1 << 2;
     /** open for input (0x08) */
-    static const openmode in      = 1 << 3;
+    static constexpr const openmode in      = 1 << 3;
     /** open for output (0x10) */
-    static const openmode out     = 1 << 4;
+    static constexpr const openmode out     = 1 << 4;
     /** perform input and output in binary mode (as opposed to text mode) (0x20) */
-    static const openmode binary  = 1 << 5;
+    static constexpr const openmode binary  = 1 << 5;
 
     /// 27.4.2.1.5 Type ios_base::seekdir [ios::seekdir]
     ///\todo must be static const
