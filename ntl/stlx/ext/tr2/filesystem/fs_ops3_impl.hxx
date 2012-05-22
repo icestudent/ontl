@@ -138,7 +138,7 @@ namespace std
 
       uintmax_t file_size(const path& p, error_code& ec /*= throws()*/)
       {
-        using namespace NTL__SUBSYSTEM_NS;
+        using namespace NTL_SUBSYSTEM_NS;
         file_network_open_information fbi;
         ntstatus st = ZwQueryFullAttributesFile(const_unicode_string(native(p)), fbi);
         return !__::throw_files_error(ec, st, "Can't get file size", p) ? 0 : static_cast<uintmax_t>(fbi.EndOfFile);
@@ -146,7 +146,7 @@ namespace std
 
       std::time_t last_write_time(const path& p, error_code& ec /*= throws()*/)
       {
-        using namespace NTL__SUBSYSTEM_NS;
+        using namespace NTL_SUBSYSTEM_NS;
         file_network_open_information fbi;
         ntstatus st = ZwQueryFullAttributesFile(const_unicode_string(native(p)), fbi);
         return !__::throw_files_error(ec, st, "Can't get last write time", p) ? 0 : ntime2ctime(fbi.LastWriteTime);
@@ -154,7 +154,7 @@ namespace std
 
       void last_write_time(const path& p, const std::time_t new_time, error_code& ec /*= throws()*/)
       {
-        using namespace NTL__SUBSYSTEM_NS;
+        using namespace NTL_SUBSYSTEM_NS;
         file_handler f;
         ntstatus st = f.open(const_unicode_string(native(p)), file::read_attributes|file::write_attributes|synchronize, file::share_read|file::share_write, file::creation_options_default);
         if(success(st)){
@@ -220,7 +220,7 @@ namespace std
         static file_status status(const path& p, ntl::nt::ntstatus& st, bool follow_symlink = true) __ntl_nothrow
         {
           // TODO: determine console, pipe, mailslot, device, etc.
-          using namespace NTL__SUBSYSTEM_NS;
+          using namespace NTL_SUBSYSTEM_NS;
           //file_basic_information fbi;
           file_network_open_information fbi;
           const object_attributes::attributes attr = object_attributes::case_insensitive|(follow_symlink ? object_attributes::none : object_attributes::openlink);
@@ -314,7 +314,7 @@ namespace std
 
       bool create_directory(const path& dp, error_code& ec)
       {
-        using namespace NTL__SUBSYSTEM_NS;
+        using namespace NTL_SUBSYSTEM_NS;
         file_handler f;
         ntstatus st = f.create(const_unicode_string(native(dp)), file::create_new, file::list_directory|synchronize, file::share_read|file::share_write, 
           file::directory_file|file::open_for_backup_intent|file::synchronous_io_nonalert, file_attribute::normal);

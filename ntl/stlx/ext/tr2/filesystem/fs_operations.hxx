@@ -94,7 +94,7 @@ namespace std
           {
             // TODO: determine console, pipe, mailslot, device, etc.
             ec.clear();
-            using namespace NTL__SUBSYSTEM_NS;
+            using namespace NTL_SUBSYSTEM_NS;
             //file_basic_information fbi;
             file_network_open_information fbi;
 
@@ -192,7 +192,7 @@ namespace std
           static bool equivalent(const Path1& p1, const Path2& p2, error_code& ec)
           {
             // open files
-            using namespace NTL__SUBSYSTEM_NS;
+            using namespace NTL_SUBSYSTEM_NS;
             file_handler f1, f2;
             ntstatus st = f1.open(const_unicode_string(p1.external_file_string()), file::read_attributes|synchronize, file::share_valid_flags, file::open_for_backup_intent);
             if(success(st))
@@ -306,7 +306,7 @@ namespace std
             ec.clear();
           static const uintmax_t errval = 0;
           uintmax_t size = errval;
-          using namespace NTL__SUBSYSTEM_NS;
+          using namespace NTL_SUBSYSTEM_NS;
           file_network_open_information fbi;
           ntstatus st = ZwQueryFullAttributesFile(const_unicode_string(p.external_file_string()), fbi);
           if(success(st)){
@@ -327,7 +327,7 @@ namespace std
         /** Returns the posix time of last data modification of \c p */
         template <class Path> inline std::time_t last_write_time(const Path& p, error_code& ec = throws())
         {
-          using namespace NTL__SUBSYSTEM_NS;
+          using namespace NTL_SUBSYSTEM_NS;
           if(&ec != &throws())
             ec.clear();
           time_t val = 0;
@@ -348,7 +348,7 @@ namespace std
         /** Returns the posix time of last data modification of \c p */
         template <class Path> inline void last_write_time(const Path& p, const std::time_t new_time, error_code& ec = throws())
         {
-          using namespace NTL__SUBSYSTEM_NS;
+          using namespace NTL_SUBSYSTEM_NS;
           file_handler f;
           ntstatus st = f.open(const_unicode_string(p.external_file_string()), file::read_attributes|file::write_attributes|synchronize, file::share_read|file::share_write, file::creation_options_default);
           if(success(st)){
@@ -376,7 +376,7 @@ namespace std
         /** Creates a directory object, returns false if directory is already exists */
         template <class Path> inline bool create_directory(const Path& dp, error_code& ec = throws())
         {
-          using namespace NTL__SUBSYSTEM_NS;
+          using namespace NTL_SUBSYSTEM_NS;
           file_handler f;
           ntstatus st = f.create(const_unicode_string(dp.external_file_string()), file::create_new, file::list_directory|synchronize, file::share_read|file::share_write, 
             file::directory_file|file::open_for_backup_intent|file::synchronous_io_nonalert, file_attribute::normal);
@@ -396,7 +396,7 @@ namespace std
         static error_code create_hard_link(const Path1& old_fp, const Path2& new_fp, error_code& ec)
         {
           static_assert((is_same<typename Path1::external_string_type, typename Path2::external_string_type>::value), "Must be the same type");
-          using namespace NTL__SUBSYSTEM_NS;
+          using namespace NTL_SUBSYSTEM_NS;
 
           // reject UNC links
           if(old_fp.is_unc() || new_fp.is_unc())
@@ -415,7 +415,7 @@ namespace std
               if(file.size() > 6){
                 wstring drive = file.substr(0, 6);
                 const const_unicode_string cus(drive);
-                NTL__SUBSYSTEM_NS::symbolic_link linko(cus);
+                NTL_SUBSYSTEM_NS::symbolic_link linko(cus);
                 if(success(linko)){
                   wstring target = linko.query();
                   return !target.empty() && target.compare(0, _countof(lanman_), lanman_) == 0;
@@ -470,7 +470,7 @@ namespace std
         /** Removes the file object */
         template <class Path> inline bool remove(const Path& p, error_code& ec = throws())
         {
-          using namespace NTL__SUBSYSTEM_NS;
+          using namespace NTL_SUBSYSTEM_NS;
           ntstatus st = ZwDeleteFile(const_unicode_string(p.external_file_string()));
           if(success(st)){
             if(&ec != &throws())
@@ -502,7 +502,7 @@ namespace std
 
           const wstring from = from_p.external_file_string(), to = to_p.external_file_string();
 
-          using namespace NTL__SUBSYSTEM_NS;
+          using namespace NTL_SUBSYSTEM_NS;
           file_handler f;
           ntstatus st = f.open(const_unicode_string(from), file::read_attributes|delete_access|synchronize, file::share_valid_flags, file::creation_options_default);
           if(success(st))
@@ -528,7 +528,7 @@ namespace std
           if(equivalent(from_fp, to_fp))
             return;
 
-          using namespace NTL__SUBSYSTEM_NS;
+          using namespace NTL_SUBSYSTEM_NS;
           file_handler from, to;
           ntstatus st = from.open(const_unicode_string(from_fp.external_file_string()), file::generic_read, file::share_valid_flags, file::creation_options_default);
           if(success(st)){

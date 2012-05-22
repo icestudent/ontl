@@ -11,8 +11,8 @@
 #ifndef NTL_SUBSYSTEM_KM
 # define NTL_SUBSYSTEM_KM
 #endif
-#undef  NTL__SUBSYSTEM_NS
-#define NTL__SUBSYSTEM_NS ntl::km
+#undef  NTL_SUBSYSTEM_NS
+#define NTL_SUBSYSTEM_NS ntl::km
 
 #include "../nt/basedef.hxx"
 #include "../stdlib.hxx"

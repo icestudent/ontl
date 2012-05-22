@@ -532,11 +532,23 @@
 							Name="filesystem_V3"
 							>
 							<File
+								RelativePath=".\stlx\ext\tr2\filesystem\fs_directory_v3.hxx"
+								>
+							</File>
+							<File
+								RelativePath=".\stlx\ext\tr2\filesystem\fs_operations_v3.hxx"
+								>
+							</File>
+							<File
+								RelativePath=".\stlx\ext\tr2\filesystem\fs_ops3_impl.hxx"
+								>
+							</File>
+							<File
 								RelativePath=".\stlx\ext\tr2\filesystem\fs_path.hxx"
 								>
 							</File>
 							<File
-								RelativePath=".\stlx\ext\tr2\filesystem\fs_template.hxx"
+								RelativePath=".\stlx\ext\tr2\filesystem\fs_path_impl.hxx"
 								>
 							</File>
 							<File

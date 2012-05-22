@@ -19,13 +19,12 @@ namespace ntl
       uint8_t   hash[16];
     };
 
-    typedef void __stdcall MD5Init_t(md5_ctx* context);
-    typedef void __stdcall MD5Final_t(md5_ctx* context);
-    typedef void __stdcall MD5Update_t(md5_ctx* context, const void* input, uint32_t size);
-
-    class md5:
-      md5_ctx
+    class md5: md5_ctx
     {
+      typedef void __stdcall MD5Init_t(md5_ctx* context);
+      typedef void __stdcall MD5Final_t(md5_ctx* context);
+      typedef void __stdcall MD5Update_t(md5_ctx* context, const void* input, uint32_t size);
+
       struct runtime
       {
         MD5Init_t* init;
@@ -46,6 +45,15 @@ namespace ntl
           init = ntdll->find_export<MD5Init_t*>("MD5Init");
           update = ntdll->find_export<MD5Update_t*>("MD5Update");
           final = ntdll->find_export<MD5Final_t*>("MD5Final");
+          if(!init){
+            // for xp x86
+            ntdll = f("advapi32.dll");
+            if(!ntdll)
+              return;
+            init = ntdll->find_export<MD5Init_t*>("MD5Init");
+            update = ntdll->find_export<MD5Update_t*>("MD5Update");
+            final = ntdll->find_export<MD5Final_t*>("MD5Final");
+          }
         }
       };
 

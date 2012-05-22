@@ -10,10 +10,10 @@
 
 // VC compiler always under NT and for NT (if not for KM)
 #if defined _MSC_VER && !defined(NTL_SUBSYSTEM_KM)
-# define NTL__SUBSYSTEM_NT
+# define NTL_SUBSYSTEM_NT
 #endif
-#ifndef NTL__SUBSYSTEM_NS
-# define NTL__SUBSYSTEM_NS ntl::nt
+#ifndef NTL_SUBSYSTEM_NS
+# define NTL_SUBSYSTEM_NS ntl::nt
 #endif
 
 #include "status.hxx"

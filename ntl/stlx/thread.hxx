@@ -245,21 +245,21 @@ namespace std
     /** Offers the operating system the opportunity to schedule another %thread. */
     inline void yield() __ntl_nothrow
     {
-      NTL__SUBSYSTEM_NS::this_thread::yield_execution();
+      NTL_SUBSYSTEM_NS::this_thread::yield_execution();
     }
 
     /** Blocks the calling %thread at least until the time specified by \c abs_time. */
     template <class Clock, class Duration>
     inline void sleep_until(const chrono::time_point<Clock, Duration>& abs_time)
     {
-      NTL__SUBSYSTEM_NS::this_thread::sleep_until(abs_time);
+      NTL_SUBSYSTEM_NS::this_thread::sleep_until(abs_time);
     }
 
     /** Blocks the calling %thread for at least the time specified by \c rel_time. */
     template <class Rep, class Period>
     inline void sleep_for(const chrono::duration<Rep, Period>& rel_time)
     {
-      NTL__SUBSYSTEM_NS::this_thread::sleep_for(rel_time);
+      NTL_SUBSYSTEM_NS::this_thread::sleep_for(rel_time);
     }
   } // this_thread
 
@@ -320,7 +320,7 @@ namespace std
         ec = e;
       return;
     }
-    using namespace NTL__SUBSYSTEM_NS;
+    using namespace NTL_SUBSYSTEM_NS;
     ntstatus st = NtWaitForSingleObject(h, true, infinite_timeout());
     if(st != status::wait_0){
       e = posix_error::make_error_code(posix_error::no_such_process);
@@ -331,7 +331,7 @@ namespace std
       return;
     }
     // wait ok, release handle
-    NTL__SUBSYSTEM_NS::close(h);
+    NTL_SUBSYSTEM_NS::close(h);
     h = nullptr;
     tid = 0;
   }
@@ -348,7 +348,7 @@ namespace std
         ec = e;
       return;
     }
-    NTL__SUBSYSTEM_NS::close(h);
+    NTL_SUBSYSTEM_NS::close(h);
     h = nullptr;
     tid = 0;
   }
@@ -375,7 +375,7 @@ namespace std
     tp->run();
     //if(ntl::atomic::compare_exchange(tp->cleanup, false, true)){
     //  // close handle
-    //  NTL__SUBSYSTEM_NS::close(tp->handle);
+    //  NTL_SUBSYSTEM_NS::close(tp->handle);
     //}
     delete tp;
   #ifdef NTL_SUBSYSTEM_KM

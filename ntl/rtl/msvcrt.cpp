@@ -60,6 +60,9 @@ namespace ntl { namespace msvcrt
   }
   size_t NTL_CRTCALL vsnprintf(char *buffer, size_t count, const char *format, va_list argptr)
   {
+    if(!imp_vsnprintf)   // no at winxp
+      return std::vsnprintf(buffer, count, format, argptr);
+    
     typedef size_t __cdecl f_t(char*, size_t, const char*, va_list);
     return reinterpret_cast<f_t*>(imp_vsnprintf)(buffer, count, format, argptr);
   }

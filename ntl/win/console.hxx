@@ -412,7 +412,7 @@ protected:
     const void* p;
     streamsize pending = n;
 
-    NTL__SUBSYSTEM_NS::file_handler f; f.reset(outh);
+    NTL_SUBSYSTEM_NS::file_handler f; f.reset(outh);
     __ntl_try {
       do{
         streamsize chunk_size, write_size;
@@ -425,7 +425,7 @@ protected:
           p = buf, chunk_size = to_next-buf, write_size = chunk_size*sizeof(char);
 
         assert(write_size > 0);
-        if(!NTL__SUBSYSTEM_NS::success(f.write(p, static_cast<uint32_t>(write_size))))
+        if(!NTL_SUBSYSTEM_NS::success(f.write(p, static_cast<uint32_t>(write_size))))
           break;
         const streamsize fwritten = static_cast<streamsize>(f.get_io_status_block().Information);
         assert(fwritten == write_size);
@@ -479,11 +479,11 @@ protected:
     fromT buf[1024];
     const fromT *from_next;
     streamsize readed = 0;
-    NTL__SUBSYSTEM_NS::file_handler f; f.reset(outh);
+    NTL_SUBSYSTEM_NS::file_handler f; f.reset(outh);
     __ntl_try{
       for(;;){
         streamsize cb = std::min(max_size*sizeof(fromT), _countof(buf));
-        if(!NTL__SUBSYSTEM_NS::success(f.read(buf, static_cast<uint32_t>(cb))))
+        if(!NTL_SUBSYSTEM_NS::success(f.read(buf, static_cast<uint32_t>(cb))))
           break;
         streamsize freaded = static_cast<streamsize>(f.get_io_status_block().Information);
         assert(freaded > 0);

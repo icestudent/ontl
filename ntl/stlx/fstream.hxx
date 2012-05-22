@@ -53,8 +53,13 @@ namespace std {
   class basic_filebuf:
     public basic_streambuf<charT, traits>
   {
+#ifdef NTL_SUBSYSTEM_KM
     /** 16 KB default buffer size */
     static const streamsize default_file_buffer_size = 1024 * 16;
+#else
+    /** 1 MB default buffer size */
+    static const streamsize default_file_buffer_size = 1024 * 1024;
+#endif
     typedef typename traits::state_type state_type;
 
     basic_filebuf(const basic_filebuf& rhs) __deleted;
@@ -69,11 +74,15 @@ namespace std {
     ///\name 27.9.1.2 basic_filebuf constructors [filebuf.cons]
 
     basic_filebuf()
-      :mode(), our_buffer(true),encoding(Encoding::Default)
+      :mode(), our_buffer(true), encoding(Encoding::Default)
     {}
 
 #ifdef NTL_CXX_RV
-    basic_filebuf(basic_filebuf&& rhs);
+    basic_filebuf(basic_filebuf&& rhs)
+      :mode(), our_buffer(true), encoding(Encoding::Default)
+    {
+      swap(rhs);
+    }
 #endif
 
     virtual ~basic_filebuf()
@@ -104,11 +113,11 @@ namespace std {
 
     basic_filebuf<charT,traits>* open(const string& s, ios_base::openmode mode, EncodingType encoding = Encoding::Ansi)
     {
-      return do_open(tr2::files::path(s), mode, encoding) ? this : nullptr;
+      return do_open(__fs::path(s), mode, encoding) ? this : nullptr;
     }
     basic_filebuf<charT,traits>* open(const char* s, ios_base::openmode mode, EncodingType encoding = Encoding::Ansi)
     {
-      return do_open(tr2::files::path(s), mode, encoding) ? this : nullptr;
+      return do_open(__fs::path(s), mode, encoding) ? this : nullptr;
     }
     // NTL extension
     basic_filebuf<charT,traits>* open(const __fs::path& name, ios_base::openmode mode, EncodingType encoding = Encoding::Ansi)
@@ -317,8 +326,8 @@ namespace std {
       }
       static const native_file::Origin origins[] = {native_file::file_begin, native_file::file_end, native_file::file_current};
 
-      NTL__SUBSYSTEM_NS::file::size_type new_off;
-      if(NTL__SUBSYSTEM_NS::success(f.seek(width > 0 ? off*width : 0, origins[way], &new_off))){
+      NTL_SUBSYSTEM_NS::file::size_type new_off;
+      if(NTL_SUBSYSTEM_NS::success(f.seek(width > 0 ? off*width : 0, origins[way], &new_off))){
         off = new_off;
         if(off != 0 && width > 0)
           off /= width;
@@ -401,7 +410,7 @@ namespace std {
           p = buf, chunk_size = to_next-buf, write_size = chunk_size*sizeof(toT);
 
         assert(write_size > 0);
-        if(!NTL__SUBSYSTEM_NS::success(f.write(p, static_cast<uint32_t>(write_size))))
+        if(!NTL_SUBSYSTEM_NS::success(f.write(p, static_cast<uint32_t>(write_size))))
           break;
         const streamsize fwritten = static_cast<streamsize>(f.get_io_status_block().Information);
         actual += fwritten / (re == codecvt_base::noconv ? sizeof(char_type) : sizeof(toT));
@@ -438,7 +447,7 @@ namespace std {
           p = buf, chunk_size = to_next-buf, write_size = chunk_size*sizeof(toT);
 
         assert(write_size > 0);
-        if(!NTL__SUBSYSTEM_NS::success(f.write(p, static_cast<uint32_t>(write_size))))
+        if(!NTL_SUBSYSTEM_NS::success(f.write(p, static_cast<uint32_t>(write_size))))
           break;
         const streamsize fwritten = static_cast<streamsize>(f.get_io_status_block().Information);
         actual += fwritten / (re == codecvt_base::noconv ? sizeof(char_type) : sizeof(toT));
@@ -457,7 +466,7 @@ namespace std {
       streamsize pending = to-from, write_size = pending*sizeof(char_type), actual = 0;
       do{
         assert(write_size > 0);
-        if(!NTL__SUBSYSTEM_NS::success(f.write(from, static_cast<uint32_t>(write_size))))
+        if(!NTL_SUBSYSTEM_NS::success(f.write(from, static_cast<uint32_t>(write_size))))
           break;
         const streamsize fwritten = static_cast<streamsize>(f.get_io_status_block().Information);
         actual += fwritten;
@@ -474,7 +483,7 @@ namespace std {
     {
       readed = 0;
       streamsize read_size = to_end - to;
-      if(!NTL__SUBSYSTEM_NS::success(f.read(to, static_cast<uint32_t>(read_size))))
+      if(!NTL_SUBSYSTEM_NS::success(f.read(to, static_cast<uint32_t>(read_size))))
         return false;
       readed = static_cast<streamsize>(f.get_io_status_block().Information);
       return readed > 0;
@@ -492,7 +501,7 @@ namespace std {
       const fromT *from_next;
       for(;;){
         streamsize cb = min(read_size*sizeof(fromT), _countof(buf));
-        if(!NTL__SUBSYSTEM_NS::success(f.read(buf, static_cast<uint32_t>(cb))))
+        if(!NTL_SUBSYSTEM_NS::success(f.read(buf, static_cast<uint32_t>(cb))))
           break;
         streamsize freaded = static_cast<streamsize>(f.get_io_status_block().Information);
         assert(freaded > 0);
@@ -524,7 +533,7 @@ namespace std {
       const fromT *from_next;
       for(;;){
         streamsize cb = min(read_size*sizeof(fromT), _countof(buf));
-        if(!NTL__SUBSYSTEM_NS::success(f.read(buf, static_cast<uint32_t>(cb))))
+        if(!NTL_SUBSYSTEM_NS::success(f.read(buf, static_cast<uint32_t>(cb))))
           break;
         streamsize freaded = static_cast<streamsize>(f.get_io_status_block().Information);
         assert(freaded > 0);      // in bytes
@@ -557,7 +566,7 @@ namespace std {
       uint32_t bom = 0, bom_size = 0;
       if(!(mode & (ios_base::binary|ios_base::trunc))){
         // try to read bom when text mode & file isn't truncated
-        using namespace NTL__SUBSYSTEM_NS;
+        using namespace NTL_SUBSYSTEM_NS;
         file_handler fh;
         if(success(fh.open(fname, native_file::access_mask_default, native_file::share_valid_flags)) && success(fh.read(&bom,sizeof(bom))))
           bom_size = static_cast<uint32_t>(fh.get_io_status_block().Information);
@@ -580,7 +589,7 @@ namespace std {
         am = native_file::generic_read;
         sm = native_file::share_valid_flags;
       }
-      using namespace NTL__SUBSYSTEM_NS;
+      using namespace NTL_SUBSYSTEM_NS;
       bool ok = success(f.create(fname, cd, am, sm));
       if(!ok)
         return false;
@@ -643,7 +652,7 @@ namespace std {
 #endif
 
       if(mode & ios_base::app)
-        f.seek(0, NTL__SUBSYSTEM_NS::file_handler::file_end);
+        f.seek(0, NTL_SUBSYSTEM_NS::file_handler::file_end);
 
       bool ok = false;
       if(mode & ios_base::binary) {
@@ -669,7 +678,7 @@ namespace std {
 
     bool flush()
     {
-      return NTL__SUBSYSTEM_NS::success(f.flush());
+      return NTL_SUBSYSTEM_NS::success(f.flush());
     }
 
     // reset buffer positions
@@ -717,7 +726,7 @@ namespace std {
 
   private:
     //typedef ntl::nt::file_handler native_file;  // for intellisense
-    typedef NTL__SUBSYSTEM_NS::file_handler native_file;
+    typedef NTL_SUBSYSTEM_NS::file_handler native_file;
 
     native_file f;
     pair<char_type*, streamsize> buf;
