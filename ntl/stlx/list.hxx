@@ -230,7 +230,7 @@ class list
     }
     #endif
     
-    list(initializer_list<T> il, const Allocator& a = Allocator())
+    list(const initializer_list<T>& il, const Allocator& a = Allocator())
       :node_allocator(a)
     {
       init_head();
@@ -256,7 +256,7 @@ class list
     }
     #endif
     
-    list& operator=(initializer_list<T> il)
+    list& operator=(const initializer_list<T>& il)
     {
       assign(il.begin(), il.end());
       return *this;
@@ -279,7 +279,7 @@ class list
       if ( n > s ) insert(it, n - s, t);
     }
     
-    void assign(initializer_list<T> il)
+    void assign(const initializer_list<T>& il)
     {
       assign(il.begin(), il.end());
     }
@@ -426,7 +426,7 @@ class list
       insert__disp(position, first, last, is_integral<InputIterator>::type());
     }
 
-    void insert(const_iterator position, initializer_list<T> il)
+    void insert(const_iterator position, const initializer_list<T>& il)
     {
       insert(position, il.begin(), il.end());
     }
@@ -449,13 +449,13 @@ class list
       return last.p;
     }
 
-    void swap(list<T, Allocator>& x)
-    {
-      using std::swap;
-      swap(head.next, x.head.next);
-      swap(head.prev, x.head.prev);
-      swap(node_allocator, x.node_allocator);
-    }
+    void swap(list<T, Allocator>& x);
+    //{
+    //  using std::swap;
+    //  swap(head.next, x.head.next);
+    //  swap(head.prev, x.head.prev);
+    //  swap(node_allocator, x.node_allocator);
+    //}
 
     __forceinline
     void clear() { erase(begin(), end()); }

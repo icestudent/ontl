@@ -91,7 +91,7 @@ namespace std {
       assign(x.cbegin(), x.cend());
     }
     
-    deque(initializer_list<T> il, const Allocator& a = Allocator())
+    deque(const initializer_list<T>& il, const Allocator& a = Allocator())
       :alloc(a), left(), right(), capL(), capR(), base_(), cap_()
     {
       assign(il.begin(), il.end(), forward_iterator_tag());
@@ -124,7 +124,7 @@ namespace std {
       dispose();
     }
     
-    deque& operator=(initializer_list<T> il)
+    deque& operator=(const initializer_list<T>& il)
     {
       //dispose();
       assign(il.begin(), il.end(), forward_iterator_tag());
@@ -178,7 +178,7 @@ namespace std {
       validate();
     }
 
-    void assign(initializer_list<T> il)
+    void assign(const initializer_list<T>& il)
     {
       assign(il.begin(), il.end(), forward_iterator_tag());
     }
@@ -380,7 +380,7 @@ namespace std {
       insert(position, first, last, typename iterator_traits<InputIterator>::iterator_category());
     }
 
-    void insert(const_iterator position, initializer_list<T> il)
+    void insert(const_iterator position, const initializer_list<T>& il)
     {
       insert(position, il.begin(), il.end());
     }

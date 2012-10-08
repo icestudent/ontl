@@ -140,8 +140,7 @@ class vector
       vector__disp(first, last, typename iterator_traits<InputIterator>::iterator_category());
     }
 
-    __forceinline
-    vector(const vector<T, Allocator>& x)
+    vector(const vector& x)
     : array_allocator(x.array_allocator)
     {
       capacity_ = x.size();
@@ -172,6 +171,7 @@ class vector
     vector(vector&& x)
       :begin_(), end_(), capacity_()
     {
+      //static_assert(false, "hzhz");
       std::swap(begin_, x.begin_);
       std::swap(end_, x.end_);
       std::swap(capacity_, x.capacity_);
@@ -192,11 +192,12 @@ class vector
     }
     #endif
 
-    vector(initializer_list<T> il)
+    vector(const initializer_list<T>& il)
     {
+      static_assert(false, "IL?!");
       construct(il.begin(), il.size());
     }
-    vector(initializer_list<T> il, const Allocator& a)
+    vector(const initializer_list<T>& il, const Allocator& a)
       :array_allocator(a)
     {
       construct(il.begin(), il.size());
@@ -205,8 +206,10 @@ class vector
     __forceinline
     ~vector() __ntl_nothrow
     {
-      clear();
-      if ( begin_ ) array_allocator.deallocate(begin_, capacity_);
+      if(begin_){
+        clear();
+        array_allocator.deallocate(begin_, capacity_);
+      }
     }
 
     vector<T, Allocator>& operator=(const vector<T, Allocator>& x)
@@ -230,7 +233,7 @@ class vector
     }
     #endif
 
-    vector& operator=(initializer_list<T> il)
+    vector& operator=(const initializer_list<T>& il)
     {
       assign(il);
       return *this;
@@ -254,7 +257,7 @@ class vector
       construct(n, u);
     }
 
-    void assign(initializer_list<T> il)
+    void assign(const initializer_list<T>& il)
     {
       assign__disp(il.begin(), il.end(), forward_iterator_tag());
     }
@@ -527,7 +530,7 @@ class vector
       return insert__disp(&const_cast<value_type&>(*position), first, last, is_integral<InputIterator>::type());
     }
 
-    iterator insert(const_iterator position, initializer_list<T> il)
+    iterator insert(const_iterator position, const initializer_list<T>& il)
     {
       return insert__disp(&const_cast<value_type&>(*position), il.begin(), il.end(), false_type());
     }
@@ -598,7 +601,7 @@ class vector
     {
       difference_type n = end_ - begin_;
       end_ = begin_;
-      if(!__::no_dtor<T>::value)
+      if(n > 0 && !__::no_dtor<T>::value)
         while ( n ) array_allocator.destroy(begin_ + --n);
     }
 

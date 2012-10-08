@@ -291,4 +291,7 @@ extern "C" unsigned __cdecl _ValidateImageBase(std::uintptr_t base)
     && (pe->get_nt_headers()->optional_header32()->is_valid() || pe->get_nt_headers()->optional_header64()->is_valid());
 }
 
+// prevent removing functions written above by VC11's optimizer.
+volatile bool cookie_used = &__security_check_cookie && &_FindPESection && &_ValidateImageBase;
+
 #endif // _MSC_VER >= 1600

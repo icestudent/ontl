@@ -1165,7 +1165,7 @@ struct char_traits<wchar_t>
             goto next_xpos;
         }
         return xpos;
-next_xpos:;
+      next_xpos:;
       }
       return npos;
     }
