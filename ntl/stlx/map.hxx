@@ -249,16 +249,16 @@ public:
 #endif
 
 #ifdef NTL_CXX_RV
-    std::pair<iterator, bool> insert(const value_type& x)
-    {
-      return tree_type::insert_impl(tree_type::construct_node(x));
-    }
+    //std::pair<iterator, bool> insert(const value_type& x)
+    //{
+    //  return tree_type::insert_impl(tree_type::construct_node(x));
+    //}
 
-    iterator insert(const_iterator /*position*/, const value_type& x)
-    {
-      // TODO: implement fast insert function based on position
-      return tree_type::insert_impl(tree_type::construct_node(x)).first;
-    }
+    //iterator insert(const_iterator /*position*/, const value_type& x)
+    //{
+    //  // TODO: implement fast insert function based on position
+    //  return tree_type::insert_impl(tree_type::construct_node(x)).first;
+    //}
 
     template<class P>
     std::pair<iterator, bool> insert(P&& x)

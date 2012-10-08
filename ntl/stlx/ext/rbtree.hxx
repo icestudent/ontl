@@ -328,11 +328,29 @@ namespace std
 
         std::pair<iterator, bool> insert_reference(value_type&& x)
         {
-          return insert_impl(construct_node(std::forward<value_type>(x)));
+          bool greater;
+          std::pair<node*, node*> place = find_node(x, greater);
+          if(place.first)
+            return std::make_pair(make_iterator(place.first), false);
+          return std::make_pair(insert_impl(place.second, construct_node(std::forward<value_type>(x)), greater), true);
         }
     #endif
 
-        std::pair<iterator, bool> insert_impl(node* const np)
+        /** returns node & parent node */
+        std::pair<node*, node*> find_node(const value_type& elem, bool& greater)
+        {
+          node *q = nullptr;
+          for ( node* p = root_; p; p = p->child[greater] )
+          {
+            greater = elem_greater(elem, p->elem);
+            if ( !greater && !elem_less(elem, p->elem) )
+              return std::make_pair(p, q);
+            q = p;
+          }
+          return std::make_pair(nullptr, q);
+        }
+
+        iterator insert_impl(node* const place, node* const np, bool greater)
         {
           // insert this as the root node if the tree is empty
           if ( empty() )
@@ -340,18 +358,10 @@ namespace std
             np->color(node::black);
             first_ = last_ = root_ = np;
             ++count_;
-            return std::make_pair(make_iterator(root_), true);
+            return make_iterator(root_);
           }
-          bool greater = false;
-          node *q = nullptr;
-          // check if node exists
-          for ( node* p = root_; p; p = p->child[greater] )
-          {
-            greater = elem_greater(np->elem, p->elem);
-            if ( !greater && !elem_less(np->elem, p->elem) )
-              return std::make_pair(make_iterator(p), false);
-            q = p;
-          }
+          assert(place != nullptr);
+          node *q = place;
           // create node
           np->parent(q);
           q->child[greater] = np;
@@ -362,20 +372,24 @@ namespace std
           ++count_;
           // balance tree
           fixup_insert(np);
-          return std::make_pair(make_iterator(np), true);
+          return make_iterator(np);
         }
 
       public:
 
         std::pair<iterator, bool> insert(const value_type& x)
         {
-          return insert_impl(construct_node(x));
+          bool greater;
+          std::pair<node*, node*> place = find_node(x, greater);
+          if(place.first)
+            return std::make_pair(make_iterator(place.first), false);
+          return std::make_pair(insert_impl(place.second, construct_node(x), greater), true);
         }
 
         iterator insert(const_iterator /*position*/, const value_type& x)
         {
           // TODO: implement fast insert function based on position
-          return insert_impl(construct_node(x)).first;
+          return insert(x).first;
         }
 
         template <class InputIterator>
