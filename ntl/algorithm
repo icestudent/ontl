@@ -1,1 +1,2 @@
 #include "stlx/algorithm.hxx"
+#include "stlx/ext/split.hxx"
