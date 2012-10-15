@@ -9,7 +9,7 @@
 namespace
 {
   // CRT stubs
-  vfv_t *imp_strtod, *imp_vsnprintf, *imp_acos, *imp_atan, *imp_tan, *imp_strtok;
+  vfv_t *imp_strtod, *imp_vsnprintf, *imp_acos, *imp_atan, *imp_tan, *imp_strtok, *imp_modf;
 }
 
 // CRT forwards
@@ -34,6 +34,21 @@ double NTL_CRTCALL atof(const char *nptr)
   char* end;
   return strtod(nptr, &end);
 }
+
+double NTL_CRTCALL std::modf(double value, double* iptr)
+{
+  typedef double __cdecl f_t(double, double*);
+  return reinterpret_cast<f_t*>(imp_modf)(value, iptr);
+}
+
+float NTL_CRTCALL std::modff(float value, float* iptr)
+{
+  double ip;
+  const double rem = modf(value, &ip);
+  *iptr = static_cast<float>(ip);
+  return static_cast<float>(rem);
+}
+
 
 #define FPFUNC(func, type) \
   type NTL_CRTCALL std::func(type d)\
@@ -121,6 +136,7 @@ namespace
     NTL_IMP(acos);
     NTL_IMP(atan);
     NTL_IMP(tan);
+    NTL_IMP(modf);
 #undef NTL_IMP
 
     return msvcrt;

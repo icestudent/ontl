@@ -223,9 +223,9 @@ namespace std
   float logbf(float x);
   long double logbl(long double x);
 
-  double modf(double value, double *iptr);
-  float modff(float value, float *iptr);
-  long double modfl(long double value, long double *iptr);
+  double NTL_CRTCALL modf(double value, double *iptr);
+  float NTL_CRTCALL modff(float value, float *iptr);
+  long double NTL_CRTCALL modfl(long double value, long double *iptr);
 
   double scalbn(double x, int n);
   float scalbnf(float x, int n);
@@ -476,7 +476,7 @@ namespace std
   float logb(float);
   long lrint(float);
   long lround(float);
-  float modf(float, float*);
+  inline float modf(float value, float* iptr) { return modff(value, iptr); }
   float nearbyint(float);
   float nextafter(float, float);
   float nexttoward(float, long double);
