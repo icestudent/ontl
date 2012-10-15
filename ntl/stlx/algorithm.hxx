@@ -354,7 +354,7 @@ namespace __
   }
 
   template<class InputIterator, class OutputIterator>
-  inline OutputIterator move(InputIterator first, InputIterator last, OutputIterator result, false_type)
+  inline OutputIterator move_impl(InputIterator first, InputIterator last, OutputIterator result, false_type)
   {
     while ( first != last )
     {
@@ -366,7 +366,7 @@ namespace __
   }
 
   template<class InputRandomIterator, class OutputRandomIterator>
-  inline OutputRandomIterator move(InputRandomIterator first, InputRandomIterator last, OutputRandomIterator result, true_type)
+  inline OutputRandomIterator move_impl(InputRandomIterator first, InputRandomIterator last, OutputRandomIterator result, true_type)
   {
     memmove(result, first, (last - first)*sizeof(typename iterator_traits<InputRandomIterator>::value_type));
     return result + (last - first);
@@ -427,7 +427,7 @@ BidirectionalIterator2
 template<class InputIterator, class OutputIterator>
 inline OutputIterator move(InputIterator first, InputIterator last, OutputIterator result)
 {
-  return __::move<InputIterator,OutputIterator>(first, last, result, __::is_memmoveable<InputIterator,OutputIterator>());
+  return __::move_impl<InputIterator,OutputIterator>(first, last, result, __::is_memmoveable<InputIterator,OutputIterator>());
 }
 
 template<class BidirectionalIterator1, class BidirectionalIterator2>
@@ -1127,10 +1127,10 @@ const T& min(const T& a, const U& b, const Args&... args);
 #endif
 
 template<class T>
-T min(initializer_list<T> t);
+T min(const initializer_list<T>& t);
 
 template<class T, class Compare>
-T min(initializer_list<T> t, Compare comp);
+T min(const initializer_list<T>& t, Compare comp);
 
 template<class T>
 __forceinline
@@ -1155,10 +1155,10 @@ const T& max(const T& a, const U& b, const Args&... args);
 #endif
 
 template <class T>
-T max(initializer_list<T> t);
+T max(const initializer_list<T>& t);
 
 template<class T, class Compare>
-T max(initializer_list<T> t, Compare comp);
+T max(const initializer_list<T>& t, Compare comp);
 
 /**	\return <tt>pair<const T&, const T&>(b, a)</tt> if \p b is smaller than \p a, and <tt>pair<const T&, constT&>(a, b)</tt> otherwise. */
 template<class T> 
@@ -1177,10 +1177,10 @@ inline pair<const T&, const T&> minmax(const T& a, const T& b, Compare comp)
 }
 
 template<class T>
-pair<const T&, const T&> minmax(initializer_list<T> t);
+pair<const T&, const T&> minmax(const initializer_list<T>& t);
 
 template<class T, class Compare>
-pair<const T&, const T&> minmax(initializer_list<T> t, Compare comp);
+pair<const T&, const T&> minmax(const initializer_list<T>& t, Compare comp);
 
 #ifdef NTL_CXX_VT
 template<class T, class... Args>
