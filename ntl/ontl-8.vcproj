@@ -5,10 +5,6 @@
 	Name=".ntl"
 	ProjectGUID="{081E6E33-CC33-4BBF-81E8-2865B1D8FD67}"
 	RootNamespace=".ntl"
-	SccProjectName="Svn"
-	SccAuxPath="Svn"
-	SccLocalPath="Svn"
-	SccProvider="SubversionScc"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -331,6 +327,10 @@
 					</File>
 					<File
 						RelativePath=".\stlx\ext\rbtree.hxx"
+						>
+					</File>
+					<File
+						RelativePath=".\stlx\ext\split.hxx"
 						>
 					</File>
 					<File

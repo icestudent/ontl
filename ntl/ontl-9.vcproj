@@ -323,6 +323,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\stlx\ext\split.hxx"
+						>
+					</File>
+					<File
 						RelativePath=".\stlx\ext\typelist.hxx"
 						>
 					</File>
@@ -640,6 +644,10 @@
 					</File>
 					<File
 						RelativePath=".\stlx\stdstring.hxx"
+						>
+					</File>
+					<File
+						RelativePath=".\stlx\string_ref.hxx"
 						>
 					</File>
 					<File
@@ -1474,6 +1482,14 @@
 				<File
 					RelativePath=".\rtl\dbgstream.cpp"
 					>
+					<FileConfiguration
+						Name="debug|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
 					<FileConfiguration
 						Name="debug|Win32"
 						ExcludedFromBuild="true"

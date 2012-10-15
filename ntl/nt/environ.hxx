@@ -100,6 +100,12 @@ namespace ntl {
         return st;
       }
 
+      bool exists(const const_unicode_string& name) const
+      {
+        unicode_string us;
+        return RtlQueryEnvironmentVariable_U(env, name, us) != status::variable_not_found;
+      }
+
       ntstatus query(const const_unicode_string& name, unicode_string& value) const
       {
         return RtlQueryEnvironmentVariable_U(env, name, value);
