@@ -507,11 +507,16 @@ namespace std
         ///\name modifiers
         std::pair<iterator, bool> insert(const value_type& v)
         {
-          iterator i = insert(cend(), v);
-          return make_pair(i, i != end());
+          return insert_impl(cend(), v);
         }
 
         iterator insert(const_iterator hint, const value_type& v)
+        {
+          return insert_impl(hint, v).first;
+        }
+
+      protected:
+        std::pair<iterator, bool> insert_impl(const_iterator hint, const value_type& v)
         {
           const hash_t hkey = hash_(value2key(v, is_map()));
           const size_type n = mapkey(hkey);
@@ -523,7 +528,7 @@ namespace std
             if(b.hash == hkey || b.dirty){
               for(const node_type* p = b.elems; p; p = p->next)
                 if(p->hkey == hkey && equal_(value2key(p->elem, is_map()), value2key(v, is_map())))
-                  return end();
+                  return std::make_pair(iterator(const_cast<node_type*>(p), &b, buckets_.second), false);
             }
           }
           // construct node(value, hash)
@@ -561,9 +566,10 @@ namespace std
             b.size++;
           }
           count_++;
-          return iterator(p, &b, buckets_.second);
+          return std::make_pair(iterator(p, &b, buckets_.second), true);
         }
 
+    public:
         template <class InputIterator>
         void insert(InputIterator first, InputIterator last)
         {

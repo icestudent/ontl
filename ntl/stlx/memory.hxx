@@ -103,8 +103,10 @@ template<class T, class Alloc> struct uses_allocator
     typedef typename Alloc::difference_type difference_type;
     typedef typename Alloc::size_type       size_type;
 
-    typedef typename pointer_traits<pointer>::rebind<void>::other void_pointer;
-    typedef typename pointer_traits<pointer>::rebind<const void>::other const_void_pointer;
+    //typedef typename pointer_traits<pointer>::rebind<void>::other void_pointer;
+    //typedef typename pointer_traits<pointer>::rebind<const void>::other const_void_pointer;
+    typedef void*       void_pointer;
+    typedef const void* const_void_pointer;
     
     typedef false_type propagate_on_container_copy_assignment;
     typedef false_type propagate_on_container_move_assignment;

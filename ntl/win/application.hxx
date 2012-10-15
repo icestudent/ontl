@@ -154,6 +154,9 @@ class application: noncopyable
         option(const char_type (&name)[N])
           :name(name, N)
         {}
+        option(const char_type* name, size_t len)
+          :name(name, len)
+        {}
 
         bool operator()(const char_type* opt) const;
         bool operator()(const std::basic_string<char_type>& opt) const { return opt.compare(0, name.second-1, name.first) == 0; }

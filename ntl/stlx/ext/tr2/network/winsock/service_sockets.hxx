@@ -351,7 +351,7 @@ namespace ntl { namespace network {
         timeval time;
         const std::chrono::seconds sec = std::chrono::duration_cast<std::chrono::seconds>(rel_time);
         time.sec  = (long)sec.count();
-        time.usec = (long)std::chrono::duration_cast<std::chrono::seconds>(rel_time - sec).count();
+        time.usec = (long)std::chrono::duration_cast<std::chrono::microseconds>(rel_time - sec).count();
 
         int re = impl.funcs->select(1, &r, &w, &e, &time);
         check_error(ec, re);
