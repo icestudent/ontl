@@ -268,6 +268,7 @@ extern "C" int __cdecl _purecall(void)
 #include <pe/image.hxx>
 extern "C" void __fastcall __security_check_cookie(std::uintptr_t cookie)
 {
+  (void)cookie;
   assert(cookie != __security_cookie);
 }
 

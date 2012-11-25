@@ -279,7 +279,7 @@ namespace ntl
 namespace ntl { namespace cxxruntime {
   struct exception_ptr
   {
-    operator explicit_bool_type() const { return explicit_bool(false); }
+    __explicit_operator_bool() const { return __explicit_bool(false); }
   };
 
   inline bool operator==(const exception_ptr&  , const exception_ptr&  ) { return false; }
@@ -352,13 +352,13 @@ namespace std
   class nested_exception
   {
   public:
-    nested_exception() throw()
+    nested_exception() __ntl_nothrow
       :e(current_exception())
     {}
 
   #ifdef NTL_CXX_EF
-    nested_exception(const nested_exception&) throw() = default;
-    nested_exception& operator=(const nested_exception&) throw() = default;
+    nested_exception(const nested_exception&) __ntl_nothrow = default;
+    nested_exception& operator=(const nested_exception&) __ntl_nothrow = default;
     virtual ~nested_exception() = default;
   #else
     // default generated

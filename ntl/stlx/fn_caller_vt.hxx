@@ -4,17 +4,11 @@
  *
  ****************************************************************************
  */
-#ifndef NTL__STLX_FNCALLER
-#define NTL__STLX_FNCALLER
+#ifndef NTL__STLX_FNCALLER_VT
+#define NTL__STLX_FNCALLER_VT
 #pragma once
 
 #include "result_of.hxx"
-
-#if defined(NTL_CXX_VT)
-# include "fn_caller_vt.hxx"
-#elif defined(NTL_CXX_RV__WORKS) // doesn't works yet
-# include "fn_caller_rv.hxx"
-#else
 
 namespace std
 {
@@ -122,35 +116,14 @@ namespace std
     template<typename F, typename R = void>
     struct invoker
     {
-      static inline R invoke(F f)
+      template<class... Args>
+      static inline R invoke(F f, Args... args)
       {
-        typedef NTL_FUNARGS() Args;
-        return fn_caller<F,Args,R>::call(f,Args());
-      }
-
-      template<class A1>
-      static inline R invoke(F f, A1 a1)
-      {
-        typedef NTL_FUNARGS(A1) Args;
-        return fn_caller<F,Args,R>::call(f,Args(a1));
-      }
-
-      template<class A1, class A2>
-      static inline R invoke(F f, A1 a1, A2 a2)
-      {
-        typedef NTL_FUNARGS(A1,A2) Args;
-        return fn_caller<F,Args,R>::call(f,Args(a1,a2));
-      }
-
-      template<class A1, class A2, class A3>
-      static inline R invoke(F f, A1 a1, A2 a2, A3 a3)
-      {
-        typedef NTL_FUNARGS(A1,A2,A3) Args;
-        return fn_caller<F,Args,R>::call(f,Args(a1,a2,a3));
+        typedef NTL_FUNARGS(Args...) ArgsT;
+        return fn_caller<F,ArgsT,R>::call(f,ArgsT(args...));
       }
     };
   } // func
   } // __
 } // std
-#endif // rv
-#endif // NTL__STLX_FNCALLER
+#endif // NTL__STLX_FNCALLER_VT

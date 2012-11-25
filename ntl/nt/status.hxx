@@ -1658,7 +1658,7 @@ struct status
 
     msvc_exception = (int)0x406D1388,
 
-#if !defined(__BCPLUSPLUS__) && !defined(__ICL)
+#if !defined(__BCPLUSPLUS__) && !defined(__ICL) && !defined(__clang__)
     cxx_exception = (int)(0xE0000000|'msc'),
     com_exception = (int)(0xE0000000|'MOC'),
     complus_exception = (int)(0xE0000000|'RCC')
@@ -1686,8 +1686,8 @@ struct status
 
 typedef nt::status::type ntstatus;
 
-static __forceinline
-bool success(const ntstatus s)
+static //__forceinline
+inline bool success(const ntstatus s)
 {
   return s >= 0;
 }

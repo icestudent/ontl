@@ -15,7 +15,7 @@
 #include "cwchar.hxx"
 
 #ifdef NTL_CXX_CHARS
-# ifdef __ICL
+# if defined(__ICL) || defined(__clang__)
 #  define __STDC_UTF_16__ 1
 #  define __STDC_UTF_32__ 1
 # else
@@ -26,8 +26,13 @@
 #endif
 
 #ifndef NTL_CXX_CHARS_TYPES
-typedef std::uint_least16_t char16_t;
-typedef std::uint_least32_t char32_t;
+#ifdef __clang__
+  typedef __CHAR16_TYPE__ char16_t;
+  typedef __CHAR32_TYPE__ char32_t;
+#else
+  typedef std::uint_least16_t char16_t;
+  typedef std::uint_least32_t char32_t;
+#endif // clang
 #endif
 
 namespace std

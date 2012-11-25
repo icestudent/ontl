@@ -26,7 +26,7 @@ namespace std
             if(!throwable)
               holder.clear();
           }else{
-            const error_code e = make_error_code(st);
+            e = make_error_code(st);
             if(!throwable)
               holder = e;
           }
@@ -35,6 +35,7 @@ namespace std
 
         inline bool throw_files_error(error_code& holder, ntl::nt::ntstatus st, const char* msg)
         {
+          (void)msg;
           bool throwable; error_code e;
           const bool success = handle_status(holder, st, e, throwable);
           if(!success && throwable)
@@ -43,6 +44,7 @@ namespace std
         }
         inline bool throw_files_error(error_code& holder, ntl::nt::ntstatus st, const char* msg, const path& p1)
         {
+          (void)msg; (void)p1;
           bool throwable; error_code e;
           const bool success = handle_status(holder, st, e, throwable);
           if(!success && throwable)
@@ -51,6 +53,7 @@ namespace std
         }
         inline bool throw_files_error(error_code& holder, ntl::nt::ntstatus st, const char* msg, const path& p1, const path& p2)
         {
+          (void)msg; (void)p1; (void)p2;
           bool throwable; error_code e;
           const bool success = handle_status(holder, st, e, throwable);
           if(!success && throwable)
@@ -211,6 +214,7 @@ namespace std
           if(used == max)
             used = 0;
         }
+        ec.clear();
         return s;
       }
 
@@ -330,6 +334,106 @@ namespace std
         return success(st);
       }
 
+      namespace __
+      {
+        static bool equivalent(const path& p1, const path& p2, error_code& ec)
+        {
+          // open files
+          using namespace NTL_SUBSYSTEM_NS;
+          file_handler f1, f2;
+          ntstatus st = f1.open(const_unicode_string(native(p1)), file::read_attributes|synchronize, file::share_valid_flags, file::open_for_backup_intent);
+          if(success(st))
+            st = f2.open(const_unicode_string(native(p2)), file::read_attributes|synchronize, file::share_valid_flags, file::open_for_backup_intent);
+          ec.clear();
+          if(success(st)){
+            // compare the volumes
+            volume_information<file_fs_volume_information> v1(f1.get(), false), v2(f2.get(), false);
+            if(status::is_error(v1) || status::is_error(v2)){
+              ec = make_error_code( status::is_error(v1) ? v1.operator ntstatus() : v2.operator ntstatus() );
+              return false;
+            }
+            if(v1->VolumeSerialNumber != v2->VolumeSerialNumber)
+              return false;
+
+            // compare files
+            file_information<file_internal_information> fi1(f1.get()), fi2(f2.get());
+            if(!fi1 || !fi2){
+              ec = make_error_code( status::is_error(fi1) ? fi1.operator ntstatus() : fi2.operator ntstatus() );
+              return false;
+            }
+            if(fi1->IndexNumber != fi2->IndexNumber)
+              return false;
+            // TODO: resolve links
+            return true;
+          }
+          ec = make_error_code(st);
+          return false;
+        }
+      }
+
+      /** Determines, is the given paths are the same */
+      inline bool equivalent(const path& p1, const path& p2) __ntl_throws(filesystem_error, filesystem_error)
+      {
+        // check paths
+        file_status s1 = status(p1), s2 = status(p2);
+        bool e1 = exists(s1), e2 = exists(s2);
+        if((!e1 && !e2) || (is_other(s1) && is_other(s2))){
+          if(!e1 || is_other(s1))
+            __ntl_throw(filesystem_error( "Failed to determine equivalence", p1, make_error_code(!e1 ? posix_error::no_such_file_or_directory : posix_error::file_exists) ));
+          else
+            __ntl_throw(filesystem_error( "Failed to determine equivalence", p2, make_error_code(!e2 ? posix_error::no_such_file_or_directory : posix_error::file_exists) ));
+        }
+        if(s1 != s2)
+          return false;
+        error_code ec;
+        bool re = __::equivalent(p1,p2,ec);
+        if(ec){
+          __ntl_throw(filesystem_error("Failed to determine equivalence", p1, p2, ec));
+        }
+        return re;
+      }
+
+      /** Determines, is the given paths are the same */
+      inline bool equivalent(const path& p1, const path& p2, error_code& ec) __ntl_nothrow
+      {
+        if(&ec == &throws())
+          return equivalent(p1,p2);
+
+        // check paths
+        file_status s1 = status(p1), s2 = status(p2);
+        bool e1 = exists(s1), e2 = exists(s2);
+        if((!e1 && !e2) || (is_other(s1) && is_other(s2))){
+          if(!e1 || is_other(s1))
+            ec = make_error_code(!e1 ? posix_error::no_such_file_or_directory : posix_error::file_exists);
+          else
+            ec = make_error_code(!e2 ? posix_error::no_such_file_or_directory : posix_error::file_exists);
+          return false;
+        }
+        return __::equivalent(p1,p2,ec);
+      }
+
+      inline void rename(const path& from, const path& to, error_code& ec)
+      {
+        if(&ec != &throws())
+          ec.clear();
+
+        // If from_p and to_p resolve to the same file, no action is taken
+        if(equivalent(from, to))
+          return;
+
+        using namespace NTL_SUBSYSTEM_NS;
+        file_handler f;
+        ntstatus st = f.open(const_unicode_string(native(from)), file::read_attributes|delete_access|synchronize, file::share_valid_flags, file::creation_options_default);
+        if(success(st))
+          st = f.rename(const_unicode_string(native(to)));
+        if(!success(st)){
+          error_code e = make_error_code(st);
+          if(&ec == &throws())
+            __ntl_throw(filesystem_error("Can't rename file", from, to, e));
+          else
+            ec = e;
+        }
+      }
 
     } // files
   } // tr2

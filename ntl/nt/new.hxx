@@ -38,7 +38,7 @@ namespace std
 ///\name  Single-object forms
 
 __forceinline
-void* __cdecl operator new(std::size_t size) throw(std::bad_alloc)
+void* __cdecl operator new(std::size_t size)
 {
 #ifdef NTL_NO_NEW_HANDLERS
   return ntl::nt::heap::alloc(ntl::nt::process_heap(), size);
@@ -114,7 +114,7 @@ void __cdecl
 ///\name  Array forms
 
 __forceinline
-void* __cdecl operator new[](std::size_t size) throw(std::bad_alloc)
+void* __cdecl operator new[](std::size_t size)
 {
   // NOTE: 5.3.4/7 (N2960)
 /***

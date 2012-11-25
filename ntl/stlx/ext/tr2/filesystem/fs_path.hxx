@@ -44,6 +44,9 @@ namespace std
         template<typename charT, class traits, class alloc>
         struct path_accept<std::basic_string<charT,traits,alloc> >: path_char_accept<charT>{};
 
+        template<typename charT, class traits>
+        struct path_accept<std::basic_string_ref<charT,traits> >: path_char_accept<charT>{};
+
         template<typename charT, class traits, class alloc>
         struct path_accept<ntl::nt::native_string<charT,traits,alloc> >: path_char_accept<charT>{};
         template<typename charT, class traits, class alloc>
@@ -73,7 +76,7 @@ namespace std
       public:
 
         ///\name encoding conversion
-        inline static std::locale imbue( const std::locale& loc ) { return std::locale::classic(); }
+        inline static std::locale imbue( const std::locale& /*loc*/ ) { return std::locale::classic(); }
         inline static const codecvt_type & codecvt();
 
         ///\name constructors and destructor
@@ -173,6 +176,7 @@ namespace std
       protected:
         path& append(const string_type& s, const codecvt_type&) { return append(s.c_str(), s.size()); }
         path& append(const string_type& s) { return append(s.c_str(), s.size()); }
+
         inline path& append(const value_type* s, size_t len);
       
         path& append_conv(const value_type* s, size_t len) { return append(s, len); }
@@ -191,6 +195,12 @@ namespace std
           return append_conv(cvt.from_bytes(s));
         }
         path& append_conv(const std::string& s)
+        {
+          wstring_convert<codecvt_type> cvt;
+          return append_conv(cvt.from_bytes(s));
+        }
+        path& append_conv(const std::basic_string_ref<value_type>& s) { return append(s.data(), s.size()); }
+        path& append_conv(const std::basic_string_ref<char>& s)
         {
           wstring_convert<codecvt_type> cvt;
           return append_conv(cvt.from_bytes(s));

@@ -177,7 +177,7 @@ namespace std { namespace tr2 { namespace network {
       basic_resolver_query()
         :hint(), host_exists(false)
       {}
-      basic_resolver_query(const string& service_name, flags f = passive | address_configured)
+      basic_resolver_query(const string_ref& service_name, flags f = passive | address_configured)
         :hint(), service(service_name), host_exists(false)
       {
         const typename protocol_type::endpoint p;
@@ -185,13 +185,13 @@ namespace std { namespace tr2 { namespace network {
         hint.flags = f;
         hint.family = ntl::network::constants::af_unspec;
       }
-      basic_resolver_query(const InternetProtocol& proto, const string& service_name, flags f = passive | address_configured)
+      basic_resolver_query(const InternetProtocol& proto, const string_ref& service_name, flags f = passive | address_configured)
         :hint(), service(service_name), host_exists(false)
       {
         set_proto(proto);
         hint.flags = f;
       }
-      basic_resolver_query(const string& host_name,  const string& service_name, flags f = address_configured)
+      basic_resolver_query(const string_ref& host_name,  const string_ref& service_name, flags f = address_configured)
         :hint(), host(host_name), service(service_name), host_exists(true)
       {
         const typename protocol_type::endpoint p;
@@ -199,7 +199,7 @@ namespace std { namespace tr2 { namespace network {
         hint.flags = f;
         hint.family = ntl::network::constants::af_unspec;
       }
-      basic_resolver_query(const InternetProtocol& proto, const string& host_name, const string& service_name, flags f = address_configured)
+      basic_resolver_query(const InternetProtocol& proto, const string_ref& host_name, const string_ref& service_name, flags f = address_configured)
         :hint(), host(host_name), service(service_name), host_exists(true)
       {
         set_proto(proto);

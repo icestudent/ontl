@@ -61,14 +61,6 @@ namespace std
       inline bool         exists(file_status s) __ntl_nothrow;
       inline bool         exists(const path& p, error_code& ec = throws());
 
-      inline bool         equivalent(const path& p1, const path& p2, error_code& ec = throws());
-
-      inline uintmax_t    file_size(const path& p, error_code& ec = throws());
-
-      inline uintmax_t    hard_link_count(const path& p, error_code& ec = throws());
-
-      inline const path&  initial_path(error_code& ec = throws());
-
       inline bool         status_known(file_status s)     __ntl_nothrow { return s.type() != status_unknown; }
       inline bool         is_directory(file_status s)     __ntl_nothrow { return s.type() == directory_file; }
       inline bool         is_regular_file(file_status s)  __ntl_nothrow { return s.type() == regular_file; }
@@ -77,10 +69,22 @@ namespace std
 
       inline file_status  status(const path& p, error_code& ec = throws());
       inline bool         is_empty(const path& p, error_code& ec = throws());
-      inline bool         is_directory(const path& p, error_code& ec = throws())    { return is_directory(status(p)); }
-      inline bool         is_other(const path& p, error_code& ec = throws())        { return is_other(status(p)); }
-      inline bool         is_regular_file(const path& p, error_code& ec = throws()) { return is_regular_file(status(p)); }
-      inline bool         is_symlink(const path& p, error_code& ec = throws())      { return is_symlink(status(p)); }
+      inline bool         is_directory(const path& p, error_code& ec = throws())    { return is_directory(status(p, ec)); }
+      inline bool         is_other(const path& p, error_code& ec = throws())        { return is_other(status(p, ec)); }
+      inline bool         is_regular_file(const path& p, error_code& ec = throws()) { return is_regular_file(status(p, ec)); }
+      inline bool         is_symlink(const path& p, error_code& ec = throws())      { return is_symlink(status(p, ec)); }
+
+      /** Determines, is the given paths are the same */
+      inline bool equivalent(const path& p1, const path& p2) __ntl_throws(filesystem_error);
+
+      /** Determines, is the given paths are the same */
+      inline bool equivalent(const path& p1, const path& p2, error_code& ec) __ntl_nothrow;
+
+      inline uintmax_t    file_size(const path& p, error_code& ec = throws());
+
+      inline uintmax_t    hard_link_count(const path& p, error_code& ec = throws());
+
+      inline const path&  initial_path(error_code& ec = throws());
 
       inline std::time_t  last_write_time(const path& p, error_code& ec = throws());
       inline void         last_write_time(const path& p, const std::time_t new_time, error_code& ec = throws());

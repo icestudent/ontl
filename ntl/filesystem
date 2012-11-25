@@ -1,0 +1,5 @@
+#include "stlx/ext/tr2/filesystem_v3.hxx"
+namespace std
+{
+	namespace files = std::tr2::files;
+}

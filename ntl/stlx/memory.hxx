@@ -260,14 +260,14 @@ class allocator
       p->T::/*< workaround MSVC's weird `scalar deleting destructor'*/ ~T();
     }
 
-#if defined(NTL_CXX_VT)
+#ifdef NTL_CXX_VT
 
-    template<class... Args>
-    void construct(pointer p, Args&&... args)
+    template<class U, class... Args>
+    void construct(U* p, Args&&... args)
     {
-      __assume(p);
-      ::new((void*)p) T(forward<Args>(args)...);
+      ::new((void*)p) U(std::forward<Args>(args)...);
     }
+
 #else
 
 #ifdef NTL_CXX_RV

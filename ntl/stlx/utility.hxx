@@ -17,7 +17,7 @@
 #endif
 
 /// Standard Template Library
-namespace std 
+namespace std
 {
 
 /**\defgroup  std_depr **************** C++ Standard Compatibility features [depr]
@@ -69,9 +69,9 @@ bool operator>=(const T & x, const T & y) { return !(x < y); }
 #if NTL_CXX_RV >= 20
 
   // rvalue ref v2
-  template <class T> inline T&& forward(typename std::remove_reference<T>::type& t) { return static_cast<T&&>(t); }
-  template <class T> inline T&& forward(typename std::remove_reference<T>::type&& t){ return static_cast<T&&>(t); }
-  template <class T> inline typename std::remove_reference<T>::type&& move(T&& t) { return static_cast<typename std::remove_reference<T>::type&&>(t); }
+  template <class T> inline T&& forward(typename remove_reference<T>::type& t) { return static_cast<T&&>(t); }
+  template <class T> inline T&& forward(typename remove_reference<T>::type&& t){ return static_cast<T&&>(t); 	static_assert(!is_lvalue_reference<T>::value, "lvalue not allowed"); }
+  template <class T> inline typename remove_reference<T>::type&& move(T&& t) { return static_cast<typename remove_reference<T>::type&&>(t); }
 #else
   template <class T>
   struct identity
@@ -82,7 +82,7 @@ bool operator>=(const T & x, const T & y) { return !(x < y); }
   template <class T>
   inline T&& forward(typename identity<T>::type&& t) { return t; }
 
-  template <class T> 
+  template <class T>
   inline typename remove_reference<T>::type&& move(T&& t) { return t; }
 # endif // rvalue ref v2
 
@@ -197,11 +197,11 @@ struct pair
 
 
     constexpr pair()
-      :first(), second() 
+      :first(), second()
     {}
 
     pair(const T1 & x, const T2 & y)
-      :first(x), second(y) 
+      :first(x), second(y)
     {}
 
     template<class U, class V>
@@ -210,7 +210,7 @@ struct pair
     {}
 
 #ifdef NTL_CXX_RV
-    template<class U, class V> 
+    template<class U, class V>
     pair(U&& x, V&& y)
       :first(forward<U>(x)), second(forward<V>(y))
     {}
@@ -335,9 +335,9 @@ namespace __
   struct pair_type
   {
     typedef typename decay<T>::type U;
-    
-    typedef typename conditional<is_same<U, reference_wrapper<T> >::value, 
-                                 T&, 
+
+    typedef typename conditional<is_same<U, reference_wrapper<T> >::value,
+                                 T&,
                                  U
                                 >::type type;
   };
@@ -346,7 +346,7 @@ namespace __
   {
     typedef typename pair_type<T1>::type V1;
     typedef typename pair_type<T2>::type V2;
-    typedef typename pair<V1, V2> type;
+    typedef typename std::pair<V1, V2> type;
   };
 }
 
@@ -377,9 +377,9 @@ inline InputIterator end(const std::pair<InputIterator, InputIterator>& p)   { r
 /**@} lib_pairs */
 #pragma endregion
 
-///\name 20.2.x.1 class noncopyable [utility.noncopyable] 
+///\name 20.2.x.1 class noncopyable [utility.noncopyable]
 /**
- *	@brief 20.2.x.1 class noncopyable [utility.noncopyable] 
+ *	@brief 20.2.x.1 class noncopyable [utility.noncopyable]
  *  @details Class noncopyable is provided to simplify creation of classes that inhibit copy semantics.
  **/
 using ntl::noncopyable;

@@ -150,7 +150,8 @@ namespace std
 
     void clear()
     {
-      v = 0, c = &system_category();
+      if(this)
+        v = 0, c = &system_category();
     }
 
     // 19.5.2.4 observers:

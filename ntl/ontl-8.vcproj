@@ -654,6 +654,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\stlx\string_ref.hxx"
+						>
+					</File>
+					<File
 						RelativePath=".\stlx\unordered_map.hxx"
 						>
 					</File>

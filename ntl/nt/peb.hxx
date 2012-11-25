@@ -198,7 +198,7 @@ struct peb
   static __forceinline
   peb& instance()
   {
-    return *teb::get(&teb::ProcessEnvironmentBlock);
+    return *teb::instance().ProcessEnvironmentBlock;
   }
 
   __forceinline

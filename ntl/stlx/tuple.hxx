@@ -8,6 +8,10 @@
 #define NTL__STLX_TUPLE
 #pragma once
 
+#ifdef NTL_CXX_VT
+# include "tuple_vt.hxx"
+#else
+
 #define TTL_MAX_TEMPLATE_PARAMS 5
 #define STLX_ENABLE_TUPLE_RELATIONS
 
@@ -1091,4 +1095,5 @@ namespace std
 //  This software is provided "as is" without express or implied
 //  warranty, and with no claim as to its suitability for any purpose.
 //
+#endif// NTL_CXX_VT
 #endif//#ifndef NTL__STLX_TUPLE

@@ -84,7 +84,7 @@ namespace ntl {
       static environment create(bool clone_current = true)
       {
         void* env = nullptr;
-        ntstatus st = RtlCreateEnvironment(clone_current, &env);
+        /*ntstatus st =*/ RtlCreateEnvironment(clone_current, &env);
         return assign(env);
       }
 

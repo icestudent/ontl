@@ -48,7 +48,11 @@ class type_info
      **/
     bool operator==(const type_info& rhs) const
     {
-      return std::strcmp(mname()+1, rhs.mname()+1) == 0;
+      #ifndef __clang__
+        return std::strcmp(mname()+1, rhs.mname()+1) == 0;
+      #else
+        return __type_name == rhs.__type_name;
+      #endif
     }
 
     /**
@@ -57,7 +61,7 @@ class type_info
      **/
     bool operator!=(const type_info& rhs) const
     {
-      return std::strcmp(mname()+1, rhs.mname()+1) != 0;
+      return !operator==(rhs);
     }
 
     /**
@@ -66,13 +70,21 @@ class type_info
      **/
     bool before(const type_info& rhs) const __ntl_nothrow
     {
-      return std::strcmp(mname()+1, rhs.mname()+1) <= 0;
+      #ifndef __clang__
+        return std::strcmp(mname()+1, rhs.mname()+1) <= 0;
+      #else
+        return __type_name < rhs.__type_name;
+      #endif
     }
 
     /** Hashes this object */
     size_t hash_code() const __ntl_nothrow
     {
-      return reinterpret_cast<size_t>(this);
+      #ifndef __clang__
+        return reinterpret_cast<size_t>(this);
+      #else
+        return *reinterpret_cast<const size_t*>(&__type_name);
+      #endif
     }
 
     /**
@@ -83,7 +95,7 @@ class type_info
 #ifndef _NTL_DEMANGLE
     {
       // return mangled name as implementation-defined :-)
-      return mname(); 
+      return mname();
     }
 #else
     ;// use definition in rtti.cpp
@@ -92,17 +104,33 @@ class type_info
   private:
     type_info(const type_info&) __deleted;
     type_info& operator=(const type_info&) __deleted;
+
+#if defined(_MSC_VER)
+    // vc++
     mutable void* data;
     const char* mname() const { return reinterpret_cast<const char*>(this + 1); }
-};
+
+#elif defined(__clang__)
+    // clang abi
+protected:
+    const char* __type_name;
+    const char* mname() const { return __type_name; }
+    type_info(const char* iname)
+      :__type_name(iname)
+    {}
+#endif // _msc_ver
+
+}; // type_info
+
 #if defined(_MSC_VER) && !defined(__ICL)
-///\warning break this to get `Unresolved external : const type_info::'vftable' (??_7type_info@@6B@)`
-static_assert(sizeof _TypeDescriptor == sizeof type_info, "broken type");
+  ///\warning break this to get `Unresolved external : const type_info::'vftable' (??_7type_info@@6B@)`
+  static_assert(sizeof _TypeDescriptor == sizeof type_info, "broken type");
 #endif
 
 #if (STLX_USE_RTTI || STLX_USE_EXCEPTIONS/*do we need another macro instead?*/) && !defined(__ICL)
-inline type_info::~type_info()
-{}
+  // inline type_info dtor
+  inline type_info::~type_info()
+  {}
 #endif
 #pragma warning(pop)
 

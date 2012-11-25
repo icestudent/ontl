@@ -10,6 +10,11 @@
 
 #include "stdexception.hxx"
 
+
+#ifdef NTL_CXX_VT
+# include "function_vt.hxx"
+#else
+
 #include "mem_fn.hxx"
 #ifndef NTL__STLX_FNCALLER
 #include "fn_caller.hxx"
@@ -281,7 +286,7 @@ namespace std
         ///\name 20.7.15.2.3 function capacity
 
         /** Returns true if this has target */
-        operator __::explicit_bool_type() const __ntl_nothrow { return __::explicit_bool(caller); }
+        __explicit_operator_bool() const __ntl_nothrow { return __explicit_bool(caller); }
 
 
         ///\name 20.7.15.2.2, function modifiers:
@@ -397,9 +402,9 @@ namespace std
     /** function<> specialization for 1 argument */
     template<class R, class A1>
     class function< R(A1)>:
-      public __::func::detail::function<R, FUNARGS(A1)>
+      public __::func::detail::function<R, NTL_FUNARGS(A1)>
     {
-      typedef __::func::detail::function<R, FUNARGS(A1)> base;
+      typedef __::func::detail::function<R, NTL_FUNARGS(A1)> base;
     public:
       template<typename F>
       explicit function(F f)
@@ -417,9 +422,9 @@ namespace std
     /** function<> specialization for 2 arguments */
     template<class R, class A1, class A2>
     class function< R(A1, A2)>: 
-      public __::func::detail::function<R, FUNARGS(A1,A2)>
+      public __::func::detail::function<R, NTL_FUNARGS(A1,A2)>
     {
-      typedef __::func::detail::function<R, FUNARGS(A1,A2)> base;
+      typedef __::func::detail::function<R, NTL_FUNARGS(A1,A2)> base;
     public:
       template<typename F>
       explicit function(F f)
@@ -437,9 +442,9 @@ namespace std
     /** function<> specialization for 3 arguments */
     template<class R, class A1, class A2, class A3>
     class function< R(A1, A2, A3)>: 
-      public __::func::detail::function<R, FUNARGS(A1,A2,A3)>
+      public __::func::detail::function<R, NTL_FUNARGS(A1,A2,A3)>
     {
-      typedef __::func::detail::function<R, FUNARGS(A1,A2,A3)> base;
+      typedef __::func::detail::function<R, NTL_FUNARGS(A1,A2,A3)> base;
     public:
       template<typename F>
       explicit function(F f)
@@ -459,5 +464,5 @@ namespace std
   /**@} lib_utilities        */
 
 } // namespace std
-
+#endif // NTL_CXX_VT
 #endif // NTL__STLX_FUNCTION

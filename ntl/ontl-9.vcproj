@@ -1010,6 +1010,10 @@
 							>
 						</File>
 						<File
+							RelativePath=".\stlx\fn_caller_vt.hxx"
+							>
+						</File>
+						<File
 							RelativePath=".\stlx\function.hxx"
 							>
 						</File>
@@ -1023,6 +1027,10 @@
 						</File>
 						<File
 							RelativePath=".\stlx\mem_fn_rv.hxx"
+							>
+						</File>
+						<File
+							RelativePath=".\stlx\mem_fn_vt.hxx"
 							>
 						</File>
 						<File

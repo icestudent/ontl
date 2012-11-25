@@ -38,8 +38,8 @@ namespace std {
 #endif
 
 #ifndef CHAR_MIN
-#if defined(_MSC_VER) || defined(__BCPLUSPLUS__) || defined(__GNUC__)
-  #ifndef _CHAR_UNSIGNED
+#if defined(_MSC_VER) || defined(__BCPLUSPLUS__) || defined(__GNUC__) || defined(__clang__)
+  #if !defined(_CHAR_UNSIGNED) && !defined(__CHAR_UNSIGNED__)
     #define CHAR_MIN    SCHAR_MIN
     #define CHAR_MAX    SCHAR_MAX
   #else
@@ -104,7 +104,7 @@ namespace std {
 #ifndef LLONG_MAX
   #if defined(_MSC_VER) || defined(__BCPLUSPLUS__)
     #define LLONG_MAX   9223372036854775807i64
-  #elif defined(__GNUC__)
+  #elif defined(__GNUC__) || defined(__clang__)
     #define LLONG_MAX   __LONG_LONG_MAX__
   #endif
 #endif
@@ -112,7 +112,7 @@ namespace std {
 #ifndef LLONG_MIN
   //#if defined(_MSC_VER) || defined(__BCPLUSPLUS__)
   //  #define LLONG_MIN   (-9223372036854775808i64)
-  //#elif defined(__GNUC__)
+  //#elif defined(__GNUC__) || defined(__clang__)
     #define LLONG_MIN   (-LLONG_MAX-1)
   //#endif
 #endif
@@ -120,7 +120,7 @@ namespace std {
 #ifndef ULLONG_MAX
   #if defined(_MSC_VER) || defined(__BCPLUSPLUS__)
     #define ULLONG_MAX  0xffffffffffffffffui64
-  #elif defined(__GNUC__)
+  #elif defined(__GNUC__) || defined(__clang__)
     #define ULLONG_MAX  (LLONG_MAX * 2ULL + 1)
   #endif
 #endif

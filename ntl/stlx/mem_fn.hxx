@@ -8,7 +8,9 @@
 #define NTL_MEMFN_HXX
 #pragma once
 
-#ifdef NTL_CXX_RV
+#if defined(NTL_CXX_VT)
+# include "mem_fn_vt.hxx"
+#elif defined(NTL_CXX_RV)
 # include "mem_fn_rv.hxx"
 #else 
 
@@ -187,39 +189,39 @@ namespace std
     result_type operator()(U& obj) const
     {
       static_assert(tuple_size<Args>::value == 0, "wrong count of arguments");
-      return __::func::invoke<result_type>(pmf, FUNARGS(U&)(obj));
+      return __::func::invoke<result_type>(pmf, NTL_FUNARGS(U&)(obj));
     }
     template<typename U>
     result_type operator()(const U& obj) const
     {
       static_assert(tuple_size<Args>::value == 0, "wrong count of arguments");
-      return __::func::invoke<result_type>(pmf, FUNARGS(const U&)(obj));
+      return __::func::invoke<result_type>(pmf, NTL_FUNARGS(const U&)(obj));
     }
 
     template<typename U>
     result_type operator()(U& obj, typename __::arg_t<0, Args>::type a1) const
     {
       static_assert(tuple_size<Args>::value == 1, "wrong count of arguments");
-      return __::func::invoke<result_type>(pmf, FUNARGS(U&, typename __::arg_t<0, Args>::type)(obj, a1));
+      return __::func::invoke<result_type>(pmf, NTL_FUNARGS(U&, typename __::arg_t<0, Args>::type)(obj, a1));
     }
     template<typename U>
     result_type operator()(const U& obj, typename __::arg_t<0, Args>::type a1) const
     {
       static_assert(tuple_size<Args>::value == 1, "wrong count of arguments");
-      return __::func::invoke<result_type>(pmf, FUNARGS(const U&, typename __::arg_t<0, Args>::type)(obj, a1));
+      return __::func::invoke<result_type>(pmf, NTL_FUNARGS(const U&, typename __::arg_t<0, Args>::type)(obj, a1));
     }
 
     template<typename U>
     result_type operator()(U& obj, typename __::arg_t<0, Args>::type a1, typename __::arg_t<1, Args>::type a2) const
     {
       static_assert(tuple_size<Args>::value == 2, "wrong count of arguments");
-      return __::func::invoke<result_type>(pmf, FUNARGS(U&, typename __::arg_t<0, Args>::type, typename __::arg_t<1, Args>::type)(obj, a1, a2));
+      return __::func::invoke<result_type>(pmf, NTL_FUNARGS(U&, typename __::arg_t<0, Args>::type, typename __::arg_t<1, Args>::type)(obj, a1, a2));
     }
     template<typename U>
     result_type operator()(const U& obj, typename __::arg_t<0, Args>::type a1, typename __::arg_t<1, Args>::type a2) const
     {
       static_assert(tuple_size<Args>::value == 2, "wrong count of arguments");
-      return __::func::invoke<result_type>(pmf, FUNARGS(const U&, typename __::arg_t<0, Args>::type, typename __::arg_t<1, Args>::type)(obj, a1, a2));
+      return __::func::invoke<result_type>(pmf, NTL_FUNARGS(const U&, typename __::arg_t<0, Args>::type, typename __::arg_t<1, Args>::type)(obj, a1, a2));
     }
 #endif
   };
@@ -290,9 +292,9 @@ namespace std
   mem_fn_t<R, const volatile T, R(T::*)()const volatile> mem_fn( R (T::* pm)() const volatile) __ntl_nothrow;
 
   template<typename R, class T, class A1>
-  mem_fn_t<R, T, R(T::*)(A1), FUNARGS(A1)> mem_fn( R (T::* pm)(A1) ) __ntl_nothrow
+  mem_fn_t<R, T, R(T::*)(A1), NTL_FUNARGS(A1)> mem_fn( R (T::* pm)(A1) ) __ntl_nothrow
   {
-    return mem_fn_t<R, T, R(T::*)(A1), FUNARGS(A1)>(pm);
+    return mem_fn_t<R, T, R(T::*)(A1), NTL_FUNARGS(A1)>(pm);
   }
 
 #endif

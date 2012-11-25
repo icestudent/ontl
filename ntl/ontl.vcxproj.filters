@@ -811,6 +811,9 @@
     <ClInclude Include="winapp.hxx">
       <Filter>ntl\.root</Filter>
     </ClInclude>
+    <ClInclude Include="stlx\type_traits_clang.hxx">
+      <Filter>ntl\stlx\utility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="stlx\tt_isfunc.inl">
@@ -823,6 +826,9 @@
       <Filter>ntl\stlx\utility\functional</Filter>
     </None>
     <None Include="copying.txt" />
+    <None Include="rtl\ehsup.asm">
+      <Filter>ntl\rtl</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="rtl\consoleapp.cpp">
@@ -852,13 +858,5 @@
     <ClCompile Include="rtl\wchar_mask_data.cpp">
       <Filter>ntl\rtl</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <MASM Include="rtl\ehsup.asm">
-      <Filter>ntl\rtl</Filter>
-    </MASM>
-    <MASM Include="rtl\safeseh.asm">
-      <Filter>ntl\rtl</Filter>
-    </MASM>
   </ItemGroup>
 </Project>

@@ -130,7 +130,14 @@ namespace std
     template <class F> explicit thread(F f);
 
   #ifdef NTL_CXX_VT
-    template <class F, class ...Args> thread(F&& f, Args&&... args);
+    template <class F, class ...Args>
+    thread(F&& f, Args&&... args)
+      :h(),tid()
+    {
+      typedef __::thread_params<F, typename __::tmap<Args...>::type> tparams;
+      tparams* tp = new tparams(f, std::move(make_tuple(std::forward<Args>(args)...)));
+      start(tp);
+    }
   #else
     template <class F, class A1> thread(F f, A1 a1);
     template <class F, class A1, class A2> thread(F f, A1 a1, A2 a2);
@@ -212,7 +219,7 @@ namespace std
     operator ntl::nt::client_id() const
     {
       using namespace ntl::nt;
-      client_id cid = {teb::get(&teb::ClientId).UniqueProcess, tid_};
+      client_id cid = {teb::instance().ClientId.UniqueProcess, tid_};
       return cid;
     }
   protected:
@@ -442,7 +449,7 @@ namespace std
 
   //////////////////////////////////////////////////////////////////////////
   // thread construction
-
+#ifndef NTL_CXX_VT
   template<class F>
   inline thread::thread(F f)
     :h(),tid()
@@ -456,7 +463,7 @@ namespace std
   inline thread::thread(F f, A1 a1)
     :h(),tid()
   {
-    typedef __::thread_params<F, FUNARGS(A1) > tparams;
+    typedef __::thread_params<F, NTL_FUNARGS(A1) > tparams;
     tparams* tp = new tparams(f, std::move(make_tuple(a1)));
     start(tp);
   }
@@ -465,7 +472,7 @@ namespace std
   inline thread::thread(F f, A1 a1, A2 a2)
     :h(),tid()
   {
-    typedef __::thread_params<F, FUNARGS(A1,A2)> tparams;
+    typedef __::thread_params<F, NTL_FUNARGS(A1,A2)> tparams;
     tparams* tp = new tparams(f, std::move(make_tuple(a1,a2)));
     start(tp);
   }
@@ -474,7 +481,7 @@ namespace std
   inline thread::thread(F f, A1 a1, A2 a2, A3 a3)
     :h(),tid()
   {
-    typedef __::thread_params<F, FUNARGS(A1,A2,A3)> tparams;
+    typedef __::thread_params<F, NTL_FUNARGS(A1,A2,A3)> tparams;
     tparams* tp = new tparams(f, std::move(make_tuple(a1,a2,a3)));
     start(tp);
   }
@@ -482,11 +489,11 @@ namespace std
   inline thread::thread(F f, A1 a1, A2 a2, A3 a3, A4 a4)
     :h(),tid()
   {
-    typedef __::thread_params<F, FUNARGS(A1,A2,A3,A4)> tparams;
+    typedef __::thread_params<F, NTL_FUNARGS(A1,A2,A3,A4)> tparams;
     tparams* tp = new tparams(f, std::move(make_tuple(a1,a2,a3,a4)));
     start(tp);
   }
-
+#endif // VT
   //////////////////////////////////////////////////////////////////////////
 
   /** @} thread_thread */

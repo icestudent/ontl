@@ -33,35 +33,26 @@ namespace std
     typedef const E*  iterator;
     typedef const E*  const_iterator;
 
-#ifndef NTL_CXX_IL
-    size_t   size()  const { return 0; }
-    const E* begin() const { return nullptr; }
-    const E* end()   const { return nullptr; } //-V524
-#else
-    size_t   size()  const;
-    const E* begin() const;
-    const E* end()   const;
+    size_t   size()  const { return end_ - begin_;}
+    const E* begin() const { return begin_;       }
+    const E* end()   const { return end_;         }
 
+    /** constructs an empty initializer_list object */
     initializer_list()
-      :i(), len()
+      :begin_(), end_()
+    {}
+
+    /** constructs from pointer plus a length */
+    initializer_list(iterator first, size_type count)
+      :begin_(first), end_(first+count)
+    {}
+    /** constructs from pair of pointers */
+    initializer_list(const_iterator begin, const_iterator end)
+      :begin_(begin), end_(end)
     {}
 
   private:
-    iterator i;
-    size_type len;
-
-    initializer_list(iterator i, size_type l)
-      :i(i), len(l)
-    {
-      char _[0];
-    }
-    initializer_list(const_iterator begin, const_iterator end)
-      :i(begin), len(end-begin)
-    {
-      char _[0];
-    }
-   
-#endif
+    const_iterator begin_, end_;
   };
 
   ///\name 18.9.3 Initializer list range access [support.initlist.range]

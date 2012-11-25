@@ -12,6 +12,7 @@
 #include "../baseconf_0x.hxx"
 #include "cpp0x_mode.hxx"
 
+
 // NTL LIB signature
 #define NTL_CPPLIB
 
@@ -19,7 +20,7 @@ namespace std {
 
 // Boost support
 #ifndef __STDC_VERSION__
-#define __STDC_VERSION__ 199901 
+#define __STDC_VERSION__ 199901
 #endif
 
 /**\addtogroup  lib_language_support *** 18 Language support library [language.support]
@@ -29,9 +30,9 @@ namespace std {
   #pragma warning(push)
   #pragma warning(disable:4324)
   #ifndef __ICL
-  typedef alignas(8192)  struct {} max_align_t;
+    typedef struct alignas(8192) {} max_align_t;
   #else
-  typedef alignas(8192)  struct {void*_;} max_align_t;
+    typedef struct alignas(8192) {void*_;} max_align_t;
   #endif
   #pragma warning(pop)
 #else
@@ -52,7 +53,12 @@ namespace std {
 #define NULL nullptr
 #endif
 
-#ifdef __GNUC__
+#if defined(__clang__)
+  typedef __typeof__(((int*)0)-((int*)0)) ptrdiff_t;
+  typedef __typeof__(sizeof(int)) size_t;
+  typedef __PTRDIFF_TYPE__ ssize_t;
+
+#elif defined(__GNUC__)
 
   typedef __PTRDIFF_TYPE__  ptrdiff_t;
   typedef __SIZE_TYPE__     size_t;
@@ -81,7 +87,12 @@ namespace std {
 #endif
 
 #ifndef offsetof
-  #define offsetof(s,m) (size_t)&reinterpret_cast<const volatile char&>((((s *)0)->m))
+  #if defined(__clang__)
+  # define offsetof(s,m) __builtin_offsetof(s,m)
+  #else
+  # define offsetof(s,m) (size_t)&reinterpret_cast<const volatile char&>((((s *)0)->m))
+  #endif
+
   #define offsetof_ptr(s,memptr) (size_t)&reinterpret_cast<const volatile char&>((((s *)0)->*memptr))
   // from bcb #define offsetof( s_name, m_name )  (size_t)&(((s_name*)0)->m_name)
 #endif
@@ -134,7 +145,12 @@ char (*__countof_helper(T(&array)[N]))[N];
 #define _countof(array) sizeof(*__countof_helper(array))
 #define _endof(array) (array+_countof(array))
 
-namespace std { namespace __{ using ntl::explicit_bool; using ntl::explicit_bool_type; } }
+namespace std { namespace __{ 
+#ifndef NTL_CXX_EXPLICITOP
+  using ntl::explicit_bool;
+  using ntl::explicit_bool_type;
+#endif
+} }
 
 namespace stlx = std;
 

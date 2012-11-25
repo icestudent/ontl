@@ -926,7 +926,7 @@ namespace std
   /** packaged_task class template specialization for callable with one argument */
   template<class R, class A1>
   class packaged_task<R(A1)>:
-    public __::packaged_task<R,FUNARGS(A1)>
+    public __::packaged_task<R,NTL_FUNARGS(A1)>
   {
   public:
     packaged_task()
@@ -949,7 +949,7 @@ namespace std
   /** packaged_task class template specialization for callable with two arguments */
   template<class R, class A1, class A2>
   class packaged_task<R(A1,A2)>:
-    public __::packaged_task<R,FUNARGS(A1,A2)>
+    public __::packaged_task<R,NTL_FUNARGS(A1,A2)>
   {
   public:
     packaged_task()

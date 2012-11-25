@@ -57,7 +57,7 @@ namespace ttl
     //using namespace meta_rel_ops;
 
     //internal implementation
-#ifdef NTL_CXX_VT
+#ifdef NTL_CXX_VT_TYPELIST
       namespace impl
       {
         struct typelist_traits

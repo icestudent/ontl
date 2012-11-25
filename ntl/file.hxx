@@ -37,7 +37,7 @@ class basic_file : public traits
   public:
     inline basic_file() : f() {}
 
-    operator explicit_bool_type() const { return f.operator explicit_bool_type(); } 
+    __explicit_operator_bool() const { return __explicit_bool(f); } 
     //operator const void*() { return f.operator const void*(); }
 
     template<typename objectT>

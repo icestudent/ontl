@@ -29,8 +29,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef NTL_RESULT_OF_HXX
-#define NTL_RESULT_OF_HXX
+#ifndef NTL__STLX_RESULT_OF
+#define NTL__STLX_RESULT_OF
 #pragma once
 
 #ifndef NTL__STLX_TYPE_TRAITS
@@ -319,4 +319,4 @@ namespace std
 
 } // namespace std
 
-#endif // !NTL_RESULT_OF_HXX
+#endif // !NTL__STLX_RESULT_OF

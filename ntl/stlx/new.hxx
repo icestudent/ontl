@@ -71,8 +71,8 @@ struct  nothrow_t {};
 extern __declspec(selectany) const nothrow_t nothrow = {};
 #elif defined(__BCPLUSPLUS__)
 __declspec(selectany) extern const nothrow_t nothrow;
-#elif defined(__GNUC__)
- extern const nothrow_t nothrow;
+#elif defined(__GNUC__) || defined(__clang__)
+  constexpr const nothrow_t nothrow = {};
 #endif
 
 /// Type new_handler [18.6.2.3 new.handler]
@@ -107,7 +107,7 @@ new_handler get_new_handler() __ntl_nothrow;
 
 ///\name  Single-object forms [18.6.1.1 lib.new.delete.single]
 
-void* operator new      (std::size_t size) __ntl_throws(std::bad_alloc);
+void* operator new      (std::size_t size);
 void  operator delete   (void* ptr) __ntl_nothrow;
 
 void* operator new      (std::size_t size, const std::nothrow_t&) __ntl_nothrow;
@@ -115,7 +115,7 @@ void  operator delete   (void* ptr, const std::nothrow_t&) __ntl_nothrow;
 
 ///\name  Array forms [18.6.1.2 lib.new.delete.array]
 
-void* operator new[]    (std::size_t size) __ntl_throws(std::bad_alloc);
+void* operator new[]    (std::size_t size);
 void  operator delete[] (void* ptr) __ntl_nothrow;
 
 void* operator new[]    (std::size_t size, const std::nothrow_t&) __ntl_nothrow;
@@ -157,7 +157,7 @@ void* operator new(std::size_t size, const varsize_tag&, std::size_t aux_size)
 }
 
 __forceinline
-void operator delete(void* ptr, const varsize_tag&, std::size_t)
+void operator delete(void* ptr, const varsize_tag&, std::size_t) __ntl_nothrow
 {
   return ::operator delete(ptr);
 }

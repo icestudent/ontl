@@ -296,15 +296,15 @@ namespace std
         return conv.to_bytes(p);
       }
 
-      template<> inline std::string    path::string<std::string>(const codecvt_type& cvt)  const { return string(); }
-      template<> inline std::wstring   path::string<std::wstring>(const codecvt_type& cvt) const { return wstring(); }
-      template<> inline std::u16string path::string<std::u16string>(const codecvt_type& cvt) const { return u16string(); }
-      template<> inline std::u32string path::string<std::u32string>(const codecvt_type& cvt) const { return u32string(); }
+      template<> inline std::string    path::string<std::string>(const codecvt_type& /*cvt*/)  const { return string(); }
+      template<> inline std::wstring   path::string<std::wstring>(const codecvt_type& /*cvt*/) const { return wstring(); }
+      template<> inline std::u16string path::string<std::u16string>(const codecvt_type& /*cvt*/) const { return u16string(); }
+      template<> inline std::u32string path::string<std::u32string>(const codecvt_type& /*cvt*/) const { return u32string(); }
 
-      template<> inline std::string    path::generic_string<std::string>(const codecvt_type& cvt)  const { return generic_string(); }
-      template<> inline std::wstring   path::generic_string<std::wstring>(const codecvt_type& cvt) const { return generic_wstring(); }
-      template<> inline std::u16string path::generic_string<std::u16string>(const codecvt_type& cvt) const { return generic_u16string(); }
-      template<> inline std::u32string path::generic_string<std::u32string>(const codecvt_type& cvt) const { return generic_u32string(); }
+      template<> inline std::string    path::generic_string<std::string>(const codecvt_type& /*cvt*/)  const { return generic_string(); }
+      template<> inline std::wstring   path::generic_string<std::wstring>(const codecvt_type& /*cvt*/) const { return generic_wstring(); }
+      template<> inline std::u16string path::generic_string<std::u16string>(const codecvt_type& /*cvt*/) const { return generic_u16string(); }
+      template<> inline std::u32string path::generic_string<std::u32string>(const codecvt_type& /*cvt*/) const { return generic_u32string(); }
 
 
       path::iterator& path::iterator::operator ++()
@@ -412,7 +412,7 @@ namespace std
         ntl::nt::rtl::relative_name rel(s.c_str());
         if(rel)
           s.assign(rel.path.data(), rel.path.length());
-        return rel;
+        return static_cast<bool>(rel);
       }
 
       path& path::replace_extension(const path& new_ext)

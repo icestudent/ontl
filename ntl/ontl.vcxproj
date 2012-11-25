@@ -208,6 +208,7 @@
     <ClInclude Include="stlx\set.hxx" />
     <ClInclude Include="stlx\stack.hxx" />
     <ClInclude Include="stlx\stdstring.hxx" />
+    <ClInclude Include="stlx\type_traits_clang.hxx" />
     <ClInclude Include="stlx\unordered_map.hxx" />
     <ClInclude Include="stlx\unordered_set.hxx" />
     <ClInclude Include="stlx\vector.hxx" />
@@ -437,16 +438,12 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <MASM Include="rtl\ehsup.asm">
+    <None Include="rtl\ehsup.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release|Win32'">true</ExcludedFromBuild>
-    </MASM>
-    <MASM Include="rtl\safeseh.asm">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release|Win32'">true</ExcludedFromBuild>
-    </MASM>
+      <FileType>Document</FileType>
+    </None>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

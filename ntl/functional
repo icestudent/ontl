@@ -4,6 +4,7 @@
   #include "stlx/bind.hxx"
   #include "stlx/function.hxx"
 #else
-//#include "stlx/mem_fn_vt.hxx"
-//#include "stlx/function_vt.hxx"
+  #include "stlx/mem_fn_vt.hxx"
+  #include "stlx/bind_vt.hxx"
+  #include "stlx/function_vt.hxx"
 #endif

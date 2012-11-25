@@ -192,15 +192,14 @@ class vector
     }
     #endif
 
-    vector(const initializer_list<T>& il)
+    vector(initializer_list<T> il)
     {
-      static_assert(false, "IL?!");
-      construct(il.begin(), il.size());
+      vector__disp(il.begin(), il.end(), forward_iterator_tag());
     }
-    vector(const initializer_list<T>& il, const Allocator& a)
+    vector(initializer_list<T> il, const Allocator& a)
       :array_allocator(a)
     {
-      construct(il.begin(), il.size());
+      vector__disp(il.begin(), il.end(), forward_iterator_tag());
     }
 
     __forceinline
@@ -233,7 +232,7 @@ class vector
     }
     #endif
 
-    vector& operator=(const initializer_list<T>& il)
+    vector& operator=(initializer_list<T> il)
     {
       assign(il);
       return *this;
@@ -257,7 +256,7 @@ class vector
       construct(n, u);
     }
 
-    void assign(const initializer_list<T>& il)
+    void assign(initializer_list<T> il)
     {
       assign__disp(il.begin(), il.end(), forward_iterator_tag());
     }
@@ -482,7 +481,10 @@ class vector
     ///\name  modifiers [23.2.6.4]
 
     #ifdef NTL_CXX_VT
-    template <class... Args> void emplace_back(Args&&... args);
+    template <class... Args> void emplace_back(Args&&... args)
+    {
+      emplace(end(), std::forward<Args>(args)...);
+    }
     #endif
 
     #ifdef NTL_CXX_RV
@@ -504,7 +506,12 @@ class vector
     void pop_back() __ntl_nothrow { array_allocator.destroy(--end_); }
 
     #ifdef NTL_CXX_VT
-    template <class... Args> iterator emplace(const_iterator position, Args&&... args);
+    template <class... Args> iterator emplace(const_iterator position, Args&&... args)
+    {
+      iterator r_dest = insert__blank_space(position, 1);
+      array_allocator.construct(--r_dest, std::forward<Args>(args)...);
+      return r_dest;
+    }
     #endif
 
     iterator insert(const_iterator position, const T& x)
@@ -530,7 +537,7 @@ class vector
       return insert__disp(&const_cast<value_type&>(*position), first, last, is_integral<InputIterator>::type());
     }
 
-    iterator insert(const_iterator position, const initializer_list<T>& il)
+    iterator insert(const_iterator position, initializer_list<T> il)
     {
       return insert__disp(&const_cast<value_type&>(*position), il.begin(), il.end(), false_type());
     }

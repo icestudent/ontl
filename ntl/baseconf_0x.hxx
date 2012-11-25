@@ -65,38 +65,54 @@
   #define NTL_CXX_VT
   // range-based for loop
   #define NTL_CXX_FOR
+
+// compiler-specific parameters
+#ifdef __clang__
+# undef NTL_CXX_CHARS_TYPES
+# undef NTL_CXX_VT // temporary
+#endif
+
 #endif // pure c++0x
 
 
 
 #if __cplusplus <= 199711L // legacy compilers
 
-#if defined(_MSC_VER) && !defined(__ICL)
+#if defined(_MSC_VER) && !defined(__ICL) && !defined(__clang__)
 #if _MSC_VER >= 1600
 
 /** VC10's partial C++0x support */
-// _MSC_FULL_VER: 160011001 (CTP), 160020506 (beta1), 160021003 (beta2), 160030128 (rc), 160040219 (sp1), 170040825 (ctp), 170050214 (b1)
+// _MSC_FULL_VER: 160011001 (CTP), 160020506 (beta1), 160021003 (beta2), 160030128 (rc), 160040219 (sp1), 170040825 (ctp), 170050214 (b1), 170050727 (sp0), 170051025
 
 #define NTL_CXX_AUTO
+#define NTL_CXX_ASSERT
+#define NTL_CXX_LAMBDA
+
 #if _MSC_FULL_VER >= 160020506 // beta1
 # define NTL_CXX_AUTORET
 # define NTL_CXX_TYPEOF
 #endif
+
 #if _MSC_FULL_VER >= 160021003 // beta2
 # define NTL_CXX_NULLPTR
 #endif
-#if _MSC_FULL_VER >= 170040825 // v17
 
-#endif
-#define NTL_CXX_ASSERT
-#define NTL_CXX_LAMBDA
-
-#if _MSC_FULL_VER >= 170040825 // v17
+#if _MSC_FULL_VER >= 170040825 // v17 b1
 # define NTL_CXX_ENUM
 # define NTL_CXX_NULLPTR
 # define NTL_CXX_RV 21
 #else
 # define NTL_CXX_RV 20
+#endif
+
+#if _MSC_FULL_VER >= 170050727 // v17
+# define NTL_CXX_FOR
+#endif
+
+#if _MSC_FULL_VER >= 170051025 // v17 november update
+# define NTL_CXX_IL
+# define NTL_CXX_EXPLICITOP
+//# define NTL_CXX_VT // buggy
 #endif
 
 #endif // _MSC_VER >= 1600
@@ -182,6 +198,10 @@
 # define NTL_CXX_EXPLICITOP	// 4.5
 # define NTL_CXX_LAMBDA		// 4.5
 #endif // gcc 4.5+
+
+#elif defined(__clang__) && defined(__GXX_EXPERIMENTAL_CXX0X__)
+
+
 
 #endif // compilers set
 #endif // legacy compilers

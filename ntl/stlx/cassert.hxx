@@ -13,9 +13,12 @@
 
 namespace ntl
 {
-  typedef void (*assert_handler)(const char* expr, const char* file, int line);
+  typedef void (*assert_handler)(const char* expr, const char* func, const char* file, int line);
 
-  __declspec(selectany) assert_handler __assert_handler = 0;
+#ifdef _MSC_VER
+  __declspec(selectany)
+#endif
+  assert_handler __assert_handler = 0;
 
   inline assert_handler set_assert_handler(assert_handler handler)
   {
@@ -35,11 +38,11 @@ inline __assert_handler __set_assert_handler(__assert_handler handler)
 }
 
 /** \c assert caller */
-inline void __ntl_assert(const char* expr, const char* file, int line)
+inline void __ntl_assert(const char* expr, const char* func, const char* file, int line)
 {
   ntl::assert_handler handler = ntl::__assert_handler;
   if(handler)
-    handler(expr, file, line);
+    handler(expr, func, file, line);
   else
     __debugbreak();
 }
@@ -59,17 +62,17 @@ inline void __ntl_assert(const char* expr, const char* file, int line)
 #else
   #define assert(expr) \
     if ( !!(expr) ); else if(ntl::__assert_handler)\
-      __ntl_assert("Assertion ("#expr") failed in "__func__,__FILE__,__LINE__);\
+      __ntl_assert("Assertion ("#expr") failed in ", __func__,__FILE__,__LINE__);\
       else __debugbreak();\
     ((void)0)
 #define _assert_msg(msg) \
   if(ntl::__assert_handler)\
-    __ntl_assert("Assertion (" msg ") failed in "__func__,__FILE__,__LINE__);\
+    __ntl_assert("Assertion (" msg ") failed in ", __func__,__FILE__,__LINE__);\
   else __debugbreak();\
       ((void)0)
 #define _assert_string(msg) \
   if(ntl::__assert_handler)\
-  __ntl_assert(msg,__FILE__,__LINE__);\
+  __ntl_assert(msg,__func__,__FILE__,__LINE__);\
   else __debugbreak();\
   ((void)0)
 #endif
@@ -78,7 +81,7 @@ inline void __ntl_assert(const char* expr, const char* file, int line)
 #define NTL__STLX_CASSERT
 
 #if defined(_MSC_VER) && !defined(__ICL)
-namespace std 
+namespace std
 {
   namespace __
   {
@@ -99,5 +102,5 @@ namespace std
 #endif
 
 #endif // msc
-  
+
 #endif//#ifndef NTL__STLX_CASSERT

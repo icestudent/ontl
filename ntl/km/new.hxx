@@ -25,7 +25,7 @@ namespace ntl {
 
 __forceinline
 void * __cdecl
-  operator new(std::size_t size) __ntl_throws(std::bad_alloc)
+  operator new(std::size_t size))
 {
   return ntl::km::pool<ntl::km::PagedPool>::alloc(size);
 }
@@ -56,7 +56,7 @@ void __cdecl
 
 __forceinline
 void * __cdecl
-  operator new[](std::size_t size) __ntl_throws(std::bad_alloc)
+  operator new[](std::size_t size)
 {
   return ntl::km::pool<ntl::km::PagedPool>::alloc(size);
 }

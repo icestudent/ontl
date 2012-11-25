@@ -1127,10 +1127,10 @@ const T& min(const T& a, const U& b, const Args&... args);
 #endif
 
 template<class T>
-T min(const initializer_list<T>& t);
+T min(initializer_list<T> t);
 
 template<class T, class Compare>
-T min(const initializer_list<T>& t, Compare comp);
+T min(initializer_list<T> t, Compare comp);
 
 template<class T>
 __forceinline
@@ -1155,10 +1155,10 @@ const T& max(const T& a, const U& b, const Args&... args);
 #endif
 
 template <class T>
-T max(const initializer_list<T>& t);
+T max(initializer_list<T> t);
 
 template<class T, class Compare>
-T max(const initializer_list<T>& t, Compare comp);
+T max(initializer_list<T> t, Compare comp);
 
 /**	\return <tt>pair<const T&, const T&>(b, a)</tt> if \p b is smaller than \p a, and <tt>pair<const T&, constT&>(a, b)</tt> otherwise. */
 template<class T> 
@@ -1177,10 +1177,10 @@ inline pair<const T&, const T&> minmax(const T& a, const T& b, Compare comp)
 }
 
 template<class T>
-pair<const T&, const T&> minmax(const initializer_list<T>& t);
+pair<const T&, const T&> minmax(initializer_list<T> t);
 
 template<class T, class Compare>
-pair<const T&, const T&> minmax(const initializer_list<T>& t, Compare comp);
+pair<const T&, const T&> minmax(initializer_list<T> t, Compare comp);
 
 #ifdef NTL_CXX_VT
 template<class T, class... Args>

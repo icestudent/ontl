@@ -79,7 +79,7 @@ namespace ntl { namespace numeric {
 
     public:
       /** Classifies a character. */
-      static bool is(mask m, char c) 
+      static bool is(mask m, char c)
       {
         return (detail::ascii_mask[static_cast<unsigned char>(c)] & m) != 0;
       }
@@ -105,7 +105,7 @@ namespace ntl { namespace numeric {
   static const std::size_t max_number_size = 68;
 
   template<typename storage_type, typename signed_storage_type>
-  static convresult str2num(storage_type& value, const char* str, std::ssize_t len, unsigned int base, storage_type max_val, signed_storage_type min_val, 
+  static convresult str2num(storage_type& value, const char* str, std::ssize_t len, unsigned int base, storage_type max_val, signed_storage_type min_val,
                               std::size_t* taken = 0, char thousands_sep = '\0', char decimal_sep = '\0')
   {
     using std::size_t;
@@ -204,7 +204,7 @@ namespace ntl { namespace numeric {
       result = conv_result::overflow;
     }else if(minus)
       value = static_cast<storage_type>( -static_cast<signed_storage_type>(value) );
-    
+
     return result;
   }
 
@@ -237,7 +237,7 @@ namespace ntl { namespace numeric {
     if(size > len)
       return conv_result::eof;
 
-    if(written) 
+    if(written)
       *written = size;
 
     if(*buf == '-')
@@ -317,7 +317,7 @@ namespace ntl { namespace numeric {
   inline char* itoa(T value, char* str, std::size_t strLen, int radix = 10, std::size_t* written = 0)
   {
     static_assert(std::is_integral<T>::value, "only integral types supported");
-    typedef detail::select<T>::type storage_type;
+    typedef typename detail::select<T>::type storage_type;
     num2str<storage_type>(static_cast<storage_type>(value), std::is_signed<T>::value, str, strLen, radix, written);
     return str;
   }
@@ -326,7 +326,7 @@ namespace ntl { namespace numeric {
   inline char* itoa(T value, char (&str)[N], int radix = 10, std::size_t* written = 0)
   {
     static_assert(std::is_integral<T>::value, "only integral types supported");
-    typedef detail::select<T>::type storage_type;
+    typedef typename detail::select<T>::type storage_type;
     num2str<storage_type>(static_cast<storage_type>(value), std::is_signed<T>::value, str, N, radix, written);
     return str;
   }
@@ -335,7 +335,7 @@ namespace ntl { namespace numeric {
   inline wchar_t* itow(T value, wchar_t* str, std::size_t strLen, int radix = 10, std::size_t* written = 0)
   {
     static_assert(std::is_integral<T>::value, "only integral types supported");
-    typedef detail::select<T>::type storage_type;
+    typedef typename detail::select<T>::type storage_type;
     char buf[max_number_size];
     std::size_t lwritten;
     const convresult re = num2str<storage_type>(static_cast<storage_type>(value), std::is_signed<T>::value, buf, strLen, radix, &lwritten);

@@ -17,13 +17,13 @@
 
 #ifndef va_start
 
+#if _MSC_VER
+
 // MSVC stdlib compatibility
 #ifndef _VA_LIST_DEFINED
 typedef struct { } * va_list;
 #define _VA_LIST_DEFINED
 #endif
-
-#ifdef _MSC_VER
 
 #if defined(_M_IX86)
 
@@ -58,6 +58,20 @@ typedef struct { } * va_list;
 
 #else//CPU type
 #   error unsupported CPU type
+#endif
+
+
+#elif __clang__ // !_MSC_VER
+
+typedef __builtin_va_list va_list;
+
+#define va_start(ap, param) __builtin_va_start(ap, param)
+#define va_end(ap)          __builtin_va_end(ap)
+#define va_arg(ap, type)    __builtin_va_arg(ap, type)
+#define __va_copy(d,s) __builtin_va_copy(d,s)
+
+#if __STDC_VERSION__ >= 199900L || __cplusplus >= 201103L || !defined(__STRICT_ANSI__)
+# define va_copy(dest, src)  __builtin_va_copy(dest, src)
 #endif
 
 #endif//!_MSC_VER

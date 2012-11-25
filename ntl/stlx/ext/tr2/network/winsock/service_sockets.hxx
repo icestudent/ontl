@@ -319,7 +319,7 @@ namespace ntl { namespace network {
       bool wait(const implementation_type& impl, socket_base::wait_type check, std::error_code& ec)
       {
         if(!check_open(impl, ec))
-          return ec;
+          return static_cast<bool>(ec);
         fd_set r, w, e;
         if(check & socket_base::read)
           r.set(impl.s);

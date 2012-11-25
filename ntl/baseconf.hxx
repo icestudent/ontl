@@ -24,6 +24,7 @@
   # error upgrade your compiler at least to BCB 2009 (12.00)
   #endif
 #elif defined(__INTEL_COMPILER)
+// Intel C++
   #ifndef __ICL
   # define __ICL __INTEL_COMPILER
   #endif
@@ -32,6 +33,12 @@
   #if !(__GNUC__ > 4 || __GNUC__ == 4 && __GNUC_MINOR__ >= 2)
   # error upgrade GCC at least to the GCC 4.2
   #endif
+#elif defined(__clang__)
+// Clang
+  #if !(__clang_major__ >= 3 || __clang_major__ == 2 && __clang_minor__ >= 9)
+  # error upgrade Clang at least to the Clang 2.9
+  #endif
+
 #else
 # pragma message("Unknown compiler, it is unsupported probably. Sorry, mate")
 #endif
@@ -67,7 +74,7 @@
     #else
       #define STLX_USE_EXCEPTIONS 0
     #endif
-  #elif defined(__GNUC__)
+  #elif defined(__GNUC__) || defined(__clang__)
     #ifdef __EXCEPTIONS
       #define STLX_USE_EXCEPTIONS 1
     #else
@@ -90,7 +97,7 @@
     #else
       #define STLX_USE_RTTI 0
     #endif
-  #elif defined(__GNUC__)
+  #elif defined(__GNUC__) || defined(__clang__)
     #ifdef __GXX_RTTI
       #define STLX_USE_RTTI 1
     #else
@@ -117,7 +124,7 @@
 # else
 # pragma runtime_checks( "", off )
 # endif
-#elif defined(__GNUC__)
+#elif defined(__GNUC__) || defined(__clang__)
 # define __forceinline __attribute__((always_inline))
 # define __assume(X)
 #else
@@ -167,7 +174,7 @@
 
 #if defined(_MSC_VER)
 # define __noalias __declspec(noalias)
-#elif defined(__BCPLUSPLUS__) || defined(__GNUC__)
+#elif defined(__BCPLUSPLUS__) || defined(__GNUC__) || defined(__clang__)
 # define __noalias
 #endif
 
@@ -200,11 +207,17 @@
   #endif // x64
 #endif // __GNUC__
 
-#ifdef __GNUC__
+#if defined(__GNUC__)  || defined(__clang__)
+#ifndef _M_X64
  #define __cdecl    __attribute__((cdecl))
  #define __stdcall  __attribute__((stdcall))
  #define __fastcall __attribute__((fastcall))
-#endif
+#else
+  #define __cdecl    
+  #define __stdcall  
+  #define __fastcall 
+#endif // x64
+#endif // __GNUC__
 
 #ifndef NTL_CRTCALL
 # ifdef NTL_STLX_FORCE_CDECL
@@ -227,7 +240,7 @@
   #elif defined(__BCPLUSPLUS__)
     #define NTL_EXTERNAPI extern "C" __declspec(dllimport) __declspec(nothrow)
     #define NTL_EXTERNVAR extern "C" __declspec(dllimport)
-  #elif defined(__GNUC__)
+  #elif defined(__GNUC__) || defined(__clang__)
     #define NTL_EXTERNAPI extern "C"
     #define NTL_EXTERNVAR extern "C"
   #endif

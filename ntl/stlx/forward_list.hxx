@@ -192,7 +192,12 @@ namespace std {
     }
   #endif
 
-    forward_list(const initializer_list<T>& il, const Alloc& a = Alloc())
+    forward_list(initializer_list<T> il)
+    {
+      init_head();
+      insert_after(cbefore_begin(), il);
+    }
+    forward_list(initializer_list<T> il, const Alloc& a)
       :node_allocator(a)
     {
       init_head();
@@ -221,7 +226,7 @@ namespace std {
       return *this;
     }
   #endif
-    forward_list& operator=(const initializer_list<T>& il)
+    forward_list& operator=(initializer_list<T> il)
     {
       assign(il);
       return *this;
@@ -240,7 +245,7 @@ namespace std {
       insert_after(cbefore_begin(), n, t);
     }
 
-    void assign(const initializer_list<T>& il)
+    void assign(initializer_list<T> il)
     {
       assign(il.begin(), il.end());
     }
@@ -365,7 +370,7 @@ namespace std {
       insert__disp(position, first, last, is_integral<InputIterator>::type());
     }
 
-    void insert_after(const_iterator position, const initializer_list<T>& il)
+    void insert_after(const_iterator position, initializer_list<T> il)
     {
       insert_after(position, il.begin(), il.end());
     }

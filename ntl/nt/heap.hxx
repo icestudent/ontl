@@ -217,7 +217,7 @@ RtlGetProcessHeaps(
 
 
 typedef
-  ntstatus __stdcall 
+  ntstatus __stdcall
   rtl_enum_heaps_routine(
     heap_ptr  HeapHandle,
     void* Parameter
@@ -231,7 +231,7 @@ RtlEnumProcessHeaps(
     void* Parameter
     );
 
-struct rtl_heap_usage_entry 
+struct rtl_heap_usage_entry
 {
     rtl_heap_usage_entry *Next;
     void* Address;
@@ -292,7 +292,7 @@ RtlWalkHeap(
     rtl_heap_walk_entry* Entry
     );
 
-struct rtl_heap_entry 
+struct rtl_heap_entry
 {
     size_t Size;
     uint16_t Flags;
@@ -309,7 +309,7 @@ struct rtl_heap_entry
     } u;
 };
 
-struct rtl_heap_tag 
+struct rtl_heap_tag
 {
     uint32_t NumberOfAllocations;
     uint32_t NumberOfFrees;
@@ -319,7 +319,7 @@ struct rtl_heap_tag
     wchar_t TagName[ 24 ];
 } ;
 
-struct rtl_heap_information 
+struct rtl_heap_information
 {
     void* BaseAddress;
     uint32_t Flags;
@@ -336,13 +336,13 @@ struct rtl_heap_information
     rtl_heap_entry* Entries;
 };
 
-struct rtl_process_heaps 
+struct rtl_process_heaps
 {
     uint32_t NumberOfHeaps;
     rtl_heap_information Heaps[ 1 ];
 };
 
-enum heap_information_class 
+enum heap_information_class
 {
     HeapCompatibilityInformation
 };
@@ -606,7 +606,7 @@ struct process_heap
   __forceinline
     operator heap_ptr() const
   {
-    heap_ptr p = teb::get(&teb::ProcessEnvironmentBlock)->ProcessHeap;
+    heap_ptr p = peb::instance().ProcessHeap;
     return p;
   }
 };

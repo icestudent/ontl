@@ -29,7 +29,7 @@ namespace std { namespace tr2 { namespace sys {
    *	@brief 5.5.3. Class mutable_buffer
    **/
   class mutable_buffer:
-    pair<void*, size_t>
+    public pair<void*, size_t>
   {
     friend class const_buffer;
   public:
@@ -39,17 +39,19 @@ namespace std { namespace tr2 { namespace sys {
       :pair(data, size)
     {}
 
-    template<class T> 
-    friend inline T buffer_cast(const mutable_buffer& b) __ntl_nothrow      { return static_cast<T>(b.first); }
-    friend size_t buffer_size(const mutable_buffer& b);
+    //template<class T> 
+    //friend inline T buffer_cast(const mutable_buffer& b) __ntl_nothrow      { return static_cast<T>(b.first); }
+    //friend size_t buffer_size(const mutable_buffer& b);
   };
+  template<class T> 
+  inline T buffer_cast(const mutable_buffer& b) __ntl_nothrow      { return static_cast<T>(b.first); }
 
 
   /**
    *	@brief 5.5.4. Class const_buffer
    **/
   class const_buffer:
-    pair<const void*, size_t>
+    public pair<const void*, size_t>
   {
   public:
     const_buffer()
@@ -61,10 +63,12 @@ namespace std { namespace tr2 { namespace sys {
       :pair(b)
     {}
 
-    template<class T>
-    friend inline T buffer_cast(const const_buffer& b) __ntl_nothrow        { return static_cast<T>(b.first); }
-    friend size_t buffer_size(const const_buffer& b) __ntl_nothrow;
+    //template<class T>
+    //friend inline T buffer_cast(const const_buffer& b) __ntl_nothrow        { return static_cast<T>(b.first); }
+    //friend size_t buffer_size(const const_buffer& b) __ntl_nothrow;
   };
+  template<class T>
+  inline T buffer_cast(const const_buffer& b) __ntl_nothrow        { return static_cast<T>(b.first); }
 
   inline size_t buffer_size(const const_buffer& b) __ntl_nothrow    { return b.second; }
   inline size_t buffer_size(const mutable_buffer& b) __ntl_nothrow  { return b.second; }

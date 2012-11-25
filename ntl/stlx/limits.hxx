@@ -655,40 +655,40 @@ template<> class numeric_limits<unsigned long long>
 
 namespace __
 {
-#if defined(__GNUC__)
-  inline float float_infinity()     { return __builtin_huge_valf(); }
-  inline float float_quiet_NaN()    { return __builtin_nanf("");    }
-  inline float float_signaling_NaN(){ return __builtin_nansf("");   }
-  inline float float_denorm_min()   { return __FLT_DENORM_MIN__;    }
+#if defined(__GNUC__) || defined(__clang__)
+  inline constexpr float float_infinity()     { return __builtin_huge_valf(); }
+  inline constexpr float float_quiet_NaN()    { return __builtin_nanf("");    }
+  inline constexpr float float_signaling_NaN(){ return __builtin_nansf("");   }
+  inline constexpr float float_denorm_min()   { return __FLT_DENORM_MIN__;    }
 
-  inline double double_infinity()     { return __builtin_huge_valf(); }
-  inline double double_quiet_NaN()    { return __builtin_nanf("");    }
-  inline double double_signaling_NaN(){ return __builtin_nansf("");   }
-  inline double double_denorm_min()   { return __DBL_DENORM_MIN__;    }
+  inline constexpr double double_infinity()     { return __builtin_huge_valf(); }
+  inline constexpr double double_quiet_NaN()    { return __builtin_nanf("");    }
+  inline constexpr double double_signaling_NaN(){ return __builtin_nansf("");   }
+  inline constexpr double double_denorm_min()   { return __DBL_DENORM_MIN__;    }
 
-  inline long double long_double_infinity()     { return __builtin_huge_valf(); }
-  inline long double long_double_quiet_NaN()    { return __builtin_nanf("");    }
-  inline long double long_double_signaling_NaN(){ return __builtin_nansf("");   }
-  inline long double long_double_denorm_min()   { return __LDBL_DENORM_MIN__;   }
+  inline constexpr long double long_double_infinity()     { return __builtin_huge_valf(); }
+  inline constexpr long double long_double_quiet_NaN()    { return __builtin_nanf("");    }
+  inline constexpr long double long_double_signaling_NaN(){ return __builtin_nansf("");   }
+  inline constexpr long double long_double_denorm_min()   { return __LDBL_DENORM_MIN__;   }
 #else
   union fvalue { uint8_t raw[sizeof(float)]; float value; };
   static_assert(sizeof(fvalue) == 4, "unsupported float size");
-  inline float float_infinity()
+  inline constexpr float float_infinity()
   {
     static constexpr const fvalue infinity      = { 0x00, 0x00, 0x80, 0x7F };
     return infinity.value;
   }
-  inline float float_quiet_NaN()
+  inline constexpr float float_quiet_NaN()
   {
     static constexpr const fvalue quiet_NaN     = { 0x00, 0x00, 0xC0, 0x7F };
     return quiet_NaN.value;
   }
-  inline float float_signaling_NaN()
+  inline constexpr float float_signaling_NaN()
   {
     static constexpr const fvalue signaling_NaN = { 0x01, 0x00, 0x80, 0x7F };
     return signaling_NaN.value;
   }
-  inline float float_denorm_min()
+  inline constexpr float float_denorm_min()
   {
     static constexpr const fvalue denorm_min    = { 0x01, 0x00, 0x00, 0x00 };
     return denorm_min.value;
@@ -696,25 +696,25 @@ namespace __
 
   union dvalue { uint8_t raw[sizeof(double)]; double  value;};
   STATIC_ASSERT(sizeof(dvalue) == 8);
-  inline double double_infinity()
+  inline constexpr double double_infinity()
   {
     static constexpr const dvalue infinity =
     { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xF0, 0x7F };
     return infinity.value;
   }
-  inline double double_quiet_NaN()
+  inline constexpr double double_quiet_NaN()
   {
     static constexpr const dvalue quiet_NaN =
     { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xF8, 0x7F };
     return quiet_NaN.value;
   }
-  inline double double_signaling_NaN()
+  inline constexpr double double_signaling_NaN()
   {
     static constexpr const dvalue signaling_NaN =
     { 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0xF0, 0x7F };
     return signaling_NaN.value;
   }
-  inline double double_denorm_min()
+  inline constexpr double double_denorm_min()
   {
     static constexpr const dvalue denorm_min =
     { 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
@@ -723,25 +723,25 @@ namespace __
 #if DBL_DIG == LDBL_DIG
   union ldvalue { uint8_t raw[sizeof(double)]; long double value;};
   STATIC_ASSERT(sizeof(ldvalue) == 8);
-  inline long double long_double_infinity()
+  inline constexpr long double long_double_infinity()
   {
     static constexpr const ldvalue infinity =
     { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xF0, 0x7F };
     return infinity.value;
   }
-  inline long double long_double_quiet_NaN()
+  inline constexpr long double long_double_quiet_NaN()
   {
     static constexpr const ldvalue quiet_NaN =
     { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xF8, 0x7F };
     return quiet_NaN.value;
   }
-  inline long double long_double_signaling_NaN()
+  inline constexpr long double long_double_signaling_NaN()
   {
     static constexpr const ldvalue signaling_NaN =
     { 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0xF0, 0x7F };
     return signaling_NaN.value;
   }
-  inline long double long_double_denorm_min()
+  inline constexpr long double long_double_denorm_min()
   {
     static constexpr const ldvalue denorm_min =
     { 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };

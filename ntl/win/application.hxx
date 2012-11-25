@@ -12,7 +12,8 @@
 #include "handle.hxx"
 #include "pe/image.hxx"
 #include "stlx/iterator.hxx"
-
+#include "stlx/vector.hxx"
+#include "stlx/string_ref.hxx"
 
 namespace ntl {
 namespace win {
@@ -104,19 +105,23 @@ class application: noncopyable
 
     struct command_line
     {
-      const char_type * argv[128];
+      //const char_type * argv[128];
+      //typedef const char_type* value_type;
+      // 
+      typedef std::basic_string_ref<char_type> value_type;
+      std::vector<value_type> argv;
       int               argc;
 
-      typedef const char_type * * iterator;
-      typedef const char_type* const * const_iterator;
+      typedef value_type * iterator;
+      typedef value_type const * const_iterator;
       typedef std::reverse_iterator<iterator> reverse_iterator;
       typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
 
-      iterator begin() { return &argv[0]; }
-      iterator end()   { return &argv[argc]; }
+      iterator begin() { return argv.begin(); }
+      iterator end()   { return argv.end(); }
 
-      const_iterator begin() const { return &argv[0]; }
-      const_iterator end() const   { return &argv[argc]; }
+      const_iterator begin() const { return argv.cbegin(); }
+      const_iterator end() const   { return argv.cend(); }
 
       const_iterator cbegin() const{ return begin(); }
       const_iterator cend() const  { return end(); }
@@ -130,7 +135,7 @@ class application: noncopyable
       const_reverse_iterator  crend()  const { return rend(); }
 
       // random access
-      const char_type* operator[](int argno)
+      const value_type operator[](int argno)
       {
         return argv[argno];
       }
@@ -148,27 +153,31 @@ class application: noncopyable
        **/
       struct option
       {
-        std::pair<const char_type*, size_t> name;
+        typedef std::basic_string_ref<char_type> string_ref;
+        
+        string_ref name;
 
         template<size_t N>
         option(const char_type (&name)[N])
-          :name(name, N)
+          :name(name, N-1)
         {}
         option(const char_type* name, size_t len)
           :name(name, len)
         {}
+        option(const string_ref& name)
+          :name(name)
+        {}
 
-        bool operator()(const char_type* opt) const;
-        bool operator()(const std::basic_string<char_type>& opt) const { return opt.compare(0, name.second-1, name.first) == 0; }
-
-        const char_type* value(const char_type* opt) const
+        //bool operator()(const char_type* opt) const;
+        bool operator()(const string_ref& opt) const
         {
-          static const char_type null = '\0';
-          return opt[name.second-1] == '=' ? opt + name.second : &null;
+          return opt.starts_with(name) && (opt[name.length()] == '\0' || opt[name.length()] == '=');
         }
-        std::basic_string<char_type> value(const std::basic_string<char_type>& opt) const
+
+        string_ref value(const string_ref& opt) const
         {
-          return name.second < opt.length() && opt[name.second-1] == '=' ? opt.substr(name.second) : std::basic_string<char_type>();
+          return (opt.starts_with(name) && opt[name.length()] == '=')
+            ? string_ref(&opt[name.length()+1]) : string_ref();
         }
       };
 
@@ -184,14 +193,19 @@ class application: noncopyable
       {
         argc = 0;
         // self
+        char_type* beg;
         if(*p == '"'){
-          argv[argc++] = ++p;
+          //argv[argc++] = ++p;
+          beg = ++p;
           while(*p && *p != '"') p++;
           if(!*p) return -1;
+          argv.push_back(value_type(beg, p-beg));
           *p++ = '\0';
         }else{
-          argv[argc++] = p;
+          //argv[argc++] = p;
+          beg = p;
           while(*p < '\0' || *p > ' ') p++;
+          argv.push_back(value_type(beg, p-beg));
           if(*p) *p++ = '\0';
         }
         // arguments
@@ -199,17 +213,21 @@ class application: noncopyable
           while(*p > '\0' && *p <= ' ') p++;
           if(!*p) break;
           if(*p == '"'){
-            argv[argc++] = ++p;
+            //argv[argc++] = ++p;
+            beg = ++p;
             while(*p && *p != '"') p++;
             if(!*p) return -1;
+            argv.push_back(value_type(beg, p-beg));
             *p++ = '\0';
           }else{
-            argv[argc++] = p;
+            //argv[argc++] = p;
+            beg = p;
             while(*p < '\0' || *p > ' ') p++;
+            argv.push_back(value_type(beg, p-beg));
             if(*p) *p++ = '\0';
           }
         }
-        return argc;
+        return argc = static_cast<int>(argv.size());
       }
 
     };
@@ -234,20 +252,20 @@ inline wchar_t* application<wchar_t>::command_line::get()
   return GetCommandLineW();
 }
 
-template<>
-inline bool application<char>::command_line::option::operator()(const char* opt) const
-{
-  const size_t len = std::strlen(opt);
-  return std::strncmp(opt, name.first, name.second-1) == 0 && 
-    ( len == name.second-1 || (len > name.second && opt[name.second-1] == '=') );
-}
-template<>
-inline bool application<wchar_t>::command_line::option::operator()(const wchar_t* opt) const
-{
-  const size_t len = std::wcslen(opt);
-  return std::wcsncmp(opt, name.first, name.second-1) == 0 && 
-    ( len == name.second-1 || (len > name.second && opt[name.second-1] == '=') );
-}
+//template<>
+//inline bool application<char>::command_line::option::operator()(const char* opt) const
+//{
+//  const size_t len = std::strlen(opt);
+//  return std::strncmp(opt, name.first, name.second-1) == 0 && 
+//    ( len == name.second-1 || (len > name.second && opt[name.second-1] == '=') );
+//}
+//template<>
+//inline bool application<wchar_t>::command_line::option::operator()(const wchar_t* opt) const
+//{
+//  const size_t len = std::wcslen(opt);
+//  return std::wcsncmp(opt, name.first, name.second-1) == 0 && 
+//    ( len == name.second-1 || (len > name.second && opt[name.second-1] == '=') );
+//}
 
 
 /**@} application */

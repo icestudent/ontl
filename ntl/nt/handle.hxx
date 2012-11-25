@@ -145,7 +145,7 @@ enum handle_attributes
   handle_flag_protect_from_close  = 2
 };
 
-static __forceinline
+static inline
   handle_attributes operator|(handle_attributes m, handle_attributes m2)
 {
   return bitwise_or(m, m2);

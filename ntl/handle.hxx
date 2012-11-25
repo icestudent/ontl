@@ -46,7 +46,7 @@ class basic_handle
 
     //bool is_valid() const { return Validate(get()); }
 
-    operator explicit_bool_type() const __ntl_nothrow { return explicit_bool(get()); }
+    __explicit_operator_bool() const __ntl_nothrow { return __explicit_bool(get()); }
 
     X get() const __ntl_nothrow { return h; }
     X get() const volatile __ntl_nothrow { return h; }

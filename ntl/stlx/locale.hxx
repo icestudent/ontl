@@ -31,6 +31,7 @@
 
 #include "../nt/string.hxx"
 #include "cstdlib.hxx"
+#include "string_ref.hxx"
 
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -286,6 +287,8 @@ class wstring_convert
 public:
   typedef basic_string<char, char_traits<char>, Byte_alloc> byte_string;
   typedef basic_string<Elem, char_traits<Elem>, Wide_alloc> wide_string;
+  typedef basic_string_ref<char, char_traits<char>> byte_string_ref;
+  typedef basic_string_ref<Elem, char_traits<Elem>> wide_string_ref;
   typedef typename Codecvt::state_type                      state_type;
   typedef typename wide_string::traits_type::int_type       int_type;
 
@@ -329,6 +332,11 @@ public:
   {
     return from_bytes(str.c_str(), str.length());
   }
+  /** convert the sequence stored in \e str to a wide %string */
+  wide_string from_bytes(const byte_string_ref& str) __ntl_throws(range_error)
+  {
+    return from_bytes(str.data(), str.length());
+  }
   /** convert the sequence defined by the range <tt>[first,last)</tt> to a wide %string */
   wide_string from_bytes(const char *first, const char *last) __ntl_throws(range_error)
   {
@@ -360,6 +368,11 @@ public:
   byte_string to_bytes(const wide_string& wstr) __ntl_throws(range_error)
   {
     return to_bytes(wstr.c_str(), wstr.length());
+  }
+  /** convert the sequence stored in \e wstr to a byte %string */
+  byte_string to_bytes(const wide_string_ref& wstr) __ntl_throws(range_error)
+  {
+    return to_bytes(wstr.data(), wstr.length());
   }
   /** convert the sequence defined by the range <tt>[first,last)</tt> to a byte %string */
   byte_string to_bytes(const Elem *first, const Elem *last) __ntl_throws(range_error)

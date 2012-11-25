@@ -64,7 +64,7 @@ struct linked_ptr
       return links.prev == links.next && ptr;
     }
 
-    operator explicit_bool_type() const
+    __explicit_operator_bool() const
     {
       // ptr != 0 forces a few bloat instructions
       return explicit_bool(ptr);

@@ -114,6 +114,19 @@ namespace ntl {
     {
       static const dpfltr::type type = Type;
 
+#ifdef NTL_CXX_VT
+      template<typename... T>
+      void printf(const char format[], T... args) const
+      {
+#ifdef NTL__DEBUG_2K
+        KdPrint((format, args...));
+#else
+        KdPrintEx((type, DefaultLevel, format, args...));
+#endif
+      }
+
+#else // VT
+
       void printf(const char msg[]) const
       {
 #ifdef NTL__DEBUG_2K
@@ -182,6 +195,8 @@ namespace ntl {
         KdPrintEx((type, DefaultLevel, format, arg1, arg2, arg3, arg4, arg5, arg6));
 #endif
       }
+#endif // NTL_CXX_VT
+
       void operator()(const char msg[]) const
       {
         printf(msg);
@@ -318,6 +333,9 @@ namespace ntl {
 
 
   }//namespace nt
+
+namespace dbg = NTL_SUBSYSTEM_NS::dbg;
+
 }//namespace ntl
 
 #ifdef _M_X64
@@ -332,5 +350,4 @@ extern "C" inline void __cdecl debug_abort()
 }
 
 //static const void* __dummyref = reinterpret_cast<const void*>(debug_abort);
-
 #endif // NTL__NT_DEBUG

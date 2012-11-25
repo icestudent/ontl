@@ -8,7 +8,7 @@
 #define NTL__STLX_FNCALLER_RV
 #pragma once
 
-#ifndef NTL_RESULT_OF_HXX
+#ifndef NTL__STLX_RESULT_OF
 # include "result_of.hxx"
 #endif
 
@@ -113,35 +113,35 @@ namespace std
     }
 
     /// Invoke arguments type set creation
-    #define FUNARGS(...) typename __::tmap<__VA_ARGS__>::type
+    #define NTL_FUNARGS(...) typename __::tmap<__VA_ARGS__>::type
 
     template<typename F, typename R = void>
     struct invoker
     {
       static inline R invoke(F f)
       {
-        typedef FUNARGS() Args;
+        typedef NTL_FUNARGS() Args;
         return fn_caller<F,Args,R>::call(f,Args());
       }
 
       template<class A1>
       static inline R invoke(F f, A1 a1)
       {
-        typedef FUNARGS(A1) Args;
+        typedef NTL_FUNARGS(A1) Args;
         return fn_caller<F,Args,R>::call(f,Args(a1));
       }
 
       template<class A1, class A2>
       static inline R invoke(F f, A1 a1, A2 a2)
       {
-        typedef FUNARGS(A1,A2) Args;
+        typedef NTL_FUNARGS(A1,A2) Args;
         return fn_caller<F,Args,R>::call(f,Args(a1,a2));
       }
 
       template<class A1, class A2, class A3>
       static inline R invoke(F f, A1 a1, A2 a2, A3 a3)
       {
-        typedef FUNARGS(A1,A2,A3) Args;
+        typedef NTL_FUNARGS(A1,A2,A3) Args;
         return fn_caller<F,Args,R>::call(f,Args(a1,a2,a3));
       }
     };

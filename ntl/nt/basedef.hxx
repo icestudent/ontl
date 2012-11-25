@@ -21,14 +21,18 @@
 #include "../stdlib.hxx"
 
 
-extern "C" __declspec(selectany) /*C2373 volatile*/ std::uintptr_t __security_cookie = 
+extern "C"
+#ifdef _MSC_VER
+__declspec(selectany)
+#endif
+/*C2373 volatile*/ std::uintptr_t __security_cookie =
   #ifdef _M_X64
     0x00002B992DDFA232;
   #else
     0xBB40E64E;
   #endif
 
-#ifdef __ICL
+#if defined(__ICL) || defined(__clang__)
 struct __s_GUID
 {
   unsigned long Data1;
@@ -145,8 +149,7 @@ namespace ntl {
 
     typedef single_list_entry slist_entry;
 
-    alignas(8)
-    struct slist_header : public slist_entry
+    struct alignas(8) slist_header : public slist_entry
     {
       uint16_t    Depth;
       uint16_t    Sequence;

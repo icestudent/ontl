@@ -299,10 +299,7 @@ namespace rtl
       return object_attributes(/*ContainingDirectory, ContainingDirectory ? RelativeName : */path);
     }
 
-    operator explicit_bool_type() const
-    {
-      return explicit_bool(ok_);
-    }
+    __explicit_operator_bool() const { return __explicit_bool(ok_); }
 
   protected:
     bool ok_;

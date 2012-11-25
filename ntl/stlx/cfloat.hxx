@@ -15,7 +15,7 @@ namespace std {
 /**\addtogroup  lib_support_limits ***** 18.3 Implementation properties [support.limits]
  *@{*/
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || defined(__clang__)
   #include <float.h>
   #ifndef DBL_RADIX
     #define DBL_RADIX FLT_RADIX

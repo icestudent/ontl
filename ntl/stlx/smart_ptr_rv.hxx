@@ -160,7 +160,7 @@ namespace std
     deleter_type& get_deleter() __ntl_nothrow { return deleter; }
     const deleter_type& get_deleter() const __ntl_nothrow { return deleter; }
 
-    operator __::explicit_bool_type() const __ntl_nothrow { return __::explicit_bool(ptr); }
+    __explicit_operator_bool() const __ntl_nothrow { return __explicit_bool(ptr); }
 
     ///\name 20.8.11.2.5 unique_ptr modifiers [unique.ptr.single.modifiers]
     pointer release()
@@ -281,7 +281,7 @@ namespace std
   public:
     const deleter_type& get_deleter() const __ntl_nothrow { return __default_deleter; }
 #endif
-    operator __::explicit_bool_type() const __ntl_nothrow { return __::explicit_bool(ptr); }
+    __explicit_operator_bool() const __ntl_nothrow { return __explicit_bool(ptr); }
 
     ///\name 20.8.11.2.5 unique_ptr modifiers [unique.ptr.single.modifiers]
     pointer release()
@@ -399,7 +399,7 @@ namespace std
     deleter_type& get_deleter() __ntl_nothrow { return deleter; }
     const deleter_type& get_deleter() const __ntl_nothrow { return deleter; }
 
-    operator __::explicit_bool_type() const __ntl_nothrow { return __::explicit_bool(ptr); }
+    __explicit_operator_bool() const __ntl_nothrow { return __explicit_bool(ptr); }
 
     ///\name 20.8.11.2.5 unique_ptr modifiers [unique.ptr.single.modifiers]
     pointer release()
@@ -514,7 +514,7 @@ namespace std
       return deleter;
     }
 
-    operator __::explicit_bool_type() const __ntl_nothrow { return __::explicit_bool(ptr); }
+    __explicit_operator_bool() const __ntl_nothrow { return __explicit_bool(ptr); }
 
     ///\name 20.8.11.2.5 unique_ptr modifiers [unique.ptr.single.modifiers]
     pointer release()
@@ -980,7 +980,7 @@ namespace std
     {
       if(this != &r){
         reset();
-        swap(move(r));
+        swap(r);
       }
       return *this;
     }

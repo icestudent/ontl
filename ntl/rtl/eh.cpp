@@ -443,9 +443,8 @@ static int array_unwind_filter(exception_pointers* eh)
   case exception_record::cxxmagic:
     std::terminate();
     break;
-  default:
-    return exception_continue_search;
   }
+  return exception_continue_search;
 }
 
 // Destructor support for arrays of objects

@@ -245,11 +245,11 @@ struct char_traits<wchar_t>
     typedef allocator_traits<Allocator> allocator_traits;
     typedef typename allocator_traits::size_type size_type_;
 
-    /** because Requires: s shall not be a null pointer [21.4.2/9] 
+    /** because Requires: s shall not be a null pointer [21.4.2/9]
     and http://www.open-std.org/jtc1/sc22/wg21/docs/lwg-closed.html#466 **/
-    basic_string(nullptr_t, const Allocator& a = Allocator()) __deleted; // string(nullptr)
-    basic_string(int, const Allocator& a = Allocator()) __deleted;       // string(0)
-    basic_string(nullptr_t, size_type_, const Allocator& a = Allocator()) __deleted;
+    //basic_string(nullptr_t, const Allocator& a = Allocator()) __deleted; // string(nullptr)
+    //basic_string(int, const Allocator& a = Allocator()) __deleted;       // string(0)
+    //basic_string(nullptr_t, size_type_, const Allocator& a = Allocator()) __deleted;
     //basic_string(int, size_type_, const Allocator& a = Allocator()) __deleted; // icl can't resolve string(1, '1') and string(0, 0)
 
     ///////////////////////////////////////////////////////////////////////////
@@ -286,7 +286,10 @@ struct char_traits<wchar_t>
     /// - data() a non-null pointer that is copyable and can have 0 added to it;
     /// - size() == 0;
     /// - capacity() an unspecified value.
-    explicit basic_string(const Allocator& a = Allocator())
+    explicit basic_string()
+      :length_(), capacity_(), buffer_(), alloc()
+    {}
+    explicit basic_string(const Allocator& a)
       :length_(), capacity_(), buffer_(), alloc(a)
     {}
 
@@ -321,7 +324,7 @@ struct char_traits<wchar_t>
       :alloc(a), length_(), capacity_(), buffer_()
     {
       if(pos > str.size()){
-        __throw_out_of_range(__func__": invalid `pos`");
+        __throw_out_of_range("std::basic_string(): invalid `pos`");
         return;
       }
       if(!str.empty() && pos < str.size())
@@ -353,7 +356,10 @@ struct char_traits<wchar_t>
     ///   array whose first element is pointed at by s;
     /// - size() == traits::length(s);
     /// - capacity() is at least as large as size().
-    basic_string(const charT* s, const Allocator& a = Allocator())
+    basic_string(const charT* s)
+      :length_(), capacity_(), buffer_()
+    { if(!assert_ptr(s)) return; append(s); } // one line for simplifing tracing
+    basic_string(const charT* s, const Allocator& a)
       :length_(), capacity_(), buffer_(), alloc(a)
     { if(!assert_ptr(s)) return; append(s); } // one line for simplifing tracing
 
@@ -366,8 +372,16 @@ struct char_traits<wchar_t>
     ///   n elements, each storing the initial value c;
     /// - size() = n;
     /// - capacity() is at least as large as size().
-    basic_string(size_type n, charT c, const Allocator& a = Allocator())
-      :length_(), capacity_(), buffer_(), 
+    basic_string(size_type n, charT c)
+      :length_(), capacity_(), buffer_(),
+      alloc()
+    {
+      assert_pos(n);
+      if(n < npos)
+        append(n, c);
+    }
+    basic_string(size_type n, charT c, const Allocator& a)
+      :length_(), capacity_(), buffer_(),
       alloc(a)
     {
       assert_pos(n);
@@ -399,7 +413,14 @@ struct char_traits<wchar_t>
     }
 
     __forceinline
-      basic_string(initializer_list<charT> il, const Allocator& a = Allocator())
+      basic_string(initializer_list<charT> il)
+      :length_(), capacity_(), buffer_()
+    {
+      append(il.begin(), il.end());
+    }
+
+    __forceinline
+      basic_string(initializer_list<charT> il, const Allocator& a)
       :alloc(a), length_(), capacity_(), buffer_()
     {
       append(il.begin(), il.end());
@@ -413,7 +434,7 @@ struct char_traits<wchar_t>
     {
       swap(str);
     }
-    basic_string(basic_string&& str, const Allocator& a);
+    //basic_string(basic_string&& str, const Allocator& a);
 #endif
 
     /// Effects: destructs string object.
@@ -512,7 +533,7 @@ struct char_traits<wchar_t>
     void resize(size_type n, charT c) __ntl_throws(length_error)
     {
       if(n > max_size()){
-        __throw_length_error(__func__": n > max_size()");
+        __throw_length_error("std::basic_string::resize(): n > max_size()");
         return;
       }
       if(n > capacity_){
@@ -538,7 +559,7 @@ struct char_traits<wchar_t>
     void reserve(size_type n = 0)
     {
       if(n > max_size()){
-        __throw_length_error(__func__": res_arg > max_size()");
+        __throw_length_error("std::basic_string::reserve(): res_arg > max_size()");
         return;
       }
       if(n <= length_){
@@ -551,7 +572,7 @@ struct char_traits<wchar_t>
     /// 13 Remarks: shrink_to_fit is a non-binding request to reduce capacity()
     ///   to size(). \note The request is non-binding to allow latitude for
     ///   implementation-specific optimizations.
-    void shrink_to_fit() 
+    void shrink_to_fit()
     {
       if(length_){
         pointer buf = allocator_traits::allocate(alloc, length_);
@@ -601,13 +622,13 @@ struct char_traits<wchar_t>
     const_reference at(size_type pos) const __ntl_throws(out_of_range)
     {
       if(pos >= length_)
-        __throw_out_of_range(__func__": pos > size()");
+        __throw_out_of_range("std::basic_string::at(): pos > size()");
       return operator[](pos);
     }
     reference at(size_type pos)             __ntl_throws(out_of_range)
     {
       if(pos >= length_)
-        __throw_out_of_range(__func__": pos > size()");
+        __throw_out_of_range("std::basic_string::at(): pos > size()");
       return operator[](pos);
     }
 
@@ -644,7 +665,7 @@ struct char_traits<wchar_t>
     basic_string& append(const basic_string& str, size_type pos, size_type n)
     {
       if(pos > str.size()){
-        __throw_out_of_range(__func__": invalid `pos`");
+        __throw_out_of_range("std::basic_string::append(): invalid `pos`");
       }else if(!str.empty()){
         replace_impl(length_,0,str.buffer_,str.length_,pos,n);
       }
@@ -713,7 +734,7 @@ struct char_traits<wchar_t>
     basic_string& assign(const basic_string& str, size_type pos, size_type n)
     {
       if(pos > str.length_){
-        __throw_out_of_range(__func__": invalid `pos`");
+        __throw_out_of_range("std::basic_string::assign(): invalid `pos`");
       }else if(!str.empty()){
         size_type len = str.length_;  // insert from self protection
         clear();                      // can set str.length() to 0 if &str == this
@@ -768,7 +789,7 @@ struct char_traits<wchar_t>
     basic_string& insert(size_type pos1, const basic_string& str, size_type pos2, size_type n)
     {
       if(pos1 > length_ || pos2 > str.length_){
-        __throw_out_of_range(__func__": invalid `pos`");
+        __throw_out_of_range("std::basic_string::insert(): invalid `pos`");
       }
       if(!str.empty() && pos1 <= length_ && pos2 <= str.length_)
         replace_impl(pos1, 0, str.buffer_, str.length_, pos2, n);
@@ -778,7 +799,7 @@ struct char_traits<wchar_t>
     basic_string& insert(size_type pos, const charT* s, size_type n)
     {
       if(pos > length_){
-        __throw_out_of_range(__func__": invalid `pos`");
+        __throw_out_of_range("std::basic_string::insert(): invalid `pos`");
       }
       if(pos <= length_)
         replace_impl(pos, 0, s, n);
@@ -788,7 +809,7 @@ struct char_traits<wchar_t>
     basic_string& insert(size_type pos, const charT* s)
     {
       if(pos > length_){
-        __throw_out_of_range(__func__": invalid `pos`");
+        __throw_out_of_range("std::basic_string::insert(): invalid `pos`");
       }
       if(pos <= length_)
         replace_impl(pos, 0, s, traits_type::length(s));
@@ -798,7 +819,7 @@ struct char_traits<wchar_t>
     basic_string& insert(size_type pos, size_type n, charT c)
     {
       if(pos > length_){
-        __throw_out_of_range(__func__": invalid `pos`");
+        __throw_out_of_range("std::basic_string::insert(): invalid `pos`");
       }
       if(pos <= length_)
         replace(pos, 0, n, c);
@@ -846,7 +867,7 @@ struct char_traits<wchar_t>
     basic_string& erase(size_type pos = 0, size_type n = npos)
     {
       if(pos > length_){
-        __throw_out_of_range(__func__": invalid `pos`");
+        __throw_out_of_range("std::basic_string::erase(): invalid `pos`");
       }else if(length_){
         const size_type xlen = min(n, length_-pos);
         if(xlen < length_){
@@ -1035,7 +1056,7 @@ struct char_traits<wchar_t>
     {
       if(!str) return *this;
       if(pos1 > length_ || pos2 > len){
-        __throw_out_of_range(__func__": invalid position given");
+        __throw_out_of_range("std::basic_string::replace_impl(): invalid position given");
         return *this;
       }
 
@@ -1045,7 +1066,7 @@ struct char_traits<wchar_t>
         return *this;
 
       if(length_ - xlen >= max_size()-rlen){
-        __throw_length_error(__func__": too large size");
+        __throw_length_error("std::basic_string::replace_impl(): too large size");
         return *this;
       }
 
@@ -1078,7 +1099,7 @@ struct char_traits<wchar_t>
 
       if(rlen)                              // replace
         traits_type::copy(buffer_+pos1, s+pos2, rlen);
-      
+
       if((length_ || rlen) && xlen > rlen && xlen != length_)  // collapse to non-empty string
         traits_type::move(buffer_+pos1+rlen, buffer_+pos1+xlen, length_-pos1);
 
@@ -1095,7 +1116,7 @@ struct char_traits<wchar_t>
     size_type copy(charT* s, size_type n, size_type pos = 0) const// __ntl_throws(out_of_range)
     {
       if(pos > size()){
-        __throw_out_of_range(__func__": invalid `pos`");
+        __throw_out_of_range("std::basic_string::copy(): invalid `pos`");
         return 0;
       }
       const size_type tail = size() - pos;
@@ -1454,7 +1475,7 @@ next_xpos:;
     basic_string substr(size_type pos = 0, size_type n = npos) const __ntl_throws(out_of_range)
     {
       if(pos > size()){
-        __throw_out_of_range(__func__": invalid `pos`");
+        __throw_out_of_range("std::basic_string::substr(): invalid `pos`");
         return basic_string();
       }
       return basic_string(*this, pos, n);
@@ -2086,7 +2107,7 @@ namespace __
     unary_function<basic_string<charT, traits, Allocator>, size_t>
   {
     /// string hash calculation
-    inline size_t operator()(const basic_string<charT, traits, Allocator>& str) const __ntl_nothrow // 
+    inline size_t operator()(const basic_string<charT, traits, Allocator>& str) const __ntl_nothrow //
     {
       return FNVHash()(str.data(), str.length()*sizeof(charT));
     }
@@ -2101,7 +2122,7 @@ template <> struct hash<std::u32string>: __::string_hash<std::u32string>{};
 
 
 //////////////////////////////////////////////////////////////////////////
-// 
+//
 #if STLX_USE_EXCEPTIONS
 std::__::exstring::exstring(const std::string& r)
 {

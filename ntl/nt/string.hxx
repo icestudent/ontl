@@ -39,7 +39,7 @@ namespace nt {
   {
   public:
     typedef uint16_t size_type;
-    typedef std::allocator<charT>::pointer pointer;
+    typedef typename std::allocator<charT>::pointer pointer;
 
     __noalias __forceinline charT* __restrict allocate(size_type n, std::allocator<void>::const_pointer = 0)
     {
@@ -71,7 +71,7 @@ class native_string
 
     ///\name  native_string types:
 
-    typedef typename  traits                      traits_type;
+    typedef           traits                      traits_type;
     typedef typename  traits::char_type           value_type;
     typedef           Allocator                   allocator_type;
     typedef charT *       pointer;
@@ -140,7 +140,7 @@ class native_string
     template<uint16_t Size>
     native_string(value_type (&str)[Size])
       : length_(
-                sizeof(value_type) * 
+                sizeof(value_type) *
                   (std::is_const<charT>::value ? traits::length(str) : (Size-1))
                 ),
       maximum_length_(Size*sizeof(value_type)),

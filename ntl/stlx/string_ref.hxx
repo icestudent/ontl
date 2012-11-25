@@ -86,7 +86,9 @@ namespace std
       :p(str), len(len)
     {}
 
-    basic_string_ref(initializer_list<charT> il);
+    basic_string_ref(initializer_list<charT> il)
+      :p(il.begin()), len(il.size())
+    {}
     
     basic_string_ref& operator=(const basic_string_ref& r)
     {
@@ -96,8 +98,10 @@ namespace std
     }
 
     template<typename Allocator>
-#ifdef NTL_CXX_EXPLICITOP
-    explicit 
+#ifdef NTL__CXX_EXPLICITOP
+#if defined(_MSC_FULL_VER) && _MSC_FULL_VER > 170051025 // not work with Nov'12 CTP
+    explicit
+#endif
 #endif
       operator basic_string<charT, traits, Allocator>() const { return basic_string<charT, traits, Allocator>(p, len); }
 
@@ -119,15 +123,21 @@ namespace std
     constexpr bool empty() const            { return len == 0; }
 
     // element access
-    constexpr const charT& operator[](size_type pos) const { return pos < len ? p[pos] : zero_char; }
-    const charT& at(size_t pos) const
+    constexpr const charT& operator[](size_type pos) const
     {
-      if(pos >= length_)
-        __throw_out_of_range(__func__": pos > size()");
-      return p[pos];
+      if(pos < len)
+        return p[pos];
+      return zero_char;
+      //return pos < len ? p[pos] : zero_char;
     }
-    constexpr const charT& front() const    { return p[0]; }
-    constexpr const charT& back() const     { return p[len-1]; }
+    const_reference at(size_t pos) const
+    {
+      if(pos >= len)
+        __throw_out_of_range(__func__": pos > size()");
+      return operator[](pos);
+    }
+    constexpr const_reference front() const    { return p[0]; }
+    constexpr const_reference back() const     { return p[len-1]; }
     constexpr const charT* data() const     { return p; }
 
     // modifiers
@@ -190,10 +200,13 @@ namespace std
       return npos;
     }
 
-    size_type find(charT c) const
+    size_type find(charT c, size_type pos = 0) const
     {
-      const charT* pos = traits_type::find(p, len, c);
-      return pos == nullptr ? npos : (pos-p);
+      if(pos >= len)
+        return npos;
+      pointer f = p+pos;
+      const charT* e = traits_type::find(f, len-pos, c);
+      return e == nullptr ? npos : (e-f);
     }
 
     size_type rfind(const basic_string_ref& s) const;

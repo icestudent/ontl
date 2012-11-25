@@ -80,11 +80,10 @@
 
 #ifdef NTL_CXX_EXPLICITOP
 # define __explicit_operator_bool() explicit operator bool()
-# define __explicit_bool(...) __VA_ARGS__
+# define __explicit_bool(...) ((__VA_ARGS__) ? true : false)
 #else
 # define __explicit_operator_bool() operator ntl::explicit_bool_type()
-# define __explicit_bool(...) ntl::explicit_bool(__VA_ARGS__)
-#endif
+# define __explicit_bool(...) ntl::explicit_bool((__VA_ARGS__) ? true : false)
 
 namespace ntl
 {
@@ -104,6 +103,7 @@ namespace ntl
     return cond ? &explicit_bool_t::_ : 0;
   }
 }
+#endif // NTL_CXX_EXPLICITOP
 
 // null pointer constant
 namespace std

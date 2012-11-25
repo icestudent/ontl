@@ -348,7 +348,7 @@ namespace std { namespace tr2 { namespace network {
           if(str.find('.', 7) != string::npos){
             // its ipv4 mapped
             address_v4 v4 = address_v4::from_string(string(str, 7, end - str.cbegin() - 7), ec);
-            if(ec == false){
+            if(!ec){
               const uint32_t id = addr.scope;
               addr = v4_mapped(v4);
               addr.scope = id;
@@ -526,10 +526,10 @@ namespace std { namespace tr2 { namespace network {
           ec.clear();
         error_code e;
         address_v4 v4 = address_v4::from_string(str, e);
-        if(e == false)
+        if(!e)
           return address(v4);
         address_v6 v6 = address_v6::from_string(str, e);
-        if(e == false)
+        if(!e)
           return address(v6);
         throw_system_error(e, ec);
         return address();

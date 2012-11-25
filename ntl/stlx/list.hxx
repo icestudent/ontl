@@ -91,7 +91,7 @@ class list
                            difference_type, pointer, reference>
     {
         iterator__impl() /*: p(0)*/ {}
-        iterator__impl(const iterator__impl& i) : p(i.p) {}
+        //iterator__impl(const iterator__impl& i) : p(i.p) {}
 
         reference operator* () const
           { return static_cast<node_type*>(this->p)->elem; }
@@ -123,7 +123,7 @@ class list
     {
         const_iterator__impl() /*: p(0)*/ {}
         const_iterator__impl(const typename list::iterator__impl& i) : p(i.p) {} //`typename list::' works around MSVC's /Ze
-        const_iterator__impl(const const_iterator__impl& i) : p(i.p) {}
+        //const_iterator__impl(const const_iterator__impl& i) : p(i.p) {}
 
         const_reference operator* () const
           { return static_cast<const node_type*>(this->p)->elem; }
@@ -230,7 +230,13 @@ class list
     }
     #endif
     
-    list(const initializer_list<T>& il, const Allocator& a = Allocator())
+    list(initializer_list<T> il)
+    {
+      init_head();
+      insert(begin(), il);
+    }
+
+    list(initializer_list<T> il, const Allocator& a)
       :node_allocator(a)
     {
       init_head();
@@ -256,7 +262,7 @@ class list
     }
     #endif
     
-    list& operator=(const initializer_list<T>& il)
+    list& operator=(initializer_list<T> il)
     {
       assign(il.begin(), il.end());
       return *this;
@@ -279,7 +285,7 @@ class list
       if ( n > s ) insert(it, n - s, t);
     }
     
-    void assign(const initializer_list<T>& il)
+    void assign(initializer_list<T> il)
     {
       assign(il.begin(), il.end());
     }
@@ -366,9 +372,22 @@ class list
     ///\name modifiers [23.2.4.3]
 
     #ifdef NTL_CXX_VT
-    template <class... Args> void emplace_front(Args&&... args);
-    template <class... Args> void emplace_back(Args&&... args);
-    template <class... Args> iterator emplace(const_iterator position, Args&&... args);
+    template <class... Args> void emplace_front(Args&&... args)
+    {
+      emplace(begin(), std::forward<Args>(args)...);
+    }
+    template <class... Args> void emplace_back(Args&&... args)
+    {
+      emplace(end(), std::forward<Args>(args)...);
+    }
+    template <class... Args> iterator emplace(const_iterator position, Args&&... args)
+    {
+      node_type * const p = node_allocator.allocate(1);
+      node_allocator.construct(p, std::forward<Args>(args)...);
+      double_linked* const np = position.p;
+      p->link(np->prev, np);
+      return p;
+    }
     #endif
 
     #ifdef NTL_CXX_RV
@@ -394,7 +413,6 @@ class list
     iterator insert(const_iterator position, const T& x)
     {
       node_type * const p = node_allocator.allocate(1);
-      //get_allocator().construct(&p->elem, x);
       node_allocator.construct(p, x);
       double_linked* const np = position.p;
       p->link(np->prev, np);
@@ -426,7 +444,7 @@ class list
       insert__disp(position, first, last, is_integral<InputIterator>::type());
     }
 
-    void insert(const_iterator position, const initializer_list<T>& il)
+    void insert(const_iterator position, initializer_list<T> il)
     {
       insert(position, il.begin(), il.end());
     }
@@ -468,7 +486,11 @@ class list
     void insert__disp(const_iterator position, InputIterator first, InputIterator last,
                       const false_type&)
     {
-      while ( first != last ) position = insert(position, *--last);
+      //while ( first != last ) position = insert(position, *--last);
+      while(first != last){
+        insert(position, *first);
+        ++first;
+      }
     }
 
     template <class IntegralType>

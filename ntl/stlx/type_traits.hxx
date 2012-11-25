@@ -66,13 +66,15 @@ namespace __
 #define NTL__IN_STLX_TYPE_TRAITS
 
 #if   defined(__GNUC__)
-  #include "type_traits_gnuc.hxx"
+# include "type_traits_gnuc.hxx"
 #elif defined(_MSC_VER)
-  #include "type_traits_msvc.hxx"
+# include "type_traits_msvc.hxx"
 #elif defined(__BCPLUSPLUS__)
-  #include "type_traits_bcb.hxx"
+# include "type_traits_bcb.hxx"
+#elif defined(__clang__)
+# include "type_traits_clang.hxx"
 #else
-  #error Unspported compiler
+# error Unspported compiler
 #endif
 
 #undef  NTL__IN_STLX_TYPE_TRAITS
