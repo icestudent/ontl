@@ -11,6 +11,7 @@
 #include "algorithm.hxx"
 #include "memory.hxx"
 #include "stdexcept_fwd.hxx"
+#include "range.hxx"
 
 #ifdef _MSC_VER
 # pragma warning(push)
@@ -171,10 +172,7 @@ class vector
     vector(vector&& x)
       :begin_(), end_(), capacity_()
     {
-      //static_assert(false, "hzhz");
-      std::swap(begin_, x.begin_);
-      std::swap(end_, x.end_);
-      std::swap(capacity_, x.capacity_);
+      swap(x);
     }
 
     vector(vector&& x, const Allocator& a)
@@ -190,6 +188,40 @@ class vector
         x.clear();
       }
     }
+
+#ifdef NTL_STLX_RANGE
+    ///\name Range extension
+    template<class Iter>
+    explicit vector(std::range<Iter>&& R)
+      :begin_(), end_(), capacity_()
+    {
+      assign(forward<Range>(R));
+    }
+    template<class Iter>
+    explicit vector(std::range<Iter>&& R, const Allocator& a)
+      :begin_(), end_(), capacity_(),
+      array_allocator(a)
+    {
+      assign(forward<Range>(R));
+    }
+    template<class Iter>
+    vector& operator=(std::range<Iter>&& R)
+    {
+      assign(forward<Range>(R));
+      return *this;
+    }
+    template<class Iter>
+    void assign(std::range<Iter>&& R)
+    {
+      assign(__::ranged::adl_begin(R), __::ranged::adl_end(R));
+    }
+    template<class Iter>
+    iterator insert(const_iterator position, std::range<Iter>&& R)
+    {
+      return insert(position, __::ranged::adl_begin(R), __::ranged::adl_end(R));
+    }
+    ///\}
+#endif // NTL_STLX_RANGE
     #endif
 
     vector(initializer_list<T> il)

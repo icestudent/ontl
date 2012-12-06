@@ -10,6 +10,7 @@
 
 #include "stdexcept_fwd.hxx"
 #include "ext/hashtable.hxx"
+#include "range.hxx"
 
 namespace std {
 
@@ -64,6 +65,7 @@ namespace std {
 #endif
 
   public:
+    using base::insert;
     ///\name construct/destroy/copy
 
     /** Constructs an empty unordered_set using the specified hash function, key equality function, and allocator, and using at least \c n buckets.
@@ -114,6 +116,29 @@ namespace std {
       base::operator=(r);
       return *this;
     }
+
+#ifdef NTL_STLX_RANGE
+    ///\name Range extension
+    template<class Iter>
+    unordered_set(std::range<Iter>&& R, size_type n = initial_count, const hasher& hf = hasher(), const key_equal& eql = key_equal(), const allocator_type& a = allocator_type())
+      :base(n,hf,eql,a)
+    {
+      insert(forward<Range>(R));
+    }
+    template<class Iter>
+    unordered_set& operator=(std::range<Iter>&& R)
+    {
+      clear();
+      insert(forward<Range>(R));
+      return *this;
+    }
+    template<class Iter>
+    void insert(std::range<Iter>&& R)
+    {
+      insert(__::ranged::adl_begin(R), __::ranged::adl_end(R));
+    }
+    ///\}
+#endif // NTL_STLX_RANGE
 #endif
     /** Constructs an unordered_set using the specified initializer %list and provided hash and key equality functions */
     unordered_set(initializer_list<value_type> il,
@@ -292,6 +317,8 @@ namespace std {
 #endif
 
   public:
+    using base::insert;
+
     ///\name construct/destroy/copy
 
     /** Constructs an empty unordered_multiset using the specified hash function, key equality function, and allocator, and using at least \c n buckets.
@@ -343,6 +370,29 @@ namespace std {
       base::operator=(r);
       return *this;
     }
+
+#ifdef NTL_STLX_RANGE
+    ///\name Range extension
+    template<class Iter>
+    explicit unordered_multiset(std::range<Iter>&& R, size_type n = initial_count, const hasher& hf = hasher(), const key_equal& eql = key_equal(), const allocator_type& a = allocator_type())
+      :base(n,hf,eql,a)
+    {
+      insert(forward<Range>(R));
+    }
+    template<class Iter>
+    unordered_multiset& operator=(std::range<Iter>&& R)
+    {
+      clear();
+      insert(forward<Range>(R));
+      return *this;
+    }
+    template<class Iter>
+    void insert(std::range<Iter>&& R)
+    {
+      insert(__::ranged::adl_begin(R), __::ranged::adl_end(R));
+    }
+    ///\}
+#endif // NTL_STLX_RANGE
 #endif
     /** Constructs an unordered_multiset using the specified initializer %list and provided hash and key equality functions */
     unordered_multiset(initializer_list<value_type> il,

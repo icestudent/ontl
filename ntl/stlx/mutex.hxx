@@ -489,7 +489,18 @@ namespace std
 
 #ifdef NTL_CXX_VT
   template<class Callable, class ...Args>
-  void call_once(once_flag& flag, Callable func, Args&&... args);
+  inline void call_once(once_flag& flag, Callable func, Args&&... args)
+  {
+    static_assert(std::is_member_function_pointer<Callable>::value == false, "must not be a member function pointer");
+    if(flag.ready())
+      return;
+
+    once_flag::lock lock(flag);
+    if(!flag.ready()){
+      func(std::forward<Args>(args)...);
+      flag.set_ready();
+    }
+  }
 #else
 
   // 30.3.5.2 Function call_once [thread.once.callonce]

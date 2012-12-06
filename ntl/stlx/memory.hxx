@@ -632,7 +632,17 @@ namespace __ {
       static aligned_storage<sizeof(T)+sizeof(int), alignof(T)>::type buf;
       return reinterpret_cast<T*>(&buf);
     }
-
+#ifdef NTL_CXX_VT
+    /** returns object which constructed with specified argument(s) */
+    template<class... Args>
+    static T* get_object(Args... args)
+    {
+      T* p = get_buffer();
+      if(!check_constructed(p, true))
+        allocator<T>().construct(p, std::forward<Args>(args)...);
+      return p;
+    }
+#else // VT
     /** returns default-constructed object */
     static T* get_object()
     {
@@ -675,6 +685,8 @@ namespace __ {
         allocator<T>().construct(p, a1);
       return p;
     }
+#endif // VT
+
     /** schedules object destruction at program exit */
     static void schedule_destruction(T*) { atexit(dtor); }
 

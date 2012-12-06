@@ -426,9 +426,20 @@ public:
     free_checking_enabled     = 0x00000040,
     /** leaves adjacent blocks of heap memory separate when they are freed */
     disable_coalesce_on_free  = 0x00000080,
+
+    settable_user_value       = 0x00000100,
+    settable_user_flag1       = 0x00000200,
+    settable_user_flag2       = 0x00000400,
+    settable_user_flag3       = 0x00000800,
+    settable_user_flags       = 0x00000E00,
+
     create_align_16           = 0x00010000,
     create_enable_tracing     = 0x00020000,
-    create_enable_execute     = 0x00040000
+    create_enable_execute     = 0x00040000,
+    page_allocs               = 0x01000000,
+    protection_enabled        = 0x02000000,
+    break_when_out_of_vm      = 0x04000000,
+    no_alignment              = 0x08000000
   };
 
   friend flag operator | (flag m, flag m2) { return bitwise_or(m, m2); }

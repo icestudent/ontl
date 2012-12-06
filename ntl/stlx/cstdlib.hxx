@@ -10,6 +10,7 @@
 
 #ifndef NTL__STLX_CSTDINT
 # include "cstddef.hxx"
+# include "cstdint.hxx"
 #endif
 #include "cassert.hxx"
 
@@ -104,7 +105,7 @@ __declspec(selectany) std::uint32_t __ntl_rand_seed = 0;
 /// 7.20.2.1 The rand function
 inline int NTL_CRTCALL rand(void)
 {
-  ntl::atomic::compare_exchange(__ntl_rand_seed, static_cast<uint32_t>(ntl::intrinsic::rdtsc()), 0); // init seed if 0
+  ntl::atomic::compare_exchange(__ntl_rand_seed, static_cast<std::uint32_t>(ntl::intrinsic::rdtsc()), 0); // init seed if 0
   std::uint32_t seed = __ntl_rand_seed;
   ntl::intrinsic::_ReadBarrier();
   std::uint32_t val = ntl::nt::RtlRandom(&seed);

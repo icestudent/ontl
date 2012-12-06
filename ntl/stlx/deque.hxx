@@ -122,6 +122,39 @@ namespace std {
         x.clear();
       }
     }
+
+#ifdef NTL_STLX_RANGE
+    ///\name Range extension
+    template<class Iter>
+    explicit deque(std::range<Iter>&& R)
+      :left(), right(), capL(), capR(), base_(), cap_()
+    {
+      assign(forward<Range>(R));
+    }
+    template<class Iter>
+    explicit deque(std::range<Iter>&& R, const Allocator& a)
+      :alloc(a), left(), right(), capL(), capR(), base_(), cap_()
+    {
+      assign(forward<Range>(R));
+    }
+    template<class Iter>
+    deque& operator=(std::range<Iter>&& R)
+    {
+      assign(forward<Range>(R));
+      return *this;
+    }
+    template<class Iter>
+    void assign(std::range<Iter>&& R)
+    {
+      assign(__::ranged::adl_begin(R), __::ranged::adl_end(R));
+    }
+    template<class Iter>
+    iterator insert(const_iterator position, std::range<Iter>&& R)
+    {
+      return insert(position, __::ranged::adl_begin(R), __::ranged::adl_end(R));
+    }
+    ///\}
+#endif // NTL_STLX_RANGE
     #endif
 
     ~deque()

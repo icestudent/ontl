@@ -10,6 +10,7 @@
 
 #include "stdexcept_fwd.hxx"
 #include "ext/hashtable.hxx"
+#include "range.hxx"
 
 namespace std {
 
@@ -69,6 +70,8 @@ namespace std {
 #endif
 
   public:
+    using base::insert;
+
     ///\name construct/destroy/copy
 
     /** Constructs an empty unordered_map using the specified hash function, key equality function, and allocator, and using at least \c n buckets.
@@ -119,6 +122,29 @@ namespace std {
       base::operator=(r);
       return *this;
     }
+
+#ifdef NTL_STLX_RANGE
+    ///\name Range extension
+    template<class Iter>
+    explicit unordered_map(std::range<Iter>&& R, size_type n = initial_count, const hasher& hf = hasher(), const key_equal& eql = key_equal(), const allocator_type& a = allocator_type())
+      :base(n,hf,eql,a)
+    {
+      insert(forward<Range>(R));
+    }
+    template<class Iter>
+    unordered_map& operator=(std::range<Iter>&& R)
+    {
+      clear();
+      insert(forward<Range>(R));
+      return *this;
+    }
+    template<class Iter>
+    void insert(std::range<Iter>&& R)
+    {
+      insert(__::ranged::adl_begin(R), __::ranged::adl_end(R));
+    }
+    ///\}
+#endif // NTL_STLX_RANGE
 #endif
     /** Constructs an unordered_map using the specified initializer %list and provided hash and key equality functions */
     unordered_map(initializer_list<value_type> il,
@@ -328,6 +354,8 @@ namespace std {
 #endif
 
   public:
+    using base::insert;
+
     ///\name construct/destroy/copy
 
     /** Constructs an empty unordered_multimap using the specified hash function, key equality function, and allocator, and using at least \c n buckets.
@@ -378,6 +406,29 @@ namespace std {
       base::operator=(r);
       return *this;
     }
+
+#ifdef NTL_STLX_RANGE
+    ///\name Range extension
+    template<class Iter>
+    unordered_multimap(std::range<Iter>&& R, size_type n = initial_count, const hasher& hf = hasher(), const key_equal& eql = key_equal(), const allocator_type& a = allocator_type())
+      :base(n,hf,eql,a)
+    {
+      insert(forward<Range>(R));
+    }
+    template<class Iter>
+    unordered_multimap& operator=(std::range<Iter>&& R)
+    {
+      clear();
+      insert(forward<Range>(R));
+      return *this;
+    }
+    template<class Iter>
+    void insert(std::range<Iter>&& R)
+    {
+      insert(__::ranged::adl_begin(R), __::ranged::adl_end(R));
+    }
+    ///\}
+#endif // NTL_STLX_RANGE
 #endif
     /** Constructs an unordered_multimap using the specified initializer %list and provided hash and key equality functions */
     unordered_multimap(initializer_list<value_type> il,

@@ -10,6 +10,7 @@
 
 #include "algorithm.hxx"
 #include "memory.hxx"
+#include "range.hxx"
 
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -228,6 +229,38 @@ class list
         x.clear();
       }
     }
+
+#ifdef NTL_STLX_RANGE
+    ///\name Range extension
+    template<class Iter>
+    explicit list(std::range<Iter>&& R)
+    {
+      assign(forward<Range>(R));
+    }
+    template<class Iter>
+    explicit list(std::range<Iter>&& R, const Allocator& a)
+      :node_allocator(a)
+    {
+      assign(forward<Range>(R));
+    }
+    template<class Iter>
+    list& operator=(std::range<Iter>&& R)
+    {
+      assign(forward<Range>(R));
+      return *this;
+    }
+    template<class Iter>
+    void assign(std::range<Iter>&& R)
+    {
+      assign(__::ranged::adl_begin(R), __::ranged::adl_end(R));
+    }
+    template<class Iter>
+    iterator insert(const_iterator position, std::range<Iter>&& R)
+    {
+      return insert(position, __::ranged::adl_begin(R), __::ranged::adl_end(R));
+    }
+    ///\}
+#endif // NTL_STLX_RANGE
     #endif
     
     list(initializer_list<T> il)

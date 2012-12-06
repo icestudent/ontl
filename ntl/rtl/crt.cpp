@@ -49,7 +49,7 @@ sec(".CRT$XTZ") vfv_t* __xt_z[]= {0};
 # include "../nt/new.hxx"
 # include "../nt/thread.hxx"
 #endif
-
+using namespace std;
 namespace
 {
   static const size_t exit_list_max = 1024*4;

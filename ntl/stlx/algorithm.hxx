@@ -698,15 +698,26 @@ ForwardIterator
   return unique_copy(first, last, first, pred);
 }
 
+namespace __
+{
+  template<class BidirectionalIterator> __forceinline void reverse(BidirectionalIterator first, BidirectionalIterator last, bidirectional_iterator_tag)
+  {
+    for ( ; first != last && first != --last; ++first )
+      iter_swap(first, last);
+  }
+  template<class RandomAccessIterator> __forceinline void reverse(RandomAccessIterator first, RandomAccessIterator last, random_access_iterator_tag)
+  {
+    if(first == last)
+      return;
+    for(--last; first < last; ++first, --last)
+      iter_swap(first, last);
+  }
+}
 
 template<class BidirectionalIterator>
-__forceinline
-void
-  reverse(BidirectionalIterator first, BidirectionalIterator last)
+__forceinline void reverse(BidirectionalIterator first, BidirectionalIterator last)
 {
-  if ( first != last )
-    for ( ; first != --last; ++first )
-      iter_swap(first, last);
+  __::reverse(first, last, std::iterator_traits<BidirectionalIterator>::iterator_category());
 }
 
 
@@ -882,11 +893,11 @@ ForwardIterator
   lower_bound(ForwardIterator first, ForwardIterator last,
               const T& value, Compare comp)
 {
-  typedef iterator_traits<ForwardIterator>::difference_type difference_t; 
-  difference_t len = distance(first, last);
+  typedef typename iterator_traits<ForwardIterator>::difference_type diff_t; 
+  diff_t len = distance(first, last);
   while ( len > 0 )
   {
-    difference_t const half = len / 2;
+    diff_t const half = len / 2;
     ForwardIterator middle = first;
     advance(middle, half);
     if ( comp(*middle, value) != false )
@@ -914,13 +925,32 @@ ForwardIterator
 template<class ForwardIterator, class T>
 inline
 ForwardIterator
-  upper_bound(ForwardIterator first, ForwardIterator last, const T& value);
+  upper_bound(ForwardIterator first, ForwardIterator last, const T& value)
+{
+  return upper_bound(first, last, value, less<T>());
+}
 
 template<class ForwardIterator, class T, class Compare>
 inline
 ForwardIterator
-  upper_bound(ForwardIterator first, ForwardIterator last,
-              const T& value, Compare comp);
+  upper_bound(ForwardIterator first, ForwardIterator last, const T& value, Compare comp)
+{
+  typedef typename iterator_traits<ForwardIterator>::difference_type diff_t;
+  diff_t len = std::distance(first, last);
+  while(len > 0){
+    const diff_t half = len / 2;
+    ForwardIterator split = first;
+    std::advance(split, half);
+    if(comp(value, *split) != false){
+      len = half;
+    }else{
+      first = split;
+      ++first;
+      len = len - half - 1;
+    }
+  }
+  return first;
+}
 
 template<class ForwardIterator, class T>
 inline
@@ -934,15 +964,19 @@ pair<ForwardIterator, ForwardIterator>
               const T& value, Compare comp);
 
 template<class ForwardIterator, class T>
-inline
-bool
-  binary_search(ForwardIterator first, ForwardIterator last, const T& value);
+inline bool binary_search(ForwardIterator first, ForwardIterator last, const T& value)
+{
+  ForwardIterator i = std::lower_bound(first, last, value);
+  return i != last && !(value < *i);
+}
 
 template<class ForwardIterator, class T, class Compare>
-inline
-bool
-  binary_search(ForwardIterator first, ForwardIterator last,
-                const T& value, Compare comp);
+inline bool binary_search(ForwardIterator first, ForwardIterator last, const T& value, Compare comp)
+{
+  ForwardIterator i = std::lower_bound(first, last, value, comp);
+  return i != last && comp(value, *i) == false;
+
+}
 
 ///\name 25.3.4, merge:
 template<class InputIterator1, class InputIterator2, class OutputIterator>

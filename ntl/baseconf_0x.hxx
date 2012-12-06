@@ -115,6 +115,12 @@
 //# define NTL_CXX_VT // buggy
 #endif
 
+#if _MSC_FULL_VER == 170051106 // v17 update 1
+# undef NTL_CXX_IL
+# undef NTL_CXX_EXPLICITOP
+# undef NTL_CXX_VT
+#endif
+
 #endif // _MSC_VER >= 1600
 
 #elif defined(__BCPLUSPLUS__)
@@ -124,7 +130,6 @@
 #define NTL_CXX_ALIGNOF
 #define NTL_CXX_CHARS
 #define NTL_CXX_TYPEOF
-#define NTL_CXX_DECLTYPE
 #define NTL_CXX_ENUM
 #define NTL_CXX_ASSERT
 

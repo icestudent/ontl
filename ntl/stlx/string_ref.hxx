@@ -138,7 +138,7 @@ namespace std
     }
     constexpr const_reference front() const    { return p[0]; }
     constexpr const_reference back() const     { return p[len-1]; }
-    constexpr const charT* data() const     { return p; }
+    constexpr const charT*    data() const     { return p; }
 
     // modifiers
     void clear()
@@ -168,6 +168,16 @@ namespace std
         return static_cast<int>(size() - str.size());
       const int r = traits_type::compare(begin(), str.begin(), rlen);
       return r != 0 ? r : static_cast<int>(size() - str.size());
+    }
+    int compare(size_type pos, size_type n, const basic_string_ref& str) const
+    {
+      if(pos+n > size())
+        return -1;
+      const size_t rlen = std::min(n, str.size());
+      if(!rlen)
+        return static_cast<int>(n - str.size());
+      const int r = traits_type::compare(begin()+pos, str.begin(), rlen);
+      return r != 0 ? r : static_cast<int>(n - str.size());
     }
 
     bool starts_with(const basic_string_ref& x) const

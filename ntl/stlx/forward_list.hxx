@@ -11,6 +11,7 @@
 #include "memory.hxx"
 
 #include "../linked_list.hxx"
+#include "range.hxx"
 
 namespace std {
 
@@ -21,7 +22,7 @@ namespace std {
  *@{*/
 
   /// Class template forward_list [23.2.3 forwardlist]
-  template <class T, class Alloc = allocator<T> >
+  template <class T, class Allocator = allocator<T> >
   class forward_list
   {
     typedef ntl::single_linked single_linked;
@@ -57,26 +58,26 @@ namespace std {
       }
     };
 
-    typedef typename forward_list<T, Alloc>::node   node_type;
+    typedef typename forward_list<T, Allocator>::node   node_type;
     typedef typename  
-      Alloc::template rebind<node_type>::other      node_allocator_type;
+      Allocator::template rebind<node_type>::other      node_allocator_type;
 
   #ifdef NTL_CXX_RV
-    typedef forward_list<T, Alloc>&& list_reference;
+    typedef forward_list<T, Allocator>&& list_reference;
   #else
-    typedef forward_list<T, Alloc>&  list_reference;
+    typedef forward_list<T, Allocator>&  list_reference;
   #endif
 
   public:
     // types:
     typedef T                                       value_type;
-    typedef Alloc                                   allocator_type;
+    typedef Allocator                               allocator_type;
     typedef typename  
-      Alloc::template rebind<T>::other              allocator;
+      Allocator::template rebind<T>::other          allocator;
     typedef typename  allocator::pointer            pointer;
     typedef typename  allocator::const_pointer      const_pointer;
-    typedef       value_type&                       reference;
-    typedef const value_type&                       const_reference;
+    typedef           value_type&                   reference;
+    typedef const     value_type&                   const_reference;
     typedef typename  allocator::size_type          size_type;
     typedef typename  allocator::difference_type    difference_type;
 
@@ -147,7 +148,7 @@ namespace std {
 
   public:
     // 23.2.3.1 construct/copy/destroy:
-    explicit forward_list(const Alloc& a = Alloc())
+    explicit forward_list(const Allocator& a = Allocator())
       :node_allocator(a)
     {
       init_head();
@@ -161,7 +162,7 @@ namespace std {
         insert_after(cbefore_begin(), T());
     }
 
-    forward_list(size_type n, const T& value, const Alloc& a = Alloc())
+    forward_list(size_type n, const T& value, const Allocator& a = Allocator())
       : node_allocator(a)
     {
       init_head();
@@ -169,14 +170,14 @@ namespace std {
     }
 
     template <class InputIterator>
-    forward_list(InputIterator first, InputIterator last, const Alloc& a = Alloc())
+    forward_list(InputIterator first, InputIterator last, const Allocator& a = Allocator())
       : node_allocator(a)
     {
       init_head();
       insert_after(cbefore_begin(), first, last);
     }
 
-    forward_list(const forward_list<T,Alloc>& x)
+    forward_list(const forward_list<T,Allocator>& x)
       : node_allocator(x.node_allocator)
     {
       init_head();
@@ -184,7 +185,7 @@ namespace std {
     }
 
   #ifdef NTL_CXX_RV
-    forward_list(forward_list<T,Alloc>&& x)
+    forward_list(forward_list<T,Allocator>&& x)
       :node_allocator()
     {
       init_head();
@@ -197,7 +198,7 @@ namespace std {
       init_head();
       insert_after(cbefore_begin(), il);
     }
-    forward_list(initializer_list<T> il, const Alloc& a)
+    forward_list(initializer_list<T> il, const Allocator& a)
       :node_allocator(a)
     {
       init_head();
@@ -210,14 +211,14 @@ namespace std {
         clear();
     }
 
-    forward_list<T,Alloc>& operator=(const forward_list<T,Alloc>& x)
+    forward_list<T,Allocator>& operator=(const forward_list<T,Allocator>& x)
     {
       assign(x.begin(), x.end());
       return *this;
     }
 
   #ifdef NTL_CXX_RV
-    forward_list<T,Alloc>& operator=(forward_list<T,Alloc>&& x)
+    forward_list<T,Allocator>& operator=(forward_list<T,Allocator>&& x)
     {
       if(this != &x){
         clear();
@@ -225,14 +226,48 @@ namespace std {
       }
       return *this;
     }
-  #endif
+
+#ifdef NTL_STLX_RANGE
+    ///\name Range extension
+    template<class Iter>
+    explicit forward_list(std::range<Iter>&& R)
+    {
+      init_head();
+      insert_after(cbefore_begin(), forward<Range>(R));
+    }
+    template<class Iter>
+    explicit forward_list(std::range<Iter>&& R, const Allocator& a)
+      : node_allocator(a)
+    {
+      init_head();
+      insert_after(cbefore_begin(), forward<Range>(R));
+    }
+    template<class Iter>
+    forward_list& operator=(std::range<Iter>&& R)
+    {
+      assign(R);
+      return *this;
+    }
+    template<class Iter>
+    void assign(std::range<Iter>&& R)
+    {
+      assign(__::ranged::adl_begin(R), __::ranged::adl_end(R));
+    }
+    template<class Iter>
+    iterator insert_after(const_iterator position, std::range<Iter>&& R)
+    {
+      return insert_after(position, __::ranged::adl_begin(R), __::ranged::adl_end(R));
+    }
+    ///\}
+#endif // NTL_STLX_RANGE
+#endif
     forward_list& operator=(initializer_list<T> il)
     {
       assign(il);
       return *this;
     }
 
-    
+
     template <class InputIterator>
     void assign(InputIterator first, InputIterator last)
     {
@@ -316,9 +351,9 @@ namespace std {
     }
   #endif
 
-    void push_front(const T& x)
+    void push_front(const T& t)
     {
-      insert_after(cbefore_begin(), x);
+      insert_after(cbefore_begin(), t);
     }
 
     void pop_front()
@@ -359,20 +394,22 @@ namespace std {
       return p;
     }
 
-    void insert_after(const_iterator position, size_type n, const T& x)
+    iterator insert_after(const_iterator position, size_type n, const T& x)
     {
-      while ( n-- ) insert_after(position, x);
+      iterator re = position;
+      while ( n-- ) re = insert_after(position, x);
+      return re;
     }
 
     template <class InputIterator>
-    void insert_after(const_iterator position, InputIterator first, InputIterator last)
+    iterator insert_after(const_iterator position, InputIterator first, InputIterator last)
     {
-      insert__disp(position, first, last, is_integral<InputIterator>::type());
+      return insert__disp(position, first, last, is_integral<InputIterator>::type());
     }
 
-    void insert_after(const_iterator position, initializer_list<T> il)
+    iterator insert_after(const_iterator position, initializer_list<T> il)
     {
-      insert_after(position, il.begin(), il.end());
+      return insert_after(position, il.begin(), il.end());
     }
 
     iterator erase_after(const_iterator position)
@@ -471,15 +508,16 @@ namespace std {
 
   private:
     template <class InputIterator>
-    void insert__disp(const_iterator position, InputIterator first, InputIterator last, const false_type&)
+    iterator insert__disp(const_iterator position, InputIterator first, InputIterator last, const false_type&)
     {
       while ( first != last ) position = insert_after(position, *first++);
+      return const_cast<single_linked*>(position.p);
     }
 
     template <class IntegralType>
-    void insert__disp(const_iterator position, IntegralType n, IntegralType x, const true_type&)
+    iterator insert__disp(const_iterator position, IntegralType n, IntegralType x, const true_type&)
     {
-      insert_after(position, static_cast<size_type>(n), static_cast<value_type>(x));
+      return insert_after(position, static_cast<size_type>(n), static_cast<value_type>(x));
     }
 
   public:
@@ -605,10 +643,10 @@ namespace std {
 
 
   // Comparison operators
-  template <class T, class Alloc>
-  inline bool operator==(const forward_list<T,Alloc>& x, const forward_list<T,Alloc>& y)
+  template <class T, class Allocator>
+  inline bool operator==(const forward_list<T,Allocator>& x, const forward_list<T,Allocator>& y)
   {
-    for(typename forward_list<T, Alloc>::const_iterator x1 = x.cbegin(), y1 = y.cbegin(), x2 = x.cend(), y2 = y.cend();
+    for(typename forward_list<T, Allocator>::const_iterator x1 = x.cbegin(), y1 = y.cbegin(), x2 = x.cend(), y2 = y.cend();
         x1 != x2 && y1 != y2;
         ++x1, ++y1)
     {
@@ -618,40 +656,40 @@ namespace std {
     return true;
   }
 
-  template <class T, class Alloc>
-  inline bool operator< (const forward_list<T,Alloc>& x, const forward_list<T,Alloc>& y)
+  template <class T, class Allocator>
+  inline bool operator< (const forward_list<T,Allocator>& x, const forward_list<T,Allocator>& y)
   {
     return lexicographical_compare(x.cbegin(), x.cend(), y.cbegin(), y.cend());
   }
 
-  template <class T, class Alloc>
-  inline bool operator!=(const forward_list<T,Alloc>& x, const forward_list<T,Alloc>& y)
+  template <class T, class Allocator>
+  inline bool operator!=(const forward_list<T,Allocator>& x, const forward_list<T,Allocator>& y)
   {
     return rel_ops::operator !=(x, y);
   }
 
-  template <class T, class Alloc>
-  inline bool operator> (const forward_list<T,Alloc>& x, const forward_list<T,Alloc>& y)
+  template <class T, class Allocator>
+  inline bool operator> (const forward_list<T,Allocator>& x, const forward_list<T,Allocator>& y)
   {
     return rel_ops::operator >(x, y);
   }
 
-  template <class T, class Alloc>
-  inline bool operator>=(const forward_list<T,Alloc>& x, const forward_list<T,Alloc>& y)
+  template <class T, class Allocator>
+  inline bool operator>=(const forward_list<T,Allocator>& x, const forward_list<T,Allocator>& y)
   {
     return rel_ops::operator >=(x, y);
   }
 
-  template <class T, class Alloc>
-  inline bool operator<=(const forward_list<T,Alloc>& x, const forward_list<T,Alloc>& y)
+  template <class T, class Allocator>
+  inline bool operator<=(const forward_list<T,Allocator>& x, const forward_list<T,Allocator>& y)
   {
     return rel_ops::operator <=(x, y);
   }
 
 
   // 23.2.3.6 specialized algorithms:
-  template <class T, class Alloc>
-  inline void swap(forward_list<T,Alloc>& x, forward_list<T,Alloc>& y)
+  template <class T, class Allocator>
+  inline void swap(forward_list<T,Allocator>& x, forward_list<T,Allocator>& y)
   {
     x.swap(y);
   }

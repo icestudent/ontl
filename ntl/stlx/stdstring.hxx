@@ -32,6 +32,9 @@
 #ifndef NTL__STDLIB
 # include "../stdlib.hxx"
 #endif
+#ifndef NTL__STLX_RANGE
+#include "range.hxx"
+#endif
 
 #ifndef EOF // should be moved to "stdio.hxx" ?
 # define EOF -1
@@ -435,7 +438,73 @@ struct char_traits<wchar_t>
       swap(str);
     }
     //basic_string(basic_string&& str, const Allocator& a);
+
+#ifdef NTL_STLX_RANGE
+    ///\name Range extension
+#if 0
+    template<class Range, typename IsRange = enable_if<__::ranged::is_ranged<Range, basic_string>::value>::type>
+    explicit basic_string(Range&& R)
+      :length_(), capacity_(), buffer_()
+    {
+      assign(forward<Range>(R));
+    }
+    template<class Range, typename IsRange = enable_if<__::ranged::is_ranged<Range, basic_string>::value>::type>
+    explicit basic_string(Range&& R, const Allocator& a)
+      :length_(), capacity_(), buffer_(),
+      alloc(a)
+    {
+      assign(forward<Range>(R));
+    }
+    template<class Range, typename IsRange = enable_if<__::ranged::is_ranged<Range, basic_string>::value>::type>
+    basic_string& operator=(Range&& R)
+    {
+      assign(forward<Range>(R));
+      return *this;
+    }
+    template<class Range, typename IsRange = enable_if<__::ranged::is_ranged<Range, basic_string>::value>::type>
+    basic_string& assign(Range&& R)
+    {
+      return assign(__::ranged::adl_begin(R), __::ranged::adl_end(R));
+    }
+    template<class Range, typename IsRange = enable_if<__::ranged::is_ranged<Range, basic_string>::value>::type>
+    iterator insert(const_iterator position, Range&& R)
+    {
+      return insert(position, __::ranged::adl_begin(R), __::ranged::adl_end(R));
+    }
+#else
+    template<class Iter>
+    explicit basic_string(std::range<Iter>&& R)
+      :length_(), capacity_(), buffer_()
+    {
+      assign(forward<std::range<Iter>>(R));
+    }
+    template<class Iter>
+    explicit basic_string(std::range<Iter>&& R, const Allocator& a)
+      :length_(), capacity_(), buffer_(),
+      alloc(a)
+    {
+      assign(forward<std::range<Iter>>(R));
+    }
+    template<class Iter>
+    basic_string& operator=(std::range<Iter>&& R)
+    {
+      assign(forward<std::range<Iter>>(R));
+      return *this;
+    }
+    template<class Iter>
+    basic_string& assign(std::range<Iter>&& R)
+    {
+      return assign(__::ranged::adl_begin(R), __::ranged::adl_end(R));
+    }
+    template<class Iter>
+    iterator insert(const_iterator position, std::range<Iter>&& R)
+    {
+      return insert(position, __::ranged::adl_begin(R), __::ranged::adl_end(R));
+    }
 #endif
+    ///\}
+#endif // NTL_STLX_RANGE
+#endif // NTL_CXX_RV
 
     /// Effects: destructs string object.
     __forceinline
@@ -1057,7 +1126,9 @@ struct char_traits<wchar_t>
       if(!str) return *this;
       if(pos1 > length_ || pos2 > len){
         __throw_out_of_range("std::basic_string::replace_impl(): invalid position given");
+        #if !STLX_USE_EXCEPTIONS
         return *this;
+        #endif
       }
 
       // dest size, src size
@@ -1067,7 +1138,9 @@ struct char_traits<wchar_t>
 
       if(length_ - xlen >= max_size()-rlen){
         __throw_length_error("std::basic_string::replace_impl(): too large size");
+        #if !STLX_USE_EXCEPTIONS
         return *this;
+        #endif
       }
 
       const_pointer s = str;
@@ -1117,7 +1190,9 @@ struct char_traits<wchar_t>
     {
       if(pos > size()){
         __throw_out_of_range("std::basic_string::copy(): invalid `pos`");
+#if !STLX_USE_EXCEPTIONS
         return 0;
+#endif
       }
       const size_type tail = size() - pos;
       const size_type rlen = min(n, tail);

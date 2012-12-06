@@ -436,6 +436,26 @@ void ntl::nt::exception::inconsistency()
 }
 
 
+///\name EH support for array of objects
+#ifdef _M_X64
+# define __ehcall __stdcall
+#else
+# define __ehcall __thiscall
+#endif
+
+#if 0
+
+struct UDT {};
+typedef void (UDT::* xtor)();
+#define CALL_XTOR(callee, ptr) ((reinterpret_cast<UDT*>(ptr)->*(callee))())
+
+#else
+
+typedef void(__thiscall* xtor)(void*);
+#define CALL_XTOR(callee, ptr) ( (callee)(ptr) )
+
+#endif
+
 static int array_unwind_filter(exception_pointers* eh)
 {
   switch(eh->ExceptionRecord->ExceptionCode)
@@ -447,8 +467,23 @@ static int array_unwind_filter(exception_pointers* eh)
   return exception_continue_search;
 }
 
+/** unwind corrupted array */
+static void array_unwind(void* ptr, size_t size, int count, xtor dtor)
+{
+  __try{
+    while(--count >= 0){
+      ptr = ntl::padd(ptr, -static_cast<std::ssize_t>(size));
+      CALL_XTOR(dtor, ptr);
+    }
+  }__except(array_unwind_filter(exception_info())){
+
+  }
+}
+
+
 // Destructor support for arrays of objects
-void __stdcall __ehvec_dtor( void* ptr, unsigned size, int count, void(__thiscall *dtor)(void*) )
+void __stdcall __ehvec_dtor(void* ptr, size_t size, int count, xtor dtor)
+//void __stdcall __ehvec_dtor( void* ptr, unsigned size, int count, void(__thiscall *dtor)(void*) )
 {
   __try{
     // destroy from end to begin
@@ -456,9 +491,27 @@ void __stdcall __ehvec_dtor( void* ptr, unsigned size, int count, void(__thiscal
     int ssize = -static_cast<int>(size);
     while(--count >= 0){
       ptr = ntl::padd(ptr, ssize);
-      (*dtor)(ptr);
+      CALL_XTOR(dtor, ptr);
     }
   }
   __except(array_unwind_filter(exception_info())){
+  }
+}
+
+/** Constructor */
+void __stdcall __ehvec_ctor(void* ptr, size_t size, int count, xtor ctor, xtor dtor)
+{
+  int i = 0;
+  bool success = false;
+  __try{
+    for(i = 0; i < count; i++){
+      CALL_XTOR(ctor, ptr);
+      ptr = ntl::padd(ptr, size);
+    }
+    success = true;
+  }
+  __finally{
+    if(!success)
+      array_unwind(ptr, size, i, dtor);
   }
 }

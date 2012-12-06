@@ -19,6 +19,9 @@
 #ifndef NTL__STLX_STRING
 # include "../stlx/stdstring.hxx"
 #endif
+#ifndef NTL__STLX_STRINGREF
+# include "../stlx/string_ref.hxx"
+#endif
 
 namespace ntl {
 namespace nt {
@@ -104,6 +107,14 @@ class native_string
       buffer_(str.begin())
     {/**/}
 
+    native_string(
+      typename std::conditional<std::is_const<charT>::value,
+        const std::basic_string_ref<value_type>&, std::basic_string_ref<value_type>&>::type str)
+    : length_(static_cast<size_type>(str.size() * sizeof(value_type))),
+      maximum_length_(length_/* + sizeof(value_type)*/),
+      buffer_(str.begin())
+    {/**/}
+
  friend class native_string;
 
 #if 0 // issue13 fix
@@ -165,9 +176,13 @@ class native_string
 
     ///\name  native_string connversions
 
-    std::basic_string<value_type> get_string() const
+    //std::basic_string<value_type> get_string() const
+    //{
+    //  return std::basic_string<value_type>(begin(), size());
+    //}
+    std::basic_string_ref<value_type> get_string() const
     {
-      return std::basic_string<value_type>(begin(), size());
+      return std::basic_string_ref<value_type>(begin(), size());
     }
 
     template<class CustomAllocator>

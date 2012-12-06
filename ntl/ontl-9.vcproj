@@ -424,6 +424,10 @@
 								RelativePath=".\stlx\ext\tr2\network\stream_socket.hxx"
 								>
 							</File>
+							<File
+								RelativePath=".\stlx\ext\tr2\network\uri.hxx"
+								>
+							</File>
 							<Filter
 								Name="impl"
 								>
@@ -928,6 +932,10 @@
 					</File>
 					<File
 						RelativePath=".\stlx\move.hxx"
+						>
+					</File>
+					<File
+						RelativePath=".\stlx\range.hxx"
 						>
 					</File>
 					<File

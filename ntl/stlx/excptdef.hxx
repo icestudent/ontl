@@ -52,6 +52,8 @@
 #ifdef NTL_CXX_NOEXCEPT
 # undef __ntl_nothrow
 # define __ntl_nothrow noexcept
+#else
+# define noexcept __ntl_nothrow
 #endif
 
 #endif // NTL__STLX_EXCPTDEF

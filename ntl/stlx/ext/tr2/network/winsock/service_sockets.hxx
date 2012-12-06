@@ -339,7 +339,7 @@ namespace ntl { namespace network {
       bool wait_for(const implementation_type& impl, socket_base::wait_type check, const std::chrono::duration<Rep, Period>& rel_time, std::error_code& ec)
       {
         if(!check_open(impl, ec))
-          return ec;
+          return static_cast<bool>(ec);
         fd_set r, w, e;
         if(check & socket_base::read)
           r.set(impl.s);
@@ -454,7 +454,7 @@ namespace ntl { namespace network {
             assert(re > 0);
             received += re;
             offset += re;
-            if(addr)    // don't read data without connection
+            if(addr || flags == socket_base::message_peek)    // don't read data without connection
               return received;
           } while(offset < buf->len);
         }

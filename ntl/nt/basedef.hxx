@@ -379,6 +379,9 @@ NTL_EXTERNAPI
 NTL_EXTERNAPI
   uint32_t __stdcall RtlRandom(uint32_t* Seed);
 
+NTL_EXTERNAPI
+  uint32_t __stdcall RtlRandomEx(uint32_t* Seed);
+
 namespace harderror
 {
   namespace response

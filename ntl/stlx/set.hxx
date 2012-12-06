@@ -10,6 +10,7 @@
 
 #include "algorithm.hxx"
 #include "ext/rbtree.hxx"
+#include "range.hxx"
 
 namespace std {
 
@@ -92,6 +93,7 @@ namespace std {
 
     set<Key,Compare,Allocator>& operator= (const set<Key,Compare,Allocator>& x)
     {
+      clear();
       assign(x);
       return *this;
     }
@@ -99,9 +101,33 @@ namespace std {
     #ifdef NTL_CXX_RV
     set<Key,Compare,Allocator>& operator= (set<Key,Compare,Allocator>&& x)
     {
+      clear();
       assign(x);
       return *this;
     }
+
+#ifdef NTL_STLX_RANGE
+    ///\name Range extension
+    template<class Iter>
+    explicit set(std::range<Iter>&& R, const Compare& comp = Compare(), const Allocator& a = Allocator())
+      :tree_type(comp, a)
+    {
+      insert(forward<Range>(R));
+    }
+    template<class Iter>
+    set& operator=(std::range<Iter>&& R)
+    {
+      clear();
+      insert(forward<Range>(R));
+      return *this;
+    }
+    template<class Iter>
+    void insert(std::range<Iter>&& R)
+    {
+      insert_range(__::ranged::adl_begin(R), __::ranged::adl_end(R));
+    }
+    ///\}
+#endif // NTL_STLX_RANGE
     #endif
 
     // modifiers:
@@ -110,7 +136,6 @@ namespace std {
     template <class... Args> iterator emplace(const_iterator position, Args&&... args);
     #endif
 
-#ifdef NTL_CXX_RV
     std::pair<iterator, bool> insert(const value_type& x)
     {
       bool greater;
@@ -126,6 +151,7 @@ namespace std {
       return insert(x).first;
     }
 
+#ifdef NTL_CXX_RV
     std::pair<iterator, bool> insert(value_type&& x)
     {
       return tree_type::insert_reference(std::forward<value_type>(x));

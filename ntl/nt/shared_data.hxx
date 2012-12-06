@@ -9,7 +9,7 @@
 #pragma once
 
 #include "../cpu.hxx"
-#include "../stdint.h"
+#include "../stlx/cstdint.hxx"
 
 namespace ntl {
 namespace nt {
