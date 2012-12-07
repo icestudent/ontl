@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<VisualStudioPropertySheet
+	ProjectType="Visual C++"
+	Version="8.00"
+	Name="ntl-km"
+	>
+	<Tool
+		Name="VCCLCompilerTool"
+		ExceptionHandling="0"
+		BufferSecurityCheck="false"
+		DebugInformationFormat="3"
+	/>
+	<Tool
+		Name="VCLinkerTool"
+		AdditionalDependencies="ntoskrnl.lib hal.lib"
+		OutputFile="$(OutDir)\$(ProjectName).sys"
+		LinkIncremental="1"
+		GenerateManifest="false"
+		IgnoreDefaultLibraryNames="libcmt.lib libcmtd.lib ntdll.lib ntdllp.lib"
+		GenerateDebugInformation="true"
+		SubSystem="3"
+		Driver="1"
+		EntryPointSymbol="DrvEntry"
+		SetChecksum="true"
+		FixedBaseAddress="1"
+	/>
+</VisualStudioPropertySheet>

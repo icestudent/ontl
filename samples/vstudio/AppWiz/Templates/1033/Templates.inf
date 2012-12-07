@@ -1,0 +1,15 @@
+[!if NTL_APPTYPE_CONSOLE]
+console.cpp
+[!endif]
+[!if NTL_APPTYPE_NATIVE]
+native.cpp
+[!endif]
+[!if NTL_APPTYPE_WIN32]
+win32.cpp
+[!endif]
+[!if NTL_APPTYPE_DRIVER]
+driver.cpp
+[!endif]
+[!if NTL_APPTYPE_DLL]
+dll.cpp
+[!endif]

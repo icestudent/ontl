@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<VisualStudioPropertySheet
+	ProjectType="Visual C++"
+	Version="8.00"
+	Name="ntl-common"
+	>
+	<Tool
+		Name="VCCLCompilerTool"
+		AdditionalIncludeDirectories="d:\usr\lib\common\ontl\ntl"
+		ExceptionHandling="0"
+		BufferSecurityCheck="false"
+	/>
+	<Tool
+		Name="VCLinkerTool"
+		AdditionalDependencies="ntdll.lib"
+		GenerateManifest="false"
+		IgnoreDefaultLibraryNames="libcmt.lib"
+	/>
+</VisualStudioPropertySheet>

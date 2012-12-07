@@ -1,0 +1,1282 @@
+; AutoExp.Dat - templates for automatically expanding data (with NTL support)
+; Copyright(c) Microsoft Corporation. All Rights Reserved.
+;
+; v 0.1  - supports basic_string, list, vector, stack, auto_ptr, pair
+; v 0.2  - added bitset
+; v 0.3  - added set & map
+; v 0.4  - array, rbtree, negators
+; v 0.5  - unique_ptr, shared_ptr
+; v 0.6  - forward_list
+; v 0.6a - some fixes
+; v 0.7  - added char16_t
+; v 0.8  - added deque, queue
+; v 0.9  - chrono types
+; v 0.10 - added iostreams
+; v 0.11 - added fs::path
+; v 0.12 - fixed set & map
+; v 0.13 - added ntl::basic_file
+; v 0.14 - unordered containers
+; v 0.15 - string_ref
+; v 0.16 - initializer_list
+;
+;---------------------------------------------------------------
+;
+; While debugging, Data Tips and items in the Watch and Variable
+; windows are automatically expanded to show their most important
+; elements. The expansion follows the format given by the rules
+; in this file. You can add rules for your types or change the
+; predefined rules.
+;
+; For good examples, read the rules in this file.
+; Links:
+; http://www.virtualdub.org/blog/pivot/entry.php?id=120
+; http://garrys-brain.blogspot.com/2007/08/debugging-stlport-in-visual-studio.html
+; http://blog.gamedeff.com/?p=143
+;
+; To find what the debugger considers the type of a variable to
+; be, add it to the Watch window and look at the Type column.
+;
+; An AutoExpand rule is a line with the name of a type, an equals
+; sign, and text with replaceable parts in angle brackets. The
+; part in angle brackets names a member of the type and an
+; optional Watch format specifier.
+;
+; AutoExpand rules use the following syntax. The equals sign (=),
+; angle brackets (<>), and comma are taken literally. Square
+; brackets ([]) indicate optional items.
+;
+; type=[text]<member[,format]>...
+;
+; type      Name of the type (may be followed by <*> for template
+;           types such as the ATL types listed below).
+;
+; text      Any text.Usually the name of the member to display,
+;           or a shorthand name for the member.
+;
+; member    Name of a member to display.
+;
+; format    Watch format specifier. One of the following:
+;
+;   Letter  Description                 Sample         Display
+;   ------  --------------------------  ------------   -------------
+;   d,i     Signed decimal integer      0xF000F065,d   -268373915
+;   u       Unsigned decimal integer    0x0065,u       101
+;   o       Unsigned octal integer      0xF065,o       0170145
+;   x,X     Hexadecimal integer         61541,X        0X0000F065
+;   l,h     long or short prefix for    00406042,hx    0x0c22
+;             d, i, u, o, x, X
+;   f       Signed floating-point       3./2.,f        1.500000
+;   e       Signed scientific-notation  3./2.,e        1.500000e+000
+;   g       Shorter of e and f          3./2.,g        1.5
+;   c       Single character            0x0065,c       'e'
+;   s       Zero-terminated string      pVar,s         "Hello world"
+;   su      Unicode string              pVar,su        "Hello world"
+;
+; For details of other format specifiers see Help under:
+; "format specifiers/watch variable"
+;
+; The special format <,t> specifies the name of the most-derived
+; type of the object. This is especially useful with pointers or
+; references to a base class.
+;
+; If there is no rule for a class, the base classes are checked for
+; a matching rule.
+;
+; There are some special entries allowed in the AutoExpand section:
+; $BUILTIN is used to display more complex types that need to do more
+; than just show a member variable or two.
+; $ADDIN allows external DLLs to be added to display even more complex
+; types via the EE Add-in API. The first argument is the DLL name, the
+; second argument is the name of the export from the DLL to use. For
+; further information on this API see the sample called EEAddIn.
+;
+; WARNING: if hexadecimal mode is on in the watch window, all numbers here are
+; evaluated in hex, e.g. 42 becomes 0x42
+
+[AutoExpand]
+
+; from windef.h
+tagPOINT =x=<x> y=<y>
+tagRECT =top=<top> bottom=<bottom> left=<left> right=<right>
+
+; from winuser.h
+tagMSG =msg=<message,x> wp=<wParam,x> lp=<lParam,x>
+
+; intrinsics
+__m64 =<m64_i64,x>
+__m128=$BUILTIN(M128)
+__m128i=$BUILTIN(M128I)
+__m128d=$BUILTIN(M128D)
+
+
+_GUID=$BUILTIN(GUID)
+guid=$BUILTIN(GUID)
+
+; see EEAddIn sample for how to use these
+;_SYSTEMTIME=$ADDIN(EEAddIn.dll,AddIn_SystemTime)
+;_FILETIME=$ADDIN(EEAddIn.dll,AddIn_FileTime)
+
+std::binder1st<*>= op=<op> value=<value>
+std::binder2nd<*>= op=<op> value=<value>
+std::less<*>=lessthan
+std::greater<*>=greaterthan
+
+[Visualizer]
+; This section contains visualizers for STL and ATL containers
+
+;------------------------------------------------------------------------------
+;  chrono
+;------------------------------------------------------------------------------
+std::chrono::duration<*> {
+	preview (
+	#( $e.rep_ )
+	)
+}
+std::chrono::time_point<*> {
+	preview ( #( $e.d ) )
+}
+;------------------------------------------------------------------------------
+;  std::array
+;------------------------------------------------------------------------------
+std::array<*> {
+  preview (
+    ; An actual array is previewed with its address.
+    ; array<T, N> is previewed like vector<T>.
+    #(
+      "[",
+      $e.__actual_size,
+      "](",
+      #array(expr: $e.__elems[$i], size: $e.__actual_size),
+      ")"
+    )
+  )
+
+  children (
+    ; Just like an actual array.
+    #array(expr: $e.__elems[$i], size: $e.__actual_size)
+  )
+}
+
+;------------------------------------------------------------------------------
+;  std::vector
+;------------------------------------------------------------------------------
+std::vector<*>{
+  children
+  (
+		#(
+	    #array
+	    (
+	      expr :  ($c.begin_)[$i],
+	      size :  $c.end_-$c.begin_
+	    ),
+			[raw]: [$e,!]
+		)
+  )
+
+    preview
+    (
+      #(
+      "[",
+            $e.end_ - $e.begin_ ,
+            "](",
+
+            #array
+            (
+        expr :   ($c.begin_)[$i],
+        size :   $c.end_-$c.begin_
+      ),
+      ")"
+    )
+  )
+}
+
+std::vector<*>::iterator|std::vector<*>::const_iterator{
+  preview
+  (
+    #(*$e)
+  )
+
+  children
+  (
+    #(ptr: $e.)
+  )
+}
+
+
+
+;------------------------------------------------------------------------------
+;  std::string/basic_string
+;------------------------------------------------------------------------------
+
+std::basic_string<char,*>{
+  preview
+  (
+    #if($e.length_ == 0)(
+      "<empty>"
+    ) #else (
+      [$e.buffer_,s]
+    )
+  )
+
+  stringview
+  (
+    [$e.buffer_,sb]
+  )
+
+  children
+  (
+    #([raw]: [$e,!],  #array( expr: $e.buffer_[$i], size: $e.length_))
+  )
+
+}
+
+std::basic_string<wchar_t,*>|std::basic_string<unsigned short,*>{
+  preview
+  (
+    #if($e.length_ == 0)(
+      "<empty>"
+    ) #else (
+      [$e.buffer_,su]
+    )
+  )
+
+  stringview
+  (
+    [$e.buffer_,sub]
+  )
+
+  children
+  (
+    #([raw]: [$e,!],  #array( expr: $e.buffer_[$i], size: $e.length_))
+  )
+}
+
+; char16_t
+std::basic_string<std::char16_t,*>{
+  preview
+  (
+    #if($e.buffer_ == $e.str.end_)(
+      "<empty>"
+    ) #else (
+      [$e.buffer_,su]
+    )
+  )
+
+  stringview
+  (
+    [$e.buffer_,sub]
+  )
+
+  children
+  (
+    #([raw]: [$e,!],  #array( expr: $e.buffer_[$i], size: $e.length_))
+  )
+
+}
+
+std::basic_string<*>::iterator|std::basic_string<*>::const_iterator{
+  preview
+  (
+    #( $e )
+  )
+
+  children
+  (
+    #( ptr: *$e )
+  )
+}
+
+
+std::basic_string<unsigned char,*>{
+  preview
+  (
+    #if($e.length_ == 0)(
+      "<empty>"
+    ) #else (
+      [$e.buffer_,mb]
+    )
+  )
+
+  stringview
+  (
+    [$e.buffer_,sb]
+  )
+
+  children
+  (
+    #([raw]: [$e,!],  #array( expr: $e.buffer_[$i], size: $e.length_))
+  )
+
+}
+
+
+;------------------------------------------------------------------------------
+;  std::string_ref
+;------------------------------------------------------------------------------
+std::basic_string_ref<char,*>{
+  preview
+  (
+    #if($e.len == 0)(
+      "<empty>"
+    ) #else (
+      [$e.p,s]
+    )
+  )
+  stringview
+  (
+    [$e.p,sb]
+  )
+  children
+  (
+    #([raw]: [$e,!],  #array( expr: $e.p[$i], size: $e.len))
+  )
+}
+std::basic_string_ref<wchar_t,*>|std::basic_string_ref<unsigned short,*>|std::basic_string_ref<std::char16_t,*>{
+  preview
+  (
+    #if($e.len == 0)(
+      "<empty>"
+    ) #else (
+      [$e.p,su]
+    )
+  )
+  stringview
+  (
+    [$e.p,sub]
+  )
+  children
+  (
+    #([raw]: [$e,!],  #array( expr: $e.p[$i], size: $e.len))
+  )
+}
+
+
+
+
+
+
+std::pair<*>{
+  preview
+  (
+    #(
+      "(",
+      $e.first,
+      ",",
+      $e.second ,
+      ")"
+    )
+  )
+}
+
+;------------------------------------------------------------------------------
+;  std::auto_ptr
+;------------------------------------------------------------------------------
+
+std::auto_ptr<*>{
+  preview
+  (
+    #if($c.ptr == 0)(
+      "<empty>"
+    ) #else (
+      #(  "auto_ptr ",
+        (*(($T1 *)$c.ptr))
+       )
+    )
+  )
+  children
+  (
+    #(
+      ptr: (*(($T1 *)$c.ptr))
+    )
+  )
+}
+
+;------------------------------------------------------------------------------
+;  std::unique_ptr
+;------------------------------------------------------------------------------
+std::unique_ptr<*>{
+  preview
+  (
+    #if($e.ptr == 0) (
+      "<empty>"
+    ) #else (
+      #( "unique_ptr ", *$e.ptr )
+    )
+  )
+  children
+  (
+    #(
+      ptr: *$e.ptr
+    )
+  )
+}
+
+;------------------------------------------------------------------------------
+;  std::shared_ptr
+;------------------------------------------------------------------------------
+
+std::shared_ptr<*>{
+  preview
+  (
+    #if($c.ptr == 0)(
+      "<empty>"
+    ) #else (
+      #(
+        "shared_ptr ",
+        (*(($T1 *)$c.ptr))
+       )
+    )
+  )
+  children
+  (
+    #(
+      [raw]: [$c,!],
+      ptr: (*(($T1 *)$c.ptr))
+    )
+  )
+}
+
+;------------------------------------------------------------------------------
+;  std::map
+;------------------------------------------------------------------------------
+
+std::map<*>{
+  children
+  (
+    #(
+      [raw]: [$c,!],
+      #tree(
+          head : $c.root_,
+          size : $c.count_,
+          left : left_,
+          right : right_
+      ) : $e.elem
+    )
+  )
+
+  preview
+  (
+    #(
+      "[",$e.count_,"](",
+      #tree
+      (
+        head : $c.root_,
+        size : $c.count_,
+        left : left_,
+        right : right_
+      ) : $e.elem,
+      ")"
+    )
+  )
+}
+
+;------------------------------------------------------------------------------
+;  std::multi_map
+;------------------------------------------------------------------------------
+
+std::multimap<*>{
+  children
+  (
+    #tree
+    (
+      head : $c._Myhead->_Parent,
+        skip : $c._Myhead,
+        size : $c._Mysize,
+        left : _Left,
+        right : _Right
+    ) : $e._Myval
+  )
+
+  preview
+  (
+    #(
+      "[",
+      $e._Mysize,
+      "](",
+
+      #tree
+      (
+        head : $c._Myhead->_Parent,
+        skip : $c._Myhead,
+        size : $c._Mysize,
+        left : _Left,
+        right : _Right
+      ) : $e._Myval,
+
+      ")"
+    )
+  )
+}
+
+
+;------------------------------------------------------------------------------
+;  std::list
+;------------------------------------------------------------------------------
+
+std::list<*,*>{
+
+  children
+  (
+    #(
+      [raw]: [$c,!],
+      #list
+      (
+        head : $e.head.next,
+        next : next
+      ) : ((std::list<$T1,$T2>::node*)&$e)->elem
+    )
+  )
+
+  preview
+  (
+		#if ($e.head.next == &($e.head)) ("<empty>") #else (
+			#(
+	      "(",
+	      #list
+	      (
+	        head : $e.head.next,
+	        next : next
+	      ) : ((std::list<$T1,$T2>::node*)&$e)->elem,
+	      ")"
+	  	)
+    )
+  )
+}
+
+std::list<*>::iterator__impl|std::list<*>::iterator__impl{
+  preview
+  (
+    #($e.p)
+  )
+
+  children
+  (
+    #(ptr: $e.p)
+  )
+
+}
+
+
+;------------------------------------------------------------------------------
+;  std::forward_list
+;------------------------------------------------------------------------------
+std::forward_list<*,*>{
+
+  children
+  (
+    #(
+      [raw]: [$c,!],
+      #if($c.head.next == 0) (
+        #array(expr: 0, size: 0)
+      ) #else (
+        #list
+        (
+          head : $c.head.next,
+          next : next
+        ) : ((std::forward_list<$T1,$T2>::node*)&$e)->elem
+      )
+    )
+  )
+
+  preview
+  (
+    #if($c.head.next == 0) ("<empty>") #else (
+      #(
+        "(",
+        #list
+        (
+          head : $c.head.next,
+          next : next
+        ) : ((std::forward_list<$T1,$T2>::node*)&$e)->elem,
+        ")"
+      )
+    )
+  )
+
+}
+
+std::forward_list<*,*>::iterator__impl|std::forward_list<*,*>::const_iterator__impl{
+  preview
+  (
+    #if($e.p == 0) ( "<end>" ) #else ( (std::forward_list<$T1,$T2>::node*)$e.p ) )
+  )
+
+  children
+  (
+    #(
+      [raw]: [$e,!],
+      #if(#e.p == 0) (
+        #array(expr: 0, size: 0)
+      ) #else (
+        #(ptr: $e.p)
+      )
+    )
+  )
+
+}
+
+;------------------------------------------------------------------------------
+;  std::bitset  <bitset>
+;------------------------------------------------------------------------------
+
+std::bitset<*>{
+  preview
+  (
+    #(
+    "[",
+      $c.digits,
+    "](",
+    #array
+    (
+      expr :   ($c.storage_[$i / $c.element_size_] >> ($i % $c.element_size_)),
+      size :   $c.digits
+    ) : [($e & 1),d],
+    ")"
+    )
+  )
+  children
+  (
+    #(
+      [raw]: [$c,!],
+      #array
+      (
+        expr :   ($c.storage_[$i / $c.element_size_] >> ($i % $c.element_size_)),
+        size :   $c.digits
+      ) : (bool)($e & 1))
+    )
+}
+
+std::bitset<*>::reference{
+    preview
+    (
+    #(
+      "bitset[", $e._Mypos, "] = ",
+      (bool)(($e._Pbitset->_Array[$i / _Bitsperword] >> ($e._Mypos % _Bitsperword)) & 1)
+    )
+    )
+}
+
+;------------------------------------------------------------------------------
+;  std::deque
+;------------------------------------------------------------------------------
+std::deque<*>{
+  children
+  (
+	#(
+    #array
+    (
+      expr :  ($c.left)[$i],
+      size :  $c.right-$c.left
+    ),
+	[raw]: [$e,!]
+	)
+  )
+  preview
+    (
+      #(
+	      "[",
+            $e.right - $e.left ,
+        "](",
+
+	      #array
+		     (
+	      expr :   ($c.left)[$i],
+        size :   $c.right-$c.left
+  		    ),
+      	")"
+    )
+  )
+}
+
+std::deque<*>::iterator|std::deque<*>::const_iterator{
+  preview
+  (
+    #(*$e)
+  )
+
+  children
+  (
+    #(ptr: $e.)
+  )
+}
+
+
+;------------------------------------------------------------------------------
+;  std::queue
+;------------------------------------------------------------------------------
+
+std::queue<*>{
+  children
+  (
+    #array
+    (
+      expr : $c.c._Map[ (($i + $c.c._Myoff) / $c.c._EEN_DS) % $c.c._Mapsize][($i + $c.c._Myoff) % $c.c._EEN_DS],
+      size : $c.c._Mysize
+    )
+  )
+
+ preview
+  (
+    #(
+      "[",
+      $e.c._Mysize,
+      "](",
+
+      #array
+      (
+        expr : $c.c._Map[ (($i + $c.c._Myoff) / $c.c._EEN_DS) % $c.c._Mapsize][($i + $c.c._Myoff) % $c.c._EEN_DS],
+        size : $c.c._Mysize
+      ),
+
+      ")"
+    )
+  )
+}
+
+
+;------------------------------------------------------------------------------
+;  std::priority_queue
+;------------------------------------------------------------------------------
+
+std::priority_queue<*>{
+  preview
+  (
+    $e.c
+  )
+}
+
+;------------------------------------------------------------------------------
+;  std::set
+;------------------------------------------------------------------------------
+
+std::set<*>{
+  children
+  (
+    #(
+      [raw]: [$c,!],
+      #tree
+      (
+          head : $c.root_,
+          size : $c.count_,
+          left : left_,
+          right : right_
+      ) : $e.elem
+    )
+  )
+
+  preview
+  (
+    #(
+      "[",
+      $e.count_,
+      "](",
+
+      #tree
+      (
+        head : $c.root_,
+        size : $c.count_,
+        left : left_,
+        right : right_
+      ) : $e.elem,
+
+      ")"
+    )
+  )
+}
+
+;------------------------------------------------------------------------------
+;  std::multi_set
+;------------------------------------------------------------------------------
+
+std::multiset<*>{
+    preview
+    (
+    #(
+      "[",
+            $e._Mysize ,
+            "](",
+
+            #tree
+            (
+        head : $c._Myhead->_Parent,
+        skip : $c._Myhead,
+        left : _Left,
+        right : _Right,
+        size  : $c._Mysize
+      ) : $e._Myval,
+
+      ")"
+    )
+  )
+
+  children
+  (
+    #tree
+    (
+      head : $c._Myhead->_Parent,
+      skip : $c._Myhead,
+      left : _Left,
+      right : _Right,
+      size  : $c._Mysize
+    ) : $e._Myval
+  )
+}
+
+
+;------------------------------------------------------------------------------
+;  tree::rbtree::rbtree (shared my map/multimap/set/multiset)
+;------------------------------------------------------------------------------
+
+tree::rbtree::rbtree<*>::iterator|tree::rbtree::rbtree<*>::const_iterator{
+  preview
+  (
+    #($e.p->elem)
+  )
+
+  children
+  (
+    #(ptr: $e.p->elem)
+  )
+
+
+}
+
+
+;------------------------------------------------------------------------------
+;  std::stack
+;------------------------------------------------------------------------------
+
+std::stack<*>{
+  children
+  (
+    #(
+      [raw]: [$c,!],
+      #array
+      (
+        expr : $c.c.begin_[$i],
+        size : $c.c.size_
+      )
+    )
+  )
+
+    preview
+    (
+    #(
+      "[",
+            $e.c.size_ ,
+            "](",
+
+            #array
+            (
+        expr : $c.c.begin_[$i],
+        size : $c.c.size_
+      ),
+
+      ")"
+    )
+  )
+}
+
+;------------------------------------------------------------------------------
+;  stdext::hash_map
+;  stdext::hash_multimap
+;  stdext::hash_set
+;  stdext::hash_multiset
+;------------------------------------------------------------------------------
+
+stdext::hash_map<*>|stdext::hash_multimap<*>|stdext::hash_set<*>|stdext::hash_multiset<*>{
+
+  preview
+  (
+    #(
+      "[",
+      $e._List._Mysize,
+      "](",
+
+      #list
+      (
+        head : $c._List._Myhead->_Next,
+                size : $c._List._Mysize,
+        next : _Next
+      ) : $e._Myval,
+
+      ")"
+    )
+  )
+
+  children
+  (
+
+    #list
+    (
+      head : $c._List._Myhead->_Next,
+      size : $c._List._Mysize,
+      next : _Next
+    ) : $e._Myval
+  )
+}
+
+
+; STL negators are previewed with "not[12](<stored functor>)".
+; They have a child with the fake name of [pred], so that the
+; stored functor can be inspected.
+std::unary_negate<*>{
+  preview (
+    #(
+      "not1(",
+      $e.pred,
+      ")"
+    )
+  )
+
+  children (
+    #([pred] : $e.pred)
+  )
+}
+std::binary_negate<*>{
+  preview (
+    #(
+      "not2(",
+      $e.pred,
+      ")"
+    )
+  )
+
+  children (
+    #([pred] : $e.pred)
+  )
+}
+
+
+;------------------------------------------------------------------------------
+;  I/O Streams
+;------------------------------------------------------------------------------
+
+std::basic_ostream<*> {
+	preview ( #( "state(", [$e.state,x], ")" ) )
+	children (
+		#(
+			[raw]: [$e,!],
+			state: [$e.state,x],
+			exceptmask: [$e.exceptmask,x],
+			format: [$e.fmtfl,x],
+			precision: $e.prec,
+			width: $e.wide,
+			fill: $e.fillc
+		)
+	)
+}
+
+std::basic_istream<*> {
+	preview ( #( "state(", [$e.state,x], ")" ) )
+	children (
+		#(
+			[raw]: [$e,!],
+			state: [$e.state,x],
+			exceptmask: [$e.exceptmask,x],
+			format: [$e.fmtfl,x],
+			precision: $e.prec,
+			width: $e.wide,
+			fill: $e.fillc
+		)
+	)
+}
+
+std::basic_iostream<*> {
+	preview ( #( "state(", [$e.state,x], ")" ) )
+	children (
+		#(
+			[raw]: [$e,!],
+			state: [$e.state,x],
+			exceptmask: [$e.exceptmask,x],
+			format: [$e.fmtfl,x],
+			precision: $e.prec,
+			width: $e.wide,
+			fill: $e.fillc
+		)
+	)
+}
+
+
+; ------------------------------------
+; string streams
+; ------------------------------------
+
+std::basic_ostringstream<*>{
+  preview
+  (
+    #( "state(", [$e.state,x], ") ", $e.sb.str_ )
+  )
+
+  children (
+		#(
+			[raw]: [$e,!],
+			string: $e.sb.str_,
+			mode:   [$e.sb.mode_,x]
+		)
+	)
+}
+
+std::basic_istringstream<*>{
+  preview
+  (
+    #( "state(", [$e.state,x], ") ", $e.sb.str_ )
+  )
+
+  children (
+		#(
+			[raw]: [$e,!],
+			string: $e.sb.str_,
+			mode:   [$e.sb.mode_,x]
+		)
+	)
+}
+
+std::basic_stringstream<*>{
+  preview
+  (
+    #( "state(", [$e.state,x], ") ", $e.sb.str_ )
+  )
+
+  children (
+		#(
+			[raw]: [$e,!],
+			string: $e.sb.str_,
+			mode:   [$e.sb.mode_,x]
+		)
+	)
+}
+
+; ------------------------------------
+; file streams
+; ------------------------------------
+std::basic_ofstream<*> {
+	preview ( #( "state(", [$e.state,x], ")" ) )
+	children (
+		#(
+			[raw]: [$e,!],
+			encoding: $e.sb.encoding,
+			mode: $e.sb.mode,
+			file: $e.sb.f
+		)
+	)
+}
+
+std::basic_ifstream<*> {
+	preview ( #( "state(", [$e.state,x], ")" ) )
+	children (
+		#(
+			[raw]: [$e,!],
+			encoding: $e.sb.encoding,
+			mode: $e.sb.mode,
+			file: $e.sb.f
+		)
+	)
+}
+
+std::basic_fstream<*> {
+	preview ( #( "state(", [$e.state,x], ")" ) )
+	children (
+		#(
+			[raw]: [$e,!],
+			encoding: $e.sb.encoding,
+			mode: $e.sb.mode,
+			file: $e.sb.f
+		)
+	)
+}
+
+;------------------------------------------------------------------------------
+;  tr2::files
+;------------------------------------------------------------------------------
+std::tr2::files::path {
+  preview
+  (
+    $e.s
+  )
+
+  stringview
+  (
+    $e.s
+  )
+
+  children
+  (
+    #([raw]: [$e,!],  #array( expr: $e.s.buffer_[$i], size: $e.s.length_))
+  )
+}
+
+;------------------------------------------------------------------------------
+;  NTL Types
+;------------------------------------------------------------------------------
+ntl::basic_handle<*> {
+	preview ( $e.h )
+	children ( $e.h )
+}
+
+ntl::basic_file<*>{
+	preview ( $e.f )
+	children ( $e.f )
+}
+
+ntl::nt::file_handler {
+	preview ( #( $e.h, ", ", $e.iosb ) )
+	children (
+		#(
+			[raw]:  [$e,!],
+			handle: $e.h,
+			iosb:   $e.iosb
+		)
+	)
+}
+
+ntl::km::file_handler {
+	preview ( #( $e.h, ", ", $e.iosb ) )
+	children (
+		#(
+			[raw]:  [$e,!],
+			handle: $e.h,
+			iosb:   $e.iosb
+		)
+	)
+}
+
+;------------------------------------------------------------------------------
+;  hashes
+;------------------------------------------------------------------------------
+std::hash<*>{
+	preview ( "hash" )
+	children ( #array(expr: 0, size: 0) )
+}
+
+;------------------------------------------------------------------------------
+;  comparisons
+;------------------------------------------------------------------------------
+std::equal_to<*>{ preview ( "equal_to" ) children ( #array (expr: 0, size: 0) ) }
+std::not_equal_to<*>{ preview ( "not_equal_to" ) children ( #array (expr: 0, size: 0) ) }
+std::greater<*>{ preview ( "greater" ) children ( #array (expr: 0, size: 0) ) }
+std::less<*>{ preview ( "less" ) children ( #array (expr: 0, size: 0) ) }
+std::greater_equal<*>{ preview ( "greater_equal" ) children ( #array (expr: 0, size: 0) ) }
+std::less_equal<*>{ preview ( "less_equal" ) children ( #array (expr: 0, size: 0) ) }
+
+;------------------------------------------------------------------------------
+;  unordered containers
+;------------------------------------------------------------------------------
+
+std::ext::hashtable::chained_hashtable<*>::node {
+	preview ( $e.elem )
+	children (
+		#(
+			hash_key: $e.hkey,
+			value: $e.elem
+		)
+	)
+}
+
+std::ext::hashtable::chained_hashtable<*>::bucket_type {
+	preview (
+    #if($e.size == 0)(
+      "<empty>"
+		) #else (
+			#( "[",$e.size,"]  ", 
+
+	        #list
+	        (
+	          head : $e.elems,
+		        size : $e.size,
+	          next : next
+	        ) : $e
+
+			)
+		)
+	)
+	children (
+    #(
+      [raw]: [$c,!],
+      #if($c.size == 0) (
+        #array(expr: 0, size: 0)
+      ) #else (
+    		#(
+					count: $e.size,
+					bucket: $e.hash,
+					dirty: $e.dirty,
+
+	        #list
+	        (
+	          head : $e.elems,
+		        size : $e.size,
+	          next : next
+	        ) : $e
+
+  			)
+      )
+    )
+	)
+}
+
+
+std::unordered_set<*>|std::unordered_map<*> {
+	preview (
+    #if($e.count_ == 0)(
+      "<empty>"
+		) #else (
+			#( "[",$e.count_,"]" )
+		)
+	)
+	children (
+		#(
+			[raw]: [$e,!],
+			count: $e.count_,
+			space: ($e.buckets_.second - $e.buckets_.first),
+			load: #($e.count_/($e.buckets_.second - $e.buckets_.first)),
+			hash: $e.hash_,
+			eq: $e.equal_,
+			#array (
+				size: ($e.buckets_.second - $e.buckets_.first),
+				expr: ($e.buckets_.first)[$i]
+			)
+		)
+	)
+}
+
+
+
+;------------------------------------------------------------------------------
+;  std::initializer_list
+;------------------------------------------------------------------------------
+std::initializer_list<*> {
+  preview (
+    #(
+      "[",
+      $e.end_-$e.begin_,
+      "](",
+      #array(expr: $e.begin_[$i], size: $e.end_-$e.begin_),
+      ")"
+    )
+  )
+
+  children (
+    ; Just like an actual array.
+    #array(expr: $e.begin_[$i], size: $e.end_-$e.begin_)
+  )
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+; This section lets you define your own errors for the HRESULT display.
+; You need to list the error code in unsigned decimal, followed by the message.
+; Changes will take effect the next time you redisplay the variable.
+[hresult]
+;1234=my custom error code

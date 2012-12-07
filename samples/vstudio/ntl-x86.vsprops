@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<VisualStudioPropertySheet
+	ProjectType="Visual C++"
+	Version="8.00"
+	Name="ntl-x86"
+	OutputDirectory="$(PlatformName)\$(ConfigurationName)"
+	IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+	>
+	<Tool 
+		Name="VCCLCompilerTool" 
+		EnableEnhancedInstructionSet="2"/>
+	<Tool
+		Name="VCLinkerTool"
+		AdditionalLibraryDirectories="F:\DDK\7600\lib\win7\i386"
+		AdditionalDependencies="ntdll.lib ntdllp.lib"
+	/>
+</VisualStudioPropertySheet>

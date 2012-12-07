@@ -1,0 +1,425 @@
+<html dir="ltr">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+    <title>NTL Application Wizard</title>
+    <meta name="vs_targetSchema" content="http://schemas.microsoft.com/intellisense/ie5" />
+		<META HTTP-EQUIV="MSThemeCompatible" CONTENT="Yes">
+    <style type="text/css">
+        @import url();
+    </style>
+    <!-- This closing tag is here only to avoid security warning -->
+    <!--</object>-->
+    <link rel="stylesheet" href="../NewStyles.css">
+
+    <script>
+        var scriptPath = window.external.FindSymbol("SCRIPT_COMMON_PATH");
+        document.styleSheets(0).imports(0).href = scriptPath + "/NewStyles.css";
+    </script>
+
+    <!-- SYMBOLS declaration -->
+    
+    <symbol name='WIZARD_DIALOG_TITLE' type="text" value="NTL Application Wizard"></symbol>
+    <symbol name='NTL_APPTYPE' type="text" value=""></symbol>
+    <symbol name='NTL_USE_UNICODE' type="checkbox" value="false"></symbol>
+    <symbol name='SOURCE_FILTER' type="text" value="c;cc;cpp;cxx;tcc;def;bat;cmd;asm"></symbol>
+    <symbol name='INCLUDE_FILTER' type="text" value="h;hh;hpp;hxx;inl;inc"></symbol>
+    
+    <!-- Page 2 Controls -->
+    <symbol name='NTL_APPTYPE_CONSOLE' type="radio" value="true"></symbol>
+    <symbol name='NTL_APPTYPE_WIN32' type="radio" value="false"></symbol>
+    <symbol name='NTL_APPTYPE_DLL' type="radio" value="false"></symbol>
+    <symbol name='NTL_APPTYPE_NATIVE' type="radio" value="false"></symbol>
+    <symbol name='NTL_APPTYPE_DRIVER' type="radio" value="false"></symbol>
+    
+    <symbol name='NTL_PLATFORM_X86' type="checkbox" value="true"></symbol>
+    <symbol name='NTL_PLATFORM_X64' type="checkbox" value="true"></symbol>
+    
+    <!-- Page 3 Controls -->
+    <symbol name='NTL_RUNTIME_CRT' type="checkbox" value="true"></symbol>
+    <symbol name='NTL_RUNTIME_EXC' type="checkbox" value="false"></symbol>
+    <symbol name='NTL_RUNTIME_RTTI' type="checkbox" value="false"></symbol>
+    <symbol name='NTL_RUNTIME_IOS' type="checkbox" value="true"></symbol>
+    <symbol name='NTL_RUNTIME_FLT' type="checkbox" value="false"></symbol>
+    <!-- END OF SYMBOLS -->
+
+    
+</head>
+<body onload="InitDocument(document);" onkeydown="if (!bValidating) OnKey();" onkeypress="if (!bValidating) OnPress();">
+    <table class="ONE" height="100%" width="100%" border="0" cellpadding="0" cellspacing="0">
+        <col width="178">
+        <col>
+        <!--OPEN OF INTRODUCTORY INFORMATION TABLE//-->
+        <tr valign="TOP">
+            <td height="79" width="100%" colspan="2">
+                <table class="TWO" border="0" cellpadding="0" cellspacing="0">
+                    <col width="12">
+                    <col>
+                    <col width="12">
+                    <tr>
+                        <td valign="TOP" height="12" width="12">
+                            &nbsp;
+                        </td>
+                        <td valign="TOP" height="12">
+                            &nbsp;
+                        </td>
+                        <td valign="TOP" height="12" width="12">
+                            &nbsp;
+                        </td>
+                        <td class="IMAGE" valign="BOTTOM" width="110" rowspan="2">
+                            <div class="SMALLA" id="Layer0">
+                                <img class="SMALLEST" src="../../Images/ntl-head.png" width="63" height="63" alt=""
+                                    border="0">
+                            </div>
+                        </td>
+                        <td valign="TOP" height="12" width="6" rowspan="2">
+                            &nbsp;
+                        </td>
+                    </tr>
+                    <tr>
+                        <td valign="TOP" height="65" width="12">
+                            &nbsp;
+                        </td>
+                        <td valign="TOP" height="65">
+                            <h4 class="HEAD" id="HEAD">
+                                Welcome to the WTL Project Wizard</h4>
+                            <p class="SUBHEAD" id="SUBHEAD">
+                                This wizard generates an WTL project with the properties you specify.</p>
+                        </td>
+                        <td valign="TOP" height="65" width="12">
+                            &nbsp;
+                        </td>
+                    </tr>
+                    <tr>
+                        <td valign="TOP" class="RULE" colspan="5" height="2">
+                            <table border="0" width="100%" height="1" cellpadding="0" cellspacing="0">
+                                <tr valign="TOP">
+                                    <td height="1" width="100%" bgcolor="BUTTONSHADOW">
+                                    </td>
+                                    <td height="1" width="1" bgcolor="WINDOW">
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <!--CLOSE OF INTRODUCTORY INFORMATION TABLE//-->
+        <!--OPEN OF NAVIGATION, CONTENT, AND BUTTON TABLES//-->
+        <tr valign="TOP">
+            <td class="Three" valign="TOP" height="100%" width="100%">
+                <table class="fixedSize" height="100%" width="100%" border="0" cellpadding="0" cellspacing="0">
+                    <tr valign="TOP">
+                        <td class="threeCustom" valign="TOP">
+                            <!--OPEN OF NAVIGATION TABLE//-->
+                            <table class="THREE" border="0" cellpadding="0" cellspacing="0">
+                                <col width="12">
+                                <col width="166">
+                                <col width="1">
+                                <tr>
+                                    <td valign="TOP" colspan="3" height="12">
+                                        &nbsp;
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td valign="TOP" height="100%">
+                                        &nbsp;
+                                    </td>
+                                    <td valign="TOP" height="100%">
+                                        <!--OPEN OF NAVIGATIONAL LINKS//-->
+                                        <div class="LINKSELECTED">
+                                            <span class="VERTLINE1">
+                                                <img src="../../Images/spacer.gif" width="1" height="1" alt="" border="0">
+                                            </span><span class="HORILINE1">
+                                                <table width="167" height="100%" border="0" cellpadding="0" cellspacing="0">
+                                                    <tr valign="TOP">
+                                                        <td class="DOTTEDLINE" height="1">
+                                                        </td>
+                                                    </tr>
+                                                    <tr valign="TOP">
+                                                        <td height="100%">
+                                                            <img src="../../Images/spacer.gif" width="1" height="28" alt="" border="0">
+                                                        </td>
+                                                    </tr>
+                                                    <tr valign="TOP">
+                                                        <td class="DOTTEDLINE" height="1">
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </span>
+                                            <table width="160" height="28" border="0" cellpadding="0" cellspacing="0" class="LINKTEXTSELECTED">
+                                                <tr valign="MIDDLE">
+                                                    <td width="100%">
+                                                        <span id="Default" title="Examine an overview of selections.">Overview</span>
+                                                    </td>
+                                                    <td width="4">
+                                                        <img src="../../Images/spacer.gif" height="1" width="4">
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                        <div class="LINK">
+                                            <table width="100%" height="28" border="0" cellpadding="0" cellspacing="0" class="LINKTEXT">
+                                                <tr valign="MIDDLE">
+                                                    <td width="100%">
+                                                        <span class="ACTIVELINK" id="AppType" title="Specify the application type and platform support for your NTL project."
+                                                            onclick="Next(document, 'AppType.htm');" tabindex="1">Application Type</span>
+                                                    </td>
+                                                    <td width="4">
+                                                        <img src="../../Images/spacer.gif" height="1" width="4">
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                        <div class="LINK">
+                                            <table width="100%" height="28" border="0" cellpadding="0" cellspacing="0" class="LINKTEXT">
+                                                <tr valign="MIDDLE">
+                                                    <td width="100%">
+                                                        <span class="ACTIVELINK" id="AppSettings" title="Specify the application feature support for your NTL project."
+                                                            onclick="Next(document, 'AppSettings.htm');" tabindex="1">Application Settings</span>
+                                                    </td>
+                                                    <td width="4">
+                                                        <img src="../../Images/spacer.gif" height="1" width="4">
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                        <!--CLOSE OF NAVIGATIONAL LINKS//-->
+                                    </td>
+                                    <td width="1">
+                                        <div class="VERTLINE">
+                                            <img src="../../Images/spacer.gif" width="1" height="1" alt="" border="0">
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+                <!--CLOSE OF NAVIGATION TABLE//-->
+            </td>
+            <td valign="TOP" height="100%">
+                <!--OPEN OF CONTENT AND BUTTON TABLE//-->
+                <table class="ONE" border="0" cellpadding="0" cellspacing="0">
+                    <col width="100%">
+                    <tr valign="TOP">
+                        <td height="100%">
+                            <!--OPEN OF CONTENT//-->
+                            <table class="CONTENT" border="0" cellpadding="0" cellspacing="0">
+                                <col width="12">
+                                <col width="398">
+                                <col width="12">
+                                <tr>
+                                    <td valign="TOP" height="12" colspan="3">
+                                        &nbsp;
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td valign="TOP" width="12">
+                                        &nbsp;
+                                    </td>
+                                    <td valign="TOP">
+                                        <span class="ItemTextTop" id="SETTINGS_SPAN">These are the current project settings:</span>
+                                        <ul>
+                                            <li class="LIST"><span class="SideBtnHidden" id="NTL_APPTYPE" title="">
+                                                <label for="NTL_APPTYPE">
+                                                </label>
+                                            </span></li>
+                                            <li class="LIST"><span class="SideBtnHidden" id="NTL_PLATFORM" title="">
+                                                <label for="NTL_PLATFORM">
+                                                </label>
+                                            </span></li>
+                                            <li class="LIST"><span class="SideBtnHidden" id="NTL_MISC" title="">
+                                                <label for="NTL_MISC">
+                                                </label>
+                                            </span></li>
+                                            <li class="LIST"><span class="SideBtnHidden" id="NTL_VSPROPS" title="">
+                                                <label for="NTL_VSPROPS">
+                                                </label>
+                                            </span></li>
+                                        </ul>
+                                        <span class="ItemText" id="FinishText">Click <b>Finish</b> from any window to accept
+                                            the current settings.</span>
+                                        <p class="ElementSpacer2">
+                                            &nbsp;</p>
+                                    </td>
+                                    <td valign="TOP" width="12">
+                                        &nbsp;
+                                    </td>
+                                </tr>
+                            </table>
+                            <!--CLOSE OF CONTENT//-->
+                        </td>
+                    </tr>
+                    <tr valign="BOTTOM">
+                        <td height="48">
+                            <!--OPEN OF BUTTON HTML//-->
+                            <table height="48" border="0" cellpadding="0" cellspacing="0">
+                                <col width="12">
+                                <col>
+                                <col width="75">
+                                <col width="4">
+                                <col width="75">
+                                <col width="4">
+                                <col width="75">
+                                <col width="12">
+                                <tr>
+                                    <td valign="TOP" class="RULE" colspan="8" height="2">
+                                        <table border="0" width="100%" height="1" cellpadding="0" cellspacing="0">
+                                            <tr valign="TOP">
+                                                <td height="1" width="100%" bgcolor="BUTTONSHADOW">
+                                                </td>
+                                                <td height="1" width="1" bgcolor="WINDOW">
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td valign="TOP" height="11" colspan="8">
+                                        &nbsp;
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td valign="MIDDLE" height="23" width="12">
+                                        &nbsp;
+                                    </td>
+                                    <td valign="TOP" height="23">
+                                        &nbsp;
+                                    </td>
+                                    <td valign="MIDDLE" height="23" width="75">
+                                        <button class="BUTTONS" id="FinishBtn" onclick="OnFinish(document);">
+                                            Finish</button>
+                                    </td>
+                                    <td valign="MIDDLE" height="23" width="4">
+                                        &nbsp;
+                                    </td>
+                                    <td valign="MIDDLE" height="23" width="75">
+                                        <button class="BUTTONS" id="CancelBtn" onclick="window.external.Finish(document, 'cancel');">
+                                            Cancel</button>
+                                    </td>
+                                    <td valign="MIDDLE" height="23" width="4">
+                                        &nbsp;
+                                    </td>
+                                    <td valign="MIDDLE" height="23" width="75">
+                                        <button class="BUTTONS" id="HelpBtn" onclick="window.external.OnHelp('vc.appwiz.atl.com.overview');">
+                                            Help</button>
+                                    </td>
+                                    <td valign="MIDDLE" height="23" width="12">
+                                        &nbsp;
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td valign="TOP" height="12" colspan="8">
+                                        &nbsp;
+                                    </td>
+                                </tr>
+                            </table>
+                            <!--CLOSE OF BUTTON HTML//-->
+                        </td>
+                    </tr>
+                </table>
+                <!--CLOSE OF NAVIGATION, CONTENT, AND BUTTON TABLES//-->
+            </td>
+        </tr>
+    </table>
+</body>
+
+<script language="jscript">
+
+    var tab_array = new Array();
+    tab_array[0] = Default;
+    tab_array[1] = AppType;
+    tab_array[2] = AppSettings;
+
+    var runtimes = new ActiveXObject("Scripting.Dictionary");
+    runtimes.Add('NTL_RUNTIME_CRT', "CRT");
+    runtimes.Add('NTL_RUNTIME_EXC', "exceptions");
+    runtimes.Add('NTL_RUNTIME_RTTI', "RTTI");
+    runtimes.Add('NTL_RUNTIME_IOS', "iostreams");
+    runtimes.Add('NTL_RUNTIME_FLT', "fpu");
+
+    function InitDocument(document) {
+        setDirection();
+        if (window.external.FindSymbol('DOCUMENT_FIRST_LOAD')) {
+            // This function sets the default symbols based 
+            // on the values specified in the SYMBOL tags above
+            window.external.SetDefaults(document);
+        }
+
+        // Load the document and initialize the controls with the appropriate symbol values
+        window.external.Load(document);
+
+        // Do additional initialization
+        OnInit();
+    }
+
+    function Next(document, linkto) {
+        window.external.Next(document, linkto);
+    }
+
+    function OnFinish(document) {
+        OnWizFinish(document);
+    }
+
+    function find_symbol(symbol) { return window.external.FindSymbol(symbol); }
+    function OnInit() {
+        if (find_symbol("NTL_APPTYPE_CONSOLE")) {
+            NTL_APPTYPE.innerText = "Console application";
+        }
+        else if (find_symbol("NTL_APPTYPE_NATIVE")) {
+            NTL_APPTYPE.innerText = "Native application";
+        }
+        else if (find_symbol("NTL_APPTYPE_DRIVER")) {
+            NTL_APPTYPE.innerText = "System driver application";
+        }
+        else if (find_symbol("NTL_APPTYPE_WIN32")) {
+            NTL_APPTYPE.innerText = "Win32 application";
+        }
+        else if (find_symbol("NTL_APPTYPE_DLL")) {
+            NTL_APPTYPE.innerText = "Dynamic link library";
+        }
+        var platforms = "";
+        if (find_symbol("NTL_PLATFORM_X86")) {
+            platforms = "x86";
+        }
+        if (find_symbol("NTL_PLATFORM_X64")) {
+            platforms += (platforms.length ? "/" : "") + "x64";
+        }
+        NTL_PLATFORM.innerText = platforms;
+        NTL_VSPROPS.parentNode.style.display = 'none';
+        if  (find_symbol("NTL_USE_UNICODE")) {
+        	NTL_VSPROPS.parentNode.style.display = 'block';
+        	NTL_VSPROPS.innerText = 'Unicode';
+        }
+
+        var props = GetRuntimes();
+        NTL_MISC.innerText = 'Runtime: ' + props + '.';
+        NTL_MISC.parentNode.style.display = (props.length > 0) ? 'block' : 'none';
+    }
+
+    function debug(msg, expr) { alert(msg + ': ' + expr); }
+    
+    function GetRuntimes() {
+        var keys = (new VBArray(runtimes.Keys())).toArray();
+        var props = new Array()
+        for (i = 0; i < runtimes.Count; i++) {
+            var k = keys[i];
+            if (find_symbol(k))
+                props.push(runtimes(k));
+        }
+        return props.join(', ');
+    }
+</script>
+
+<script id="INCLUDE_SCRIPT" language="jscript"></script>
+
+<script id="INCLUDE_COMMON" language="jscript"></script>
+
+<script>
+    var scriptPath = window.external.FindSymbol("SCRIPT_COMMON_PATH");
+    document.scripts("INCLUDE_SCRIPT").src = scriptPath + "/Script.js";
+    document.scripts("INCLUDE_COMMON").src = scriptPath + "/Common.js";
+</script>
+
+</html>

@@ -1,0 +1,5 @@
+1) Copy NTLAppWiz.* files to %VS%\VC\VCProjects
+2) Create %VS%\VC\VCProjects\NTL and copy NTLAppWiz.vsdir
+3) Fix relative paths to vsz at vsdir files
+4) Set ABSOLUTE_PATH variable of NTLAppWiz.vsz to AppWiz directory of NTL wizard (which contains this file)
+5) Fix path to your NTL sources at AppWiz\Scripts\1033\default.js (NtlBasePath variable).
