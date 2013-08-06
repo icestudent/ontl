@@ -123,11 +123,11 @@ namespace ntl {
     public:
       
       /** Manual-reset event: an event object whose state remains signaled until it is explicitly reset to nonsignaled by the reset() function. */
-      static const event_type NotificationEvent    = NotificationEvent;
+      static const event_type NotificationEvent    = nt::NotificationEvent;
 
       /** Auto-reset event: an event object whose state remains signaled until a single waiting thread is released, 
           at which time the system automatically sets the state to nonsignaled.  */
-      static const event_type SynchronizationEvent = SynchronizationEvent;
+      static const event_type SynchronizationEvent = nt::SynchronizationEvent;
 
       static const event_type manual_reset = NotificationEvent,
         auto_reset = SynchronizationEvent;

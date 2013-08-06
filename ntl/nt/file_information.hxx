@@ -593,7 +593,7 @@ struct volume_information<file_fs_volume_information>
       }else if(status_ != status::buffer_overflow){
         ptr.reset();
         break;
-      }else if(!with_label && status_ == status::buffer_overflow){
+      }else if(!with_label /*&& status_ == status::buffer_overflow*/){
         break;
       }
     }

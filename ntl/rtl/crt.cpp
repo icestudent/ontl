@@ -263,7 +263,7 @@ extern "C" int __cdecl _purecall(void)
 
 
 
-#if _MSC_VER >= 1600
+#if _MSC_VER >= 1500
 
 #include <pe/image.hxx>
 extern "C" void __fastcall __security_check_cookie(std::uintptr_t cookie)

@@ -507,7 +507,7 @@ namespace std {
 
     void validate()
     {
-      capacity();
+      capacity(); //-V530
       base();
     }
     // allocate memory

@@ -202,15 +202,24 @@ static inline void zero_mem(type & object)
   zero_mem(&object, sizeof(type));
 }
 
-template<typename type>
-static inline void bzero(type& object)
-{
-  zero_mem<type>(object);
-}
 static inline void bzero(void* obj, size_t n)
 {
   zero_mem(obj, n);
 }
+
+template<typename type>
+static inline void bzero(type& object)
+{
+  static_assert(!std::is_pointer<type>::value, "pointers isn't allowed here");
+  zero_mem<type>(object);
+}
+
+template<typename type, size_t N>
+static inline void bzero(type (&object)[N])
+{
+  zero_mem(object, sizeof(type) * N);
+}
+
 
 /// compares object's memory
 template<typename type>

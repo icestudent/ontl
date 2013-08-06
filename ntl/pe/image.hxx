@@ -765,7 +765,7 @@ namespace ntl {
       template<typename PtrType, typename DllFinder>
       PtrType find_export(uint16_t exp, DllFinder find_dll) const
       {
-        return brute_cast<PtrType>(find_export(reinterpret_cast<const char*>(exp), find_dll));
+        return brute_cast<PtrType>(find_export(reinterpret_cast<const char*>(exp), find_dll)); //-V542
       }
 
       ///\name  Imports

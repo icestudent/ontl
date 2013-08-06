@@ -562,7 +562,7 @@ class basic_istream : virtual public basic_ios<charT, traits>
     pos_type tellg()
     {
       pos_type re = pos_type(-1);
-      const sentry ok(*this, true);
+      const sentry ok(*this, true); //-V808
       if(!fail()){
         ios_base::iostate state = ios_base::goodbit;
         __ntl_try{
@@ -578,7 +578,7 @@ class basic_istream : virtual public basic_ios<charT, traits>
 
     basic_istream<charT,traits>& seekg(pos_type pos)
     {
-      const sentry ok(*this, true);
+      const sentry ok(*this, true); //-V808
       if(!fail()){
         ios_base::iostate state = ios_base::goodbit;
         __ntl_try{
@@ -595,7 +595,7 @@ class basic_istream : virtual public basic_ios<charT, traits>
 
     basic_istream<charT,traits>& seekg(off_type off, ios_base::seekdir dir)
     {
-      const sentry ok(*this, true);
+      const sentry ok(*this, true); //-V808
       if(!fail()){
         ios_base::iostate state = ios_base::goodbit;
         __ntl_try{
@@ -730,7 +730,7 @@ inline basic_istream<charT,traits>& operator>>(basic_istream<charT,traits>& is, 
     }
     str.append(buf, bufc);
     // its a formatted input, so make string a bit pretty:
-    str.c_str();
+    str.c_str(); //-V530
     if(traits::eq_int_type(c, eof))
       state |= ios_base::eofbit;
     is.width(0);

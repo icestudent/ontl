@@ -61,14 +61,14 @@ inline void __ntl_assert(const char* expr, const char* func, const char* file, i
   #define _assert_string(msg) __noop
 #else
   #define assert(expr) \
-    if ( !!(expr) ); else if(ntl::__assert_handler)\
+  if ( !!(expr) ) {;} else if(ntl::__assert_handler) {\
       __ntl_assert("Assertion ("#expr") failed in ", __func__,__FILE__,__LINE__);\
-      else __debugbreak();\
+    }else {__debugbreak(); }\
     ((void)0)
 #define _assert_msg(msg) \
-  if(ntl::__assert_handler)\
+  if(ntl::__assert_handler){\
     __ntl_assert("Assertion (" msg ") failed in ", __func__,__FILE__,__LINE__);\
-  else __debugbreak();\
+  }else { __debugbreak(); }\
       ((void)0)
 #define _assert_string(msg) \
   if(ntl::__assert_handler)\

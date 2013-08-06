@@ -134,7 +134,7 @@ namespace std {
       }
       str_.assign(s);
       #ifdef NTL_DEBUG
-      str_.c_str(); // pretty view
+      str_.c_str(); // pretty view //-V530
       #endif
       set_ptrs();
       growto(str_.size());

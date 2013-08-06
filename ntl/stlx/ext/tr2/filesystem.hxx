@@ -1,12 +1,14 @@
 /**\file*********************************************************************
  *                                                                     \brief
- *  Filesystem library
+ *  Filesystem V1 library
  *
  ****************************************************************************
  */
 #ifndef NTL__STLX_TR2_FILESYSTEM
 #define NTL__STLX_TR2_FILESYSTEM
 #pragma once
+
+#pragma message("Filesystem V1 is deprecated now, use <tr2/files.hxx>!")
 
 #include "../../iosfwd.hxx"
 #include "../../stdstring.hxx"
@@ -39,13 +41,13 @@ namespace std
 
     /// System namespace
     namespace sys {
-      /// Filesystem Library
+      /// Filesystem V1 Library
       namespace filesystem
       {
       /**
        *  \addtogroup tr2
        *@{
-       *  \defgroup tr2_filesystem Filesystem Library
+       *  \defgroup tr2_filesystem Filesystem V1 Library
        *
        *  This paper proposes addition of a filesystem library component to the C++ Standard Library Technical Report 2.\n
        *  The proposal is based on the Boost Filesystem Library (see http://boost.org/libs/filesystem).\n
@@ -485,7 +487,7 @@ namespace std
           ntl::nt::rtl::relative_name rel(xs.c_str());
           if(rel)
             native = traits_type::to_internal(*this, rel.path.get_string());
-          return rel;
+          return static_cast<bool>(rel);
         }
 
         pos_type filename_pos() const;

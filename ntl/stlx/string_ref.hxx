@@ -147,11 +147,15 @@ namespace std
     }
     void remove_prefix(size_type n)
     {
+      if(n > len)
+        n = len;
       p += n,
         len -= n;
     }
     void remove_suffix(size_type n)
     {
+      if(n > len)
+        n = len;
       len -= n;
     }
 

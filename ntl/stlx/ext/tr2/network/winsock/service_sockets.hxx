@@ -385,7 +385,7 @@ namespace ntl { namespace network {
           impl.proto_type = type,
           impl.proto_protocol = protocol,
           impl.ipv6 = af == constants::af_inet6,
-          impl.is_stream = type == constants::sock_stream || constants::sock_seqpacket;
+          impl.is_stream = type == constants::sock_stream || type == constants::sock_seqpacket;
         return success(ec);
       }
 

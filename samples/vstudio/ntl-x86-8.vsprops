@@ -7,8 +7,8 @@
 	IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 	>
 	<Tool 
-		Name="VCCLCompilerTool" 
-		EnableEnhancedInstructionSet="2"/>
+		Name="VCCLCompilerTool"
+	/>
 	<Tool
 		Name="VCLinkerTool"
 		AdditionalLibraryDirectories="F:\DDK\7600\lib\wnet\i386"

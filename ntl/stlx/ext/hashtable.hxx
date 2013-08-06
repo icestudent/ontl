@@ -169,7 +169,7 @@ namespace std
             if(!p->next){ // end of current bucket
               // find next nonempty bucket
               while(++b != be && !b->elems);
-              p = b == be ? nullptr : b->elems;
+              p = b == be ? 0 : b->elems;
             }else{
               p = p->next;
             }

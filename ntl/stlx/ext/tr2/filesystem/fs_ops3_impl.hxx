@@ -130,6 +130,43 @@ namespace std
         copy_file(from, to, copy_option::fail_if_exists, ec);
       }
 
+      void copy_file(const path& from_fp, const path& to_fp, copy_option option, error_code& ec)
+      {
+        if(&ec != &throws())
+          ec.clear();
+
+        // If from_p and to_p resolve to the same file, no action is taken
+        if(equivalent(from_fp, to_fp))
+          return;
+
+        using namespace NTL_SUBSYSTEM_NS;
+        file_handler from, to;
+        ntstatus st = from.open(const_unicode_string(native(from_fp)), file::generic_read, file::share_valid_flags, file::creation_options_default);
+        if(success(st)){
+          st = to.create(const_unicode_string(native(to_fp)), file::overwrite_if, file::generic_write, file::share_read, file::creation_options_default);
+          if(success(st)){
+            static const size_t buf_size = 64*1024; // 64k
+            ntl::raw_data buf(buf_size); // 64k
+            int64_t size = from.size();
+            while(size){
+              from.read(buf.begin(), buf_size);
+              size_t readed = from.get_io_status_block().Information;
+              st = to.write(buf.begin(), static_cast<uint32_t>(readed));
+              size -= readed;
+            }
+            if(!success(st) && to.size() == from.size())
+              st = status::success;
+          }
+        }
+        if(!success(st)){
+          error_code e = make_error_code(st);
+          if(&ec == &throws())
+            __ntl_throw(filesystem_error("Failed to copy file [from:to]", from_fp, to_fp, e));
+          else
+            ec = e;
+        }
+      }
+
       bool exists(file_status s) __ntl_nothrow
       {
         return s.type() != status_unknown && s.type() != file_not_found;
@@ -237,7 +274,7 @@ namespace std
               ft = symlink_file;
             return file_status(ft);
           }
-          if(st == status::object_name_not_found || status::object_path_not_found){
+          if(st == status::object_name_not_found || st == status::object_path_not_found){
             st = status::success;
             return file_status(file_not_found);
           }
@@ -381,7 +418,7 @@ namespace std
           if(!e1 || is_other(s1))
             __ntl_throw(filesystem_error( "Failed to determine equivalence", p1, make_error_code(!e1 ? posix_error::no_such_file_or_directory : posix_error::file_exists) ));
           else
-            __ntl_throw(filesystem_error( "Failed to determine equivalence", p2, make_error_code(!e2 ? posix_error::no_such_file_or_directory : posix_error::file_exists) ));
+            __ntl_throw(filesystem_error( "Failed to determine equivalence", p2, make_error_code(!e2 ? posix_error::no_such_file_or_directory : posix_error::file_exists) )); //-V523
         }
         if(s1 != s2)
           return false;

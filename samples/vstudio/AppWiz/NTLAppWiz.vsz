@@ -1,6 +1,5 @@
 VSWIZARD 7.0
-Wizard=VsWizard.VsWizardEngine
-
+Wizard=VsWizard.VsWizardEngine.9.0
 Param="WIZARD_NAME = NTLAppWiz"
 Param="WIZARD_VERSION = 7.0"
 Param="ABSOLUTE_PATH = ."

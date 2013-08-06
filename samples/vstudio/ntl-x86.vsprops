@@ -8,7 +8,7 @@
 	>
 	<Tool 
 		Name="VCCLCompilerTool" 
-		EnableEnhancedInstructionSet="2"/>
+	/>
 	<Tool
 		Name="VCLinkerTool"
 		AdditionalLibraryDirectories="F:\DDK\7600\lib\win7\i386"

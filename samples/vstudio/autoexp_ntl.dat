@@ -18,6 +18,7 @@
 ; v 0.14 - unordered containers
 ; v 0.15 - string_ref
 ; v 0.16 - initializer_list
+; v 0.17 - std::array<char,*>
 ;
 ;---------------------------------------------------------------
 ;
@@ -138,6 +139,43 @@ std::chrono::time_point<*> {
 ;------------------------------------------------------------------------------
 ;  std::array
 ;------------------------------------------------------------------------------
+std::array<char,*>{
+  preview
+  (
+    #if($e.__actual_size == 0)(
+      "<empty>"
+    ) #else (
+      [$e.__elems,s]
+    )
+  )
+  stringview
+  (
+    [$e.__elems,sb]
+  )
+  children
+  (
+    #([raw]: [$e,!],  #array( expr: $e.__elems[$i], size: $e.__actual_size))
+  )
+}
+std::array<wchar_t,*>{
+  preview
+  (
+    #if($e.__actual_size == 0)(
+      "<empty>"
+    ) #else (
+      [$e.__elems,su]
+    )
+  )
+  stringview
+  (
+    [$e.__elems,sub]
+  )
+  children
+  (
+    #([raw]: [$e,!],  #array( expr: $e.__elems[$i], size: $e.__actual_size))
+  )
+}
+
 std::array<*> {
   preview (
     ; An actual array is previewed with its address.
@@ -156,6 +194,8 @@ std::array<*> {
     #array(expr: $e.__elems[$i], size: $e.__actual_size)
   )
 }
+
+
 
 ;------------------------------------------------------------------------------
 ;  std::vector

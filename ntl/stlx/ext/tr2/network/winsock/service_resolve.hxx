@@ -52,13 +52,13 @@ namespace ntl { namespace network {
 
       resolve_result resolve(implementation_type& impl, const query_type& q, std::error_code& ec)
       {
-        resolve_result re;
+        resolve_result entries;
         addrinfo* response;
         {
           const int err = impl.funcs->getaddrinfo(q.host_exists ? q.host.c_str() : nullptr, q.service.c_str(), &q.hint, &response);
           if(err != 0){
             sockerror(ec);
-            return re;
+            return std::move(entries);
           }
         }
 
@@ -70,7 +70,7 @@ namespace ntl { namespace network {
         size_t count = 0;
         for(const addrinfo* ai = response; ai != 0; count++, ai = ai->next);
 
-        std::shared_ptr<entries_t> entries(new entries_t());
+        entries.reset(new entries_t());
         entries->reserve(count);
 
         bool length_error = false;
@@ -102,7 +102,7 @@ namespace ntl { namespace network {
         char svc[32], host[1025];
         if(!check_error(ec, impl.funcs->getnameinfo(ep.data(), static_cast<int>(ep.size()),
           host, _countof(host), svc, _countof(svc), 0)))
-          return entries;
+          return std::move(entries);
         entries.reset(new entries_t());
         entries->push_back(entry_t(ep, host, svc));
         return std::move(entries);

@@ -284,6 +284,14 @@ namespace std { namespace tr2 { namespace sys {
   template<class CharT, class Traits, class Allocator>
   inline const_buffers_1 buffer(const basic_string<CharT, Traits, Allocator>& str, size_t s) { return const_buffers_1(str.cbegin(), min(str.size() * sizeof(CharT), s)); }
 
+  template<class CharT, class Traits>
+  inline mutable_buffers_1 buffer(basic_string_ref<CharT, Traits>& str) { return mutable_buffers_1(str.begin(), str.size() * sizeof(CharT)); }
+  template<class CharT, class Traits>
+  inline mutable_buffers_1 buffer(basic_string_ref<CharT, Traits>& str, size_t s) { return mutable_buffers_1(str.begin(), min(str.size() * sizeof(CharT), s)); }
+  template<class CharT, class Traits>
+  inline const_buffers_1 buffer(const basic_string_ref<CharT, Traits>& str) { return const_buffers_1(str.cbegin(), str.size() * sizeof(CharT)); }
+  template<class CharT, class Traits>
+  inline const_buffers_1 buffer(const basic_string_ref<CharT, Traits>& str, size_t s) { return const_buffers_1(str.cbegin(), min(str.size() * sizeof(CharT), s)); }
 
 
 
@@ -415,10 +423,10 @@ namespace std { namespace tr2 { namespace sys {
   inline size_t read_until(SyncReadStream& s, basic_fifobuf<Allocator>& fb, char delim)
   {
     error_code ec;
-    size_t s = read_until(s, fb, delim);
+    size_t cb = read_until(s, fb, delim);
     if(ec)
       __ntl_throw(system_error(ec));
-    return s;
+    return cb;
   }
   template <class SyncReadStream, class Allocator>
   size_t read_until(SyncReadStream& s, basic_fifobuf<Allocator>& fb, char delim, error_code& ec);
@@ -426,10 +434,10 @@ namespace std { namespace tr2 { namespace sys {
   inline size_t read_until(SyncReadStream& s, basic_fifobuf<Allocator>& fb, const string& delim)
   {
     error_code ec;
-    size_t s = read_until(s, fb, delim);
+    size_t cb = read_until(s, fb, delim);
     if(ec)
       __ntl_throw(system_error(ec));
-    return s;
+    return cb;
   }
   template <class SyncReadStream, class Allocator>
   size_t read_until(SyncReadStream& s, basic_fifobuf<Allocator>& fb, const string& delim, error_code& ec);

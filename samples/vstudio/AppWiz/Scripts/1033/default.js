@@ -257,14 +257,15 @@ function AddConfigurations(proj, strProjectName) {
 			var wizardVersion = parseFloat(WizardVersion);
 			var vsprops = wizardVersion >= 10 ? "props" : "vsprops";
 			
-			var sheets = NtlBasePath + "/ntl-props." + vsprops;
+			var SheetPath = NtlBasePath + "/../samples/vstudio/";
+			var sheets = SheetPath + "ntl-props." + vsprops;
 			if(WizardVersion == "8.0")
-				sheets += ";" + NtlBasePath + "/ntl-x86-8." + vsprops;
+				sheets += ";" + SheetPath + "ntl-x86-8." + vsprops;
 			else
-				sheets += ";" + NtlBasePath + "/ntl-x86." + vsprops;
+				sheets += ";" + SheetPath + "ntl-x86." + vsprops;
 			
 			if(wizard.FindSymbol("NTL_APPTYPE_DRIVER"))
-				sheets += ";" + NtlBasePath + "/ntl-km." + vsprops;
+				sheets += ";" + SheetPath + "ntl-km." + vsprops;
 			
 			try {
 				config.InheritedPropertySheets = sheets;

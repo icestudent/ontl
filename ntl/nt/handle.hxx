@@ -93,7 +93,7 @@ __class_enum(kwait_reason)
 static inline const systime_t& infinite_timeout()
 {
   static const systime_t* const p = 0;
-  return *p;
+  return *p; //-V522
 }
 
 NTL_EXTERNAPI

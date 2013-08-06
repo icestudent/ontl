@@ -367,7 +367,7 @@ namespace std { namespace tr2 { namespace network {
             ok = false;
           }
         }
-        for(;ok && p < end-1; p++){
+        for(;ok && p < end-1; ++p){
           if(*p == ':'){
             if(p[-1] == ':'){
               if(compressed){

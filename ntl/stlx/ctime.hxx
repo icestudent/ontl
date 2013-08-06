@@ -188,8 +188,8 @@ tm *__gettime(const time_t *__restrict timer, tm *__restrict result)
   result->tm_mon  = TimeFields.Month-1;
   result->tm_year = TimeFields.Year ? (TimeFields.Year - 1900) : 0;
   result->tm_wday = TimeFields.Weekday;
-  result->tm_yday;
-  result->tm_isdst;
+  result->tm_yday = 0; // unimplemented
+  result->tm_isdst = 0;
   return result;
 }
 #pragma warning(pop)

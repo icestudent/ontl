@@ -400,7 +400,7 @@ namespace std
           p++;
         }
       #ifdef NTL_DEBUG
-        s.c_str();
+        s.c_str(); //-V530
       #endif
         return *this;
       }

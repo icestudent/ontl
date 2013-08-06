@@ -22,7 +22,7 @@ struct system_time
     static const type& infinite()
     {
       static const type* const null = 0;
-      return *null;
+      return *null; //-V522
     }
 
     __forceinline type get() volatile const

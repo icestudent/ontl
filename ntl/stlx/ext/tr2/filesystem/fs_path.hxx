@@ -415,7 +415,7 @@ namespace std
               msg = move(tmp);
             }
             __ntl_catch(...){
-              return system_error::what();
+              return system_error::what(); //-V612
             }
           }
           return msg.c_str();
