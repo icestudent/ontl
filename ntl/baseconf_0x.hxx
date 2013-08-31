@@ -82,7 +82,10 @@
 #if _MSC_VER >= 1600
 
 /** VC10's partial C++0x support */
-// _MSC_FULL_VER: 160011001 (CTP), 160020506 (beta1), 160021003 (beta2), 160030128 (rc), 160040219 (sp1), 170040825 (ctp), 170050214 (b1), 170050727 (sp0), 170051025
+// _MSC_FULL_VER: 
+// VC16 (2010): 160011001 (CTP), 160020506 (beta1), 160021003 (beta2), 160030128 (rc), 160040219 (sp1)
+// VC17 (2012): 170040825 (ctp), 170050214 (b1), 170050727 (sp0), 170051025
+// VC18 (2013): 180020617 (ctp)
 
 #define NTL_CXX_AUTO
 #define NTL_CXX_ASSERT
@@ -119,6 +122,11 @@
 # undef NTL_CXX_IL
 # undef NTL_CXX_EXPLICITOP
 # undef NTL_CXX_VT
+#endif
+
+#if _MSC_FULL_VER >= 180020617 // v18 preview
+# define NTL_CXX_EXPLICITOP
+# define NTL_CXX_VT
 #endif
 
 #endif // _MSC_VER >= 1600
