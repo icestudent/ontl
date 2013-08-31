@@ -119,6 +119,10 @@ namespace __ {
   {};
 
 
+  ///\name 30.2.6 decay_copy [thread.decaycopy]
+  template<typename T>
+  inline typename decay<T>::type decay_copy(T&& v)  { return std::forward<T>(v); }
+
 struct check_meta_rel
 {
   _CHECK_TRAIT((is_same<volatile int, volatile int>::value));

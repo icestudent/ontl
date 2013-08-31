@@ -69,10 +69,15 @@ namespace std
       std::__::func::detail::function<void, Args> fn;
       Args args;
 
+#ifdef NTL_CXX_RV
+      explicit thread_params(F&& f, const Args& a)
+        :fn(forward<F>(f)), args(a)
+      {}
+#else
       explicit thread_params(F f, const Args& a)
         :fn(forward<F>(f)), args(a)
       {}
-
+#endif // RV
       void run()
       {
         fn(args);
@@ -134,8 +139,8 @@ namespace std
     thread(F&& f, Args&&... args)
       :h(),tid()
     {
-      typedef __::thread_params<F, typename __::tmap<Args...>::type> tparams;
-      tparams* tp = new tparams(f, std::move(make_tuple(std::forward<Args>(args)...)));
+      typedef __::thread_params<decay<F>::type, typename __::tmap<Args...>::type> tparams;
+      tparams* tp = new tparams(__::decay_copy(f), std::move(make_tuple(std::forward<Args>(args)...)));
       start(tp);
     }
   #else
