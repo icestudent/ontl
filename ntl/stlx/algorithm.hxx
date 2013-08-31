@@ -1130,7 +1130,7 @@ template<class RandomAccessIterator, class Compare>
 RandomAccessIterator is_heap_until(RandomAccessIterator first, RandomAccessIterator last,
                                    Compare comp);
 
-///\name 25.3.7 Minimum and maximum [alg.min.max]
+///\name 25.4.7 Minimum and maximum [alg.min.max]
 #ifdef min
 #undef min
 #endif
@@ -1151,20 +1151,17 @@ __forceinline const T& min(const T& a, const T& b, Compare comp)
   return comp(b, a) ? b : a;
 }
 
-#ifdef NTL_CXX_VT
-template<class T, class... Args>
-const T& min(const T& a, const Args&... args);
-template<class T, class Compare>
-const T& min(const T& a, const T& b, Compare comp);
-template<class T, class U, class... Args>
-const T& min(const T& a, const U& b, const Args&... args);
-#endif
-
 template<class T>
-T min(initializer_list<T> t);
+inline T min(initializer_list<T> t)
+{
+  return *min_element(t.begin(), t.end());
+}
 
 template<class T, class Compare>
-T min(initializer_list<T> t, Compare comp);
+inline T min(initializer_list<T> t, Compare comp)
+{
+  return *min_element(t.begin(), t.end(), comp);
+}
 
 template<class T>
 __forceinline
@@ -1179,20 +1176,17 @@ __forceinline const T& max(const T& a, const T& b, Compare comp)
   return comp(a, b) ? b : a;
 }
 
-#ifdef NTL_CXX_VT
-template<class T, class... Args>
-const T& max(const T& a, const Args&... args);
-template<class T, class Compare>
-const T& max(const T& a, const T& b, Compare comp);
-template<class T, class U, class... Args>
-const T& max(const T& a, const U& b, const Args&... args);
-#endif
-
 template <class T>
-T max(initializer_list<T> t);
+inline T max(initializer_list<T> t)
+{
+  return *max_element(t.begin(), t.end());
+}
 
 template<class T, class Compare>
-T max(initializer_list<T> t, Compare comp);
+inline T max(initializer_list<T> t, Compare comp)
+{
+  return *max_element(t.begin(), t.end(), comp);
+}
 
 /**	\return <tt>pair<const T&, const T&>(b, a)</tt> if \p b is smaller than \p a, and <tt>pair<const T&, constT&>(a, b)</tt> otherwise. */
 template<class T> 
@@ -1211,19 +1205,18 @@ inline pair<const T&, const T&> minmax(const T& a, const T& b, Compare comp)
 }
 
 template<class T>
-pair<const T&, const T&> minmax(initializer_list<T> t);
+inline pair<const T&, const T&> minmax(initializer_list<T> t)
+{
+  const pair<const T*, const T*> re = minmax_element(t.begin(), t.end());
+  return pair<const T&, const T&>(*re.first, *re.second);
+}
 
 template<class T, class Compare>
-pair<const T&, const T&> minmax(initializer_list<T> t, Compare comp);
-
-#ifdef NTL_CXX_VT
-template<class T, class... Args>
-pair<const T&, const T&> minmax(const T& a, const Args&... args);
-template<class T, class Compare>
-pair<const T&, const T&> minmax(const T& a, const T& b, Compare comp);
-template<class T, class U, class... Args>
-pair<const T&, const T&> minmax(const T& a, const U& b, const Args&... args);
-#endif
+inline pair<const T&, const T&> minmax(initializer_list<T> t, Compare comp)
+{
+  const pair<const T*, const T*> re = minmax_element(t.begin(), t.end(), comp);
+  return pair<const T&, const T&>(*re.first, *re.second);
+}
 
 template<class ForwardIterator>
 inline
