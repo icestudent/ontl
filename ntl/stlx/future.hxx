@@ -972,7 +972,10 @@ namespace std
   ///\name 30.6.8 Function template async [futures.async]
 #if defined(NTL_CXX_VT) || defined(NTL_DOC)
   template <class F, class... Args>
-  future<typename result_of<F(Args...)>::type> async(F&& f, Args&&... args);
+  inline future<typename result_of<F(Args...)>::type> async(F&& f, Args&&... args)
+  {
+    return async(launch::async|launch::deferred, __::decay_copy(f), std::forward<Args>(args)...);
+  }
   template <class F, class... Args>
   future<typename result_of<F(Args...)>::type> async(launch policy, F&& f, Args&&... args);
 #elif defined(NTL_CXX_RV)

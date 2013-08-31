@@ -311,9 +311,38 @@ namespace std {
     
     ///\name 23.2.2.3 modifiers:
     #ifdef NTL_CXX_VT
-    template <class... Args> void emplace_front(Args&&... args);
-    template <class... Args> void emplace_back(Args&&... args);
-    template <class... Args> iterator emplace(const_iterator position, Args&&... args);
+    template <class... Args> void emplace_front(Args&&... args)
+    {
+      if(empty())
+        reserve();
+      else if(!capL)
+        relocate(false);
+      alloc.construct(--left, std::forward<Args>(args)...); --capL;
+      validate();
+    }
+
+    template <class... Args> void emplace_back(Args&&... args)
+    {
+      if(empty())
+        reserve();
+      else if(!capR)
+        relocate(true);
+      alloc.construct(right++, std::forward<Args>(args)...); --capR;
+      validate();
+    }
+
+    template <class... Args> iterator emplace(const_iterator position, Args&&... args)
+    {
+      assert(position >= left && position <= right);
+      if(position == right){
+        emplace_back(std::forward<Args>(args)...);
+        return right-1;
+      }
+      pointer pos = insert_impl(position);
+      alloc.construct(pos, std::forward<Args>(args)...);
+      validate();
+      return pos;
+    }
     #endif
 
     #ifdef NTL_CXX_RV

@@ -93,7 +93,7 @@ class stack
     #endif
     #ifdef NTL_CXX_VT
     template <class... Args>
-    void emplace(Args&&... args);
+    void emplace(Args&&... args) { c.emplace_back(forward<Args>(args)...); }
     #endif
 
     void swap(stack&  s) { c.swap(s.c); }

@@ -329,7 +329,7 @@ namespace std {
     template <class... Args>
     void emplace_front(Args&&... args)
     {
-      insert_after(cbefore_begin(), forward<Args>(args)...);
+      emplace_after(cbefore_begin(), forward<Args>(args)...);
     }
   #elif defined(NTL_CXX_RV)
 
@@ -362,7 +362,15 @@ namespace std {
     }
     
   #ifdef NTL_CXX_VT
-    template <class... Args> iterator emplace_after(const_iterator position, Args&&... args);
+    template <class... Args> iterator emplace_after(const_iterator position, Args&&... args)
+    {
+      node* const p = node_allocator.allocate(1);
+      node_allocator.construct(p, std::forward<Args>(args)...);
+      single_linked* pp = const_cast<single_linked*>(position.p);
+      p->link(pp);
+      return p;
+    }
+
   #elif defined NTL_CXX_RV
     template <class Arg1>
     iterator emplace_after(const_iterator position, Arg1&& arg1)
