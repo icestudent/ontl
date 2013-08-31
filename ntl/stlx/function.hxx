@@ -11,7 +11,7 @@
 #include "stdexception.hxx"
 
 
-#ifdef NTL_CXX_VT
+#ifdef NTL_CXX_VT_WORKS
 # include "function_vt.hxx"
 #else
 

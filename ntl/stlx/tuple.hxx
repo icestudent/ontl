@@ -8,7 +8,7 @@
 #define NTL__STLX_TUPLE
 #pragma once
 
-#ifdef NTL_CXX_VT
+#ifdef NTL_CXX_VT_WORKS
 # include "tuple_vt.hxx"
 #else
 
