@@ -30,9 +30,7 @@
   #endif
 
   #ifndef NTL_CXX_ALIGNOF
-    #if defined(__ICL) || _MSC_VER <= 1700
-      #define alignof(X) __alignof(X)
-    #endif
+    #define alignof(X) __alignof(X)
   #endif
   static_assert(alignof(int)==alignof(unsigned int), "wierd platform");
 
