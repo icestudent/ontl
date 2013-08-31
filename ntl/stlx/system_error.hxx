@@ -507,16 +507,17 @@ private:
     if(ec)
       __ntl_throw(system_error(ec));
   }
-  __forceinline error_code& throw_system_error(const error_code& actual, error_code& holder)
+  __forceinline error_code& throw_system_error(const error_code& error, error_code& holder)
   {
     const bool throwable = &holder == &throws();
-    if(actual){
+    if(error){
       if(throwable)
-        __ntl_throw(system_error(actual));
+        __ntl_throw(system_error(error));
     }
     if(!throwable)
-      holder = actual;
-    return holder;
+      return holder = error;
+    static error_code success;
+    return success;
   }
 
   //////////////////////////////////////////////////////////////////////////
