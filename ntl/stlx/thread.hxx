@@ -132,9 +132,17 @@ namespace std
      *  @note Return value of provided callable object is ignored.
      *  @note If \c f terminates with an uncaught exception, \c std::terminate() shall be called.
      **/
+  #if !defined(NTL_CXX_VT) || defined(NTL_DOC)
+    
     template <class F> explicit thread(F f);
 
-  #ifdef NTL_CXX_VT
+    template <class F, class A1> thread(F f, A1 a1);
+    template <class F, class A1, class A2> thread(F f, A1 a1, A2 a2);
+    template <class F, class A1, class A2, class A3> thread(F f, A1 a1, A2 a2, A3 a3);
+    template <class F, class A1, class A2, class A3, class A4> thread(F f, A1 a1, A2 a2, A3 a3, A4 a4);
+
+  #else
+
     template <class F, class ...Args>
     thread(F&& f, Args&&... args)
       :h(),tid()
@@ -143,11 +151,7 @@ namespace std
       tparams* tp = new tparams(__::decay_copy(f), std::move(make_tuple(std::forward<Args>(args)...)));
       start(tp);
     }
-  #else
-    template <class F, class A1> thread(F f, A1 a1);
-    template <class F, class A1, class A2> thread(F f, A1 a1, A2 a2);
-    template <class F, class A1, class A2, class A3> thread(F f, A1 a1, A2 a2, A3 a3);
-    template <class F, class A1, class A2, class A3, class A4> thread(F f, A1 a1, A2 a2, A3 a3, A4 a4);
+
   #endif
 
     thread(__rvalue(thread) r);
@@ -419,7 +423,7 @@ namespace std
     if(joinable())
       detach(ec);
     swap(r);
-	return *this;
+    return *this;
   }
 
   // members:
