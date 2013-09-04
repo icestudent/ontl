@@ -469,7 +469,7 @@ namespace std
       //    ec = e;
       //}
       wait(ec);
-      return data->get(ec);
+      return move(data->get(ec));
     }
 
     ///\name functions to check state and wait for ready
@@ -529,7 +529,7 @@ namespace std
         else
           ec = error;
       }
-      return data != nullptr;
+      return !!data;
     }
     ///\endcond
   private:
@@ -630,8 +630,10 @@ namespace std
     class promise
     {
       typedef __::future_result<R> feature_result;
-      typedef typename feature_result::type result_type;
       typedef unique_ptr<__::future_data<R> > unique_data_ptr;
+
+    public:
+      typedef typename feature_result::type result_type;
 
     public:
       promise(const promise& rhs) __deleted;
@@ -898,6 +900,29 @@ namespace std
    *  packaged_task is intended to be used in cases where the user needs to build a %thread pool or similar structure because the standard facilities do not have the desired characteristics.
    **/
 
+#ifdef NTL_CXX_VT
+
+  template<class R, class... Args>
+  class packaged_task<R(Args...)>:
+    public __::packaged_task<R, NTL_FUNARGS(Args...)>
+  {
+  public:
+    packaged_task()
+    {}
+    template <class F>
+    explicit packaged_task(F&& f)
+    {
+      this->f = forward<F>(f);
+    }
+
+    inline void operator()(Args... args)
+    {
+      call(make_tuple(args...));
+    }
+  };
+
+#else
+
   /** packaged_task class template specialization for callable without arguments */
   template<class R>
   class packaged_task<R()>:
@@ -968,19 +993,29 @@ namespace std
     }
   };
 
+#endif // NTL_CXX_VT
 
   ///\name 30.6.8 Function template async [futures.async]
 #if defined(NTL_CXX_VT) || defined(NTL_DOC)
+
   template <class F, class... Args>
-  inline future<typename result_of<F(Args...)>::type> async(F&& f, Args&&... args)
+  inline 
+    future<typename result_of<typename decay<F>::type(typename decay<Args>::type...)>::type>
+    async(F&& f, Args&&... args)
   {
     return async(launch::async|launch::deferred, __::decay_copy(f), std::forward<Args>(args)...);
   }
+
   template <class F, class... Args>
-  future<typename result_of<F(Args...)>::type> async(launch policy, F&& f, Args&&... args);
+  inline 
+    future<typename result_of<typename decay<F>::type(typename decay<Args>::type...)>::type>
+    async(launch policy, F&& f, Args&&... args);
+
 #elif defined(NTL_CXX_RV)
+
   template <class F>
   future<typename result_of<F()>::type> async(launch policy, F&& f);
+
 #else
 
   template <class F>
