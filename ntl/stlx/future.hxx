@@ -248,7 +248,7 @@ namespace std
       bool has_error() const
       {
         lock_guard g(data_guard);
-        return error;
+        return static_cast<bool>(error);
       }
 
       void set_exception(exception_ptr ep)
