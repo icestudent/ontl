@@ -9,7 +9,7 @@
 namespace
 {
   // CRT stubs
-  vfv_t *imp_strtod, *imp_vsnprintf, *imp_acos, *imp_atan, *imp_tan, *imp_strtok, *imp_modf;
+  vfv_t *imp_strtod, *imp_vsnprintf, *imp_vsnwprintf, *imp_acos, *imp_atan, *imp_tan, *imp_strtok, *imp_modf;
 }
 
 // CRT forwards
@@ -81,6 +81,14 @@ namespace ntl { namespace msvcrt
     typedef size_t __cdecl f_t(char*, size_t, const char*, va_list);
     return reinterpret_cast<f_t*>(imp_vsnprintf)(buffer, count, format, argptr);
   }
+  size_t NTL_CRTCALL vsnwprintf(wchar_t *buffer, size_t count, const wchar_t *format, va_list argptr)
+  {
+    if (!imp_vsnwprintf)   // no at winxp
+      return 0;
+    
+    typedef size_t __cdecl f_t(wchar_t*, size_t, const wchar_t*, va_list);
+    return reinterpret_cast<f_t*>(imp_vsnwprintf)(buffer, count, format, argptr);
+  }
   char* NTL_CRTCALL strtok(char* string, const char* format, char** context)
   {
     typedef char* __cdecl f_t(char*, const char*, char**);
@@ -130,14 +138,16 @@ namespace
 
     // bind imports
 #define NTL_IMP(func) imp_ ## func = msvcrt->find_export<vfv_t*>(#func)
+#define NTL_IMP2(func,name) imp_ ## func = msvcrt->find_export<vfv_t*>(name)
+
     NTL_IMP(strtod);
     NTL_IMP(strtok);
     NTL_IMP(vsnprintf);
+    NTL_IMP2(vsnwprintf, "vsnwprintf");
     NTL_IMP(acos);
     NTL_IMP(atan);
     NTL_IMP(tan);
     NTL_IMP(modf);
-#undef NTL_IMP
 
     return msvcrt;
   }

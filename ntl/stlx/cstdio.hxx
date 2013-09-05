@@ -83,6 +83,7 @@ namespace ntl { namespace msvcrt
 {
   size_t NTL_CRTCALL snprintf(char *buffer, size_t count, const char *format, ...);
   size_t NTL_CRTCALL vsnprintf(char *buffer, size_t count, const char *format, va_list argptr);
+  size_t NTL_CRTCALL vsnwprintf(wchar_t *buffer, size_t count, const wchar_t *format, va_list argptr);
 
   int NTL_CRTCALL sscanf(const char* string, const char* format, ...);
   int NTL_CRTCALL vsscanf(const char* string, const char* format, va_list argptr);
