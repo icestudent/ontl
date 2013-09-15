@@ -59,7 +59,7 @@
   #define NTL_CXX_LAMBDA   11
   // rvalue references v3.0
   #define NTL_CXX_RV       30
-  // template typedef
+  // template typedef ( = using)
   #define NTL_CXX_TT
   // variadic templates (implies rvalue references support)
   #define NTL_CXX_VT
@@ -85,7 +85,7 @@
 // _MSC_FULL_VER: 
 // VC16 (2010): 160011001 (CTP), 160020506 (beta1), 160021003 (beta2), 160030128 (rc), 160040219 (sp1)
 // VC17 (2012): 170040825 (ctp), 170050214 (b1), 170050727 (sp0), 170051025
-// VC18 (2013): 180020617 (ctp)
+// VC18 (2013): 180020617 (ctp), 180020827 (rc)
 
 #define NTL_CXX_AUTO
 #define NTL_CXX_ASSERT
@@ -127,6 +127,11 @@
 #if _MSC_FULL_VER >= 180020617 // v18 preview
 # define NTL_CXX_EXPLICITOP
 # define NTL_CXX_VT
+#endif
+
+#if _MSC_FULL_VER >= 180020827 // v18 rc
+# define NTL_CXX_EF
+# define NTL_CXX_TT
 #endif
 
 #endif // _MSC_VER >= 1600
