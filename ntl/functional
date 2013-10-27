@@ -1,6 +1,6 @@
 #include "stlx/functional.hxx"
 #include "stlx/reference_wrapper.hxx"
-#ifndef NTL_CXX_VT
+#ifndef NTL_CXX_VT_WORKS
   #include "stlx/bind.hxx"
   #include "stlx/function.hxx"
 #else

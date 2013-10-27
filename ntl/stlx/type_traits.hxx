@@ -120,8 +120,10 @@ namespace __ {
 
 
   ///\name 30.2.6 decay_copy [thread.decaycopy]
+#ifdef NTL_CXX_RV
   template<typename T>
   inline typename decay<T>::type decay_copy(T&& v)  { return std::forward<T>(v); }
+#endif
 
 struct check_meta_rel
 {

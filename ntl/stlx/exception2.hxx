@@ -357,8 +357,8 @@ namespace std
     {}
 
   #ifdef NTL_CXX_EF
-    nested_exception(const nested_exception&) __ntl_nothrow = default;
-    nested_exception& operator=(const nested_exception&) __ntl_nothrow = default;
+    nested_exception(const nested_exception&) /*__ntl_nothrow*/ = default;
+    nested_exception& operator=(const nested_exception&) /*__ntl_nothrow*/ = default;
     virtual ~nested_exception() = default;
   #else
     // default generated

@@ -1,3 +1,3 @@
-#include <nt/dbgstream>
+#include <nt/dbgstream.hxx>
 
 NTL_DBG_DEFINE_STREAMS();

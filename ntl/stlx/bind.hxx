@@ -12,7 +12,7 @@
 
 #if defined(NTL_CXX_VT)
 # include "bind_vt.hxx"
-#ilif defined(NTL_CXX_RV__WORKS) // doesn't works yet
+#elif defined(NTL_CXX_RV__WORKS) // doesn't works yet
 # include "bind_rv.hxx"
 #else
 #include "fn_caller.hxx"
