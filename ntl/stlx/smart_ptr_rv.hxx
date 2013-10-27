@@ -660,6 +660,77 @@ namespace std
   };//template class unique_ptr<T[N], default_delete<T[N]> >
   #endif
 
+  ///\name 20.8.11.4 unique_ptr creation [unique.ptr.create]
+
+  namespace __
+  {
+    template<class T> struct never_true: false_type {};
+
+    template<class T>
+    struct unique_if
+    {
+      typedef unique_ptr<T> single;
+    };
+
+    template<class T>
+    struct unique_if<T[]>
+    {
+      typedef unique_ptr<T[]> runtime;
+    };
+
+    template<class T, size_t N>
+    struct unique_if<T[N]>
+    {
+      static_assert(never_true<T>::value, "make_unique forbids T[N]. Please use T[].");
+    };
+  }
+
+
+  template<class T>
+  inline typename __::unique_if<T>::runtime make_unique(size_t n)
+  {
+    typedef typename remove_extent<T>::type U;
+    return unique_ptr<T>(new U[n]());
+  }
+
+#ifdef NTL_CXX_VT
+  template<class T, class... Args>
+  inline typename __::unique_if<T>::single make_unique(Args&&... args)
+  {
+    return unique_ptr<T>(new T(std::forward<Args>(args)...));
+  }
+#endif
+
+  template<class T>
+  inline typename __::unique_if<T>::single make_unique_default_init()
+  {
+    return unique_ptr<T>(new T);
+  }
+
+
+  template<class T>
+  inline typename __::unique_if<T>::runtime make_unique_default_init(size_t n)
+  {
+    typedef typename remove_extent<T>::type U;
+    return unique_ptr<T>(new U[n]);
+  }
+
+#ifdef NTL_CXX_VT
+  template<class T, class... Args>
+  inline typename __::unique_if<T>::runtime make_unique_value_init(size_t n, Args&&... args)
+  {
+    typedef typename remove_extent<T>::type U;
+    return unique_ptr<T>(new U[n]{ std::forward<Args>(args)... });
+  }
+
+  template<class T, class... Args>
+  inline typename __::unique_if<T>::runtime make_unique_auto_size(Args&&... args)
+  {
+    typedef typename remove_extent<T>::type U;
+    return unique_ptr<T>(new U[sizeof...(Args)]{ std::forward<Args>(args)... });
+  }
+#endif
+
   ///\name 20.8.11.4 unique_ptr specialized algorithms [unique.ptr.special]
   template <class T, class D> void swap(unique_ptr<T, D>& x, unique_ptr<T, D>& y)
   {
