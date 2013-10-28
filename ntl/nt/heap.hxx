@@ -31,7 +31,7 @@ struct rtl_heap_parameters;
 
 
 NTL_EXTERNAPI
-__declspec(restrict)
+__restrict
 heap_ptr __stdcall
   RtlCreateHeap(
     uint32_t              Flags,
@@ -49,7 +49,7 @@ ntstatus __stdcall
     );
 
 NTL_EXTERNAPI
-__declspec(restrict)
+__restrict
 void * __stdcall
   RtlAllocateHeap(
     heap_ptr  HeapHandle,

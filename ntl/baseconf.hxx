@@ -13,7 +13,7 @@
 /* Supported compilers                                                  */
 /************************************************************************/
 
-#if defined(_MSC_VER) && !defined(__INTEL_COMPILER)
+#if defined(_MSC_VER) && !defined(__INTEL_COMPILER) && !defined(__clang__)
 // MS VC++
   #if _MSC_VER < 1400
   # error upgrade your compiler at least to VC8 (14.00)

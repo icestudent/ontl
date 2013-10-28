@@ -32,8 +32,7 @@ namespace ntl {
     {
     public:
 
-      __declspec(noalias) __declspec(restrict)
-        __forceinline
+      __noalias __restrict __forceinline
         pointer allocate(size_type n, std::allocator<void>::const_pointer = 0)
         __ntl_nothrow
       {
@@ -43,8 +42,7 @@ namespace ntl {
         return p;
       }
 
-      __declspec(noalias)
-        __forceinline
+      __noalias __forceinline
         void deallocate(pointer p, size_type /* n */)
       {
         ::operator delete(p);//(address(*p));

@@ -67,9 +67,8 @@
   #define NTL_CXX_FOR
 
 // compiler-specific parameters
-#ifdef __clang__
-# undef NTL_CXX_CHARS_TYPES
-# undef NTL_CXX_VT // temporary
+#if defined(__clang__) && (__clang_major__ == 3 && __clang_minor__ <= 4)
+# undef NTL_CXX_CHARS_TYPES // because he cannot mangle __char16_t
 #endif
 
 #endif // pure c++0x

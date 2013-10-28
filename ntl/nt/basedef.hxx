@@ -158,7 +158,7 @@ namespace ntl {
 
 
     /// Masks for the predefined standard access types
-    enum access_mask
+    enum access_mask: uint32_t
     {
       no_access = 0,
       delete_access             = 0x00010000L,
