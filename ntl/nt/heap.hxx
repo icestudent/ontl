@@ -31,8 +31,8 @@ struct rtl_heap_parameters;
 
 
 NTL_EXTERNAPI
-__restrict
-heap_ptr __stdcall
+heap_ptr
+__stdcall
   RtlCreateHeap(
     uint32_t              Flags,
     void *                HeapBase    __optional,
@@ -49,8 +49,8 @@ ntstatus __stdcall
     );
 
 NTL_EXTERNAPI
-__restrict
-void * __stdcall
+void * __restrict
+__stdcall
   RtlAllocateHeap(
     heap_ptr  HeapHandle,
     uint32_t  Flags,
