@@ -1,3 +1,4 @@
 *.user
 ntl/*.props
 ntl/*.vsprops
+samples/vstudio/autoexp.dat.*
