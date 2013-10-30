@@ -935,6 +935,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\stlx\optional.hxx"
+						>
+					</File>
+					<File
 						RelativePath=".\stlx\range.hxx"
 						>
 					</File>
