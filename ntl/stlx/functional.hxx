@@ -112,41 +112,102 @@ struct binary_function
  *    functors for all of the arithmetic operators
  *@{*/
 
-template <class T>
+template <class T = void>
 struct plus : binary_function<T, T, T>
 {
   T operator()(const T& x, const T& y) const { return x + y; }
 };
 
-template <class T>
+template <class T = void>
 struct minus : binary_function<T, T, T>
 {
   T operator()(const T& x, const T& y) const { return x - y; }
 };
 
-template <class T>
+template <class T = void>
 struct multiplies : binary_function<T, T, T>
 {
   T operator()(const T& x, const T& y) const { return x * y; }
 };
 
-template <class T>
+template <class T = void>
 struct divides : binary_function<T, T, T>
 {
   T operator()(const T& x, const T& y) const { return x / y; }
 };
 
-template <class T>
+template <class T = void>
 struct modulus : binary_function<T, T, T>
 {
   T operator()(const T& x, const T& y) const { return x % y; }
 };
 
-template <class T>
+template <class T = void>
 struct negate : unary_function<T, T>
 {
   T operator()(const T& x) const { return - x; }
 };
+
+#ifdef NTL_CXX_TYPEOF
+
+// Making Operator Functors [n3421]
+
+template <>
+struct plus<void>
+{
+	template <class T, class U>
+	auto operator()(T&& t, U&& u) const ->
+	decltype(std::forward<T>(t) + std::forward<U>(u))
+	{ return std::forward<T>(t) + std::forward<U>(u); }
+};
+
+template <>
+struct minus<void>
+{
+	template <class T, class U>
+	auto operator()(T&& t, U&& u) const ->
+	decltype(std::forward<T>(t) - std::forward<U>(u))
+	{ return std::forward<T>(t) - std::forward<U>(u); }
+};
+
+template <>
+struct multiplies<void>
+{
+	template <class T, class U>
+	auto operator()(T&& t, U&& u) const ->
+	decltype(std::forward<T>(t) * std::forward<U>(u))
+	{ return std::forward<T>(t) * std::forward<U>(u); }
+};
+
+template <>
+struct divides<void>
+{
+	template <class T, class U>
+	auto operator()(T&& t, U&& u) const ->
+	decltype(std::forward<T>(t) / std::forward<U>(u))
+	{ return std::forward<T>(t) / std::forward<U>(u); }
+};
+
+template <>
+struct modulus<void>
+{
+	template <class T, class U>
+	auto operator()(T&& t, U&& u) const ->
+	decltype(std::forward<T>(t) % std::forward<U>(u))
+	{ return std::forward<T>(t) % std::forward<U>(u); }
+};
+
+template <>
+struct negate<void>
+{
+	template <class T>
+	auto operator()(T&& t) const ->
+	decltype( -std::forward<T>(t) )
+	{ return  -std::forward<T>(t); }
+};
+
+#endif // NTL_CXX_TYPEOF
+
 
 /**@} lib_arithmetic_operations */
 #pragma endregion
@@ -156,41 +217,101 @@ struct negate : unary_function<T, T>
  *   functors for all of the comparison operators
  *@{*/
 
-template <class T>
+template <class T = void>
 struct equal_to : binary_function<T, T, bool>
 {
   bool operator()(const T& x, const T& y) const { return x == y; }
 };
 
-template <class T>
+template <class T = void>
 struct not_equal_to : binary_function<T, T, bool>
 {
   bool operator()(const T& x, const T& y) const { return x != y; }
 };
 
-template <class T>
+template <class T = void>
 struct greater : binary_function<T, T, bool>
 {
   bool operator()(const T& x, const T& y) const { return x > y; }
 };
 
-template <class T>
+template <class T = void>
 struct less : binary_function<T, T, bool>
 {
   bool operator()(const T& x, const T& y) const { return x < y; }
 };
 
-template <class T>
+template <class T = void>
 struct greater_equal : binary_function<T, T, bool>
 {
   bool operator()(const T& x, const T& y) const { return x >= y; }
 };
 
-template <class T>
+template <class T = void>
 struct less_equal : binary_function<T, T, bool>
 {
   bool operator()(const T& x, const T& y) const { return x <= y; }
 };
+
+#ifdef NTL_CXX_TYPEOF
+
+// Making Operator Functors [n3421]
+
+template <>
+struct equal_to<void>
+{
+	template <class T, class U>
+	auto operator()(T&& t, U&& u) const ->
+	decltype(std::forward<T>(t) == std::forward<U>(u))
+	{ return std::forward<T>(t) == std::forward<U>(u); }
+};
+
+template <>
+struct not_equal_to<void>
+{
+	template <class T, class U>
+	auto operator()(T&& t, U&& u) const ->
+	decltype(std::forward<T>(t) != std::forward<U>(u))
+	{ return std::forward<T>(t) != std::forward<U>(u); }
+};
+
+template <>
+struct greater<void>
+{
+	template <class T, class U>
+	auto operator()(T&& t, U&& u) const ->
+	decltype(std::forward<T>(t) > std::forward<U>(u))
+	{ return std::forward<T>(t) > std::forward<U>(u); }
+};
+
+template <>
+struct less<void>
+{
+	template <class T, class U>
+	auto operator()(T&& t, U&& u) const ->
+	decltype(std::forward<T>(t) < std::forward<U>(u))
+	{ return std::forward<T>(t) < std::forward<U>(u); }
+};
+
+template <>
+struct greater_equal<void>
+{
+	template <class T, class U>
+	auto operator()(T&& t, U&& u) const ->
+	decltype(std::forward<T>(t) >= std::forward<U>(u))
+	{ return std::forward<T>(t) >= std::forward<U>(u); }
+};
+
+template <>
+struct less_equal<void>
+{
+	template <class T, class U>
+	auto operator()(T&& t, U&& u) const ->
+	decltype(std::forward<T>(t) <= std::forward<U>(u))
+	{ return std::forward<T>(t) <= std::forward<U>(u); }
+};
+
+#endif // NTL_CXX_TYPEOF
 
 /**@} lib_comparisons */
 #pragma endregion
@@ -201,23 +322,56 @@ struct less_equal : binary_function<T, T, bool>
  *   functors for all of the logical operators
  *@{*/
 
-template <class T>
+template <class T = void>
 struct logical_and : binary_function<T, T, bool>
 {
   bool operator()(const T& x, const T& y) const { return x && y; }
 };
 
-template <class T>
+template <class T = void>
 struct logical_or : binary_function<T, T, bool>
 {
   bool operator()(const T& x, const T& y) const { return x || y; }
 };
 
-template <class T>
+template <class T = void>
 struct logical_not : unary_function<T, bool>
 {
   bool operator()(const T& x) const { return ! x; }
 };
+
+#ifdef NTL_CXX_TYPEOF
+
+// Making Operator Functors [n3421]
+
+template <>
+struct logical_and<void>
+{
+	template <class T, class U>
+	auto operator()(T&& t, U&& u) const ->
+	decltype(std::forward<T>(t) && std::forward<U>(u))
+	{ return std::forward<T>(t) && std::forward<U>(u); }
+};
+
+template <>
+struct logical_or<void>
+{
+	template <class T, class U>
+	auto operator()(T&& t, U&& u) const ->
+	decltype(std::forward<T>(t) || std::forward<U>(u))
+	{ return std::forward<T>(t) || std::forward<U>(u); }
+};
+
+template <>
+struct logical_not<void>
+{
+	template <class T, class U>
+	auto operator()(T&& t) const ->
+	decltype( !std::forward<T>(t))
+	{ return  !std::forward<T>(t); }
+};
+
+#endif // NTL_CXX_TYPEOF
 
 /**@} lib_logical_operations */
 #pragma endregion
@@ -228,7 +382,7 @@ struct logical_not : unary_function<T, bool>
  *   functors for all of the bitwise operators in the language
  *@{**/
 
-template <class T> struct bit_and : binary_function<T,T,T>
+template <class T = void> struct bit_and : binary_function<T,T,T>
 {
   T operator()(const T& x, const T& y) const
   {
@@ -236,7 +390,7 @@ template <class T> struct bit_and : binary_function<T,T,T>
   }
 };
 
-template <class T> struct bit_or : binary_function<T,T,T>
+template <class T = void> struct bit_or : binary_function<T,T,T>
 {
   T operator()(const T& x, const T& y) const
   {
@@ -244,13 +398,64 @@ template <class T> struct bit_or : binary_function<T,T,T>
   }
 };
 
-template <class T> struct bit_xor : binary_function<T,T,T>
+template <class T = void> struct bit_xor : binary_function<T,T,T>
 {
   T operator()(const T& x, const T& y) const
   {
     return x ^ y;
   }
 };
+
+template <class T = void> struct bit_not : unary_function<T,T>
+{
+  T operator()(const T& x) const
+  {
+    return ~x;
+  }
+};
+
+#ifdef NTL_CXX_TYPEOF
+
+// Making Operator Functors [n3421]
+
+template <>
+struct bit_and<void>
+{
+	template <class T, class U>
+	auto operator()(T&& t, U&& u) const ->
+	decltype(std::forward<T>(t) & std::forward<U>(u))
+	{ return std::forward<T>(t) & std::forward<U>(u); }
+};
+
+template <>
+struct bit_or<void>
+{
+	template <class T, class U>
+	auto operator()(T&& t, U&& u) const ->
+	decltype(std::forward<T>(t) | std::forward<U>(u))
+	{ return std::forward<T>(t) | std::forward<U>(u); }
+};
+
+template <>
+struct bit_xor<void>
+{
+	template <class T, class U>
+	auto operator()(T&& t, U&& u) const ->
+	decltype(std::forward<T>(t) ^ std::forward<U>(u))
+	{ return std::forward<T>(t) ^ std::forward<U>(u); }
+};
+
+template <>
+struct bit_not<void>
+{
+	template <class T, class U>
+	auto operator()(T&& t) const ->
+	decltype( ~std::forward<T>(t) )
+	{ return  ~std::forward<T>(t); }
+};
+
+#endif // NTL_CXX_TYPEOF
+
 /**@} lib_bitwise_operations */
 #pragma endregion
 
