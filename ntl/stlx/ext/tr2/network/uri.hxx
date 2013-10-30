@@ -1,6 +1,6 @@
 /**\file*********************************************************************
  *                                                                     \brief
- *  URI Library for C++
+ *  URI Library for C++ [N3792]
  *
  ****************************************************************************
  */
@@ -18,29 +18,74 @@
 namespace std { namespace tr2 { namespace network {
 
   ///\name class declarations
-  class uri;
-  class uri_syntax_error;
-  class uri_builder;
+	class uri;
+	class uri_builder;
+	class uri_syntax_error;
+	class base_uri_error;
+	class uri_builder_error;
+	class percent_decoding_error;
+
+	enum class uri_error {
+		// uri syntax errors
+		invalid_syntax = 1,
+
+		// uri reference and resolution errors
+		base_uri_is_empty,
+		base_uri_is_not_absolute,
+		base_uri_is_opaque,
+		base_uri_does_not_match,
+
+		// builder errors
+		invalid_uri,
+		invalid_scheme,
+		invalid_user_info,
+		invalid_host,
+		invalid_port,
+		invalid_path,
+		invalid_query,
+		invalid_fragment,
+
+		// decoding errors
+		not_enough_input,
+		non_hex_input,
+		conversion_failed,
+	};
+
+	template <>
+	struct is_error_code_enum<uri_error>:
+	true_type {};
+
+	enum class uri_normalization_level {
+		string_comparison,
+		syntax_based,
+	};
 
   ///\name factory functions
-  template <class String>
-  uri make_uri(const String &u, std::error_code &e) noexcept;
+	template <class Source>
+	uri make_uri(const Source& source, std::error_code& ec);
+
+	template <class InputIterator>
+	uri make_uri(InputIterator first, InputIterator last, std::error_code& ec);
+	
+	template <class Source, class Allocator>
+	uri make_uri(const Source& source, const Allocator& alloc, std::error_code& ec);
+	
+	template <class InputIterator, class Allocator>
+	uri make_uri(InputIterator first, InputIterator last, const Allocator& alloc, std::error_code& ec);
 
   ///\name swap functions
-  void swap(uri &lhs, uri &rhs);
+  void swap(uri& lhs, uri& rhs);
 
   ///\name hash functions
   std::size_t hash_value(const uri &u);
 
   ///\name equality and comparison operators
-  enum uri_comparison_level {  };
-  bool compare(const uri &lhs, const uri &rhs, uri_comparison_level level);
-  bool operator == (const uri &lhs, const uri &rhs);
-  bool operator != (const uri &lhs, const uri &rhs);
-  bool operator <  (const uri &lhs, const uri &rhs);
-  bool operator <= (const uri &lhs, const uri &rhs);
-  bool operator >  (const uri &lhs, const uri &rhs);
-  bool operator >= (const uri &lhs, const uri &rhs);
+  bool operator == (const uri& lhs, const uri& rhs);
+  bool operator != (const uri& lhs, const uri& rhs);
+  bool operator <  (const uri& lhs, const uri& rhs);
+  bool operator <= (const uri& lhs, const uri& rhs);
+  bool operator >  (const uri& lhs, const uri& rhs);
+  bool operator >= (const uri& lhs, const uri& rhs);
 
   ///\name percent encoding and decoding
   template <typename InputIterator, typename OutputIterator>
@@ -59,26 +104,26 @@ namespace std { namespace tr2 { namespace network {
   OutputIterator decode(InputIterator first, InputIterator last, OutputIterator out);
 
   template <class String>
-  String encode_user_info(const String &user_info);
+  String encode_user_info(const String& user_info);
   template <class String>
-  String encode_host(const String &host);
+  String encode_host(const String& host);
   template <class String>
-  String encode_port(const String &port);
+  String encode_port(const String& port);
   template <class String>
-  String encode_path(const String &path);
+  String encode_path(const String& path);
   template <class String>
-  String encode_query(const String &query);
+  String encode_query(const String& query);
   template <class String>
-  String encode_fragment(const String &fragment);
+  String encode_fragment(const String& fragment);
   template <class String>
-  String decode(const String &source);
+  String decode(const String& source);
 
   ///\name stream operators
-  std::ostream &operator <<  (std::ostream &os, const uri &u);
-  std::wostream &operator << (std::wostream &os, const uri &u);
-  std::istream &operator >>  (std::istream &os, uri &u);
-  std::wistream &operator >> (std::wistream &os, uri &u);
-  ///\}
+	template <typename CharT, class CharTraits = std::char_traits<CharT> >
+	std::basic_ostream<CharT, CharTraits>& operator<< (std::basic_ostream<CharT, CharTraits>& os, const uri& u);
+	template <typename CharT, class CharTraits = std::char_traits<CharT> >
+	std::basic_istream<CharT, CharTraits>& operator>> (std::basic_istream<CharT, CharTraits>& is, uri& u);
+	///\}
 
   //////////////////////////////////////////////////////////////////////////
   /**
@@ -104,103 +149,124 @@ namespace std { namespace tr2 { namespace network {
    **/
   class uri
   {
-    std::wstring str_;
+		std::wstring str;
   public:
-    ///\name typedefs
-    typedef wstring string_type;
-    typedef string_type::const_iterator iterator;
-    typedef string_type::const_iterator const_iterator;
-    typedef std::iterator_traits<iterator>::value_type value_type;
+		///\name typedefs
+		typedef std::wstring string_type;
+		typedef typename string_type::iterator iterator;
+		typedef typename string_type::const_iterator const_iterator;
+		typedef std::iterator_traits<iterator>::value_type value_type;
+		typedef basic_string_ref<value_type> string_view;
 
-    ///\name range types
-    class part_range;
+		///\name constructors and destructor
+		uri()
+		{}
 
-    ///\name constructors and destructor
-    uri()
-    {}
+		template <class Source, class Allocator = std::allocator<value_type> >
+		explicit uri(const Source& source, const Allocator& alloc = Allocator());
 
-    template <typename InputIterator>
-    uri(const InputIterator &first, const InputIterator &last)
-    {
-      assign(first, last);
-    }
+		template <typename InputIterator, class Allocator = std::allocator<value_type> >
+		uri(InputIterator begin, InputIterator end, const Allocator& alloc = Allocator());
 
-    template <class Source>
-    explicit uri(const Source &source)
-    {
-      assign(source);
-    }
+		uri(const uri& other);
 
-    uri(const uri &other)
-      :str_(other.str_)
-    {}
+		uri(uri&& other) noexcept;
 
-    uri(uri &&other) noexcept
-    {
-      swap(other);
-    }
+		~uri() noexcept;
 
-    ~uri()
-    {}
+		///\name assignment
+		uri& operator= (const uri& other);
+		uri& operator= (uri&& other) noexcept;
 
-    ///\name assignment
-    uri &operator = (const uri &other)
-    {
-      str_ = other.str_; return *this;
-    }
+		///\name modifiers
+		void swap(uri& other) noexcept;
 
-    uri &operator = (uri &&other)
-    {
-      str_.clear();
-      swap(other);
-      return *this;
-    }
+		///\name iterators
+		const_iterator begin() const;
+		const_iterator end() const;
+		const_iterator cbegin() const;
+		const_iterator cend() const;
 
-    template <typename InputIterator>
-    void assign(const InputIterator &first, const InputIterator &last);
+		///\name accessors
+		std::optional<string_view> scheme() const;
+		std::optional<string_view> user_info() const;
+		std::optional<string_view> host() const;
+		std::optional<string_view> port() const;
+		template <typename IntT>
+		std::optional<IntT> port(typename std::is_integral<IntT>::type* = 0) const;
+		std::optional<string_view> path() const;
+		std::optional<string_view> authority() const;
+		std::optional<string_view> query() const;
+		std::optional<string_view> fragment() const;
 
-    template <class Source>
-    void assign(const Source &source);
+		///\name string accessors
+		template <typename CharT,
+		class CharTraits = std::char_traits<CharT>,
+		class Allocator = std::allocator<CharT>>
+			std::basic_string<CharT, CharTraits, Allocator>
+			to_string(const Allocator& alloc = Allocator()) const;
+		std::string string() const;
+		std::wstring wstring() const;
+		std::string u8string() const;
+		std::u16string u16string() const;
+		std::u32string u32string() const;
 
-    ///\name swap
-    void swap(uri &other) noexcept
-    {
-      str_.swap(other.str_);
-    }
+		///\name query
+		bool empty() const noexcept;
+		bool is_absolute() const;
+		bool is_opaque() const;
 
-    ///\name iterators
-    const_iterator begin() const;
-    const_iterator end() const;
+		///\name transformers
+		uri normalize(uri_normalization_level level) const;
+		template <class Allocator>
+		uri normalize(uri_normalization_level level, const Allocator& alloc) const;
+		uri normalize(uri_normalization_level level, std::error_code& ec) const;
+		template <class Allocator>
+		uri normalize(uri_normalization_level level, const Allocator& alloc,
+			std::error_code& ec) const;
 
-    ///\name accessors
-    part_range scheme() const;
-    part_range user_info() const;
-    part_range host() const;
-    part_range port() const;
-    part_range path() const;
-    part_range authority() const;
-    part_range query() const;
-    part_range fragment() const;
+		uri make_relative(const uri& base) const;
+		template <class Allocator>
+		uri make_relative(const uri& base, const Allocator& alloc) const;
+		uri make_relative(const uri& base, std::error_code& ec) const;
+		template <class Allocator>
+		uri make_relative(const uri& base, const Allocator& alloc,
+			std::error_code& ec) const;
 
-    ///\name query
-    bool empty() const noexcept { return str_.empty(); }
-    bool absolute() const noexcept;
-    bool opaque() const noexcept;
+		uri resolve(const uri& base) const;
+		template <class Allocator>
+		uri resolve(const uri& base, const Allocator& alloc) const;
+		uri resolve(const uri& base, std::error_code& ec) const;
+		template <class Allocator>
+		uri resolve(const uri& base, const Allocator& alloc,
+			std::error_code& ec) const;
 
-    ///\name transformers
-    uri normalize() const;
-    uri relativize(const uri &other) const;
-    uri resolve(const uri &other) const;
+		///\name comparison
+		int compare(const uri& other, uri_normalization_level level) const noexcept;
 
-    template <class String>
-    uri resolve(const String &other) const;
-
-    ///\name string accessors
-    string string() const;
-    wstring wstring() const;
-    u16string u16string() const;
-    u32string u32string() const;
-    ///\}
+		///\name percent encoding and decoding
+		template <typename InputIterator, typename OutputIterator>
+		static OutputIterator encode_user_info(InputIterator begin, InputIterator end,
+			OutputIterator out);
+		template <typename InputIterator, typename OutputIterator>
+		static OutputIterator encode_host(InputIterator begin, InputIterator end,
+			OutputIterator out);
+		template <typename InputIterator, typename OutputIterator>
+		static OutputIterator encode_port(InputIterator begin, InputIterator end,
+			OutputIterator out);
+		template <typename InputIterator, typename OutputIterator>
+		static OutputIterator encode_path(InputIterator begin, InputIterator end,
+			OutputIterator out);
+		template <typename InputIterator, typename OutputIterator>
+		static OutputIterator encode_query(InputIterator begin, InputIterator end,
+			OutputIterator out);
+		template <typename InputIterator, typename OutputIterator>
+		static OutputIterator encode_fragment(InputIterator begin, InputIterator end,
+			OutputIterator out);
+		template <typename InputIterator, typename OutputIterator>
+		static OutputIterator decode(InputIterator begin, InputIterator end,
+			OutputIterator out);
+		///\}
   };
 
 
@@ -216,7 +282,7 @@ namespace std { namespace tr2 { namespace network {
     const_iterator begin() const;
     const_iterator end() const;
 
-    // string accessors
+    ///\name string accessors
     uri::string_type native() const;
     std::string string() const;
     std::wstring wstring() const;
