@@ -112,6 +112,7 @@
 #if defined(_MSC_VER)
 # pragma warning(disable:4514)// unreferenced inline function has been removed
 # pragma warning(disable:4480)// nonstandard extension used: specifying underlying type for enum 'enum'
+# pragma warning(disable:4456 4457 4458)	// declaration hides previous local declaration, function parameter or class member
 # ifdef __ICL
 #  pragma warning(disable:271)  // [remark] trailing comma is nonstandard
 #  pragma warning(disable:304)  // [remark] access control not specified ("access" by default)
