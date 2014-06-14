@@ -84,7 +84,8 @@
 // _MSC_FULL_VER: 
 // VC16 (2010): 160011001 (CTP), 160020506 (beta1), 160021003 (beta2), 160030128 (rc), 160040219 (sp1)
 // VC17 (2012): 170040825 (ctp), 170050214 (b1), 170050727 (sp0), 170051025
-// VC18 (2013): 180020617 (ctp), 180020827 (rc), 180021005 (sp0)
+// VC18 (2013): 180020617 (ctp), 180020827 (rc), 180021005 (sp0), 180021114 (Nov2013 CTP), 180030501 (Update 2)
+// VC19 (2014): 190021730 (ctp)
 
 #define NTL_CXX_AUTO
 #define NTL_CXX_ASSERT
@@ -132,6 +133,12 @@
 # define NTL_CXX_EF
 # define NTL_CXX_TT
 #endif
+
+#if _MSC_FULL_VER >= 180021114 // v18 nov2013
+//# define NTL_CXX_CONSTEXPR
+#endif
+
+
 
 #endif // _MSC_VER >= 1600
 
