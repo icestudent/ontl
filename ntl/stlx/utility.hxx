@@ -195,32 +195,42 @@ struct pair
     T1  first;
     T2  second;
 
+#ifdef NTL_CXX_EF
+		pair(const pair&) = default;
+		pair(pair&&) = default;
+#else
+		pair(const pair& p)
+			:first(p.first), second(p.second)
+		{}
+#endif
 
     constexpr pair()
       :first(), second()
     {}
 
-    pair(const T1 & x, const T2 & y)
+    constexpr pair(const T1 & x, const T2 & y)
       :first(x), second(y)
     {}
 
     template<class U, class V>
-    pair(const pair<U, V>& p)
+    constexpr pair(const pair<U, V>& p)
       :first(p.first), second(p.second)
     {}
 
 #ifdef NTL_CXX_RV
     template<class U, class V>
-    pair(U&& x, V&& y)
+    constexpr pair(U&& x, V&& y)
       :first(forward<U>(x)), second(forward<V>(y))
     {}
 
-    pair(pair&& p)
+	#ifndef NTL_CXX_EF
+    constexpr pair(pair&& p)
       :first(move(p.first)), second(move(p.second))
     {}
+	#endif
 
     template<class U, class V>
-    pair(pair<U, V>&& p)
+    constexpr pair(pair<U, V>&& p)
       :first(forward<U>(p.first)), second(forward<V>(p.second))
     {}
 #endif
