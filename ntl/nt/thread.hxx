@@ -515,24 +515,6 @@ public:
       return NtDelayExecution(alertable, -1i64*std::chrono::duration_cast<system_duration>(rel_time).count());
     }
 
-    template <size_t N>
-    inline ntstatus wait_for(const std::array<legacy_handle, N>& handles, bool wait_all = false, bool alertable = false)
-    {
-      return NtWaitForMultipleObjects(handles.size(), handles.data(), wait_all ? wait_type::WaitAll : wait_type::WaitAny, alertable, infinite_timeout());
-    }
-
-    template <size_t N, class Rep, class Period>
-    inline ntstatus wait_for(const std::array<legacy_handle, N>& handles, const std::chrono::duration<Rep, Period>& rel_time, bool wait_all = false, bool alertable = false)
-    {
-      return NtWaitForMultipleObjects(handles.size(), handles.data(), wait_all ? wait_type::WaitAll : wait_type::WaitAny, alertable, -1i64*std::chrono::duration_cast<system_duration>(rel_time).count());
-    }
-
-    template <size_t N, class Clock, class Duration>
-    inline ntstatus wait_until(const std::array<legacy_handle, N>& handles, const std::chrono::time_point<Clock, Duration>& abs_time, bool wait_all = false, bool alertable = false)
-    {
-      return NtWaitForMultipleObjects(handles.size(), handles.data(), wait_all ? wait_type::WaitAll : wait_type::WaitAny, alertable, std::chrono::duration_cast<system_duration>(abs_time.time_since_epoch()).count());
-    }
-
   } // this_thread
  } // namespace nt
 
