@@ -43,6 +43,8 @@
   #define NTL_CXX_THREADL
   // __func__
   #define NTL_CXX_FUNC
+	// inline namespace
+	#define NTL_CXX_NS
 
   // C++0x attributes
   #define NTL_CXX_ATTRIBUTES
@@ -138,6 +140,9 @@
 //# define NTL_CXX_CONSTEXPR
 #endif
 
+#if _MSC_FULL_VER >= 190021730 // v19 ctp1
+# define NTL_CXX_NS
+#endif
 
 
 #endif // _MSC_VER >= 1600
@@ -192,12 +197,17 @@
 
 #if __ICL >= 1300
   /** 13.0 */
-#define NTL_CXX_CONSTEXPR
-//#define NTL_CXX_NOEXCEPT  // not work
-#define NTL_CXX_EXPLICITOP
-#define NTL_CXX_IL
-#define NTL_CXX_FOR
-#undef NTL_CXX_CHARS_TYPES  // undefined even with /Qoption,cpp,"--uliterals"
+	#define NTL_CXX_CONSTEXPR
+	//#define NTL_CXX_NOEXCEPT  // not work
+	#define NTL_CXX_EXPLICITOP
+	#define NTL_CXX_IL
+	#define NTL_CXX_FOR
+	#undef NTL_CXX_CHARS_TYPES  // undefined even with /Qoption,cpp,"--uliterals"
+#endif
+
+#if __ICL >= 1400
+  /** 13.0 */
+# define NTL_CXX_NS
 #endif
 
 #endif // __ICL

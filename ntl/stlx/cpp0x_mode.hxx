@@ -76,6 +76,13 @@
   #define __default
 #endif
 
+// inline namespace
+#ifdef NTL_CXX_NS
+	#define __inline_ns inline
+#else
+	#define __inline_ns
+#endif
+
 #ifdef NTL_CXX_EXPLICITOP
 # define __explicit_operator_bool() explicit operator bool()
 # define __explicit_bool(...) ((__VA_ARGS__) ? true : false)
