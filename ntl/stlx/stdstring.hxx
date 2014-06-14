@@ -2195,6 +2195,30 @@ template <> struct hash<std::u16string>: __::string_hash<std::u16string>{};
 template <> struct hash<std::u32string>: __::string_hash<std::u32string>{};
 
 
+//////////////////////////////////////////////////////////////////////////
+// string literals
+__inline_ns namespace literals
+{
+	/// suffix for basic_string literals [21.7]
+	__inline_ns namespace string_literals
+	{
+		#pragma warning(disable:4455)
+		inline string			operator "" s(const char			*str, size_t len) { return string		(str, len); }
+		inline wstring		operator "" s(const wchar_t		*str, size_t len) { return wstring	(str, len); };
+	#ifdef NTL_CXX_CHARS
+		inline u16string	operator "" s(const char16_t	*str, size_t len) { return u16string(str, len); };
+		inline u32string	operator "" s(const char32_t	*str, size_t len) { return u32string(str, len); };
+	#endif
+		#pragma warning(default:4455)
+	} // string_lierals ns
+} // literals ns
+
+#ifndef NTL_CXX_NS
+	// inline namespace 
+	using namespace literals;
+	using namespace literals::string_literals;
+#endif
+
 
 //////////////////////////////////////////////////////////////////////////
 //

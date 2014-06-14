@@ -1,6 +1,6 @@
 /**\file*********************************************************************
  *                                                                     \brief
- *  Time utilities [20.8 time]
+ *  Time utilities [20.13 time]
  *
  ****************************************************************************
  */
@@ -22,9 +22,10 @@ namespace std
     /**\addtogroup  lib_utilities *** 20 General utilities library [utilities]
      *@{
      **/
-    /**\defgroup  lib_chrono ***** 20.8 Time utilities [time]
+    /**\defgroup  lib_chrono ***** 20.13 Time utilities [time]
      *
      *   This subclause describes the chrono library that provides generally useful time utilities.
+     *   \note Based on N3690.
      *@{
      */
 
@@ -41,10 +42,12 @@ namespace std
     typedef duration<int64_t>              seconds;
     typedef duration<int32_t, ratio< 60> > minutes;
     typedef duration<int32_t, ratio<3600> >hours;
-  }
+
+  } // chrono ns
+
 
   // common_type traits
-  /// Specializations of common_type [20.8.2.3 time.traits.specializations]
+  /// Specializations of common_type [20.13.2.3 time.traits.specializations]
   template <class Rep1, class Period1, class Rep2, class Period2>
   struct common_type<chrono::duration<Rep1, Period1>, chrono::duration<Rep2, Period2> >
   {
@@ -81,13 +84,13 @@ namespace std
   namespace chrono
   {
     // customization traits
-    /// is_floating_point [20.8.2.1 time.traits.is_fp]
+    /// is_floating_point [20.13.2.1 time.traits.is_fp]
     template <class Rep>
     struct treat_as_floating_point:
       is_floating_point<Rep>
     {};
 
-    /// duration_values [20.8.2.2 time.traits.duration_values]
+    /// duration_values [20.13.2.2 time.traits.duration_values]
     template <class Rep>
     struct duration_values
     {
@@ -101,7 +104,7 @@ namespace std
 
 
     /**
-     *	@brief Class template duration [20.8.3 time.duration]
+     *	@brief Class template duration [20.13.3 time.duration]
      *
      *  A \c duration type measures time between two points in time (\c time_points). A \c duration has a representation which
      *  holds a count of ticks and a tick period. The tick period is the amount of time which occurs from one tick to the next, in
@@ -140,7 +143,7 @@ namespace std
       typedef Period period;
 
     public:
-      ///\name 20.8.3.1 construct/copy/destroy
+      ///\name 20.13.3.1 construct/copy/destroy
       constexpr duration()
         :rep_(duration_values<rep>::zero())
       {}
@@ -192,11 +195,11 @@ namespace std
 #endif
 
 
-      ///\name 20.8.3.2 observer
+      ///\name 20.13.3.2 observer
       constexpr rep count() const { return rep_; }
 
 
-      ///\name 20.8.3.3 arithmetic
+      ///\name 20.13.3.3 arithmetic
       constexpr duration operator+() const
       {
         return *this;
@@ -274,7 +277,7 @@ namespace std
       }
 
 
-      ///\name 20.8.3.4 special values
+      ///\name 20.13.3.4 special values
       static constexpr const duration zero()
       {
         return duration(duration_values<rep>::zero());
@@ -457,7 +460,7 @@ namespace std
     }
 
     /**
-     *	@brief duration_cast [20.8.3.7 time.duration.cast]
+     *	@brief duration_cast [20.13.3.7 time.duration.cast]
      *
      *  @note \e Requires: ToDuration shall be an instantiation of duration. Diagnostic required.
      *
@@ -475,10 +478,77 @@ namespace std
       return __::duration_cast_impl<CF::num == 1, CF::den == 1>::template cast<ToDuration, CF, CR>(d);
     }
 
+	} // chrono ns
 
 
+	__inline_ns namespace literals
+	{
+		/// 20.13.5.8, suffixes for duration literals
+		__inline_ns namespace chrono_literals
+		{
+#pragma warning(disable:4455)
+			constexpr inline chrono::hours operator "" h(unsigned long long l)
+			{
+				return chrono::hours(static_cast<chrono::hours::rep>(l));
+			}
+			constexpr inline chrono::duration<long double, ratio<3600,1>> operator "" h(long double l)
+			{
+				return chrono::duration<long double, ratio<3600,1>>(l);
+			}
+			constexpr inline chrono::minutes operator "" min(unsigned long long l)
+			{
+				return chrono::minutes(static_cast<chrono::minutes::rep>(l));
+			}
+			constexpr inline chrono::duration<long double , ratio<60,1>> operator "" min(long double l)
+			{
+				return chrono::duration<long double, ratio<60,1>>(l);
+			}
+			constexpr inline chrono::seconds operator "" s(unsigned long long l)
+			{
+				return chrono::seconds(static_cast<chrono::seconds::rep>(l));
+			}
+			constexpr inline chrono::duration<long double > operator "" s(long double l)
+			{
+				return chrono::duration<long double, ratio<1,1>>(l);
+			}
+			constexpr inline chrono::milliseconds operator "" ms(unsigned long long l)
+			{
+				return chrono::milliseconds(static_cast<chrono::milliseconds::rep>(l));
+			}
+			constexpr inline chrono::duration<long double , milli> operator "" ms(long double l)
+			{
+				return chrono::duration<long double, milli>(l);
+			}
+			constexpr inline chrono::microseconds operator "" us(unsigned long long l)
+			{
+				return chrono::microseconds(static_cast<chrono::microseconds::rep>(l));
+			}
+			constexpr inline chrono::duration<long double , micro> operator "" us(long double l)
+			{
+				return chrono::duration<long double, micro>(l);
+			}
+			constexpr inline chrono::nanoseconds operator "" ns(unsigned long long l)
+			{
+				return chrono::nanoseconds(static_cast<chrono::nanoseconds::rep>(l));
+			}
+			constexpr inline chrono::duration<long double , nano> operator "" ns(long double l)
+			{
+				return chrono::duration<long double, nano>(l);
+			}
+#pragma warning(default:4455)
+		} // chrono_literals ns
+	} // literals ns
+
+#ifndef NTL_CXX_NS
+	// inline namespace 
+	using namespace literals;
+	using namespace literals::chrono_literals;
+#endif
+
+	namespace chrono
+	{
     /**
-     *	@brief Class template time_point [20.8.4 time.point]
+     *	@brief Class template time_point [20.13.4 time.point]
      *
      *  A time_point represents a point in time, as opposed to a duration of time.
      *  Another way of saying the same thing, is that a time_point represents an epoch plus or minus a duration.
@@ -498,7 +568,7 @@ namespace std
       typedef typename duration::rep rep;
       typedef typename duration::period period;
     public:
-      ///\name 20.8.4.1 Construct
+      ///\name 20.13.4.1 Construct
       time_point()
       {}
 
@@ -511,10 +581,10 @@ namespace std
         :d(static_cast<duration>(t.time_since_epoch()))
       {}
 
-      ///\name 20.8.4.2 observer
+      ///\name 20.13.4.2 observer
       duration time_since_epoch() const { return d; }
 
-      ///\name 20.8.4.3 arithmetic
+      ///\name 20.13.4.3 arithmetic
       time_point& operator+=(const duration& d)
       {
         this->d += d; return *this;
@@ -525,7 +595,7 @@ namespace std
         this->d -= d; return *this;
       }
 
-      ///\name 20.8.4.4 special values
+      ///\name 20.13.4.4 special values
       static constexpr time_point min() { return time_point(duration::min()); }
       static constexpr time_point max() { return time_point(duration::max()); }
       ///\}
@@ -605,7 +675,7 @@ namespace std
 
 
     /**
-     *	@brief time_point_cast [20.8.4.7 time.point.cast]
+     *	@brief time_point_cast [20.13.4.7 time.point.cast]
      *  @note \e Requires: ToDuration shall be an instance of duration.
      **/
     template <class ToDuration, class Clock, class Duration>
@@ -620,7 +690,7 @@ namespace std
     /************************************************************************/
 
     /**
-     *	@brief Class system_clock [20.8.5.1 time.clock.system]
+     *	@brief Class system_clock [20.13.5.1 time.clock.system]
      *
      *  Objects of class system_clock represent wall clock time from the system-wide realtime clock.
      **/
@@ -638,13 +708,13 @@ namespace std
       typedef duration::period                        period;
       typedef chrono::time_point<system_clock>        time_point;
 
-      // NOTE: see the Table 54 (20.8.1), system time can be adjusted back.
+      // NOTE: see the Table 54 (20.13.1), system time can be adjusted back.
       static const bool is_monotonic = false;
     public:
 #ifdef NTL_CXX_CONSTEXPR
-      static_assert(duration::min() < duration::zero(), "20.8.5.1.2");
+      static_assert(duration::min() < duration::zero(), "20.13.5.1.2");
 #else
-      static_assert(numeric_limits<duration::rep>::is_signed, "20.8.5.1.2");
+      static_assert(numeric_limits<duration::rep>::is_signed, "20.13.5.1.2");
 #endif
 
       /** \c return the time_point representing a current date and time */
@@ -668,7 +738,7 @@ namespace std
 
 
     /**
-     *	@brief Class monotonic_clock [20.8.5.2 time.clock.monotonic]
+     *	@brief Class monotonic_clock [20.13.5.2 time.clock.monotonic]
      *
      *  Objects of class monotonic_clock represent clocks for which values of time_point never decrease as physical time
      *  advances.
@@ -689,9 +759,9 @@ namespace std
       static const bool is_monotonic = true;
     public:
 #ifdef NTL_CXX_CONSTEXPR
-      static_assert(duration::min() < duration::zero(), "20.8.5.1.2");
+      static_assert(duration::min() < duration::zero(), "20.13.5.1.2");
 #else
-      static_assert(numeric_limits<duration::rep>::is_signed, "20.8.5.1.2");
+      static_assert(numeric_limits<duration::rep>::is_signed, "20.13.5.1.2");
 #endif
 
       /** \c return the time_point representing a current monotonic time */
@@ -699,7 +769,7 @@ namespace std
     };
 
     /**
-     *	@brief Class high_resolution_clock [20.8.5.3 time.clock.hires]
+     *	@brief Class high_resolution_clock [20.13.5.3 time.clock.hires]
      *
      *  Objects of class high_resolution_clock represent clocks with the shortest tick period.
      **/
@@ -779,6 +849,8 @@ namespace std
     /**@} lib_chrono */
     /**@} lib_utilities */
   } // namespace chrono
+
+
 
 } // namespace std
 
