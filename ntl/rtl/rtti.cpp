@@ -149,8 +149,8 @@ namespace ntl { namespace cxxruntime
 
   union typeinfos
   {
-    const typeinfo& rawtype;
-    const std::type_info& type;
+    const typeinfo* rawtype;
+    const std::type_info* type;
   private:
     typeinfos& operator=(const typeinfos&); // make icl happy
   };
@@ -295,7 +295,7 @@ namespace ntl { namespace cxxruntime
       const base_class2* base, * const * ptr = hierarchy->classes->bases;
       for(unsigned i = 0; i < hierarchy->bases; i++, ptr++){
         base = *ptr;
-        if(base->type.rawtype == desttype){
+        if(*base->type.rawtype == desttype){
           // assume that no more than one base classes are exists,
           // i.e. only one base object exists, which type equals to the target type, and it [base object] can be private,
           // so we can't give access to it.
@@ -341,7 +341,7 @@ namespace ntl { namespace cxxruntime
 #ifdef _M_X64
         imagebase->va<const typeinfo*>(base->type);
 #else
-          &base->type.rawtype;
+          base->type.rawtype;
 #endif
 
         // check dest
