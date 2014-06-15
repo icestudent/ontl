@@ -26,32 +26,36 @@ namespace std { namespace tr2 { namespace sys {
 
 
   /**
-   *	@brief 5.5.3. Class mutable_buffer
+   *  @brief 5.5.3. Class mutable_buffer
    **/
   class mutable_buffer:
-    public pair<void*, size_t>
+    protected pair<void*, size_t>
   {
     friend class const_buffer;
   public:
     mutable_buffer()
     {}
+
     mutable_buffer(void* data, size_t size)
       :pair(data, size)
     {}
 
-    //template<class T> 
-    //friend inline T buffer_cast(const mutable_buffer& b) __ntl_nothrow      { return static_cast<T>(b.first); }
-    //friend size_t buffer_size(const mutable_buffer& b);
+    mutable_buffer(const mutable_buffer& b)
+      :pair(b)
+    {}
+
+    template<class T> 
+    friend inline T buffer_cast(const mutable_buffer& b) __ntl_nothrow;
+    friend size_t buffer_size(const mutable_buffer& b);
   };
-  template<class T> 
-  inline T buffer_cast(const mutable_buffer& b) __ntl_nothrow      { return static_cast<T>(b.first); }
+
 
 
   /**
-   *	@brief 5.5.4. Class const_buffer
+   *  @brief 5.5.4. Class const_buffer
    **/
   class const_buffer:
-    public pair<const void*, size_t>
+    protected pair<const void*, size_t>
   {
   public:
     const_buffer()
@@ -63,12 +67,15 @@ namespace std { namespace tr2 { namespace sys {
       :pair(b)
     {}
 
-    //template<class T>
-    //friend inline T buffer_cast(const const_buffer& b) __ntl_nothrow        { return static_cast<T>(b.first); }
-    //friend size_t buffer_size(const const_buffer& b) __ntl_nothrow;
+    template<class T>
+    friend inline T buffer_cast(const const_buffer& b) __ntl_nothrow;
+    friend size_t buffer_size(const const_buffer& b) __ntl_nothrow;
   };
+
   template<class T>
   inline T buffer_cast(const const_buffer& b) __ntl_nothrow        { return static_cast<T>(b.first); }
+  template<class T> 
+  inline T buffer_cast(const mutable_buffer& b) __ntl_nothrow      { return static_cast<T>(b.first); }
 
   inline size_t buffer_size(const const_buffer& b) __ntl_nothrow    { return b.second; }
   inline size_t buffer_size(const mutable_buffer& b) __ntl_nothrow  { return b.second; }
@@ -76,7 +83,7 @@ namespace std { namespace tr2 { namespace sys {
 
 
   /**
-   *	@brief 5.5.5. Class mutable_buffers_1
+   *  @brief 5.5.5. Class mutable_buffers_1
    **/
   class mutable_buffers_1:
     public mutable_buffer
@@ -103,7 +110,7 @@ namespace std { namespace tr2 { namespace sys {
 
 
   /**
-   *	@brief 5.5.6. Class const_buffers_1
+   *  @brief 5.5.6. Class const_buffers_1
    **/
   class const_buffers_1:
     public const_buffer
@@ -128,7 +135,7 @@ namespace std { namespace tr2 { namespace sys {
 
 
   /**
-   *	@brief 5.5.8. Class template basic_fifobuf
+   *  @brief 5.5.8. Class template basic_fifobuf
    *
    *  The class basic_fifobuf is derived from basic_streambuf to associate the input sequence and output sequence with one 
    *  or more objects of some character array type, whose elements store arbitrary values. These character array objects are internal 
