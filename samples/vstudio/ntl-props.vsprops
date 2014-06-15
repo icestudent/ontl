@@ -10,6 +10,7 @@
 		ExceptionHandling="0"
 		BufferSecurityCheck="false"
 		EnableEnhancedInstructionSet="1"
+		AdditionalOptions="/Zc:threadSafeInit-"
 	/>
 	<Tool
 		Name="VCLinkerTool"
