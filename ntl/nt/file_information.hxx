@@ -498,6 +498,22 @@ struct file_end_of_file_information
   int64_t EndOfFile;
 };
 
+///\name  FileCompletionInformation == 30
+struct file_completion_information
+{
+  static const file_information_class info_class_type = FileCompletionInformation;
+
+  legacy_handle Port;
+  const void* Key;
+};
+
+///\name  FileIoCompletionNotificationInformation == 41
+struct file_io_completion_notification_information
+{
+  static const file_information_class info_class_type = FileIoCompletionNotificationInformation;
+
+  uint32_t Flags;
+};
 
 ///\name FileNetworkOpenInformation == 34
 struct file_network_open_information
