@@ -712,19 +712,32 @@ unsigned long
 /// @warning not to be allocated on memory with the PAGE_NOCACHE attribute.
 struct atomic_t
 {
-    operator const volatile unsigned long & () const { return value; }
-    unsigned long operator++() { return atomic::increment(value); }
-    unsigned long operator--() { return atomic::decrement(value); }
-    void operator+=(unsigned long val) { exchange_add(val); }
-    void operator-=(unsigned long val) { exchange_add(0 - val); }
-    unsigned long exchange(unsigned long val)
-      { return atomic::exchange(value, val); }
-    unsigned long exchange_add(unsigned long val)
-      { return atomic::exchange_add(value, val); }
-    unsigned long exchange_if_equal(unsigned long val, unsigned long comparand)
-      { return atomic::compare_exchange(value, val, comparand); }
+	typedef unsigned long type;
 
-  private: unsigned long volatile value;
+public:
+	operator const volatile type & () const { return value; }
+
+	type compare(type val) const
+	{ return atomic::compare_exchange(value, value, val); }
+
+	type operator++() { return atomic::increment(value); }
+	type operator--() { return atomic::decrement(value); }
+	void operator+=(type val) { exchange_add(val); }
+	void operator-=(type val) { exchange_add(0 - val); }
+	type exchange(type val)
+	{ return atomic::exchange(value, val); }
+	type exchange_add(type val)
+	{ return atomic::exchange_add(value, val); }
+	type exchange_if_equal(type val, type comparand)
+	{ return atomic::compare_exchange(value, val, comparand); }
+
+public:
+	explicit atomic_t(type val = 0)
+		:value(val)
+	{}
+
+private:
+	mutable volatile type value;
 };//struct atomic_t
 
 namespace atomic
@@ -762,6 +775,45 @@ namespace atomic
       current = 1;
     }
   };
+
+
+	/** Integral atomic value */
+	typedef ntl::atomic_t value_t;
+
+
+	/** Boolean atomic flag */
+	struct flag_t
+	{
+		operator const bool() const { return value != false; }
+
+		void set()		{ exchange(true); }
+		void clear()	{ exchange(false); }
+
+		bool test() const
+		{ return atomic::exchange_add(value, 0) != false; }
+
+		bool test(bool val) const
+		{ return atomic::exchange_add(value, 0) == static_cast<unsigned long>(val); }
+
+		bool test_and_set()
+		{ return atomic::exchange(value, true) != false; }
+
+		bool exchange(bool val)
+		{ return atomic::exchange(value, val) != false; }
+
+		bool exchange_if_equal(bool val, bool comparand)
+		{ return atomic::compare_exchange(value, val, comparand) != false; }
+
+		explicit flag_t(bool val = false)
+			:value(val)
+		{}
+
+		flag_t& operator= (bool val)
+		{ return exchange(val), *this; }
+
+	private: mutable volatile unsigned long value;
+	};
+	
 } // atomic
 
 template <class Lock, class T = void>
