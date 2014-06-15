@@ -27,7 +27,8 @@ namespace std { namespace tr2 {
 
     void* io_handler_allocate(size_t s, ...);
     void io_handler_deallocate(void* p, size_t s, ...);
-    template<class F> void io_handler_invoke(F f, ...);
+    template<class F> void io_handler_invoke(F& f, ...);
+    template<class F> void io_handler_invoke(F const& f, ...);
 
     template<class IoObjectService>
     class basic_io_object;

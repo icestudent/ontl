@@ -512,6 +512,22 @@
 								RelativePath=".\stlx\ext\tr2\network\timer.hxx"
 								>
 							</File>
+							<Filter
+								Name="iocp"
+								>
+								<File
+									RelativePath=".\stlx\ext\tr2\network\iocp\iocp_service.hxx"
+									>
+								</File>
+								<File
+									RelativePath=".\stlx\ext\tr2\network\iocp\op.hxx"
+									>
+								</File>
+								<File
+									RelativePath=".\stlx\ext\tr2\network\iocp\wait_op.hxx"
+									>
+								</File>
+							</Filter>
 						</Filter>
 						<Filter
 							Name="filesystem"

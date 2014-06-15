@@ -19,17 +19,22 @@ namespace std { namespace tr2 { namespace sys {
   class io_service;
   class invalid_service_owner;
   class service_already_exists;
+  class iocp_service;
 
   template<class Service> Service& use_service(io_service&);
   template<class Service> void add_service(io_service&, Service*);
   template<class Service> bool has_service(io_service&);
 
-  // default handler hook functions:
-  inline void* io_handler_allocate(size_t s, ...)    { return ::operator new(s);    }
-  inline void io_handler_deallocate(void* p, size_t, ...)   { ::operator delete(p); }
+  ///\name default handler hook functions (note: handler passed as pointer to ...)
+  inline void* io_handler_allocate(size_t s, ...)           { return ::operator new(s);    }
+  inline void  io_handler_deallocate(void* p, size_t, ...)  { return ::operator delete(p); }
 
   template<class F> 
-  inline void io_handler_invoke(F f, ...) { f(); }
+  inline void io_handler_invoke(F& f, ...) { f(); }
+
+  template<class F> 
+  inline void io_handler_invoke(F const& f, ...) { f(); }
+  ///\}
 
   template<class IoObjectService>
   class basic_io_object;
@@ -85,7 +90,7 @@ namespace std { namespace tr2 { namespace sys {
 
 
   /**
-   *	@brief 5.3.3. Class io_service
+   *  @brief 5.3.3. Class io_service
    *  @details Class io_service implements an extensible, type-safe, polymorphic set of <i>IO services, indexed by service/type</i>.
    *  An object of class io_service must be initialised before I/O objects such as sockets, resolvers and timers can be used. These I/O objects 
    *  are distinguished by having constructors that accept an \c io_service& parameter.
@@ -101,7 +106,7 @@ namespace std { namespace tr2 { namespace sys {
     class strand;
 
     /**
-     *	@brief 5.3.5. Class io_service::id
+     *  @brief 5.3.5. Class io_service::id
      *  @details The class io_service::id provides identification of services, and is used as an index for service lookup.
      **/
     class id: noncopyable
@@ -111,7 +116,7 @@ namespace std { namespace tr2 { namespace sys {
     };
 
     ///\name constructors/destructor:
-    io_service(){svcNo = 0;}
+    io_service();
     ~io_service();
 
     ///\name members:
@@ -155,12 +160,15 @@ namespace std { namespace tr2 { namespace sys {
       io_service* owner;
       size_t      id;
     };
-    typedef std::unique_lock<std::mutex> services_lock;
+    typedef std::unique_lock<std::recursive_mutex> guard;
     typedef forward_list<service_node> services_t;
+    typedef iocp_service service_implementation_type;
     
-    std::mutex lock;
+    mutable std::recursive_mutex lock;
     services_t services;
     size_t svcNo;
+
+    service_implementation_type& impl;
 
     struct finder:
       unary_function<service_node, bool>
@@ -180,7 +188,7 @@ namespace std { namespace tr2 { namespace sys {
 
     template<class Service> void do_add_service(Service* svc)
     {
-      services_lock _(lock);
+      guard _(lock);
       type_index key(typeid(Service));
       services_t::const_iterator it = find_if(services.cbegin(), services.cend(), finder(key));
       if(it != services.cend()){
@@ -192,14 +200,14 @@ namespace std { namespace tr2 { namespace sys {
     }
     template<class Service> bool do_has_service() const
     {
-      services_lock _(lock);
+      guard _(lock);
       type_index key(typeid(Service));
       services_t::const_iterator it = find_if(services.cbegin(), services.cend(), finder(key));
       return it != services.cend();
     }
     template<class Service> Service& do_use_service()
     {
-      services_lock _(lock);
+      guard _(lock);
       type_index key(typeid(Service));
       services_t::const_iterator it = find_if(services.cbegin(), services.cend(), finder(key));
       if(it != services.cend()){
@@ -222,7 +230,7 @@ namespace std { namespace tr2 { namespace sys {
 
 
   /**
-   *	Service objects may be explicitly added to an io_service using the function template add_service<Service>(). If the 
+   *  Service objects may be explicitly added to an io_service using the function template add_service<Service>(). If the 
    *  Service is already present, the service_already_exists exception is thrown. If the owner of the service is not the same 
    *  object as the io_service parameter, the invalid_service_owner exception is thrown. 
    **/
@@ -232,7 +240,7 @@ namespace std { namespace tr2 { namespace sys {
 
 
   /**
-   *	@brief 5.3.4. Class io_service::service
+   *  @brief 5.3.4. Class io_service::service
    *  @details Base class for services
    **/
   class io_service::service:
@@ -259,18 +267,10 @@ namespace std { namespace tr2 { namespace sys {
     void operator=(const service&) __deleted;
   };
 
-  inline io_service::~io_service()
-  {
-    for(services_t::iterator it = services.begin(), end = services.end(); it != end; ++it, svcNo--){
-      assert(svcNo == it->id);
-      it->val->shutdown_service();
-      delete it->val;
-    }
-    assert(svcNo == 0);
-  }
 
+  //////////////////////////////////////////////////////////////////////////
   /**
-   *	@brief 5.3.6 Class io_service::work
+   *  @brief 5.3.6 Class io_service::work
    *  @details An object of class io_service::work represents a unit of unfinished work for an io_service. 
    **/
   class io_service::work
@@ -293,7 +293,7 @@ namespace std { namespace tr2 { namespace sys {
   };
 
   /**
-   *	@brief 5.3.7 Class io_service::strand
+   *  @brief 5.3.7 Class io_service::strand
    *  @details An object of class io_service::strand may be used to prevent concurrent invocation of handlers.
    *
    *  A \e strand is defined as a strictly sequential invocation of event handlers (i.e. no concurrent invocation). Use of strands allows 
@@ -329,4 +329,64 @@ namespace std { namespace tr2 { namespace sys {
   } // sys
  } // tr2
 } // std
+
+#include "iocp/iocp_service.hxx"
+
+//////////////////////////////////////////////////////////////////////////
+namespace std { namespace tr2 { namespace sys {
+
+  inline io_service::io_service()
+    : svcNo(0)
+    , impl(use_service<iocp_service>(*this))
+  {}
+
+  inline io_service::~io_service()
+  {
+    for(services_t::iterator it = services.begin(), end = services.end(); it != end; ++it, svcNo--){
+      assert(svcNo == it->id);
+      it->val->shutdown_service();
+      delete it->val;
+    }
+    assert(svcNo == 0);
+  }
+
+  inline size_t io_service::run_one(error_code& ec /* = throws() */)
+  {
+    error_code e;
+    size_t re = impl.run_one(e);
+    return throw_system_error(e, ec), re;
+  }
+
+  inline size_t io_service::poll_one(error_code& ec /* = throws() */)
+  {
+    error_code e;
+    size_t re = impl.poll_one(e);
+    return throw_system_error(e, ec), re;
+  }
+
+  inline void io_service::stop()
+  {
+    impl.stop();
+  }
+
+  inline void io_service::reset()
+  {
+    impl.reset();
+  }
+
+  template<class CompletionHandler>
+  inline void io_service::dispatch(CompletionHandler handler)
+  {
+    impl.dispatch(handler);
+  }
+
+  template<class CompletionHandler>
+  inline void io_service::post(CompletionHandler handler)
+  {
+    impl.post(handler);
+  }
+
+}}}
+
+
 #endif // NTL__STLX_TR2_IOSERVICE
