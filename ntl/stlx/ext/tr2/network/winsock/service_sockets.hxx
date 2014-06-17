@@ -216,6 +216,8 @@ namespace ntl { namespace network {
 
     public:
       typedef socket native_type;
+      typedef std::pair<const native_type, socket_base::wait_type> wait_status_type;
+
       struct implementation_type
       {
         functions_t* funcs;
@@ -358,6 +360,45 @@ namespace ntl { namespace network {
         if(re == 0)
           ec = std::make_error_code(stdnet::network_error::timed_out);
         return re == 1;
+      }
+
+      size_t wait_with(const implementation_type& impl, wait_status_type* sockets, size_t count, std::error_code& ec)
+      {
+        fd_set r, w, e;
+        size_t fdcount = 0;
+        for(size_t i = 0; i < count; i++) {
+          wait_status_type& check = sockets[i];
+          if(check.first == 0)
+            continue;
+          fdcount++;
+          if(check.second & socket_base::read)
+            r.set(check.first);
+          if(check.second & socket_base::write)
+            w.set(check.first);
+          if(check.second & socket_base::error)
+            e.set(check.first);
+        }
+
+        int re = impl.funcs->select(fdcount, &r, &w, &e, nullptr);
+        if(!check_error(ec, re)) {
+          return 0;
+        } else if(re == 0) {
+          ec = std::make_error_code(stdnet::network_error::timed_out);
+          return 0;
+        }
+
+        for(size_t i = 0; i < count; i++) {
+          wait_status_type& check = sockets[i];
+          check.second = socket_base::wait_none;
+          if(r.isset(check.first))
+            check.second |= socket_base::read;
+          if(w.isset(check.first))
+            check.second |= socket_base::write;
+          if(e.isset(check.first))
+            check.second |= socket_base::error;
+        }
+        
+        return re;
       }
 
     protected:

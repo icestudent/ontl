@@ -17,7 +17,7 @@
 namespace std { namespace tr2 { namespace network {
 
   /**
-   *	@brief 5.7.6. Class template basic_socket
+   *  @brief 5.7.6. Class template basic_socket
    **/
   template<class Protocol, class SocketService>
   class basic_socket:
@@ -29,6 +29,7 @@ namespace std { namespace tr2 { namespace network {
     typedef typename SocketService::native_type native_type;
     typedef Protocol protocol_type;
     typedef typename Protocol::endpoint endpoint_type;
+    typedef typename SocketService::wait_status_type wait_status_type;
 
     ///\name members:
     native_type native() { return service.native(impl); }
@@ -176,6 +177,13 @@ namespace std { namespace tr2 { namespace network {
       return re;
     }
 
+    size_t wait_with(wait_status_type* sockets, size_t count, std::error_code& ec)
+    {
+      error_code e;
+      size_t re = service.wait_with(impl, sockets, count, e);
+      throw_system_error(e, ec);
+      return re;
+    }
 
   protected:
     ///\name constructors:
@@ -200,6 +208,7 @@ namespace std { namespace tr2 { namespace network {
       service.bind(impl, endpoint, ec);
       throw_system_error(ec);
     }
+
     basic_socket(tr2::sys::io_service& ios, const protocol_type& protocol, const native_type& native_socket)
       :basic_io_object(ios)
     {
