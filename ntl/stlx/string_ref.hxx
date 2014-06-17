@@ -199,10 +199,10 @@ namespace std
     }
 
     //////////////////////////////////////////////////////////////////////////
-    size_type find(const basic_string_ref& s) const
+    size_type find(const basic_string_ref& s, size_type pos = 0) const
     {
       const charT* const beg = begin(), *p = s.begin();
-      for(size_type xpos = 0, n = s.length(); xpos + n <= len; ++xpos)
+      for(size_type xpos = pos, n = s.length(); xpos + n <= len; ++xpos)
       {
         for(size_type i = 0; i != n; ++i){
           if ( !traits_type::eq(*(beg + xpos  + i), *(p + i)) )
