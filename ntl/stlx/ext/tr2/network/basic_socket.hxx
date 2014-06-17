@@ -207,8 +207,13 @@ namespace std { namespace tr2 { namespace network {
       service.assign(impl, protocol, native_socket, ec);
       throw_system_error(ec);
     }
+
     ~basic_socket()
-    {}
+    {
+      std::error_code ec;
+      close(ec);
+    }
+
     ///\}
   };
 
