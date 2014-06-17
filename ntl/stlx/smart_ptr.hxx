@@ -721,6 +721,7 @@ namespace std
         }
         virtual void dispose() __ntl_nothrow
         {
+          free();
           delete this;
         }
       };
