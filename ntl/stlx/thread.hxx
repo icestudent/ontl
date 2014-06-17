@@ -45,19 +45,12 @@ namespace std
 
   namespace __
   {
-    template<class>
-    struct thread_cleanup
-    {
-
-    };
-
     struct thread_params_base
     {
-      volatile uint32_t cleanup, start;
-      //ntl::nt::legacy_handle handle;
+      volatile uint32_t start;
 
       thread_params_base()
-        :cleanup(), start()//, handle()
+        : start()
       {}
       virtual ~thread_params_base(){}
       virtual void run() = 0;
@@ -356,7 +349,7 @@ namespace std
   {
     // detect alive
     check_alive();
-    if(!h || !tid){
+    if(!h || !tid) {
       error_code e = h ? posix_error::make_error_code(posix_error::no_such_process) : posix_error::make_error_code(posix_error::invalid_argument);
       if(&ec == &throws())
         __ntl_throw(system_error(e));
@@ -388,11 +381,13 @@ namespace std
     for(ntl::atomic::backoff b; ntl::atomic::compare_exchange(tp->start, true, false) == false;)
       b.pause();
 
-    tp->run();
-    //if(ntl::atomic::compare_exchange(tp->cleanup, false, true)){
-    //  // close handle
-    //  NTL_SUBSYSTEM_NS::close(tp->handle);
-    //}
+    __ntl_try {
+      tp->run();
+    }
+    __ntl_catch(...) {
+      // If the invocation terminates with an uncaught exception, std::terminate shall be called.
+      std::terminate();
+    }
     delete tp;
   #ifdef NTL_SUBSYSTEM_KM
     ntl::km::system_thread::exit(ntl::nt::status::success);
