@@ -207,6 +207,28 @@ namespace ttl
     pointer operator&() { return d; }
   };
 
+  template<>
+  struct data_holder<const void*> : data_holder_base
+  {
+    enum { const_value = 0 };
+
+    typedef void type;
+    typedef void* pointer;
+    typedef const void* const_pointer;
+
+    typedef const void* return_type;
+    typedef const void* const_return_type;
+    typedef const void* param_type;
+
+    const void* d;
+
+    data_holder() : d(0) {}
+    data_holder( param_type d_ ) : d(d_) {}
+
+    void set( param_type d_ ) { d = d_; }
+    const_return_type get() { return d; }
+    const_pointer operator&() { return d; }
+  };
 
   //template<>
   //struct data_holder<void> : data_holder_base
