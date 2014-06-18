@@ -55,6 +55,8 @@
   #define NTL_CXX_EF
   // explicit conversion operators
   #define NTL_CXX_EXPLICITOP
+  // user-defined literals
+  #define NTL_CXX_UDL
   // initializer lists
   #define NTL_CXX_IL
   // lambda
@@ -142,6 +144,7 @@
 
 #if _MSC_FULL_VER >= 190021730 // v19 ctp1
 # define NTL_CXX_NS
+# define NTL_CXX_UDL
 #endif
 
 
