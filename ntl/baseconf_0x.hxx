@@ -132,11 +132,11 @@
 #endif
 
 #if _MSC_FULL_VER >= 180020827 // v18 rc
-# define NTL_CXX_EF
 # define NTL_CXX_TT
 #endif
 
 #if _MSC_FULL_VER >= 180021114 // v18 nov2013
+# define NTL_CXX_EF
 //# define NTL_CXX_CONSTEXPR
 #endif
 
