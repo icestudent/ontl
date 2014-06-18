@@ -11,15 +11,28 @@ namespace std { namespace tr2 { namespace sys {
 		struct timer_scheduler:	io_service::service
 		{
 			timer_scheduler(io_service& ios)
-				:service(ios)
+				: service(ios)
+        , handler()
+        , ctx()
 			{}
 
-			virtual void add_timer(void* timer, async_operation* op)
+      typedef void add_timer_t(void* ctx, const void* timer, async_operation* op);
+
+			void add_timer(const void* timer, async_operation* op)
 			{
-				assert(!"not implemented");
+        assert(handler);
+				if(handler)
+          handler(ctx, timer, op);
 			}
 
+
+
 		private:
+      //std::function<void(/*const*/ void*, async_operation*)> handler;
+      add_timer_t* handler;
+      void* ctx;
+
+      friend class iocp_service;
 			void shutdown_service() override
 			{}
 		};

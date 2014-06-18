@@ -342,7 +342,8 @@ namespace std { namespace tr2 { namespace sys {
 
   inline io_service::~io_service()
   {
-    for(services_t::iterator it = services.begin(), end = services.end(); it != end; ++it, svcNo--){
+    for(services_t::iterator it = services.begin(), end = services.end(); it != end; ++it, svcNo--) {
+      assert(it->owner == this);
       assert(svcNo == it->id);
       it->val->shutdown_service();
       delete it->val;

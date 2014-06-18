@@ -69,7 +69,7 @@ namespace std { namespace tr2 { namespace sys {
       bool reset(const Time& t)
       {
         tp = t;
-        return tm.set(t, routine, this);
+        return tm.set(t, nullptr, this);
       }
     private:
       static void __stdcall routine(void* ctx, uint32_t, int32_t)
@@ -164,12 +164,10 @@ namespace std { namespace tr2 { namespace sys {
     template<class WaitHandler>
     void async_wait(implementation_type& impl, WaitHandler handler)
     {
-      impl.handler = handler;
-
       typedef __::wait_operation<WaitHandler> op;
       typename op::ptr p (handler);
 
-      scheduler.add_timer(&impl, p.op);
+      scheduler.add_timer(impl.tm.get(), p.op);
       p.release();
     }
 
