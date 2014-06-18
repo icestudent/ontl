@@ -66,7 +66,8 @@ namespace std { namespace tr2 {
       // miscellaneous errors:
       already_open = ntl::nt::win32_error::wsaealready,
       eof = ntl::nt::win32_error::handle_eof,
-      not_found =  ntl::nt::win32_error::not_found
+      not_found =  ntl::nt::win32_error::not_found,
+      operation_aborted = ntl::nt::win32_error::operation_aborted,
     };
 
     class network_error_category:
