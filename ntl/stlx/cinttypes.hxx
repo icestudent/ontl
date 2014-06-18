@@ -11,8 +11,8 @@
 #include "cstdint.hxx"
 
 typedef struct {
-  intmax_t quot;
-  intmax_t rem;
+  std::intmax_t quot;
+  std::intmax_t rem;
 } imaxdiv_t;
 
 
@@ -226,7 +226,7 @@ typedef struct {
 
 #define imaxabs _abs64
 
-inline imaxdiv_t __cdecl imaxdiv(intmax_t numer, intmax_t denom)
+inline imaxdiv_t __cdecl imaxdiv(std::intmax_t numer, std::intmax_t denom)
 {
   imaxdiv_t result;
 
