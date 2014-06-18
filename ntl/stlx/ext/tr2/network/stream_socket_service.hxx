@@ -28,9 +28,10 @@ namespace std { namespace tr2 { namespace network {
     ///\name types:
     typedef Protocol protocol_type;
     typedef typename Protocol::endpoint endpoint_type;
-    typedef typename service_implementation_type::implementation_type implementation_type;
+
     typedef typename service_implementation_type::native_type native_type;
     typedef typename service_implementation_type::wait_status_type wait_status_type;
+    typedef typename service_implementation_type::implementation_type implementation_type;
 
 
     ///\name constructors:

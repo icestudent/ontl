@@ -14,7 +14,7 @@
 namespace std { namespace tr2 { namespace network {
 
   /**
-   *	@brief 5.7.7. Class template datagram_socket_service
+   *  @brief 5.7.7. Class template datagram_socket_service
    *
    *  Default service implementation for a datagram socket.
    **/
@@ -30,8 +30,9 @@ namespace std { namespace tr2 { namespace network {
     typedef Protocol protocol_type;
     typedef typename Protocol::endpoint endpoint_type;
 
-    typedef typename service_implementation_type::implementation_type implementation_type;
     typedef typename service_implementation_type::native_type native_type;
+    typedef typename service_implementation_type::wait_status_type wait_status_type;
+    typedef typename service_implementation_type::implementation_type implementation_type;
 
     ///\name constructors:
     explicit datagram_socket_service(tr2::sys::io_service& ios)
