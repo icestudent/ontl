@@ -7,7 +7,9 @@
 #include <nt/system_error.hxx>
 #include <atomic.hxx>
 #include <vector>
+
 #include "op.hxx"
+#include "complete_op.hxx"
 
 namespace std { namespace tr2 { namespace sys {
 
@@ -30,6 +32,7 @@ namespace std { namespace tr2 { namespace sys {
       , timer_event(timer_event.auto_reset)
       , timer_thread(&iocp_service::timer_proc, this)
       , scheduler(use_service<__::timer_scheduler>(ios))
+      , self_id()
     {
       scheduler.handler =
         &iocp_service::add_timer_;
@@ -37,20 +40,23 @@ namespace std { namespace tr2 { namespace sys {
         //std::bind(&iocp_service::add_timer, this, std::placeholders::_1, std::placeholders::_2);
     }
 
-    bool stopped() const
+    bool stopped() const /*volatile*/
     {
       return this->stopper.test();
     }
 
-    void stop()
+    void stop() /*volatile*/
     {
       if(stopper.test_and_set() == false) {
-        check(iocp.set_completion(nullptr, stop_service_code));
+        if(stopping.test_and_set() == false) {
+          check(iocp.set_completion(nullptr, stop_service_code));
+        }
       }
     }
 
     void reset()
     {
+      assert(!can_dispatch());
       stopper.clear();
     }
 
@@ -65,10 +71,28 @@ namespace std { namespace tr2 { namespace sys {
     }
 
     template<class CompletionHandler>
-    void dispatch(CompletionHandler handler);
+    void dispatch(CompletionHandler& handler) /*volatile*/
+    {
+      if(can_dispatch()) {
+        // we are inside run() thread, its safe to call handler
+        using std::tr2::sys::io_handler_invoke;
+        return io_handler_invoke(handler, &handler);
+      }
+
+      // we are outside run() thread
+      post(handler);
+    }
 
     template<class CompletionHandler>
-    void post(CompletionHandler handler);
+    void post(CompletionHandler& handler) /*volatile*/
+    {
+      typedef __::completion_operation<CompletionHandler> op;
+      typename op::ptr p (handler);
+
+      post_immediate_completion(p.op);
+      
+      p.release();
+    }
 
   protected:
     void check(ntl::nt::ntstatus st)
@@ -104,6 +128,12 @@ namespace std { namespace tr2 { namespace sys {
       timer_event.pulse();
     }
 
+    /** Is we inside service? If yes, we can dispatch immediately */
+    bool can_dispatch() const /*volatile*/
+    {
+      return ntl::nt::this_thread::id() == self_id;
+    }
+
     /** Request invocation of the given operation and return immediately. */
     void post_immediate_completion(async_operation* op)
     {
@@ -120,41 +150,77 @@ namespace std { namespace tr2 { namespace sys {
 
     void complete(const async_operation* op, const std::error_code& ec, size_t transferred)
     {
+      struct finish
+      {
+        iocp_service* self;
+        ~finish()     { self->work_finished(); }
+      } finish_work = {this};
+
       op->complete(*this, ec, transferred);
-      work_finished();
     }
 
     bool do_poll(bool block, error_code& ec)
     {
+      struct current_thread_t
+      {
+        iocp_service* iocp;
+        current_thread_t(iocp_service* self)
+          :iocp(self)
+        {
+          ntl::atomic::generic_op::exchange(iocp->self_id, ntl::nt::this_thread::id());
+        }
+        ~current_thread_t()
+        {
+          ntl::atomic::generic_op::exchange(iocp->self_id, static_cast<ntl::nt::legacy_handle>(nullptr));
+        }
+      };
+
       ec.clear();
       if(workers.compare(0) == 0) {
         stop();
         return false;
       }
-
+      
       const ntl::nt::system_duration instant;
+      current_thread_t set_current_thread(this);
       for(;;) {
 
         ntl::nt::io_completion_port::entry entry;
         ntstatus st = block ? iocp.pop_completion(entry) : iocp.pop_completion(entry, instant);
 
-        if(st == ntl::nt::status::timeout) {
+        if(!ntl::nt::success(st))
+        {
+          // iocp error
+          ntl::dbg::bp();
+          ec = std::make_error_code(st);
+          return false;
+        }
+        else if(st == ntl::nt::status::timeout)
+        {
           // no ready operations
+          ntl::dbg::bp();
           if(block)
             continue;
           return false;
         }
-        else if(!ntl::nt::success(st)) {
-          // iocp error
-          ec = std::make_error_code(st);
-          return false;
-        }
-        else if(entry.Status == stop_service_code) {
-          // stop service
-          if(stopper.test()) {
+        else if(entry.Status == stop_service_code)
+        {
+          // incoming stop event
+          stopping.clear();
+          if(stopper.test())
+          {
+            if(stopping.test_and_set() == false) {
+              // still stopping, wake thread
+              st = iocp.set_completion(nullptr, stop_service_code);
+              if(!ntl::nt::success(st))
+                ec = std::make_error_code(st);
+            }
             return false;
           }
-        }else if(entry.Apc) {
+        }
+        else if(entry.Apc)
+        {
+          // incoming async event 
           const async_operation* op = static_cast<const async_operation*>(entry.Apc);
           assert(op->is_async_operation());
 
@@ -162,12 +228,13 @@ namespace std { namespace tr2 { namespace sys {
             complete(op, std::make_error_code(entry.Status), entry.Information);
             return true;
           } else {
+            ntl::dbg::bp();
             op = nullptr;
           }
         }
         continue;
       }
-      return false;
+      //return false;
     }
 
   private:
@@ -234,8 +301,8 @@ namespace std { namespace tr2 { namespace sys {
   private:
     ntl::nt::io_completion_port iocp;
     ntl::atomic::value_t workers;
-    ntl::atomic::flag_t stopper, shutdown;
-    //ntl::nt::user_event shutdown;
+    ntl::atomic::flag_t stopper, stopping, shutdown;
+    ntl::nt::legacy_handle volatile self_id;
     
     // timers
     std::vector<std::pair<ntl::nt::legacy_handle, async_operation*>> timers;

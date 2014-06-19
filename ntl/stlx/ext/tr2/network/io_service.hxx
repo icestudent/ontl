@@ -144,10 +144,10 @@ namespace std { namespace tr2 { namespace sys {
     void reset();
     
     template<class CompletionHandler>
-    void dispatch(CompletionHandler handler);
+    void dispatch(CompletionHandler&& handler);
     
     template<class CompletionHandler>
-    void post(CompletionHandler handler);
+    void post(CompletionHandler&& handler);
     
     //template<class Handler>
     //unspecified wrap(Handler handler);
@@ -376,15 +376,15 @@ namespace std { namespace tr2 { namespace sys {
   }
 
   template<class CompletionHandler>
-  inline void io_service::dispatch(CompletionHandler handler)
+  inline void io_service::dispatch(CompletionHandler&& handler)
   {
-    impl.dispatch(handler);
+    impl.dispatch(std::forward<CompletionHandler>(handler));
   }
 
   template<class CompletionHandler>
-  inline void io_service::post(CompletionHandler handler)
+  inline void io_service::post(CompletionHandler&& handler)
   {
-    impl.post(handler);
+    impl.post(std::forward<CompletionHandler>(handler));
   }
 
 }}}
