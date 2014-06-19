@@ -983,7 +983,7 @@ namespace std
     shared_ptr(shared_ptr&& r) __ntl_nothrow
       :shared(),ptr()
     {
-      swap(move(r));
+      swap(r);
     }
     template<class Y> shared_ptr(const shared_ptr<Y>& r) __ntl_nothrow
       :shared(/*__::shared_data_cast<T>*/(r.shared)),ptr(r.get())

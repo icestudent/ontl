@@ -39,7 +39,7 @@ namespace std { namespace tr2 {
       basic_endpoint(const InternetProtocol& proto, unsigned short port_num)
       {
         memset(&storage, 0, sizeof(storage));
-        sa.family = proto.family();
+        sa.family = static_cast<uint16_t>(proto.family());
         sa.port = ntl::big_endian(port_num);
       }
       basic_endpoint(const ip::address& addr, unsigned short port_num)
