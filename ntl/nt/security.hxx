@@ -15,7 +15,7 @@ namespace nt {
 
   typedef const struct { }* access_token;
 
-#pragma warning(push,4)
+#pragma warning(push)
 #pragma warning(disable:4201)
   struct access_mask_t
   {

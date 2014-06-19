@@ -61,7 +61,7 @@ namespace ntl { namespace network {
     };
 
 
-#pragma warning(push, 4)
+#pragma warning(push)
 #pragma warning(disable: 4201)
 
     struct sockerror

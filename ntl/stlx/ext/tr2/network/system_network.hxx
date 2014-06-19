@@ -215,7 +215,7 @@ namespace ntl {
   } // constants
 
 
-#pragma warning(push, 4)
+#pragma warning(push)
 #pragma warning(disable: 4201)
 
   struct in_addr
