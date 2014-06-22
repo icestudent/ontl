@@ -10,6 +10,7 @@
 
 #include "object.hxx"
 #include "../stlx/chrono.hxx"
+#include "file_information.hxx"
 
 namespace ntl { namespace nt {
 
@@ -89,12 +90,20 @@ namespace ntl { namespace nt {
   {
     uintptr_t Internal1, Internal2;
     union {
-      uint64_t    Offset;
+      struct  
+      {
+        uint32_t  Offset;
+        uint32_t  OffsetHigh;
+      };
       void*       Pointer;
     };
     legacy_handle Event;
   };
   #pragma warning(default:4201)
+
+#ifndef _M_X64
+  static_assert(sizeof(overlapped) == 4*5, "invalid ntl::nt::overlapped size");
+#endif
 
   class io_completion_port;
 } // nt
@@ -146,6 +155,14 @@ namespace nt
     explicit io_completion_port(const object_attributes& ObjectAttributes, access_mask DesiredAccess = modify_state)
     {
       last_status_ = ZwOpenIoCompletion(this, DesiredAccess, &ObjectAttributes);
+    }
+
+    /** Register file handle to completion port */
+    ntstatus attach(legacy_handle handle, const void* KeyContext)
+    {
+      const file_completion_information info = {get(), KeyContext};
+      file_information<file_completion_information> set(handle, info);
+      return last_status_ = set;
     }
 
     /** Returns an uncompleted iops count. \c -1 indicates an error. */
