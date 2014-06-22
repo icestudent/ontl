@@ -61,12 +61,40 @@ namespace std { namespace tr2 { namespace sys {
       A1 a1;
     };
 
-    template<class Handler, typename A1>
-    inline binder1<Handler, A1> bind_handler(const Handler& f, const A1& a1)
+    template<class Handler, typename A1, typename A2>
+    struct binder2
     {
-      return binder1<Handler, A1>(f, a1);
-    }
-  }} // __
+      binder2(const Handler& handler, const A1& a1, const A2& a2)
+        :handler(handler), a1(a1), a2(a2)
+      {}
+
+      void operator()()
+      {
+        handler(static_cast<const A1&>(a1), static_cast<const A2&>(a2));
+      }
+      void operator()() const
+      {
+        handler(a1, a2);
+      }
+    private:
+      Handler handler;
+      A1 a1;
+      A2 a2;
+    };
+  } // __::sys
+
+  template<class Handler, typename A1>
+  inline sys::binder1<Handler, A1> bind_handler(const Handler& f, const A1& a1)
+  {
+    return sys::binder1<Handler, A1>(f, a1);
+  }
+
+  template<class Handler, typename A1, typename A2>
+  inline sys::binder2<Handler, A1, A2> bind_handler(const Handler& f, const A1& a1, const A2& a2)
+  {
+    return sys::binder2<Handler, A1, A2>(f, a1, a2);
+  }
+} // __ ns
 
   ///\name service access exceptions
   class service_already_exists:
