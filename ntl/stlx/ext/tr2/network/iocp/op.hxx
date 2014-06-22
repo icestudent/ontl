@@ -60,18 +60,35 @@ namespace std { namespace tr2 { namespace sys {
         Handler* fn;
         void* v;              // memory for op
         async_operation* op;  // op itself
-        size_t cb;
 
-        //template<class Op>
+        /** attach to existing handler pointers */
+        explicit ptr(Op* op, Handler* fn)
+          : fn(fn)
+          , v(op)
+          , op(op)
+        {}
+
+        /** allocate and construct smart handler pointer */
         explicit ptr(Handler& fn)
           : fn(&fn)
-          , cb(sizeof(Op))
           , op()
           , v()
         {
           using std::tr2::sys::io_handler_allocate;
-          v = io_handler_allocate(cb, &fn);
+          v = io_handler_allocate(sizeof(Op), &fn);
           op = new (v) Op(fn);
+        }
+
+        /** allocate and construct smart handler pointer */
+        template<typename A1>
+        explicit ptr(Handler& fn, const A1& a1)
+          : fn(&fn)
+          , op()
+          , v()
+        {
+          using std::tr2::sys::io_handler_allocate;
+          v = io_handler_allocate(sizeof(Op), this->fn);
+          op = new (v) Op(fn, a1);
         }
 
         ~ptr()
@@ -92,7 +109,7 @@ namespace std { namespace tr2 { namespace sys {
             op = nullptr;
           }
           if(v) {
-            io_handler_deallocate(v, cb, fn);
+            io_handler_deallocate(v, sizeof(Op), this->fn);
             v = nullptr;
           }
         }

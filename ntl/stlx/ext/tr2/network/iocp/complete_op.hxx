@@ -25,6 +25,7 @@ namespace std { namespace tr2 { namespace sys {
           return;    // called if async_op::destroy
 
         completion_operation* self = static_cast<completion_operation*>(base);
+        ptr p(self, &self->fn);
 
         using std::tr2::sys::io_handler_invoke;
         io_handler_invoke(self->fn, &self->fn);

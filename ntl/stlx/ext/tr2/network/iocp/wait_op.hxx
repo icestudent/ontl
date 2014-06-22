@@ -25,11 +25,10 @@ namespace std { namespace tr2 { namespace sys {
           return;    // called if async_op::destroy
 
         wait_operation* self = static_cast<wait_operation*>(base);
+        ptr p(self, &self->fn);
 
-        sys::binder1<Handler, std::error_code> binder(self->fn, ec);
-        
         using std::tr2::sys::io_handler_invoke;
-        io_handler_invoke(binder, &self->fn);
+        io_handler_invoke(bind_handler(self->fn, ec), &self->fn);
       }
 
     private:
