@@ -21,7 +21,9 @@ namespace std { namespace tr2 { namespace sys {
     typedef __::async_operation async_operation;
 
     // system codes
-    static const ntl::nt::ntstatus stop_service_code = ntl::nt::status::system_shutdown;
+    static const ntl::nt::ntstatus
+      stop_service_code   = ntl::nt::status::system_shutdown,
+      custom_result_code  = ntl::nt::status::more_entries;
 
     __::timer_scheduler& scheduler;
   public:
@@ -94,6 +96,41 @@ namespace std { namespace tr2 { namespace sys {
       p.release();
     }
 
+
+    bool register_handle(ntl::nt::legacy_handle handle, std::error_code& ec)
+    {
+      if(!ntl::nt::success(iocp.attach(handle, nullptr)))
+        return ec = std::make_error_code(iocp.last_status()), false;
+      return ec.clear(), true;
+    }
+
+    void on_completion(async_operation* op, const ntl::nt::ntstatus st = ntl::nt::status::success, size_t transferred = 0) /*volatile*/
+    {
+      op->ready.set();
+      iocp.set_completion(nullptr, st, transferred, op);
+    }
+
+    void on_completion(async_operation* op, const std::error_code& ec, size_t transferred = 0)
+    {
+      op->Internal1 = ec.value();
+      op->Internal2 = reinterpret_cast<uintptr_t>(&ec.category());
+      op->Offset = transferred;
+      op->ready.set();
+      iocp.set_completion(nullptr, custom_result_code, transferred, op);
+    }
+
+    void on_pending(async_operation* op)
+    {
+      if(op->ready.exchange_if_equal(true, false) == true) {
+        iocp.set_completion(nullptr, custom_result_code, 0, op);
+      }
+    }
+
+    void work_started()
+    {
+      ++workers;
+    }
+
   protected:
     void check(ntl::nt::ntstatus st)
     {
@@ -103,9 +140,11 @@ namespace std { namespace tr2 { namespace sys {
       }
     }
 
-    void work_started()
+    std::error_code make_error_code(ntl::nt::ntstatus st, const async_operation* op)
     {
-      ++workers;
+      return st == custom_result_code 
+        ? std::error_code(static_cast<int>(op->Internal1), *reinterpret_cast<const std::error_category*>(op->Internal2))
+        : std::make_error_code(st);
     }
 
     void work_finished()
@@ -221,11 +260,13 @@ namespace std { namespace tr2 { namespace sys {
         else if(entry.Apc)
         {
           // incoming async event 
-          const async_operation* op = static_cast<const async_operation*>(entry.Apc);
+          const ntl::nt::overlapped* lp = static_cast<const ntl::nt::overlapped*>(entry.Apc);
+          const async_operation* op = static_cast<const async_operation*>(lp);
           assert(op->is_async_operation());
 
           if(op->ready.test()) {
-            complete(op, std::make_error_code(entry.Status), entry.Information);
+
+            complete(op, make_error_code(entry.Status, op), entry.Information);
             return true;
           } else {
             ntl::dbg::bp();

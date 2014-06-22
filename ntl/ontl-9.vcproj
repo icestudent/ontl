@@ -455,6 +455,10 @@
 										>
 									</File>
 									<File
+										RelativePath=".\stlx\ext\tr2\network\winsock\socket_ops.hxx"
+										>
+									</File>
+									<File
 										RelativePath=".\stlx\ext\tr2\network\winsock\sockets.hxx"
 										>
 									</File>
@@ -515,6 +519,10 @@
 							<Filter
 								Name="iocp"
 								>
+								<File
+									RelativePath=".\stlx\ext\tr2\network\iocp\complete_op.hxx"
+									>
+								</File>
 								<File
 									RelativePath=".\stlx\ext\tr2\network\iocp\iocp_service.hxx"
 									>

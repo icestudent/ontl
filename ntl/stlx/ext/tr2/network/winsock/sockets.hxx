@@ -105,7 +105,7 @@ namespace ntl { namespace network {
 
         io_pending                 = win32_error::io_pending,
         io_incomplete              = win32_error::io_incomplete,
-        invalid_handle             = win32_error::invalid_handle,
+        invalid_handle             = win32_error::wsaenotsock,
         invalid_parameter          = win32_error::invalid_parameter,
         not_enough_memory          = win32_error::not_enough_memory,
         operation_aborted          = win32_error::operation_aborted,
@@ -211,24 +211,14 @@ namespace ntl { namespace network {
         char*     buf;
       };
 
-      struct overlapped
-      {
-        uintptr_t     Internal, InternalHigh;
-        union {
-          struct { 
-            uint32_t  Offset, OffsetHigh;
-          };
-          void*       Pointer; //-V117
-        };
-        legacy_handle hEvent;
+      typedef ntl::nt::overlapped overlapped;
 
-        typedef void __stdcall completion_routine_t(
-          uint32_t    ErrorCode,
-          uint32_t    Transferred,
-          overlapped* Overlapped,
-          uint32_t    Flags
-          );
-      };
+      typedef void __stdcall completion_routine_t(
+        uint32_t    ErrorCode,
+        uint32_t    Transferred,
+        overlapped* Overlapped,
+        uint32_t    Flags
+        );
 
       struct protocol_chain
       {
@@ -314,12 +304,16 @@ namespace ntl { namespace network {
       typedef socket __stdcall SocketW_t(int af, int type, int protocol, const protocol_info* ProtocolInfo, uint32_t, 
         uint32_t Flags);
       typedef int __stdcall Connect_t(socket s, const sockaddr* name, int namelen, const wsabuf_t* CallerData, wsabuf_t* CalleeData, void* sQos, void* gQos);
+
       typedef int __stdcall Recv_t(socket s, wsabuf_t Buffers[], uint32_t BuffersCount, uint32_t* Received, 
-        uint32_t* Flags, overlapped* Overlapped, overlapped::completion_routine_t* CompletionRoutine);
+        uint32_t* Flags, overlapped* Overlapped, completion_routine_t* CompletionRoutine);
+
+      typedef int __stdcall Send_t(socket s, const wsabuf_t Buffers[], uint32_t BuffersCount, uint32_t* Sent, 
+        uint32_t  Flags, overlapped* Overlapped, completion_routine_t* CompletionRoutine);
 
       typedef int __stdcall StringToAddressW_t(wchar_t* name, int family, const protocol_info* ProtocolInfo, sockaddr* address, int* addrlen);
 
-    }
+    } // wsa
 
     struct functions_t:
       private ntl::noncopyable
@@ -354,11 +348,21 @@ namespace ntl { namespace network {
       recvfrom_t* recvfrom;
 
       select_t* select;
+
+      struct  
+      {
+        wsa::SocketW_t* socket;
+        wsa::Connect_t* connect;
+        wsa::Send_t* send;
+        wsa::Recv_t* recv;
+      } async;
       
       bool initialized;
     private:
       functions_t& operator=(const functions_t&) __deleted;
     };
+
+    
 
 
     class winsock_runtime
@@ -422,6 +426,11 @@ namespace ntl { namespace network {
           NTL_IMP(select);
           #undef NTL_IMP
 
+          funcs.async.socket = ws->find_export<wsa::SocketW_t*>("WSASocketW");
+          funcs.async.connect = ws->find_export<wsa::Connect_t*>("WSAConnect");
+          funcs.async.send = ws->find_export<wsa::Send_t*>("WSASend");
+          funcs.async.recv = ws->find_export<wsa::Recv_t*>("WSARecv");
+
           // check import
           const void **first = (const void**)&funcs, **last = (const void**)&funcs.initialized;
           bool ok = true;
@@ -476,18 +485,22 @@ namespace ntl { namespace network {
         if(re != socket_error)
           ec.clear();
         else
-          sockerror(ec);
+          make_error(ec);
         return re != socket_error;
       }
       static std::error_code success(std::error_code& ec)
       {
         return ec.clear(), ec;
       }
-      static std::error_code sockerror(std::error_code& ec)
+      static std::error_code make_error(std::error_code& ec)
       {
         // TODO: map win32 errors to network
         const winsock::sockerror::type errc = winsock::sockerror::get();
         return ec = std::make_error_code(static_cast<std::tr2::network::error::error_type>(errc));
+      }
+      static std::error_code make_error(winsock::sockerror::type err)
+      {
+        return std::make_error_code(static_cast<std::tr2::network::error::error_type>(err));
       }
     public:
       winsock_service_base()

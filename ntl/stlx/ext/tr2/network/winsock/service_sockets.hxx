@@ -4,7 +4,7 @@
 #include "../buffer.hxx"
 #include "../socket_base.hxx"
 #include "sockets.hxx"
-
+#include "socket_ops.hxx"
 
 namespace ntl { namespace network {
   namespace error = std::tr2::network::network_error;
@@ -210,9 +210,15 @@ namespace ntl { namespace network {
     class socket_service_base:
       public winsock_service_base
     {
+      typedef ios::__::async_operation async_operation;
+      ios::iocp_service& iocp;
     protected:
       typedef stdnet::socket_base::shutdown_type shutdown_type;
       typedef stdnet::socket_base socket_base;
+
+      socket_service_base(ios::io_service& svc)
+        : iocp(ios::use_service<ios::iocp_service>(svc))
+      {}
 
     public:
       typedef socket native_type;
@@ -274,7 +280,7 @@ namespace ntl { namespace network {
           if(check_error(ec, impl.funcs->closesocket(impl.s))){
             impl.s = 0;
           }else{
-            return sockerror(ec);
+            return make_error(ec);
           }
         }
         return success(ec);
@@ -410,6 +416,10 @@ namespace ntl { namespace network {
         return impl.s != 0;
       }
 
+      static const sockerror::type 
+        error_not_opened = sockerror::invalid_handle,
+        operation_pending = sockerror::io_pending;
+
     protected:
       std::error_code open(implementation_type& impl, int af, int type, int protocol, std::error_code& ec)
       {
@@ -420,13 +430,16 @@ namespace ntl { namespace network {
         impl.s = impl.funcs->socket(af, type, protocol);
         if(impl.s == invalid_socket){
           impl.s = 0;
-          return sockerror(ec);
+          return make_error(ec);
         }
         impl.proto_family = af,
           impl.proto_type = type,
           impl.proto_protocol = protocol,
           impl.ipv6 = af == constants::af_inet6,
           impl.is_stream = type == constants::sock_stream || type == constants::sock_seqpacket;
+
+        iocp.register_handle(reinterpret_cast<ntl::nt::legacy_handle>(impl.s), ec);
+
         return success(ec);
       }
 
@@ -482,7 +495,7 @@ namespace ntl { namespace network {
             int re = addr
               ? impl.funcs->recvfrom(impl.s, buf->buf + offset, buf->len - offset, flags, addr, &addrlen)
               : impl.funcs->recv(impl.s, buf->buf + offset, buf->len - offset, flags);
-            sockerror(ec);
+            make_error(ec);
             if(re == 0){
               if(!addr) // recv should fail with eof
                 ec = std::make_error_code(error::eof);
@@ -500,6 +513,29 @@ namespace ntl { namespace network {
           } while(offset < buf->len);
         }
         return received;
+      }
+
+      void async_send(implementation_type& impl, const buffer_sequences& buffs, const sockaddr* addr, size_t addrlen, socket_base::message_flags flags, async_operation* op)
+      {
+        iocp.work_started();
+
+        const size_t max_size = buffs.total_size();
+        if(max_size == 0 && impl.is_stream)
+          return iocp.on_completion(op);
+
+        if(!impl.s)
+          return iocp.on_completion(op, make_error(error_not_opened));
+
+        uint32_t transfered = 0;
+        int re = impl.funcs->async.send(impl.s, buffs.buffers(), buffs.count(), &transfered, flags, op, nullptr);
+
+        sockerror err;
+        if(re == socket_error && err != sockerror::io_pending)
+          iocp.on_completion(op, make_error(err), transfered);
+        else
+          iocp.on_pending(op);
+
+
       }
 
     };
@@ -522,7 +558,8 @@ namespace ntl { namespace network {
       };
 
     public:
-      socket_service(ios::io_service& /*io_service*/)
+      socket_service(ios::io_service& svc)
+        : socket_service_base(svc)
       {}
 
       // construct/destroy impl
@@ -685,8 +722,18 @@ namespace ntl { namespace network {
       void async_receive(implementation_type& impl, const MutableBufferSequence& buffers, socket_base::message_flags flags, ReadHandler handler);
       template<class MutableBufferSequence, class ReadHandler>
       void async_receive_from(implementation_type& impl, const MutableBufferSequence& buffers, endpoint_type& sender, socket_base::message_flags flags, ReadHandler handler);
+
       template<class ConstBufferSequence, class WriteHandler>
-      void async_send(implementation_type& impl, const ConstBufferSequence& buffers, socket_base::message_flags flags, WriteHandler handler);
+      void async_send(implementation_type& impl, const ConstBufferSequence& buffers, socket_base::message_flags flags, WriteHandler handler)
+      {
+        typedef ios::__::socket_send_operation<WriteHandler, ConstBufferSequence> op;
+        typename op::ptr p (handler, buffers);
+
+        buffer_sequence<ios::const_buffer, ConstBufferSequence> buffs(buffers);
+        daddy::async_send(impl, buffs, nullptr, 0, flags, p.op);
+        p.release();
+      }
+
       template<class ConstBufferSequence, class WriteHandler>
       void async_send_to(implementation_type& impl, const ConstBufferSequence& buffers, const endpoint_type& destination, socket_base::message_flags flags, WriteHandler handler);
     };
