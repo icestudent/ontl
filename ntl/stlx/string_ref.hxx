@@ -220,7 +220,7 @@ namespace std
         return npos;
       pointer f = p+pos;
       const charT* e = traits_type::find(f, len-pos, c);
-      return e == nullptr ? npos : (e-f);
+      return e == nullptr ? npos : (e-p);
     }
 
     size_type rfind(const basic_string_ref& s) const;
