@@ -90,6 +90,10 @@ namespace std
       static R call_memfun(F f, Obj& obj, Args& args, index_type<2>) { return (obj.*f)(get<1>(args)); }
       template<class Obj>
       static R call_memfun(F f, Obj& obj, Args& args, index_type<3>) { return (obj.*f)(get<1>(args), get<2>(args)); }
+      template<class Obj>
+      static R call_memfun(F f, Obj& obj, Args& args, index_type<4>) { return (obj.*f)(get<1>(args), get<2>(args), get<3>(args)); }
+      template<class Obj>
+      static R call_memfun(F f, Obj& obj, Args& args, index_type<5>) { return (obj.*f)(get<1>(args), get<2>(args), get<3>(args), get<4>(args)); }
     private:
       template<bool IsRef>
       static R callf(F f, Args& args, index_type<fn_unk>, bool_type<IsRef>)
@@ -101,6 +105,8 @@ namespace std
       static R call_fun(F f, Args& args, index_type<1>) { return f(get<0>(args)); }
       static R call_fun(F f, Args& args, index_type<2>) { return f(get<0>(args), get<1>(args)); }
       static R call_fun(F f, Args& args, index_type<3>) { return f(get<0>(args), get<1>(args), get<2>(args)); }
+      static R call_fun(F f, Args& args, index_type<4>) { return f(get<0>(args), get<1>(args), get<2>(args), get<3>(args)); }
+      static R call_fun(F f, Args& args, index_type<5>) { return f(get<0>(args), get<1>(args), get<2>(args), get<3>(args), get<4>(args)); }
     };
 
 

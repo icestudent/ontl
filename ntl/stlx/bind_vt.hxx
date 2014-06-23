@@ -120,9 +120,9 @@ namespace std
     template<typename Result, class F, class BunchArgs, bool relaxed = false>
     struct bind_t
     {
-      template<class A1 = empty_type, class A2 = empty_type> struct R
+      template<class A1 = empty_type, class A2 = empty_type, class A3 = empty_type, class A4 = empty_type> struct R
       {
-        typedef NTL_FUNARGS(A1,A2) Args;
+        typedef NTL_FUNARGS(A1,A2,A3,A4) Args;
         typedef typename conditional<relaxed, type2type<Result>, result_of_impl<F> >::type weak_type;
         typedef typename weak_type::type type;
       };
@@ -154,17 +154,34 @@ namespace std
         typedef binds::bindargs<BunchArgs, Args> bindargs;
         return func::invoke<typename R::type>(f,bindargs::result(bunch,Args(a1,a2)));
       }
+      template<class A1, class A2, class A3>
+      typename R<A1,A2,A3>::type  operator()(A1 a1, A2 a2, A3 a3) const
+      {
+        typedef R<A1,A2,A3> R;
+        typedef typename R::Args Args;
+        typedef binds::bindargs<BunchArgs, Args> bindargs;
+        return func::invoke<typename R::type>(f,bindargs::result(bunch,Args(a1,a2,a3)));
+      }
+      template<class A1, class A2, class A3, class A4>
+      typename R<A1,A2,A3,A4>::type  operator()(A1 a1, A2 a2, A3 a3, A4 a4) const
+      {
+        typedef R<A1,A2,A3,A4> R;
+        typedef typename R::Args Args;
+        typedef binds::bindargs<BunchArgs, Args> bindargs;
+        return func::invoke<typename R::type>(f,bindargs::result(bunch,Args(a1,a2,a3,a4)));
+      }
     private:
       F f;
       BunchArgs bunch; // связанные параметры (вместе с метками)
     };
 
-    template<class F, class A1 = empty_type, class A2 = empty_type>
+    template<class F, class A1 = empty_type, class A2 = empty_type, class A3 = empty_type, class A4 = empty_type>
     struct binder
-    {typedef bind_t<empty_type, F, NTL_FUNARGS(A1,A2)> type; };
-    template<typename R, class F, class A1 = empty_type, class A2 = empty_type>
+    {typedef bind_t<empty_type, F, NTL_FUNARGS(A1,A2,A3,A4)> type; };
+
+    template<typename R, class F, class A1 = empty_type, class A2 = empty_type, class A3 = empty_type, class A4 = empty_type>
     struct nbinder
-    {typedef bind_t<R, F, NTL_FUNARGS(A1,A2), true> type; };
+    {typedef bind_t<R, F, NTL_FUNARGS(A1,A2,A3,A4), true> type; };
   } // __
 
   template<typename R, class F, class Args, bool relaxed>
@@ -172,46 +189,74 @@ namespace std
 
   // no arguments
   template<class F>
-  typename __::binder<F>::type bind(F f)
+  inline typename __::binder<F>::type bind(F f)
   {
     return typename __::binder<F>::type(f, move(NTL_FUNARGS()()));
   }
 
   // 1 argument
   template<class F, class A1>
-  typename __::binder<F, A1>::type bind(F f, A1 a1)
+  inline typename __::binder<F, A1>::type bind(F f, A1 a1)
   {
     return typename __::binder<F, A1>::type(f, move(NTL_FUNARGS(A1)(a1)));
   }
 
   // 2 arguments
   template<class F, class A1, class A2>
-  typename __::binder<F, A1,A2>::type bind(F f, A1 a1, A2 a2)
+  inline typename __::binder<F, A1,A2>::type bind(F f, A1 a1, A2 a2)
   {
     return typename __::binder<F, A1,A2>::type(f, move(NTL_FUNARGS(A1,A2)(a1,a2)));
+  }
+
+  // 3 arguments
+  template<class F, class A1, class A2, class A3>
+  inline typename __::binder<F, A1,A2,A3>::type bind(F f, A1 a1, A2 a2, A3 a3)
+  {
+    return typename __::binder<F, A1,A2,A3>::type(f, move(NTL_FUNARGS(A1,A2,A3)(a1,a2,a3)));
+  }
+
+  // 4 arguments
+  template<class F, class A1, class A2, class A3, class A4>
+  inline typename __::binder<F, A1,A2,A3,A4>::type bind(F f, A1 a1, A2 a2, A3 a3, A4 a4)
+  {
+    return typename __::binder<F, A1,A2,A3,A4>::type(f, move(NTL_FUNARGS(A1,A2,A3,A4)(a1,a2,a3,a4)));
   }
 
   // non-strict bind()
 
   // no arguments
   template<typename R, class F>
-  typename __::nbinder<R,F>::type bind(F f)
+  inline typename __::nbinder<R,F>::type bind(F f)
   {
     return typename __::nbinder<R,F>::type(f, move(NTL_FUNARGS()()));
   }
 
   // 1 argument
   template<typename R, class F, class A1>
-  typename __::nbinder<R,F, A1>::type bind(F f, A1 a1)
+  inline typename __::nbinder<R,F, A1>::type bind(F f, A1 a1)
   {
     return typename __::nbinder<R,F, A1>::type(f, move(NTL_FUNARGS(A1)(a1)));
   }
 
   // 2 arguments
   template<typename R, class F, class A1, class A2>
-  typename __::nbinder<R,F, A1,A2>::type bind(F f, A1 a1, A2 a2)
+  inline typename __::nbinder<R,F, A1,A2>::type bind(F f, A1 a1, A2 a2)
   {
     return typename __::nbinder<R,F, A1,A2>::type(f, move(NTL_FUNARGS(A1,A2)(a1,a2)));
+  }
+
+  // 3 arguments
+  template<typename R, class F, class A1, class A2, class A3>
+  inline typename __::nbinder<R,F, A1,A2,A3>::type bind(F f, A1 a1, A2 a2, A3 a3)
+  {
+    return typename __::nbinder<R,F, A1,A2,A3>::type(f, move(NTL_FUNARGS(A1,A2,A3)(a1,a2,a3)));
+  }
+
+  // 4 arguments
+  template<typename R, class F, class A1, class A2, class A3, class A4>
+  inline typename __::nbinder<R,F, A1,A2,A3,A4>::type bind(F f, A1 a1, A2 a2, A3 a3, A4 a4)
+  {
+    return typename __::nbinder<R,F, A1,A2,A3,A4>::type(f, move(NTL_FUNARGS(A1,A2,A3,A4)(a1,a2,a3,a4)));
   }
 
   /**@} lib_bind */
