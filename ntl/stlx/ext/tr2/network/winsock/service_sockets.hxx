@@ -427,7 +427,7 @@ namespace ntl { namespace network {
         if(is_open(impl)){
           return ec = error::make_error_code(error::already_open);
         }
-        impl.s = impl.funcs->socket(af, type, protocol);
+        impl.s = impl.funcs->async.socket(af, type, protocol, nullptr, 0, wsa::socket_overlapped);
         if(impl.s == invalid_socket){
           impl.s = 0;
           return make_error(ec);
@@ -522,8 +522,7 @@ namespace ntl { namespace network {
         const size_t max_size = buffs.total_size();
         if(max_size == 0 && impl.is_stream)
           return iocp.on_completion(op);
-
-        if(!impl.s)
+        else if(!impl.s)
           return iocp.on_completion(op, make_error(error_not_opened));
 
         uint32_t transfered = 0;
@@ -534,8 +533,26 @@ namespace ntl { namespace network {
           iocp.on_completion(op, make_error(err), transfered);
         else
           iocp.on_pending(op);
+      }
 
+      void async_receive(implementation_type& impl, buffer_sequences& buffs, sockaddr* addr, size_t addrsize, socket_base::message_flags flags, async_operation* op)
+      {
+        iocp.work_started();
 
+        const size_t max_size = buffs.total_size();
+        if(max_size == 0 && impl.is_stream)
+          return iocp.on_completion(op);
+        else if(!impl.s)
+          return iocp.on_completion(op, make_error(error_not_opened));
+
+        uint32_t received = 0, uflags = flags;
+        int re = impl.funcs->async.recv(impl.s, buffs.buffers(), buffs.count(), &received, &uflags, op, nullptr);
+
+        sockerror err;
+        if(re == socket_error && err != sockerror::io_pending)
+          iocp.on_completion(op, make_error(err), received);
+        else
+          iocp.on_pending(op);
       }
 
     };
@@ -719,9 +736,26 @@ namespace ntl { namespace network {
       }
 
       template<class MutableBufferSequence, class ReadHandler>
-      void async_receive(implementation_type& impl, const MutableBufferSequence& buffers, socket_base::message_flags flags, ReadHandler handler);
+      void async_receive(implementation_type& impl, const MutableBufferSequence& buffers, socket_base::message_flags flags, ReadHandler handler)
+      {
+        typedef ios::__::socket_recv_operation<ReadHandler, MutableBufferSequence> op;
+        typename op::ptr p (handler, buffers);
+
+        buffer_sequence<ios::mutable_buffer, MutableBufferSequence> buffs(buffers);
+        daddy::async_receive(impl, buffs, nullptr, 0, flags, p.op);
+        p.release();
+      }
+
       template<class MutableBufferSequence, class ReadHandler>
-      void async_receive_from(implementation_type& impl, const MutableBufferSequence& buffers, endpoint_type& sender, socket_base::message_flags flags, ReadHandler handler);
+      void async_receive_from(implementation_type& impl, const MutableBufferSequence& buffers, endpoint_type& sender, socket_base::message_flags flags, ReadHandler handler)
+      {
+        typedef ios::__::socket_recv_operation<ReadHandler, MutableBufferSequence> op;
+        typename op::ptr p (handler, buffers);
+
+        buffer_sequence<ios::mutable_buffer, MutableBufferSequence> buffs(buffers);
+        daddy::async_receive(impl, buffs, sender.data(), sender.capacity(), flags, p.op);
+        p.release();
+      }
 
       template<class ConstBufferSequence, class WriteHandler>
       void async_send(implementation_type& impl, const ConstBufferSequence& buffers, socket_base::message_flags flags, WriteHandler handler)
@@ -735,7 +769,15 @@ namespace ntl { namespace network {
       }
 
       template<class ConstBufferSequence, class WriteHandler>
-      void async_send_to(implementation_type& impl, const ConstBufferSequence& buffers, const endpoint_type& destination, socket_base::message_flags flags, WriteHandler handler);
+      void async_send_to(implementation_type& impl, const ConstBufferSequence& buffers, const endpoint_type& destination, socket_base::message_flags flags, WriteHandler handler)
+      {
+        typedef ios::__::socket_send_operation<WriteHandler, ConstBufferSequence> op;
+        typename op::ptr p (handler, buffers);
+
+        buffer_sequence<ios::const_buffer, ConstBufferSequence> buffs(buffers);
+        daddy::async_send(impl, buffs, destination.data(), destination.size(), flags, p.op);
+        p.release();
+      }
     };
 
   }

@@ -205,6 +205,17 @@ namespace ntl { namespace network {
 
     namespace wsa
     {
+      enum socket_flags {
+        socket_overlapped           = 0x01,
+        socket_multipoint_c_root    = 0x02,
+        socket_multipoint_c_leaf    = 0x04,
+        socket_multipoint_d_root    = 0x08,
+        socket_multipoint_d_leaf    = 0x10,
+        socket_access_system_security=0x40,
+      };
+      __ntl_bitmask_type(socket_flags, inline);
+
+
       struct wsabuf_t
       {
         uint32_t  len;
@@ -228,8 +239,9 @@ namespace ntl { namespace network {
 
       struct protocol_info
       {
-        uint32_t      ServiceFlags[4], ProviderFlags;
-        nt::guid          ProviderId;
+        uint32_t      ServiceFlags[4];
+        uint32_t      ProviderFlags;
+        nt::guid      ProviderId;
         uint32_t      CatalogEntryId;
         protocol_chain* ProtocolChain;
         int32_t       Version, AddressFamily, MaxSockAddr, MinSockAddr;
@@ -301,15 +313,23 @@ namespace ntl { namespace network {
       typedef int __stdcall  Cleanup_t();
       typedef int  __stdcall GetLastError_t();
       typedef void __stdcall SetLastError_t(int Error);
+
       typedef socket __stdcall SocketW_t(int af, int type, int protocol, const protocol_info* ProtocolInfo, uint32_t, 
         uint32_t Flags);
+
       typedef int __stdcall Connect_t(socket s, const sockaddr* name, int namelen, const wsabuf_t* CallerData, wsabuf_t* CalleeData, void* sQos, void* gQos);
 
       typedef int __stdcall Recv_t(socket s, wsabuf_t Buffers[], uint32_t BuffersCount, uint32_t* Received, 
         uint32_t* Flags, overlapped* Overlapped, completion_routine_t* CompletionRoutine);
 
+      typedef int __stdcall RecvFrom_t(socket s, wsabuf_t Buffers[], uint32_t BuffersCount, uint32_t* Received, 
+        uint32_t* Flags, sockaddr* from, int* namelen, overlapped* Overlapped, completion_routine_t* CompletionRoutine);
+
       typedef int __stdcall Send_t(socket s, const wsabuf_t Buffers[], uint32_t BuffersCount, uint32_t* Sent, 
         uint32_t  Flags, overlapped* Overlapped, completion_routine_t* CompletionRoutine);
+
+      typedef int __stdcall SendTo_t(socket s, const wsabuf_t Buffers[], uint32_t BuffersCount, uint32_t* Sent, 
+        uint32_t  Flags, const sockaddr* name, int namelen, overlapped* Overlapped, completion_routine_t* CompletionRoutine);
 
       typedef int __stdcall StringToAddressW_t(wchar_t* name, int family, const protocol_info* ProtocolInfo, sockaddr* address, int* addrlen);
 
@@ -351,10 +371,12 @@ namespace ntl { namespace network {
 
       struct  
       {
-        wsa::SocketW_t* socket;
-        wsa::Connect_t* connect;
-        wsa::Send_t* send;
-        wsa::Recv_t* recv;
+        wsa::SocketW_t*   socket;
+        wsa::Connect_t*   connect;
+        wsa::Send_t*      send;
+        wsa::Recv_t*      recv;
+        wsa::SendTo_t*    sendto;
+        wsa::RecvFrom_t*  recvfrom;
       } async;
       
       bool initialized;
@@ -430,6 +452,8 @@ namespace ntl { namespace network {
           funcs.async.connect = ws->find_export<wsa::Connect_t*>("WSAConnect");
           funcs.async.send = ws->find_export<wsa::Send_t*>("WSASend");
           funcs.async.recv = ws->find_export<wsa::Recv_t*>("WSARecv");
+          funcs.async.sendto = ws->find_export<wsa::SendTo_t*>("WSASendTo");
+          funcs.async.recvfrom = ws->find_export<wsa::RecvFrom_t*>("WSARecvFrom");
 
           // check import
           const void **first = (const void**)&funcs, **last = (const void**)&funcs.initialized;

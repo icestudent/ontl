@@ -61,6 +61,8 @@ namespace std { namespace tr2 { namespace sys {
         void* v;              // memory for op
         async_operation* op;  // op itself
 
+        typedef Op type;
+
         /** attach to existing handler pointers */
         explicit ptr(Op* op, Handler* fn)
           : fn(fn)
