@@ -413,6 +413,10 @@
 								>
 							</File>
 							<File
+								RelativePath=".\stlx\ext\tr2\network\placeholders.hxx"
+								>
+							</File>
+							<File
 								RelativePath=".\stlx\ext\tr2\network\socket_acceptor.hxx"
 								>
 							</File>

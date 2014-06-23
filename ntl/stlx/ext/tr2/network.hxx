@@ -26,4 +26,7 @@
 
 #include "network/basic_resolver.hxx"
 #include "network/socket_acceptor.hxx"
+
+#include "network/placeholders.hxx"
+
 #endif // NTL__STLX_TR2_NETWORK
