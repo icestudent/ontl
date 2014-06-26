@@ -85,6 +85,7 @@ namespace ntl { namespace nt {
   };
 
   /** Contains information used in asynchronous (or %overlapped) input and output (I/O). */
+  #pragma warning(push)
   #pragma warning(disable:4201) // nameless union
   struct overlapped
   {
@@ -99,7 +100,7 @@ namespace ntl { namespace nt {
     };
     legacy_handle Event;
   };
-  #pragma warning(default:4201)
+  #pragma warning(pop)
 
 #ifndef _M_X64
   static_assert(sizeof(overlapped) == 4*5, "invalid ntl::nt::overlapped size");
