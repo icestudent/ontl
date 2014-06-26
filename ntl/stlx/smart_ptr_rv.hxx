@@ -82,13 +82,13 @@ namespace std
     unique_ptr() __ntl_nothrow
       : ptr(0), deleter()
     {
-      static_assert(!(is_reference<D>::value || is_pointer<D>::value), "D shall not be a reference type or pointer type");
+      assert(!(is_reference<D>::value || is_pointer<D>::value) && "D shall not be a reference type or pointer type");
     }
 
     explicit unique_ptr(pointer p) __ntl_nothrow 
       : ptr(p), deleter()
     {
-      static_assert(!(is_reference<D>::value || is_pointer<D>::value), "D shall not be a reference type or pointer type");
+      assert(!(is_reference<D>::value || is_pointer<D>::value) && "D shall not be a reference type or pointer type");
     }
 
     unique_ptr(nullptr_t) __ntl_nothrow
