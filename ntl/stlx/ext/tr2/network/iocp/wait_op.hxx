@@ -24,7 +24,7 @@ namespace std { namespace tr2 { namespace sys {
         if(!owner)
           return;    // called if async_op::destroy
 
-        wait_operation* self = static_cast<wait_operation*>(base);
+        ptr::type* self = static_cast<ptr::type*>(base);
         ptr p(self, &self->fn);
 
         using std::tr2::sys::io_handler_invoke;

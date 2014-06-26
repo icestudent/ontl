@@ -19,6 +19,7 @@ namespace std { namespace tr2 { namespace sys {
     typedef ntl::nt::ntstatus ntstatus;
     typedef ntl::nt::status   status;
     typedef __::async_operation async_operation;
+    typedef ntl::nt::overlapped overlapped;
 
     // system codes
     static const ntl::nt::ntstatus
@@ -107,7 +108,7 @@ namespace std { namespace tr2 { namespace sys {
     void on_completion(async_operation* op, const ntl::nt::ntstatus st = ntl::nt::status::success, size_t transferred = 0) /*volatile*/
     {
       op->ready.set();
-      iocp.set_completion(nullptr, st, transferred, op);
+      iocp.set_completion(nullptr, st, transferred, static_cast<overlapped*>(op));
     }
 
     void on_completion(async_operation* op, const std::error_code& ec, size_t transferred = 0)
@@ -116,13 +117,13 @@ namespace std { namespace tr2 { namespace sys {
       op->Internal2 = reinterpret_cast<uintptr_t>(&ec.category());
       op->Offset = transferred;
       op->ready.set();
-      iocp.set_completion(nullptr, custom_result_code, transferred, op);
+      iocp.set_completion(nullptr, custom_result_code, transferred, static_cast<overlapped*>(op));
     }
 
     void on_pending(async_operation* op)
     {
       if(op->ready.exchange_if_equal(true, false) == true) {
-        iocp.set_completion(nullptr, custom_result_code, 0, op);
+        iocp.set_completion(nullptr, custom_result_code, 0, static_cast<overlapped*>(op));
       }
     }
 
@@ -184,7 +185,7 @@ namespace std { namespace tr2 { namespace sys {
     void post_deferred_completion(async_operation* op)
     {
       op->ready.set();
-      iocp.set_completion(nullptr, op);
+      iocp.set_completion(nullptr, static_cast<overlapped*>(op));
     }
 
     void complete(const async_operation* op, const std::error_code& ec, size_t transferred)
@@ -326,7 +327,7 @@ namespace std { namespace tr2 { namespace sys {
         ntstatus st = NtWaitForMultipleObjects(count+1, handles, wait_type::WaitAny, false, infinite_timeout());
         if(st == ntl::nt::status::wait_0) {
           // timers changed
-          continue;;
+          continue;
         }
         else if(st >= status::wait_1 && st <= status::wait_63) {
           count = st - status::wait_1;

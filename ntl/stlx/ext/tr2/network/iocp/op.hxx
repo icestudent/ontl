@@ -81,7 +81,6 @@ namespace std { namespace tr2 { namespace sys {
           op = new (v) Op(fn);
         }
 
-        /** allocate and construct smart handler pointer */
         template<typename A1>
         explicit ptr(Handler& fn, const A1& a1)
           : fn(&fn)
@@ -91,6 +90,28 @@ namespace std { namespace tr2 { namespace sys {
           using std::tr2::sys::io_handler_allocate;
           v = io_handler_allocate(sizeof(Op), this->fn);
           op = new (v) Op(fn, a1);
+        }
+
+        template<typename A1, typename A2>
+        explicit ptr(Handler& fn, const A1& a1, const A2& a2)
+          : fn(&fn)
+          , op()
+          , v()
+        {
+          using std::tr2::sys::io_handler_allocate;
+          v = io_handler_allocate(sizeof(Op), this->fn);
+          op = new (v) Op(fn, a1, a2);
+        }
+
+        template<typename A1, typename A2, typename A3>
+        explicit ptr(Handler& fn, const A1& a1, const A2& a2, const A3& a3)
+          : fn(&fn)
+          , op()
+          , v()
+        {
+          using std::tr2::sys::io_handler_allocate;
+          v = io_handler_allocate(sizeof(Op), this->fn);
+          op = new (v) Op(fn, a1, a2, a3);
         }
 
         ~ptr()
@@ -107,7 +128,8 @@ namespace std { namespace tr2 { namespace sys {
         {
           using std::tr2::sys::io_handler_deallocate;
           if(op) {
-            op->~async_operation();
+            Op* derived = static_cast<Op*>(op);
+            derived->~Op();
             op = nullptr;
           }
           if(v) {
@@ -121,11 +143,10 @@ namespace std { namespace tr2 { namespace sys {
       typedef void handler_t(iocp_service* owner, async_operation* base, const error_code& ec, size_t transferred);
 
     protected:
-      virtual ~async_operation(){}
+      //virtual ~async_operation(){}
 
       explicit async_operation(handler_t* fn)
         : handle(fn)
-        , next()
         , ready(false)
         , signature(signature_const)
       {
@@ -142,7 +163,6 @@ namespace std { namespace tr2 { namespace sys {
       friend class iocp_service;
       static const uint32_t signature_const = 0xFEDCBA91;
       const uint32_t signature;
-      async_operation* next;
       handler_t* handle;
       ntl::atomic::flag_t ready;
     };
