@@ -134,7 +134,7 @@ namespace std { namespace tr2 { namespace sys {
     /** Returns a duration from now to the expiry time associated with the timer implementation \p impl */
     duration_type expires_from_now(const implementation_type& impl) const __ntl_nothrow
     {
-      return traits_type::substract(impl.tp, traits_time::now());
+      return traits_type::subtract(impl.tp, traits_type::now());
     }
 
     /** Sets the expiry time associated with the timer implementation \p impl. Implicitly cancels asynchronous 
