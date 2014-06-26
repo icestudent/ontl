@@ -624,7 +624,7 @@ class basic_istream : virtual public basic_ios<charT, traits>
 template<class charT, class traits>
 inline basic_istream<charT,traits>& operator>>(basic_istream<charT,traits>& is, charT* s)
 {
-  const basic_istream<charT,traits>::sentry ok(is, true);
+  const basic_istream<charT,traits>::sentry ok(is); // formatted input
   ios_base::iostate state = ios_base::goodbit;
   streamsize ccount = 0;
   if(ok)
