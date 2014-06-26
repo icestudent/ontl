@@ -315,7 +315,7 @@ namespace std
     public:
 
       template<typename F>
-      explicit function(F f)
+      function(F f)
         :base(forward<F>(f))
       {}
 

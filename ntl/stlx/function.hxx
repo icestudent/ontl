@@ -387,7 +387,7 @@ namespace std
       typedef __::func::detail::function<R> base;
     public:
       template<typename F>
-      explicit function(F f)
+      function(F f)
         :base(forward<F>(f))
       {}
       explicit function() __ntl_nothrow {}
@@ -407,7 +407,7 @@ namespace std
       typedef __::func::detail::function<R, NTL_FUNARGS(A1)> base;
     public:
       template<typename F>
-      explicit function(F f)
+      function(F f)
         :base(forward<F>(f))
       {}
       explicit function() __ntl_nothrow {}
@@ -427,7 +427,7 @@ namespace std
       typedef __::func::detail::function<R, NTL_FUNARGS(A1,A2)> base;
     public:
       template<typename F>
-      explicit function(F f)
+      function(F f)
         :base(forward<F>(f))
       {}
       explicit function() __ntl_nothrow {}
@@ -447,7 +447,7 @@ namespace std
       typedef __::func::detail::function<R, NTL_FUNARGS(A1,A2,A3)> base;
     public:
       template<typename F>
-      explicit function(F f)
+      function(F f)
         :base(forward<F>(f))
       {}
       explicit function() __ntl_nothrow {}
