@@ -31,7 +31,7 @@ namespace ntl
           typedef std::basic_streambuf<char> base;
           typedef std::streamsize streamsize;
 
-          static const size_t buffer_size = 128;
+          static const size_t buffer_size = 512;
           char buf[buffer_size+sizeof(void*)];  // buffer_size + native alignment
 
           dbgprint<DefaultLevel, Type>& printer;
