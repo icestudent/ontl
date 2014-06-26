@@ -153,7 +153,7 @@ namespace std { namespace tr2 { namespace network {
         error_code e;
         service.open(impl, endpoint.protocol(), e);
         if(e){
-          service.get_io_service().post(__::network::bind_handler(handler, e));
+          service.get_io_service().post(::std::tr2::sys::__::bind_handler(handler, e));
           return;
         }
       }

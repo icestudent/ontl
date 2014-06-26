@@ -214,7 +214,7 @@ namespace std { namespace tr2 { namespace sys {
     {}
     bool operator()(const error_code& ec, size_t s) const
     {
-       !!ec || s >= min;
+       return !!ec || s >= min;
     }
   private:
     size_t min;
