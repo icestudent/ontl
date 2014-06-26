@@ -61,8 +61,8 @@ typedef uint64_t  uint_fast64_t;
   typedef          long long  intptr_t;
   typedef unsigned long long  uintptr_t;
   #else//if defined _M_IX86
-  typedef __w64          long intptr_t;
-  typedef __w64 unsigned long uintptr_t;
+  typedef __w64          long intptr_t; //-V677
+  typedef __w64 unsigned long uintptr_t; //-V677
   #endif
 #endif
 

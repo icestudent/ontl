@@ -205,12 +205,12 @@ namespace std
     id():tid_()
     {}
 
-    friend bool operator==(id x, id y) { return x.tid_ == y.tid_; }
-    friend bool operator!=(id x, id y) { return x.tid_ != y.tid_; }
-    friend bool operator< (id x, id y) { return x.tid_ <  y.tid_; }
-    friend bool operator<=(id x, id y) { return x.tid_ <= y.tid_; }
-    friend bool operator> (id x, id y) { return x.tid_ >  y.tid_; }
-    friend bool operator>=(id x, id y) { return x.tid_ >= y.tid_; }
+    friend bool operator==(id const& x, id const& y) { return x.tid_ == y.tid_; }
+    friend bool operator!=(id const& x, id const& y) { return x.tid_ != y.tid_; }
+    friend bool operator< (id const& x, id const& y) { return x.tid_ <  y.tid_; }
+    friend bool operator<=(id const& x, id const& y) { return x.tid_ <= y.tid_; }
+    friend bool operator> (id const& x, id const& y) { return x.tid_ >  y.tid_; }
+    friend bool operator>=(id const& x, id const& y) { return x.tid_ >= y.tid_; }
 
     template<class charT, class traits>
     friend basic_ostream<charT, traits>& operator<< (basic_ostream<charT, traits>& out, thread::id id)

@@ -27,7 +27,7 @@ namespace std {
 #define CLOCKS_PER_SEC ntl::nt::system_time_resolution
 
 typedef ntl::nt::systime_t clock_t;
-typedef ntl::nt::systime_t time_t;
+typedef ntl::nt::systime_t time_t; //-V677
 #else
 typedef int64_t clock_t;
 typedef int64_t time_t;

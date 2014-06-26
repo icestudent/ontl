@@ -11,7 +11,7 @@
 #include "cwchar.hxx"
 
 typedef unsigned short wctype_t;
-typedef wchar_t  wctrans_t;
+typedef wchar_t  wctrans_t; //-V677
 
 namespace std
 {

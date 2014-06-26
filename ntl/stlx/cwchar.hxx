@@ -24,12 +24,12 @@
 /** an object type other than an array type that can hold the conversion state
   information necessary to convert between sequences of multibyte characters and wide
   characters */
-typedef int mbstate_t;
+typedef int mbstate_t; //-V677
 
 /** an integer type unchanged by default argument promotions that can hold any
   value corresponding to members of the extended character set, as well as at least one
   value that does not correspond to any member of the extended character set */
-typedef unsigned short wint_t;
+typedef unsigned short wint_t; //-V677
 
 #ifndef WEOF
   // expands to a constant expression of type wint_t whose value does not correspond to any member of the extended character set.

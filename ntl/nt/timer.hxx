@@ -147,10 +147,10 @@ class timer:
 {
 public:
   /** Manual-reset timer: a timer whose state remains signaled until a new due time was established. */
-  static const timer_type NotificationTimer = NotificationTimer;
+  static const timer_type NotificationTimer = nt::NotificationTimer;
 
   /** Auto-reset timer: a timer whose state remains signaled until a thread completes a wait operation on the timer object. */
-  static const timer_type SynchronizationTimer = SynchronizationTimer;
+  static const timer_type SynchronizationTimer = nt::SynchronizationTimer;
 
   static const timer_type manual_reset = NotificationTimer,
     auto_reset = SynchronizationTimer;

@@ -49,8 +49,8 @@ namespace ttl
 		return_type get() { return d; }
 		const_pointer operator&() const { return &d; }
 		pointer operator&() { return &d; }
-		const_reference operator*() const { return d; }
-		reference operator*() { return d; }
+		const_reference operator*() const { return d; } //-V659
+		reference operator*() { return d; } //-V659
 	};
 
 	template< typename T >
