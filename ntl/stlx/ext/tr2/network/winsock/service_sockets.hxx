@@ -739,7 +739,7 @@ namespace ntl { namespace network {
       void async_receive(implementation_type& impl, const MutableBufferSequence& buffers, socket_base::message_flags flags, ReadHandler handler)
       {
         typedef ios::__::socket_recv_operation<ReadHandler, MutableBufferSequence> op;
-        typename op::ptr p (handler, buffers);
+        typename op::ptr p (handler, buffers, impl.is_stream, std::tr2::sys::buffer_size(buffers) == 0);
 
         buffer_sequence<ios::mutable_buffer, MutableBufferSequence> buffs(buffers);
         daddy::async_receive(impl, buffs, nullptr, 0, flags, p.op);
@@ -750,7 +750,7 @@ namespace ntl { namespace network {
       void async_receive_from(implementation_type& impl, const MutableBufferSequence& buffers, endpoint_type& sender, socket_base::message_flags flags, ReadHandler handler)
       {
         typedef ios::__::socket_recv_operation<ReadHandler, MutableBufferSequence> op;
-        typename op::ptr p (handler, buffers);
+        typename op::ptr p (handler, buffers, impl.is_stream, std::tr2::sys::buffer_size(buffers) == 0);
 
         buffer_sequence<ios::mutable_buffer, MutableBufferSequence> buffs(buffers);
         daddy::async_receive(impl, buffs, sender.data(), sender.capacity(), flags, p.op);

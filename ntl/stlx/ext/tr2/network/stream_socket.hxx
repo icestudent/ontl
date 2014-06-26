@@ -96,28 +96,22 @@ namespace std { namespace tr2 { namespace network {
     template<class MutableBufferSequence>
     size_t read_some(const MutableBufferSequence& buffers, error_code& ec = throws())
     {
-      error_code e;
-      size_t re = service.receive(impl, buffers, socket_base::message_default, e);
-      throw_system_error(e, ec);
-      return re;
+      return receive(buffers, ec);
     }
     template<class ConstBufferSequence>
     size_t write_some(const ConstBufferSequence& buffers, error_code& ec = throws())
     {
-      error_code e;
-      size_t re = service.send(impl, buffers, socket_base::message_default, e);
-      throw_system_error(e, ec);
-      return re;
+      return send(buffers, ec);
     }
     template<class MutableBufferSequence, class ReadHandler>
     void async_read_some(const MutableBufferSequence& buffers, ReadHandler handler)
     {
-      service.async_receive(impl, buffers, socket_base::message_default, handler);
+      return async_receive(buffers, handler);
     }
     template<class ConstBufferSequence, class WriteHandler>
     void async_write_some(const ConstBufferSequence& buffers, WriteHandler handler)
     {
-      service.async_send(impl, buffers, socket_base::message_default, handler);
+      return async_send(buffers, handler);
     }
     ///\}
   };

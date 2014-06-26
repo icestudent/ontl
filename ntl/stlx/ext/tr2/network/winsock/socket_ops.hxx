@@ -16,7 +16,7 @@ namespace std { namespace tr2 { namespace sys {
 
       socket_send_operation(Handler& h, const Buffers& buffers)
         : async_operation(do_complete)
-        , fn(std::forward<Handler>(h))
+        , fn(move(h))
         , buffers(buffers)
       {}
 
@@ -48,10 +48,12 @@ namespace std { namespace tr2 { namespace sys {
       typedef ReadHandler Handler;
       typedef typename async_operation::ptr<socket_recv_operation, Handler> ptr;
 
-      socket_recv_operation(Handler& h, const Buffers& buffers)
+      socket_recv_operation(Handler& h, const Buffers& buffers, bool stream, bool empty)
         : async_operation(do_complete)
         , fn(std::forward<Handler>(h))
         , buffers(buffers)
+        , is_stream(stream)
+        , is_empty(empty)
       {}
 
     protected:
@@ -66,16 +68,17 @@ namespace std { namespace tr2 { namespace sys {
         // TODO: check cancel
         // TODO: map error values
         std::error_code e = ec;
-        if(!e && transferred == 0)
+        if(!e && transferred == 0 && self->is_stream && !self->is_empty)
           e = std::make_error_code(network::error::eof);
 
         using std::tr2::sys::io_handler_invoke;
-        io_handler_invoke(bind_handler(self->fn, ec, transferred), &self->fn);
+        io_handler_invoke(bind_handler(self->fn, e, transferred), &self->fn);
       }
 
     private:
       Handler fn;
       Buffers buffers;
+      bool is_stream, is_empty;
     };
   } // __ ns
 
