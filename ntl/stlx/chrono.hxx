@@ -806,23 +806,30 @@ namespace std
     inline time_t system_clock::to_time_t (const system_clock::time_point& t)
     {
       // Number of seconds from 1/1/1601 to 1/1/1970 in 10ms units (see system_clock::period) (10ms = 1 centisecond)
-      typedef ratio_divide<ratio_multiply<ratio<116444736>, hecto>::type, centi>::type epochdiff_t;
-      STATIC_ASSERT(epochdiff_t::num == 1164447360000LL);
+      typedef ratio_multiply<ratio<116444736>, giga>::type epochdiff_t;
+      STATIC_ASSERT(epochdiff_t::num == 116444736000000000LL);
 
-      const system_clock::duration diff(epochdiff_t::num);
+      typedef int64_t systime_t;
+      typedef std::ratio_multiply<std::ratio<100>, std::nano>::type       systime_unit;
+      typedef std::chrono::duration<systime_t, systime_unit>              system_duration;
+      const system_clock::duration diff = duration_cast<system_clock::duration>(system_duration(epochdiff_t::num));
       return duration_cast<chrono::seconds>(t.time_since_epoch() - diff).count();
     }
 
     inline system_clock::time_point system_clock::from_time_t(time_t t)
     {
       // Number of seconds from 1/1/1601 to 1/1/1970 in 10ms units (see system_clock::period) (10ms = 1 centisecond)
-      typedef ratio_divide<ratio_multiply<ratio<116444736>, hecto>::type, centi>::type epochdiff_t;
-      STATIC_ASSERT(epochdiff_t::num == 1164447360000LL);
-      typedef chrono::time_point<system_clock, chrono::seconds> seconds_time_point;
-      const system_clock::duration diff(epochdiff_t::num);
+      typedef ratio_multiply<ratio<116444736>, giga>::type epochdiff_t;
+      STATIC_ASSERT(epochdiff_t::num == 116444736000000000LL);
+
+      typedef int64_t systime_t;
+      typedef std::ratio_multiply<std::ratio<100>, std::nano>::type       systime_unit;
+      typedef std::chrono::duration<systime_t, systime_unit>              system_duration;
+      const system_clock::duration diff = duration_cast<system_clock::duration>(system_duration(epochdiff_t::num));
 
       // NOTE: c++ recognizes `seconds_time_point from_tp(chrono::seconds(t))` as function declaration, so we need an alternate way:
       //  const seconds_time_point from_tp((chrono::seconds(t))) OR
+      typedef chrono::time_point<system_clock, chrono::seconds> seconds_time_point;
       const seconds_time_point from_tp(static_cast<chrono::seconds>(t));
       return time_point(duration_cast<duration>(from_tp.time_since_epoch()) + diff);
     }
