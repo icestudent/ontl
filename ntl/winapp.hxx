@@ -58,6 +58,7 @@ int _Winapp_entry()
   (void)&__console_abort;
 #endif
 
+  crt_initializer __crt;
   winapp app;
   return app.main();
 
