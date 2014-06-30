@@ -27,7 +27,7 @@ namespace std
 
       //////////////////////////////////////////////////////////////////////////
       /**
-       *	@brief Class template directory_entry
+       *  @brief Class template directory_entry
        *  @details A directory_entry object stores a basic_path object, a file_status object for non-symbolic link status, 
        *  and a file_status object for symbolic link status. 
        *  The file_status objects act as value caches.
@@ -50,6 +50,16 @@ namespace std
           :p(p),st(st), lst(symlink_st)
         {}
 
+        directory_entry(const directory_entry& r)
+          :p(r.p), st(r.st), lst(r.lst)
+        {}
+
+        directory_entry& operator=(const directory_entry& r)
+        {
+          directory_entry(r).swap(*this);
+          return *this;
+        }
+
       #ifdef NTL_CXX_RV
         explicit directory_entry(path_type&& p, file_status st = file_status(), file_status symlink_st = file_status())
           :p(forward<path_type>(p)),st(st), lst(symlink_st)
@@ -58,10 +68,10 @@ namespace std
         {
           swap(r);
         }
-        directory_entry& operator=(directory_entry&& r)
-        {
-          directory_entry(r).swap(*this);
-        }
+        //directory_entry& operator=(directory_entry&& r)
+        //{
+        //  directory_entry(r).swap(*this);
+        //}
 
         void assign(path_type&& p, file_status st = file_status(), file_status symlink_st = file_status())
         {
@@ -139,7 +149,7 @@ namespace std
 
       //////////////////////////////////////////////////////////////////////////
       /**
-       *	@brief Class template directory_iterator
+       *  @brief Class template directory_iterator
        *  @details directory_iterator satisfies the requirements of an input iterator (C++ Std, 24.1.1, Input iterators [lib.input.iterators]).
        *
        *  A directory_iterator reads successive elements from the directory for which it was constructed, as if by calling POSIX readdir_r(). 
@@ -389,7 +399,7 @@ namespace std
       inline void swap(directory_iterator& x, directory_iterator& y) { x.swap(y); }
       //////////////////////////////////////////////////////////////////////////
       /**
-       *	@brief Class template recursive_directory_iterator
+       *  @brief Class template recursive_directory_iterator
        *  @details The behavior of a recursive_directory_iterator is the same as a directory_iterator unless otherwise specified.
        *
        *  - When an iterator is constructed, \c level is set to 0;
