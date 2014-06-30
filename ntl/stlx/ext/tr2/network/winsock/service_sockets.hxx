@@ -483,13 +483,20 @@ namespace ntl { namespace network {
       {
         if(!check_open(impl, ec))
           return 0;
-        const size_t max_size = buffs.total_size(), count = buffs.count();
-        if(max_size == 0 && impl.is_stream)
+
+        if(buffs.total_size() == 0 && impl.is_stream)
           return 0;
+
+        // block until data will be available
+        wait(impl, stdnet::socket_base::read, ec);
+
+        size_t received = 0;
+        const size_t max_size = std::min(available(impl, ec), buffs.total_size()), count = buffs.count();
+
         int addrlen = static_cast<int>(addrsize);
         buffer_sequences::native_buffer* buf = buffs.buffers();
-        size_t received = 0;
-        for(size_t nbuf = 0; !ec && nbuf < count && received < max_size; nbuf++, buf++){
+
+        for(size_t nbuf = 0; !ec && nbuf < count && received < max_size; nbuf++, buf++) {
           uint32_t offset = 0;
           do {
             int re = addr
@@ -510,7 +517,8 @@ namespace ntl { namespace network {
             offset += re;
             if(addr || flags == socket_base::message_peek)    // don't read data without connection
               return received;
-          } while(offset < buf->len);
+
+          } while(offset < buf->len && received < max_size);
         }
         return received;
       }
