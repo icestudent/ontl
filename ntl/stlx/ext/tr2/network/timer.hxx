@@ -112,8 +112,8 @@ namespace std { namespace tr2 { namespace sys {
     size_t cancel(implementation_type& impl, error_code& ec) __ntl_nothrow
     {
       ec.clear();
-      size_t c = impl.tm.cancel();
-      if(!c)
+      size_t c = scheduler.remove_timer(impl.tm.get());
+      if(!impl.tm.cancel())
         ec = std::make_error_code(impl.tm.last_status());
       return c;
     }

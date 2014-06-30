@@ -20,6 +20,7 @@ namespace std { namespace tr2 { namespace sys {
     typedef ntl::nt::status   status;
     typedef __::async_operation async_operation;
     typedef ntl::nt::overlapped overlapped;
+    typedef std::vector<std::pair<ntl::nt::legacy_handle, async_operation*>> timer_queue;
 
     // system codes
     static const ntl::nt::ntstatus
@@ -154,18 +155,56 @@ namespace std { namespace tr2 { namespace sys {
         stop();
     }
 
-    void add_timer(const void* timer, async_operation* op)
+    struct find_timer
     {
+      ntl::nt::legacy_handle h;
+      bool operator()(const timer_queue::value_type& t) const
+      {
+        return h == t.first;
+      }
+    };
+
+    size_t add_timer(const void* timer, async_operation* op)
+    {
+      if(!op)
+        return remove_timer(timer);
+
       if(shutdown.test()) {
         post_immediate_completion(op);
-        return;
+        return false;
       }
 
       work_started();
 
       wlock lock(timer_lock);
-      timers.push_back(std::make_pair(reinterpret_cast<ntl::nt::legacy_handle>(timer), op));
+
+      const ntl::nt::legacy_handle h = reinterpret_cast<ntl::nt::legacy_handle>(timer);
+      //find_timer ft = {h};
+      //assert((std::find_if(timers.begin(), timers.end(), ft) == timers.end() && "multiple wait isn't supported yet")));
+      timers.push_back(std::make_pair(h, op));
       timer_event.pulse();
+      return true;
+    }
+
+    size_t remove_timer(const void* timer)
+    {
+      if(shutdown.test())
+        return 0;
+
+      wlock lock(timer_lock);
+      const ntl::nt::legacy_handle t = reinterpret_cast<ntl::nt::legacy_handle>(timer);
+      find_timer ft = {t};
+      timer_queue::iterator tm = std::find_if(timers.begin(), timers.end(), ft);
+      if(tm != timers.end()) {
+        // complete handler with aborted code
+        on_completion(tm->second, std::make_error_code(std::tr2::network::error::operation_aborted));
+        timers.erase(tm);
+
+        // wake up thread to recalculate timers
+        timer_event.pulse();
+        return 1;
+      }
+      return 0;
     }
 
     /** Is we inside service? If yes, we can dispatch immediately */
@@ -238,7 +277,6 @@ namespace std { namespace tr2 { namespace sys {
         else if(st == ntl::nt::status::timeout)
         {
           // no ready operations
-          ntl::dbg::bp();
           if(block)
             continue;
           return false;
@@ -302,7 +340,7 @@ namespace std { namespace tr2 { namespace sys {
 
     static uint32_t __stdcall timer_proc(void* Parameter)
     { return static_cast<iocp_service*>(Parameter)->timer_worker(); }
-    static void add_timer_(void* ctx, const void* timer, async_operation* op)
+    static size_t add_timer_(void* ctx, const void* timer, async_operation* op)
     { return static_cast<iocp_service*>(ctx)->add_timer(timer, op); }
 
     uint32_t __stdcall timer_worker()
@@ -347,10 +385,10 @@ namespace std { namespace tr2 { namespace sys {
     ntl::nt::legacy_handle volatile self_id;
     
     // timers
-    std::vector<std::pair<ntl::nt::legacy_handle, async_operation*>> timers;
     ntl::nt::user_thread timer_thread;
     ntl::nt::srwlock timer_lock;
     ntl::nt::user_event timer_event;
+    timer_queue timers;
     typedef ntl::nt::srwlock::guard<false> rlock;
     typedef ntl::nt::srwlock::guard<true>  wlock;
   };

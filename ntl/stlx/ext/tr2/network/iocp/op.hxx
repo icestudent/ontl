@@ -16,7 +16,7 @@ namespace std { namespace tr2 { namespace sys {
         , ctx()
       {}
 
-      typedef void add_timer_t(void* ctx, const void* timer, async_operation* op);
+      typedef size_t add_timer_t(void* ctx, const void* timer, async_operation* op);
 
       void add_timer(const void* timer, async_operation* op)
       {
@@ -25,6 +25,11 @@ namespace std { namespace tr2 { namespace sys {
           handler(ctx, timer, op);
       }
 
+      size_t remove_timer(const void* timer)
+      {
+        assert(handler);
+        return handler ? handler(ctx, timer, nullptr) : 0;
+      }
 
 
     private:
