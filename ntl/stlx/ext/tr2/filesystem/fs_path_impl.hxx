@@ -18,6 +18,10 @@ namespace std
           :path(), pos(), element()
         {}
 
+        iterator(const iterator& r)
+          : name(r.name), path(r.path), pos(r.pos), element(r.element)
+        {}
+
 #ifdef NTL_CXX_RV
         iterator(iterator&& r)
           :name(move(r.name)), path(r.path), pos(r.pos), element(r.element)
