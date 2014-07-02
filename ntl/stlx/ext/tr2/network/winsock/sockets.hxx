@@ -519,6 +519,7 @@ namespace ntl { namespace network {
       static std::error_code make_error(std::error_code& ec)
       {
         // TODO: map win32 errors to network
+        // TODO: map ntstatus errors to network (https://github.com/joyent/libuv/blob/master/src/win/winsock.c#L153)
         const winsock::sockerror::type errc = winsock::sockerror::get();
         return ec = std::make_error_code(static_cast<std::tr2::network::error::error_type>(errc));
       }

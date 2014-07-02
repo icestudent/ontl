@@ -68,6 +68,10 @@ namespace std { namespace tr2 { namespace sys {
         // TODO: check cancel
         // TODO: map error values
         std::error_code e = ec;
+        if(e) {
+          if(e == ntl::nt::status::buffer_overflow)
+            e = std::make_error_code(std::tr2::network::error::message_size);
+        }
         if(!e && transferred == 0 && self->is_stream && !self->is_empty)
           e = std::make_error_code(network::error::eof);
 
