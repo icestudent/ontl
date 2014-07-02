@@ -534,7 +534,9 @@ namespace ntl { namespace network {
           return iocp.on_completion(op, make_error(error_not_opened));
 
         uint32_t transfered = 0;
-        int re = impl.funcs->async.send(impl.s, buffs.buffers(), buffs.count(), &transfered, flags, op, nullptr);
+        int re = addr
+          ? impl.funcs->async.sendto(impl.s, buffs.buffers(), buffs.count(), &transfered, flags, addr, static_cast<int>(addrlen), op, nullptr)
+          : impl.funcs->async.send(impl.s, buffs.buffers(), buffs.count(), &transfered, flags, op, nullptr);
 
         sockerror err;
         if(re == socket_error && err != sockerror::io_pending)
@@ -553,8 +555,11 @@ namespace ntl { namespace network {
         else if(!impl.s)
           return iocp.on_completion(op, make_error(error_not_opened));
 
+        int addrlen = static_cast<int>(addrsize);
         uint32_t received = 0, uflags = flags;
-        int re = impl.funcs->async.recv(impl.s, buffs.buffers(), buffs.count(), &received, &uflags, op, nullptr);
+        int re = addr
+          ? impl.funcs->async.recvfrom(impl.s, buffs.buffers(), buffs.count(), &received, &uflags, addr, &addrlen, op, nullptr)
+          : impl.funcs->async.recv(impl.s, buffs.buffers(), buffs.count(), &received, &uflags, op, nullptr);
 
         sockerror err;
         if(re == socket_error && err != sockerror::io_pending)
