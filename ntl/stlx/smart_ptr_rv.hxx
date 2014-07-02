@@ -123,8 +123,8 @@ namespace std
     ///\name 20.8.11.2.2 unique_ptr destructor [unique.ptr.single.dtor]
     ~unique_ptr() __ntl_nothrow 
     {
-      if ( get() )
-        get_deleter()(get()); 
+      if ( ptr )
+        get_deleter()(ptr); 
     }
 
     ///\name 20.8.11.2.3 unique_ptr assignment [unique.ptr.single.asgn]
@@ -153,8 +153,8 @@ namespace std
     }
 
     ///\name 20.8.11.2.4 unique_ptr observers [unique.ptr.single.observers]
-    typename add_lvalue_reference<T>::type operator*() const __ntl_nothrow { return *get(); }
-    pointer operator->() const __ntl_nothrow { return get(); }
+    typename add_lvalue_reference<T>::type operator*() const __ntl_nothrow { return *ptr; }
+    pointer operator->() const __ntl_nothrow { return ptr; }
     pointer get() const __ntl_nothrow { return ptr; }
 
     deleter_type& get_deleter() __ntl_nothrow { return deleter; }
@@ -173,7 +173,7 @@ namespace std
     __forceinline
       void reset(pointer p = 0) __ntl_nothrow
     {
-      if ( get() && get() != p ) get_deleter()(get());
+      if ( ptr && ptr != p ) get_deleter()(ptr);
       set(p);
     }
 
@@ -239,8 +239,8 @@ namespace std
     ///\name 20.8.11.2.2 unique_ptr destructor [unique.ptr.single.dtor]
     ~unique_ptr() __ntl_nothrow 
     {
-      if ( get() )
-        get_deleter()(get()); 
+      if ( ptr )
+        get_deleter()(ptr); 
     }
 
     ///\name 20.8.11.2.3 unique_ptr assignment [unique.ptr.single.asgn]
@@ -267,8 +267,8 @@ namespace std
     }
 
     ///\name 20.8.11.2.4 unique_ptr observers [unique.ptr.single.observers]
-    typename add_lvalue_reference<T>::type operator*() const __ntl_nothrow { return *get(); }
-    pointer operator->() const __ntl_nothrow { return get(); }
+    typename add_lvalue_reference<T>::type operator*() const __ntl_nothrow { return *ptr; }
+    pointer operator->() const __ntl_nothrow { return ptr; }
     pointer get() const __ntl_nothrow { return ptr; }
 
     // local statics produce code bloat, shoud we replace the UD with a global static?
@@ -294,7 +294,7 @@ namespace std
     __forceinline
     void reset(pointer p = 0) __ntl_nothrow
     {
-      if ( get() && get() != p ) get_deleter()(get());
+      if ( ptr && ptr != p ) get_deleter()(ptr);
       set(p);
     }
 
@@ -373,8 +373,8 @@ namespace std
     ///\name 20.8.11.2.2 unique_ptr destructor [unique.ptr.single.dtor]
     ~unique_ptr() __ntl_nothrow 
     {
-      if ( get() )
-        get_deleter()(get()); 
+      if ( ptr )
+        get_deleter()(ptr); 
     }
 
     ///\name 20.8.11.2.3 unique_ptr assignment [unique.ptr.single.asgn]
@@ -393,7 +393,7 @@ namespace std
     }
 
     ///\name 20.8.11.3.2 unique_ptr observers [unique.ptr.runtime.observers]
-    T& operator[](size_t i) const __ntl_nothrow { return get()[i]; }
+    T& operator[](size_t i) const __ntl_nothrow { return ptr[i]; }
     pointer get() const __ntl_nothrow { return ptr; }
 
     deleter_type& get_deleter() __ntl_nothrow { return deleter; }
@@ -412,7 +412,7 @@ namespace std
     __forceinline
     void reset(pointer p = 0) __ntl_nothrow
     {
-      if ( get() && get() != p ) get_deleter()(get());
+      if ( ptr && ptr != p ) get_deleter()(ptr);
       set(p);
     }
 
@@ -480,8 +480,8 @@ namespace std
     ///\name 20.8.11.2.2 unique_ptr destructor [unique.ptr.single.dtor]
     ~unique_ptr() __ntl_nothrow 
     {
-      if ( get() )
-        get_deleter()(get()); 
+      if ( ptr )
+        get_deleter()(ptr); 
     }
 
     ///\name 20.8.11.2.3 unique_ptr assignment [unique.ptr.single.asgn]
@@ -499,7 +499,7 @@ namespace std
     }
 
     ///\name 20.8.11.3.2 unique_ptr observers [unique.ptr.runtime.observers]
-    T& operator[](size_t i) const __ntl_nothrow { return get()[i]; }
+    T& operator[](size_t i) const __ntl_nothrow { return ptr[i]; }
     pointer get() const __ntl_nothrow { return ptr; }
 
     deleter_type& get_deleter() __ntl_nothrow
@@ -527,7 +527,7 @@ namespace std
     __forceinline
     void reset(pointer p = 0) __ntl_nothrow
     {
-      if ( get() && get() != p ) get_deleter()(get());
+      if ( ptr && ptr != p ) get_deleter()(ptr);
       set(p);
     }
 
@@ -587,8 +587,8 @@ namespace std
     ///\name 20.8.11.4.1 unique_ptr destructor [unique.ptr.compiletime.dtor]
     ~unique_ptr() __ntl_nothrow 
     {
-      if ( get() )
-        get_deleter()(get(), N); 
+      if ( ptr )
+        get_deleter()(ptr, N); 
     }
 
     ///\name 20.8.11.2.3 unique_ptr assignment [unique.ptr.single.asgn]
@@ -606,7 +606,7 @@ namespace std
     }
 
     ///\name 20.8.11.4.1 unique_ptr destructor [unique.ptr.compiletime.dtor]
-    T& operator[](size_t i) const __ntl_nothrow { return get()[i]; }
+    T& operator[](size_t i) const __ntl_nothrow { return ptr[i]; }
     pointer get() const __ntl_nothrow { return ptr; }
 
     deleter_type& get_deleter() __ntl_nothrow
@@ -634,7 +634,7 @@ namespace std
     __forceinline
     void reset(pointer p = 0) __ntl_nothrow
     {
-      if ( get() && get() != p ) get_deleter()(get(), N);
+      if ( ptr && ptr != p ) get_deleter()(ptr, N);
       set(p);
     }
 
@@ -1141,7 +1141,7 @@ namespace std
       return shared && shared->use_count == 1;
     }
 
-    operator explicit_bool_type() const __ntl_nothrow { return get() ? &explicit_bool::_ : 0;  }
+    operator explicit_bool_type() const __ntl_nothrow { return ptr ? &explicit_bool::_ : 0;  }
 
   protected:
     template<class T, class U>
@@ -1627,19 +1627,19 @@ namespace std
     }
 
     __forceinline
-      ~auto_ptr() __ntl_nothrow { if ( get() ) delete get(); }
+      ~auto_ptr() __ntl_nothrow { if ( ptr ) delete ptr; }
 
     ///\name  D.9.1.2 auto_ptr members [auto.ptr.members]
 
-    X & operator* ()  const __ntl_nothrow { return *get(); }
-    X * operator->()  const __ntl_nothrow { return get(); }
+    X & operator* ()  const __ntl_nothrow { return *ptr; }
+    X * operator->()  const __ntl_nothrow { return ptr; }
     X * get()         const __ntl_nothrow { return ptr; }
     X * release()           __ntl_nothrow { X * tmp = get(); set(0); return tmp; }
 
     __forceinline
       void reset(X * p = 0)   __ntl_nothrow
     {
-      if ( get() && get() != p ) delete get();
+      if ( ptr && ptr != p ) delete ptr;
       set(p);
     }
 
