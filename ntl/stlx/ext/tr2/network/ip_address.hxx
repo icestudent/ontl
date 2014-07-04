@@ -490,6 +490,7 @@ namespace std { namespace tr2 { namespace network {
       }
 
       ///\name members:
+      bool is_unspecified()const{ return v4addr ? v4.is_unspecified() : v6.is_unspecified(); }
       bool is_multicast() const { return v4addr ? v4.is_multicast() : v6.is_multicast(); }
       bool is_v4() const        { return v4addr; }
       bool is_v6() const        { return v4addr == false; }
