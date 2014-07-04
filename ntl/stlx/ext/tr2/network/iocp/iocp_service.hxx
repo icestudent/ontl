@@ -182,7 +182,7 @@ namespace std { namespace tr2 { namespace sys {
       //find_timer ft = {h};
       //assert((std::find_if(timers.begin(), timers.end(), ft) == timers.end() && "multiple wait isn't supported yet")));
       timers.push_back(std::make_pair(h, op));
-      timer_event.pulse();
+      timer_event.set();
       return true;
     }
 
@@ -201,7 +201,7 @@ namespace std { namespace tr2 { namespace sys {
         timers.erase(tm);
 
         // wake up thread to recalculate timers
-        timer_event.pulse();
+        timer_event.set();
         return 1;
       }
       return 0;
