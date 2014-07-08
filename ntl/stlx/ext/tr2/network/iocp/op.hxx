@@ -16,13 +16,20 @@ namespace std { namespace tr2 { namespace sys {
         , ctx()
       {}
 
-      typedef size_t add_timer_t(void* ctx, const void* timer, async_operation* op);
+      struct timer_data 
+      {
+        ntl::nt::legacy_handle h;
+        async_operation* op;
+        ntl::nt::system_duration fire;
+      };
 
-      void add_timer(const void* timer, async_operation* op)
+      typedef size_t add_timer_t(void* ctx, const void* timer, const timer_data* data);
+
+      void add_timer(const void* timer, const timer_data* data)
       {
         assert(handler);
         if(handler)
-          handler(ctx, timer, op);
+          handler(ctx, timer, data);
       }
 
       size_t remove_timer(const void* timer)
@@ -175,3 +182,25 @@ namespace std { namespace tr2 { namespace sys {
   } // __ ns
 
 }}}
+
+namespace std
+{
+  template<>
+  struct less<std::tr2::sys::__::timer_scheduler::timer_data>
+  {
+    typedef std::tr2::sys::__::timer_scheduler::timer_data T;
+    bool operator()(const T& x, const T& y) const
+    {
+      return x.fire < y.fire;
+    }
+  };
+  template<>
+  struct greater<std::tr2::sys::__::timer_scheduler::timer_data>
+  {
+    typedef std::tr2::sys::__::timer_scheduler::timer_data T;
+    bool operator()(const T& x, const T& y) const
+    {
+      return x.fire > y.fire;
+    }
+  };
+}

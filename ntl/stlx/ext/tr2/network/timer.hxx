@@ -57,8 +57,6 @@ namespace std { namespace tr2 { namespace sys {
     struct implementation_type:
       private ntl::noncopyable
     {
-      typedef function<void(const error_code&)> handler_t;
-      handler_t       handler;
       ntl::nt::timer  tm;
       Time            tp;
 
@@ -167,7 +165,8 @@ namespace std { namespace tr2 { namespace sys {
       typedef __::wait_operation<WaitHandler> op;
       typename op::ptr p (handler);
 
-      scheduler.add_timer(impl.tm.get(), p.op);
+      const __::timer_scheduler::timer_data data = { impl.tm.get(), p.op, std::chrono::duration_cast<ntl::nt::system_duration>(impl.tp.time_since_epoch()) };
+      scheduler.add_timer(data.h, &data);
       p.release();
     }
 

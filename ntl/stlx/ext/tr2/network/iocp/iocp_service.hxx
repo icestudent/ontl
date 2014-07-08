@@ -19,9 +19,24 @@ namespace std { namespace tr2 { namespace sys {
     typedef ntl::nt::ntstatus ntstatus;
     typedef ntl::nt::status   status;
     typedef __::async_operation async_operation;
+    typedef __::timer_scheduler::timer_data timer_data;
     typedef ntl::nt::overlapped overlapped;
-    typedef std::vector<std::pair<ntl::nt::legacy_handle, async_operation*>> timer_queue;
+    
+    // sort by time, unique by handle
+    typedef std::vector<timer_data> timer_queue; // can't use std::priority_queue because of erase(timer)
 
+    struct find_timer
+    {
+      ntl::nt::legacy_handle h;
+      bool operator()(const timer_queue::value_type& t) const
+      {
+        return h == t.h;
+      }
+      explicit find_timer(ntl::nt::legacy_handle h)
+        : h(h)
+      {}
+    };
+    
     // system codes
     static const ntl::nt::ntstatus
       stop_service_code   = ntl::nt::status::system_shutdown,
@@ -155,33 +170,20 @@ namespace std { namespace tr2 { namespace sys {
         stop();
     }
 
-    struct find_timer
+    size_t add_timer(const void* timer, const timer_data* data)
     {
-      ntl::nt::legacy_handle h;
-      bool operator()(const timer_queue::value_type& t) const
-      {
-        return h == t.first;
-      }
-    };
-
-    size_t add_timer(const void* timer, async_operation* op)
-    {
-      if(!op)
+      if(!data)
         return remove_timer(timer);
 
       if(shutdown.test()) {
-        post_immediate_completion(op);
+        post_immediate_completion(data->op);
         return false;
       }
 
       work_started();
 
       wlock lock(timer_lock);
-
-      const ntl::nt::legacy_handle h = reinterpret_cast<ntl::nt::legacy_handle>(timer);
-      //find_timer ft = {h};
-      //assert((std::find_if(timers.begin(), timers.end(), ft) == timers.end() && "multiple wait isn't supported yet")));
-      timers.push_back(std::make_pair(h, op));
+      timers.push_back(*data);
       timer_event.set();
       return true;
     }
@@ -193,11 +195,10 @@ namespace std { namespace tr2 { namespace sys {
 
       wlock lock(timer_lock);
       const ntl::nt::legacy_handle t = reinterpret_cast<ntl::nt::legacy_handle>(timer);
-      find_timer ft = {t};
-      timer_queue::iterator tm = std::find_if(timers.begin(), timers.end(), ft);
+      timer_queue::iterator tm = std::find_if(timers.begin(), timers.end(), find_timer(t));
       if(tm != timers.end()) {
         // complete handler with aborted code
-        on_completion(tm->second, std::make_error_code(std::tr2::network::error::operation_aborted));
+        on_completion(tm->op, std::make_error_code(std::tr2::network::error::operation_aborted));
         timers.erase(tm);
 
         // wake up thread to recalculate timers
@@ -340,8 +341,8 @@ namespace std { namespace tr2 { namespace sys {
 
     static uint32_t __stdcall timer_proc(void* Parameter)
     { return static_cast<iocp_service*>(Parameter)->timer_worker(); }
-    static size_t add_timer_(void* ctx, const void* timer, async_operation* op)
-    { return static_cast<iocp_service*>(ctx)->add_timer(timer, op); }
+    static size_t add_timer_(void* ctx, const void* timer, const timer_data* data)
+    { return static_cast<iocp_service*>(ctx)->add_timer(timer, data); }
 
     uint32_t __stdcall timer_worker()
     {
@@ -349,30 +350,39 @@ namespace std { namespace tr2 { namespace sys {
       ntl::nt::this_thread::setname("iocp::timer_proc");
 
       size_t count;
-      legacy_handle handles[64];
-
-      handles[0] = timer_event.get();
+      legacy_handle handles[2] = { timer_event.get() };
 
       do {
+
+        timer_data first;
         {
-          rlock lock(timer_lock);
-          size_t size = timers.size();
-          for(count = 0; count != size; ++count) {
-            handles[count+1] = timers[count].first;
+          count = 1;
+          wlock lock(timer_lock);
+          if(!timers.empty()) {
+            // remove the last timer now to eliminate a possible concurrent change when fired
+            if(timers.size() > 1)
+              std::sort(timers.begin(), timers.end(), std::greater<timer_queue::value_type>());
+            first = timers.back();
+            timers.pop_back();
+            handles[count++] = first.h;
           }
         }
 
-        ntstatus st = NtWaitForMultipleObjects(count+1, handles, wait_type::WaitAny, false, infinite_timeout());
+        ntstatus st = NtWaitForMultipleObjects(count, handles, wait_type::WaitAny, false, infinite_timeout());
         if(st == ntl::nt::status::wait_0) {
-          // timers changed
+          // queue was changed
+          if(count > 1) {
+            // place current timer back to queue
+            wlock lock(timer_lock);
+            timers.push_back(first);
+          }
           continue;
         }
-        else if(st >= status::wait_1 && st <= status::wait_63) {
-          count = st - status::wait_1;
-          wlock lock(timer_lock);
-          post_deferred_completion(timers[count].second);
-          timers.erase(timers.begin() + count);
+        else if(st == status::wait_1) {
+          // timer fired
+          post_deferred_completion(first.op);
         }
+
       } while(shutdown.test(false));
 
       ntl::nt::this_thread::exit(status::success);
