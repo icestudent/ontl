@@ -310,16 +310,13 @@ namespace std { namespace tr2 { namespace sys {
     service_implementation_type& ios;
   public:
     // constructors/destructor:
-    explicit work(io_service& ios)
-      :ios(ios)
-    {}
-    work(const work& other)
-      :ios(other.ios)
-    {}
+    explicit work(io_service& ios);
+    work(const work& other);
     ~work(); // if last, stop ios
 
     // members:
-    io_service& get_io_service() { return ios; }
+    io_service& get_io_service();
+
   private:
     void operator=(const work&) __deleted;
   };
@@ -417,6 +414,30 @@ namespace std { namespace tr2 { namespace sys {
   inline void io_service::post(CompletionHandler&& handler)
   {
     impl.post(std::forward<CompletionHandler>(handler));
+  }
+
+
+  //////////////////////////////////////////////////////////////////////////
+  inline io_service::work::work(io_service& ios)
+    : ios(use_service<service_implementation_type>(ios))
+  {
+    this->ios.work_started();
+  }
+
+  inline io_service::work::work(const work& r)
+    : ios(r.ios)
+  {
+    this->ios.work_started();
+  }
+
+  inline io_service::work::~work()
+  {
+    this->ios.work_finished();
+  }
+
+  inline io_service& io_service::work::get_io_service()
+  {
+    return ios.get_io_service();
   }
 
 }}}

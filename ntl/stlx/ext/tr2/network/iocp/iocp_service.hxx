@@ -150,6 +150,12 @@ namespace std { namespace tr2 { namespace sys {
       ++workers;
     }
 
+    void work_finished()
+    {
+      if(--workers == 0)
+        stop();
+    }
+
   protected:
     void check(ntl::nt::ntstatus st)
     {
@@ -164,12 +170,6 @@ namespace std { namespace tr2 { namespace sys {
       return st == custom_result_code 
         ? std::error_code(static_cast<int>(op->Internal1), *reinterpret_cast<const std::error_category*>(op->Internal2))
         : std::make_error_code(st);
-    }
-
-    void work_finished()
-    {
-      if(--workers == 0)
-        stop();
     }
 
     size_t add_timer(const void* timer, const timer_data* data)
