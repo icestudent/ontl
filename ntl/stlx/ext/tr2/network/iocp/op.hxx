@@ -2,7 +2,11 @@
 
 namespace std { namespace tr2 { namespace sys {
 
-  class iocp_service;
+  namespace iocp
+  {
+    class iocp_service;
+  }
+
   namespace __
   {
     struct async_operation;
@@ -44,7 +48,7 @@ namespace std { namespace tr2 { namespace sys {
       add_timer_t* handler;
       void* ctx;
 
-      friend class iocp_service;
+      friend class iocp::iocp_service;
       void shutdown_service() override
       {}
     };
@@ -53,6 +57,8 @@ namespace std { namespace tr2 { namespace sys {
     /** Base async operation */
     struct async_operation: ntl::nt::overlapped
     {
+      typedef iocp::iocp_service iocp_service;
+
       void complete(iocp_service& owner, const error_code& ec, size_t transferred) const
       {
         handle(&owner, const_cast<async_operation*>(this), ec, transferred);

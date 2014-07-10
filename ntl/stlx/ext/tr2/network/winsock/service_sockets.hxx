@@ -211,13 +211,13 @@ namespace ntl { namespace network {
       public winsock_service_base
     {
       typedef ios::__::async_operation async_operation;
-      ios::iocp_service& iocp;
+      ios::iocp::iocp_service& iocp;
     protected:
       typedef stdnet::socket_base::shutdown_type shutdown_type;
       typedef stdnet::socket_base socket_base;
 
       socket_service_base(ios::io_service& svc)
-        : iocp(ios::use_service<ios::iocp_service>(svc))
+        : iocp(ios::use_service<ios::iocp::iocp_service>(svc))
       {}
 
     public:

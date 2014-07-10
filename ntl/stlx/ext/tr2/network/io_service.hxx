@@ -16,10 +16,14 @@
 
 namespace std { namespace tr2 { namespace sys {
 
+  namespace iocp
+  {
+    class iocp_service;
+  }
+
   class io_service;
   class invalid_service_owner;
   class service_already_exists;
-  class iocp_service;
 
   template<class Service> Service& use_service(io_service&);
   template<class Service> void add_service(io_service&, Service*);
@@ -190,7 +194,7 @@ namespace std { namespace tr2 { namespace sys {
     };
     typedef std::unique_lock<std::recursive_mutex> guard;
     typedef forward_list<service_node> services_t;
-    typedef iocp_service service_implementation_type;
+    typedef iocp::iocp_service service_implementation_type;
     
     mutable std::recursive_mutex lock;
     services_t services;
@@ -303,7 +307,7 @@ namespace std { namespace tr2 { namespace sys {
    **/
   class io_service::work
   {
-    io_service& ios;
+    service_implementation_type& ios;
   public:
     // constructors/destructor:
     explicit work(io_service& ios)
@@ -365,7 +369,7 @@ namespace std { namespace tr2 { namespace sys {
 
   inline io_service::io_service()
     : svcNo(0)
-    , impl(use_service<iocp_service>(*this))
+    , impl(use_service<service_implementation_type>(*this))
   {}
 
   inline io_service::~io_service()

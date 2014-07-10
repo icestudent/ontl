@@ -13,6 +13,8 @@
 
 namespace std { namespace tr2 { namespace sys {
 
+  namespace iocp {
+
   class iocp_service:
     public io_service::service
   {
@@ -403,5 +405,5 @@ namespace std { namespace tr2 { namespace sys {
     typedef ntl::nt::srwlock::guard<true>  wlock;
   };
 
-
+} // iocp ns
 }}}
