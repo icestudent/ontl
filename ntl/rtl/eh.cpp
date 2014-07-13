@@ -456,6 +456,12 @@ typedef void(__thiscall* xtor)(void*);
 
 #endif
 
+#if _MSC_VER >= 1900
+  typedef size_t ehvec_count;
+#else
+  typedef int ehvec_count;
+#endif
+
 static int array_unwind_filter(exception_pointers* eh)
 {
   switch(eh->ExceptionRecord->ExceptionCode)
@@ -468,7 +474,7 @@ static int array_unwind_filter(exception_pointers* eh)
 }
 
 /** unwind corrupted array */
-static void array_unwind(void* ptr, size_t size, int count, xtor dtor)
+static void array_unwind(void* ptr, size_t size, ehvec_count count, xtor dtor)
 {
   __try{
     while(--count >= 0){
@@ -482,8 +488,7 @@ static void array_unwind(void* ptr, size_t size, int count, xtor dtor)
 
 
 // Destructor support for arrays of objects
-void __stdcall __ehvec_dtor(void* ptr, size_t size, int count, xtor dtor)
-//void __stdcall __ehvec_dtor( void* ptr, unsigned size, int count, void(__thiscall *dtor)(void*) )
+void __stdcall __ehvec_dtor(void* ptr, size_t size, ehvec_count count, xtor dtor)
 {
   __try{
     // destroy from end to begin
@@ -499,9 +504,9 @@ void __stdcall __ehvec_dtor(void* ptr, size_t size, int count, xtor dtor)
 }
 
 /** Constructor */
-void __stdcall __ehvec_ctor(void* ptr, size_t size, int count, xtor ctor, xtor dtor)
+void __stdcall __ehvec_ctor(void* ptr, size_t size, ehvec_count count, xtor ctor, xtor dtor)
 {
-  int i = 0;
+  ehvec_count i = 0;
   bool success = false;
   __try{
     for(i = 0; i < count; i++){
