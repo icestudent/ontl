@@ -57,7 +57,8 @@ class list
         T elem;
         node(const T& elem) : elem(elem)   {}
         #ifdef NTL_CXX_RV
-        node(T&& elem) : elem(forward<T>(elem))  {}
+        template<typename U>
+        node(U&& x) : elem(forward<U>(x))  {}
         node(node&& x): elem(move(x.elem))
         {}
         #endif
