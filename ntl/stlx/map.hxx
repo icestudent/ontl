@@ -262,8 +262,14 @@ public:
 
     // modifiers:
 #ifdef NTL_CXX_VT
-    template <class... Args> pair<iterator, bool> emplace(Args&&... args);
-    template <class... Args> iterator emplace_hint(const_iterator position, Args&&... args);
+    template <class... Args> pair<iterator, bool> emplace(Args&&... args)
+    {
+      return emplace_hint(end(), std::forward<Args>(args)...);
+    }
+    template <class... Args> iterator emplace_hint(const_iterator position, Args&&... args)
+    {
+      return emplace_hint(position, std::forward<Args>(args)...).first;
+    }
 #endif
 
 #ifdef NTL_CXX_RV
