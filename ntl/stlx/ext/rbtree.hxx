@@ -73,7 +73,7 @@ namespace std
             child[left] = l;
             child[right]= r;
           }
-          node(const T& elem)
+          explicit node(const T& elem)
             :parent_and_color(0 | red),
             elem(elem)
           {
@@ -81,7 +81,7 @@ namespace std
           }
 #ifdef NTL_CXX_RV
           template<typename U>
-          node(U&& elem)
+          explicit node(U&& elem)
             :parent_and_color(0 | red),
             elem(std::forward<U>(elem))
           {
@@ -336,6 +336,28 @@ namespace std
           return std::make_pair(insert_impl(place.second, construct_node(std::forward<value_type>(x)), greater), true);
         }
     #endif
+
+    #ifdef NTL_CXX_VT
+        template <class... Args>
+        std::pair<iterator, bool> emplace_hint(const_iterator /*position*/, Args&&... args)
+        {
+          node_type* const np = node_allocator.allocate(1);
+          node_allocator.construct(np, std::forward<Args>(args)...);
+
+          bool greater;
+          std::pair<node*, node*> place = find_node(np->elem, greater);
+          if(!place.first) {
+            // not exists, place node at tree
+            return std::make_pair(insert_impl(place.second, np, greater), true);
+          }
+
+          // exists, destroy created copy
+          node_allocator.destroy(np);
+          node_allocator.deallocate(np, 1);
+          return std::make_pair(make_iterator(place.first), false);
+        }
+    #endif
+
 
         /** returns node & parent node */
         std::pair<node*, node*> find_node(const value_type& elem, bool& greater)
