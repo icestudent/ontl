@@ -80,9 +80,10 @@ namespace std
             child[left] = child[right] = nullptr;
           }
 #ifdef NTL_CXX_RV
-          node(T&& elem)
+          template<typename U>
+          node(U&& elem)
             :parent_and_color(0 | red),
-            elem(std::forward<T>(elem))
+            elem(std::forward<U>(elem))
           {
             child[left] = child[right] = nullptr;
           }
