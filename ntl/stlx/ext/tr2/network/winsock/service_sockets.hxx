@@ -490,12 +490,17 @@ namespace ntl { namespace network {
         // block until data will be available
         wait(impl, stdnet::socket_base::read, ec);
 
-        size_t received = 0;
-        const size_t max_size = std::min(available(impl, ec), buffs.total_size()), count = buffs.count();
+        const size_t avail = available(impl, ec);
+        const size_t max_size = std::min(avail, buffs.total_size()), count = buffs.count();
+        if(impl.is_stream && avail == 0) {
+          ec = error::make_error_code(error::eof);
+          return 0;
+        }
 
         int addrlen = static_cast<int>(addrsize);
         buffer_sequences::native_buffer* buf = buffs.buffers();
 
+        size_t received = 0;
         for(size_t nbuf = 0; !ec && nbuf < count && received < max_size; nbuf++, buf++) {
           uint32_t offset = 0;
           do {
