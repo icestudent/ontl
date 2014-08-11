@@ -331,6 +331,9 @@ namespace ntl { namespace network {
       typedef int __stdcall SendTo_t(socket s, const wsabuf_t Buffers[], uint32_t BuffersCount, uint32_t* Sent, 
         uint32_t  Flags, const sockaddr* name, int namelen, overlapped* Overlapped, completion_routine_t* CompletionRoutine);
 
+      typedef int __stdcall Ioctl_t(socket s, uint32_t ControlCode, const void* InBuffer, uint32_t InBufferSize,
+        void* OutBuffer, uint32_t OutBufferSize, uint32_t* Returned, overlapped* Overlapped, completion_routine_t* COmpletionRoutine);
+
       typedef int __stdcall StringToAddressW_t(wchar_t* name, int family, const protocol_info* ProtocolInfo, sockaddr* address, int* addrlen);
 
     } // wsa
@@ -377,6 +380,7 @@ namespace ntl { namespace network {
         wsa::Recv_t*      recv;
         wsa::SendTo_t*    sendto;
         wsa::RecvFrom_t*  recvfrom;
+        wsa::Ioctl_t*     ioctl;
       } async;
       
       bool initialized;
@@ -454,6 +458,7 @@ namespace ntl { namespace network {
           funcs.async.recv = ws->find_export<wsa::Recv_t*>("WSARecv");
           funcs.async.sendto = ws->find_export<wsa::SendTo_t*>("WSASendTo");
           funcs.async.recvfrom = ws->find_export<wsa::RecvFrom_t*>("WSARecvFrom");
+          funcs.async.ioctl = ws->find_export<wsa::Ioctl_t*>("WSAIoctl");
 
           // check import
           const void **first = (const void**)&funcs, **last = (const void**)&funcs.initialized;

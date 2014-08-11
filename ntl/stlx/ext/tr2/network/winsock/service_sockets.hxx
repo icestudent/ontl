@@ -421,6 +421,14 @@ namespace ntl { namespace network {
         operation_pending = sockerror::io_pending;
 
     protected:
+      bool is_blocked(const implementation_type* impl, std::error_code& ec) const
+      {
+        uint32_t blocking = 0;
+        int re = impl->funcs->async.ioctl(impl->s, constants::fionbio, nullptr, 0, &blocking, sizeof(blocking), nullptr, nullptr, nullptr);
+        check_error(ec, re);
+        return blocking != 0;
+      }
+
       std::error_code open(implementation_type& impl, int af, int type, int protocol, std::error_code& ec)
       {
         static const native_type invalid_socket = static_cast<socket>(-1);
