@@ -193,18 +193,32 @@ namespace std { namespace tr2 { namespace sys {
   };
 
 
-  /** 5.5.9. Class transfer_all */
+  /**
+   *	@brief 5.5.9. Class transfer_all
+   *	
+   *  A completion condition function object that indicates that a read or write operation should continue until all of the data has been transferred,
+   *  or until an error occurs.
+   **/
   class transfer_all:
     public binary_function<error_code, size_t, bool>
   {
   public:
-    bool operator()(const error_code& ec, size_t) const
+    static const size_t max_transfer = 1024*64;
+
+    size_t operator()(const error_code& ec, size_t) const
     {
-      return !!ec;
+      return !!ec ? 0 : max_transfer;
     }
   };
 
-  /** 5.5.10. Class transfer_at_least */
+
+  /**
+   *	@brief 5.5.10. Class transfer_at_least
+   *	
+   *	A completion condition function object that indicates that a read or write operation
+   *	should continue until a minimum number of bytes has been transferred,
+   *	or until an error occurs.
+   **/
   class transfer_at_least:
     public binary_function<error_code, size_t, bool>
   {
@@ -212,13 +226,38 @@ namespace std { namespace tr2 { namespace sys {
     transfer_at_least(size_t m)
       :min(m)
     {}
-    bool operator()(const error_code& ec, size_t s) const
+    size_t operator()(const error_code& ec, size_t s) const
     {
-       return !!ec || s >= min;
+      return (!!ec || s >= min) ? 0 : transfer_all::max_transfer;
     }
   private:
     size_t min;
   };
+
+
+  /**
+   *	@brief Class transfer_exactly
+   *	
+   *	A completion condition function object that indicates that a read or write operation
+   *	should continue until an exact number of bytes has been transferred,
+   *	or until an error occurs.
+   **/
+  class transfer_exactly:
+    public binary_function<error_code, size_t, bool>
+  {
+  public:
+    transfer_exactly(size_t m)
+      :min(m)
+    {}
+    size_t operator()(const error_code& ec, size_t s) const
+    {
+      return (!!ec || s >= min) ? 0 : std::min(min - s, transfer_all::max_transfer);
+    }
+  private:
+    size_t min;
+  };
+
+
   
   inline const_buffer operator+(const const_buffer& b, size_t size) __ntl_nothrow
   {
