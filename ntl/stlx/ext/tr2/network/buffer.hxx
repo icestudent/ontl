@@ -351,19 +351,39 @@ namespace std { namespace tr2 { namespace sys {
       __ntl_throw(system_error(ec));
     return s;
   }
+  
   template<class SyncReadStream, class MutableBufferSequence>
-  size_t read(SyncReadStream& stream, const MutableBufferSequence& buffers, error_code& ec);
+  inline size_t read(SyncReadStream& stream, const MutableBufferSequence& buffers, error_code& ec)
+  {
+    return stream.read_some(buffers, ec);
+  }
+
   template<class SyncReadStream, class MutableBufferSequence, class CompletionCondition>
-  inline size_t read(SyncReadStream& stream, const MutableBufferSequence& buffers, CompletionCondition completion_condition)
+  inline size_t read(SyncReadStream& stream, const MutableBufferSequence& buffers, CompletionCondition condition)
   {
     error_code ec;
-    size_t s = read(stream, buffers, completion_condition, ec);
+    size_t s = read(stream, buffers, condition, ec);
     if(ec)
       __ntl_throw(system_error(ec));
     return s;
   }
+
   template<class SyncReadStream, class MutableBufferSequence, class CompletionCondition>
-  size_t read(SyncReadStream& stream, const MutableBufferSequence& buffers, CompletionCondition completion_condition, error_code& ec);
+  inline size_t read(SyncReadStream& stream, const MutableBufferSequence& buffers, CompletionCondition condition, error_code& ec)
+  {
+    ec.clear();
+    const size_t max_size = buffer_size(buffers);
+    uint8_t* buf = buffer_cast<uint8_t*>(buffers);
+    size_t transferred = 0;
+    while(transferred < max_size) {
+      const size_t max_transfer = std::min(condition(ec, transferred), max_size - transferred);
+      if(max_transfer == 0)
+        break;
+      const size_t re = stream.read_some(buffer(buf + transferred, max_transfer), ec);
+      transferred += re;
+    }
+    return transferred;
+  }
 
   template<class SyncReadStream, class Allocator>
   inline size_t read(SyncReadStream& stream, basic_fifobuf<Allocator>& fb)
@@ -374,19 +394,22 @@ namespace std { namespace tr2 { namespace sys {
       __ntl_throw(system_error(ec));
     return s;
   }
+
   template<class SyncReadStream, class Allocator>
   size_t read(SyncReadStream& stream, basic_fifobuf<Allocator>& fb, error_code& ec);
+
   template<class SyncReadStream, class Allocator, class CompletionCondition>
-  inline size_t read(SyncReadStream& stream, basic_fifobuf<Allocator>& fb, CompletionCondition completion_condition)
+  inline size_t read(SyncReadStream& stream, basic_fifobuf<Allocator>& fb, CompletionCondition condition)
   {
     error_code ec;
-    size_t s = read(stream, fb, completion_condition, ec);
+    size_t s = read(stream, fb, condition, ec);
     if(ec)
       __ntl_throw(system_error(ec));
     return s;
   }
+
   template<class SyncReadStream, class Allocator, class CompletionCondition>
-  size_t read(SyncReadStream& stream, basic_fifobuf<Allocator>& fb, CompletionCondition completion_condition, error_code& ec);
+  size_t read(SyncReadStream& stream, basic_fifobuf<Allocator>& fb, CompletionCondition condition, error_code& ec);
 
 
 
@@ -394,8 +417,9 @@ namespace std { namespace tr2 { namespace sys {
   ///\name 5.5.12. Asynchronous write operations
   template<class AsyncReadStream, class Allocator, class ReadHandler>
   size_t async_read(AsyncReadStream& stream, basic_fifobuf<Allocator>& fb, ReadHandler handler);
+
   template<class AsyncReadStream, class Allocator, class CompletionCondition, class ReadHandler>
-  size_t async_read(AsyncReadStream& stream, basic_fifobuf<Allocator>& fb, CompletionCondition completion_condition, ReadHandler handler);
+  size_t async_read(AsyncReadStream& stream, basic_fifobuf<Allocator>& fb, CompletionCondition condition, ReadHandler handler);
 
 
 
@@ -410,19 +434,39 @@ namespace std { namespace tr2 { namespace sys {
       __ntl_throw(system_error(ec));
     return s;
   }
+  
   template<class SyncWriteStream, class ConstBufferSequence>
-  size_t write(SyncWriteStream& stream, const ConstBufferSequence& buffers, error_code& ec);
+  inline size_t write(SyncWriteStream& stream, const ConstBufferSequence& buffers, error_code& ec)
+  {
+    return stream.write_some(buffers, ec);
+  }
+
   template<class SyncWriteStream, class ConstBufferSequence, class CompletionCondition>
-  inline size_t write(SyncWriteStream& stream, const ConstBufferSequence& buffers, CompletionCondition completion_condition)
+  inline size_t write(SyncWriteStream& stream, const ConstBufferSequence& buffers, CompletionCondition condition)
   {
     error_code ec;
-    size_t s = write(stream, buffers, completion_condition, ec);
+    size_t s = write(stream, buffers, condition, ec);
     if(ec)
       __ntl_throw(system_error(ec));
     return s;
   }
+
   template<class SyncWriteStream, class ConstBufferSequence, class CompletionCondition>
-  size_t write(SyncWriteStream& stream, const ConstBufferSequence& buffers, CompletionCondition completion_condition, error_code& ec);
+  inline size_t write(SyncWriteStream& stream, const ConstBufferSequence& buffers, CompletionCondition condition, error_code& ec)
+  {
+    ec.clear();
+    const size_t max_size = buffer_size(buffers);
+    const uint8_t* buf = buffer_cast<const uint8_t*>(buffers);
+    size_t transferred = 0;
+    while(transferred < max_size) {
+      const size_t max_transfer = std::min(condition(ec, transferred), max_size - transferred);
+      if(max_transfer == 0)
+        break;
+      const size_t re = stream.write_some(buffer(buf + transferred, max_transfer), ec);
+      transferred += re;
+    }
+    return transferred;
+  }
 
   template<class SyncWriteStream, class Allocator>
   inline size_t write(SyncWriteStream& stream, basic_fifobuf<Allocator>& fb)
@@ -433,19 +477,22 @@ namespace std { namespace tr2 { namespace sys {
       __ntl_throw(system_error(ec));
     return s;
   }
+
   template<class SyncWriteStream, class Allocator>
   size_t write(SyncWriteStream& stream, basic_fifobuf<Allocator>& fb, error_code& ec);
+
   template<class SyncWriteStream, class Allocator, class CompletionCondition>
-  inline size_t write(SyncWriteStream& stream, basic_fifobuf<Allocator>& fb, CompletionCondition completion_condition)
+  inline size_t write(SyncWriteStream& stream, basic_fifobuf<Allocator>& fb, CompletionCondition condition)
   {
     error_code ec;
-    size_t s = write(stream, fb, completion_condition, ec);
+    size_t s = write(stream, fb, condition, ec);
     if(ec)
       __ntl_throw(system_error(ec));
     return s;
   }
+
   template<class SyncWriteStream, class Allocator, class CompletionCondition>
-  size_t write(SyncWriteStream& stream, basic_fifobuf<Allocator>& fb, CompletionCondition completion_condition, error_code& ec);
+  size_t write(SyncWriteStream& stream, basic_fifobuf<Allocator>& fb, CompletionCondition condition, error_code& ec);
 
 
 
@@ -454,12 +501,12 @@ namespace std { namespace tr2 { namespace sys {
   template<class AsyncWriteStream, class ConstBufferSequence, class WriteHandler>
   size_t async_write(AsyncWriteStream& stream, const ConstBufferSequence& buffers, WriteHandler handler);
   template<class AsyncWriteStream, class ConstBufferSequence, class CompletionCondition, class WriteHandler>
-  size_t async_write(AsyncWriteStream& stream, const ConstBufferSequence& buffers, CompletionCondition completion_condition, WriteHandler handler);
+  size_t async_write(AsyncWriteStream& stream, const ConstBufferSequence& buffers, CompletionCondition condition, WriteHandler handler);
 
   template<class AsyncWriteStream, class Allocator, class WriteHandler>
   size_t async_write(AsyncWriteStream& stream, basic_fifobuf<Allocator>& fb, WriteHandler handler);
   template<class AsyncWriteStream, class Allocator, class CompletionCondition, class WriteHandler>
-  size_t async_write(AsyncWriteStream& stream, basic_fifobuf<Allocator>& fb, CompletionCondition completion_condition, WriteHandler handler);
+  size_t async_write(AsyncWriteStream& stream, basic_fifobuf<Allocator>& fb, CompletionCondition condition, WriteHandler handler);
 
 
 
