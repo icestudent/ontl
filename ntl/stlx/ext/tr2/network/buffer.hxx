@@ -412,7 +412,19 @@ namespace std { namespace tr2 { namespace sys {
   size_t read(SyncReadStream& stream, basic_fifobuf<Allocator>& fb, CompletionCondition condition, error_code& ec);
 
 
+  /** This function is used to receive a whole buffer from a stream until condition returns \c 0. */
+  template<class SyncReadStream, class MutableBufferSequence, class CompletionCondition>
+  inline size_t receive(SyncReadStream& stream, const MutableBufferSequence& buffers, CompletionCondition condition, error_code& ec)
+  {
+    return read(stream, buffers, condition, ec);
+  }
 
+  /** This function is used to receive a whole buffer from a stream. */
+  template<class SyncReadStream, class MutableBufferSequence>
+  inline size_t receive(SyncReadStream& stream, const MutableBufferSequence& buffers, error_code& ec)
+  {
+    return read(stream, buffers, ec);
+  }
 
   ///\name 5.5.12. Asynchronous write operations
   template<class AsyncReadStream, class Allocator, class ReadHandler>
@@ -495,6 +507,19 @@ namespace std { namespace tr2 { namespace sys {
   size_t write(SyncWriteStream& stream, basic_fifobuf<Allocator>& fb, CompletionCondition condition, error_code& ec);
 
 
+  /** This function is used to send a whole buffer to the stream until \c condition returns 0. */
+  template<class SyncWriteStream, class ConstBufferSequence, class CompletionCondition>
+  inline size_t send(SyncWriteStream& stream, const ConstBufferSequence& buffers, CompletionCondition condition, error_code& ec)
+  {
+    return write(stream, buffers, condition, ec);
+  }
+
+  /** This function is used to send a whole buffer to the stream. */
+  template<class SyncWriteStream, class ConstBufferSequence>
+  inline size_t send(SyncWriteStream& stream, const ConstBufferSequence& buffers, error_code& ec)
+  {
+    return write(stream, buffers, ec);
+  }
 
 
   ///\name 5.5.14. Asynchronous write operations
