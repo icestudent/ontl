@@ -34,7 +34,9 @@ extern "C"
 # ifdef _M_X64
   #pragma intrinsic(ceil, tan, atan)
 # else
-double __cdecl ceil(double x) { return floor(x+1.0); }
+#  if _MSC_VER < 1900
+     double __cdecl ceil(double x) { return floor(x+1.0); }
+#  endif
 # endif
 #endif
 
