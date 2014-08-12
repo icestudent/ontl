@@ -342,6 +342,8 @@ namespace std { namespace tr2 { namespace sys {
 
 
   ///\name 5.5.11. Synchronous read operations
+
+  /** This function is used to read a whole buffer from a stream. */
   template<class SyncReadStream, class MutableBufferSequence>
   inline size_t read(SyncReadStream& stream, const MutableBufferSequence& buffers)
   {
@@ -352,12 +354,14 @@ namespace std { namespace tr2 { namespace sys {
     return s;
   }
   
+  /** This function is used to read a whole buffer from a stream. */
   template<class SyncReadStream, class MutableBufferSequence>
   inline size_t read(SyncReadStream& stream, const MutableBufferSequence& buffers, error_code& ec)
   {
     return read(stream, buffers, transfer_all(), ec);
   }
 
+  /** This function is used to read a whole buffer from a stream until condition returns \c 0. */
   template<class SyncReadStream, class MutableBufferSequence, class CompletionCondition>
   inline size_t read(SyncReadStream& stream, const MutableBufferSequence& buffers, CompletionCondition condition)
   {
@@ -368,6 +372,7 @@ namespace std { namespace tr2 { namespace sys {
     return s;
   }
 
+  /** This function is used to read a whole buffer from a stream until condition returns \c 0. */
   template<class SyncReadStream, class MutableBufferSequence, class CompletionCondition>
   inline size_t read(SyncReadStream& stream, const MutableBufferSequence& buffers, CompletionCondition condition, error_code& ec)
   {
@@ -437,6 +442,8 @@ namespace std { namespace tr2 { namespace sys {
 
 
   ///\name 5.5.13. Synchronous write operations
+
+  /** This function is used to write a whole buffer to the stream. */
   template<class SyncWriteStream, class ConstBufferSequence>
   inline size_t write(SyncWriteStream& stream, const ConstBufferSequence& buffers)
   {
@@ -447,12 +454,14 @@ namespace std { namespace tr2 { namespace sys {
     return s;
   }
   
+  /** This function is used to write a whole buffer to the stream. */
   template<class SyncWriteStream, class ConstBufferSequence>
   inline size_t write(SyncWriteStream& stream, const ConstBufferSequence& buffers, error_code& ec)
   {
     return write(stream, buffers, transfer_all(), ec);
   }
 
+  /** This function is used to write a whole buffer to the stream until \c condition returns 0. */
   template<class SyncWriteStream, class ConstBufferSequence, class CompletionCondition>
   inline size_t write(SyncWriteStream& stream, const ConstBufferSequence& buffers, CompletionCondition condition)
   {
@@ -463,6 +472,7 @@ namespace std { namespace tr2 { namespace sys {
     return s;
   }
 
+  /** This function is used to write a whole buffer to the stream until \c condition returns 0. */
   template<class SyncWriteStream, class ConstBufferSequence, class CompletionCondition>
   inline size_t write(SyncWriteStream& stream, const ConstBufferSequence& buffers, CompletionCondition condition, error_code& ec)
   {
