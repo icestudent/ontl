@@ -355,7 +355,7 @@ namespace std { namespace tr2 { namespace sys {
   template<class SyncReadStream, class MutableBufferSequence>
   inline size_t read(SyncReadStream& stream, const MutableBufferSequence& buffers, error_code& ec)
   {
-    return stream.read_some(buffers, ec);
+    return read(stream, buffers, transfer_all(), ec);
   }
 
   template<class SyncReadStream, class MutableBufferSequence, class CompletionCondition>
@@ -438,7 +438,7 @@ namespace std { namespace tr2 { namespace sys {
   template<class SyncWriteStream, class ConstBufferSequence>
   inline size_t write(SyncWriteStream& stream, const ConstBufferSequence& buffers, error_code& ec)
   {
-    return stream.write_some(buffers, ec);
+    return write(stream, buffers, transfer_all(), ec);
   }
 
   template<class SyncWriteStream, class ConstBufferSequence, class CompletionCondition>
