@@ -386,6 +386,10 @@
 							>
 						</File>
 						<File
+							RelativePath=".\stlx\ext\tr2\stream_mutex.hxx"
+							>
+						</File>
+						<File
 							RelativePath=".\stlx\ext\tr2\timer.hxx"
 							>
 						</File>
