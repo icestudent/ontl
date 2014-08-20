@@ -51,7 +51,10 @@ namespace ntl {
       template<bool Exclusive>
       class guard;
 
-      srwlock()
+      template<bool Exclusive>
+      class try_lock;
+
+      constexpr srwlock()
       {
         _ = 0;
       }
@@ -76,6 +79,8 @@ namespace ntl {
       }
     };
 
+
+
     template<bool Exclusive>
     class srwlock::guard
     {
@@ -96,6 +101,37 @@ namespace ntl {
 
       guard(const guard&) __deleted;
       guard& operator=(const guard&) __deleted;
+    };
+
+
+
+    template<bool Exclusive>
+    class srwlock::try_lock
+    {
+    public:
+      static const bool exclusive = Exclusive;
+
+      explicit try_lock(srwlock& m)
+        :m(m)
+      {
+        locked = m.try_acquire(exclusive);
+      }
+      ~try_lock()
+      {
+        if(locked)
+          m.release(exclusive);
+      }
+
+      bool owns_lock() const { return locked; }
+
+      __explicit_operator_bool() const { return __explicit_bool(locked); }
+
+    private:
+      srwlock& m;
+      bool locked;
+
+      try_lock(const try_lock&) __deleted;
+      try_lock& operator=(const try_lock&) __deleted;
     };
 
   } 
