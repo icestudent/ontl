@@ -1003,6 +1003,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\stlx\type_traits_aliases.hxx"
+						>
+					</File>
+					<File
 						RelativePath=".\stlx\type_traits_bcb.hxx"
 						>
 					</File>

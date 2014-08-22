@@ -15,6 +15,8 @@
 #ifndef NTL__STLX_LIMITS
 #include "limits.hxx" // for is_integral
 #endif
+
+// forward declaration of type traits
 #include "type_traits_fwd.hxx"
 
 
@@ -63,8 +65,9 @@ namespace __
 } // namespace std
 
 
-#define NTL__IN_STLX_TYPE_TRAITS
 
+// type traits implementation
+#define NTL__IN_STLX_TYPE_TRAITS
 #if   defined(__GNUC__)
 # include "type_traits_gnuc.hxx"
 #elif defined(_MSC_VER)
@@ -76,8 +79,13 @@ namespace __
 #else
 # error Unspported compiler
 #endif
-
 #undef  NTL__IN_STLX_TYPE_TRAITS
+
+
+#ifdef NTL_CXX_TT
+# include "type_traits_aliases.hxx"
+#endif
+
 
 namespace std {
 namespace __ {

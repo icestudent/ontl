@@ -313,6 +313,8 @@ namespace std
     public __::result_of<FunctionCallType>
   {};
 
+  template <class T> using result_of_t                    = typename result_of<T>::type;
+
 /**@} lib_func_ret         */
 /**@} lib_function_objects */
 /**@} lib_utilities        */
