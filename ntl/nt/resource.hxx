@@ -55,7 +55,7 @@ namespace ntl {
         legacy_handle     ExclusiveSemaphore;
         uint32_t          NumberOfWaitingExclusive;
 
-        int32_t           NumberOfActive;
+        int32_t           NumberOfActive; // negative: exclusive acquire; zero: not acquired; positive: shared acquire(s)
         legacy_handle     ExclusiveOwnerThread;
 
         enum flags { None, LongTerm };
@@ -166,9 +166,11 @@ namespace ntl {
       RtlConvertSharedToExclusive,
       RtlConvertExclusiveToShared;
  
+    NTL_EXTERNAPI 
     bool __stdcall
       RtlAcquireResourceShared(rtl::resource* Resource, bool Wait);
 
+    NTL_EXTERNAPI 
     bool __stdcall
       RtlAcquireResourceExclusive(rtl::resource* Resource, bool Wait);
 
