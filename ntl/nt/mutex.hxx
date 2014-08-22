@@ -334,6 +334,190 @@ namespace ntl {
       base_mutex& operator=(const base_mutex&) __deleted;
     };
 
+
+
+    class base_shared_mutex:
+      protected resource
+    {
+      base_shared_mutex(const base_shared_mutex&) __deleted;
+      base_shared_mutex& operator=(const base_shared_mutex&) __deleted;
+
+      static const bool recursive = false;
+    public:
+      base_shared_mutex()
+      {}
+
+      ~base_shared_mutex()
+      {
+        if(is_locked_any()) {
+          if(recursive && is_owner())
+            release();
+          else 
+            // UB
+            _assert_msg("This mutex owned by other thread or deletion of owning mutex is not allowed.");
+        }
+      }
+
+      ///\name exclusive ownership
+      
+      /** locks the mutex, blocks if the mutex is not available */
+      void lock()
+      {
+        if(!recursive) {
+          if(is_owner()) { // throw system_error(resource_deadlock_would_occur)
+            _assert_msg("Current thread already owns the mutex.");
+            return;
+          }
+        }
+        acquire_exclusive();
+      }
+
+      /** tries to lock the mutex, returns if the mutex is not available */
+      bool try_lock()
+      {
+        if(!recursive) {
+          if(is_owner()) { // throw system_error(resource_deadlock_would_occur)
+            _assert_msg("Current thread already owns the mutex.");
+            return true;
+          }
+        }
+        return acquire_exclusive(false);
+      }
+
+      /** unlocks the mutex */
+      void unlock()
+      {
+        if(!is_locked(true)) {
+          _assert_msg("Unlocking non-locked mutex."); // throw system_error(operation_not_permitted)
+        } else {
+          if(!is_owner()) {
+            _assert_msg("The mutex must be locked by the current thread of execution.");
+          } 
+          release();
+        }
+      }
+
+      ///\name shared ownership
+      
+      /** locks the mutex for shared ownership, blocks if the mutex is not available */
+      void lock_shared()
+      {
+        if(!recursive) {
+          if(is_owner()) { // throw system_error(resource_deadlock_would_occur)
+            _assert_msg("Current thread already owns the mutex.");
+            return;
+          }
+        }
+        acquire_shared();
+      }
+
+      /** tries to lock the mutex for shared ownership, returns if the mutex is not available */
+      bool try_lock_shared()
+      {
+        if(!recursive) {
+          if(is_owner()) { // throw system_error(resource_deadlock_would_occur)
+            _assert_msg("Current thread already owns the mutex.");
+            return true;
+          }
+        }
+        return acquire_shared(false);
+      }
+
+      /** unlocks the mutex (shared ownership) */
+      void unlock_shared()
+      {
+        if(!is_locked(false)) {
+          _assert_msg("Unlocking non-locked mutex."); // throw system_error(operation_not_permitted)
+        } else
+          release();
+      }
+      ///\}
+
+    protected:
+      bool is_owner() const
+      {
+        return ExclusiveOwnerThread == teb::instance().ClientId.UniqueThread;
+      }
+
+      bool is_locked(bool exclusive) const
+      {
+        if(NumberOfActive == 0)
+          return false;
+        else if(exclusive)
+          return NumberOfActive < 0;
+        else
+          return NumberOfActive > 0;
+      }
+      bool is_locked_any() const { return NumberOfActive != 0; }
+
+      ntstatus wait_exclusive(const systime_t& timeout)
+      {
+        const legacy_handle current_thread = teb::instance().ClientId.UniqueThread;
+        for(;;)
+        {
+          // pre check object state
+          {
+            // critical section
+            critical_section::guard lock(CriticalSection);
+
+            if((NumberOfActive == 0) || (NumberOfActive == -1 && !ExclusiveOwnerThread)) {
+              NumberOfActive = -1;
+              ExclusiveOwnerThread = current_thread;
+              return status::success;
+            }
+
+            if(ExclusiveOwnerThread == current_thread) {
+              NumberOfActive = -1;
+              return status::success;
+            }
+
+            NumberOfWaitingExclusive++;
+            this->DebugInfo->ContentionCount++;
+          }
+
+          ntstatus st = NtWaitForSingleObject(ExclusiveSemaphore, false, timeout);
+          if(st == status::timeout)
+            return st;
+
+          // signaled, do post check by section above
+        }
+      }
+
+      ntstatus wait_shared(const systime_t& timeout)
+      {
+        const legacy_handle current_thread = teb::instance().ClientId.UniqueThread;
+        for(;;)
+        {
+          // pre check object state
+          {
+            // critical section
+            critical_section::guard lock(CriticalSection);
+
+            if(NumberOfActive >= 0) {
+              // all waiting is shared, so join them
+              NumberOfActive += 1;
+              return status::success;
+            }
+            else if(ExclusiveOwnerThread == current_thread) {
+              // already have exclusive lock
+              NumberOfActive -= 1;
+              return status::success;
+            }
+
+            NumberOfWaitingShared++;
+            this->DebugInfo->ContentionCount++;
+          }
+
+          ntstatus st = NtWaitForSingleObject(SharedSemaphore, false, timeout);
+          if(st == status::timeout)
+            return st;
+
+          // signaled, do post check by section above
+        }
+      }
+
+    };
+
 #pragma warning(default:4127)
   }
 }

@@ -891,6 +891,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\stlx\shared_mutex.hxx"
+						>
+					</File>
+					<File
 						RelativePath=".\stlx\stdexcept.hxx"
 						>
 					</File>
