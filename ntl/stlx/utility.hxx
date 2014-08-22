@@ -155,8 +155,23 @@ bool operator>=(const T & x, const T & y) { return !(x < y); }
 
 #pragma region pairs
 
+
+  // definitions in <algorithm>
+
   template<class T>
   inline void swap(T& a, T& b);
+
+  template <class T, size_t N>
+  inline void swap(T (&a)[N], T (&b)[N]);
+
+#ifdef NTL_CXX_RV
+  template <class T, class U = T>
+  inline T exchange(T& obj, U&& new_val);
+#else
+  template <class T, class U = T> inline T exchange(T& obj, U& new_val);
+  template <class T, class U = T> inline T exchange(T& obj, const U& new_val);
+#endif
+
 
 /**\addtogroup  lib_pairs *****  20.3 Pairs [pairs]
  *@{*/

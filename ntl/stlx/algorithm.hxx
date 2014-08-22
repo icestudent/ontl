@@ -455,6 +455,37 @@ inline void swap(T& a, T& b)
 }
 
 
+template <class T, size_t N>
+inline void swap(T (&a)[N], T (&b)[N])
+{
+  swap_ranges(a, a+N, b);
+}
+
+
+#ifndef NTL_CXX_RV
+template <class T, class U> inline T exchange(T& obj, U& new_val)
+{
+  T old_val(obj);
+  obj = new_val;
+  return old_val;
+}
+template <class T, class U> inline T exchange(T& obj, const U& new_val)
+{
+  T old_val(obj);
+  obj = new_val;
+  return old_val;
+}
+#else
+
+template <class T, class U> 
+inline T exchange(T& obj, U&& new_val)
+{
+  T old_val = std::move(obj);
+  obj = std::forward<U>(new_val);
+  return old_val;
+}
+#endif
+
 template<class ForwardIterator1, class ForwardIterator2>
 __forceinline
 ForwardIterator2
