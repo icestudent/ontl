@@ -291,6 +291,30 @@ namespace std
 
         const_iterator find(const value_type& x) const { return const_cast<rb_tree*>(this)->find(x); }
 
+#ifdef NTL_CXX_TYPEOF
+        template<typename K>
+        typename enable_if<__::is_transparent<Compare, K>::value, iterator>::type find(const K& x)
+        {
+          node* p = root_;
+          while ( p )
+          {
+            if(comparator_(x, p->elem))       // elem_less
+              p = p->child[left];
+            else if(comparator_(p->elem, x))  // elem_greater
+              p = p->child[right];
+            else
+              break;//return iterator(p, this);
+          }
+          return make_iterator(p);// returns end() if !p
+        }
+
+        template<typename K>
+        typename enable_if<__::is_transparent<Compare, K>::value, const_iterator>::type find(const K& x) const
+        {
+          return const_cast<rb_tree*>(this)->find<K>(x);
+        }
+#endif
+
         // modifiers
       protected:
         void assign(const rb_tree& x)

@@ -63,6 +63,29 @@ namespace std {
       {
         return comp(x.first, y.first);
       }
+      __forceinline
+        bool operator()(const value_type& x, const Key& y) const
+      {
+        return comp(x.first, y);
+      }
+      __forceinline
+        bool operator()(const Key& x, const value_type& y) const
+      {
+        return comp(x, y.first);
+      }
+
+      template<typename U>
+      __forceinline
+        typename enable_if<__::is_transparent<Compare, U>::value, bool>::type operator()(const value_type& x, const U& y) const
+      {
+        return comp(x.first, y);
+      }
+      template<typename U>
+      __forceinline
+        typename enable_if<__::is_transparent<Compare, U>::value, bool>::type operator()(const U& y, const value_type& x) const
+      {
+        return comp(y, x.first);
+      }
 
     friend class std::map<Key, T, Compare, Allocator>;
     friend class std::multimap<Key, T, Compare, Allocator>;
@@ -330,9 +353,9 @@ public:
       node* p = tree_type::root_;
       while ( p )
       {
-        if ( val_comp_.comp(x, p->elem.first) )
+        if ( val_comp_(x, p->elem) )
           p = p->child[tree_type::left];
-        else if(val_comp_.comp(p->elem.first, x))
+        else if(val_comp_(p->elem, x))
           p = p->child[tree_type::right];
         else
           return tree_type::make_iterator(p);
@@ -344,6 +367,36 @@ public:
     {
       return const_cast<map*>(this)->find(x);
     }
+
+#ifdef NTL_CXX_TYPEOF
+    template<typename K>
+    typename enable_if<__::is_transparent<Compare, K>::value, iterator>::type find(const K& x)
+    {
+      node* p = tree_type::root_;
+      while ( p )
+      {
+        if ( val_comp_(x, p->elem) )
+          p = p->child[tree_type::left];
+        else if(val_comp_(p->elem, x))
+          p = p->child[tree_type::right];
+        else
+          return tree_type::make_iterator(p);
+      }
+      return end();
+    }
+    template<typename K>
+    typename enable_if<__::is_transparent<Compare, K>::value, const_iterator>::type find(const K& x) const
+    {
+      return const_cast<map*>(this)->find(x);
+    }
+
+    template<typename K>
+    typename enable_if<__::is_transparent<Compare, K>::value, size_type>::type count(const K& x)
+    {
+      return find(x) != end() ? 1 : 0;
+    }
+
+#endif
 
     size_type count(const key_type& x) const
     {

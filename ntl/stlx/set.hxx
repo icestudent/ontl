@@ -178,6 +178,13 @@ namespace std {
     {
       return find(x) != end() ? 1 : 0;
     }
+#ifdef NTL_CXX_TYPEOF
+    template<typename K>
+    typename enable_if<__::is_transparent<Compare, K>::value, size_type>::type count(const K& x)
+    {
+      return find(x) != end() ? 1 : 0;
+    }
+#endif
 
     iterator        lower_bound(const key_type& x)        { return equal_range(x)->second; }
     const_iterator  lower_bound(const key_type& x) const  { return equal_range(x)->second; }
