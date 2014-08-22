@@ -152,6 +152,19 @@ struct negate : unary_function<T, T>
 
 // Making Operator Functors [n3421]
 
+namespace __
+{
+  template<class T, class U = void>
+  struct is_transparent
+  {
+  private:
+    template<class X> static sfinae_passed_tag test(typename X::is_transparent* = 0);
+    template<class X> static sfinae_failed_tag test(...);
+  public:
+    static const bool value = NTL_SFINAE_EVAL(test<T>(0));
+  };
+}
+
 template <>
 struct plus<void>
 {
@@ -159,6 +172,7 @@ struct plus<void>
 	auto operator()(T&& t, U&& u) const ->
 	decltype(std::forward<T>(t) + std::forward<U>(u))
 	{ return std::forward<T>(t) + std::forward<U>(u); }
+  typedef void is_transparent;
 };
 
 template <>
@@ -168,6 +182,7 @@ struct minus<void>
 	auto operator()(T&& t, U&& u) const ->
 	decltype(std::forward<T>(t) - std::forward<U>(u))
 	{ return std::forward<T>(t) - std::forward<U>(u); }
+  typedef void is_transparent;
 };
 
 template <>
@@ -177,6 +192,7 @@ struct multiplies<void>
 	auto operator()(T&& t, U&& u) const ->
 	decltype(std::forward<T>(t) * std::forward<U>(u))
 	{ return std::forward<T>(t) * std::forward<U>(u); }
+  typedef void is_transparent;
 };
 
 template <>
@@ -186,6 +202,7 @@ struct divides<void>
 	auto operator()(T&& t, U&& u) const ->
 	decltype(std::forward<T>(t) / std::forward<U>(u))
 	{ return std::forward<T>(t) / std::forward<U>(u); }
+  typedef void is_transparent;
 };
 
 template <>
@@ -195,6 +212,7 @@ struct modulus<void>
 	auto operator()(T&& t, U&& u) const ->
 	decltype(std::forward<T>(t) % std::forward<U>(u))
 	{ return std::forward<T>(t) % std::forward<U>(u); }
+  typedef void is_transparent;
 };
 
 template <>
@@ -204,6 +222,7 @@ struct negate<void>
 	auto operator()(T&& t) const ->
 	decltype( -std::forward<T>(t) )
 	{ return  -std::forward<T>(t); }
+  typedef void is_transparent;
 };
 
 #endif // NTL_CXX_TYPEOF
@@ -264,6 +283,7 @@ struct equal_to<void>
 	auto operator()(T&& t, U&& u) const ->
 	decltype(std::forward<T>(t) == std::forward<U>(u))
 	{ return std::forward<T>(t) == std::forward<U>(u); }
+  typedef void is_transparent;
 };
 
 template <>
@@ -273,6 +293,7 @@ struct not_equal_to<void>
 	auto operator()(T&& t, U&& u) const ->
 	decltype(std::forward<T>(t) != std::forward<U>(u))
 	{ return std::forward<T>(t) != std::forward<U>(u); }
+  typedef void is_transparent;
 };
 
 template <>
@@ -282,6 +303,7 @@ struct greater<void>
 	auto operator()(T&& t, U&& u) const ->
 	decltype(std::forward<T>(t) > std::forward<U>(u))
 	{ return std::forward<T>(t) > std::forward<U>(u); }
+  typedef void is_transparent;
 };
 
 template <>
@@ -291,6 +313,7 @@ struct less<void>
 	auto operator()(T&& t, U&& u) const ->
 	decltype(std::forward<T>(t) < std::forward<U>(u))
 	{ return std::forward<T>(t) < std::forward<U>(u); }
+  typedef void is_transparent;
 };
 
 template <>
@@ -300,6 +323,7 @@ struct greater_equal<void>
 	auto operator()(T&& t, U&& u) const ->
 	decltype(std::forward<T>(t) >= std::forward<U>(u))
 	{ return std::forward<T>(t) >= std::forward<U>(u); }
+  typedef void is_transparent;
 };
 
 template <>
@@ -309,6 +333,7 @@ struct less_equal<void>
 	auto operator()(T&& t, U&& u) const ->
 	decltype(std::forward<T>(t) <= std::forward<U>(u))
 	{ return std::forward<T>(t) <= std::forward<U>(u); }
+  typedef void is_transparent;
 };
 
 #endif // NTL_CXX_TYPEOF
@@ -351,6 +376,7 @@ struct logical_and<void>
 	auto operator()(T&& t, U&& u) const ->
 	decltype(std::forward<T>(t) && std::forward<U>(u))
 	{ return std::forward<T>(t) && std::forward<U>(u); }
+  typedef void is_transparent;
 };
 
 template <>
@@ -360,6 +386,7 @@ struct logical_or<void>
 	auto operator()(T&& t, U&& u) const ->
 	decltype(std::forward<T>(t) || std::forward<U>(u))
 	{ return std::forward<T>(t) || std::forward<U>(u); }
+  typedef void is_transparent;
 };
 
 template <>
@@ -369,6 +396,7 @@ struct logical_not<void>
 	auto operator()(T&& t) const ->
 	decltype( !std::forward<T>(t))
 	{ return  !std::forward<T>(t); }
+  typedef void is_transparent;
 };
 
 #endif // NTL_CXX_TYPEOF
@@ -425,6 +453,7 @@ struct bit_and<void>
 	auto operator()(T&& t, U&& u) const ->
 	decltype(std::forward<T>(t) & std::forward<U>(u))
 	{ return std::forward<T>(t) & std::forward<U>(u); }
+  typedef void is_transparent;
 };
 
 template <>
@@ -434,6 +463,7 @@ struct bit_or<void>
 	auto operator()(T&& t, U&& u) const ->
 	decltype(std::forward<T>(t) | std::forward<U>(u))
 	{ return std::forward<T>(t) | std::forward<U>(u); }
+  typedef void is_transparent;
 };
 
 template <>
@@ -443,6 +473,7 @@ struct bit_xor<void>
 	auto operator()(T&& t, U&& u) const ->
 	decltype(std::forward<T>(t) ^ std::forward<U>(u))
 	{ return std::forward<T>(t) ^ std::forward<U>(u); }
+  typedef void is_transparent;
 };
 
 template <>
@@ -452,6 +483,7 @@ struct bit_not<void>
 	auto operator()(T&& t) const ->
 	decltype( ~std::forward<T>(t) )
 	{ return  ~std::forward<T>(t); }
+  typedef void is_transparent;
 };
 
 #endif // NTL_CXX_TYPEOF
