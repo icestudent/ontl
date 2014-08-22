@@ -187,6 +187,8 @@ namespace ntl {
       ntl::noncopyable
     {
     public:
+      class guard;
+
       /** Constructs CS object */
       critical_section()
       {
@@ -321,6 +323,29 @@ namespace ntl {
       void spin_count(uint32_t SpinCount)
       {
         ntl::nt::RtlSetCriticalSectionSpinCount(this, SpinCount);
+      }
+    };
+
+    class critical_section::guard
+    {
+      guard(const guard&) __deleted;
+      guard& operator=(const guard&) __deleted;
+
+      critical_section& m;
+    public:
+      explicit guard(critical_section& m)
+        : m(m)
+      {
+        m.acquire();
+      }
+      explicit guard(rtl::critical_section& cs)
+        : m(static_cast<critical_section&>(cs))
+      {
+        m.acquire();
+      }
+      ~guard()
+      {
+        m.release();
       }
     };
 
