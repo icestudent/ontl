@@ -105,6 +105,13 @@ namespace std
       }
     };
 
+    ///\name Stream locks
+    template <typename Stream>
+    inline stream_guard<Stream> lock_stream(stream_mutex<Stream>& mtx)
+    {
+      return stream_guard<Stream>(mtx);
+    }
+
 
     ///\name Stream Operators
     template <typename Stream, typename T>
