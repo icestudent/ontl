@@ -801,7 +801,7 @@ class ostreambuf_iterator
 
   ///\name 24.8 Container access (N4017) [iterator.container]
 
-  template <class C> inline constexpr auto size(const C& c) noexcept { return c.size(); }
+  template <class C> inline constexpr auto size(const C& c) noexcept -> decltype(c.size()) { return c.size(); }
 
   template <class T, size_t N> inline constexpr size_t size(const T (&array)[N]) noexcept { return N; }
 
@@ -809,21 +809,21 @@ class ostreambuf_iterator
 
   template <class T, size_t N> inline constexpr bool empty(const T (&array)[N]) noexcept { return false; }
 
-  template <class C> inline constexpr decltype(auto) front(C& c) { return c.front(); }
+  template <class C> inline constexpr auto front(C& c) -> decltype(c.front()) { return c.front(); }
 
-  template <class C> inline constexpr decltype(auto) front(const C& c) { return c.front(); }
+  template <class C> inline constexpr auto front(const C& c) -> decltype(c.front()) { return c.front(); }
 
-  template <class C> inline constexpr decltype(auto) back(C& c) { return c.back(); }
+  template <class C> inline constexpr auto back(C& c) -> decltype(c.back()) { return c.back(); }
 
-  template <class C> inline constexpr decltype(auto) back(const C& c) { return c.back(); }
+  template <class C> inline constexpr auto back(const C& c) -> decltype(c.back()) { return c.back(); }
 
   template <class T, size_t N> inline constexpr T& front(T (&array)[N]) noexcept { return array[0]; }
 
   template <class T, size_t N> inline constexpr T& back(T (&array)[N]) noexcept { return array[N-1]; }
 
-  template <class C> inline constexpr auto data(C& c) noexcept { return c.data(); }
+  template <class C> inline constexpr auto data(C& c) noexcept -> decltype(c.data()) { return c.data(); }
 
-  template <class C> inline constexpr auto data(const C& c) noexcept { return c.data(); }
+  template <class C> inline constexpr auto data(const C& c) noexcept -> decltype(c.data()) { return c.data(); }
 
   template <class T, size_t N> inline constexpr T* data(T (&array)[N]) noexcept { return array; }
 
