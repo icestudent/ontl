@@ -64,6 +64,12 @@ namespace std { namespace tr2 { namespace network {
       throw_system_error(ec);
     }
 
+    ~basic_socket_acceptor()
+    {
+      std::error_code ec;
+      close(ec);
+    }
+
     ///\name members:
     native_type native() { return service.native(); }
 
