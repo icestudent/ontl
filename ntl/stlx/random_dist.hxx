@@ -92,17 +92,21 @@ namespace std
         const T space = pspace+1,
           scale = uspace / space,
           up = scale * space;
+
         do {
           re = static_cast<T>(g()) - umin;
         } while(re >= up);
+
         re /= scale;
+
       } else if(uspace < pspace) {
         // zoom in
-        const T space = uspace+1;
         T x;
+        const T space = uspace+1;
+        const param_type smaller(0, space != 0 ? static_cast<IntType>(pspace / space) : IntType());
         do {
-          x = space * this->operator()(g, param_type(0, static_cast<IntType>(pspace / space)));
-          re = x + (static_cast<T>(g()) - umin);
+          x = space * this->operator()(g, smaller);
+          re = x + ( static_cast<T>(g()) - umin );
         } while(re > pspace || re < x);
 
       } else {
