@@ -75,34 +75,38 @@ namespace std
     template<class URNG>
     result_type operator()(URNG& g)
     {
-      return this->operator()(g, param_type(0, numeric_limits<IntType>::max()));
+      return this->operator()(g, p);
     }
     template<class URNG>
-    result_type operator()(URNG& g, const param_type& parm)
+    result_type operator()(URNG& g, const param_type& p)
     {
       typedef typename make_unsigned<result_type>::type R;
       typedef typename make_unsigned<typename URNG::result_type>::type UR;
       typedef typename conditional<( sizeof(R) > sizeof(UR) ), R, UR>::type T;
 
-      const T umin = g.min(), umax = g.max(), uspace = umax-umin, space = max()-min();
+      assert(p.first <= p.second);
+      const T umin = g.min(), umax = g.max(), uspace = umax-umin, pspace = p.second - p.first;
       T re;
-      if(uspace > space){
+      if(uspace > pspace) {
         // zoom out
-        const T scale = uspace / (space+1),
-          up = uspace * scale;
+        const T space = pspace+1,
+          scale = uspace / space,
+          up = scale * space;
         do {
           re = static_cast<T>(g()) - umin;
         } while(re >= up);
         re /= scale;
-      }else if(uspace < space){
+      } else if(uspace < pspace) {
         // zoom in
-        T x, us = uspace+1;
-        do{
-          x = us * this->operator()(g, param_type(0, static_cast<IntType>(space / us)));
+        const T space = uspace+1;
+        T x;
+        do {
+          x = space * this->operator()(g, param_type(0, static_cast<IntType>(pspace / space)));
           re = x + (static_cast<T>(g()) - umin);
-        } while(re > space || re < x);
+        } while(re > pspace || re < x);
 
-      }else{
+      } else {
+        // equal space
         re = static_cast<T>(g()) - umin;
       }
       return static_cast<IntType>(re + p.first);
