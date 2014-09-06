@@ -185,6 +185,11 @@ namespace std { namespace tr2 { namespace sys {
       work_started();
 
       wlock lock(timer_lock);
+      const ntl::nt::legacy_handle t = reinterpret_cast<ntl::nt::legacy_handle>(timer);
+      timer_queue::iterator tm = std::find_if(timers.begin(), timers.end(), find_timer(t));
+      if(tm != timers.end()) {
+        timers.erase(tm);
+      }
       timers.push_back(*data);
       timer_event.set();
       return true;
@@ -199,12 +204,15 @@ namespace std { namespace tr2 { namespace sys {
       const ntl::nt::legacy_handle t = reinterpret_cast<ntl::nt::legacy_handle>(timer);
       timer_queue::iterator tm = std::find_if(timers.begin(), timers.end(), find_timer(t));
       if(tm != timers.end()) {
-        // complete handler with aborted code
-        on_completion(tm->op, std::make_error_code(std::tr2::network::error::operation_aborted));
+        async_operation* op = tm->op;
         timers.erase(tm);
 
         // wake up thread to recalculate timers
         timer_event.set();
+
+        // complete handler with aborted code
+        on_completion(op, std::make_error_code(std::tr2::network::error::operation_aborted));
+
         return 1;
       }
       return 0;
@@ -365,7 +373,7 @@ namespace std { namespace tr2 { namespace sys {
             if(timers.size() > 1)
               std::sort(timers.begin(), timers.end(), std::greater<timer_queue::value_type>());
             first = timers.back();
-            timers.pop_back();
+            //timers.pop_back();
             handles[count++] = first.h;
           }
         }
@@ -373,16 +381,20 @@ namespace std { namespace tr2 { namespace sys {
         ntstatus st = NtWaitForMultipleObjects(count, handles, wait_type::WaitAny, false, infinite_timeout());
         if(st == ntl::nt::status::wait_0) {
           // queue was changed
-          if(count > 1) {
-            // place current timer back to queue
-            wlock lock(timer_lock);
-            timers.push_back(first);
-          }
           continue;
         }
         else if(st == status::wait_1) {
           // timer fired
-          post_deferred_completion(first.op);
+          wlock lock(timer_lock);
+          timer_queue::iterator tm = std::find_if(timers.begin(), timers.end(), find_timer(first.h));
+          if(tm != timers.end()) {
+            // fired and not erased yet
+            timers.erase(tm);
+            post_deferred_completion(first.op);
+          } else {
+            // if erased, operation_aborted will be sent 
+            first.h = 0;
+          }
         }
 
       } while(shutdown.test(false));
