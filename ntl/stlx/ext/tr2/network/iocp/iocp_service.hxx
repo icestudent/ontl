@@ -218,6 +218,7 @@ namespace std { namespace tr2 { namespace sys {
       return 0;
     }
 
+  public:
     /** Is we inside service? If yes, we can dispatch immediately */
     bool can_dispatch() const /*volatile*/
     {
@@ -238,6 +239,7 @@ namespace std { namespace tr2 { namespace sys {
       iocp.set_completion(nullptr, static_cast<overlapped*>(op));
     }
 
+  protected:
     void complete(const async_operation* op, const std::error_code& ec, size_t transferred)
     {
       struct finish
