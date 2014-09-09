@@ -50,6 +50,7 @@ namespace std { namespace tr2 { namespace network {
 
        template<class ResolveHandler>
        void async_resolve(implementation_type& impl, const query_type& q, ResolveHandler handler) { return svc.async_resolve(impl, q, handler); }
+
        template<class ResolveHandler>
        void async_resolve(implementation_type& impl, const endpoint_type& e, ResolveHandler handler) { return svc.async_resolve(impl, e, handler); }
        ///\}

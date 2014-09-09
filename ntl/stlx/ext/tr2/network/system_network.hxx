@@ -322,6 +322,32 @@ namespace ntl {
     addrinfo* next;
   };
 
+  template<typename charT>
+  struct addrinfoex_t
+  {
+    enum namespace_type {
+      ns_all      = 0,
+
+    };
+
+    int32_t   flags;
+    int32_t   family;
+    int32_t   socktype;
+    int32_t   protocol;
+    size_t    addrlen;
+    charT*    canonname;
+    sockaddr* addr;
+    void*     blob;
+    size_t    bloblen;
+    nt::guid* provider;
+
+    addrinfoex_t* next;
+  };
+
+  typedef addrinfoex_t<char>    addrinfoex_a;
+  typedef addrinfoex_t<wchar_t> addrinfoex_w;
+
+
   struct timeval
   {
     long sec;

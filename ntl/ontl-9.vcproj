@@ -455,6 +455,10 @@
 									Name="winsock"
 									>
 									<File
+										RelativePath=".\stlx\ext\tr2\network\winsock\dns_ops.hxx"
+										>
+									</File>
+									<File
 										RelativePath=".\stlx\ext\tr2\network\winsock\service_resolve.hxx"
 										>
 									</File>

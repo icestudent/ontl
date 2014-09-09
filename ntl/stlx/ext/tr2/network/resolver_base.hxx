@@ -102,7 +102,7 @@ namespace std { namespace tr2 { namespace network {
 
       ///\name constructors:
       basic_resolver_iterator()
-        :response()
+        :response(0)
       {}
 
       ///\name forward iterator members
@@ -145,8 +145,6 @@ namespace std { namespace tr2 { namespace network {
       }
       ///\}
 
-    protected:
-      friend class resolver_service<InternetProtocol>;
       typedef shared_ptr<vector<value_type> > response_t;
       basic_resolver_iterator(const response_t& res)
         :result(res), response(0)

@@ -332,9 +332,12 @@ namespace ntl { namespace network {
         uint32_t  Flags, const sockaddr* name, int namelen, overlapped* Overlapped, completion_routine_t* CompletionRoutine);
 
       typedef int __stdcall Ioctl_t(socket s, uint32_t ControlCode, const void* InBuffer, uint32_t InBufferSize,
-        void* OutBuffer, uint32_t OutBufferSize, uint32_t* Returned, overlapped* Overlapped, completion_routine_t* COmpletionRoutine);
+        void* OutBuffer, uint32_t OutBufferSize, uint32_t* Returned, overlapped* Overlapped, completion_routine_t* CompletionRoutine);
 
       typedef int __stdcall StringToAddressW_t(wchar_t* name, int family, const protocol_info* ProtocolInfo, sockaddr* address, int* addrlen);
+
+      typedef int __stdcall GetAddrInfoExA_t(const char* Name, const char* ServiceName, uint32_t NameSpace, const ntl::nt::guid* NspId, 
+        const addrinfoex_a* Hints, addrinfoex_a** Result, const timeval* Timeout, overlapped* Overlapped, completion_routine_t* CompletionRoutine, nt::legacy_handle* NameHandle);
 
     } // wsa
 
@@ -381,6 +384,7 @@ namespace ntl { namespace network {
         wsa::SendTo_t*    sendto;
         wsa::RecvFrom_t*  recvfrom;
         wsa::Ioctl_t*     ioctl;
+        wsa::GetAddrInfoExA_t* getaddrinfoA;
       } async;
       
       bool initialized;
@@ -459,6 +463,7 @@ namespace ntl { namespace network {
           funcs.async.sendto = ws->find_export<wsa::SendTo_t*>("WSASendTo");
           funcs.async.recvfrom = ws->find_export<wsa::RecvFrom_t*>("WSARecvFrom");
           funcs.async.ioctl = ws->find_export<wsa::Ioctl_t*>("WSAIoctl");
+          funcs.async.getaddrinfoA = ws->find_export<wsa::GetAddrInfoExA_t*>("GetAddrInfoExA");
 
           // check import
           const void **first = (const void**)&funcs, **last = (const void**)&funcs.initialized;
