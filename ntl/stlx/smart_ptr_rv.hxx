@@ -1230,8 +1230,47 @@ namespace std
   template<class T, class... Args> 
   inline shared_ptr<T> make_shared(Args&&... args)
   {
-    return shared_ptr<T>(new T(forward<Args>(args)...));
+    struct object_deleter
+    {
+      typename std::aligned_storage<sizeof(T), alignof(T)>::type storage;
+      bool exists;
+
+      T* data() { return reinterpret_cast<T*>(&storage); }
+
+      void free()
+      {
+        if(exists) {
+          exists = false;
+          data()->~T();
+        }
+      }
+
+      void operator() (T*)
+      {
+        free();
+      }
+
+      ~object_deleter()
+      {
+        free();
+      }
+
+      object_deleter()
+        : exists(false)
+      {}
+    };
+
+    shared_ptr<T> sp(static_cast<T*>(nullptr), object_deleter());
+    object_deleter* sd = std::get_deleter<object_deleter>(sp);
+    
+    T* p = sd->data();
+    ::new ( static_cast<void*>(p) ) T(forward<Args>(args)...);
+    sd->exists = true;
+    __::check_shared<T>::check<T>(p, sp);
+
+    return std::shared_ptr<T> (sp, p);
   }
+
   template<class T, class Alloc, class... Args>
   inline shared_ptr<T> allocate_shared(const Alloc& a, Args&&... args)
   {
@@ -1336,7 +1375,7 @@ namespace std
   template<class D, class T> 
   inline D* get_deleter(shared_ptr<T> const& p)
   {
-    return !p.empty() ? reinterpret_cast<D*>(p.shared->get_deleter(__ntl_typeid(D))) : nullptr;
+    return !p.empty() ? reinterpret_cast<D*>( const_cast<void*>( p.shared->get_deleter(__ntl_typeid(D)) ) ) : nullptr;
   }
   //////////////////////////////////////////////////////////////////////////
 
