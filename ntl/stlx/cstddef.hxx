@@ -27,16 +27,7 @@ namespace std {
  *@{*/
 
 #ifdef _MSC_VER
-  #pragma warning(push)
-  #pragma warning(disable:4324)
-  #ifndef __ICL
-    typedef struct alignas(8192) {} max_align_t;
-  #else
-    typedef struct alignas(8192) {void*_;} max_align_t;
-  #endif
-  #pragma warning(pop)
-#else
-  typedef struct {} max_align_t;
+  typedef double max_align_t;
 #endif
 
 /**\addtogroup  lib_support_types ****** 18.2 Types [support.types]

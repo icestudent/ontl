@@ -208,7 +208,7 @@ template <> struct aligner<256> { __declspec(align(256)) class type {}; };
 template <> struct aligner<512> { __declspec(align(512)) class type {}; };
 template <> struct aligner<1024> { __declspec(align(1024)) class type {}; };
 template <> struct aligner<4096> { __declspec(align(4096)) class type {}; };
-template <> struct aligner<sizeof(max_align_t)> { __declspec(align(8192)) class type {}; };
+template <> struct aligner<8192> { __declspec(align(8192)) class type {}; };
 } // namespace aux
 
 template <std::size_t Len, std::size_t Align>
@@ -216,22 +216,24 @@ struct aligned_storage
 {
   union type
   {
-    private: unsigned char __data[Len];
-    typename aux::aligner<1 + ( Align - 1
-                             | (Align - 1) >> 1
-                             | (Align - 1) >> 2
-                             | (Align - 1) >> 3
-                             | (Align - 1) >> 4
-                             | (Align - 1) >> 5
-                             | (Align - 1) >> 6
-                             | (Align - 1) >> 7
-                             | (Align - 1) >> 8
-                             | (Align - 1) >> 9
-                             | (Align - 1) >> 10
-                             | (Align - 1) >> 11
-                             | (Align - 1) >> 12
-                             | (Align - 1) >> 13 )
-                          >::type __align;
+    private: 
+      unsigned char __data[Len];
+      max_align_t   __align;
+    //typename aux::aligner<1 + ( Align - 1
+    //                         | (Align - 1) >> 1
+    //                         | (Align - 1) >> 2
+    //                         | (Align - 1) >> 3
+    //                         | (Align - 1) >> 4
+    //                         | (Align - 1) >> 5
+    //                         | (Align - 1) >> 6
+    //                         | (Align - 1) >> 7
+    //                         | (Align - 1) >> 8
+    //                         | (Align - 1) >> 9
+    //                         | (Align - 1) >> 10
+    //                         | (Align - 1) >> 11
+    //                         | (Align - 1) >> 12
+    //                         | (Align - 1) >> 13 )
+    //                      >::type __align;
   };
 };
 
