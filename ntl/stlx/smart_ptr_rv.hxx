@@ -831,8 +831,8 @@ namespace std
       virtual void free() __ntl_nothrow
       {
         if(p){
-          T* pp = p; p = nullptr;
-          delete pp;
+          T* ptr = p; p = nullptr;
+          delete ptr;
         }
       }
     };
@@ -922,6 +922,7 @@ namespace std
 
     template<class Y>
     void check_shared(Y* p, const shared_ptr<T>* ptr);
+
   public:
     typedef T element_type;
 
@@ -1091,11 +1092,12 @@ namespace std
 
     void reset()
     {
-      if(shared){
+      if(shared) {
         if(--shared->use_count == 0)
           free();
-        shared = nullptr;
       }
+      shared = nullptr;
+      ptr = nullptr;
     }
 
     template<class Y> void reset(Y* p)
@@ -1186,11 +1188,13 @@ namespace std
     }
     void free()__ntl_nothrow
     {
-      if(shared && shared->weak_count == 0){
-        shared->dispose();
-        shared = nullptr,
-          ptr = nullptr; // NOTE: is this safe?
+      if(shared) {
+        shared->free(); // free object, but not counter
+        if(shared->weak_count == 0)
+          shared->dispose(); // free counter
       }
+      shared = nullptr;
+      ptr = nullptr;
     }
   private:
     shared_data shared;
