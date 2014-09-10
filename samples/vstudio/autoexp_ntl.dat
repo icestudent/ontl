@@ -60,6 +60,7 @@
 ;
 ;   Letter  Description                 Sample         Display
 ;   ------  --------------------------  ------------   -------------
+;   !       Raw format                  [$e,!]         $e
 ;   d,i     Signed decimal integer      0xF000F065,d   -268373915
 ;   u       Unsigned decimal integer    0x0065,u       101
 ;   o       Unsigned octal integer      0xF065,o       0170145
@@ -109,7 +110,6 @@ __m128=$BUILTIN(M128)
 __m128i=$BUILTIN(M128I)
 __m128d=$BUILTIN(M128D)
 
-
 _GUID=$BUILTIN(GUID)
 guid=$BUILTIN(GUID)
 
@@ -124,6 +124,45 @@ std::greater<*>=greaterthan
 
 [Visualizer]
 ; This section contains visualizers for STL and ATL containers
+
+
+;------------------------------------------------------------------------------
+;  Network
+;------------------------------------------------------------------------------
+
+std::tr2::network::ip::address_v4 {
+  preview (
+    #( (int)$e.v.b1, ".", (int)$e.v.b2, ".", (int)$e.v.b3, ".", (int)$e.v.b4 )
+  )
+}
+
+std::tr2::network::ip::address {
+	preview (
+		#if($e.v4addr) ( $e.v4 ) #else ( $e.v6 )
+	)
+}
+
+std::tr2::network::ip::basic_endpoint<std::tr2::network::ip::tcp> {
+	preview (
+		#switch($e.sa.family)
+		#case 0  ("af_unspec")
+		#case 1  ("af_unix")
+		#case 2  ( #( (int)$e.v4.addr.b1, ".", (int)$e.v4.addr.b2, ".", (int)$e.v4.addr.b3, ".", (int)$e.v4.addr.b4, " ", $e.sa.port / 256 + ($e.sa.port % 256) * 256, " (tcp)" ) )
+		#case 23 ("af_inet6")
+		#default ("<empty>")
+	)
+}
+
+std::tr2::network::ip::basic_endpoint<std::tr2::network::ip::udp> {
+	preview (
+		#switch($e.sa.family)
+		#case 0  ("af_unspec")
+		#case 1  ("af_unix")
+		#case 2  ( #( (int)$e.v4.addr.b1, ".", (int)$e.v4.addr.b2, ".", (int)$e.v4.addr.b3, ".", (int)$e.v4.addr.b4, " ", $e.sa.port / 256 + ($e.sa.port % 256) * 256, " (udp)" ) )
+		#case 23 ("af_inet6")
+		#default ("<empty>")
+	)
+}
 
 ;------------------------------------------------------------------------------
 ;  chrono
