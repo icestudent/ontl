@@ -151,46 +151,146 @@ namespace std { namespace tr2 { namespace sys {
    *    sequence to accommodate changes in the size of the character sequence.
    **/
   template<class Allocator = std::allocator<char> >
-  class basic_fifobuf:
-    public streambuf
+  class basic_fifobuf
+    : public std::streambuf
+    , ntl::noncopyable
   {
   public:
     // types:
-    typedef Allocator allocator_type;
-    typedef const void* const_buffers_type;
-    typedef void* mutable_buffers_type;
+    typedef Allocator         allocator_type;
+    typedef const_buffers_1   const_buffers_type;
+    typedef mutable_buffers_1 mutable_buffers_type;
 
+  public:
     // constructors:
     explicit basic_fifobuf(size_t max_sz = numeric_limits<size_t>::max(), const Allocator& alloc = Allocator())
-      :size_(), max_size_(max_sz), alloc(alloc)
-    {}
+      : buffer_(alloc)
+      , max_size_(max_sz)
+    {
+      size_t capacity = std::min(max_sz, initial_output_size);
+      buffer_.resize(std::max(capacity, 1u));  // at least 1 byte
+      setg(&buffer_[0], &buffer_[0], &buffer_[0]);
+      setp(&buffer_[0], &buffer_[0] + capacity);
+    }
 
     // members:
-    allocator_type get_allocator() const { return alloc; }
-    size_t size()     const { return size_; }
-    size_t max_size() const { return max_size_; }
+    allocator_type get_allocator() const { return buffer_.get_allocator(); }
 
-    const_buffers_type data() const;
+    size_t size()     const { return pptr() - gptr(); }
+    size_t max_size() const { return max_size_;       }
+
+    const_buffers_type data() const { return buffer(const_buffers_type(gptr(), size())); }
+
     /** Ensures that the output sequence can accommodate n characters, reallocating character array objects as necessary.  */
-    mutable_buffers_type prepare(size_t n);
+    mutable_buffers_type prepare(size_t n)
+    {
+      growto(n);
+      return buffer(pptr(), n);
+    }
     
     /** Appends \p n characters from the start of the output sequence to the input sequence. The beginning of the output sequence is advanced by \p n characters. */
-    void commit(size_t n) __ntl_throws(length_error);
+    void commit(size_t n) __ntl_throws(length_error)
+    {
+      if(pptr() + n > epptr())
+        n = epptr() - pptr();
+      
+      pbump(static_cast<int>(n));
+      setg(eback(), gptr(), pptr());
+    }
+
     /** Removes \p n characters from the beginning of the input sequence.  */
-    void consume(size_t n) __ntl_throws(length_error);
+    void consume(size_t n) __ntl_throws(length_error)
+    {
+      if(egptr() < pptr())
+        setg(&buffer_[0], gptr(), pptr());
+
+      if(gptr() + n > pptr())
+        n = pptr() - gptr();
+      gbump(static_cast<int>(n));
+    }
+
   protected:
     // overridden virtual functions:
-    virtual int_type underflow();
-    virtual int_type pbackfail(int_type c = traits_type::eof());
-    virtual int_type overflow(int_type c = traits_type::eof());
+    virtual int_type underflow() override
+    {
+      if(gptr() < pptr()) {
+        setg(&buffer_[0], gptr(), pptr());
+        return traits_type::to_int_type(*gptr());
+      }
+      return traits_type::eof();
+    }
+
+    //virtual int_type pbackfail(int_type c = traits_type::eof());
+    virtual int_type overflow(int_type c = traits_type::eof()) override
+    {
+      if(traits_type::eq_int_type(c, traits_type::eof()))
+        return traits_type::not_eof(c);
+
+      if(pptr() == epptr()) {
+        size_t cb = pptr() - gptr();
+        if(cb < max_size_ && (max_size_ - cb) < initial_output_size)
+          growto(max_size_ - cb);
+        else
+          growto(initial_output_size);
+      }
+      *pptr() = traits_type::to_char_type(c);
+      pbump(1);
+      return c;
+    }
   
+  protected:
+    void growto(size_t n)
+    {
+      size_t gnext = gptr() - &buffer_[0];
+      size_t pnext = pptr() - &buffer_[0];
+      size_t pend = epptr() - &buffer_[0];
+
+      // Check if there is already enough space in the put area.
+      if (n <= pend - pnext)
+      {
+        return;
+      }
+
+      // Shift existing contents of get area to start of buffer.
+      if (gnext > 0)
+      {
+        pnext -= gnext;
+        std::memmove(&buffer_[0], &buffer_[0] + gnext, pnext);
+      }
+
+      // Ensure buffer is large enough to hold at least the specified size.
+      if (n > pend - pnext)
+      {
+        if (n <= max_size_ && pnext <= max_size_ - n)
+        {
+          pend = pnext + n;
+          buffer_.resize((std::max<std::size_t>)(pend, 1));
+        }
+        else
+        {
+          __throw_length_error(__func__": `n` too large");
+        }
+      }
+
+      setg(&buffer_[0], &buffer_[0], &buffer_[0] + pnext);
+      setp(&buffer_[0] + pnext, &buffer_[0] + pend);
+    }
+
+
   private:
     basic_fifobuf(const basic_fifobuf&) __deleted;
     void operator=(const basic_fifobuf&)__deleted;
+
   private:
-    size_t size_, max_size_;
-    allocator_type alloc;
+    static const size_t initial_output_size = 64;
+
+    std::string buffer_;
+    size_t max_size_;
   };
+
+
+  /** Typedef for the typical usage of basic_fifobuf. */
+  typedef basic_fifobuf<> fifobuf, streambuf;
 
 
   /**
