@@ -70,7 +70,7 @@ namespace std { namespace tr2 { namespace network {
       ///\name constructors:
       basic_resolver_entry()
       {}
-      basic_resolver_entry(const endpoint_type& ep, const string& h, const string& s)
+      basic_resolver_entry(const endpoint_type& ep, const string_ref& h, const string_ref& s)
         :p(ep), h(h), s(s)
       {}
 
@@ -78,8 +78,8 @@ namespace std { namespace tr2 { namespace network {
       endpoint_type endpoint() const  { return p; }
       operator endpoint_type() const  { return p; }
       
-      string host_name()    const     { return h; }
-      string service_name() const     { return s; }
+      string const& host_name()    const     { return h; }
+      string const& service_name() const     { return s; }
       ///\}
     private:
       endpoint_type p;

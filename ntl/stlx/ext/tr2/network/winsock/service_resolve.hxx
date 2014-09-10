@@ -91,7 +91,7 @@ namespace ntl { namespace network {
           std::memcpy(ep.data(), ai->addr, ai->addrlen);
           //ep.port(ai->addr->port);
 
-          entries->push_back(entry_t(ep, ai->canonname ? std::string(ai->canonname) : q.host, q.service));
+          entries->push_back(entry_t(ep, ai->canonname ? ai->canonname : q.host, q.service));
         }
         impl.funcs->freeaddrinfo(response);
 

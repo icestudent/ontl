@@ -111,7 +111,7 @@ namespace std { namespace tr2 {
         return std::move(s);
       }
 
-      static basic_endpoint from_string(const string& str, error_code& ec = throws())
+      static basic_endpoint from_string(const string_ref& str, error_code& ec = throws())
       {
         // [addr6]:port or addr4:port
         if(&ec != &throws())
