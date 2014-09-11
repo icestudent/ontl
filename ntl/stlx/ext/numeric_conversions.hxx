@@ -263,12 +263,32 @@ namespace ntl { namespace numeric {
     return static_cast<value_t>(value);
   }
 
+  inline int strtoi(const char * __restrict nptr, size_t len, const char ** __restrict endptr = 0, int base = 0)
+  {
+    typedef int value_t;
+    std::size_t taken;
+    unsigned long value;
+    const convresult re = str2num<unsigned long, long>(value, nptr, len, base, std::numeric_limits<value_t>::__max, std::numeric_limits<value_t>::__min, &taken);
+    if(endptr) *endptr = re <= conv_result::bad_format ? nptr : nptr + taken;
+    return static_cast<value_t>(value);
+  }
+
   inline long strtol(const char * __restrict nptr, const char ** __restrict endptr = 0, int base = 0)
   {
     typedef long value_t;
     std::size_t taken;
     unsigned long value;
     const convresult re = str2num<unsigned long, long>(value, nptr, -1, base, std::numeric_limits<value_t>::__max, std::numeric_limits<value_t>::__min, &taken);
+    if(endptr) *endptr = re <= conv_result::bad_format ? nptr : nptr + taken;
+    return static_cast<value_t>(value);
+  }
+
+  inline long strtol(const char * __restrict nptr, size_t len, const char ** __restrict endptr = 0, int base = 0)
+  {
+    typedef long value_t;
+    std::size_t taken;
+    unsigned long value;
+    const convresult re = str2num<unsigned long, long>(value, nptr, len, base, std::numeric_limits<value_t>::__max, std::numeric_limits<value_t>::__min, &taken);
     if(endptr) *endptr = re <= conv_result::bad_format ? nptr : nptr + taken;
     return static_cast<value_t>(value);
   }
@@ -283,6 +303,16 @@ namespace ntl { namespace numeric {
     return static_cast<value_t>(value);
   }
 
+  inline unsigned long strtoul(const char * __restrict nptr, size_t len, const char ** __restrict endptr = 0, int base = 0)
+  {
+    typedef unsigned long value_t;
+    std::size_t taken;
+    unsigned long value;
+    const convresult re = str2num<unsigned long, long>(value, nptr, len, base, std::numeric_limits<value_t>::__max, std::numeric_limits<value_t>::__min, &taken);
+    if(endptr) *endptr = re <= conv_result::bad_format ? nptr : nptr + taken;
+    return static_cast<value_t>(value);
+  }
+
   inline long long strtoll(const char * __restrict nptr, const char ** __restrict endptr = 0, int base = 0)
   {
     typedef long long value_t;
@@ -293,12 +323,32 @@ namespace ntl { namespace numeric {
     return static_cast<value_t>(value);
   }
 
+  inline long long strtoll(const char * __restrict nptr, size_t len, const char ** __restrict endptr = 0, int base = 0)
+  {
+    typedef long long value_t;
+    std::size_t taken;
+    unsigned long long value;
+    const convresult re = str2num<unsigned long long, long long>(value, nptr, len, base, std::numeric_limits<value_t>::__max, std::numeric_limits<value_t>::__min, &taken);
+    if(endptr) *endptr = re <= conv_result::bad_format ? nptr : nptr + taken;
+    return static_cast<value_t>(value);
+  }
+
   inline unsigned long long strtoull(const char * __restrict nptr, const char ** __restrict endptr = 0, int base = 0)
   {
     typedef unsigned long long value_t;
     std::size_t taken;
     unsigned long long value;
     const convresult re = str2num<unsigned long long, long long>(value, nptr, -1, base, std::numeric_limits<value_t>::__max, std::numeric_limits<value_t>::__min, &taken);
+    if(endptr) *endptr = re <= conv_result::bad_format ? nptr : nptr + taken;
+    return static_cast<value_t>(value);
+  }
+
+  inline unsigned long long strtoull(const char * __restrict nptr, size_t len, const char ** __restrict endptr = 0, int base = 0)
+  {
+    typedef unsigned long long value_t;
+    std::size_t taken;
+    unsigned long long value;
+    const convresult re = str2num<unsigned long long, long long>(value, nptr, len, base, std::numeric_limits<value_t>::__max, std::numeric_limits<value_t>::__min, &taken);
     if(endptr) *endptr = re <= conv_result::bad_format ? nptr : nptr + taken;
     return static_cast<value_t>(value);
   }
