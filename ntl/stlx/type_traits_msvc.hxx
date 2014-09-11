@@ -556,6 +556,29 @@ NTL__STLX_DEF_TRAIT(has_nothrow_assign)
 NTL__STLX_DEF_TRAIT2(is_destructible, has_user_destructor)
 NTL__STLX_DEF_TRAIT(has_virtual_destructor)
 
+
+#ifdef NTL_CXX_VT
+
+template<class T, class... Args>
+struct is_constructible: std::integral_constant<bool, __is_constructible(T, Args...)> {};
+
+#else
+
+template<class T, class U>
+struct is_constructible: std::integral_constant<bool, __is_constructible(T, U)> {};
+
+#endif
+
+template<class T>
+struct is_default_constructible: is_constructible<T> {};
+
+template<class T>
+struct is_copy_constructible: is_constructible<T,typename add_lvalue_reference<typename add_const<T>::type>::type> {};
+
+template<class T>
+struct is_move_constructible: is_constructible<T,typename add_rvalue_reference<T>::type> {};
+
+//////////////////////////////////////////////////////////////////////////
 template <class T> struct is_signed
 //: public integral_constant<bool, (is_arithmetic<T>::value && T(-1) < T(0))> {};
 : public integral_constant<bool, (static_cast<T>(-1) < 0)> {};
