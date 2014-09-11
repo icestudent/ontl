@@ -857,7 +857,10 @@ template<class T> struct hash<T*>;
 template<class T>
 struct hash: unary_function<T, size_t>
 {
-  size_t operator()(T val) const __ntl_nothrow;
+  size_t operator()(T val) const __ntl_nothrow
+  {
+    static_assert(false, "hash<T> must be specialized!");
+  }
 };
 
 /// hash function implementation for pointers
