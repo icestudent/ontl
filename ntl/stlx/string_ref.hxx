@@ -223,8 +223,36 @@ namespace std
       return e == nullptr ? npos : (e-p);
     }
 
-    size_type rfind(const basic_string_ref& s) const;
-    size_type rfind(charT c) const;
+    size_type rfind(const basic_string_ref& s) const
+    {
+      const size_type cursize = size(), pos = 0, n = s.size();
+      if(!n) return min(pos,cursize);
+      size_type & xpos = pos;
+      if ( xpos > cursize || xpos + n > cursize )
+        xpos = cursize - n;
+      const charT* const beg = begin();
+      while ( xpos + n > 0 )
+      {
+        for ( size_type i = 0; i != n; ++i )
+          if ( !traits_type::eq(*(beg + xpos + i), *(s + i)) )
+            goto next_xpos;
+        return xpos;
+      next_xpos:
+        --xpos;
+      }
+      return npos;
+    }
+
+    size_type rfind(charT c) const
+    {
+      size_type xpos = size();
+      const charT* const beg = begin();
+      while ( xpos-- )
+        if ( traits_type::eq(*(beg + xpos), c) )
+          return xpos;
+      return npos;
+    }
+
     size_type find_first_of(const basic_string_ref& s) const;
     size_type find_first_of(charT c) const;
     size_type find_last_of(const basic_string_ref& s) const;
