@@ -396,7 +396,7 @@ namespace nt {
 	template <size_t N>
 	inline ntstatus wait_for(const std::array<legacy_handle, N>& handles, bool wait_all = false, bool alertable = false)
 	{
-		return NtWaitForMultipleObjects(handles.size(), handles.data(), wait_all ? wait_type::WaitAll : wait_type::WaitAny, alertable, infinite_timeout());
+		return NtWaitForMultipleObjects(static_cast<uint32_t>(handles.size()), handles.data(), wait_all ? wait_type::WaitAll : wait_type::WaitAny, alertable, infinite_timeout());
 	}
 
 	template <size_t N, class Rep, class Period>

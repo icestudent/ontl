@@ -371,7 +371,7 @@ namespace ntl { namespace network {
       size_t wait_with(const implementation_type& impl, wait_status_type* sockets, size_t count, std::error_code& ec)
       {
         fd_set r, w, e;
-        size_t fdcount = 0;
+        unsigned fdcount = 0;
         for(size_t i = 0; i < count; i++) {
           wait_status_type& check = sockets[i];
           if(check.first == 0)
@@ -548,8 +548,8 @@ namespace ntl { namespace network {
 
         uint32_t transfered = 0;
         int re = addr
-          ? impl.funcs->async.sendto(impl.s, buffs.buffers(), buffs.count(), &transfered, flags, addr, static_cast<int>(addrlen), op, nullptr)
-          : impl.funcs->async.send(impl.s, buffs.buffers(), buffs.count(), &transfered, flags, op, nullptr);
+          ? impl.funcs->async.sendto(impl.s, buffs.buffers(), static_cast<uint32_t>(buffs.count()), &transfered, flags, addr, static_cast<int>(addrlen), op, nullptr)
+          : impl.funcs->async.send(impl.s, buffs.buffers(), static_cast<uint32_t>(buffs.count()), &transfered, flags, op, nullptr);
 
         sockerror err;
         if(re == socket_error && err != sockerror::io_pending)
@@ -571,8 +571,8 @@ namespace ntl { namespace network {
         int addrlen = static_cast<int>(addrsize);
         uint32_t received = 0, uflags = flags;
         int re = addr
-          ? impl.funcs->async.recvfrom(impl.s, buffs.buffers(), buffs.count(), &received, &uflags, addr, &addrlen, op, nullptr)
-          : impl.funcs->async.recv(impl.s, buffs.buffers(), buffs.count(), &received, &uflags, op, nullptr);
+          ? impl.funcs->async.recvfrom(impl.s, buffs.buffers(), static_cast<uint32_t>(buffs.count()), &received, &uflags, addr, &addrlen, op, nullptr)
+          : impl.funcs->async.recv(impl.s, buffs.buffers(), static_cast<uint32_t>(buffs.count()), &received, &uflags, op, nullptr);
 
         sockerror err;
         if(re == socket_error && err != sockerror::io_pending)

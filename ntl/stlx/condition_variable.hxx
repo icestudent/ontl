@@ -58,8 +58,8 @@ namespace std
   {
     struct monitor
     {
-      volatile unsigned& waiters;
-      monitor(volatile unsigned& waiters)
+      volatile uint32_t& waiters;
+      monitor(volatile uint32_t& waiters)
         :waiters(waiters)
       {
         ntl::atomic::increment(waiters);
@@ -158,7 +158,7 @@ namespace std
     condition_variable& operator=(const condition_variable&) __deleted;
 
   private:
-    volatile unsigned waiters;
+    volatile uint32_t waiters;
   };
 
 

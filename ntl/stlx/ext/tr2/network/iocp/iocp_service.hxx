@@ -361,7 +361,7 @@ namespace std { namespace tr2 { namespace sys {
       using namespace ntl::nt;
       ntl::nt::this_thread::setname("iocp::timer_proc");
 
-      size_t count;
+      uint32_t count;
       legacy_handle handles[2] = { timer_event.get() };
 
       do {

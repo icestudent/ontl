@@ -91,9 +91,10 @@ namespace ntl { namespace nt {
   {
     uintptr_t Internal1, Internal2;
     union {
+      size_t      Offset;
       struct  
       {
-        uint32_t  Offset;
+        uint32_t  OffsetLow;
         uint32_t  OffsetHigh;
       };
       void*       Pointer;
