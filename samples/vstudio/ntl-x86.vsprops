@@ -8,6 +8,7 @@
 	>
 	<Tool 
 		Name="VCCLCompilerTool" 
+		EnableEnhancedInstructionSet="1"
 	/>
 	<Tool
 		Name="VCLinkerTool"
