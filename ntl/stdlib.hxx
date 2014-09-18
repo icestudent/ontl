@@ -152,6 +152,9 @@ type
   return bswap(value);
 }
 
+static inline uint8_t big_endian(const uint8_t value) { return value; }
+static inline  int8_t big_endian(const  int8_t value) { return value; }
+
 /// host <-> little-endian
 template<typename type>
 static inline
