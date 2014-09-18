@@ -39,7 +39,12 @@ namespace ntl {
 
       struct srwlock
       {
-        void* _;
+        uintptr_t Locked  :1;
+        uintptr_t Waiting :1;
+        uintptr_t Waking  :1;
+        uintptr_t MultipleShared :1;
+        uintptr_t Shared  :28;
+
       };
     } // rtl
 
