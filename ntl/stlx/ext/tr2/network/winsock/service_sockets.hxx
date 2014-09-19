@@ -473,8 +473,8 @@ namespace ntl { namespace network {
           size_t offset = 0;
           do {
             const int re = addr
-              ? impl.funcs->sendto(impl.s, buf->buf + offset, buf->len - offset, flags, addr, static_cast<int>(addrlen))
-              : impl.funcs->send(impl.s, buf->buf + offset, buf->len - offset, flags);
+              ? impl.funcs->sendto(impl.s, buf->buf + offset, static_cast<int>(buf->len - offset), flags, addr, static_cast<int>(addrlen))
+              : impl.funcs->send(impl.s, buf->buf + offset, static_cast<int>(buf->len - offset), flags);
             if(!check_error(ec, re))
               return transfered;
             assert(re >= 0);
@@ -513,8 +513,8 @@ namespace ntl { namespace network {
           size_t offset = 0;
           do {
             const int re = addr
-              ? impl.funcs->recvfrom(impl.s, buf->buf + offset, buf->len - offset, flags, addr, &addrlen)
-              : impl.funcs->recv(impl.s, buf->buf + offset, buf->len - offset, flags);
+              ? impl.funcs->recvfrom(impl.s, buf->buf + offset, static_cast<int>(buf->len - offset), flags, addr, &addrlen)
+              : impl.funcs->recv(impl.s, buf->buf + offset, static_cast<int>(buf->len - offset), flags);
             make_error(ec);
             if(re == 0){
               if(!addr) // recv should fail with eof
