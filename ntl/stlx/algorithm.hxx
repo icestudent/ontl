@@ -1398,7 +1398,7 @@ inline pair<ForwardIterator, ForwardIterator> minmax_element(ForwardIterator fir
           // last pass
           if(comp(*i, *re.first))
             re.first = i;
-          else if(!comp(*i, re.second))
+          else if(!comp(*i, *re.second))
             re.second = i;
           break;
         }
@@ -1406,7 +1406,7 @@ inline pair<ForwardIterator, ForwardIterator> minmax_element(ForwardIterator fir
         if(comp(*first, *i)) {
           if(comp(*first, *re.first))
             re.first = first;
-          if(!comp(*i, re.second))
+          if(!comp(*i, *re.second))
             re.second = i;
         } else {
           if(comp(*i, *re.first))
