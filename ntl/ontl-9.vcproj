@@ -315,6 +315,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\stlx\ext\join.hxx"
+						>
+					</File>
+					<File
 						RelativePath=".\stlx\ext\numeric_conversions.hxx"
 						>
 					</File>
