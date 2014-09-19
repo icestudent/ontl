@@ -1,6 +1,6 @@
 /**\file*********************************************************************
  *                                                                     \brief
- *  String split
+ *  [N3593] String split
  *
  ****************************************************************************
  */
@@ -9,7 +9,7 @@
 #pragma once
 
 #include "../string_ref.hxx"
-#include "../forward_list.hxx"
+#include "../vector.hxx"
 
 namespace std
 {
@@ -87,7 +87,7 @@ namespace std
   template <typename Delimiter>
   class splitter
   {
-    typedef std::forward_list<string_ref> refs_type;
+    typedef std::vector<string_ref>            refs_type;
   public:
     typedef typename refs_type::const_iterator const_iterator;
     typedef typename refs_type::iterator       iterator;
@@ -140,15 +140,14 @@ namespace std
     template <typename Delimiter, typename Predicate>
     inline typename enable_if<__::split_is_delimiter<Delimiter>::value,splitter<Delimiter> >::type split(const std::string_ref& text, Delimiter d, Predicate filter)
     {
-      typedef std::forward_list<string_ref> sequence;
-      sequence seq; sequence::iterator seq_pos = seq.before_begin();
+      std::vector<string_ref> seq;
       for(string_ref cur = text, pos = d.find(cur); !cur.empty(); pos = d.find(cur)){
         const bool notfound = pos.empty();
         // range [current] delim
         const string_ref::size_type len = notfound ? cur.length() : (pos.data()-cur.data());
         const string_ref sub(cur.data(), len);
         if(filter(sub))
-          seq_pos = seq.insert_after(seq_pos, sub);
+          seq.push_back(sub);
         if(notfound)
           break;
         // current = delim [rest]
@@ -157,7 +156,7 @@ namespace std
           // if delimiter at end of string, treat end as additional empty result
           const string_ref sub(pos.end());
           if(filter(sub))
-            seq_pos = seq.insert_after(seq_pos, sub);
+            seq.push_back(sub);
         }
       }
       splitter<Delimiter> result(seq);
@@ -185,12 +184,11 @@ namespace std
   inline splitter<literal> split(const std::string_ref& text, const string_ref& delim, Predicate filter)
   {
     if(delim.empty()){
-      typedef std::forward_list<string_ref> sequence;
-      sequence seq; sequence::iterator seq_pos = seq.before_begin();
+      std::vector<string_ref> seq;
       for(string_ref::const_iterator p = text.begin(), end = text.end(); p != end; ++p){
         string_ref sub(p, 1);
         if(filter(sub))
-          seq_pos = seq.insert_after(seq_pos, sub);
+          seq.push_back(sub);
       }
       splitter<literal> result(seq);
       return std::move(result);
@@ -208,8 +206,5 @@ namespace std
   {
     return std::split(text, delim, __::split_default_predicate());
   }
-
-
 }
 #endif // NTL__EXT_SPLIT
-
