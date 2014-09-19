@@ -1381,13 +1381,50 @@ inline
 ForwardIterator
   max_element(ForwardIterator first, ForwardIterator last, Compare comp);
 
-template<class ForwardIterator>
-pair<ForwardIterator, ForwardIterator>
-minmax_element(ForwardIterator first, ForwardIterator last);
 template<class ForwardIterator, class Compare>
-pair<ForwardIterator, ForwardIterator>
-minmax_element(ForwardIterator first, ForwardIterator last, Compare comp);
+inline pair<ForwardIterator, ForwardIterator> minmax_element(ForwardIterator first, ForwardIterator last, Compare comp)
+{
+  pair<ForwardIterator, ForwardIterator> re(first, first);
+  if(first != last) {
+    if(++first != last) {
+      if(comp(*first, *re.first))
+        re.first = first;
+      else
+        re.second = first;
 
+      while(++first != last) {
+        ForwardIterator i = first;
+        if(++first == last) {
+          // last pass
+          if(comp(*i, *re.first))
+            re.first = i;
+          else if(!comp(*i, re.second))
+            re.second = i;
+          break;
+        }
+
+        if(comp(*first, *i)) {
+          if(comp(*first, *re.first))
+            re.first = first;
+          if(!comp(*i, re.second))
+            re.second = i;
+        } else {
+          if(comp(*i, *re.first))
+            re.first = i;
+          if(!comp(*first, *re.second))
+            re.second = first;
+        }
+      }
+    }
+  }
+  return re;
+}
+
+template<class ForwardIterator>
+inline pair<ForwardIterator, ForwardIterator> minmax_element(ForwardIterator first, ForwardIterator last)
+{
+  return minmax_element(first, last, less<typename iterator_traits<ForwardIterator>::value_type>());
+}
 
 ///\name 25.3.8 Lexicographical comparison [alg.lex.comparison]
 template<class InputIterator1, class InputIterator2>
