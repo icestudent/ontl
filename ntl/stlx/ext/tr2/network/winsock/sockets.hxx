@@ -466,7 +466,7 @@ namespace ntl { namespace network {
           funcs.async.getaddrinfoA = ws->find_export<wsa::GetAddrInfoExA_t*>("GetAddrInfoExA");
 
           // check import
-          const void **first = (const void**)&funcs, **last = (const void**)&funcs.initialized;
+          const void **first = (const void**)&funcs, **last = (const void**)&funcs.initialized; //-V580
           bool ok = true;
           do{
             if(!*first){

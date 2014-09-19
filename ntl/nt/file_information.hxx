@@ -382,7 +382,7 @@ struct file_names_information
   uint32_t FileNameLength;
   wchar_t  FileName[1];
 
-  const_unicode_string name() const { return const_unicode_string(FileName, FileNameLength); }
+  const_unicode_string name() const { return const_unicode_string(FileName, FileNameLength); } //-V106
 };
 
 template<>
@@ -581,6 +581,7 @@ struct volume_information:
 };
 
 ///\name   FileFsVolumeInformation == 1
+alignas(8)
 struct file_fs_volume_information
 {
   static const fs_information_class info_class_type = FileFsVolumeInformation;
@@ -591,7 +592,7 @@ struct file_fs_volume_information
   bool     SupportsObjects;
   wchar_t  VolumeLabel[1];
 
-  const_unicode_string label() const { return const_unicode_string(VolumeLabel, VolumeLabelLength / sizeof(wchar_t)); }
+  const_unicode_string label() const { return const_unicode_string(VolumeLabel, VolumeLabelLength / sizeof(wchar_t)); } //-V104
 };
 
 template<>

@@ -25,7 +25,7 @@ extern "C"
 #ifdef _MSC_VER
 __declspec(selectany)
 #endif
-/*C2373 volatile*/ std::uintptr_t __security_cookie =
+/*C2373 volatile*/ std::uintptr_t __security_cookie = //-V101
   #ifdef _M_X64
     0x00002B992DDFA232;
   #else

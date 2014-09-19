@@ -1862,7 +1862,7 @@ class num_get : public locale::facet
         const numpunct<char_type>& np = use_facet< numpunct<char_type> >(str.getloc());
         const numpunct<char_type>::string_type t = np.truename(), f = np.falsename();
         size_t i = 0, e1 = t.length(), e2 = f.length();
-        unsigned nt = 0, nf = 0; // not true, not false
+        bool nt = false, nf = false; // not true, not false
         do{
           const char_type c = *in;
           if(in == end)
@@ -2371,7 +2371,8 @@ class num_put : public locale::facet
         const charT ts = punct.thousands_sep(),
           ds = punct.decimal_point();
 
-        int group = 0, groupsize = 0, groups = static_cast<int>(vec.size()), i = 0;
+        size_t group = 0, groupsize = 0, groups = vec.size();
+        int i = 0;
         size_t to = _countof(value) - 1;
 
         bool nogroup = vec.empty() || memchr(floatbuf, '.', len) != nullptr;

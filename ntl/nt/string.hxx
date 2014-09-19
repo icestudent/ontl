@@ -305,7 +305,7 @@ class native_string
     {
       if ( n > size() ) __ntl_throw (std::out_of_range(__FUNCTION__));
     }
-    const native_string& operator=(const native_string & s);
+    const native_string& operator=(const native_string & s) __deleted;
 
 
 };//class native_string

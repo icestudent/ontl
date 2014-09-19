@@ -96,7 +96,7 @@ struct object_attributes
   private:
 
     //object_attributes(const object_attributes &);
-    const object_attributes & operator=(const object_attributes &);
+    const object_attributes & operator=(const object_attributes &) __deleted;
 
 };
 
@@ -364,7 +364,7 @@ namespace nt {
       uint32_t len = 0;
       last_status_ = NtQuerySymbolicLinkObject(get(), us, &len);
       if(len){
-        ws.resize(len/sizeof(wchar_t));
+        ws.resize(len/sizeof(wchar_t)); //-V104
         unicode_string us2(ws);
         last_status_ = NtQuerySymbolicLinkObject(get(), us2, nullptr);
         if(!success(last_status_))

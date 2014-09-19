@@ -106,7 +106,7 @@ class console
   public:
     static legacy_handle handle(type t)
     {
-      return *(&nt::peb::instance().ProcessParameters->StandardInput + t);
+      return *(&nt::peb::instance().ProcessParameters->StandardInput + t); //-V104
     }
 
     static bool is_console_handle(legacy_handle h)

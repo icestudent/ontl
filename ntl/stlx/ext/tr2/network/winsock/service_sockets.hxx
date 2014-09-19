@@ -376,7 +376,7 @@ namespace ntl { namespace network {
           wait_status_type& check = sockets[i];
           if(check.first == 0)
             continue;
-          fdcount++;
+          fdcount++; //-V127
           if(check.second & socket_base::read)
             r.set(check.first);
           if(check.second & socket_base::write)
@@ -385,7 +385,7 @@ namespace ntl { namespace network {
             e.set(check.first);
         }
 
-        int re = impl.funcs->select(fdcount, &r, &w, &e, nullptr);
+        const int re = impl.funcs->select(fdcount, &r, &w, &e, nullptr);
         if(!check_error(ec, re)) {
           return 0;
         } else if(re == 0) {
@@ -404,7 +404,7 @@ namespace ntl { namespace network {
             check.second |= socket_base::error;
         }
         
-        return re;
+        return re; //-V109
       }
 
     protected:
@@ -470,16 +470,16 @@ namespace ntl { namespace network {
         const buffer_sequences::native_buffer* buf = buffs.buffers();
         size_t transfered = 0;
         for(size_t i = 0; i < count && !ec; i++, buf++){
-          uint32_t offset = 0;
+          size_t offset = 0;
           do {
-            int re = addr
+            const int re = addr
               ? impl.funcs->sendto(impl.s, buf->buf + offset, buf->len - offset, flags, addr, static_cast<int>(addrlen))
               : impl.funcs->send(impl.s, buf->buf + offset, buf->len - offset, flags);
             if(!check_error(ec, re))
               return transfered;
             assert(re >= 0);
-            transfered += re;
-            offset += re;
+            transfered += re; //-V101
+            offset += re; //-V101
             if(addr)    // don't write more than one buffer without connection
               return transfered;
           } while(offset < buf->len);
@@ -510,9 +510,9 @@ namespace ntl { namespace network {
 
         size_t received = 0;
         for(size_t nbuf = 0; !ec && nbuf < count && received < max_size; nbuf++, buf++) {
-          uint32_t offset = 0;
+          size_t offset = 0;
           do {
-            int re = addr
+            const int re = addr
               ? impl.funcs->recvfrom(impl.s, buf->buf + offset, buf->len - offset, flags, addr, &addrlen)
               : impl.funcs->recv(impl.s, buf->buf + offset, buf->len - offset, flags);
             make_error(ec);
@@ -526,8 +526,8 @@ namespace ntl { namespace network {
               continue;
             }
             assert(re > 0);
-            received += re;
-            offset += re;
+            received += re; //-V101
+            offset += re; //-V101
             if(addr || flags == socket_base::message_peek)    // don't read data without connection
               return received;
 

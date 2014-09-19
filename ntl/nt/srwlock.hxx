@@ -49,8 +49,8 @@ namespace ntl {
             uintptr_t MultipleShared :1;
             uintptr_t Shared  :28;
           };
-
-          void* _;
+          uintptr_t Value; //-V117
+          void* _; //-V117
         };
       };
     } // rtl
@@ -68,7 +68,7 @@ namespace ntl {
 
       constexpr srwlock()
       {
-        _ = 0;
+        Value = 0;
       }
 
       void acquire(bool exclusive)

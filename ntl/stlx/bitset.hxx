@@ -457,7 +457,7 @@ namespace std {
     {
       static const uint64_t make_tidy()
       {
-        return (1 << size) - 1;
+        return (1Ui64 << size) - 1;
       }
     };
     template<size_t size> struct tidy<size, true>

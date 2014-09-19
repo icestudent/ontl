@@ -122,6 +122,7 @@ namespace std
           iterator_impl operator++(int){ iterator_impl tmp( *this ); ++*this; return tmp; }
           iterator_impl operator--(int){ iterator_impl tmp( *this ); --*this; return tmp; }
 
+          iterator_impl& operator= (const iterator_impl& i) { p = i.p; return *this; }
           friend bool operator==(const iterator_impl& x, const iterator_impl& y)
           { return x.p == y.p; }
           friend bool operator!=(const iterator_impl& x, const iterator_impl& y)
@@ -163,6 +164,8 @@ namespace std
           const_iterator_impl& operator--()  { p = tree_->next(p, left); return *this; }
           const_iterator_impl operator++(int){ const_iterator_impl tmp( *this ); ++*this; return tmp; }
           const_iterator_impl operator--(int){ const_iterator_impl tmp( *this ); --*this; return tmp; }
+
+          const_iterator_impl& operator= (const const_iterator_impl& i) { p = i.p; return *this; }
 
           friend bool operator==(const const_iterator_impl& x, const const_iterator_impl& y)
           { return x.p == y.p; }

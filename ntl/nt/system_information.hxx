@@ -282,7 +282,7 @@ struct system_process_information
   uint64_t              WriteTransferCount;
   uint64_t              OtherTransferCount;
 
-  size_t size() const { return NumberOfThreads; }
+  size_t size() const { return NumberOfThreads; } //-V109
 
   typedef const system_thread_information *     const_iterator;
   typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
@@ -307,7 +307,7 @@ struct system_process_information
 
   const_iterator end() const
   {
-    return begin() + NumberOfThreads;
+    return begin() + NumberOfThreads; //-V104
   }
 #endif
   const_reverse_iterator  rbegin() const { return const_reverse_iterator(end()); }
@@ -398,7 +398,7 @@ struct rtl_process_module_information// RTL_PROCESS_MODULE_INFORMATION
 
   pe::image * image() const
   {
-    return this ? pe::image::bind(ImageBase) : nullptr;
+    return this ? pe::image::bind(ImageBase) : nullptr; //-V704
   }
 
   const char * file_name() const
@@ -415,7 +415,7 @@ struct system_modules_information //RTL_PROCESS_MODULES
   uint32_t                        NumberOfModules;
   rtl_process_module_information  Modules[1];
 
-  size_t size() const { return NumberOfModules; }
+  size_t size() const { return NumberOfModules; } //-V109
 
   typedef rtl_process_module_information *        iterator;
   typedef const rtl_process_module_information *  const_iterator;

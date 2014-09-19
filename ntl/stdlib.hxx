@@ -205,7 +205,7 @@ type
 static inline void zero_mem(void* object, size_t n)
 {
   char * const p = reinterpret_cast<char*>(object);
-  for ( unsigned i = 0; i != n; ++i )
+  for ( size_t i = 0; i != n; ++i )
     p[i] = 0; //-V108
 }
 template<typename type>

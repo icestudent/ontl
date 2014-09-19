@@ -96,6 +96,8 @@ namespace std {
       iterator__impl operator++(int)
       { iterator__impl tmp( *this ); ++*this; return tmp; }
 
+      iterator__impl& operator= (const iterator__impl& i) { p = i.p; return *this; }
+
       friend bool operator==(const iterator__impl& x, const iterator__impl& y)
       { return x.p == y.p; }
 
@@ -125,6 +127,8 @@ namespace std {
       const_iterator__impl & operator++() { p = p->next; return *this; }
       const_iterator__impl operator++(int)
       { const_iterator__impl tmp( *this ); ++*this; return tmp; }
+
+      const_iterator__impl& operator= (const const_iterator__impl& i) { p = i.p; return *this; }
 
       friend bool
         operator==(const const_iterator__impl& x, const const_iterator__impl& y)

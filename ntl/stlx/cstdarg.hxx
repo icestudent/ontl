@@ -21,7 +21,7 @@
 
 // MSVC stdlib compatibility
 #ifndef _VA_LIST_DEFINED
-typedef struct { } * va_list;
+typedef struct { } * va_list; //-V677
 #define _VA_LIST_DEFINED
 #endif
 

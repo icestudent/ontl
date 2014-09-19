@@ -110,7 +110,7 @@ class application: noncopyable
       // 
       typedef std::basic_string_ref<char_type> value_type;
       std::vector<value_type> argv;
-      int               argc;
+      size_t                  argc;
 
       typedef value_type * iterator;
       typedef value_type const * const_iterator;
@@ -135,12 +135,12 @@ class application: noncopyable
       const_reverse_iterator  crend()  const { return rend(); }
 
       // random access
-      const value_type operator[](int argno)
+      const value_type operator[](size_t argno)
       {
         return argv[argno];
       }
 
-      int size() const { return argc; }
+      size_t size() const { return argc; }
       bool empty() const { return false; }
 
       static inline char_type * get();
@@ -227,7 +227,7 @@ class application: noncopyable
             if(*p) *p++ = '\0';
           }
         }
-        return argc = static_cast<int>(argv.size());
+        return argc = argv.size();
       }
 
     };

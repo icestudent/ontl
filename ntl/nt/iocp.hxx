@@ -91,13 +91,13 @@ namespace ntl { namespace nt {
   {
     uintptr_t Internal1, Internal2;
     union {
-      size_t      Offset;
+      size_t      Offset; //-V117
       struct  
       {
         uint32_t  OffsetLow;
         uint32_t  OffsetHigh;
       };
-      void*       Pointer;
+      void*       Pointer; //-V117
     };
     legacy_handle Event;
   };
