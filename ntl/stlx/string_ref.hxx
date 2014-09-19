@@ -16,10 +16,11 @@ namespace std
   template<typename charT, typename traits = char_traits<charT> >
   class basic_string_ref;
 
-  typedef basic_string_ref<char> string_ref;
-  typedef basic_string_ref<char16_t> u16string_ref;
-  typedef basic_string_ref<char32_t> u32string_ref;
-  typedef basic_string_ref<wchar_t> wstring_ref;
+  typedef basic_string_ref<char>      string_ref,     string_view;
+  typedef basic_string_ref<char16_t>  u16string_ref,  u16string_view;
+  typedef basic_string_ref<char32_t>  u32string_ref,  u32string_view;
+  typedef basic_string_ref<wchar_t>   wstring_ref,    wstring_view;
+
 
   // numeric conversions
   int stoi(const string_ref& str, size_t* idx=0, int base=10);
