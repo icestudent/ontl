@@ -169,6 +169,10 @@ namespace std
     /// \name types
     /// @{
 
+    /// Iterator itself
+    typedef Iterator iterator;
+    typedef Iterator const_iterator;
+
     /// The iterator category of \c Iterator.
     /// \todo Consider defining range categories. If they don't add
     /// anything over the corresponding iterator categories, then
