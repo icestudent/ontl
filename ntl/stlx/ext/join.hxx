@@ -8,7 +8,9 @@
 #define NTL__EXT_JOIN
 #pragma once
 
+#include "../type_traits.hxx"
 #include "../string_ref.hxx"
+#include "../sstream.hxx"
 
 namespace std
 {
@@ -49,10 +51,34 @@ namespace std
     }
   };
 
+  /** Stream-based formatter for iterators */
+  template <class InputIterator>
+  inline std::string join(InputIterator first, InputIterator last, const std::string_ref& sep)
+  {
+    std::ostringstream o;
+
+    if(first != last) {
+      o << *first;
+      ++first;
+    }
+    while(first != last) {
+      o << sep;
+      o << *first;
+      ++first;
+    }
+    return o.str();
+  }
+
+  /** Stream-based formatter for container */
+  template <class Range>
+  inline std::string join(const Range& range, const std::string_ref& sep)
+  {
+    return join(std::begin(range), std::end(range), sep);
+  }
 
   // Range and Formatter
   template <class InputIterator, typename Formatter>
-  inline std::string join(InputIterator first, InputIterator last, const std::string_ref& sep, Formatter format)
+  inline std::string sjoin(InputIterator first, InputIterator last, const std::string_ref& sep, Formatter format)
   {
     std::string o;
     o.reserve(128);
@@ -69,23 +95,18 @@ namespace std
     return std::move(o);
   }
 
+
   // Range (a default formatter is used)
   template <class InputIterator>
-  inline std::string join(InputIterator first, InputIterator last, const std::string_ref& sep)
+  inline std::string sjoin(InputIterator first, InputIterator last, const std::string_ref& sep)
   {
     return join(first, last, sep, join_formatter());
   }
 
-  template <class Range>
-  inline std::string join(const Range& range, const std::string_ref& sep)
-  {
-    return join(std::begin(range), std::end(range), sep, join_formatter());
-  }
-
   template <class Range, typename Formatter>
-  inline std::string join(const Range& range, const std::string_ref& sep, Formatter format)
+  inline std::string sjoin(const Range& range, const std::string_ref& sep, Formatter format)
   {
-    return join(std::begin(range), std::end(range), sep, join_formatter());
+    return sjoin(std::begin(range), std::end(range), sep, format);
   }
 }
 #endif // NTL__EXT_JOIN
