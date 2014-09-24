@@ -168,7 +168,7 @@ namespace std { namespace tr2 { namespace sys {
       , max_size_(max_sz)
     {
       size_t capacity = std::min(max_sz, initial_output_size);
-      buffer_.resize(std::max(capacity, 1u));  // at least 1 byte
+      buffer_.resize(std::max<size_t>(capacity, 1u));  // at least 1 byte
       setg(&buffer_[0], &buffer_[0], &buffer_[0]);
       setp(&buffer_[0], &buffer_[0] + capacity);
     }
