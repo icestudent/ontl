@@ -389,6 +389,47 @@ class basic_ios : public ios_base
       this->clear();
     }
 
+    void set_rdbuf(basic_streambuf<charT, traits>* sb)
+    {
+      this->sb = sb;
+    }
+
+    void move(basic_ios& x)
+    {
+      swap(x);
+      sb = nullptr;
+      x.tiestr = nullptr;
+    }
+#ifdef NTL_CXX_RV
+    void move(basic_ios&& x)
+    {
+      move(x);
+    }
+#endif
+
+    void swap(basic_ios& x)
+    {
+      if(this == &x)
+        return;
+
+      // ios_base
+      using std::swap;
+      swap(prec, x.prec);
+      swap(wide, x.wide);
+      swap(fmtfl, x.fmtfl);
+      swap(state, x.state);
+      swap(exceptmask, x.exceptmask);
+    #if STLX__CONFORMING_LOCALE
+      swap(loc, x.loc);
+    #endif
+
+      // basic_ios
+      swap(tiestr,x.tiestr);
+      swap(fillc,x.fillc);
+
+      // unchanged: rdbuf
+    }
+
   ///////////////////////////////////////////////////////////////////////////
   public:
 
@@ -409,6 +450,7 @@ class basic_ios : public ios_base
     {
       basic_streambuf<charT, traits>* const old = this->sb;
       this->sb = sb;
+      clear();
       return old;
     }
 
@@ -463,37 +505,6 @@ class basic_ios : public ios_base
         exceptions(x.exceptmask);
       }
       return *this;
-    }
-
-  #ifdef NTL_CXX_RV
-    void move(basic_ios&& x)
-    {
-      swap(x);
-      sb = nullptr;
-      x.tiestr = nullptr;
-    }
-  #endif
-
-    void swap(basic_ios& x)
-    {
-      if(this == &x)
-        return;
-      // ios_base
-      using std::swap;
-      swap(prec, x.prec);
-      swap(wide, x.wide);
-      swap(fmtfl, x.fmtfl);
-      swap(state, x.state);
-      swap(exceptmask, x.exceptmask);
-    #if STLX__CONFORMING_LOCALE
-      swap(loc, x.loc);
-    #endif
-
-      // basic_ios
-      swap(tiestr,x.tiestr);
-      swap(fillc,x.fillc);
-
-      // unchanged: rdbuf
     }
 
     ///\name 27.4.4.3 basic_ios flags functions [iostate.flags]

@@ -132,6 +132,7 @@ namespace std {
         // reserve additional characters for output buffer
         growto(s.size() + initial_output_size);
       }
+      str_.reserve(initial_output_size);
       str_.assign(s);
       #ifdef NTL_DEBUG
       str_.c_str(); // pretty view //-V530
@@ -346,19 +347,28 @@ namespace std {
     {}
 
   #ifdef NTL_CXX_RV
-    basic_istringstream(basic_istringstream&& rhs);
+    basic_istringstream(basic_istringstream&& rhs)
+      : basic_istream<charT,traits>(std::move(rhs))
+      , sb(std::move(rhs.sb))
+    {
+      this->set_rdbuf(&sb);
+    }
 
     ///\name 27.7.2.2 Assign and swap:
     basic_istringstream& operator=(basic_istringstream&& rhs)
     {
-      swap(rhs); return *this;
+      basic_istream::operator =(std::move(rhs));
+      sb = std::move(rhs.sb);
+      return *this;
     }
   #endif
 
     void swap(basic_istringstream& rhs)
     {
-      basic_istream::swap(rhs);
-      sb.swap(rhs.sb);
+      if(this != &rhs) {
+        basic_istream::swap(rhs);
+        sb.swap(rhs.sb);
+      }
     }
 
     ///\name 27.7.2.3 Members:
@@ -409,19 +419,28 @@ namespace std {
     {}
 
   #ifdef NTL_CXX_RV
-    basic_ostringstream(basic_ostringstream&& rhs);
+    basic_ostringstream(basic_ostringstream&& rhs)
+      : basic_ostream<charT,traits>(std::move(rhs))
+      , sb(std::move(rhs.sb))
+    {
+      this->set_rdbuf(&sb);
+    }
 
     ///\name 27.7.3.2 Assign/swap:
     basic_ostringstream& operator=(basic_ostringstream&& rhs)
     {
-      swap(rhs); return *this;
+      basic_ostream::operator =(std::move(rhs));
+      sb = std::move(rhs.sb);
+      return *this;
     }
   #endif
 
     void swap(basic_ostringstream& rhs)
     {
-      basic_ostream::swap(rhs);
-      sb.swap(rhs.sb);
+      if(this != &rhs) {
+        basic_ostream::swap(rhs);
+        sb.swap(rhs.sb);
+      }
     }
 
     ///\name 27.7.3.3 Members:
@@ -473,9 +492,10 @@ namespace std {
 
   #ifdef NTL_CXX_RV
     basic_stringstream(basic_stringstream&& rhs)
-      :base_type(&sb)
+      : base_type(std::move(rhs))
+      , sb(std::move(rhs.sb))
     {
-      swap(rhs);
+      this->set_rdbuf(&sb);
     }
   #endif
 
@@ -483,13 +503,18 @@ namespace std {
   #ifdef NTL_CXX_RV
     basic_stringstream& operator=(basic_stringstream&& rhs)
     {
-      swap(rhs); return *this;
+      base_type::operator =(std::move(rhs));
+      sb = std::move(rhs.sb);
+      return *this;
     }
   #endif
 
     void swap(basic_stringstream& rhs)
     {
-      std::swap(sb, rhs.sb);
+      if(this != &rhs) {
+        base_type::swap(rhs);
+        sb.swap(rhs.sb);
+      }
     }
 
     ///\name Members:

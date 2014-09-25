@@ -99,13 +99,21 @@ namespace std {
 #ifdef NTL_CXX_RV
     basic_filebuf& operator=(basic_filebuf&& rhs)
     {
-      swap(rhs); return *this;
+      close();
+      swap(rhs);
+      return *this;
     }
 #endif
 
     void swap(basic_filebuf& rhs)
     {
+      using std::swap;
       basic_streambuf::swap(rhs);
+      swap(f, rhs.f);
+      swap(buf, rhs.buf);
+      swap(encoding, rhs.encoding);
+      swap(mode, rhs.mode);
+      swap(our_buffer, rhs.our_buffer);
     }
 
     ///\name 27.9.1.4 Member functions [filebuf.members]
@@ -769,7 +777,12 @@ class basic_ifstream:
       open(s, mode, encoding);
     }
 #ifdef NTL_CXX_RV
-    basic_ifstream(basic_ifstream&& rhs);
+    basic_ifstream(basic_ifstream&& rhs)
+      : basic_istream(std::move(rhs))
+      , sb(std::move(rhs.sb))
+    {
+      this->set_rdbuf(&sb);
+    }
 #endif
 
     // NTL extension
@@ -782,7 +795,9 @@ class basic_ifstream:
 #ifdef NTL_CXX_RV
     basic_ifstream& operator=(basic_ifstream&& rhs)
     {
-      swap(rhs); return *this;
+      basic_istream::operator =(std::move(rhs));
+      sb = std::move(rhs.sb);
+      return *this;
     }
 #endif
     void swap(basic_ifstream& rhs)
@@ -857,7 +872,13 @@ class basic_ofstream:
       open(s, mode, encoding);
     }
 #ifdef NTL_CXX_RV
-    basic_ofstream(basic_ofstream&& rhs);
+    basic_ofstream(basic_ofstream&& rhs)
+      : basic_ostream<charT,traits>(std::move(rhs))
+      , sb(std::move(rhs.sb))
+    {
+      this->set_rdbuf(&sb);
+    }
+
 #endif
 
     // NTL extension
@@ -870,7 +891,9 @@ class basic_ofstream:
 #ifdef NTL_CXX_RV
     basic_ofstream& operator=(basic_ofstream&& rhs)
     {
-      return swap(rhs), *this;
+      basic_ostream::operator =(std::move(rhs));
+      sb = std::move(rhs.sb);
+      return *this;
     }
 #endif
 
@@ -948,7 +971,13 @@ class basic_fstream:
       open(s, mode, encoding);
     }
 #ifdef NTL_CXX_RV
-    basic_fstream(basic_fstream&& rhs);
+    basic_fstream(basic_fstream&& rhs)
+      : basic_iostream<charT,traits>(std::move(rhs))
+      , sb(std::move(rhs.sb))
+    {
+      this->set_rdbuf(&sb);
+    }
+
 #endif
 
     // NTL extension
@@ -961,7 +990,9 @@ class basic_fstream:
 #ifdef NTL_CXX_RV
     basic_fstream& operator=(basic_fstream&& rhs)
     {
-      return swap(rhs), *this;
+      basic_iostream::operator =(std::move(rhs));
+      sb = std::move(rhs.sb);
+      return *this;
     }
 #endif
 
