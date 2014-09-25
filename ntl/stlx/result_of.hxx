@@ -313,7 +313,9 @@ namespace std
     public __::result_of<FunctionCallType>
   {};
 
+#ifdef NTL_CXX_TT
   template <class T> using result_of_t                    = typename result_of<T>::type;
+#endif
 
 /**@} lib_func_ret         */
 /**@} lib_function_objects */

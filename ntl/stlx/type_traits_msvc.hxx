@@ -562,13 +562,6 @@ NTL__STLX_DEF_TRAIT(has_virtual_destructor)
 template<class T, class... Args>
 struct is_constructible: std::integral_constant<bool, __is_constructible(T, Args...)> {};
 
-#else
-
-template<class T, class U>
-struct is_constructible: std::integral_constant<bool, __is_constructible(T, U)> {};
-
-#endif
-
 template<class T>
 struct is_default_constructible: is_constructible<T> {};
 
@@ -577,6 +570,14 @@ struct is_copy_constructible: is_constructible<T,typename add_lvalue_reference<t
 
 template<class T>
 struct is_move_constructible: is_constructible<T,typename add_rvalue_reference<T>::type> {};
+
+#else
+
+//template<class T, class U>
+//struct is_constructible: std::integral_constant<bool, __is_constructible(T, U)> {};
+
+#endif
+
 
 //////////////////////////////////////////////////////////////////////////
 template <class T> struct is_signed

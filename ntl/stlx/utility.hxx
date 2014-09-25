@@ -168,8 +168,8 @@ bool operator>=(const T & x, const T & y) { return !(x < y); }
   template <class T, class U = T>
   inline T exchange(T& obj, U&& new_val);
 #else
-  template <class T, class U = T> inline T exchange(T& obj, U& new_val);
-  template <class T, class U = T> inline T exchange(T& obj, const U& new_val);
+  template <class T, class U> inline T exchange(T& obj, U& new_val);
+  template <class T, class U> inline T exchange(T& obj, const U& new_val);
 #endif
 
 

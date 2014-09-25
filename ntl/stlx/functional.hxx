@@ -148,8 +148,15 @@ struct negate : unary_function<T, T>
   T operator()(const T& x) const { return - x; }
 };
 
-#ifdef NTL_CXX_TYPEOF
+#ifndef NTL_CXX_TYPEOF
+namespace __
+{
+  template<class T, class U = void>
+  struct is_transparent: false_type
+  {};
+}
 
+#else
 // Making Operator Functors [n3421]
 
 namespace __
