@@ -59,7 +59,7 @@ class stack
 
     template <class Alloc> 
     stack(const stack& s, const Alloc& a)
-      :c(c,a)
+      :c(s.c,a)
     {}
 
     template <class Alloc>
