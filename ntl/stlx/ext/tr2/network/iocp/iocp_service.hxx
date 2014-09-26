@@ -334,6 +334,7 @@ namespace std { namespace tr2 { namespace sys {
   private:
     void shutdown_service() override
     {
+      timer_thread.resume(true);
       shutdown.set();
       timer_event.set();
       while(workers > 0) {
