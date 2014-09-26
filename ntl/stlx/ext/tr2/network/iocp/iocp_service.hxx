@@ -51,7 +51,7 @@ namespace std { namespace tr2 { namespace sys {
     explicit iocp_service(io_service& ios)
       : service(ios)
       , timer_event(timer_event.auto_reset)
-      , timer_thread(&iocp_service::timer_proc, this)
+      , timer_thread(&iocp_service::timer_proc, this, true) // create_suspended
       , scheduler(use_service<__::timer_scheduler>(ios))
       , self_id()
     {
@@ -192,6 +192,7 @@ namespace std { namespace tr2 { namespace sys {
       }
       timers.push_back(*data);
       timer_event.set();
+      timer_thread.resume();
       return true;
     }
 
