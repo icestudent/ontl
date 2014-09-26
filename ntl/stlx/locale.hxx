@@ -606,9 +606,6 @@ class ctype : public locale::facet, public ctype_base
     _NTL_LOC_VIRTUAL const charT* do_narrow(const charT* low, const charT* high, char dfault, char* dest) const;
     ///\}
 };// class ctype
-#ifdef __ICL
-#pragma warning(disable:444)
-#endif
 
 /// 22.2.1.2 Class template ctype_byname [locale.ctype.byname]
 template <class charT>
@@ -633,9 +630,6 @@ class ctype_byname : public ctype<charT>
     _NTL_LOC_VIRTUAL const charT* do_narrow(const charT* low, const charT* high, char dfault, char* dest) const;
 };
 
-#ifdef __ICL
-#pragma warning(disable:444)
-#endif
 /**
  *	@brief 22.2.1.3 ctype<char> specialization [facet.ctype.special]
  *  @details A specialization ctype<char> is provided so that the member functions on type \c char can be implemented inline.
@@ -810,9 +804,6 @@ template <> class ctype<char>
     const bool          del;
 
 };// class ctype<char>
-#ifdef __ICL
-#pragma warning(default:444)
-#endif
 
 /// 22.2.1.4 Class ctype_byname<char> [lib.locale.ctype.byname.special]
 template <> class ctype_byname<char>

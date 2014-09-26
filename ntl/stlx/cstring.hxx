@@ -18,6 +18,7 @@ extern "C++" {
 #include "cassert.hxx"
 
 #ifdef __ICL
+#pragma warning(push)
 #pragma warning(disable:2259) // [remark] non-pointer conversion from
 #endif
 
@@ -367,7 +368,7 @@ int NTL_CRTIMP
 #endif // #ifndef _INC_STDLIB
 
 #ifdef __ICL
-#pragma warning(default:2259)
+#pragma warning(pop)
 #endif
 
 // MSVC winnt.h" compatibility

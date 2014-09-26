@@ -194,11 +194,12 @@ namespace std
     mutable pointer ptr;
 #ifndef __GNUC__
 #ifdef __ICL
+#pragma warning(push)
 #pragma warning(disable:80) // a storage class may not be specified here
 #endif
     typename conditional<is_const<deleter_type>::value, deleter_type, mutable deleter_type>::type deleter;
 #ifdef __ICL
-#pragma warning(default:80)
+#pragma warning(pop)
 #endif
 #else
     mutable deleter_type deleter;
@@ -425,11 +426,12 @@ namespace std
     mutable pointer ptr;
   #ifndef __GNUC__
   #ifdef __ICL
+  #pragma warning(push)
   #pragma warning(disable:80) // a storage class may not be specified here
   #endif
     typename conditional<is_const<deleter_type>::value, deleter_type, mutable deleter_type>::type deleter;
   #ifdef __ICL
-  #pragma warning(default:80)
+  #pragma warning(pop)
   #endif
   #else
     mutable deleter_type deleter;

@@ -117,6 +117,7 @@ namespace ntl { namespace km {
         //reserved_max  = 260
       };
     }
+#pragma warning(push)
 #pragma warning(disable:4201) // nameless union
     struct in_addr
     {
@@ -127,7 +128,7 @@ namespace ntl { namespace km {
         uint32_t addr;
       };
     };
-#pragma warning(default:4201)
+#pragma warning(pop)
 
     struct in_addr6
     {

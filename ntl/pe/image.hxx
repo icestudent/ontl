@@ -722,9 +722,6 @@ namespace ntl {
         const uint32_t ordinal = uintptr_t(exp) <= 0xFFFF
           ? exports->ordinal(this, static_cast<uint16_t>(reinterpret_cast<uintptr_t>(exp)))
           : exports->ordinal(this, exp);
-        #ifdef __ICL
-        # pragma warning(default: 810)
-        #endif
         void * const f = exports->function(this, ordinal);
         const uintptr_t ex = reinterpret_cast<uintptr_t>(exports);
         if ( !in_range(ex, ex + export_table->Size, f) ) //-V104

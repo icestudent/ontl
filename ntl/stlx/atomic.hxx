@@ -1098,7 +1098,6 @@ namespace std
     uint32_t val_;
   #endif
   };
-#pragma warning(default: 4127)
 
   inline bool atomic_flag_test_and_set(volatile atomic_flag* flag) { return flag->test_and_set(); }
   inline bool atomic_flag_test_and_set_explicit(volatile atomic_flag* flag, memory_order mo) { return flag->test_and_set(mo); }

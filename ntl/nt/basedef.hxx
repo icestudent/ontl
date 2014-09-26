@@ -202,13 +202,14 @@ namespace ntl {
     };
 
 
+    #pragma warning(push)
     #pragma warning(disable:4201) // nameless union
     struct io_status_block
     {
       union { ntstatus  Status; void * Pointer; }; //-V117
       uintptr_t Information;
     };
-    #pragma warning(default:4201)
+    #pragma warning(pop)
 
 
     typedef

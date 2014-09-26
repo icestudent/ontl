@@ -151,8 +151,8 @@ namespace ntl {
     };
 
 
-
 #ifdef NTL__STLX_SYSTEM_ERROR
+#pragma warning(push)
 #pragma warning(disable:4127) // conditional expression is constant
 
     /// STL default base mutex object
@@ -237,9 +237,8 @@ namespace ntl {
       base_mutex& operator=(const base_mutex&) __deleted;
     };
 
-#pragma warning(default:4127)
+#pragma warning(pop)
 #endif // NTL__STLX_SYSTEM_ERROR
-
   }
 }
 #endif // NTL__NT_MUTEX

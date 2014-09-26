@@ -487,6 +487,7 @@ namespace std
 		__inline_ns namespace chrono_literals
 		{
 #ifdef NTL_CXX_UDL
+#pragma warning(push)
 #pragma warning(disable:4455)
 			constexpr inline chrono::hours operator "" h(unsigned long long l)
 			{
@@ -536,7 +537,7 @@ namespace std
 			{
 				return chrono::duration<long double, nano>(l);
 			}
-#pragma warning(default:4455)
+#pragma warning(pop)
 #endif // udl
 		} // chrono_literals ns
 	} // literals ns

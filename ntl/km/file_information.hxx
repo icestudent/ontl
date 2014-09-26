@@ -120,6 +120,7 @@ struct file_information<file_rename_information>:
 };
 
 ///\name  FileLinkInformation == 11
+#pragma warning(push)
 #pragma warning(disable:4510 4610)
 struct file_link_information: file_rename_information
 {
@@ -127,7 +128,7 @@ struct file_link_information: file_rename_information
 
   typedef std::unique_ptr<file_link_information> ptr;
 };
-#pragma warning(default:4510 4610)
+#pragma warning(pop)
 
 template<>
 struct file_information<file_link_information>:

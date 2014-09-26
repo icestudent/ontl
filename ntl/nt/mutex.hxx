@@ -259,7 +259,7 @@ namespace ntl {
       }
    }; // mutex
 
-
+#pragma warning(push)
 #pragma warning(disable:4127) // conditional expression is constant
 
     /// STL default base mutex object
@@ -518,7 +518,7 @@ namespace ntl {
 
     };
 
-#pragma warning(default:4127)
+#pragma warning(pop)
   }
 }
 #endif // NTL__NT_MUTEX

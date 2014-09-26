@@ -144,6 +144,7 @@ namespace std
 #define _NEST(x) x
 #define _EMPTY
 #ifdef __ICL
+#pragma warning(push)
 #pragma warning(disable:424)
 #endif
     NTL_RF_MAKEBASE(_NEST(_EMPTY));
@@ -151,7 +152,7 @@ namespace std
     NTL_RF_MAKEBASE(volatile);
     NTL_RF_MAKEBASE(const volatile);
 #ifdef __ICL
-#pragma warning(default:424)
+#pragma warning(pop)
 #endif
 #undef _EMPTY
 #undef _NEST

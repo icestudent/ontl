@@ -16,6 +16,7 @@
 #include "../../type_traits.hxx"
 #endif
 
+#pragma warning(push)
 #pragma warning(disable: 4512) // assignment operator could not be generated
 
 namespace ttl
@@ -246,6 +247,6 @@ namespace ttl
 
 }
 
-#pragma warning(default: 4512)
+#pragma warning(pop)
 
 #endif //__data_holder__hpp
