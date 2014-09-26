@@ -49,7 +49,7 @@ namespace std
           enum color_type { black, red, colors };
           union
           {
-            node* child[colors];
+            node* child[colors]; //-V117
             struct {
               node *left_, *right_;
             };

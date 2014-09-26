@@ -88,7 +88,7 @@ namespace std {
       // split val to i elements
       const size_t count = min(elements_count_, sizeof(unsigned long long) / sizeof(storage_type));
       for(size_t x = 0; x < count; ++x)
-        storage_[x] = static_cast<storage_type>((val >> x * element_size_) & set_bits_);
+        storage_[x] = static_cast<storage_type>((val >> (x * element_size_)) & set_bits_);
     }
 
     template<class charT, class traits, class Allocator>

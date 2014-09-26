@@ -333,13 +333,13 @@ namespace std
     template<typename charT, typename traits>
     friend basic_ostream<charT, traits>& operator<<(basic_ostream<charT, traits>& os, const linear_congruential_engine& x)
     {
-      saveiostate s(os); os.flags(ios_base::dec|ios_base::left);
+      saveiostate s(os); os.flags(ios_base::dec|ios_base::left); //-V808
       return os << setfill(' ') << x.state_;
     }
     template<typename charT, typename traits>
     friend basic_istream<charT, traits>& operator>>(basic_istream<charT, traits>& is, linear_congruential_engine& x)
     {
-      saveiostate s(is); is.flags(ios_base::dec);
+      saveiostate s(is); is.flags(ios_base::dec); //-V808
       return is >> x.state_;
     }
     ///\}
@@ -507,7 +507,7 @@ namespace std
     template<typename charT, typename traits>
     friend basic_ostream<charT, traits>& operator<<(basic_ostream<charT, traits>& os, const mersenne_twister_engine& x)
     {
-      saveiostate s(os); os.flags(ios_base::dec|ios_base::left|ios_base::fixed);
+      saveiostate s(os); os.flags(ios_base::dec|ios_base::left|ios_base::fixed); //-V808
       os << setfill(' ') << x.state[0];
       const charT w = os.widen(' ');
       for(size_t i = 1; i < state_size; i++)
@@ -517,7 +517,7 @@ namespace std
     template<typename charT, typename traits>
     friend basic_istream<charT, traits>& operator>>(basic_istream<charT, traits>& is, mersenne_twister_engine& x)
     {
-      saveiostate s(is); is.flags(ios_base::dec|ios_base::skipws);
+      saveiostate s(is); is.flags(ios_base::dec|ios_base::skipws); //-V808
       for(size_t i = 0; i < state_size; i++)
         is >> x.state[i];
       return is;
@@ -639,13 +639,13 @@ namespace std
     template<typename charT, typename traits>
     friend basic_ostream<charT, traits>& operator<<(basic_ostream<charT, traits>& os, const discard_block_engine& x)
     {
-      saveiostate s(os); os.flags(ios_base::dec|ios_base::left|ios_base::fixed);
+      saveiostate s(os); os.flags(ios_base::dec|ios_base::left|ios_base::fixed); //-V808
       return os << setfill(' ') << x.base() << ' ' << x.n;
     }
     template<typename charT, typename traits>
     friend basic_istream<charT, traits>& operator>>(basic_istream<charT, traits>& is, discard_block_engine& x)
     {
-      saveiostate s(is); is.flags(ios_base::dec|ios_base::skipws);
+      saveiostate s(is); is.flags(ios_base::dec|ios_base::skipws); //-V808
       return is >> x.e >> x.n;
     }
     ///\}
@@ -748,7 +748,7 @@ namespace std
     template<typename charT, typename traits>
     friend basic_ostream<charT, traits>& operator<<(basic_ostream<charT, traits>& os, const shuffle_order_engine& x)
     {
-      saveiostate s(os); os.flags(ios_base::dec|ios_base::left|ios_base::fixed);
+      saveiostate s(os); os.flags(ios_base::dec|ios_base::left|ios_base::fixed); //-V808
       const charT w = os.widen(' ');    // space separator
       os << setfill(' ') << x.base();
       for(size_t i = 0; i < table_size; i++)
@@ -759,7 +759,7 @@ namespace std
     template<typename charT, typename traits>
     friend basic_istream<charT, traits>& operator>>(basic_istream<charT, traits>& is, shuffle_order_engine& x)
     {
-      saveiostate s(is); is.flags(ios_base::dec|ios_base::skipws);
+      saveiostate s(is); is.flags(ios_base::dec|ios_base::skipws); //-V808
       is >> x.e;
       for(size_t i = 0; i < table_size; i++)
         is >> x.V[i];

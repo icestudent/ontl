@@ -297,8 +297,7 @@ namespace std
             memsize = (sizeof(file_directory_information)+32)*64; // 256 files by default (26KB), multiplies by 4
           #endif
             do{
-              if(buf)
-                delete[] buf;
+              delete[] buf;
               buf = new (nothrow) char[ memsize *= multiplier ];
               if(!buf){
                 ec = make_error_code(status::insufficient_resources);

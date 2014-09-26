@@ -74,7 +74,7 @@ inline void __safe_call_new_handler(std::new_handler nh)
     try {
       nh();
     } 
-    catch(const std::bad_alloc&){
+    catch(const std::bad_alloc&){ //-V565
     }
 #else
     __try {

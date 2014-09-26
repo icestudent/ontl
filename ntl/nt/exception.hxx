@@ -789,7 +789,7 @@ namespace cxxruntime {
         return true;
 
       // different TI record with different name?
-      if(ti1 != ti2 && std::strcmp(ti1->name(), ti2->name()))
+      if(ti1 != ti2 && std::strcmp(ti1->name(), ti2->name()) != 0)
         return false;
 
       // reference?

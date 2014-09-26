@@ -1670,7 +1670,7 @@ namespace std
     }
 
     __forceinline
-      ~auto_ptr() __ntl_nothrow { if ( ptr ) delete ptr; }
+      ~auto_ptr() __ntl_nothrow { delete ptr; }
 
     ///\name  D.9.1.2 auto_ptr members [auto.ptr.members]
 

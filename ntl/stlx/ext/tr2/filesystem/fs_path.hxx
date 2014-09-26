@@ -369,7 +369,7 @@ namespace std
         public system_error
       {
         path p1,p2;
-        mutable string msg;
+        mutable string fsmsg_cache;
       public:
         typedef path path_type;
 
@@ -392,7 +392,7 @@ namespace std
 
         inline const char* what() const
         {
-          if(msg.empty()){
+          if(fsmsg_cache.empty()){
             __ntl_try{
               string tmp = system_error::what();
               if(!p1.empty() || !p2.empty()){
@@ -412,13 +412,13 @@ namespace std
                 }
                 tmp += ".";
               }
-              msg = move(tmp);
+              fsmsg_cache = move(tmp);
             }
             __ntl_catch(...){
               return system_error::what(); //-V612
             }
           }
-          return msg.c_str();
+          return fsmsg_cache.c_str();
         }
 
         ///\}

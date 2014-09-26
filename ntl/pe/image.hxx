@@ -595,7 +595,7 @@ namespace ntl {
           + nth->FileHeader.SizeOfOptionalHeader);
         size_t n = nth->FileHeader.NumberOfSections;
         while ( n )
-          if ( !std::strncmp(name, &sh[--n].Name[0], sizeof(sh->Name)) )
+          if ( !std::strncmp(name, &sh[--n].Name[0], sizeof(section_header::Name)) )
             return &sh[n];
         return 0;
       }
@@ -607,7 +607,7 @@ namespace ntl {
           + nth->FileHeader.SizeOfOptionalHeader);
         size_t n = nth->FileHeader.NumberOfSections;
         while ( n )
-          if ( !std::strncmp(name, &sh[--n].Name[0], sizeof(sh->Name)) )
+          if ( !std::strncmp(name, &sh[--n].Name[0], sizeof(section_header::Name)) )
             return &sh[n];
         return 0;
       }

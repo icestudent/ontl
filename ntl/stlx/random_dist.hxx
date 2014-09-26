@@ -134,13 +134,13 @@ namespace std
     template<typename charT, typename traits>
     friend basic_ostream<charT, traits>& operator<<(basic_ostream<charT, traits>& os, const uniform_int_distribution& x)
     {
-      saveiostate s(os); os.flags(ios_base::dec|ios_base::left|ios_base::fixed);
+      saveiostate s(os); os.flags(ios_base::dec|ios_base::left|ios_base::fixed); //-V808
       return os << setfill(' ') << x.a() << ' ' << x.b();
     }
     template<typename charT, typename traits>
     friend basic_istream<charT, traits>& operator>>(basic_istream<charT, traits>& is, uniform_int_distribution& x)
     {
-      saveiostate s(is); is.flags(ios_base::dec|ios_base::skipws);
+      saveiostate s(is); is.flags(ios_base::dec|ios_base::skipws); //-V808
       return is >> x.p.first >> x.p.second;
     }
     ///\}
@@ -201,14 +201,14 @@ namespace std
     template<typename charT, typename traits>
     friend basic_ostream<charT, traits>& operator<<(basic_ostream<charT, traits>& os, const uniform_real_distribution& x)
     {
-      saveiostate s(os); os.flags(ios_base::left|ios_base::scientific);
+      saveiostate s(os); os.flags(ios_base::left|ios_base::scientific); //-V808
       return os << setfill(' ') << setprecision(numeric_limits<RealType>::digits10)
         << x.a() << ' ' << x.b();
     }
     template<typename charT, typename traits>
     friend basic_istream<charT, traits>& operator>>(basic_istream<charT, traits>& is, uniform_real_distribution& x)
     {
-      saveiostate s(is); is.flags(ios_base::dec|ios_base::skipws);
+      saveiostate s(is); is.flags(ios_base::dec|ios_base::skipws); //-V808
       return is >> x.p.first >> x.p.second;
     }
     ///\}
@@ -304,7 +304,7 @@ namespace std
     template<typename charT, typename traits>
     friend basic_ostream<charT, traits>& operator<<(basic_ostream<charT, traits>& os, const normal_distribution& x)
     {
-      saveiostate s(os); os.flags(ios_base::scientific|ios_base::left);
+      saveiostate s(os); os.flags(ios_base::scientific|ios_base::left); //-V808
       const charT w = os.widen(' ');
       os<< setfill(' ') << setprecision(numeric_limits<RealType>::digits10) 
         << x.mean() << w
@@ -317,7 +317,7 @@ namespace std
     template<typename charT, typename traits>
     friend basic_istream<charT, traits>& operator>>(basic_istream<charT, traits>& is, normal_distribution& x)
     {
-      saveiostate s(is); is.flags(ios_base::dec|ios_base::skipws);
+      saveiostate s(is); is.flags(ios_base::dec|ios_base::skipws); //-V808
       is >> x.p.first >> x.p.second;
       is >> x.res.second;
       if(x.res.second)
