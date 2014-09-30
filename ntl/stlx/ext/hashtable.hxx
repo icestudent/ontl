@@ -682,14 +682,7 @@ namespace std
 
         size_type count(const key_type& k) const
         {
-          // if multi, than count it, otherwise return 0/1?
-          const size_type idx = bucket(k);
-          bucket_type& b = buckets_.first[idx];
-          if(b.size == 0)
-            return 0;
-          size_type n = 0;
-          for(const_local_iterator li = cbegin(idx), lend = cend(idx); li != lend; ++li, ++n);
-          return n;
+          return find(k) != end() ? 1 : 0;
         }
 
         std::pair<iterator, iterator> equal_range(const key_type& k)
