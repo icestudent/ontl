@@ -165,7 +165,7 @@ namespace std { namespace tr2 { namespace sys {
       typedef __::wait_operation<WaitHandler> op;
       typename op::ptr p (handler);
 
-      const __::timer_scheduler::timer_data data = { impl.tm.get(), p.op, std::chrono::duration_cast<ntl::nt::system_duration>(impl.tp.time_since_epoch()) };
+      const __::timer_scheduler::timer_data data = { impl.tm.get(), p.op, std::chrono::duration_cast<ntl::nt::system_duration>(impl.tp.time_since_epoch()).count() };
       scheduler.add_timer(data.h, &data);
       p.release();
     }
