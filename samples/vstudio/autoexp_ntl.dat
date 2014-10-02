@@ -19,6 +19,8 @@
 ; v 0.15 - string_ref
 ; v 0.16 - initializer_list
 ; v 0.17 - std::array<char,*>
+; v 0.18 - tr2.network (ip::address, tcp::endpoint, udp::endpoint)
+; v 0.19 - improved std::shared_ptr, std::weak_ptr
 ;
 ;---------------------------------------------------------------
 ;
@@ -457,7 +459,7 @@ std::auto_ptr<*>{
     #if($c.ptr == 0)(
       "<empty>"
     ) #else (
-      #(  "auto_ptr ",
+      #(  "ptr ",
         (*(($T1 *)$c.ptr))
        )
     )
@@ -479,7 +481,7 @@ std::unique_ptr<*>{
     #if($e.ptr == 0) (
       "<empty>"
     ) #else (
-      #( "unique_ptr ", *$e.ptr )
+      #( "ptr ", *$e.ptr )
     )
   )
   children
@@ -501,20 +503,60 @@ std::shared_ptr<*>{
       "<empty>"
     ) #else (
       #(
-        "shared_ptr ",
+        "ptr ",
         (*(($T1 *)$c.ptr))
        )
     )
   )
   children
   (
-    #(
-      [raw]: [$c,!],
-      ptr: (*(($T1 *)$c.ptr))
+    #if($c.ptr == 0)
+     ( #array(expr: 0, size: 0) )
+    #else (
+      #(
+        [raw]: [$c,!],
+        ptr: (*(($T1 *)$c.ptr)),
+        uses: ($c.shared->use_count),
+        weaks: ($c.shared->weak_count)
+      )
     )
   )
 }
 
+std::weak_ptr<*> {
+  preview
+  (
+    #if($c.ptr == 0) (
+      "<empty>"
+    ) #elif ($c.shared->use_count == 0) (
+      "<expired>"
+    ) #else (
+      #(
+        "ptr ",
+        (*(($T1 *)$c.ptr))
+       )
+    )
+  )
+  children
+  (
+    #if($c.ptr == 0)
+     ( #array(expr: 0, size: 0) )
+    #elif ($c.shared->use_count == 0) (
+      #(
+        [raw]: [$c,!],
+        uses: ($c.shared->use_count),
+        weaks: ($c.shared->weak_count)
+      )
+    ) #else (
+      #(
+        [raw]: [$c,!],
+        ptr: (*(($T1 *)$c.ptr)),
+        uses: ($c.shared->use_count),
+        weaks: ($c.shared->weak_count)
+      )
+    )
+  )
+}
 ;------------------------------------------------------------------------------
 ;  std::map
 ;------------------------------------------------------------------------------
