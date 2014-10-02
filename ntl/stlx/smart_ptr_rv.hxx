@@ -940,7 +940,6 @@ namespace std
       __ntl_try {
         shared = new __::shared_ptr_data<Y>(p);
         set(p);
-        check_shared(p, this);
       }
       __ntl_catch(bad_alloc){
         delete p;
@@ -1105,7 +1104,6 @@ namespace std
       reset();
       shared = new __::shared_ptr_data<Y>(p);
       set(p);
-      check_shared(p, this);
     }
     template<class Y, class D> void reset(Y* p, D d)
     {
@@ -1185,6 +1183,7 @@ namespace std
     void set(T* p)
     {
       ptr = p;
+      check_shared(p, this);
     }
     void free()__ntl_nothrow
     {
@@ -1225,6 +1224,7 @@ namespace std
       return shared_ptr<T>(p, d, a);
     }
   }
+
 #ifdef NTL_CXX_VT
 
   template<class T, class... Args> 
@@ -1266,9 +1266,10 @@ namespace std
     T* p = sd->data();
     ::new ( static_cast<void*>(p) ) T(forward<Args>(args)...);
     sd->exists = true;
-    __::check_shared<T>::check<T>(p, sp);
 
-    return std::shared_ptr<T> (sp, p);
+    std::shared_ptr<T> ret(sp, p);
+    __::check_shared<T>::check(p, ret);
+    return ret;
   }
 
   template<class T, class Alloc, class... Args>
@@ -1500,8 +1501,10 @@ namespace std
   template<class T>
   class enable_shared_from_this
   {
-    weak_ptr<T> weak_this;
-    friend struct __::check_shared<T>;
+    mutable weak_ptr<T> weak_this;
+
+    template<class U>
+    friend struct __::check_shared;
   protected:
     enable_shared_from_this() __ntl_nothrow
     {}
@@ -1528,11 +1531,10 @@ namespace std
     template<class T>
     struct check_shared
     {
-      template<class>
-      static inline void check(...) {}
+      static inline void check(const void*, const shared_ptr<T>&) {}
 
       template<class Y>
-      static inline void check(enable_shared_from_this<T>* p, const shared_ptr<T>& ptr)
+      static inline void check(const enable_shared_from_this<Y>* p, const shared_ptr<T>& ptr)
       {
         p->weak_this = ptr;
       }
@@ -1544,7 +1546,7 @@ namespace std
   inline void shared_ptr<T>::check_shared(Y* p, const shared_ptr<T>* ptr)
   {
     if(p)
-      __::check_shared<T>::check<Y>(p, *ptr);
+      __::check_shared<T>::check(p, *ptr);
   }
 
 #if 0
