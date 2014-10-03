@@ -825,6 +825,7 @@ namespace std
         :p(p)
       {
         use_count = 1;
+        weak_count = 1;
       }
       virtual ~shared_ptr_data() __ntl_nothrow {}
 
@@ -849,10 +850,8 @@ namespace std
 
       void free()__ntl_nothrow
       {
-        if(p){
-          T* pp = p; p = nullptr;
-          deleter(pp);
-        }
+        T* pp = p; p = nullptr;
+        deleter(pp);
       }
       const void* get_deleter(const type_info& ti) const __ntl_nothrow
       {
@@ -903,6 +902,7 @@ namespace std
     struct explicit_bool { int _; };
     typedef int explicit_bool::*  explicit_bool_type;
 
+    template<class Y> friend struct __::check_shared;
     template<class Y> friend class weak_ptr;
     template<class Y> friend class shared_ptr;
     template<class D, class T> 
@@ -1092,8 +1092,9 @@ namespace std
     void reset()
     {
       if(shared) {
-        if(--shared->use_count == 0)
+        if(--shared->use_count == 0) {
           free();
+        }
       }
       shared = nullptr;
       ptr = nullptr;
@@ -1189,7 +1190,7 @@ namespace std
     {
       if(shared) {
         shared->free(); // free object, but not counter
-        if(shared->weak_count == 0)
+        if(--shared->weak_count == 0)
           shared->dispose(); // free counter
       }
       shared = nullptr;
@@ -1232,7 +1233,9 @@ namespace std
   {
     struct object_deleter
     {
+      int guard1;
       typename std::aligned_storage<sizeof(T), alignof(T)>::type storage;
+      int guard2;
       bool exists;
 
       T* data() { return reinterpret_cast<T*>(&storage); }
@@ -1257,6 +1260,8 @@ namespace std
 
       object_deleter()
         : exists(false)
+        , guard1(32)
+        , guard2(64)
       {}
     };
 
@@ -1267,8 +1272,9 @@ namespace std
     ::new ( static_cast<void*>(p) ) T(forward<Args>(args)...);
     sd->exists = true;
 
+    __::check_shared<T>::check(p, p, sp);
+
     std::shared_ptr<T> ret(sp, p);
-    __::check_shared<T>::check(p, ret);
     return ret;
   }
 
@@ -1459,10 +1465,8 @@ namespace std
     void reset() __ntl_nothrow
     {
       if(shared){
-        --shared->weak_count;
-        if(!shared->use_count){
+        if(--shared->weak_count == 0)
           shared->dispose();
-        }
         shared = nullptr,
           ptr = nullptr;
       }
@@ -1470,7 +1474,7 @@ namespace std
 
     // observers
     long use_count() const __ntl_nothrow      { return shared ? shared->use_count : 0; }
-    bool expired() const __ntl_nothrow        { return shared && shared->use_count == 0; }
+    bool expired() const __ntl_nothrow        { return use_count() == 0; }
 
     shared_ptr<T> lock() const __ntl_nothrow  { return expired() ? shared_ptr<T>() : shared_ptr<T>(*this); }
 
@@ -1531,12 +1535,19 @@ namespace std
     template<class T>
     struct check_shared
     {
-      static inline void check(const void*, const shared_ptr<T>&) {}
+      static inline void check(const void*, const void*, const shared_ptr<T>&) {}
+
+      template<class Y, class X>
+      static inline void check(const enable_shared_from_this<Y>* p, const X* px, const shared_ptr<T>& ptr)
+      {
+        if(p && p->weak_this.expired())
+          p->weak_this = shared_ptr<T>(ptr, const_cast<X*>(px));
+      }
 
       template<class Y>
-      static inline void check(const enable_shared_from_this<Y>* p, const shared_ptr<T>& ptr)
+      static inline void enable_shared(Y* p, shared_ptr<T>& sp)
       {
-        p->weak_this = ptr;
+        check(p, p, sp);
       }
     };
   }
@@ -1546,7 +1557,7 @@ namespace std
   inline void shared_ptr<T>::check_shared(Y* p, const shared_ptr<T>* ptr)
   {
     if(p)
-      __::check_shared<T>::check(p, *ptr);
+      __::check_shared<T>::check(p, p, *ptr);
   }
 
 #if 0
