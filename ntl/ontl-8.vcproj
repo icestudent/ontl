@@ -306,19 +306,15 @@
 					Name=".ext"
 					>
 					<File
-						RelativePath=".\stlx\ext\circular_buffer.hxx"
-						>
-					</File>
-					<File
 						RelativePath=".\stlx\cpp0x_mode.hxx"
 						>
 					</File>
 					<File
-						RelativePath=".\stlx\ext\fib.hxx"
+						RelativePath=".\stlx\ext\hashtable.hxx"
 						>
 					</File>
 					<File
-						RelativePath=".\stlx\ext\hashtable.hxx"
+						RelativePath=".\stlx\ext\join.hxx"
 						>
 					</File>
 					<File
@@ -389,6 +385,14 @@
 							>
 						</File>
 						<File
+							RelativePath=".\stlx\ext\tr2\quoted.hxx"
+							>
+						</File>
+						<File
+							RelativePath=".\stlx\ext\tr2\stream_mutex.hxx"
+							>
+						</File>
+						<File
 							RelativePath=".\stlx\ext\tr2\timer.hxx"
 							>
 						</File>
@@ -416,6 +420,10 @@
 								>
 							</File>
 							<File
+								RelativePath=".\stlx\ext\tr2\network\placeholders.hxx"
+								>
+							</File>
+							<File
 								RelativePath=".\stlx\ext\tr2\network\socket_acceptor.hxx"
 								>
 							</File>
@@ -425,6 +433,10 @@
 							</File>
 							<File
 								RelativePath=".\stlx\ext\tr2\network\stream_socket.hxx"
+								>
+							</File>
+							<File
+								RelativePath=".\stlx\ext\tr2\network\uri.hxx"
 								>
 							</File>
 							<Filter
@@ -446,11 +458,19 @@
 									Name="winsock"
 									>
 									<File
+										RelativePath=".\stlx\ext\tr2\network\winsock\dns_ops.hxx"
+										>
+									</File>
+									<File
 										RelativePath=".\stlx\ext\tr2\network\winsock\service_resolve.hxx"
 										>
 									</File>
 									<File
 										RelativePath=".\stlx\ext\tr2\network\winsock\service_sockets.hxx"
+										>
+									</File>
+									<File
+										RelativePath=".\stlx\ext\tr2\network\winsock\socket_ops.hxx"
 										>
 									</File>
 									<File
@@ -511,6 +531,26 @@
 								RelativePath=".\stlx\ext\tr2\network\timer.hxx"
 								>
 							</File>
+							<Filter
+								Name="iocp"
+								>
+								<File
+									RelativePath=".\stlx\ext\tr2\network\iocp\complete_op.hxx"
+									>
+								</File>
+								<File
+									RelativePath=".\stlx\ext\tr2\network\iocp\iocp_service.hxx"
+									>
+								</File>
+								<File
+									RelativePath=".\stlx\ext\tr2\network\iocp\op.hxx"
+									>
+								</File>
+								<File
+									RelativePath=".\stlx\ext\tr2\network\iocp\wait_op.hxx"
+									>
+								</File>
+							</Filter>
 						</Filter>
 						<Filter
 							Name="filesystem"
@@ -529,7 +569,7 @@
 							</File>
 						</Filter>
 						<Filter
-							Name="filesystem_V3"
+							Name="filesystem_v3"
 							>
 							<File
 								RelativePath=".\stlx\ext\tr2\filesystem\fs_directory_v3.hxx"
@@ -549,10 +589,6 @@
 							</File>
 							<File
 								RelativePath=".\stlx\ext\tr2\filesystem\fs_path_impl.hxx"
-								>
-							</File>
-							<File
-								RelativePath=".\stlx\ext\tr2\filesystem\fs_traits.hxx"
 								>
 							</File>
 						</Filter>
@@ -674,6 +710,10 @@
 					Name="c-compat"
 					>
 					<File
+						RelativePath=".\stlx\cstd\assert.h"
+						>
+					</File>
+					<File
 						RelativePath=".\stlx\cassert.hxx"
 						>
 					</File>
@@ -730,6 +770,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\stlx\cstd\ctype.h"
+						>
+					</File>
+					<File
 						RelativePath=".\stlx\cuchar.hxx"
 						>
 					</File>
@@ -739,6 +783,70 @@
 					</File>
 					<File
 						RelativePath=".\stlx\cwctype.hxx"
+						>
+					</File>
+					<File
+						RelativePath=".\stlx\cstd\float.h"
+						>
+					</File>
+					<File
+						RelativePath=".\stlx\cstd\inttypes.h"
+						>
+					</File>
+					<File
+						RelativePath=".\stlx\cstd\limits.h"
+						>
+					</File>
+					<File
+						RelativePath=".\stlx\cstd\math.h"
+						>
+					</File>
+					<File
+						RelativePath=".\stlx\cstd\memory.h"
+						>
+					</File>
+					<File
+						RelativePath=".\stlx\cstd\stdarg.h"
+						>
+					</File>
+					<File
+						RelativePath=".\stlx\cstd\stdbool.h"
+						>
+					</File>
+					<File
+						RelativePath=".\stlx\cstd\stddef.h"
+						>
+					</File>
+					<File
+						RelativePath=".\stlx\cstd\stdint.h"
+						>
+					</File>
+					<File
+						RelativePath=".\stlx\cstd\stdio.h"
+						>
+					</File>
+					<File
+						RelativePath=".\stlx\cstd\stdlib.h"
+						>
+					</File>
+					<File
+						RelativePath=".\stlx\cstd\string.h"
+						>
+					</File>
+					<File
+						RelativePath=".\stlx\cstd\time.h"
+						>
+					</File>
+					<File
+						RelativePath=".\stlx\cstd\uchar.h"
+						>
+					</File>
+					<File
+						RelativePath=".\stlx\cstd\wchar.h"
+						>
+					</File>
+					<File
+						RelativePath=".\stlx\cstd\wctype.h"
 						>
 					</File>
 				</Filter>
@@ -787,6 +895,10 @@
 					</File>
 					<File
 						RelativePath=".\stlx\posix_error.hxx"
+						>
+					</File>
+					<File
+						RelativePath=".\stlx\shared_mutex.hxx"
 						>
 					</File>
 					<File
@@ -866,11 +978,23 @@
 						>
 					</File>
 					<File
+						RelativePath=".\stlx\optional.hxx"
+						>
+					</File>
+					<File
+						RelativePath=".\stlx\range.hxx"
+						>
+					</File>
+					<File
 						RelativePath=".\stlx\regex.hxx"
 						>
 					</File>
 					<File
 						RelativePath=".\stlx\smart_ptr.hxx"
+						>
+					</File>
+					<File
+						RelativePath=".\stlx\smart_ptr_rv.hxx"
 						>
 					</File>
 					<File
@@ -882,7 +1006,15 @@
 						>
 					</File>
 					<File
+						RelativePath=".\stlx\tuple_vt.hxx"
+						>
+					</File>
+					<File
 						RelativePath=".\stlx\type_traits.hxx"
+						>
+					</File>
+					<File
+						RelativePath=".\stlx\type_traits_aliases.hxx"
 						>
 					</File>
 					<File
@@ -921,7 +1053,23 @@
 							>
 						</File>
 						<File
+							RelativePath=".\stlx\bind_rv.hxx"
+							>
+						</File>
+						<File
+							RelativePath=".\stlx\bind_vt.hxx"
+							>
+						</File>
+						<File
 							RelativePath=".\stlx\fn_caller.hxx"
+							>
+						</File>
+						<File
+							RelativePath=".\stlx\fn_caller_rv.hxx"
+							>
+						</File>
+						<File
+							RelativePath=".\stlx\fn_caller_vt.hxx"
 							>
 						</File>
 						<File
@@ -929,7 +1077,19 @@
 							>
 						</File>
 						<File
+							RelativePath=".\stlx\function_vt.hxx"
+							>
+						</File>
+						<File
 							RelativePath=".\stlx\mem_fn.hxx"
+							>
+						</File>
+						<File
+							RelativePath=".\stlx\mem_fn_rv.hxx"
+							>
+						</File>
+						<File
+							RelativePath=".\stlx\mem_fn_vt.hxx"
 							>
 						</File>
 						<File
@@ -1255,6 +1415,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\nt\semaphore.hxx"
+					>
+				</File>
+				<File
 					RelativePath=".\nt\service.hxx"
 					>
 				</File>
@@ -1385,6 +1549,14 @@
 				<File
 					RelativePath=".\rtl\dbgstream.cpp"
 					>
+					<FileConfiguration
+						Name="debug|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
 					<FileConfiguration
 						Name="debug|Win32"
 						ExcludedFromBuild="true"
@@ -1687,6 +1859,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\win\error.hxx"
+					>
+				</File>
+				<File
 					RelativePath=".\win\handle.hxx"
 					>
 				</File>
@@ -1736,10 +1912,6 @@
 				</File>
 				<File
 					RelativePath=".\device_traits.hxx"
-					>
-				</File>
-				<File
-					RelativePath=".\dllapp.hxx"
 					>
 				</File>
 				<File
