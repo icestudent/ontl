@@ -18,6 +18,10 @@
   #if _MSC_VER < 1400
   # error upgrade your compiler at least to VC8 (14.00)
   #endif
+
+  // pure MSVC compiler (not Intel or Clang)
+  #define _MSC_VER_PURE _MSC_VER
+
 #elif defined(__BCPLUSPLUS__)
 // Borland C++
   #if __BCPLUSPLUS__ < 0x600
@@ -114,7 +118,7 @@
 # pragma warning(disable:4480)// nonstandard extension used: specifying underlying type for enum 'enum'
 # pragma warning(disable:4456 4457 4458)	// declaration hides previous local declaration, function parameter or class member
 # pragma warning(disable:4510 4512)       // default constructor and assignment operator was implicitly defined as deleted
-# ifdef __ICL
+# if defined(__ICL)
 #  pragma warning(disable:271)  // [remark] trailing comma is nonstandard
 #  pragma warning(disable:304)  // [remark] access control not specified ("access" by default)
 #  pragma warning(disable:874)  // [remark] support for placement delete is disabled
@@ -123,7 +127,7 @@
 #  pragma warning(disable:1879) // [warning] unimplemented pragma ignored (but supported)
 #  pragma warning(disable:2268) // [remark] the declaration of the copy assignment operator for "type1s" has been suppressed because that of "type2" was suppressed
 #  pragma warning(disable:2270) // [remark] the declaration of the copy assignment operator for "type1" has been suppressed because that of "type2" is inaccessible
-# else
+# elif !defined(__clang__)
 # pragma runtime_checks( "", off )
 # endif
 #elif defined(__GNUC__) || defined(__clang__)
@@ -174,7 +178,7 @@
 # define __thiscall
 #endif
 
-#if defined(_MSC_VER)
+#if defined(_MSC_VER_PURE)
 # define __noalias __declspec(noalias)
 #elif defined(__BCPLUSPLUS__) || defined(__GNUC__) || defined(__clang__)
 # define __noalias
@@ -209,11 +213,8 @@
   #endif // x64
 #endif // __GNUC__
 
-#if defined(__GNUC__)  || defined(__clang__)
+#if (defined(__GNUC__)  || defined(__clang__)) && !defined(_MSC_VER)
 #ifndef _M_X64
- #define __cdecl    __attribute__((cdecl))
- #define __stdcall  __attribute__((stdcall))
- #define __fastcall __attribute__((fastcall))
 #else
   #define __cdecl    
   #define __stdcall  
