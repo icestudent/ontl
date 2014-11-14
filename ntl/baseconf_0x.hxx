@@ -89,7 +89,7 @@
 // VC16 (2010): 160011001 (CTP), 160020506 (beta1), 160021003 (beta2), 160030128 (rc), 160040219 (sp1)
 // VC17 (2012): 170040825 (ctp), 170050214 (b1), 170050727 (sp0), 170051025
 // VC18 (2013): 180020617 (ctp), 180020827 (rc), 180021005 (sp0), 180021114 (Nov2013 CTP), 180030501 (Update 2), 180030723 (Update 3)
-// VC19 (2014): 190021730 (ctp), 190021901 (ctp2), 190022013 (ctp3), 190022129 (ctp4)
+// VC19 (2014): 190021730 (ctp), 190021901 (ctp2), 190022013 (ctp3), 190022129 (ctp4), 190022310 (preview)
 
 #define NTL_CXX_AUTO
 #define NTL_CXX_ASSERT
@@ -146,6 +146,12 @@
 # define NTL_CXX_EF
 # define NTL_CXX_NS
 # define NTL_CXX_UDL
+#endif
+
+#if _MSC_FULL_VER >= 190022310 // v19 preview
+# define NTL_CXX_CHARS_TYPES
+# define NTL_CXX_CHARS
+# define NTL_CXX_FUNC
 #endif
 
 
