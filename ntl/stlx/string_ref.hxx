@@ -134,7 +134,7 @@ namespace std
     const_reference at(size_t pos) const
     {
       if(pos >= len)
-        __throw_out_of_range(__func__": pos > size()");
+        __throw_out_of_range(__name__": pos > size()");
       return operator[](pos);
     }
     constexpr const_reference front() const    { return p[0]; }

@@ -356,7 +356,7 @@ class vector
     void resize(size_type sz)
     {
       if(sz > max_size())
-        __throw_length_error(__func__": `sz` too large");
+        __throw_length_error(__name__": `sz` too large");
       iterator new_end = begin_ + sz;
       if(new_end < end_)
         erase(new_end, end_);
@@ -367,7 +367,7 @@ class vector
     void resize(size_type sz, const T& c)
     {
       if(sz > max_size())
-        __throw_length_error(__func__": `sz` too large");
+        __throw_length_error(__name__": `sz` too large");
       iterator new_end = begin_ + sz;
       if(new_end < end_)
         erase(new_end, end_);
@@ -378,7 +378,7 @@ class vector
     void reserve(size_type n) __ntl_throws(bad_alloc, length_error)
     {
       if(n > max_size())
-        __throw_length_error(__func__": size too big");
+        __throw_length_error(__name__": size too big");
       if ( capacity() < n ) realloc(n);
     }
 
@@ -682,7 +682,7 @@ class vector
 
     void check_bounds(size_type n) const __ntl_throws(out_of_range)
     {
-      if ( n >= size() ) __throw_out_of_range(__func__": no such element.");
+      if ( n >= size() ) __throw_out_of_range(__name__": no such element.");
     }
 
     void move(const iterator to, const iterator from) const

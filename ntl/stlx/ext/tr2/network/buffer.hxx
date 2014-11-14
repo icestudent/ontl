@@ -268,7 +268,7 @@ namespace std { namespace tr2 { namespace sys {
         }
         else
         {
-          __throw_length_error(__func__": `n` too large");
+          __throw_length_error(__name__": `n` too large");
         }
       }
 

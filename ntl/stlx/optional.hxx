@@ -102,7 +102,7 @@ namespace std
 #if defined NDEBUG
 # define ASSERTED_EXPRESSION(CHECK, EXPR) (EXPR)
 #else
-# define ASSERTED_EXPRESSION(CHECK, EXPR) ((CHECK) ? (EXPR) : (__ntl_assert(#CHECK, __func__, __FILE__, __LINE__), (EXPR)))
+# define ASSERTED_EXPRESSION(CHECK, EXPR) ((CHECK) ? (EXPR) : (__ntl_assert(#CHECK, __name__, __FILE__, __LINE__), (EXPR)))
 #endif
 
 
