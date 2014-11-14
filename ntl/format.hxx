@@ -40,14 +40,17 @@ char_t * to_hex(int_t v, char_t * const p)
 }
 
 template<typename char_t>
-static inline char_t* to_hex(char_t* dst, const void* src, size_t len)
+static inline char_t* to_hex(char_t* dst, size_t dst_len, const void* src, size_t len)
 {
+  len = std::min(len, dst_len/2);
   const uint8_t* p = reinterpret_cast<const uint8_t*>(src);
   for(size_t i = 0; i < len; i++) {
     const unsigned char c = *p++;
     *dst++ = hex_digit(c);
     *dst++ = hex_digit(c >> 4);
   }
+  if(len*2 < dst_len)
+    *dst = 0;
   return dst - len*2;
 }
 
