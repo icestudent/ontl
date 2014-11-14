@@ -15,7 +15,7 @@
 #include "cwchar.hxx"
 
 #ifdef NTL_CXX_CHARS
-# if defined(__ICL) || defined(__clang__)
+# if defined(__ICL) || defined(__clang__) || defined(_MSC_VER_PURE)
 #  define __STDC_UTF_16__ 1
 #  define __STDC_UTF_32__ 1
 # else
