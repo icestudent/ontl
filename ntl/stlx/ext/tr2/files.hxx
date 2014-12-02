@@ -23,12 +23,6 @@
 // implementation
 #include "../../../nt/string.hxx"
 
-#ifndef NTL_SUBSYSTEM_KM
-# include "../../../nt/new.hxx"
-#else
-# include "../../../km/new.hxx"
-#endif
-
 namespace std
 {
   /// C++ Standard Library Technical Report 2

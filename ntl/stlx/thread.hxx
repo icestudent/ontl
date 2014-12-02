@@ -16,7 +16,6 @@
   // UM implementation
 # include "../nt/teb.hxx"
 # include "../nt/system_information.hxx"
-# include "../nt/new.hxx"
 # include "../atomic.hxx"
 #else
 # include "../km/thread.hxx"

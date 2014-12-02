@@ -1,5 +1,6 @@
 #pragma once
 
+#include <nt/debug.hxx>
 #include <nt/iocp.hxx>
 #include <nt/event.hxx>
 #include <nt/thread.hxx>
