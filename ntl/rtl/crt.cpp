@@ -4,10 +4,13 @@
 #include "../nt/exception.hxx"
 #include "../atomic.hxx"
 
+#include "../stlx/vector.hxx"
 
 #pragma region section_attributes
-#pragma comment(linker, "/merge:.CRT=.rdata")
+#ifndef NTL_EMBEDDED
+
 #define sec(x) __declspec(allocate(x))
+#pragma comment(linker, "/merge:.CRT=.rdata")
 
 #ifdef __ICL
 #pragma warning(disable: 14)
@@ -34,21 +37,16 @@ sec(".CRT$XPZ") vfv_t* __xp_z[]= {0};
 
 sec(".CRT$XTA") vfv_t* __xt_a[]= {0};
 sec(".CRT$XTZ") vfv_t* __xt_z[]= {0};
-#undef sec
 #pragma data_seg(pop)
 #ifdef __ICL
-#pragma warning(disable: 14)
+# pragma warning(disable: 14)
 #endif
+#undef sec
+
+#endif // NTL_EMBEDDED
 #pragma endregion
 
-#include "../stlx/vector.hxx"
 
-#ifdef NTL_SUBSYSTEM_KM
-# include "../km/new.hxx"
-#else
-# include "../nt/new.hxx"
-# include "../nt/thread.hxx"
-#endif
 using namespace std;
 namespace
 {
@@ -125,10 +123,12 @@ namespace ntl
       cxxruntime::_initptd();
       #endif
 
+#ifndef NTL_EMBEDDED
       // init static objects
       initterm(__xc_a, __xc_z);
       initterm(__xp_a, __xp_z);
       initterm(__xt_a, __xt_z);
+#endif
 
     }else{
       // free static objects
@@ -163,11 +163,13 @@ extern "C" int __cdecl at_quick_exit(vfv_t* f)
   return -1;
 }
 
+#ifndef NTL_EMBEDDED
 void NTL_CRTCALL exit(int status)
 {
   doexit(status, false, true);
   _Exit(status);
 }
+#endif
 
 void NTL_CRTCALL quick_exit(int status)
 {
@@ -263,7 +265,7 @@ extern "C" int __cdecl _purecall(void)
 
 
 
-#if _MSC_VER >= 1500
+#if _MSC_VER >= 1500 && !defined(NTL_EMBEDDED)
 
 #include <pe/image.hxx>
 extern "C" void __fastcall __security_check_cookie(std::uintptr_t cookie)

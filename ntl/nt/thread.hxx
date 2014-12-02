@@ -230,14 +230,14 @@ void __stdcall
     );
 
 #pragma pack(push,8)
-struct thread_name
+struct debugger_thread_name
 {
   uint32_t      type;   // 0x1000
   const char*   name;
   legacy_handle id;
   uint32_t      flags;  // 0
 
-  explicit thread_name(const char* name, legacy_handle tid)
+  explicit debugger_thread_name(const char* name, legacy_handle tid)
     :name(name), id(tid),
     type(0x1000), flags(0)
   {}
@@ -442,13 +442,15 @@ public:
 
   static void setname(const char* name, legacy_handle tid)
   {
-    const thread_name tn(name, tid);
+#ifndef NTL_EMBEDDED
+		const nt::debugger_thread_name tn(name, tid);
     const std::array<uintptr_t, 4> args = {0x1000, uintptr_t(name), uintptr_t(tid), 0};
     __try{
       raise_exception(exception::record::vcmagic, exception::continuable, args);
     }
     __except(exception::execute_handler){
     }
+#endif
   }
 
   void setname(const char* name)
