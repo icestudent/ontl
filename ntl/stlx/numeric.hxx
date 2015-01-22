@@ -71,6 +71,7 @@ namespace std
   {
     while(first != last){
       *first = value;
+      ++first;
       ++value;
     }
   }
