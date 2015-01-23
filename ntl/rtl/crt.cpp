@@ -178,6 +178,7 @@ void NTL_CRTCALL quick_exit(int status)
 }
 
 #ifndef NTL_SUBSYSTEM_KM
+#include "../nt/thread.hxx"
 void NTL_CRTCALL _Exit(int code)
 {
   using ntl::nt::status;
