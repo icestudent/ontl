@@ -427,6 +427,7 @@ inline OutputIterator
     if(pred(*first) == true)
       *result = *first;
   }
+  return result;
 }
 
 
