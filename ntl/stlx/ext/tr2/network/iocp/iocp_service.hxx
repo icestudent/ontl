@@ -338,18 +338,21 @@ namespace std { namespace tr2 { namespace sys {
       timer_thread.resume(true);
       shutdown.set();
       timer_event.set();
+      const std::chrono::milliseconds shutdown_timeout(500);
       while(workers > 0) {
         ntl::nt::io_completion_port::entry entry;
-        ntstatus st = iocp.pop_completion(entry);
-        if(entry.Apc) {
+        ntstatus st = iocp.pop_completion(entry, shutdown_timeout);
+        if(ntl::nt::success(st) && entry.Apc) {
           async_operation* op = static_cast<async_operation*>(const_cast<void*>(entry.Apc));
           assert(op->is_async_operation());
           op->destroy();
           --workers;
+        } else {
+          --workers;
         }
       }
       const std::array<ntl::nt::legacy_handle,2> objects = {iocp.get(), timer_thread.get()};
-      ntl::nt::wait_for(objects, true, true);
+      ntl::nt::wait_for(objects, true, false);
       iocp.reset();
       timer_thread.reset();
     }
