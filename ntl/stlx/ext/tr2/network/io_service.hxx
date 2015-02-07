@@ -30,6 +30,7 @@ namespace std { namespace tr2 { namespace sys {
   template<class Service> void add_service(io_service&, Service*);
   template<class Service> bool has_service(io_service&);
 
+#ifndef NTL_NO_IO_HANDLERS
   ///\name default handler hook functions (note: handler passed as pointer to ...)
   inline void* io_handler_allocate(size_t s, ...)           { return ::operator new(s);    }
   inline void  io_handler_deallocate(void* p, size_t, ...)  { return ::operator delete(p); }
@@ -40,6 +41,7 @@ namespace std { namespace tr2 { namespace sys {
   template<class F> 
   inline void io_handler_invoke(F const& f, ...) { f(); }
   ///\}
+#endif
 
   template<class IoObjectService>
   class basic_io_object;
