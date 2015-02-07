@@ -521,6 +521,10 @@
 								>
 							</File>
 							<File
+								RelativePath=".\stlx\ext\tr2\network\io_futures.hxx"
+								>
+							</File>
+							<File
 								RelativePath=".\stlx\ext\tr2\network\io_service.hxx"
 								>
 							</File>
@@ -530,6 +534,10 @@
 							</File>
 							<File
 								RelativePath=".\stlx\ext\tr2\network\timer.hxx"
+								>
+							</File>
+							<File
+								RelativePath=".\stlx\ext\tr2\network\use_future.hxx"
 								>
 							</File>
 							<Filter
