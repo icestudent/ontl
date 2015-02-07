@@ -10,11 +10,24 @@
 
 #include "resolver_base.hxx"
 #include "resolver_service.hxx"
+#include "io_futures.hxx"
 
 namespace std { namespace tr2 { namespace network {
 
   namespace ip
   {
+    // Resolve completion handler
+    template<class F, class Proto>
+    class ResolveHandler:
+      public sys::CompleteHandler<F, basic_resolver_iterator<Proto>>
+    {
+    public:
+      explicit ResolveHandler(F f)
+        : CompleteHandler(f)
+      {}
+    };
+
+
     /**
      *	@brief 5.9.11. Class template ip::basic_resolver
      **/
@@ -57,15 +70,19 @@ namespace std { namespace tr2 { namespace network {
         return std::move(re);
       }
 
-      template <class ResolveHandler>
-      void async_resolve(const query& q, ResolveHandler handler)
+      template <class Handler>
+      typename ResolveHandler<Handler, InternetProtocol>::type async_resolve(const query& q, Handler handler)
       {
-        service.async_resolve(impl, q, handler);
+        ResolveHandler<Handler, InternetProtocol> wrap(handler);
+        service.async_resolve(impl, q, wrap.handler);
+        return wrap.result.get();
       }
-      template <class ResolveHandler>
-      void async_resolve(const endpoint_type& e, ResolveHandler handler)
+      template <class Handler>
+      typename ResolveHandler<Handler, InternetProtocol>::type async_resolve(const endpoint_type& e, Handler handler)
       {
-        service.async_resolve(impl, e, handler);
+        ResolveHandler<Handler, InternetProtocol> wrap(handler);
+        service.async_resolve(impl, e, wrap.handler);
+        return wrap.result.get();
       }
     };
 

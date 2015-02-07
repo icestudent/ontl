@@ -12,9 +12,23 @@
 #include "socket_base.hxx"
 #include "basic_io_object.hxx"
 #include "../../../chrono.hxx"
-//#include "../../../unordered_map.hxx"
+#include "io_futures.hxx"
 
 namespace std { namespace tr2 { namespace network {
+
+
+  // Connect completion handler
+  template<class F>
+  class ConnectHandler:
+    public sys::CompleteHandler<F, void>
+  {
+  public:
+    explicit ConnectHandler(F f)
+      : CompleteHandler(f)
+    {}
+  };
+
+
 
   /**
    *  @brief 5.7.6. Class template basic_socket
@@ -146,18 +160,20 @@ namespace std { namespace tr2 { namespace network {
       return throw_system_error(e, ec);
     }
 
-    template<class ConnectHandler>
-    void async_connect(const endpoint_type& endpoint, ConnectHandler handler)
+    template<class Handler>
+    typename ConnectHandler<Handler>::type async_connect(const endpoint_type& endpoint, Handler handler)
     {
-      if(is_open() == false){
+      ConnectHandler<Handler> wrap(handler);
+      if(is_open() == false) {
         error_code e;
         service.open(impl, endpoint.protocol(), e);
-        if(e){
-          service.get_io_service().post(::std::tr2::sys::__::bind_handler(handler, e));
-          return;
+        if(e) {
+          service.get_io_service().post(::std::tr2::sys::__::bind_handler(wrap.handler, e));
+          return wrap.result.get();
         }
       }
-      service.async_connect(impl, endpoint, handler);
+      service.async_connect(impl, endpoint, wrap.handler);
+      return wrap.result.get();
     }
 
     bool wait(socket_base::wait_type check, std::error_code& ec)

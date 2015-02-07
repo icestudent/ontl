@@ -59,15 +59,19 @@ namespace std { namespace tr2 { namespace network {
       throw_system_error(e, ec);
       return re;
     }
-    template<class MutableBufferSequence, class ReadHandler>
-    void async_receive(const MutableBufferSequence& buffers, ReadHandler handler)
+    template<class MutableBufferSequence, class Handler>
+    typename sys::ReadHandler<Handler>::type async_receive(const MutableBufferSequence& buffers, Handler handler)
     {
-      service.async_receive(impl, buffers, socket_base::message_default, handler);
+      sys::ReadHandler<Handler> wrap(handler);
+      service.async_receive(impl, buffers, socket_base::message_default, wrap.handler);
+      return wrap.result.get();
     }
-    template<class MutableBufferSequence, class ReadHandler>
-    void async_receive(const MutableBufferSequence& buffers, socket_base::message_flags flags, ReadHandler handler)
+    template<class MutableBufferSequence, class Handler>
+    typename sys::ReadHandler<Handler>::type async_receive(const MutableBufferSequence& buffers, socket_base::message_flags flags, Handler handler)
     {
-      service.async_receive(impl. buffers, flags, handler);
+      sys::ReadHandler<Handler> wrap(handler);
+      service.async_receive(impl. buffers, flags, wrap.handler);
+      return wrap.result.get();
     }
     template<class MutableBufferSequence>
     size_t receive_from(const MutableBufferSequence& buffers, endpoint_type& sender, error_code& ec = throws())
@@ -85,15 +89,19 @@ namespace std { namespace tr2 { namespace network {
       throw_system_error(e, ec);
       return re;
     }
-    template<class MutableBufferSequence, class ReadHandler>
-    void async_receive_from(const MutableBufferSequence& buffers, endpoint_type& sender, ReadHandler handler)
+    template<class MutableBufferSequence, class Handler>
+    typename sys::ReadHandler<Handler>::type async_receive_from(const MutableBufferSequence& buffers, endpoint_type& sender, Handler handler)
     {
-      service.async_receive_from(impl, buffers, sender, socket_base::message_default, handler);
+      sys::ReadHandler<Handler> wrap(handler);
+      service.async_receive_from(impl, buffers, sender, socket_base::message_default, wrap.handler);
+      return wrap.result.get();
     }
-    template<class MutableBufferSequence, class ReadHandler>
-    void async_receive_from(const MutableBufferSequence& buffers, endpoint_type& sender, socket_base::message_flags flags, ReadHandler handler)
+    template<class MutableBufferSequence, class Handler>
+    typename sys::ReadHandler<Handler>::type async_receive_from(const MutableBufferSequence& buffers, endpoint_type& sender, socket_base::message_flags flags, Handler handler)
     {
-      service.async_receive_from(impl, buffers, sender, flags, handler);
+      sys::ReadHandler<Handler> wrap(handler);
+      service.async_receive_from(impl, buffers, sender, flags, wrap.handler);
+      return wrap.result.get();
     }
 
     template<class ConstBufferSequence>
@@ -112,15 +120,19 @@ namespace std { namespace tr2 { namespace network {
       throw_system_error(e, ec);
       return re;
     }
-    template<class ConstBufferSequence, class WriteHandler>
-    void async_send(const ConstBufferSequence& buffers, WriteHandler handler)
+    template<class ConstBufferSequence, class Handler>
+    typename sys::WriteHandler<Handler>::type async_send(const ConstBufferSequence& buffers, Handler handler)
     {
-      service.async_send(impl, buffers, socket_base::message_default, handler);
+      sys::WriteHandler<Handler> wrap(handler);
+      service.async_send(impl, buffers, socket_base::message_default, wrap.handler);
+      return wrap.result.get();
     }
-    template<class ConstBufferSequence, class WriteHandler>
-    void async_send(const ConstBufferSequence& buffers, socket_base::message_flags flags, WriteHandler handler)
+    template<class ConstBufferSequence, class Handler>
+    typename sys::WriteHandler<Handler>::type async_send(const ConstBufferSequence& buffers, socket_base::message_flags flags, Handler handler)
     {
+      sys::WriteHandler<Handler> wrap(handler);
       service.async_send(impl, buffers, flags, handler);
+      return wrap.result.get();
     }
     template<class ConstBufferSequence>
     size_t send_to(const ConstBufferSequence& buffers, const endpoint_type& destination, error_code& ec = throws())
@@ -138,15 +150,19 @@ namespace std { namespace tr2 { namespace network {
       throw_system_error(e, ec);
       return re;
     }
-    template<class ConstBufferSequence, class WriteHandler>
-    void async_send_to(const ConstBufferSequence& buffers, const endpoint_type& destination, WriteHandler handler)
+    template<class ConstBufferSequence, class Handler>
+    typename sys::WriteHandler<Handler>::type async_send_to(const ConstBufferSequence& buffers, const endpoint_type& destination, Handler handler)
     {
-      service.async_send_to(impl, buffers, destination, socket_base::message_default, handler);
+      sys::WriteHandler<Handler> wrap(handler);
+      service.async_send_to(impl, buffers, destination, socket_base::message_default, wrap.handler);
+      return wrap.result.get();
     }
-    template<class ConstBufferSequence, class WriteHandler>
-    void async_send_to(const ConstBufferSequence& buffers, const endpoint_type& destination, socket_base::message_flags flags, WriteHandler handler)
+    template<class ConstBufferSequence, class Handler>
+    typename sys::WriteHandler<Handler>::type async_send_to(const ConstBufferSequence& buffers, const endpoint_type& destination, socket_base::message_flags flags, Handler handler)
     {
-      service.async_send_to(impl, buffers, destination, flags, handler);
+      sys::WriteHandler<Handler> wrap(handler);
+      service.async_send_to(impl, buffers, destination, flags, wrap.handler);
+      return wrap.result.get();
     }
     ///\}
   };

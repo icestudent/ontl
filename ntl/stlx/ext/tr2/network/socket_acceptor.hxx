@@ -10,8 +10,21 @@
 
 #include "basic_socket.hxx"
 #include "socket_acceptor_service.hxx"
+#include "io_futures.hxx"
 
 namespace std { namespace tr2 { namespace network {
+
+  // Accept completion handler
+  template<class F>
+  class AcceptHandler:
+    public sys::CompleteHandler<F, void>
+  {
+  public:
+    explicit AcceptHandler(F f)
+      : CompleteHandler(f)
+    {}
+  };
+
 
   /**
    *	@brief 5.7.12. Class template basic_socket_acceptor
@@ -160,18 +173,22 @@ namespace std { namespace tr2 { namespace network {
     error_code accept(basic_socket<Protocol, SocketService>& socket, endpoint_type& endpoint, error_code& ec)
     {
       error_code e;
-      service.accept(socket, socket, &endpoint, e);
+      service.accept(impl, socket, &endpoint, e);
       return throw_system_error(e, ec);
     }
-    template<class SocketService, class AcceptHandler>
-    void async_accept(basic_socket<Protocol, SocketService>& socket, AcceptHandler handler)
+    template<class SocketService, class Handler>
+    typename AcceptHandler<Handler>::type async_accept(basic_socket<Protocol, SocketService>& socket, Handler handler)
     {
-      service.async_accept(socket, nullptr, handler);
+      AcceptHandler<Handler> wrap(handler);
+      service.async_accept(impl, socket, nullptr, wrap.handler);
+      return wrap.result.get();
     }
-    template<class SocketService, class AcceptHandler>
-    void async_accept(basic_socket<Protocol, SocketService>& socket, endpoint_type& endpoint, AcceptHandler handler)
+    template<class SocketService, class Handler>
+    typename AcceptHandler<Handler>::type async_accept(basic_socket<Protocol, SocketService>& socket, endpoint_type& endpoint, Handler handler)
     {
-      service.async_accept(socket, &endpoint, handler);
+      AcceptHandler<Handler> wrap(handler);
+      service.async_accept(impl, socket, &endpoint, wrap.handler);
+      return wrap.result.get();
     }
   };
 

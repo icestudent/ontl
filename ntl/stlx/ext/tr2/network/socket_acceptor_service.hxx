@@ -69,7 +69,7 @@ namespace std { namespace tr2 { namespace network {
     }
 
     template<class SocketService, class AcceptHandler>
-    void async_accept(implementation_type& impl, basic_socket<Protocol, SocketService>& socket, endpoint_type* endpoint, AcceptHandler handler) { return svc.async_accept(impl, socket, endpoint, handler); }
+    void async_accept(implementation_type& impl, basic_socket<Protocol, SocketService>& socket, endpoint_type* endpoint, AcceptHandler handler);
 
     ///\}
   private:

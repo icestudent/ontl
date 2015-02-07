@@ -19,6 +19,7 @@
 #include "../../function.hxx"
 
 #include "iocp/wait_op.hxx"
+#include "io_futures.hxx"
 
 namespace std { namespace tr2 { namespace sys {
 
@@ -188,6 +189,18 @@ namespace std { namespace tr2 { namespace sys {
 
 
 
+  // Wait completion handler
+  template<class F>
+  class WaitHandler:
+    public sys::CompleteHandler<F, void>
+  {
+  public:
+    explicit WaitHandler(F f)
+      : CompleteHandler(f)
+    {}
+  };
+
+
   /**
    *  @brief 5.4.5. Class template basic_deadline_timer
    *  @details The basic_deadline_timer class template provides the ability to perform a blocking or asynchronous wait for a timer to expire.
@@ -286,10 +299,12 @@ namespace std { namespace tr2 { namespace sys {
       return service.wait(impl, ec);
     }
     
-    template <class WaitHandler>
-    void async_wait(WaitHandler handler)
+    template <class Handler>
+    typename WaitHandler<Handler>::type async_wait(Handler handler)
     {
-      service.async_wait(impl, handler);
+      WaitHandler<Handler> wrap(handler);
+      service.async_wait(impl, wrap.handler);
+      return wrap.result.get();
     }
     ///\}
   };
@@ -394,10 +409,12 @@ namespace std { namespace tr2 { namespace sys {
       return service.wait(impl, ec);
     }
     
-    template <class WaitHandler>
-    void async_wait(WaitHandler handler)
+    template <class Handler>
+    typename WaitHandler<Handler>::type async_wait(Handler handler)
     {
-      service.async_wait(impl, handler);
+      WaitHandler<Handler> wrap(handler);
+      service.async_wait(impl, wrap.handler);
+      return wrap.result.get();
     }
     ///\}
   };
