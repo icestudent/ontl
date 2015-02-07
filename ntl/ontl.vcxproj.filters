@@ -985,6 +985,12 @@
     <ClInclude Include="stlx\range.hxx">
       <Filter>ntl\stlx\utility</Filter>
     </ClInclude>
+    <ClInclude Include="stlx\ext\tr2\network\io_futures.hxx">
+      <Filter>ntl\stlx\.ext\tr2\I/O</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\ext\tr2\network\use_future.hxx">
+      <Filter>ntl\stlx\.ext\tr2\I/O</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="stlx\tt_isfunc.inl">

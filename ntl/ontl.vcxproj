@@ -180,10 +180,12 @@
     <ClInclude Include="stlx\ext\tr2\network\iocp\iocp_service.hxx" />
     <ClInclude Include="stlx\ext\tr2\network\iocp\op.hxx" />
     <ClInclude Include="stlx\ext\tr2\network\iocp\wait_op.hxx" />
+    <ClInclude Include="stlx\ext\tr2\network\io_futures.hxx" />
     <ClInclude Include="stlx\ext\tr2\network\placeholders.hxx" />
     <ClInclude Include="stlx\ext\tr2\network\socket_acceptor.hxx" />
     <ClInclude Include="stlx\ext\tr2\network\socket_acceptor_service.hxx" />
     <ClInclude Include="stlx\ext\tr2\network\uri.hxx" />
+    <ClInclude Include="stlx\ext\tr2\network\use_future.hxx" />
     <ClInclude Include="stlx\ext\tr2\network\winsock\dns_ops.hxx" />
     <ClInclude Include="stlx\ext\tr2\network\winsock\socket_ops.hxx" />
     <ClInclude Include="stlx\ext\tr2\quoted.hxx" />
