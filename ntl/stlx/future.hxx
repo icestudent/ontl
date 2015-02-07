@@ -225,10 +225,10 @@ namespace std
     struct future_base
     {
       typedef lock_guard<mutex> lock_guard;
-      mutable mutex data_guard;
+      mutable mutex mtx;
       ntl::nt::user_event event;
-      atomic_ulong refcount;
-      atomic_ulong ready;
+      ntl::atomic_t refcount;
+      ntl::atomic::flag_t ready;
       
       exception_ptr exception;
       error_code error;
@@ -241,28 +241,28 @@ namespace std
 
       bool has_exception() const
       {
-        lock_guard g(data_guard);
+        lock_guard g(mtx);
         return exception;
       }
 
       bool has_error() const
       {
-        lock_guard g(data_guard);
+        lock_guard g(mtx);
         return static_cast<bool>(error);
       }
 
       void set_exception(exception_ptr ep)
       {
-        lock_guard g(data_guard);
+        lock_guard g(mtx);
         if(ready)
           __ntl_throw(future_error(make_error_code(future_errc::promise_already_satisfied)));
         exception = ep;
         mark_ready();
       }
 
-      void set_error(error_code& code, error_code& ec = throws())
+      void set_error(const error_code& code, error_code& ec = throws())
       {
-        lock_guard g(data_guard);
+        lock_guard g(mtx);
         if(ready){
           error_code e = make_error_code(future_errc::promise_already_satisfied);
           if(&ec == &throws())
@@ -283,7 +283,7 @@ namespace std
 
       void mark_broken()
       {
-        lock_guard g(data_guard);
+        lock_guard g(mtx);
         if(!ready){
           error = make_error_code(future_errc::broken_promise);
         #if STLX_USE_EXCEPTIONS
@@ -296,7 +296,7 @@ namespace std
       bool is_retrieved() const
       {
         // reset event to nonsignaled state 
-        lock_guard g(data_guard);
+        lock_guard g(mtx);
         return ready && !event.is_ready();
       }
 
@@ -341,7 +341,7 @@ namespace std
 
       ~future_data()
       {
-        lock_guard g(data_guard);
+        lock_guard g(mtx);
         if(ready && !exception){
           data()->~T();
         }
@@ -349,7 +349,7 @@ namespace std
 
       result_type get(error_code& ec)
       {
-        lock_guard g(data_guard);
+        lock_guard g(mtx);
         if(error){
           if(&ec == &throws())
             __ntl_throw(future_error(error));
@@ -363,7 +363,7 @@ namespace std
 
       void set(const T& value, error_code& ec)
       {
-        lock_guard g(data_guard);
+        lock_guard g(mtx);
         if(ready){
           error = make_error_code(future_errc::promise_already_satisfied);
           if(&ec == &throws())
@@ -378,7 +378,7 @@ namespace std
 
       void set(param_type value, error_code& ec)
       {
-        lock_guard g(data_guard);
+        lock_guard g(mtx);
         if(ready){
           error = make_error_code(future_errc::promise_already_satisfied);
           if(&ec == &throws())
@@ -406,7 +406,7 @@ namespace std
     {
       void get(error_code& ec)
       {
-        lock_guard g(data_guard);
+        lock_guard g(mtx);
         if(error){
           if(&ec == &throws())
             __ntl_throw(future_error(error));
@@ -419,7 +419,7 @@ namespace std
 
       void set(error_code& ec)
       {
-        lock_guard g(data_guard);
+        lock_guard g(mtx);
         if(ready){
           error = make_error_code(future_errc::promise_already_satisfied);
           if(&ec == &throws())
@@ -442,38 +442,66 @@ namespace std
   template <class R>
   class future 
   {
-    typedef typename __::future_result<R>::type result_type;
-    typedef unique_ptr<__::future_data<R> > unique_data_ptr;
+    typedef typename __::future_result<R>::rtype result_type;
+    typedef shared_ptr< __::future_data<R> > data_ptr;
     future(const future& rhs) __deleted;
     future& operator=(const future& rhs) __deleted;
+
+    friend class shared_future<R>;
   public:
+
+    /** Constructs an empty future object that does not refer to an shared state. */
+    future()
+    {}
 
     /** Move constructs a future object whose associated state is the same as the state of \p x before. */
     future(__rvalue(future) x)
       :data(move(static_cast<future&>(x).data))
     {}
 
-    /** destroys \c *this and its associated state if no other object refers to that. */
+    /** Destroys \c *this and its associated state if no other object refers to that. */
     ~future()
     {}
 
+    /** Moves the future object. */
+    future& operator=(__rvalue(future) x)
+    {
+      data = move(x.data);
+      return *this;
+    }
+
+    /** Transfers the shared state from \c *this to a shared_future and returns it. */
+    shared_future<R> share(error_code& ec = throws())
+    {
+      if(!data) {
+        error_code e = make_error_code(future_errc::no_state);
+        if(&ec == &throws())
+          __ntl_throw(future_error(e));
+        else
+          ec = e;
+      }
+      return shared_future<R>(std::move(*this));
+    }
+
     /** Returns a value stored in the asynchronous result.
         @note The effect of calling get() a second time on the same future object is unspecified. */
-    result_type get(error_code& ec = throws())
+    result_type get(error_code& ec)
     {
-      //if(data && data->is_retrieved()){
-      //  error_code e = make_error_code(future_already_retrieved);
-      //  if(&ec == &throws())
-      //    __ntl_throw(future_error(e));
-      //  else
-      //    ec = e;
-      //}
       wait(ec);
-      return move(data->get(ec));
+      return data->get(ec);
+    }
+
+    result_type get()
+    {
+      wait(throws());
+      return data->get(throws());
     }
 
     ///\name functions to check state and wait for ready
     
+    /** Returns \c true only if \c *this refers to a shared state. */
+    bool valid() const { return data; }
+
     /** Returns \c true only if the associated state holds a value or an exception ready for retrieval.
         @note the return value is unspecified after a call to get(). */
     bool is_ready() const { return data && data->ready; }
@@ -513,11 +541,12 @@ namespace std
       return data->wait_until(abs_time);
     }
     ///\}
+
   protected:
     friend class __::promise<R>;
     ///\cond __
-    explicit future(__rvalue(unique_data_ptr) p)
-      :data(move(p))
+    explicit future(data_ptr p)
+      :data(p)
     {}
 
     bool check(error_code& ec) const
@@ -533,7 +562,7 @@ namespace std
     }
     ///\endcond
   private:
-    unique_data_ptr data;
+    data_ptr data;
   };
 
 
@@ -543,20 +572,46 @@ namespace std
   template <class R>
   class shared_future
   {
-    typedef typename __::future_result<R>::type rt0;
+    typedef typename __::future_result<R>::rtype rt0;
     typedef typename conditional<is_void<R>::value||is_reference<R>::value,rt0,typename add_const<rt0>::type>::type result_type;
 
   public:
-    shared_future& operator=(const shared_future& rhs) __deleted;
+    /** Constructs an empty future object that does not refer to an shared state. */
+    shared_future()
+    {}
 
+    /** Constructs a shared_future object that refers to the same shared state as \c x (if any). */
     shared_future(const shared_future& x)
-      :data(x.data)
+      : data(x.data)
     {}
+
+    /** Move constructs a shared_future object that refers to the shared state that was originally referred to by \c x (if any). */
     shared_future(__rvalue(future<R>) x)
-      :data(move(static_cast<future<R>&>(x).data))
+      : data(move(static_cast<future<R>&>(x).data))
     {}
+
+    /** Move constructs a shared_future object that refers to the shared state that was originally referred to by \c x (if any). */
+    shared_future(__rvalue(shared_future<R>) x)
+      : data(move(static_cast<shared_future<R>&>(x).data))
+    {}
+
+    /** Releases any shared state */
     ~shared_future()
     {}
+
+    /** Assigns the contents of another shared_future. */
+    shared_future& operator=(const shared_future& x)
+    {
+      data = x.data;
+      return *this;
+    }
+
+    /** Assigns the contents of another shared_future. */
+    shared_future& operator=(__rvalue(shared_future) x)
+    {
+      data = move(static_cast<shared_future&>(x).data);
+      return *this;
+    }
 
     /** Returns a value stored in the asynchronous result. */
     result_type get(error_code& ec = throws()) const
@@ -566,6 +621,9 @@ namespace std
     }
     
     ///\name functions to check state and wait for ready
+
+    /** Returns \c true only if \c *this refers to a shared state. */
+    bool valid() const { return data; }
 
     /** Returns \c true only if the associated state holds a value or an exception ready for retrieval.
         @note the return value is unspecified after a call to get(). */
@@ -630,7 +688,7 @@ namespace std
     class promise
     {
       typedef __::future_result<R> feature_result;
-      typedef unique_ptr<__::future_data<R> > unique_data_ptr;
+      typedef shared_ptr<__::future_data<R> > data_ptr;
 
     public:
       typedef typename feature_result::type result_type;
@@ -642,7 +700,9 @@ namespace std
       promise()
       {}
       promise(__rvalue(promise) x)
-        :data(move(x.data)), retrieved(move(x.retrieved))
+        : data(move(x.data))
+        , retrieved(move(x.retrieved))
+        , satisfied(move(x.satisfied))
       {}
 
       template <class Allocator>
@@ -665,45 +725,55 @@ namespace std
       ///\name assignment
       promise& operator=(__rvalue(promise) x)
       {
-        if(this != &x)
-          data = move(x.data),
+        if(this != &x) {
+          data = move(x.data);
           retrieved = move(x.retrieved);
+          satisfied = move(x.safisfied);
+        }
         return *this;
       }
 
       void swap(promise& x)
       {
-        data.swap(x.data);
-        retrieved.swap(x.retrieved);
+        if(this == &x)
+          return;
+        using std::swap;
+        swap(data, x.data);
+        swap(retrieved, x.retrieved);
+        swap(satisfied, x.satisfied);
       }
       
       ///\name retrieving the result
       future<R> get_future(error_code& ec = throws()) __ntl_throws(future_error)
       {
-        if(retrieved){
+        if(retrieved.test_and_set()) {
           error_code e = make_error_code(future_errc::future_already_retrieved);
           if(&ec == &throws())
             __ntl_throw(future_error(e));
           else
             ec = e;
-          return future<R>(unique_data_ptr());
+          return future<R>(data_ptr());
         }
-        retrieved = true;
         check();
-        return future<R>(move(data));
+        return future<R>(data);
       }
       
       ///\name setting the result
       void set_exception(exception_ptr p)
       {
-        check();
-        data->set_exception(p);
+        std::error_code ec;
+        if(accept(ec)) {
+          check();
+          data->set_exception(p);
+        }
       }
 
-      void set_error(error_code& c)
+      void set_error(const error_code& code, error_code& c = throws())
       {
-        check();
-        data->set_error(c);
+        if(accept(c)) {
+          check();
+          data->set_error(code, c);
+        }
       }
       ///\}
     protected:
@@ -713,9 +783,23 @@ namespace std
         if(!data)
           data.reset(new __::future_data<R>);
       }
+
+      bool accept(error_code& ec)
+      {
+        if(!satisfied.test_and_set())
+          return true;
+
+        error_code e = make_error_code(future_errc::promise_already_satisfied);
+        if(&ec == &throws())
+          __ntl_throw(future_error(e));
+        else
+          ec = e;
+        return false;
+      }
+
     protected:
-      unique_data_ptr data;
-      atomic_uint retrieved;
+      data_ptr data;
+      ntl::atomic::flag_t retrieved, satisfied;
       ///\endcond
     };
   }
@@ -738,15 +822,25 @@ namespace std
       associated state are woken up. */
     void set_value(const R& r, error_code& ec = throws()) __ntl_throws(future_error)
     {
-      check();
-      data->set(r, ec);
+      if(accept(ec)) {
+        check();
+        data->set(r, ec);
+      }
     }
     ///\copydoc set_value
     void set_value(__rvalue(R) r, error_code& ec = throws()) __ntl_throws(future_error)
     {
-      check();
-      data->set(forward<R>(r), ec);
+      if(accept(ec)) {
+        check();
+        data->set(forward<R>(r), ec);
+      }
     }
+
+    /** Stores the value \c r in the shared state without making that state ready immediately. */
+    //void set_value_at_thread_exit(const R& r, error_code& ec = throws()) __ntl_throws(future_error);
+
+    /** Stores the value \c r in the shared state without making that state ready immediately. */
+    //void set_value_at_thread_exit(__rvalue(R) r, error_code& ec = throws()) __ntl_throws(future_error);
   };
 
   /** promise class template specialization for reference to the result */
@@ -758,9 +852,14 @@ namespace std
       associated state are woken up. */
     void set_value(R& r, error_code& ec = throws()) __ntl_throws(future_error)
     {
-      check();
-      data->set(r, ec);
+      if(accept(ec)) {
+        check();
+        data->set(r, ec);
+      }
     }
+
+    /** Stores the value \c r in the shared state without making that state ready immediately. */
+    //void set_value_at_thread_exit(R& r, error_code& ec = throws()) __ntl_throws(future_error);
   };
 
   /** promise class template specialization for \c void result type */
@@ -771,14 +870,21 @@ namespace std
     /** Sets that state to ready. Any blocking waits on the associated state are woken up. */
     void set_value(error_code& ec = throws()) __ntl_throws(future_error)
     {
-      check();
-      data->set(ec);
+      if(accept(ec)) {
+        check();
+        data->set(ec);
+      }
     }
-    void set_value_at_thread_exit() __ntl_throws(future_error)
-    {
 
-    }
+    /** Stores the value in the shared state without making that state ready immediately. */
+    void set_value_at_thread_exit() __ntl_throws(future_error);
   };
+
+  template<class R>
+  inline void swap(promise<R>& x, promise<R>& y)
+  {
+    x.swap(y);
+  }
 
 
   namespace __
@@ -786,7 +892,7 @@ namespace std
     template<class R, class Args = tuple<> >
     class packaged_task
     {
-      typedef unique_ptr<__::future_data<R> > unique_data_ptr;
+      typedef shared_ptr< __::future_data<R> > data_ptr;
 
     public:
       typedef R result_type;
@@ -798,8 +904,10 @@ namespace std
       ~packaged_task() __ntl_throws(future_error)
       {} // ~promise() throws(broken_future)
 
-      packaged_task(packaged_task&) __deleted;
-      packaged_task& operator=(packaged_task&) __deleted;
+
+      packaged_task(const packaged_task&) __deleted;
+      packaged_task& operator=(const packaged_task&) __deleted;
+
 
       ///\name move support
       packaged_task(__rvalue(packaged_task) x)
@@ -827,8 +935,11 @@ namespace std
       /** Returns \c true only if *this has an associated task. */
       __explicit_operator_bool() const
       {
-        return f.operator explicit_bool_type();
+        return static_cast<bool>(f);
       }
+
+      /** Checks if the task object has a valid function. */
+      bool valid() const { return static_cast<bool>(f); }
 
       // result retrieval
       /** Returns a future object associated with the result of the associated task of *this. */
@@ -837,19 +948,20 @@ namespace std
 #else
       _rvalue<future<R> >
 #endif
-        get_future(error_code& ec = throws()) __ntl_throws(bad_function_call)
+        get_future(error_code& ec = throws()) __ntl_throws(future_error)
       {
         error_code e;
         future<R> r = data.get_future(e);
         if(e){
           if(&ec == &throws())
-            __ntl_throw(bad_function_call());
+            __ntl_throw(future_error(e));
           else
             ec = e;
         }
         return move(r);
       }
 
+      /** Resets the state abandoning any stored results of previous executions. */
       void reset()
       {
         promise<R> tmp;
@@ -879,9 +991,11 @@ namespace std
         f(args);
         data.set_value();
       }
+
     protected:
       func::detail::function<R, Args> f;
       ///\endcond
+
     private:
       std::promise<R> data;
     };
@@ -919,7 +1033,15 @@ namespace std
     {
       call(make_tuple(args...));
     }
+
+    void mark_ready_at_thread_exit(Args... args);
   };
+
+  template<class F, class... Args>
+  inline void swap(packaged_task<F(Args...)>& x, packaged_task<F(Args...)>& y)
+  {
+    x.swap(y);
+  }
 
 #else
 
