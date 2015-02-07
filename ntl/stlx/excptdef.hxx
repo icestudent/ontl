@@ -14,12 +14,12 @@
 
 #if STLX_USE_EXCEPTIONS == 1
   // C++ exceptions
-  #define __ntl_try       try
-  #define __ntl_catch     catch
-  #define __ntl_throw(X)  throw X
-  #define __ntl_rethrow   throw
-  #define __ntl_throws(...) throw(__VA_ARGS__)
-  #define __ntl_nothrow   throw()
+  #define __ntl_try         try
+  #define __ntl_catch(...)  catch(__VA_ARGS__)
+  #define __ntl_throw(X)    throw X
+  #define __ntl_rethrow     throw
+  #define __ntl_throws(...  ) throw(__VA_ARGS__)
+  #define __ntl_nothrow     throw()
 
 #elif STLX_USE_EXCEPTIONS == 2
   // SEH exceptions
@@ -27,18 +27,18 @@
   template<class E>
   inline void __ntl_seh_throw_impl(const E&){}
 
-  #define __ntl_try       __try
-  #define __ntl_catch     __except(1)
-  #define __ntl_throw(X)  __ntl_seh_throw_impl(X)
-  #define __ntl_rethrow (0)
+  #define __ntl_try         __try
+  #define __ntl_catch(...)  __except(1)
+  #define __ntl_throw(X)    __ntl_seh_throw_impl(X)
+  #define __ntl_rethrow     (0)
   #define __ntl_throws(...)
   #define __ntl_nothrow
 
 
 #else
   #define __ntl_try
-  #define __ntl_catch(X)  while(false)
-  #define __ntl_throw(X)  __ntl_throw_impl()
+  #define __ntl_catch(...)  while(false)
+  #define __ntl_throw(X)    __ntl_throw_impl()
   #define __ntl_rethrow (0)
   #define __ntl_throws(...)
   #define __ntl_nothrow

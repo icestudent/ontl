@@ -11,6 +11,7 @@
 #include "../../../../stdlib.hxx"
 #include "../../../array.hxx"
 #include "../../../stdstring.hxx"
+#include "../../../typeinfo.hxx"
 #include "../../numeric_conversions.hxx"
 #include "system_network.hxx"
 //#include "network_error.hxx"
@@ -302,7 +303,9 @@ namespace std { namespace tr2 { namespace network {
       address_v4 to_v4() const __ntl_throws(bad_cast)
       {
         if(!(is_v4_mapped() || is_v4_compatible())){
-          __ntl_throw(bad_cast());
+					#if STLX_USE_EXCEPTIONS == 1
+					__ntl_throw(std::bad_cast());
+					#endif
           return address_v4();
         }
         address_v4::bytes_type v4 = { v.bytes[12], v.bytes[13], v.bytes[14], v.bytes[15] };
@@ -501,7 +504,9 @@ namespace std { namespace tr2 { namespace network {
           if(mapped){
             return v6.to_v4();
           }
-          __ntl_throw(bad_cast());
+					#if STLX_USE_EXCEPTIONS == 1
+					__ntl_throw(std::bad_cast());
+					#endif
         }
         return v4; 
       }
@@ -510,7 +515,9 @@ namespace std { namespace tr2 { namespace network {
         if(v4addr){
           if(mapped)
             return address_v6::v4_mapped(v4);
-          __ntl_throw(bad_cast());
+					#if STLX_USE_EXCEPTIONS == 1
+					__ntl_throw(std::bad_cast());
+					#endif
         }
         return v6;
       }

@@ -267,9 +267,9 @@ private:
     const char* what() const __ntl_nothrow
     {
       if (msg.empty()) {
+        string tmp = runtime_error::what();
         __ntl_try
         {
-          string tmp = runtime_error::what();
           if (ec) {
             bool nonempty = !tmp.empty() && tmp != "";
             if(nonempty)

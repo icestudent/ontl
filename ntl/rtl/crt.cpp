@@ -119,7 +119,7 @@ namespace ntl
   {
     if(init){
       // init exception support on current thread
-      #if STLX_USE_EXCEPTIONS
+      #if STLX_USE_EXCEPTIONS == 1
       cxxruntime::_initptd();
       #endif
 
