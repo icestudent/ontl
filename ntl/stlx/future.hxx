@@ -286,7 +286,7 @@ namespace std
         lock_guard g(mtx);
         if(!ready){
           error = make_error_code(future_errc::broken_promise);
-        #if STLX_USE_EXCEPTIONS
+        #if STLX_USE_EXCEPTIONS == 1
           exception = copy_exception(future_error(error));
         #endif
           mark_ready();

@@ -274,7 +274,7 @@ namespace ntl
     };
   }
 }
-#elif !STLX_USE_EXCEPTIONS
+#elif STLX_USE_EXCEPTIONS == 0 || STLX_USE_EXCEPTIONS == 2
 
 namespace ntl { namespace cxxruntime {
   struct exception_ptr
