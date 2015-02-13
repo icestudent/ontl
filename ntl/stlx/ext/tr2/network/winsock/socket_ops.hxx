@@ -30,10 +30,17 @@ namespace std { namespace tr2 { namespace sys {
         ptr p(self, &self->fn);
 
         // TODO: check cancel
-        // TODO: map error values
+        std::error_code e = ec;
+        if(e) {
+          if(e == ntl::nt::status::connection_reset)
+            e = std::make_error_code(std::tr2::network::error::connection_reset);
 
+          else if(e == ntl::nt::status::port_unreachable)
+            e = std::make_error_code(std::tr2::network::error::connection_refused);
+        }
+        
         using std::tr2::sys::io_handler_invoke;
-        io_handler_invoke(bind_handler(self->fn, ec, transferred), &self->fn);
+        io_handler_invoke(bind_handler(self->fn, e, transferred), &self->fn);
       }
 
     private:
@@ -66,11 +73,16 @@ namespace std { namespace tr2 { namespace sys {
         ptr p(self, &self->fn);
 
         // TODO: check cancel
-        // TODO: map error values
         std::error_code e = ec;
         if(e) {
           if(e == ntl::nt::status::buffer_overflow)
             e = std::make_error_code(std::tr2::network::error::message_size);
+
+          else if(e == ntl::nt::status::connection_reset)
+            e = std::make_error_code(std::tr2::network::error::connection_reset);
+
+          else if(e == ntl::nt::status::port_unreachable)
+            e = std::make_error_code(std::tr2::network::error::connection_refused);
         }
         if(!e && transferred == 0 && self->is_stream && !self->is_empty)
           e = std::make_error_code(network::error::eof);
