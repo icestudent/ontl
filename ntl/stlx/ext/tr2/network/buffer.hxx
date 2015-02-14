@@ -358,6 +358,22 @@ namespace std { namespace tr2 { namespace sys {
   };
 
 
+
+  ///\name buffer copy
+  inline size_t buffer_copy(const mutable_buffer& dest, const const_buffer& source, size_t max_size)
+  {
+    max_size = std::min(buffer_size(dest), max_size);
+    max_size = std::min(buffer_size(source), max_size);
+    std::memcpy(buffer_cast<void*>(dest), buffer_cast<const void*>(source), max_size);
+    return max_size;
+  }
+
+  inline size_t buffer_copy(const mutable_buffer& dest, const const_buffer& source)
+  {
+    return buffer_copy(dest, source, std::numeric_limits<size_t>::max());
+  }
+
+  ///\name buffer arithmetic
   
   inline const_buffer operator+(const const_buffer& b, size_t size) __ntl_nothrow
   {
@@ -375,6 +391,26 @@ namespace std { namespace tr2 { namespace sys {
       buffer_size(b) - min(size, buffer_size(b)));
   }
   inline mutable_buffer operator+(size_t size, const mutable_buffer& b) __ntl_nothrow
+  {
+    return b + size;
+  }
+
+  inline const_buffers_1 operator+(const const_buffers_1& b, size_t size) __ntl_nothrow
+  {
+    return const_buffers_1(buffer_cast<const char*>(b) + min(size, buffer_size(b)),
+      buffer_size(b) - min(size, buffer_size(b)));
+  }
+  inline const_buffers_1 operator+(size_t size, const const_buffers_1& b) __ntl_nothrow
+  {
+    return b + size;
+  }
+
+  inline mutable_buffers_1 operator+(const mutable_buffers_1& b, size_t size) __ntl_nothrow
+  {
+    return mutable_buffers_1(buffer_cast<char*>(b) + min(size, buffer_size(b)),
+      buffer_size(b) - min(size, buffer_size(b)));
+  }
+  inline mutable_buffers_1 operator+(size_t size, const mutable_buffers_1& b) __ntl_nothrow
   {
     return b + size;
   }
