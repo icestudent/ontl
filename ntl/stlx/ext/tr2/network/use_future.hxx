@@ -39,8 +39,7 @@ namespace std { namespace tr2 { namespace sys {
   };
 
 
-  __declspec(selectany)
-    use_future_t<> use_future;
+  __declare_tag use_future_t<> use_future;
 
 }}}
 

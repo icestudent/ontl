@@ -10,9 +10,7 @@
 
 namespace ntl {
   namespace km {
-    __declspec(selectany)
-      extern
-      const std::nothrow_t nonpaged;
+    __declare_tag constexpr const std::nothrow_t nonpaged;
   }
 }
 

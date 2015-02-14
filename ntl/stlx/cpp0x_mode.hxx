@@ -83,6 +83,17 @@
 	#define __inline_ns
 #endif
 
+#ifdef NTL_CXX_CONSTEXPR
+  #define __declare_tag constexpr
+#else
+# if defined(_MSC_VER_PURE)
+#   define __declare_tag extern __declspec(selectany) 
+# else
+#   define __declare_tag extern
+# endif
+#endif
+
+
 #ifdef NTL_CXX_EXPLICITOP
 # define __explicit_operator_bool() explicit operator bool()
 # define __explicit_bool(...) ((__VA_ARGS__) ? true : false)

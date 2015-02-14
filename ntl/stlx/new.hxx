@@ -67,13 +67,7 @@ public:
 
 struct  nothrow_t {};
 
-#if defined(_MSC_VER)
-extern __declspec(selectany) const nothrow_t nothrow = {};
-#elif defined(__BCPLUSPLUS__)
-__declspec(selectany) extern const nothrow_t nothrow;
-#elif defined(__GNUC__) || defined(__clang__)
-  constexpr const nothrow_t nothrow = {};
-#endif
+__declare_tag const nothrow_t nothrow = {};
 
 /// Type new_handler [18.6.2.3 new.handler]
 typedef void (*new_handler)();
@@ -142,13 +136,7 @@ void  operator delete[] (void*, void*) __ntl_nothrow            {}
 ///\name Variable-size structures support
 struct varsize_tag {};
 
-#if defined(_MSC_VER)
-extern __declspec(selectany) const varsize_tag varsize = {};
-#elif defined(__BCPLUSPLUS__)
-__declspec(selectany) extern const varsize_tag varsize;
-#elif defined(__GNUC__)
- extern const varsize_tag varsize;
-#endif
+__declare_tag constexpr const varsize_tag varsize = {};
 
 __forceinline
 void* operator new(std::size_t size, const varsize_tag&, std::size_t aux_size)
