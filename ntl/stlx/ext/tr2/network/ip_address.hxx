@@ -20,6 +20,10 @@ namespace std { namespace tr2 { namespace network {
 
   namespace ip
   {
+    struct v4_mapped_t {};
+
+    __declare_tag constexpr const v4_mapped_t v4_mapped = {};
+
     /**
      *	@brief 5.9.3. Class ip::address_v4
      **/
@@ -564,6 +568,80 @@ namespace std { namespace tr2 { namespace network {
       address_v4 v4;
       bool v4addr;
     };
+
+
+
+    ///\name Address creation
+    inline address make_address(const string_ref& str, error_code& ec = throws())
+    {
+      if(&ec != &throws())
+        ec.clear();
+      error_code e;
+      const address_v6 v6 = address_v6::from_string(str, e);
+      if(!e)
+        return v6;
+      const address_v4 v4 = address_v4::from_string(str, e);
+      if(!e)
+        return v4;
+      throw_system_error(e, ec);
+      return address();
+    }
+
+    inline constexpr address_v4 make_address_v4(const address_v4::bytes_type& bytes) { return address_v4(bytes); }
+    inline constexpr address_v4 make_address_v4(unsigned long val)                   { return address_v4(val);   }
+    inline constexpr address_v4 make_address_v4(v4_mapped_t, const address_v6& a)
+    {
+      assert(a.is_v4_mapped());
+      const address_v6::bytes_type b = a.to_bytes();
+      const address_v4::bytes_type v4b = { b[12], b[13], b[14], b[15] };
+      return address_v4(v4b);
+    }
+
+    inline address_v4 make_address_v4(const string_ref& str, error_code& ec = throws())
+    {
+      return address_v4::from_string(str, ec);
+    }
+
+    inline constexpr address_v6 make_address_v6(const address_v6::bytes_type& bytes, unsigned long scope_id)
+    {
+      return address_v6(bytes, scope_id);
+    }
+
+    inline constexpr address_v6 make_address_v6(v4_mapped_t, const address_v4& a)
+    {
+      const address_v4::bytes_type b = a.to_bytes();
+      const address_v6::bytes_type v6b = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0xFF, 0xFF, b[0], b[1], b[2], b[3] };
+      return address_v6(v6b);
+    }
+
+    inline address_v6 make_address_v6(const string_ref& str, error_code& ec = throws())
+    {
+      return address_v6::from_string(str, ec);
+    }
+
+
+    ///\name Address conversions
+    template<class T> constexpr T address_cast(const address& a);
+    template<class T> constexpr T address_cast(const address_v4& a) { static_assert(!std::is_same<T, address_v6>::value, "Don't use v4 to v6 cast"); }
+    template<class T> constexpr T address_cast(const address_v6& a) { static_assert(!std::is_same<T, address_v4>::value, "Don't use v6 to v4 cast"); }
+
+    template<> 
+    inline constexpr address    address_cast<address>   (const address& a) { return a; }
+    template<> 
+    inline constexpr address_v4 address_cast<address_v4>(const address& a) { return a.to_v4(); }
+    template<> 
+    inline constexpr address_v6 address_cast<address_v6>(const address& a) { return a.to_v6(); }
+    
+    template<>
+    inline constexpr address    address_cast<address>   (const address_v4& a) { return address(a); }
+    template<>
+    inline constexpr address_v4 address_cast<address_v4>(const address_v4& a) { return a; }
+
+    template<>
+    inline constexpr address    address_cast<address>   (const address_v6& a) { return address(a); }
+    template<>
+    inline constexpr address_v6 address_cast<address_v6>(const address_v6& a) { return a; }
+
 
 
     ///\name IP Address I/O
