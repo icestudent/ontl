@@ -56,6 +56,9 @@ namespace std { namespace tr2 {
   template<class Protocol> class datagram_socket_service;
   template<class Protocol, class DatagramSocketService = datagram_socket_service<Protocol> >
   class basic_datagram_socket;
+  template<class Protocol> class raw_socket_service;
+  template<class Protocol, class RawSocketService = raw_socket_service<Protocol> >
+  class basic_raw_socket;
   template<class Protocol> class stream_socket_service;
   template<class Protocol, class StreamSocketService = stream_socket_service<Protocol> >
   class basic_stream_socket;

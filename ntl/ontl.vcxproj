@@ -182,6 +182,8 @@
     <ClInclude Include="stlx\ext\tr2\network\iocp\wait_op.hxx" />
     <ClInclude Include="stlx\ext\tr2\network\io_futures.hxx" />
     <ClInclude Include="stlx\ext\tr2\network\placeholders.hxx" />
+    <ClInclude Include="stlx\ext\tr2\network\raw_socket.hxx" />
+    <ClInclude Include="stlx\ext\tr2\network\raw_socket_service.hxx" />
     <ClInclude Include="stlx\ext\tr2\network\socket_acceptor.hxx" />
     <ClInclude Include="stlx\ext\tr2\network\socket_acceptor_service.hxx" />
     <ClInclude Include="stlx\ext\tr2\network\uri.hxx" />

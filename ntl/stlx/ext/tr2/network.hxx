@@ -19,6 +19,9 @@
 #include "network/stream_socket_service.hxx"
 #include "network/stream_socket.hxx"
 
+#include "network/raw_socket_service.hxx"
+#include "network/raw_socket.hxx"
+
 #include "network/ip_address.hxx"
 #include "network/basic_endpoint.hxx"
 

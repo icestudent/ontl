@@ -98,7 +98,7 @@ namespace std { namespace tr2 { namespace network {
       ///\name types:
       typedef basic_endpoint<icmp>        endpoint;
       typedef basic_resolver<icmp>        resolver;
-      typedef basic_datagram_socket<icmp> socket;
+      typedef basic_raw_socket<icmp>      socket;
 
       ///\name static members:
       static icmp v4() { return icmp(ntl::network::constants::af_inet); }

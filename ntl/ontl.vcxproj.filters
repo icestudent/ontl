@@ -991,6 +991,12 @@
     <ClInclude Include="stlx\ext\tr2\network\use_future.hxx">
       <Filter>ntl\stlx\.ext\tr2\I/O</Filter>
     </ClInclude>
+    <ClInclude Include="stlx\ext\tr2\network\raw_socket.hxx">
+      <Filter>ntl\stlx\.ext\tr2\network</Filter>
+    </ClInclude>
+    <ClInclude Include="stlx\ext\tr2\network\raw_socket_service.hxx">
+      <Filter>ntl\stlx\.ext\tr2\network\impl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="stlx\tt_isfunc.inl">
