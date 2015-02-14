@@ -779,7 +779,7 @@ namespace std
     class high_resolution_clock
     {
     public:
-      typedef uint64_t rep;
+      typedef int64_t rep;
 
       typedef ratio_multiply<ratio<100>, nano>::type    period;
       typedef chrono::duration<rep, period>             duration;
