@@ -103,7 +103,7 @@ namespace std { namespace tr2 {
             s.append(1, ']');
           }
           s.append(1, ':');
-          char pb[16];
+          char pb[20] = {};
           ntl::numeric::itoa(ntl::big_endian(sa.port), pb);
           s.append(pb);
         }

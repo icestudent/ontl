@@ -73,7 +73,7 @@ namespace std { namespace tr2 { namespace network {
 
       // get
       bool value() const { return v != 0; }
-      operator bool() const { return v != 0; }
+      __explicit_operator_bool() const { return __explicit_bool(v != 0); }
       bool operator!() const{ return !v; }
 
       // extensible

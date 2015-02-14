@@ -132,11 +132,11 @@ namespace std { namespace tr2 { namespace network {
 
       ///\name address comparisons:
       friend inline bool operator==(const address_v4& a, const address_v4& b) { return a.to_ulong() == b.to_ulong(); }
-      friend inline bool operator!=(const address_v4& a, const address_v4& b) { return a.to_ulong() != b.to_ulong(); }
+      friend inline bool operator!=(const address_v4& a, const address_v4& b) { return rel_ops::operator!=(a, b); }
       friend inline bool operator< (const address_v4& a, const address_v4& b) { return a.to_ulong() <  b.to_ulong(); }
-      friend inline bool operator> (const address_v4& a, const address_v4& b) { return a.to_ulong() >  b.to_ulong(); }
-      friend inline bool operator<=(const address_v4& a, const address_v4& b) { return a.to_ulong() <= b.to_ulong(); }
-      friend inline bool operator>=(const address_v4& a, const address_v4& b) { return a.to_ulong() >= b.to_ulong(); }
+      friend inline bool operator> (const address_v4& a, const address_v4& b) { return rel_ops::operator>(a, b); }
+      friend inline bool operator<=(const address_v4& a, const address_v4& b) { return rel_ops::operator<=(a, b); }
+      friend inline bool operator>=(const address_v4& a, const address_v4& b) { return rel_ops::operator>=(a, b); }
       ///\}
     private:
       static const uint32_t 
