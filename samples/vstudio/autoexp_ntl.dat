@@ -21,6 +21,7 @@
 ; v 0.17 - std::array<char,*>
 ; v 0.18 - tr2.network (ip::address, tcp::endpoint, udp::endpoint)
 ; v 0.19 - improved std::shared_ptr, std::weak_ptr
+; v 0.20 - basic_fifobuf aka streambuf
 ;
 ;---------------------------------------------------------------
 ;
@@ -131,6 +132,26 @@ std::greater<*>=greaterthan
 ;------------------------------------------------------------------------------
 ;  Network
 ;------------------------------------------------------------------------------
+std::tr2::sys::basic_fifobuf<*> {
+	preview ( $e.buffer_ )
+	children (
+		#(
+		[raw]: [$e,!],
+		gbeg:  $e.gbeg,
+		gend:  $e.gend,
+		gnext: $e.gnext,
+		glen:  $e.gnext - $e.gbeg,
+		gsize: $e.gend - $e.gbeg,
+		pbeg:  $e.pbeg,
+		pend:  $e.pend,
+		pnext: $e.pnext,
+		plen:  $e.pnext - $e.pbeg,
+		psize: $e.pend - $e.pbeg,
+		smax:  $e.max_size_
+		)
+	)
+}
+
 
 std::tr2::network::ip::address_v4 {
   preview (
