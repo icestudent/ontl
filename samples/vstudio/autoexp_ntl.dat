@@ -22,7 +22,7 @@
 ; v 0.18 - tr2.network (ip::address, tcp::endpoint, udp::endpoint)
 ; v 0.19 - improved std::shared_ptr, std::weak_ptr
 ; v 0.20 - basic_fifobuf aka streambuf
-;
+; v 0.21 - icmp::endpoint
 ;---------------------------------------------------------------
 ;
 ; While debugging, Data Tips and items in the Watch and Variable
@@ -182,6 +182,17 @@ std::tr2::network::ip::basic_endpoint<std::tr2::network::ip::udp> {
 		#case 0  ("af_unspec")
 		#case 1  ("af_unix")
 		#case 2  ( #( (int)$e.v4.addr.b1, ".", (int)$e.v4.addr.b2, ".", (int)$e.v4.addr.b3, ".", (int)$e.v4.addr.b4, " ", $e.sa.port / 256 + ($e.sa.port % 256) * 256, " (udp)" ) )
+		#case 23 ("af_inet6")
+		#default ("<empty>")
+	)
+}
+
+std::tr2::network::ip::basic_endpoint<std::tr2::network::ip::icmp> {
+	preview (
+		#switch($e.sa.family)
+		#case 0  ("af_unspec")
+		#case 1  ("af_unix")
+		#case 2  ( #( (int)$e.v4.addr.b1, ".", (int)$e.v4.addr.b2, ".", (int)$e.v4.addr.b3, ".", (int)$e.v4.addr.b4, " ", $e.sa.port / 256 + ($e.sa.port % 256) * 256, " (icmp)" ) )
 		#case 23 ("af_inet6")
 		#default ("<empty>")
 	)
