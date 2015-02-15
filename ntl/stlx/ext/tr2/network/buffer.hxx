@@ -173,6 +173,20 @@ namespace std { namespace tr2 { namespace sys {
       setp(&buffer_[0], &buffer_[0] + capacity);
     }
 
+#ifdef NTL_CXX_RV
+    basic_fifobuf(basic_fifobuf&& rhs)
+      : max_size_()
+    {
+      swap(rhs);
+    }
+
+    basic_fifobuf& operator= (basic_fifobuf&& rhs)
+    {
+      swap(rhs);
+      return *this;
+    }
+#endif
+
     // members:
     allocator_type get_allocator() const { return buffer_.get_allocator(); }
 
@@ -207,6 +221,14 @@ namespace std { namespace tr2 { namespace sys {
       if(gptr() + n > pptr())
         n = pptr() - gptr();
       gbump(static_cast<int>(n));
+    }
+
+    void swap(basic_fifobuf& rhs)
+    {
+      using std::swap;
+      basic_streambuf::swap(rhs);
+      swap(buffer_, rhs.buffer_);
+      swap(max_size_, rhs.max_size_);
     }
 
   protected:
@@ -275,11 +297,6 @@ namespace std { namespace tr2 { namespace sys {
       setg(&buffer_[0], &buffer_[0], &buffer_[0] + pnext);
       setp(&buffer_[0] + pnext, &buffer_[0] + pend);
     }
-
-
-  private:
-    basic_fifobuf(const basic_fifobuf&) __deleted;
-    void operator=(const basic_fifobuf&)__deleted;
 
   private:
     static const size_t initial_output_size = 64;
