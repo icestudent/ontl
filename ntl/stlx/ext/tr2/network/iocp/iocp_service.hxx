@@ -372,7 +372,7 @@ namespace std { namespace tr2 { namespace sys {
 
       do {
 
-        timer_data first;
+        timer_data first = {};
         {
           count = 1;
           wlock lock(timer_lock);

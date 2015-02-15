@@ -424,7 +424,7 @@ namespace ntl { namespace network {
       bool is_blocked(const implementation_type* impl, std::error_code& ec) const
       {
         uint32_t blocking = 0;
-        int re = impl->funcs->async.ioctl(impl->s, constants::fionbio, nullptr, 0, &blocking, sizeof(blocking), nullptr, nullptr, nullptr);
+        int re = impl->funcs->async.ioctl(impl->s, static_cast<uint32_t>(constants::fionbio), nullptr, 0, &blocking, sizeof(blocking), nullptr, nullptr, nullptr);
         check_error(ec, re);
         return blocking != 0;
       }

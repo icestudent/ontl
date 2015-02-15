@@ -39,6 +39,8 @@ namespace ntl {
 
       struct srwlock
       {
+        #pragma warning(push)
+        #pragma warning(disable:4201)
         union 
         {
           struct
@@ -52,6 +54,7 @@ namespace ntl {
           uintptr_t Value; //-V117
           void* _; //-V117
         };
+        #pragma warning(pop)
       };
     } // rtl
 

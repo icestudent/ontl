@@ -95,7 +95,7 @@ namespace std { namespace tr2 { namespace sys {
     {}
 
     /** Initialises the timer implementation \p impl. */
-    void construct(implementation_type& impl)
+    void construct(implementation_type& /*impl*/)
     {}
 
     /** Cleans up resources owned by the timer implementation \p impl. Cancels asynchronous wait operations. */
@@ -258,7 +258,7 @@ namespace std { namespace tr2 { namespace sys {
     size_t expires_at(const time_type& t)
     {
       error_code ec;
-      size_t c = service.expires_at(t, ec);
+      size_t c = service.expires_at(impl, t, ec);
       if(ec)
         __ntl_throw(system_error(ec));
       return c;
