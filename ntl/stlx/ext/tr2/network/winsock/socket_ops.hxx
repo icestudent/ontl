@@ -37,6 +37,9 @@ namespace std { namespace tr2 { namespace sys {
 
           else if(e == ntl::nt::status::port_unreachable)
             e = std::make_error_code(std::tr2::network::error::connection_refused);
+
+          else if(e == ntl::nt::status::cancelled)
+            e = std::make_error_code(std::tr2::network::error::operation_aborted);
         }
         
         using std::tr2::sys::io_handler_invoke;
@@ -83,7 +86,11 @@ namespace std { namespace tr2 { namespace sys {
 
           else if(e == ntl::nt::status::port_unreachable)
             e = std::make_error_code(std::tr2::network::error::connection_refused);
+
+          else if(e == ntl::nt::status::cancelled)
+            e = std::make_error_code(std::tr2::network::error::operation_aborted);
         }
+
         if(!e && transferred == 0 && self->is_stream && !self->is_empty)
           e = std::make_error_code(network::error::eof);
 
