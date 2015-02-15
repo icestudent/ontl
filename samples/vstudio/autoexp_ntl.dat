@@ -132,11 +132,31 @@ std::greater<*>=greaterthan
 ;------------------------------------------------------------------------------
 ;  Network
 ;------------------------------------------------------------------------------
+std::basic_streambuf<*> {
+	children (
+		#(
+		[raw]: [$e,!],
+		[len]: $e.pnext - $e.gnext,
+		gbeg:  $e.gbeg,
+		gend:  $e.gend,
+		gnext: $e.gnext,
+		glen:  $e.gnext - $e.gbeg,
+		gsize: $e.gend - $e.gbeg,
+		pbeg:  $e.pbeg,
+		pend:  $e.pend,
+		pnext: $e.pnext,
+		plen:  $e.pnext - $e.pbeg,
+		psize: $e.pend - $e.pbeg,
+		)
+	)
+}
+
 std::tr2::sys::basic_fifobuf<*> {
 	preview ( $e.buffer_ )
 	children (
 		#(
 		[raw]: [$e,!],
+		[len]: $e.pnext - $e.gnext,
 		gbeg:  $e.gbeg,
 		gend:  $e.gend,
 		gnext: $e.gnext,
