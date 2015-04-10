@@ -54,6 +54,39 @@ static inline char_t* to_hex(char_t* dst, size_t dst_len, const void* src, size_
   return dst - len*2;
 }
 
+template<typename char_t>
+static inline size_t from_hex(void* dst, size_t dst_len, const char_t* src, size_t len)
+{
+  struct {
+    byte operator()(char_t c) const
+    {
+      if(c >= '0' && c <= '9')
+        return c - '0';
+
+      if(c >= 'A' && c <= 'F')
+        return (c - 'A' + 10);
+
+      if(c >= 'a' && c <= 'f')
+        return (c - 'a' + 10);
+
+      return 0;
+    }
+  } decode;
+
+  len = std::min(len/2, dst_len);
+  uint8_t* p = reinterpret_cast<uint8_t*>(dst);
+  for(size_t i = 0; i < len; i++, p++, src += 2) {
+    *p = (decode(src[0]) << 4) | decode(src[1]);
+  }
+  return p - reinterpret_cast<uint8_t*>(dst);
+}
+
+template<typename char_t, size_t N>
+static inline size_t from_hex(void* dst, size_t dst_len, const char_t (&src)[N])
+{
+  return from_hex(dst, dst_len, src, N);
+}
+
 template<typename char_t = char>
 struct hex_str_cast
 {
