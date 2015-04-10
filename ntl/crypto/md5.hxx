@@ -6,6 +6,7 @@
 #include <pe/image.hxx>
 #include "../stlx/ostream.hxx"
 #include "../stlx/vector.hxx"
+#include "../stlx/array.hxx"
 
 namespace ntl
 {
@@ -16,7 +17,7 @@ namespace ntl
       uint32_t  i[2];
       uint32_t  buf[4];
       uint8_t   in[64];
-      uint8_t   hash[16];
+      std::array<uint8_t, 16> hash;
     };
 
     class md5: md5_ctx
@@ -61,7 +62,8 @@ namespace ntl
       bool finalized;
     public:
       enum { digest_size = 16 };
-      typedef uint8_t digest[digest_size];
+
+      typedef std::array<uint8_t, digest_size> digest;
 
       md5()
         :finalized(false)
@@ -77,6 +79,11 @@ namespace ntl
         return *this;
       }
 
+      operator const digest&()
+      {
+        return final();
+      }
+
       const digest& final()
       {
         if(!finalized){
@@ -84,6 +91,12 @@ namespace ntl
           finalized = true;
         }
         return hash;
+      }
+
+      md5& reset()
+      {
+        funcs->init(this);
+        return *this;
       }
     };
 
@@ -112,6 +125,21 @@ namespace ntl
     inline md5& operator<<(md5& m, const std::vector<T,Allocator>& v)
     {
       return m(v.data(), v.size()*sizeof(T));
+    }
+
+    template<class T>
+    inline md5::digest md5sum(md5& m, const T& x)
+    {
+      m.reset();
+      m << x;
+      return m.final();
+    }
+
+    template<class T>
+    inline md5::digest md5sum(const T& x)
+    {
+      md5 m;
+      return md5sum(m, x);
     }
 
   }
