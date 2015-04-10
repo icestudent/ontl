@@ -46,8 +46,8 @@ static inline char_t* to_hex(char_t* dst, size_t dst_len, const void* src, size_
   const uint8_t* p = reinterpret_cast<const uint8_t*>(src);
   for(size_t i = 0; i < len; i++) {
     const unsigned char c = *p++;
-    *dst++ = hex_digit(c);
     *dst++ = hex_digit(c >> 4);
+    *dst++ = hex_digit(c);
   }
   if(len*2 < dst_len)
     *dst = 0;
