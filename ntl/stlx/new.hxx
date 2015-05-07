@@ -103,17 +103,21 @@ new_handler get_new_handler() __ntl_nothrow;
 
 void* operator new      (std::size_t size);
 void  operator delete   (void* ptr) __ntl_nothrow;
+void  operator delete   (void* ptr, std::size_t) __ntl_nothrow;
 
 void* operator new      (std::size_t size, const std::nothrow_t&) __ntl_nothrow;
 void  operator delete   (void* ptr, const std::nothrow_t&) __ntl_nothrow;
+void  operator delete   (void* ptr, std::size_t, const std::nothrow_t&) __ntl_nothrow;
 
 ///\name  Array forms [18.6.1.2 lib.new.delete.array]
 
 void* operator new[]    (std::size_t size);
 void  operator delete[] (void* ptr) __ntl_nothrow;
+void  operator delete[] (void* ptr, std::size_t) __ntl_nothrow;
 
 void* operator new[]    (std::size_t size, const std::nothrow_t&) __ntl_nothrow;
 void  operator delete[] (void* ptr, const std::nothrow_t&) __ntl_nothrow;
+void  operator delete[] (void* ptr, std::size_t, const std::nothrow_t&) __ntl_nothrow;
 
 ///\name  Placement forms [18.6.1.3 lib.new.delete.placement]
 ///\note  Standard says nothing about inline nor static, but we're avoiding LNK2005

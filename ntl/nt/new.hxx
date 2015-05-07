@@ -67,6 +67,12 @@ void __cdecl operator delete(void* ptr) __ntl_nothrow
   ntl::nt::heap::free(ntl::nt::process_heap(), ptr);
 }
 
+__forceinline
+void __cdecl operator delete(void* ptr, std::size_t) __ntl_nothrow
+{
+  operator delete(ptr);
+}
+
 #ifndef NTL_NO_NEW_HANDLERS
 inline void __safe_call_new_handler(std::new_handler nh)
 {
@@ -111,6 +117,12 @@ void __cdecl
   ntl::nt::heap::free(ntl::nt::process_heap(), ptr);
 }
 
+__forceinline
+void __cdecl operator delete(void* ptr, std::size_t, const std::nothrow_t& tag) __ntl_nothrow
+{
+  operator delete(ptr, tag);
+}
+
 
 ///\name  Array forms
 
@@ -134,6 +146,12 @@ void __cdecl operator delete[](void* ptr) __ntl_nothrow
 }
 
 __forceinline
+void __cdecl operator delete[](void* ptr, std::size_t) __ntl_nothrow
+{
+  operator delete[](ptr);
+}
+
+__forceinline
 void* __cdecl operator new[](std::size_t size, const std::nothrow_t&) __ntl_nothrow
 {
   return operator new(size, std::nothrow);
@@ -143,6 +161,12 @@ __forceinline
 void __cdecl operator delete[](void* ptr, const std::nothrow_t&) __ntl_nothrow
 {
   ntl::nt::heap::free(ntl::nt::process_heap(), ptr);
+}
+
+__forceinline
+void __cdecl operator delete[](void* ptr, std::size_t, const std::nothrow_t& tag) __ntl_nothrow
+{
+  operator delete[](ptr, tag);
 }
 
 #ifdef __ICL

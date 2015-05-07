@@ -36,6 +36,12 @@ void __cdecl
 }
 
 __forceinline
+void __cdecl operator delete(void* ptr, std::size_t) __ntl_nothrow
+{
+  operator delete(ptr);
+}
+
+__forceinline
 void * __cdecl
   operator new(std::size_t size, const std::nothrow_t&) __ntl_nothrow
 {
@@ -47,6 +53,12 @@ void __cdecl
   operator delete(void* ptr, const std::nothrow_t&) __ntl_nothrow
 {
   if ( ptr ) ntl::km::pool<ntl::km::NonPagedPool>::free(ptr);
+}
+
+__forceinline
+void __cdecl operator delete(void* ptr, std::size_t, const std::nothrow_t& tag) __ntl_nothrow
+{
+  operator delete(ptr, tag);
 }
 
 
@@ -67,6 +79,12 @@ void __cdecl
 }
 
 __forceinline
+void __cdecl operator delete[](void* ptr, std::size_t) __ntl_nothrow
+{
+  operator delete[](ptr);
+}
+
+__forceinline
 void * __cdecl
   operator new[](std::size_t size, const std::nothrow_t&) __ntl_nothrow
 {
@@ -78,6 +96,12 @@ void __cdecl
   operator delete[](void* ptr, const std::nothrow_t&) __ntl_nothrow
 {
   if ( ptr ) ntl::km::pool<ntl::km::NonPagedPool>::free(ptr);
+}
+
+__forceinline
+void __cdecl operator delete[](void* ptr, std::size_t, const std::nothrow_t& tag) __ntl_nothrow
+{
+  operator delete[](ptr, tag);
 }
 
 #endif//#ifndef NTL_NO_NEW
