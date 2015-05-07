@@ -296,6 +296,6 @@ extern "C" unsigned __cdecl _ValidateImageBase(std::uintptr_t base)
 }
 
 // prevent removing functions written above by VC11's optimizer.
-volatile bool cookie_used = &__security_check_cookie && &_FindPESection && &_ValidateImageBase;
+volatile const bool cookie_used = &__security_check_cookie && &_FindPESection && &_ValidateImageBase;
 
 #endif // _MSC_VER >= 1600
