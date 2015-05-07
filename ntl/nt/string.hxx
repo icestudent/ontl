@@ -413,4 +413,20 @@ NTL_EXTERNAPI void __stdcall RtlFreeUnicodeString(unicode_string& UnicodeString)
 }//namespace nt
 }//namespace ntl
 
+namespace std
+{
+  //////////////////////////////////////////////////////////////////////////
+  // string literals
+  __inline_ns namespace literals
+  {
+    /// suffix for basic_string literals [21.7]
+    __inline_ns namespace string_literals
+    {
+#ifdef NTL_CXX_UDL
+      inline ntl::nt::const_ansi_string     operator"" _as(const char    * str, size_t len) { return ntl::nt::const_ansi_string(str, len); }
+      inline ntl::nt::const_unicode_string  operator"" _us(const wchar_t * str, size_t len) { return ntl::nt::const_unicode_string(str, len); }
+#endif
+    }
+  }
+}
 #endif//#ifndef NTL__NT_STRING
