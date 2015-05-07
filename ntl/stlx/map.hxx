@@ -24,7 +24,7 @@ namespace std {
 
 /// [23.3.1 map]
 /// supports unique keys (contains at most one of each key value)
-  template<class Key,class T,class Compare,class Allocator> class map;
+  template<class Key,class T,class Compare = less<Key>,class Allocator = allocator<pair<Key, T> > > class map;
   template<class Key,class T,class Compare,class Allocator> class multimap;
 
   namespace __
@@ -98,8 +98,8 @@ namespace std {
 
 template <class Key,
           class T,
-          class Compare = less<Key>,
-          class Allocator = allocator<pair</*const*/ Key, T> > >
+          class Compare,
+          class Allocator>
 class map:
   protected std::ext::tree::rb_tree<pair</*const*/ Key, T>, __::value_compare<Key, T, Compare, Allocator>, Allocator>
 {
