@@ -103,7 +103,7 @@ namespace std
         // zoom in
         T x;
         const T space = uspace+1;
-        const param_type smaller(0, space != 0 ? static_cast<IntType>(pspace / space) : IntType());
+        const param_type smaller(IntType(0), space != 0 ? static_cast<IntType>(pspace / space) : IntType());
         do {
           x = space * this->operator()(g, smaller);
           re = x + ( static_cast<T>(g()) - umin );
