@@ -8,6 +8,7 @@
 #define NTL__STLX_IOSFWD
 #pragma once
 
+#include "cstddef.hxx"
 #include "cstdint.hxx" // for uint_least16_t
 
 //#include "cwchar.hxx" // for mbstate_t
