@@ -149,6 +149,23 @@ namespace std { namespace tr2 { namespace sys {
    *    are appended to the sequence to accommodate changes in the size of the character sequence. 
    *  - A sequence of one or more character arrays of varying sizes. Additional character array objects are appended to the 
    *    sequence to accommodate changes in the size of the character sequence.
+   *  
+   *  @example Writing:
+   *  @code
+   *  sys::streambuf buf;
+   *  std::ostream os(&buf);
+   *  os << "data";
+   *  
+   *  size_t cb = sock.send(buf.data());
+   *  buf.consume(cb);
+   *  @endcode
+   *  
+   *  @example Reading:
+   *  @code
+   *  sys::streambuf buf;
+   *  size_t cb = sock.receive(buf.prepare(128));
+   *  buf.commit(cb);
+   *  @endcode
    **/
   template<class Allocator = std::allocator<char> >
   class basic_fifobuf
@@ -190,12 +207,30 @@ namespace std { namespace tr2 { namespace sys {
     // members:
     allocator_type get_allocator() const { return buffer_.get_allocator(); }
 
+    /** Size of the input sequence */
     size_t size()     const { return pptr() - gptr(); }
     size_t max_size() const { return max_size_;       }
 
+
+    ///\name Reading
+
+    /** Input sequence buffer to read. */
     const_buffers_type data() const { return buffer(const_buffers_type(gptr(), size())); }
 
-    /** Ensures that the output sequence can accommodate n characters, reallocating character array objects as necessary.  */
+    /** Removes \p n characters from the beginning of the input sequence. */
+    void consume(size_t n) __ntl_throws(length_error)
+    {
+      if(egptr() < pptr())
+        setg(&buffer_[0], gptr(), pptr());
+
+      if(gptr() + n > pptr())
+        n = pptr() - gptr();
+      gbump(static_cast<int>(n));
+    }
+
+    ///\name Writing
+
+    /** Get buffer to output sequence, then commit() actually written data. */
     mutable_buffers_type prepare(size_t n)
     {
       growto(n);
@@ -211,17 +246,7 @@ namespace std { namespace tr2 { namespace sys {
       pbump(static_cast<int>(n));
       setg(eback(), gptr(), pptr());
     }
-
-    /** Removes \p n characters from the beginning of the input sequence.  */
-    void consume(size_t n) __ntl_throws(length_error)
-    {
-      if(egptr() < pptr())
-        setg(&buffer_[0], gptr(), pptr());
-
-      if(gptr() + n > pptr())
-        n = pptr() - gptr();
-      gbump(static_cast<int>(n));
-    }
+    ///\}
 
     void swap(basic_fifobuf& rhs)
     {
