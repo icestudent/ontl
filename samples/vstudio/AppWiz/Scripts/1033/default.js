@@ -234,6 +234,8 @@ function AddConfigurations(proj, strProjectName) {
 			} else {
 				LinkTool.SetChecksum = true;
 				LinkTool.LinkIncremental = linkIncrementalNo;
+				LinkTool.EnableCOMDATFolding = optFolding;
+				LinkTool.OptimizeReferences = optReferences;
 			}
 			
 			// driver
