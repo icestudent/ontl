@@ -9,6 +9,7 @@
 #pragma once
 
 #include "basedef.hxx"
+#include <locale>
 
 namespace ntl {
 namespace fmt {
@@ -52,6 +53,41 @@ static inline char_t* to_hex(char_t* dst, size_t dst_len, const void* src, size_
   if(len*2 < dst_len)
     *dst = 0;
   return dst - len*2;
+}
+
+template<typename char_t>
+static inline size_t from_hex(void* dst, size_t dst_len, const char_t* src, size_t len, const std::locale& locale)
+{
+	struct {
+		byte operator()(char_t c) const
+		{
+			if(c >= '0' && c <= '9')
+				return c - '0';
+
+			if(c >= 'A' && c <= 'F')
+				return (c - 'A' + 10);
+
+			if(c >= 'a' && c <= 'f')
+				return (c - 'a' + 10);
+
+			return 0;
+		}
+	} decode;
+
+	auto& ctype = std::use_facet<std::ctype<char_t>>(locale);
+
+	const char_t* end = src + len;
+	uint8_t* p = reinterpret_cast<uint8_t*>(dst);
+	while(src < end) {
+		const char_t c = src[0];
+		if(ctype.is(ctype.space, c)) {
+			src++;
+			continue;
+		}
+		*p++ = (decode(src[0]) << 4) | decode(src[1]);
+		src += 2;
+	}
+	return p - reinterpret_cast<uint8_t*>(dst);
 }
 
 template<typename char_t>
