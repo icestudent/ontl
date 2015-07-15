@@ -152,7 +152,7 @@ class native_string
     native_string(value_type (&str)[Size])
       : length_(
                 sizeof(value_type) *
-                  (std::is_const<charT>::value ? traits::length(str) : (Size-1))
+                  (std::is_const<charT>::value ? static_cast<uint16_t>(traits::length(str)) : (Size-1))
                 ),
       maximum_length_(Size*sizeof(value_type)),
       buffer_(&str[0])
