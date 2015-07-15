@@ -59,7 +59,7 @@ using std::wcschr;
 //using std::getwc;
 //using std::ungetwc;
 using std::wcscmp;
-//using std::wcsrchr;
+using std::wcsrchr;
 //using std::wcstoul;
 //using std::wscanf;
 //

@@ -57,6 +57,18 @@ namespace std {
     size_t NTL_CRTIMP
     _vsnwprintf(wchar_t*buffer, size_t count, const wchar_t*format, va_list argptr);
 
+  inline size_t NTL_CRTCALL snwprintf(wchar_t*buffer, size_t count, const wchar_t*format, ...)
+  {
+    va_list va;
+    va_start(va, format);
+    return _vsnwprintf(buffer, count, format, va);
+  }
+
+  inline size_t NTL_CRTCALL vsnwprintf(wchar_t*buffer, size_t count, const wchar_t*format, va_list argptr)
+  {
+    return _vsnwprintf(buffer, count, format, argptr);
+  }
+
   ///\name General wide string utilities
 
   ///\name Wide string numeric conversion functions
