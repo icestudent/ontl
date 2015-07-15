@@ -476,12 +476,12 @@ static int array_unwind_filter(exception_pointers* eh)
 /** unwind corrupted array */
 static void array_unwind(void* ptr, size_t size, ehvec_count count, xtor dtor)
 {
-  __try{
-    while(--count >= 0){
+  __try {
+    while(count-- > 0) {
       ptr = ntl::padd(ptr, -static_cast<std::ssize_t>(size));
       CALL_XTOR(dtor, ptr);
     }
-  }__except(array_unwind_filter(exception_info())){
+  }__except(array_unwind_filter(exception_info())) {
 
   }
 }
@@ -490,16 +490,16 @@ static void array_unwind(void* ptr, size_t size, ehvec_count count, xtor dtor)
 // Destructor support for arrays of objects
 void __stdcall __ehvec_dtor(void* ptr, size_t size, ehvec_count count, xtor dtor)
 {
-  __try{
+  __try {
     // destroy from end to begin
-    ptr = ntl::padd(ptr, size*count);
+    ptr = ntl::padd(ptr, size*static_cast<size_t>(count));
     int ssize = -static_cast<int>(size);
-    while(--count >= 0){
+    while(count-- > 0) {
       ptr = ntl::padd(ptr, ssize);
       CALL_XTOR(dtor, ptr);
     }
   }
-  __except(array_unwind_filter(exception_info())){
+  __except(array_unwind_filter(exception_info())) {
   }
 }
 
@@ -508,14 +508,14 @@ void __stdcall __ehvec_ctor(void* ptr, size_t size, ehvec_count count, xtor ctor
 {
   ehvec_count i = 0;
   bool success = false;
-  __try{
-    for(i = 0; i < count; i++){
+  __try {
+    for(i = 0; i < count; i++) {
       CALL_XTOR(ctor, ptr);
       ptr = ntl::padd(ptr, size);
     }
     success = true;
   }
-  __finally{
+  __finally {
     if(!success)
       array_unwind(ptr, size, i, dtor);
   }
