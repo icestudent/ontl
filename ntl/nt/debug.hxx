@@ -66,10 +66,13 @@ namespace ntl {
       }
       inline void shared_dbgprintf(const char msg_format[], ...)
       {
-        char buffer[4096];
+        char buffer[8*1024+2];
         va_list va;
         va_start(va, msg_format);
-        _vsnprintf(buffer, _countof(buffer), msg_format, va);
+				const size_t bufsize = _countof(buffer);
+        _vsnprintf(buffer, bufsize, msg_format, va);
+				buffer[bufsize-2] = '\n';
+				buffer[bufsize-1] = 0;
         OutputDebugStringA(buffer);
       }
     } // __
