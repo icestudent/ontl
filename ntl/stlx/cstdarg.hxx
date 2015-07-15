@@ -29,16 +29,15 @@ typedef struct { } * va_list; //-V677
 
 //  stack parameters are aligned by 4 bytes
 
+#define __intsizeof(T) ( sizeof(T) + 3 & ~3 )
+
 #define va_start(__argptr, __last_param)\
       (__argptr = (va_list)&__last_param + (sizeof(__last_param) + 3 & ~3))
 
-#define va_arg(__argptr, __type)(*(__type*) __argptr += __type + 3 & ~3)
+// reinterpret_cast<T>( (ap += N) - N ) 
+#define va_arg(__argptr, __type) ( *(__type*)((__argptr += __intsizeof(__type)) - __intsizeof(__type)) )
 
-#ifdef NTL_DEBUG
-#   define va_end(__argptr)(__argptr = (va_list)0)
-#else
-#   define va_end(__argptr)
-#endif
+#define va_end(__argptr)(__argptr = (va_list)0)
 
 #elif defined(_M_X64)
 
@@ -47,7 +46,7 @@ typedef struct { } * va_list; //-V677
 #define va_start(__argptr, __last_param)\
   (__argptr = (va_list)&__last_param + (sizeof(__last_param) + 7 & ~7))
 
-#define va_arg(__argptr, __type)(*(__type*) __argptr += __type + 7 & ~7)
+#define va_arg(__argptr, __type) ( *(__type*) (__argptr += sizeof(__int64)) - sizeof(__int64) )
 
 #ifdef NTL_DEBUG
 #   define va_end(__argptr)(__argptr = (va_list)0)
