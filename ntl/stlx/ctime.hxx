@@ -149,14 +149,14 @@ inline time_t ntime2ctime(ntl::nt::systime_t ntime)
 {
   // Number of 100 nanosecond units from 1/1/1601 to 1/1/1970
   static const int64_t epoch_bias = 116444736000000000i64;
-  return static_cast<time_t>((ntime - epoch_bias) / 10000000i64);
+  return ntime == 0 ? 0 : static_cast<time_t>((ntime - epoch_bias) / 10000000i64);
 }
 
 inline ntl::nt::systime_t ctime2ntime(time_t t)
 {
   // Number of 100 nanosecond units from 1/1/1601 to 1/1/1970
   static const int64_t epoch_bias = 116444736000000000i64;
-  return t * 10000000i64 + epoch_bias;
+  return t == 0 ? 0 : t * 10000000i64 + epoch_bias;
 }
 
 inline time_t time(time_t* timer)
