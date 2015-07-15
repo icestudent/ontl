@@ -139,10 +139,15 @@ namespace std
         if(equivalent(from_fp, to_fp))
           return;
 
+				if(option == copy_option::fail_if_exists && exists(to_fp)) {
+					__::throw_files_error(ec, ntl::nt::status::object_name_collision, "Failed to copy file [from:to]", from_fp, to_fp);
+					return;
+				}
+
         using namespace NTL_SUBSYSTEM_NS;
         file_handler from, to;
         ntstatus st = from.open(const_unicode_string(native(from_fp)), file::generic_read, file::share_valid_flags, file::creation_options_default);
-        if(success(st)){
+        if(success(st)) {
           st = to.create(const_unicode_string(native(to_fp)), file::overwrite_if, file::generic_write, file::share_read, file::creation_options_default);
           if(success(st)){
             static const size_t buf_size = 64*1024; // 64k
