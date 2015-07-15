@@ -143,6 +143,7 @@
     <ClInclude Include="crypto\md5.hxx" />
     <ClInclude Include="crypto\sha.hxx" />
     <ClInclude Include="nt\environ.hxx" />
+    <ClInclude Include="nt\pipe.hxx" />
     <ClInclude Include="nt\semaphore.hxx" />
     <ClInclude Include="nt\srwlock.hxx" />
     <ClInclude Include="nt\transaction.hxx" />

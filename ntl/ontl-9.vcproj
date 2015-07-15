@@ -1420,6 +1420,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\nt\pipe.hxx"
+					>
+				</File>
+				<File
 					RelativePath=".\nt\process_information.hxx"
 					>
 				</File>
