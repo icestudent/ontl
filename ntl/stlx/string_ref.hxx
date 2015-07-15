@@ -12,7 +12,6 @@
 
 namespace std
 {
-
   template<typename charT, typename traits = char_traits<charT> >
   class basic_string_ref;
 
@@ -301,5 +300,7 @@ namespace std
   template<> struct hash<wstring_ref>;
 
 }
+
+#include "stoi.hxx"
 
 #endif// NTL__STLX_STRINGREF

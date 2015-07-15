@@ -847,6 +847,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\stlx\stoi.hxx"
+						>
+					</File>
+					<File
 						RelativePath=".\stlx\cstd\string.h"
 						>
 					</File>

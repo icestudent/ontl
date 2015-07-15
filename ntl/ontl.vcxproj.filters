@@ -997,6 +997,9 @@
     <ClInclude Include="stlx\ext\tr2\network\raw_socket_service.hxx">
       <Filter>ntl\stlx\.ext\tr2\network\impl</Filter>
     </ClInclude>
+    <ClInclude Include="stlx\stoi.hxx">
+      <Filter>ntl\stlx\c-compat</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="stlx\tt_isfunc.inl">

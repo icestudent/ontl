@@ -261,6 +261,7 @@
     <ClInclude Include="stlx\smart_ptr_rv.hxx" />
     <ClInclude Include="stlx\stack.hxx" />
     <ClInclude Include="stlx\stdstring.hxx" />
+    <ClInclude Include="stlx\stoi.hxx" />
     <ClInclude Include="stlx\string_ref.hxx" />
     <ClInclude Include="stlx\tuple_vt.hxx" />
     <ClInclude Include="stlx\type_traits_aliases.hxx" />
