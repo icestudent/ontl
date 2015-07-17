@@ -158,9 +158,6 @@
 #ifndef __out_opt
 # define __out_opt
 #endif
-#ifndef __optional
-# define __optional
-#endif
 #ifndef __reserved
 # define __reserved
 #endif
@@ -172,6 +169,10 @@
 #endif
 #endif // NTL_NO_SAL
 ///\}
+
+#ifndef __optional
+# define __optional
+#endif
 
 #if !(defined(_MSC_VER) && _MSC_VER >= 1400)
 # define __restrict

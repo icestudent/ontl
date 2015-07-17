@@ -66,9 +66,6 @@ namespace std
     {
       if(text.empty())
         return string_ref();
-      //else if(sref.empty())
-      //  return string_ref(text, 0, 1);
-      size_t pos = text.npos;
       for(string_ref::const_iterator t = text.begin(), te = text.end(), se = sref.end(); t != te; ++t){
         for(string_ref::const_iterator s = sref.begin(); s != se; ++s){
           if(*t == *s)

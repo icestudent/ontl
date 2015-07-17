@@ -99,7 +99,7 @@ class application: noncopyable
       legacy_handle   hStdOutput;
       legacy_handle   hStdError;
 
-      void inline get();
+      static inline startupinfo get();
     };
 
 
@@ -281,15 +281,19 @@ NTL_EXTERNAPI
 void __stdcall GetStartupInfoW(startupinfow *);
 
 template<>
-inline void startupinfoa::get()
+inline startupinfoa startupinfoa::get()
 {
-  GetStartupInfoA(this);
+  startupinfoa self = {};
+  GetStartupInfoA(&self);
+  return self;
 }
 
 template<>
-inline void startupinfow::get()
+inline startupinfow startupinfow::get()
 {
-  GetStartupInfoW(this);
+  startupinfow self = {};
+  GetStartupInfoW(&self);
+  return self;
 }
 /**@} winapi_types_support */
 }//namespace win
