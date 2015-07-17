@@ -391,11 +391,11 @@ namespace std
         :base(forward<F>(f))
       {}
       explicit function() __ntl_nothrow {}
-      function(nullptr_t) __ntl_nothrow {}
+      function(std::nullptr_t) __ntl_nothrow {}
       function(const function& r)
         :base(static_cast<const base&>(r)){}
       function& operator=(const function& r) { base::operator=(static_cast<const base&>(r)); return *this; }
-      function& operator=(nullptr_t) { clear(); return *this; }
+      function& operator=(std::nullptr_t) { clear(); return *this; }
       template<class F> function& operator=(F f) { base::operator=(forward<F>(f)); return *this; }
     };
 
@@ -411,11 +411,11 @@ namespace std
         :base(forward<F>(f))
       {}
       explicit function() __ntl_nothrow {}
-      function(nullptr_t) __ntl_nothrow {}
+      function(std::nullptr_t) __ntl_nothrow {}
       function(const function& r)
         :base(static_cast<const base&>(r)){}
       function& operator=(const function& r) { base::operator=(static_cast<const base&>(r)); return *this; }
-      function& operator=(nullptr_t) { clear(); return *this; }
+      function& operator=(std::nullptr_t) { clear(); return *this; }
       template<class F> function& operator=(F f) { base::operator=(forward<F>(f)); return *this; }
     };
 
@@ -431,11 +431,11 @@ namespace std
         :base(forward<F>(f))
       {}
       explicit function() __ntl_nothrow {}
-      function(nullptr_t) __ntl_nothrow {}
+      function(std::nullptr_t) __ntl_nothrow {}
       function(const function& r)
         :base(static_cast<const base&>(r)){}
       function& operator=(const function& r) { base::operator=(static_cast<const base&>(r)); return *this; }
-      function& operator=(nullptr_t) { clear(); return *this; }
+      function& operator=(std::nullptr_t) { clear(); return *this; }
       template<class F> function& operator=(F f) { base::operator=(forward<F>(f)); return *this; }
     };
 
@@ -451,11 +451,11 @@ namespace std
         :base(forward<F>(f))
       {}
       explicit function() __ntl_nothrow {}
-      function(nullptr_t) __ntl_nothrow {}
+      function(std::nullptr_t) __ntl_nothrow {}
       function(const function& r)
         :base(static_cast<const base&>(r)){}
       function& operator=(const function& r) { base::operator=(static_cast<const base&>(r)); return *this; }
-      function& operator=(nullptr_t) { clear(); return *this; }
+      function& operator=(std::nullptr_t) { clear(); return *this; }
       template<class F> function& operator=(F f) { base::operator=(forward<F>(f)); return *this; }
     };
 
