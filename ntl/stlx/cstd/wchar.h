@@ -1,3 +1,5 @@
+#pragma once
+
 #include "../cwchar.hxx"
 
 //using std::btowc;

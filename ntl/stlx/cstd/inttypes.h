@@ -1,3 +1,5 @@
+#pragma once
+
 #include "../cinttypes.hxx"
 
 using std::uint8_t;

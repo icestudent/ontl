@@ -1,3 +1,5 @@
+#pragma once
+
 #include "../ctime.hxx"
 
 using std::time_t;

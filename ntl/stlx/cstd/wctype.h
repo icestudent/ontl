@@ -1,3 +1,5 @@
+#pragma once
+
 #include "../cwctype.hxx"
 
 using std::iswalnum;

@@ -1,3 +1,5 @@
+#pragma once
+
 #include "../cctype.hxx"
 
 using std::toupper;

@@ -1,3 +1,5 @@
+#pragma once
+
 #include "../cstring.hxx"
 
 using std::memchr;
