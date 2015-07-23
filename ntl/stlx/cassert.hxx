@@ -77,6 +77,9 @@ inline void __ntl_assert(const char* expr, const char* func, const char* file, i
   ((void)0)
 #endif
 
+#define __unreferenced(expr) (void)(expr)
+#define __unused(expr) (void)(expr)
+
 #ifndef NTL__STLX_CASSERT
 #define NTL__STLX_CASSERT
 

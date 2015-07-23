@@ -45,7 +45,7 @@ void __stdcall
 
 NTL_EXTERNAPI
 ntstatus __stdcall
-  RtlSystemTimeToLocalTime(const systime_t& SystemTime, int64_t& LocalTime);
+  RtlSystemTimeToLocalTime(const systime_t& SystemTime, systime_t& LocalTime);
 
 
 }//namespace nt
