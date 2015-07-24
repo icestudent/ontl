@@ -139,8 +139,10 @@
 #endif
 
 #if _MSC_FULL_VER == 180021114 // v18 nov2013
+# define NTL_CXX_ALIGNAS
+# define NTL_CXX_ALIGNOF
 # define NTL_CXX_EF
-//# define NTL_CXX_CONSTEXPR
+//# define NTL_CXX_CONSTEXPR    // TBD
 #endif
 
 #if _MSC_FULL_VER >= 190021730 // v19 ctp1
@@ -153,6 +155,7 @@
 # define NTL_CXX_CHARS_TYPES
 # define NTL_CXX_CHARS
 # define NTL_CXX_FUNC
+
 #endif
 
 

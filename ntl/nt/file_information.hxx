@@ -581,8 +581,8 @@ struct volume_information:
 };
 
 ///\name   FileFsVolumeInformation == 1
-alignas(8)
-struct file_fs_volume_information
+
+struct alignas(8) file_fs_volume_information
 {
   static const fs_information_class info_class_type = FileFsVolumeInformation;
 
