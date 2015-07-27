@@ -1362,25 +1362,45 @@ inline pair<const T&, const T&> minmax(initializer_list<T> t, Compare comp)
   return pair<const T&, const T&>(*re.first, *re.second);
 }
 
+template<class ForwardIterator, class Compare>
+inline ForwardIterator min_element(ForwardIterator first, ForwardIterator last, Compare comp)
+{
+  if(first == last)
+    return first;
+
+  ForwardIterator it = first;
+  for(++first; first != last; ++first) {
+    if(comp(*first, *it))
+      it = first;
+  }
+  return it;
+}
+
 template<class ForwardIterator>
-inline
-ForwardIterator
-  min_element(ForwardIterator first, ForwardIterator last);
+inline ForwardIterator min_element(ForwardIterator first, ForwardIterator last)
+{
+  return min_element(first, last, less<typename iterator_traits<ForwardIterator>::value_type>());
+}
 
 template<class ForwardIterator, class Compare>
-inline
-ForwardIterator
-  min_element(ForwardIterator first, ForwardIterator last, Compare comp);
+inline ForwardIterator max_element(ForwardIterator first, ForwardIterator last, Compare comp)
+{
+  if(first == last)
+    return first;
+
+  ForwardIterator it = first;
+  for(++first; first != last; ++first) {
+    if(comp(*it, *first))
+      it = first;
+  }
+  return it;
+}
 
 template<class ForwardIterator>
-inline
-ForwardIterator
-  max_element(ForwardIterator first, ForwardIterator last);
-
-template<class ForwardIterator, class Compare>
-inline
-ForwardIterator
-  max_element(ForwardIterator first, ForwardIterator last, Compare comp);
+inline ForwardIterator max_element(ForwardIterator first, ForwardIterator last)
+{
+  return max_element(first, last, less<typename iterator_traits<ForwardIterator>::value_type>());
+}
 
 template<class ForwardIterator, class Compare>
 inline pair<ForwardIterator, ForwardIterator> minmax_element(ForwardIterator first, ForwardIterator last, Compare comp)
