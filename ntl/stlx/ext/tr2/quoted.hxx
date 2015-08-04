@@ -81,21 +81,21 @@ namespace std
     template <class charT>
     inline const __::quoted_proxy<const charT*, charT> quoted(const charT* string, charT escape='\\', charT delim='\"')
     {
-      const __::quoted_proxy<const charT*, charT> qp = {string, escape, delim, -1};
+      const __::quoted_proxy<const charT*, charT> qp = { string, escape, delim, -1 };
       return qp;
     }
 
-    template <class charT, class traits, class alloc>
-    inline const __::quoted_proxy<const charT*, charT> quoted(const std::basic_string<charT, traits, alloc>& string, charT escape='\\', charT delim='\"')
+    template <class charT, class traits>
+    inline const __::quoted_proxy<const charT*, charT> quoted(const std::basic_string_ref<charT, traits>& string, charT escape='\\', charT delim='\"')
     {
-      const __::quoted_proxy<const charT*, charT> qp = {string.c_str(), escape, delim, string.length()};
+      const __::quoted_proxy<const charT*, charT> qp = { string.data(), escape, delim, static_cast<ssize_t>(string.length()) };
       return qp;
     }
 
     template <class charT, class traits, class alloc>
     inline const __::quoted_proxy<std::basic_string<charT,traits,alloc>&, charT> quoted(std::basic_string<charT, traits, alloc>& string, charT escape='\\', charT delim='\"')
     {
-      const __::quoted_proxy<std::basic_string<charT,traits,alloc>&, charT> qp = {string, escape, delim, 0};
+      const __::quoted_proxy<std::basic_string<charT,traits,alloc>&, charT> qp = { string, escape, delim, 0 };
       return qp;
     }
 
