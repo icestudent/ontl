@@ -117,12 +117,15 @@ namespace std {
       where high_mark represents the position one past the highest initialized character in the buffer.
        */
 
-      const char_type * const beg = mode_ & ios_base::out ? this->pbase()
-        : mode_ & ios_base::in ? this->eback() : 0;
-      //const char_type * const end = mode_ & ios_base::out ? this->pptr()
-      //  : mode_ & ios_base::in ? this->egptr() : 0;
-      const char_type * const endp = pptr(), * const endg = egptr();  // select highest initialized
-      return basic_string<charT,traits,Allocator>(beg, std::max(endp,endg));
+      typedef basic_string<charT,traits,Allocator> string_type;
+
+      if(mode_ & ios_base::out) {
+        return string_type(this->pbase(), this->pptr(), str_.get_allocator());
+      } else if(mode_ & ios_base::in) {
+        return string_type(this->eback(), this->egptr(), str_.get_allocator());
+      } else {
+        return string_type(str_.get_allocator());
+      }
     }
 
     void str(const basic_string<charT,traits,Allocator>& s)
@@ -205,7 +208,7 @@ namespace std {
 
         // 27.8.1.4/8
         //if(mode_ & ios_base::in)
-          setg(newbeg, newbeg+gp, pptr());
+        setg(newbeg, newbeg+gp, pptr());
         *pptr() = cc;
         pbump(1);
       }
