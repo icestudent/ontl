@@ -40,6 +40,7 @@
     <symbol name='NTL_RUNTIME_RTTI' type="checkbox" value="false"></symbol>
     <symbol name='NTL_RUNTIME_IOS' type="checkbox" value="true"></symbol>
     <symbol name='NTL_RUNTIME_FLT' type="checkbox" value="false"></symbol>
+    <symbol name='NTL_RUNTIME_C'   type="checkbox" value="false"></symbol>
     <!-- END OF SYMBOLS -->
 
     
@@ -338,6 +339,7 @@
     runtimes.Add('NTL_RUNTIME_RTTI', "RTTI");
     runtimes.Add('NTL_RUNTIME_IOS', "iostreams");
     runtimes.Add('NTL_RUNTIME_FLT', "fpu");
+    runtimes.Add('NTL_RUNTIME_C', "C");
 
     function InitDocument(document) {
         setDirection();

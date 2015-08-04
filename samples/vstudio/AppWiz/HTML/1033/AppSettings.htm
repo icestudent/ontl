@@ -197,11 +197,11 @@
                                             <p class="Spacer">
                                                 &nbsp;</p>
                                             <input type="Checkbox" class="CheckboxA" id="NTL_RUNTIME_CRT" name="NTL_RUNTIME_CRT"
-                                                value="on" accesskey="C" title="Check to enable the startup and termination handling."
+                                                value="on" accesskey="T" title="Check to enable the startup and termination handling."
                                                 onclick="ValidateRuntime()">
                                             <div nowrap class="itemTextCheckboxB" id="NTL_RUNTIME_CRT_D" title="C/C++ startup and termination handling (including C++ static objects initialization).">
                                                 <label for="NTL_RUNTIME_CRT" id="NTL_RUNTIME_CRT_L">
-                                                    <u>C</u>RT (startup and termination)</label>
+                                                    CR<u>T</u> (startup and termination)</label>
                                             </div>
                                             <br>
                                             <input type="Checkbox" class="CheckboxA" id="NTL_RUNTIME_EXC" name="NTL_RUNTIME_EXC"
@@ -213,7 +213,7 @@
                                             </div>
                                             <br>
                                             <input type="Checkbox" class="CheckboxA" id="NTL_RUNTIME_RTTI" name="NTL_RUNTIME_RTTI"
-                                                value="on" accesskey="R" title="Check to enable runtime type identification support."
+                                                value="on" accesskey="T" title="Check to enable runtime type identification support."
                                                 onclick="ValidateRuntime()">
                                             <div nowrap class="itemTextCheckboxB" id="NTL_RUNTIME_RTTI_D" title="Runtime type identification support.">
                                                 <label for="NTL_RUNTIME_RTTI" id="NTL_RUNTIME_RTTI_L">
@@ -232,6 +232,13 @@
                                             <div nowrap class="itemTextCheckboxB" id="NTL_RUNTIME_FLT_D" title="A bit more floating point support (cmath, msvcrt::snprintf).">
                                                 <label for="NTL_RUNTIME_FLT" id="NTL_RUNTIME_FLT_L">
                                                     <u>F</u>loating point support</label>
+                                            </div>
+                                            <br>
+                                            <input type="Checkbox" class="CheckboxA" id="NTL_RUNTIME_C" name="NTL_RUNTIME_C"
+                                                value="on" accesskey="C" title="Click to add the C standard library headers." onclick="ValidateRuntime()">
+                                            <div nowrap class="itemTextCheckboxB" id="NTL_RUNTIME_C_D" title="C standard library headers.">
+                                                <label for="NTL_RUNTIME_C" id="NTL_RUNTIME_C_L">
+                                                    <u>C</u> standard library headers</label>
                                             </div>
                                         </span>
                                     </td>

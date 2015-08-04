@@ -268,6 +268,9 @@ function AddConfigurations(proj, strProjectName) {
 			
 			if(wizard.FindSymbol("NTL_APPTYPE_DRIVER"))
 				sheets += ";" + SheetPath + "ntl-km." + vsprops;
+
+			if(wizard.FindSymbol("NTL_RUNTIME_C"))
+				sheets += ";" + SheetPath + "ntl-stdc." + vsprops;
 			
 			try {
 				config.InheritedPropertySheets = sheets;
