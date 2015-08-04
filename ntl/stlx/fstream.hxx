@@ -24,8 +24,8 @@
 #define STLX__CONFORMING_FSTREAM 0
 #endif
 
-namespace std {
-
+namespace ntl
+{
   namespace Encoding 
   {
     enum type {
@@ -38,6 +38,10 @@ namespace std {
     };
   }
   typedef Encoding::type EncodingType;
+}
+
+namespace std
+{
   namespace __fs = tr2::files;
 
   /**\addtogroup  lib_input_output ******* 27 Input/output library [input.output]
@@ -74,12 +78,12 @@ namespace std {
     ///\name 27.9.1.2 basic_filebuf constructors [filebuf.cons]
 
     basic_filebuf()
-      :mode(), our_buffer(true), encoding(Encoding::Default)
+      :mode(), our_buffer(true), encoding(ntl::Encoding::Default)
     {}
 
 #ifdef NTL_CXX_RV
     basic_filebuf(basic_filebuf&& rhs)
-      :mode(), our_buffer(true), encoding(Encoding::Default)
+      :mode(), our_buffer(true), encoding(ntl::Encoding::Default)
     {
       swap(rhs);
     }
@@ -119,16 +123,16 @@ namespace std {
     ///\name 27.9.1.4 Member functions [filebuf.members]
     bool is_open() const { return !!f; }
 
-    basic_filebuf<charT,traits>* open(const string& s, ios_base::openmode mode, EncodingType encoding = Encoding::Ansi)
+    basic_filebuf<charT,traits>* open(const string& s, ios_base::openmode mode, ntl::EncodingType encoding = ntl::Encoding::Ansi)
     {
       return do_open(__fs::path(s), mode, encoding) ? this : nullptr;
     }
-    basic_filebuf<charT,traits>* open(const char* s, ios_base::openmode mode, EncodingType encoding = Encoding::Ansi)
+    basic_filebuf<charT,traits>* open(const char* s, ios_base::openmode mode, ntl::EncodingType encoding = ntl::Encoding::Ansi)
     {
       return do_open(__fs::path(s), mode, encoding) ? this : nullptr;
     }
     // NTL extension
-    basic_filebuf<charT,traits>* open(const __fs::path& name, ios_base::openmode mode, EncodingType encoding = Encoding::Ansi)
+    basic_filebuf<charT,traits>* open(const __fs::path& name, ios_base::openmode mode, ntl::EncodingType encoding = ntl::Encoding::Ansi)
     {
       return do_open(name, mode, encoding) ? this : nullptr;
     }
@@ -168,9 +172,9 @@ namespace std {
       streamsize avail = egptr()-gptr(),
         in_avail = static_cast<streamsize>(f.size() - f.tell());
       if(in_avail){
-        if((mode & ios_base::binary) || encoding == Encoding::Default)
+        if((mode & ios_base::binary) || encoding == ntl::Encoding::Default)
           in_avail /= sizeof(char_type);
-        else if(encoding == Encoding::Utf16)
+        else if(encoding == ntl::Encoding::Utf16)
           in_avail /= sizeof(char16_t);
 
         // TODO: if we are processing CRLF, this value can be less
@@ -218,12 +222,12 @@ namespace std {
         ok = read_binary(p, p+cb, cb);
       }else{
         // TODO: process CRLF && ^Z
-        EncodingType outenc = encoding;
-        if(outenc == Encoding::Default)
-          outenc = static_cast<EncodingType>(sizeof(char_type));
+        ntl::EncodingType outenc = encoding;
+        if(outenc == ntl::Encoding::Default)
+          outenc = static_cast<ntl::EncodingType>(sizeof(char_type));
         switch(outenc)
         {
-        case Encoding::Utf16:
+        case ntl::Encoding::Utf16:
           ok = read_in<wchar_t>(p, p+cb, cb, 
             __::bool_type<__::facets::has_facet<codecvt<char_type,wchar_t,state_type> >::value>());
           break;
@@ -321,7 +325,7 @@ namespace std {
       const int width = 
   #if !STLX__CONFORMING_FSTREAM
         // output char size
-        ((mode & ios_base::binary) || encoding == Encoding::Default) ? sizeof(char_type) : encoding;
+        ((mode & ios_base::binary) || encoding == ntl::Encoding::Default) ? sizeof(char_type) : encoding;
   #else
         use_facet<codecvt<charT,char,typename traits::state_type> >(getloc()).encoding();
   #endif
@@ -563,7 +567,7 @@ namespace std {
     }
 
   private:
-    bool do_open(const __fs::path& name, ios_base::openmode mode, EncodingType enc)
+    bool do_open(const __fs::path& name, ios_base::openmode mode, ntl::EncodingType enc)
     {
       if(f)
         return false;
@@ -618,10 +622,10 @@ namespace std {
 
       // detect encoding on nonempty file
       if(bom_size > 0){
-        EncodingType file_enc = parse_encoding(bom, bom_size);
-        if(bom_size && (enc == Encoding::Default || file_enc == enc))
+        ntl::EncodingType file_enc = parse_encoding(bom, bom_size);
+        if(bom_size && (enc == ntl::Encoding::Default || file_enc == enc))
           f.seek(bom_size, native_file::file_begin); // skip bom
-        if(enc == Encoding::Default)
+        if(enc == ntl::Encoding::Default)
           enc = file_enc;
       }
       this->encoding = enc;
@@ -652,7 +656,7 @@ namespace std {
         //(UTF-16 LE)
         static const uint32_t bom_le = 0xFEFF;
         uint32_t bom_size = encoding;
-        if(encoding == Encoding::Default)
+        if(encoding == ntl::Encoding::Default)
           bom_size = sizeof(char_type); // but utf8 isn't supported by native type
         if(bom_size > 1) // ansi isn't uses bom
           f.write(&bom_le, bom_size);
@@ -667,12 +671,12 @@ namespace std {
         ok = write_binary(s, s+n, written);
       }else{
         // TODO: process CRLF && ^Z
-        EncodingType outenc = encoding;
-        if(outenc == Encoding::Default)
-          outenc = static_cast<EncodingType>(sizeof(char_type));
+        ntl::EncodingType outenc = encoding;
+        if(outenc == ntl::Encoding::Default)
+          outenc = static_cast<ntl::EncodingType>(sizeof(char_type));
         switch(outenc)
         {
-        case Encoding::Utf16:
+        case ntl::Encoding::Utf16:
           ok = write_out<wchar_t>(s, s+n,written, 
             __::bool_type<__::facets::has_facet<codecvt<char_type,wchar_t,state_type> >::value>());
           break;
@@ -698,9 +702,9 @@ namespace std {
         setp(buf.first, buf.first+buf.second);
     }
 
-    EncodingType parse_encoding(uint32_t bom, uint32_t& bom_size)
+    ntl::EncodingType parse_encoding(uint32_t bom, uint32_t& bom_size)
     {
-      EncodingType enc = Encoding::Default;
+      ntl::EncodingType enc = ntl::Encoding::Default;
       if(bom_size < 2)
         return bom_size = 0, enc;
 
@@ -711,19 +715,19 @@ namespace std {
       bom_size = 4;
       for(;;){
         if(bom == utf32_le || bom == utf32_be){ // 4 bytes
-          //if(bom == utf32_le) enc = Encoding::Utf32; // not supported
+          //if(bom == utf32_le) enc = ntl::Encoding::Utf32; // not supported
           break;
         }
         bom_size = 3;
         bom &= 0xffffff;
         if(bom == utf8){
-          //enc = Encoding::Utf8; 
+          //enc = ntl::Encoding::Utf8; 
           break;
         }
         bom_size = 2;
         bom &= 0xffff;
         if(bom == utf16_le || bom == utf32_be){
-          if(bom == utf32_le) enc = Encoding::Utf16;
+          if(bom == utf32_le) enc = ntl::Encoding::Utf16;
           break;
         }
         bom_size = 0;
@@ -738,7 +742,7 @@ namespace std {
 
     native_file f;
     pair<char_type*, streamsize> buf;
-    EncodingType encoding;
+    ntl::EncodingType encoding;
     ios_base::openmode mode;
     bool our_buffer;
   };
@@ -766,12 +770,12 @@ class basic_ifstream:
       :basic_istream(&sb)
     {}
 
-    explicit basic_ifstream(const char* s, ios_base::openmode mode = ios_base::in, EncodingType encoding = Encoding::Ansi)
+    explicit basic_ifstream(const char* s, ios_base::openmode mode = ios_base::in, ntl::EncodingType encoding = ntl::Encoding::Ansi)
       :basic_istream(&sb)
     {
       open(s, mode, encoding);
     }
-    explicit basic_ifstream(const string& s, ios_base::openmode mode = ios_base::in, EncodingType encoding = Encoding::Ansi)
+    explicit basic_ifstream(const string& s, ios_base::openmode mode = ios_base::in, ntl::EncodingType encoding = ntl::Encoding::Ansi)
       :basic_istream(&sb)
     {
       open(s, mode, encoding);
@@ -786,7 +790,7 @@ class basic_ifstream:
 #endif
 
     // NTL extension
-    explicit basic_ifstream(const __fs::path& name, ios_base::openmode mode = ios_base::in, EncodingType encoding = Encoding::Ansi)
+    explicit basic_ifstream(const __fs::path& name, ios_base::openmode mode = ios_base::in, ntl::EncodingType encoding = ntl::Encoding::Ansi)
       :basic_istream(&sb)
     {
       open(name, mode, encoding);
@@ -811,18 +815,18 @@ class basic_ifstream:
 
     bool is_open() const { return sb.is_open(); }
 
-    void open(const char* s, ios_base::openmode mode = ios_base::in, EncodingType encoding = Encoding::Ansi)
+    void open(const char* s, ios_base::openmode mode = ios_base::in, ntl::EncodingType encoding = ntl::Encoding::Ansi)
     {
       if(!sb.open(s, mode|ios_base::in, encoding))
         setstate(ios_base::failbit);
     }
-    void open(const string& s, ios_base::openmode mode = ios_base::in, EncodingType encoding = Encoding::Ansi)
+    void open(const string& s, ios_base::openmode mode = ios_base::in, ntl::EncodingType encoding = ntl::Encoding::Ansi)
     {
       if(!sb.open(s, mode|ios_base::in, encoding))
         setstate(ios_base::failbit);
     }
     // NTL extension
-    void open(const __fs::path& name, ios_base::openmode mode = ios_base::in, EncodingType encoding = Encoding::Ansi)
+    void open(const __fs::path& name, ios_base::openmode mode = ios_base::in, ntl::EncodingType encoding = ntl::Encoding::Ansi)
     {
       if(!sb.open(name, mode|ios_base::in, encoding))
         setstate(ios_base::failbit);
@@ -861,12 +865,12 @@ class basic_ofstream:
     basic_ofstream()
       :basic_ostream(&sb)
     {}
-    explicit basic_ofstream(const char* s, ios_base::openmode mode = ios_base::out, EncodingType encoding = Encoding::Ansi)
+    explicit basic_ofstream(const char* s, ios_base::openmode mode = ios_base::out, ntl::EncodingType encoding = ntl::Encoding::Ansi)
       :basic_ostream(&sb)
     {
       open(s, mode, encoding);
     }
-    explicit basic_ofstream(const string& s, ios_base::openmode mode = ios_base::out, EncodingType encoding = Encoding::Ansi)
+    explicit basic_ofstream(const string& s, ios_base::openmode mode = ios_base::out, ntl::EncodingType encoding = ntl::Encoding::Ansi)
       :basic_ostream(&sb)
     {
       open(s, mode, encoding);
@@ -882,7 +886,7 @@ class basic_ofstream:
 #endif
 
     // NTL extension
-    explicit basic_ofstream(const __fs::path& name, ios_base::openmode mode = ios_base::out, EncodingType encoding = Encoding::Ansi)
+    explicit basic_ofstream(const __fs::path& name, ios_base::openmode mode = ios_base::out, ntl::EncodingType encoding = ntl::Encoding::Ansi)
       :basic_ostream(&sb)
     {
       open(name, mode, encoding);
@@ -908,18 +912,18 @@ class basic_ofstream:
     
     bool is_open() const { return sb.is_open(); }
 
-    void open(const char* s, ios_base::openmode mode = ios_base::out, EncodingType encoding = Encoding::Ansi)
+    void open(const char* s, ios_base::openmode mode = ios_base::out, ntl::EncodingType encoding = ntl::Encoding::Ansi)
     {
       if(!sb.open(s, mode|ios_base::out, encoding))
         setstate(ios_base::failbit);
     }
-    void open(const string& s, ios_base::openmode mode = ios_base::out, EncodingType encoding = Encoding::Ansi)
+    void open(const string& s, ios_base::openmode mode = ios_base::out, ntl::EncodingType encoding = ntl::Encoding::Ansi)
     {
       if(!sb.open(s, mode|ios_base::out, encoding))
         setstate(ios_base::failbit);
     }
     // NTL extension
-    void open(const __fs::path& name, ios_base::openmode mode = ios_base::out, EncodingType encoding = Encoding::Ansi)
+    void open(const __fs::path& name, ios_base::openmode mode = ios_base::out, ntl::EncodingType encoding = ntl::Encoding::Ansi)
     {
       if(!sb.open(name, mode|ios_base::out, encoding))
         setstate(ios_base::failbit);
@@ -960,12 +964,12 @@ class basic_fstream:
     basic_fstream()
       :basic_iostream(&sb)
     {}
-    explicit basic_fstream(const char* s, ios_base::openmode mode = ios_base::in|ios_base::out, EncodingType encoding = Encoding::Ansi)
+    explicit basic_fstream(const char* s, ios_base::openmode mode = ios_base::in|ios_base::out, ntl::EncodingType encoding = ntl::Encoding::Ansi)
       :basic_iostream(&sb)
     {
       open(s, mode, encoding);
     }
-    explicit basic_fstream(const string& s, ios_base::openmode mode = ios_base::in|ios_base::out, EncodingType encoding = Encoding::Ansi)
+    explicit basic_fstream(const string& s, ios_base::openmode mode = ios_base::in|ios_base::out, ntl::EncodingType encoding = ntl::Encoding::Ansi)
       :basic_iostream(&sb)
     {
       open(s, mode, encoding);
@@ -981,7 +985,7 @@ class basic_fstream:
 #endif
 
     // NTL extension
-    explicit basic_fstream(const __fs::path& name, ios_base::openmode mode = ios_base::in|ios_base::out, EncodingType encoding = Encoding::Ansi)
+    explicit basic_fstream(const __fs::path& name, ios_base::openmode mode = ios_base::in|ios_base::out, ntl::EncodingType encoding = ntl::Encoding::Ansi)
       :basic_iostream(&sb)
     {
       open(name, mode, encoding);
@@ -1007,18 +1011,18 @@ class basic_fstream:
 
     bool is_open() const { return sb.is_open(); }
 
-    void open(const char* s, ios_base::openmode mode = ios_base::in|ios_base::out, EncodingType encoding = Encoding::Ansi)
+    void open(const char* s, ios_base::openmode mode = ios_base::in|ios_base::out, ntl::EncodingType encoding = ntl::Encoding::Ansi)
     {
       if(!sb.open(s, mode, encoding))
         setstate(ios_base::failbit);
     }
-    void open(const string& s, ios_base::openmode mode = ios_base::in|ios_base::out, EncodingType encoding = Encoding::Ansi)
+    void open(const string& s, ios_base::openmode mode = ios_base::in|ios_base::out, ntl::EncodingType encoding = ntl::Encoding::Ansi)
     {
       if(!sb.open(s, mode, encoding))
         setstate(ios_base::failbit);
     }
     // NTL extension
-    void open(const __fs::path& name, ios_base::openmode mode = ios_base::in|ios_base::out, EncodingType encoding = Encoding::Ansi)
+    void open(const __fs::path& name, ios_base::openmode mode = ios_base::in|ios_base::out, ntl::EncodingType encoding = ntl::Encoding::Ansi)
     {
       if(!sb.open(name, mode, encoding))
         setstate(ios_base::failbit);
