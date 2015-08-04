@@ -1,6 +1,7 @@
 #ifndef NTL__STLX_TR2_FILES
 # error internal header
 #endif
+#pragma once
 
 #include "../quoted.hxx"
 #include "../../../../nt/file.hxx"
@@ -262,8 +263,8 @@ namespace std
       path path::extension() const
       {
         // filename's extension, if any
-        path fname = filename();
-        pos_type dotpos = fname.s.rfind(dotval);
+        const path fname = filename();
+        const pos_type dotpos = fname.s.rfind(dotval);
         return dotpos == npos ? path() : fname.s.substr(dotpos+1, npos);
       }
 
@@ -423,9 +424,11 @@ namespace std
       {
         const path ext = extension();
         if(!ext.empty())
-          s.erase(s.size() - ext.s.size());
+          s.erase(s.size() - ext.s.size() - 1); // '.ext'
+
         if(!new_ext.empty() && new_ext.s[0] != dotval)
           s += dotval;
+
         s += new_ext.s;
         return *this;
       }

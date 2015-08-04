@@ -7,6 +7,7 @@
 #ifndef NTL__STLX_TR2_FILES
 #error internal header
 #endif
+#pragma once
 
 #include "../../../stack.hxx"
 

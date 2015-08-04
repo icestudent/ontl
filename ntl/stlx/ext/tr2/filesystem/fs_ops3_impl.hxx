@@ -4,6 +4,7 @@
 #pragma once
 
 #include <nt/environ.hxx>
+#include "fs_directory_v3.hxx"
 
 namespace std 
 {
@@ -163,13 +164,7 @@ namespace std
               st = status::success;
           }
         }
-        if(!success(st)){
-          error_code e = make_error_code(st);
-          if(&ec == &throws())
-            __ntl_throw(filesystem_error("Failed to copy file [from:to]", from_fp, to_fp, e));
-          else
-            ec = e;
-        }
+        __::throw_files_error(ec, st, "Failed to copy file [from:to]", from_fp, to_fp);
       }
 
       bool exists(file_status s) __ntl_nothrow
@@ -263,7 +258,7 @@ namespace std
       ///\name status functions
       namespace __
       {
-        static file_status status(const path& p, ntl::nt::ntstatus& st, bool follow_symlink = true) __ntl_nothrow
+        static file_status status_impl(const path& p, ntl::nt::ntstatus& st, bool follow_symlink = true) __ntl_nothrow
         {
           // TODO: determine console, pipe, mailslot, device, etc.
           using namespace NTL_SUBSYSTEM_NS;
@@ -275,7 +270,7 @@ namespace std
             file_type ft = regular_file;
             if(fbi.FileAttributes & file_attribute::directory)
               ft = directory_file;
-            else if(fbi.FileAttributes & file_attribute::reparse_point)
+            if(fbi.FileAttributes & file_attribute::reparse_point)
               ft = symlink_file;
             return file_status(ft);
           }
@@ -290,7 +285,7 @@ namespace std
       file_status status(const path& p, error_code& ec) __ntl_nothrow
       {
         ntl::nt::ntstatus st;
-        const file_status fst = __::status(p, st, true);
+        const file_status fst = __::status_impl(p, st, true);
         __::throw_files_error(ec, st, "status()", p);
         return fst;
       }
@@ -298,7 +293,7 @@ namespace std
       file_status symlink_status(const path& p, error_code& ec) __ntl_nothrow
       {
         ntl::nt::ntstatus st;
-        const file_status fst = __::status(p, st, true);
+        const file_status fst = __::status_impl(p, st, false);
         __::throw_files_error(ec, st, "symlink_status()", p);
         return fst;
       }
@@ -350,11 +345,7 @@ namespace std
       {
         error_code e;
         const bool re = __::create_directories(p, e);
-        const bool throwable = &ec == &throws();
-        if(!throwable)
-          ec = e;
-        else if(!re)
-          __ntl_throw(filesystem_error("create_directories()", p, e));
+        __::throw_files_error(ec, static_cast<ntl::nt::ntstatus>(e.value()), "Can't create directories", p);
         return re;
       }
 
@@ -364,15 +355,7 @@ namespace std
         file_handler f;
         ntstatus st = f.create(const_unicode_string(native(dp)), file::create_new, file::list_directory|synchronize, file::share_read|file::share_write, 
           file::directory_file|file::open_for_backup_intent|file::synchronous_io_nonalert, file_attribute::normal);
-        const bool throwable = &ec == &throws();
-        if(!success(st) && st != status::object_name_collision){
-          error_code e = make_error_code(st);
-          if(!throwable)
-            ec = e;
-          else
-            __ntl_throw(filesystem_error("create_directory", dp, e));
-        }else if(!throwable)
-          ec.clear();
+        __::throw_files_error(ec, st, "Can't create directory", dp);
         return success(st);
       }
 
@@ -411,7 +394,40 @@ namespace std
           ec = make_error_code(st);
           return false;
         }
-      }
+
+        inline uintmax_t remove_all_impl(const path& p, error_code& ec)
+        {
+          const file_status s = symlink_status(p, ec);
+          if(ec || !exists(s))
+            return 0;
+
+          uintmax_t removed = 0;
+
+          if(!is_directory(s)) {
+            removed += remove(p, ec);
+            return removed;
+          }
+
+          for(directory_iterator it(p, ec), end; it != end; ++it) {
+            const path f = it->path();
+            const file_status s = symlink_status(f, ec);
+            if(ec)
+              return removed;
+
+            if(is_directory(s))
+              removed += remove_all_impl(f, ec);
+            else
+              removed += remove(f, ec);
+
+            if(ec)
+              return removed;
+          }
+
+          removed += remove(p, ec);
+          return removed;
+        }
+      } // __
+
 
       /** Determines, is the given paths are the same */
       inline bool equivalent(const path& p1, const path& p2) __ntl_throws(filesystem_error, filesystem_error)
@@ -454,6 +470,41 @@ namespace std
         return __::equivalent(p1,p2,ec);
       }
 
+      inline uintmax_t remove_all(const path& p, error_code& ec)
+      {
+        std::error_code e;
+        if(&ec != &throws())
+          ec.clear();
+
+        const uintmax_t removed = __::remove_all_impl(p, e);
+        if(e) {
+          if(&ec == &throws())
+            __ntl_throw(filesystem_error("Can't remove all files", p, e));
+          else
+            ec = e;
+        }
+        return removed;
+      }
+
+      inline bool remove(const path& p, error_code& ec)
+      {
+        if(&ec != &throws())
+          ec.clear();
+
+        if(!exists(p, ec))
+          return false;
+
+        using namespace NTL_SUBSYSTEM_NS;
+        file_handler f;
+        ntstatus st = f.open(const_unicode_string(native(p)), file::delete_access|synchronize, file::share_valid_flags, file::non_directory_file|file::open_for_backup_intent|file::open_reparse_point);
+        if(st == status::file_is_a_directory)
+          st = f.open(const_unicode_string(native(p)), file::delete_access|synchronize, file::share_valid_flags, file::directory_file|file::open_for_backup_intent|file::open_reparse_point);
+        if(success(st))
+          st = f.erase();
+        __::throw_files_error(ec, st, "Can't delete file", p);
+        return true;
+      }
+
       inline void rename(const path& from, const path& to, error_code& ec)
       {
         if(&ec != &throws())
@@ -468,13 +519,7 @@ namespace std
         ntstatus st = f.open(const_unicode_string(native(from)), file::read_attributes|delete_access|synchronize, file::share_valid_flags, file::creation_options_default);
         if(success(st))
           st = f.rename(const_unicode_string(native(to)));
-        if(!success(st)){
-          error_code e = make_error_code(st);
-          if(&ec == &throws())
-            __ntl_throw(filesystem_error("Can't rename file", from, to, e));
-          else
-            ec = e;
-        }
+        __::throw_files_error(ec, st, "Can't rename file", from, to);
       }
 
     } // files
