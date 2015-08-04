@@ -16,7 +16,7 @@ namespace ntl {
 
 
 template<class FileDevice, class traits = device_traits<FileDevice> >
-class basic_file : public traits
+class basic_file : public traits, public nt::last_status_t
 {
   ///////////////////////////////////////////////////////////////////////////
   public:
@@ -51,7 +51,7 @@ class basic_file : public traits
         const attributes            attr            = traits::attribute_default
         ) __ntl_nothrow
     {
-      f.create(object, cd, desired_access, share_access, co, attr);
+      last_status_ = f.create(object, cd, desired_access, share_access, co, attr);
     }
 
     template<typename objectT>
@@ -65,7 +65,7 @@ class basic_file : public traits
         const attributes            attr            = traits::attribute_default
         ) __ntl_nothrow
     {
-      return success(f.create(object, cd, desired_access, share_access, co, attr));
+      return success(last_status_ = f.create(object, cd, desired_access, share_access, co, attr));
     }
 
     /*
@@ -78,13 +78,13 @@ class basic_file : public traits
 
     uint32_t read(void * out, const uint32_t out_size) __ntl_nothrow
     {
-      const bool ok = success(f.read(out, out_size));
+      const bool ok = success(last_status_ = f.read(out, out_size));
       return ok ? static_cast<uint32_t>(f.get_io_status_block().Information) : 0;
     }
 
     bool write(const void * in, const uint32_t in_size) __ntl_nothrow
     {
-      return success(f.write(in, in_size));
+      return success(last_status_ = f.write(in, in_size));
     }
 
     size_type size() const __ntl_nothrow
@@ -94,7 +94,7 @@ class basic_file : public traits
 
     bool size(const size_type & new_size) __ntl_nothrow
     {
-      return success(f.size(new_size));
+      return success(last_status_ = f.size(new_size));
     }
 
     size_type tell() const __ntl_nothrow
@@ -104,12 +104,12 @@ class basic_file : public traits
 
     bool seek(const size_type& offset, typename FileDevice::Origin how)
     {
-      return success(f.seek(offset, how));
+      return success(last_status_ = f.seek(offset, how));
     }
 
     bool erase()
     {
-      return success(f.erase());
+      return success(last_status_ = f.erase());
     }
 
     template<class NameType>
@@ -117,7 +117,7 @@ class basic_file : public traits
       const NameType &  new_name,
       bool              replace_if_exists)
     {
-      return success(f.rename(new_name, replace_if_exists));
+      return success(last_status_ = f.rename(new_name, replace_if_exists));
     }
 
     __forceinline

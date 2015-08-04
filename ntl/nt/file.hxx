@@ -355,6 +355,7 @@ struct device_traits<nt::file_handler>:
       write_attributes      = 0x0100,
       all_access            = (int)standard_rights_required | (int)synchronize | 0x1FF,
       append                = append_data | synchronize,
+      delete_access         = nt::delete_access,
 
       generic_read          = standard_rights_read | read_data | read_attributes | read_ea | synchronize,
       generic_write         = standard_rights_write | write_data | write_attributes | write_ea | append_data | synchronize,
