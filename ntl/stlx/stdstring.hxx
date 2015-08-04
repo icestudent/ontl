@@ -2065,8 +2065,10 @@ inline wstring to_wstring(unsigned long long val)
 // eliminate to_string(-1) ambiguity
 inline string to_string(int val) { return to_string(static_cast<long long>(val)); }
 inline string to_string(unsigned int val) { return to_string(static_cast<unsigned long long>(val)); }
+inline string to_string(unsigned long val) { return to_string(static_cast<unsigned long long>(val)); }
 inline wstring to_wstring(int val) { return to_wstring(static_cast<long long>(val)); }
 inline wstring to_wstring(unsigned int val) { return to_wstring(static_cast<unsigned long long>(val)); }
+inline wstring to_wstring(unsigned long val) { return to_wstring(static_cast<unsigned long long>(val)); }
 
 ///\}
 

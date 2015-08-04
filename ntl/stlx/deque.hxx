@@ -530,6 +530,7 @@ namespace std {
     {
       size_type c = (right - left) + capL + capR;
       assert(c == cap_);
+      __unused(c);
       return cap_;
     }
     bool can_relocate(size_type n) const { return n > capacity_factor(size()); }
@@ -556,6 +557,7 @@ namespace std {
     {
       pointer b = left - capL;
       assert(!b || b == base_);
+      __unused(b);
       return base_;
     }
 

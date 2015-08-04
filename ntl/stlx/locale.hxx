@@ -2358,7 +2358,7 @@ class num_put : public locale::facet
       {
         // group & sep
         const numpunct<charT>& punct = use_facet< numpunct<charT> >(str.getloc());
-        const basic_string<charT> vec = punct.grouping();
+        const string vec = punct.grouping();
         const charT ts = punct.thousands_sep(),
           ds = punct.decimal_point();
 

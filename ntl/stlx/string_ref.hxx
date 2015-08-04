@@ -284,7 +284,11 @@ namespace std
   template<typename charT, typename traits>
   inline bool operator == (const basic_string_ref<charT, traits>& x, const charT* y) { return x == basic_string_ref<charT, traits>(y); }
   template<typename charT, typename traits>
+  inline bool operator != (const basic_string_ref<charT, traits>& x, const charT* y) { return x != basic_string_ref<charT, traits>(y); }
+  template<typename charT, typename traits>
   inline bool operator == (const charT* x, const basic_string_ref<charT, traits>& y) { return y == basic_string_ref<charT, traits>(x); }
+  template<typename charT, typename traits>
+  inline bool operator != (const charT* x, const basic_string_ref<charT, traits>& y) { return y != basic_string_ref<charT, traits>(x); }
 
   // Inserter
   template<class charT, class traits>
