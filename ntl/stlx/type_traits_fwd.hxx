@@ -74,9 +74,9 @@ template <class T> struct add_pointer;
 // 20.6.7 Other transformations [meta.trans.other]
 
 
-namespace aux {
+namespace __ {
 template <std::size_t Align>struct aligner;
-} // namespace aux
+} // namespace __
 
 template <std::size_t Len, std::size_t Align = alignof(void*)>
 struct aligned_storage;

@@ -193,7 +193,7 @@ template <class T> struct add_pointer<T&> { typedef typename remove_reference<T>
 #pragma warning(disable:4324) // structure was padded due to __declspec(align())
 #pragma warning(disable:4820) // 'X' bytes padding added after data member 'std::aligned_storage<Len,Align>::type::data'
 
-namespace aux {
+namespace __ {
 template <std::size_t Align>struct aligner;
 // MSDN: Valid alignment values are integer powers of two from 1 to 8192 (bytes)
 template <> struct aligner<1> { __declspec(align(1)) class type {}; };
@@ -209,7 +209,7 @@ template <> struct aligner<512> { __declspec(align(512)) class type {}; };
 template <> struct aligner<1024> { __declspec(align(1024)) class type {}; };
 template <> struct aligner<4096> { __declspec(align(4096)) class type {}; };
 template <> struct aligner<8192> { __declspec(align(8192)) class type {}; };
-} // namespace aux
+} // namespace __
 
 template <std::size_t Len, std::size_t Align>
 struct aligned_storage
@@ -219,7 +219,7 @@ struct aligned_storage
     private: 
       unsigned char __data[Len];
       max_align_t   __align;
-    //typename aux::aligner<1 + ( Align - 1
+    //typename __::aligner<1 + ( Align - 1
     //                         | (Align - 1) >> 1
     //                         | (Align - 1) >> 2
     //                         | (Align - 1) >> 3

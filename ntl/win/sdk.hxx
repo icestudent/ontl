@@ -16,6 +16,10 @@
 #include <wchar.h>
 #include <Windows.h>
 
+#ifdef small
+#undef small
+#endif
+
 #include <string.h>
 #include <ctype.h>
 #include <wctype.h>
