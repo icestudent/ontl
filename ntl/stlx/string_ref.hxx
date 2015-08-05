@@ -303,6 +303,22 @@ namespace std
   template<> struct hash<u32string_ref>;
   template<> struct hash<wstring_ref>;
 
+  //////////////////////////////////////////////////////////////////////////
+  // string literals
+  __inline_ns namespace literals
+  {
+    __inline_ns namespace string_literals
+    {
+      inline string_ref   operator "" _s(const char*    str, size_t len)  { return  string_ref(str, len); }
+      inline wstring_ref  operator "" _s(const wchar_t* str, size_t len)  { return wstring_ref(str, len); }
+    }
+  }
+
+#ifndef NTL_CXX_NS
+  // inline namespace 
+  using namespace literals;
+  using namespace literals::string_literals;
+#endif
 }
 
 #include "stoi.hxx"
