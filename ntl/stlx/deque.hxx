@@ -106,13 +106,13 @@ namespace std {
     deque(deque&& x)
       :alloc(), left(), right(), capL(), capR(), base_(), cap_()
     {
-      swap(move(x));
+      swap(x);
     }
     deque(deque&& x, const Allocator& a)
       :alloc(a), left(), right(), capL(), capR(), base_(), cap_()
     {
       if(x.get_allocator() == a){
-        swap(move(x));
+        swap(x);
       }else{
         // move elements using the array_allocator
         // TODO: reserve(x.size())

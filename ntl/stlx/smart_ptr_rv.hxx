@@ -1059,24 +1059,24 @@ namespace std
     template<class Y> shared_ptr& operator=(const shared_ptr<Y>& r)
     {
       if(shared != /*__::shared_data_cast<T>*/(r.shared))
-        shared_ptr(move(r)).swap(static_cast<shared_ptr&&>(*this));
+        shared_ptr(move(r)).swap(*this);
       return *this;
     }
     template<class Y> shared_ptr& operator=(shared_ptr<Y>&& r)
     {
       if(shared != /*__::shared_data_cast<T>*/(r.shared))
-        shared_ptr(move(r)).swap(static_cast<shared_ptr&&>(*this));
+        shared_ptr(move(r)).swap(*this);
       return *this;
     }
     template<class Y> shared_ptr& operator=(auto_ptr<Y>&& r)
     {
-      shared_ptr(move(r)).swap(static_cast<shared_ptr&&>(*this));
+      shared_ptr(move(r)).swap(*this);
       return *this;
     }
     template <class Y, class D>
     shared_ptr& operator=(unique_ptr<Y, D>&& r)
     {
-      shared_ptr(move(r)).swap(static_cast<shared_ptr&&>(*this));
+      shared_ptr(move(r)).swap(*this);
       return *this;
     }
 
