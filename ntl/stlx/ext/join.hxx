@@ -52,10 +52,10 @@ namespace std
   };
 
   /** Stream-based formatter for iterators */
-  template <class InputIterator>
-  inline std::string join(InputIterator first, InputIterator last, const std::string_ref& sep)
+  template <class InputIterator, class charT>
+  inline std::basic_string<charT> join(InputIterator first, InputIterator last, const std::basic_string_ref<charT>& sep)
   {
-    std::ostringstream o;
+    std::basic_ostringstream<charT> o;
 
     if(first != last) {
       o << *first;
@@ -70,8 +70,8 @@ namespace std
   }
 
   /** Stream-based formatter for container */
-  template <class Range>
-  inline std::string join(const Range& range, const std::string_ref& sep)
+  template <class Range, class charT>
+  inline std::basic_string<charT> join(const Range& range, const std::basic_string_ref<charT>& sep)
   {
     return join(std::begin(range), std::end(range), sep);
   }
