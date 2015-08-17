@@ -28,12 +28,29 @@ template <class X,
           X(*Duplicate)(X)>
 class basic_handle
 {
-  ///////////////////////////////////////////////////////////////////////////
+#ifdef NTL_CXX_RV
+  basic_handle(const basic_handle& ) __deleted;
+  basic_handle& operator= (const basic_handle&) __deleted;
+#endif
+
   public:
     typedef X element_type;
 
     explicit basic_handle(X h = X())  __ntl_nothrow : h(h) {}
 
+#ifdef NTL_CXX_RV
+    basic_handle(basic_handle&& a) __ntl_nothrow
+      : h()
+    {
+      reset(a.release());
+    }
+    basic_handle& operator= (basic_handle&& a) __ntl_nothrow
+    {
+      reset(a.release());
+      return *this;
+    }
+
+#else
     basic_handle(basic_handle & a)  __ntl_nothrow : h(a.release()) {}
 
     basic_handle & operator=(basic_handle & a) __ntl_nothrow
@@ -41,6 +58,7 @@ class basic_handle
       reset(a.release());
       return *this;
     }
+#endif
 
     ~basic_handle() __ntl_nothrow { if ( X x = get() ) Delete(x); }
 
