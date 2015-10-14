@@ -4,10 +4,15 @@
 #include <nt/iocp.hxx>
 #include <nt/event.hxx>
 #include <nt/thread.hxx>
-#include <nt/srwlock.hxx>
 #include <nt/system_error.hxx>
 #include <atomic.hxx>
 #include <vector>
+
+#ifndef NTL_DISABLE_SRWLOCK
+# include <nt/srwlock.hxx>
+#else
+# include <nt/resource.hxx>
+#endif
 
 #include "op.hxx"
 #include "complete_op.hxx"
@@ -418,11 +423,18 @@ namespace std { namespace tr2 { namespace sys {
     
     // timers
     ntl::nt::user_thread timer_thread;
-    ntl::nt::srwlock timer_lock;
     ntl::nt::user_event timer_event;
     timer_queue timers;
+
+#ifndef NTL_DISABLE_SRWLOCK
+    ntl::nt::srwlock timer_lock;
     typedef ntl::nt::srwlock::guard<false> rlock;
     typedef ntl::nt::srwlock::guard<true>  wlock;
+#else
+    ntl::nt::critical_section timer_lock;
+    typedef ntl::nt::critical_section::guard rlock;
+    typedef ntl::nt::critical_section::guard wlock;
+#endif
   };
 
 } // iocp ns

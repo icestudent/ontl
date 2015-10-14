@@ -25,7 +25,7 @@ namespace std
     template <class charT, class traits>
     inline std::basic_ostream<charT, traits>& operator<<(std::basic_ostream<charT, traits>& os, const quoted_proxy<std::basic_string<charT,traits>&, charT>& q)
     {
-      const quoted_proxy<const charT*, charT> qp = {q.s.c_str(), q.esc, q.sep, q.s.length()};
+      const quoted_proxy<const charT*, charT> qp = {q.s.c_str(), q.esc, q.sep, static_cast<ssize_t>(q.s.length())};
       return os << qp;
     }
 

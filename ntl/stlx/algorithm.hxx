@@ -24,20 +24,10 @@
 namespace std
 {
 ///\name 25.1, non-modifying sequence operations:
-template <class InputIterator, class Predicate>
-inline bool all_of(InputIterator first, InputIterator last, Predicate pred);
-
-template <class InputIterator, class Predicate>
-inline bool any_of(InputIterator first, InputIterator last, Predicate pred);
-
-template <class InputIterator, class Predicate>
-inline bool none_of(InputIterator first, InputIterator last, Predicate pred);
-
 
 template<class InputIterator, class Function>
 __forceinline
-Function
-  for_each(InputIterator first, InputIterator last, Function f)
+Function for_each(InputIterator first, InputIterator last, Function f)
 {
   while ( first != last ) f(*first++);
   return f;
@@ -46,8 +36,7 @@ Function
 
 template<class InputIterator, class T>
 __forceinline
-InputIterator
-  find(InputIterator first, InputIterator last, const T& value)
+InputIterator find(InputIterator first, InputIterator last, const T& value)
 {
   while ( first != last && !(*first == value) ) ++first;
   return first;
@@ -56,19 +45,22 @@ InputIterator
 
 template<class InputIterator, class Predicate>
 __forceinline
-InputIterator
-  find_if(InputIterator first, InputIterator last, Predicate pred)
+InputIterator find_if(InputIterator first, InputIterator last, Predicate pred)
 {
   while ( first != last && !(pred(*first) != false) ) ++first;
   return first;
 }
 
 template<class InputIterator, class Predicate>
-InputIterator find_if_not(InputIterator first, InputIterator last,
-                          Predicate pred);
-template<class InputIterator, class Predicate>
-InputIterator find_if_not(InputIterator first, InputIterator last,
-                          Predicate pred);
+inline InputIterator find_if_not(InputIterator first, InputIterator last, Predicate pred)
+{
+  while(first != last) {
+    if(!pred(*first))
+      return first;
+    ++first;
+  }
+  return last;
+}
 
 template<class ForwardIterator1, class ForwardIterator2>
 __forceinline
@@ -111,6 +103,23 @@ ForwardIterator1
   return first1;  // here first1 == last1
 }
 
+template <class InputIterator, class Predicate>
+inline bool all_of(InputIterator first, InputIterator last, Predicate pred)
+{
+  return std::find_if_not(first, last, pred) == last;
+}
+
+template <class InputIterator, class Predicate>
+inline bool any_of(InputIterator first, InputIterator last, Predicate pred)
+{
+  return std::find_if(first, last, pred) != last;
+}
+
+template <class InputIterator, class Predicate>
+inline bool none_of(InputIterator first, InputIterator last, Predicate pred)
+{
+  return std::find_if(first, last, pred) == last;
+}
 
 template<class ForwardIterator>
 __forceinline
