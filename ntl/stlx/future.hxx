@@ -137,11 +137,12 @@ namespace std
           }
           msg = move(tmp);
         }
+        #pragma warning(push)
         #pragma warning(disable:4127)
         __ntl_catch(...) {
           return logic_error::what();
         }
-        #pragma warning(default:4127)
+        #pragma warning(pop)
       }
       return msg.c_str();
     }
