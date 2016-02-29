@@ -25,6 +25,7 @@ namespace std { namespace tr2 { namespace sys {
         ntl::nt::legacy_handle h;
         async_operation* op;
         ntl::nt::systime_t fire;
+        ntl::nt::system_duration period;
       };
 
       typedef size_t add_timer_t(void* ctx, const void* timer, const timer_data* data);

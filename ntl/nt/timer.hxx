@@ -198,10 +198,10 @@ public:
   }
 
   template <class Clock, class Duration, class PeriodRep, class PeriodType>
-  bool set(const std::chrono::time_point<Clock, Duration>& abs_time, timer_apc_routine* TimerApcRoutine, void* TimerContext, const std::chrono::duration<PeriodRep, PeriodType>& Period) volatile
+  bool set(const std::chrono::time_point<Clock, Duration>& abs_time, const std::chrono::duration<PeriodRep, PeriodType>& Period, timer_apc_routine* TimerApcRoutine, void* TimerContext) volatile
   {
     assert(get());
-    int32_t ms = std::chrono::duration_cast<std::chrono::milliseconds>(Period).count();
+    int64_t ms = std::chrono::duration_cast<std::chrono::milliseconds>(Period).count();
     return success(last_status_ = NtSetTimer(get(), std::chrono::duration_cast<system_duration>(abs_time.time_since_epoch()).count(), TimerApcRoutine, TimerContext, true, static_cast<int32_t>(ms), nullptr));
   }
 
@@ -217,7 +217,7 @@ public:
   bool set(const std::chrono::duration<Rep, Period>& rel_time, const std::chrono::duration<PeriodRep, PeriodType>& Period, timer_apc_routine* TimerApcRoutine, void* TimerContext) volatile
   {
     assert(get());
-    int64_t ms = std::chrono::duration_cast<std::chrono::milliseconds>(Period).count();
+    const int64_t ms = std::chrono::duration_cast<std::chrono::milliseconds>(Period).count();
     return success(last_status_ = NtSetTimer(get(), -1i64*std::chrono::duration_cast<system_duration>(rel_time).count(), TimerApcRoutine, TimerContext, true, static_cast<int32_t>(ms), nullptr));
   }
 
@@ -225,7 +225,7 @@ public:
   bool set_now(const std::chrono::duration<PeriodRep, PeriodType>& Period, timer_apc_routine* TimerApcRoutine, void* TimerContext) volatile
   {
     assert(get());
-    int64_t ms = std::chrono::duration_cast<std::chrono::milliseconds>(Period).count();
+    const int64_t ms = std::chrono::duration_cast<std::chrono::milliseconds>(Period).count();
     return success(last_status_ = NtSetTimer(get(), -1i64, TimerApcRoutine, TimerContext, true, static_cast<int32_t>(ms), nullptr));
   }
 

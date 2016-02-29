@@ -51,6 +51,7 @@ namespace std { namespace tr2 { namespace sys {
       custom_result_code  = ntl::nt::status::more_entries;
 
     __::timer_scheduler& scheduler;
+
   public:
     static io_service::id id;
 
@@ -61,9 +62,9 @@ namespace std { namespace tr2 { namespace sys {
       , scheduler(use_service<__::timer_scheduler>(ios))
       , self_id()
     {
+      scheduler.ctx = this;
       scheduler.handler =
         &iocp_service::add_timer_;
-      scheduler.ctx = this;
         //std::bind(&iocp_service::add_timer, this, std::placeholders::_1, std::placeholders::_2);
     }
 
@@ -324,7 +325,6 @@ namespace std { namespace tr2 { namespace sys {
           assert(op->is_async_operation());
 
           if(op->ready.test()) {
-
             complete(op, make_error_code(entry.Status, op), entry.Information);
             return true;
           } else {
@@ -402,8 +402,17 @@ namespace std { namespace tr2 { namespace sys {
           timer_queue::iterator tm = std::find_if(timers.begin(), timers.end(), find_timer(first.h));
           if(tm != timers.end()) {
             // fired and not erased yet
-            timers.erase(tm);
-            post_deferred_completion(first.op);
+            if(tm->period.count() != 0) {
+              // periodic timer, do not erase him
+              // just adjust fire time to period one
+              tm->fire += tm->period.count();
+              post_immediate_completion(first.op);
+
+            } else {
+              // deadline timer, remove him once fired
+              timers.erase(tm);
+              post_deferred_completion(first.op);
+            }
           } else {
             // if erased, operation_aborted will be sent 
             first.h = 0;
