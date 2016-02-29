@@ -281,6 +281,15 @@ namespace std
   template<typename charT, typename traits>
   inline bool operator >= (const basic_string_ref<charT, traits>& x, const basic_string_ref<charT, traits>& y) { return x.compare(y) >= 0; }
 
+  template<class charT, class traits, class Allocator>
+  inline bool operator==(const basic_string<charT,traits,Allocator>& lhs, const basic_string_ref<charT,traits>& rhs) { return basic_string_ref<charT, traits>(lhs) == rhs; }
+  template<class charT, class traits, class Allocator>
+  inline bool operator!=(const basic_string<charT,traits,Allocator>& lhs, const basic_string_ref<charT,traits>& rhs) { return basic_string_ref<charT, traits>(lhs) != rhs; }
+  template<class charT, class traits, class Allocator>
+  inline bool operator==(const basic_string_ref<charT,traits>& lhs, const basic_string<charT,traits,Allocator>& rhs) { return basic_string_ref<charT, traits>(rhs) == lhs; }
+  template<class charT, class traits, class Allocator>
+  inline bool operator!=(const basic_string_ref<charT,traits>& lhs, const basic_string<charT,traits,Allocator>& rhs) { return basic_string_ref<charT, traits>(rhs) != lhs; }
+
   template<typename charT, typename traits>
   inline bool operator == (const basic_string_ref<charT, traits>& x, const charT* y) { return x == basic_string_ref<charT, traits>(y); }
   template<typename charT, typename traits>

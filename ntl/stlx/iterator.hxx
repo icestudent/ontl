@@ -360,15 +360,14 @@ class back_insert_iterator
 
     explicit back_insert_iterator(Container & x) : container(&x) {}
 
-    back_insert_iterator<Container>&
-      operator=(typename Container::const_reference value)
+    back_insert_iterator<Container>& operator=(typename Container::const_reference value)
     {
       container->push_back(value);
       return *this;
     }
+
     #ifdef NTL_CXX_RV
-    back_insert_iterator<Container>&
-      operator=(typename Container::value_type&& value)
+    back_insert_iterator<Container>& operator=(typename Container::value_type&& value)
     {
       container->push_back(std::move(value));
       return *this;
@@ -384,9 +383,8 @@ class back_insert_iterator
 };
 
 /// 24.5.2.2.5 back_inserter [lib.back.inserter]
-template <class Container> inline
-back_insert_iterator<Container>
-back_inserter(Container& x) { return back_insert_iterator<Container>( x ); }
+template <class Container> 
+inline back_insert_iterator<Container> back_inserter(Container& x) { return back_insert_iterator<Container>( x ); }
 
 
 /// 24.5.2.3 Class template front_insert_iterator [lib.front.insert.iterator]

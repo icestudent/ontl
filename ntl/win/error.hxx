@@ -23,6 +23,7 @@ namespace std
   using ntl::nt::make_error_code;
   using ntl::nt::make_error_condition;
 
+  template <> struct is_error_condition_enum<ntl::nt::win32_error::error_type>: public true_type {};
 }
 
 #endif//#ifndef NTL__WIN_ERROR
