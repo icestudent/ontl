@@ -526,10 +526,9 @@ ForwardIterator2
 
 
 template<class ForwardIterator1, class ForwardIterator2>
-__forceinline
-void
-  iter_swap(ForwardIterator1 a, ForwardIterator2 b)
+__forceinline void iter_swap(ForwardIterator1 a, ForwardIterator2 b)
 {
+  using std::swap;
   swap(*a, *b);
 }
 
@@ -792,15 +791,26 @@ OutputIterator
 
 
 template<class ForwardIterator>
-inline
-void
-  rotate(ForwardIterator first, ForwardIterator middle, ForwardIterator last);
+inline void rotate(ForwardIterator first, ForwardIterator middle, ForwardIterator last)
+{
+  ForwardIterator next = middle;
+  while(first != next) {
+    std::iter_swap(first++, next++);
+    if(next == last) {
+      next = middle;
+    } else if(first == middle) {
+      middle = next;
+    }
+  }
+}
 
 template<class ForwardIterator, class OutputIterator>
-inline
-OutputIterator
-  rotate_copy(ForwardIterator first, ForwardIterator middle,
-              ForwardIterator last, OutputIterator result);
+inline OutputIterator rotate_copy(ForwardIterator first, ForwardIterator middle,
+              ForwardIterator last, OutputIterator result)
+{
+  result = std::copy(middle, last, result);
+  return std::copy(first, middle, result);
+}
 
 template<class RandomAccessIterator>
 inline
