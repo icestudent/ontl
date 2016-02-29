@@ -608,7 +608,7 @@ struct char_traits<wchar_t>
         return;
       }
       if(n > capacity_){
-        reserve(n);
+        grow_buffer(n);
         memset( buffer_+length_, c, (n-length_)*sizeof(charT) );
       }
       length_ = n;
@@ -636,7 +636,7 @@ struct char_traits<wchar_t>
       if(n <= length_){
         shrink_to_fit();
       }else if(n != capacity_){
-        grow_buffer(n, length_);
+        grow_buffer(n, length_, true);
       }
     }
 
@@ -906,7 +906,7 @@ struct char_traits<wchar_t>
 
       const size_type pos = static_cast<size_type>(p-buffer_);
       if(length_ + n + 1 > capacity_)
-        reserve(length_+n+1);
+        grow_buffer(length_+n+1);
       charT* pc = buffer_+pos;
       p = pc;
       if(pos < length_)
@@ -1063,7 +1063,7 @@ struct char_traits<wchar_t>
           first_pos = static_cast<size_type>(distance(static_cast<const_pointer>(buffer_), pfirst)); // always positive
 
         if(space+1 > capacity_){
-          reserve(space);
+          grow_buffer(space);
           if(from_self)
             src = ntl::brute_cast<RandomIterator>(buffer_) + first_pos;
         }
@@ -1152,7 +1152,7 @@ struct char_traits<wchar_t>
         difference_type selfpos = from_self ? str - buffer_ : 0;
 
         if(res+1 > capacity_){
-          reserve(res+1);
+          grow_buffer(res+1);
           if(from_self)
             s = buffer_ + selfpos;
         }
@@ -1769,9 +1769,14 @@ next_xpos:;
       length_ = i-buffer_;
     }
 
-    void grow_buffer(size_type new_size, size_type length)
+    void grow_buffer(size_type new_size)
     {
-      const size_type n = static_cast<size_type>(__ntl_grow_heap_block_size(new_size + 1));
+      grow_buffer(new_size, length_, false);
+    }
+
+    void grow_buffer(size_type new_size, size_type length, bool exactly)
+    {
+      const size_type n = exactly ? new_size : static_cast<size_type>(__ntl_grow_heap_block_size(new_size + 1));
       if(!(n < new_size)) // overflow
         new_size = n;
       charT* buf = allocator_traits::allocate(alloc, new_size);
