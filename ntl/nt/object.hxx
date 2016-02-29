@@ -179,11 +179,18 @@ NtQueryObject(
 		legacy_handle ObjectHandle,
 		object_information_class ObjectInformationClass,
 		void* ObjectInformation,
-		int32_t Length,
-		int32_t* ResultLength
+		uint32_t Length,
+		uint32_t* ResultLength
 	  );
 
-
+NTL_EXTERNAPI
+ntstatus __stdcall
+NtSetInformationObject(
+    legacy_handle ObjectHandle,
+    object_information_class ObjectInformationClass,
+    const void* ObjectInformation,
+    uint32_t Length
+    );
 
 ///\name Directory objects
 NTL_EXTERNAPI
@@ -411,6 +418,33 @@ namespace nt {
 		return NtWaitForMultipleObjects(handles.size(), handles.data(), wait_all ? wait_type::WaitAll : wait_type::WaitAny, alertable, std::chrono::duration_cast<system_duration>(abs_time.time_since_epoch()).count());
 	}
 
+  //////////////////////////////////////////////////////////////////////////
+
+  inline ntstatus get_handle_information(legacy_handle Handle, bool& InheritHandle, bool& ProtectFromClose)
+  {
+    uint32_t size = 0;
+    object_handle_flag_information oh;
+    ntstatus st = NtQueryObject(Handle, ObjectHandleFlagInformation, &oh, sizeof(oh), &size);
+    if(nt::success(st))
+      InheritHandle = oh.InheritHandle,
+      ProtectFromClose = oh.ProtectFromClose;
+    return st;
+  }
+
+  inline ntstatus set_handle_information(legacy_handle Handle, const bool* InheritHandle, const bool* ProtectFromClose)
+  {
+    uint32_t size = 0;
+    object_handle_flag_information oh;
+    ntstatus st = NtQueryObject(Handle, ObjectHandleFlagInformation, &oh, sizeof(oh), &size);
+    if(!nt::success(st))
+      return st;
+    if(InheritHandle)
+      oh.InheritHandle = *InheritHandle;
+    if(ProtectFromClose)
+      oh.ProtectFromClose = *ProtectFromClose;
+    st = NtSetInformationObject(Handle, ObjectHandleFlagInformation, &oh, sizeof(oh));
+    return st;
+  }
 
 }//namespace nt
 }//namespace ntl
