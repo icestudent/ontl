@@ -19,6 +19,16 @@ namespace ntl {
 #include "pool.hxx"
 #include "../stlx/new.hxx"
 
+#ifdef __ICL
+# pragma warning(push)
+# pragma warning(disable:522) // function attribute redeclared after called
+#endif
+
+#if _MSC_FULL_VER >= 190023725
+# pragma warning(push)
+# pragma warning(disable:4595) // non-member operator new or delete functions may not be declared inline
+#endif
+
 ///\name  Single-object forms
 
 __forceinline
@@ -103,6 +113,10 @@ void __cdecl operator delete[](void* ptr, std::size_t, const std::nothrow_t& tag
 {
   operator delete[](ptr, tag);
 }
+
+#if defined(__ICL) || _MSC_FULL_VER >= 190023725
+# pragma warning(pop)
+#endif
 
 #endif//#ifndef NTL_NO_NEW
 
