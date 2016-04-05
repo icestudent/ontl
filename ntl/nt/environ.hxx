@@ -115,6 +115,84 @@ namespace ntl {
       {
         return RtlSetEnvironmentVariable(&env, name, value);
       }
+
+    public:
+      typedef std::pair<std::wstring_ref, std::wstring_ref> value_type;
+
+      struct iterator;
+      typedef iterator const_iterator;
+
+      struct iterator: std::iterator<std::forward_iterator_tag, value_type>
+      {
+        friend class environment;
+        friend bool operator== (const iterator& x, const iterator& y) { return x.cur == y.cur; }
+        friend bool operator!= (const iterator& x, const iterator& y) { return x.cur != y.cur; }
+
+        reference operator*()   const { return cur; }
+        pointer   operator->()  const { return &cur;  }
+
+        iterator& operator++()  
+        {
+          capture_next();
+          return *this;
+        }
+
+        iterator operator++(int)
+        {
+          iterator tmp(*this);
+          ++*this;
+          return tmp;
+        }
+
+        iterator()
+          : cur()
+        {}
+
+      protected:
+        explicit iterator(const void* env)
+          : cur()
+        {
+          capture(reinterpret_cast<const wchar_t*>(env));
+        }
+
+        void capture_next()
+        {
+          if(const wchar_t* end = cur.second.end())
+            capture(end + 1);
+        }
+
+        void capture(const wchar_t* env)
+        {
+          std::wstring_ref s = env;
+          const size_t split = s.rfind('=');
+          if(s.empty() || split == s.npos) {
+            // end
+            cur.first.clear();
+            cur.second.clear();
+            return;
+          }
+
+          cur.first = s.substr(0, split);
+          cur.second = s.substr(split+1);
+        }
+
+
+      private:
+        mutable value_type cur;
+      };
+
+      const_iterator begin() const
+      {
+        return const_iterator(env);
+      }
+
+      const_iterator end() const
+      {
+        return const_iterator();
+      }
+
+      const_iterator cbegin() const { return begin(); }
+      const_iterator cend() const { return end(); }
     };
 
 
