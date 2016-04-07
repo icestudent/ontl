@@ -96,6 +96,7 @@ struct status
     resourcemanager_read_only                                      = (int)0x00000202,
     wait_for_oplock                                                = (int)0x00000367,
     flt_io_complete                                                = (int)0x001C0001,
+
     object_name_exists                                             = (int)0x40000000,
     thread_was_suspended                                           = (int)0x40000001,
     working_set_limit_range                                        = (int)0x40000002,
@@ -169,6 +170,7 @@ struct status
     graphics_polling_too_frequently                                = (int)0x401E0439,
     graphics_start_deferred                                        = (int)0x401E043A,
     ndis_indication_required                                       = (int)0x40230001,
+
     guard_page_violation                                           = (int)0x80000001,
     datatype_misalignment                                          = (int)0x80000002,
     breakpoint                                                     = (int)0x80000003,
@@ -227,6 +229,7 @@ struct status
     video_hung_display_driver_thread_recovered                     = (int)0x801B00EB,
     flt_buffer_too_small                                           = (int)0x801C0001,
     fve_partial_metadata                                           = (int)0x80210001,
+
     unsuccessful                                                   = (int)0xC0000001,
     not_implemented                                                = (int)0xC0000002,
     invalid_info_class                                             = (int)0xC0000003,

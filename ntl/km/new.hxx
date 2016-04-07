@@ -33,7 +33,7 @@ namespace ntl {
 
 __forceinline
 void * __cdecl
-  operator new(std::size_t size))
+  operator new(std::size_t size)
 {
   return ntl::km::pool<ntl::km::PagedPool>::alloc(size);
 }
