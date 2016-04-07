@@ -382,7 +382,9 @@
         ToggleImage();
         NTL_PLATFORM_X64.disabled = true;
         //NTL_USE_UNICODE.checked = NTL_USE_UNICODE.disabled = window.external.FindSymbol("NTL_APPTYPE_DRIVER") || window.external.FindSymbol("NTL_APPTYPE_NATIVE");
-        NTL_USE_UNICODE.checked = NTL_USE_UNICODE.disabled = (NTL_APPTYPE_DRIVER.checked || NTL_APPTYPE_NATIVE.checked);
+        NTL_USE_UNICODE.disabled = (NTL_APPTYPE_DRIVER.checked || NTL_APPTYPE_NATIVE.checked);
+        if(NTL_USE_UNICODE.disabled)
+            NTL_USE_UNICODE.checked = false;
     }
 
     function ToggleImage() {
@@ -412,7 +414,7 @@
         		DLL_APP_IMAGE.style.display = "block";
         		return;
         }
-    }		
+    }
 
     function ValidatePlatform() {
         if (!(NTL_PLATFORM_X64.checked || NTL_PLATFORM_X86.checked))

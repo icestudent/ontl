@@ -17,23 +17,23 @@
     </script>
 
     <!-- SYMBOLS declaration -->
-    
+
     <symbol name='WIZARD_DIALOG_TITLE' type="text" value="NTL Application Wizard"></symbol>
     <symbol name='NTL_APPTYPE' type="text" value=""></symbol>
-    <symbol name='NTL_USE_UNICODE' type="checkbox" value="false"></symbol>
+    <symbol name='NTL_USE_UNICODE' type="checkbox" value="true"></symbol>
     <symbol name='SOURCE_FILTER' type="text" value="c;cc;cpp;cxx;tcc;def;bat;cmd;asm"></symbol>
     <symbol name='INCLUDE_FILTER' type="text" value="h;hh;hpp;hxx;inl;inc"></symbol>
-    
+
     <!-- Page 2 Controls -->
     <symbol name='NTL_APPTYPE_CONSOLE' type="radio" value="true"></symbol>
     <symbol name='NTL_APPTYPE_WIN32' type="radio" value="false"></symbol>
     <symbol name='NTL_APPTYPE_DLL' type="radio" value="false"></symbol>
     <symbol name='NTL_APPTYPE_NATIVE' type="radio" value="false"></symbol>
     <symbol name='NTL_APPTYPE_DRIVER' type="radio" value="false"></symbol>
-    
+
     <symbol name='NTL_PLATFORM_X86' type="checkbox" value="true"></symbol>
     <symbol name='NTL_PLATFORM_X64' type="checkbox" value="true"></symbol>
-    
+
     <!-- Page 3 Controls -->
     <symbol name='NTL_RUNTIME_CRT' type="checkbox" value="true"></symbol>
     <symbol name='NTL_RUNTIME_EXC' type="checkbox" value="false"></symbol>
@@ -43,7 +43,7 @@
     <symbol name='NTL_RUNTIME_C'   type="checkbox" value="false"></symbol>
     <!-- END OF SYMBOLS -->
 
-    
+
 </head>
 <body onload="InitDocument(document);" onkeydown="if (!bValidating) OnKey();" onkeypress="if (!bValidating) OnPress();">
     <table class="ONE" height="100%" width="100%" border="0" cellpadding="0" cellspacing="0">
@@ -344,7 +344,7 @@
     function InitDocument(document) {
         setDirection();
         if (window.external.FindSymbol('DOCUMENT_FIRST_LOAD')) {
-            // This function sets the default symbols based 
+            // This function sets the default symbols based
             // on the values specified in the SYMBOL tags above
             window.external.SetDefaults(document);
         }
@@ -401,7 +401,7 @@
     }
 
     function debug(msg, expr) { alert(msg + ': ' + expr); }
-    
+
     function GetRuntimes() {
         var keys = (new VBArray(runtimes.Keys())).toArray();
         var props = new Array()
