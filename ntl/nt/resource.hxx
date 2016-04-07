@@ -10,6 +10,7 @@
 
 #include "handle.hxx"
 #include "../stlx/chrono.hxx"
+#include "time.hxx"
 
 namespace ntl {
   namespace nt {
@@ -99,7 +100,7 @@ namespace ntl {
     NTL_EXTERNAPI
       uint32_t __stdcall RtlTryEnterCriticalSection(rtl::critical_section* CriticalSection);
 
-    /** These begins with WS2003SP1 
+    /** These begins with WS2003SP1
     NTL_EXTERNAPI
       uint32_t __stdcall RtlIsCriticalSectionLocked(rtl::critical_section* CriticalSection);
 
@@ -157,20 +158,20 @@ namespace ntl {
     //////////////////////////////////////////////////////////////////////////
 
     typedef void __stdcall resource_control_t(rtl::resource*);
-   
-    NTL_EXTERNAPI 
+
+    NTL_EXTERNAPI
       resource_control_t
       RtlInitializeResource,
       RtlReleaseResource,
       RtlDeleteResource,
       RtlConvertSharedToExclusive,
       RtlConvertExclusiveToShared;
- 
-    NTL_EXTERNAPI 
+
+    NTL_EXTERNAPI
     bool __stdcall
       RtlAcquireResourceShared(rtl::resource* Resource, bool Wait);
 
-    NTL_EXTERNAPI 
+    NTL_EXTERNAPI
     bool __stdcall
       RtlAcquireResourceExclusive(rtl::resource* Resource, bool Wait);
 
@@ -206,44 +207,44 @@ namespace ntl {
       {
         ntl::nt::RtlDeleteCriticalSection(this);
       }
- 
+
       /** Waits and takes ownership of CS. */
       void acquire()
       {
         ntl::nt::RtlEnterCriticalSection(this);
       }
- 
+
       /** Releases owlership. */
       void release()
       {
         ntl::nt::RtlLeaveCriticalSection(this);
       }
- 
+
       /** Attempts to take ownership of this CS object. */
       bool try_acquire()
       {
         return ntl::nt::RtlTryEnterCriticalSection(this) != 0;
       }
- 
+
       /** Checks owlership of this CS. */
-      bool locked() const 
+      bool locked() const
       {
         return (LockCount & 1) == 0;
         //return ntl::nt::RtlIsCriticalSectionLocked(this) != 0;
       }
- 
+
       /** Checks is the current thread is owner of CS. */
       bool is_owner() const
       {
         return OwningThread == teb::instance().ClientId.UniqueThread;
         //return ntl::nt::RtlIsCriticalSectionLockedByThread(this) != 0;
       }
- 
-      
+
+
       /**
        *	@brief Waits the specified time for ownership of the CS
        *
-       * This function implements the waiting on CS object. 
+       * This function implements the waiting on CS object.
        * If the CS is haves a synchronization object, function calls standard wait mechanism,
        * otherwise it waits with a delayed execution.
        *
@@ -261,10 +262,10 @@ namespace ntl {
           DebugInfo->ContentionCount++;
           return NtWaitForSingleObject(LockSemaphore, alertable, timeout);
         }
- 
+
         if(!try_acquire() && !explicit_wait)
           return status::invalid_handle;
- 
+
         // wait
         ntstatus st = try_acquire() ? status::success : status::timeout;
         systime_t const interval = -1i64*std::chrono::duration_cast<system_duration>( std::chrono::milliseconds(50)).count();
@@ -286,7 +287,7 @@ namespace ntl {
         }
         return st;
       }
- 
+
       /**
        *	@brief Waits to ownership until the specified time is occurs
        *
@@ -302,7 +303,7 @@ namespace ntl {
       {
         return wait(std::chrono::duration_cast<system_duration>(abs_time.time_since_epoch()).count(), explicit_wait, alertable);
       }
- 
+
       /**
        *	@brief Waits to ownership for specified time
        *
@@ -318,7 +319,7 @@ namespace ntl {
       {
         return wait(-1i64*std::chrono::duration_cast<system_duration>(rel_time).count(), explicit_wait, alertable);
       }
- 
+
       /** Sets spin count */
       void spin_count(uint32_t SpinCount)
       {
@@ -392,7 +393,7 @@ namespace ntl {
         (exclusive ? RtlConvertSharedToExclusive : RtlConvertExclusiveToShared)(this);
       }
     };
-    
+
   } //namespace nt
 } //namespace ntl
 

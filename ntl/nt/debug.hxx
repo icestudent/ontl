@@ -312,7 +312,7 @@ namespace ntl {
       const dbgprint<dpfltr::trace>   trace;
       const dbgprint<dpfltr::info>    info;
 #else
-  #ifndef __BCPLUSPLUS__
+  #ifdef _MSC_VER_PURE
       const dbgprint<dpfltr::__identifier(default)>   error;
       const dbgprint<dpfltr::__identifier(default)>   warning;
       const dbgprint<dpfltr::__identifier(default)>   trace;
@@ -337,7 +337,7 @@ namespace ntl {
 
   }//namespace nt
 
-namespace dbg = NTL_SUBSYSTEM_NS::dbg;
+namespace dbg = nt::dbg;
 
 }//namespace ntl
 

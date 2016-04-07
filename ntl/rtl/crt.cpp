@@ -1,4 +1,4 @@
-#pragma once
+// #pragma once
 
 //#pragma warning(disable:4820 4061)
 #include "../stlx/cstdio.hxx"
@@ -165,7 +165,9 @@ extern "C" int __cdecl at_quick_exit(vfv_t* f)
   return -1;
 }
 
-#ifndef NTL_EMBEDDED
+#if !defined(NTL_SUBSYSTEM_KM)
+
+#ifndef NTL_EMBEDDED 
 void NTL_CRTCALL exit(int status)
 {
   doexit(status, false, true);
@@ -179,14 +181,13 @@ void NTL_CRTCALL quick_exit(int status)
   _Exit(status);
 }
 
-#ifndef NTL_SUBSYSTEM_KM
 #include "../nt/thread.hxx"
 void NTL_CRTCALL _Exit(int code)
 {
   using ntl::nt::status;
   ntl::nt::this_thread::exit_process(code == EXIT_SUCCESS ? status::success : (code == EXIT_FAILURE ? status::unsuccessful : static_cast<ntl::nt::ntstatus>(code)) );
 }
-#endif
+#endif // NTL_SUBSYSTEM_KM
 
 /************************************************************************/
 /* `abort`                                                              */
@@ -294,7 +295,7 @@ extern "C" unsigned __cdecl _ValidateImageBase(std::uintptr_t base)
 {
   using ntl::pe::image;
   const image* pe = image::bind(base);
-  return pe->get_dos_header()->is_valid() && pe->get_nt_headers()->is_valid() 
+  return pe->get_dos_header()->is_valid() && pe->get_nt_headers()->is_valid()
     && (pe->get_nt_headers()->optional_header32()->is_valid() || pe->get_nt_headers()->optional_header64()->is_valid());
 }
 

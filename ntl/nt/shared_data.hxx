@@ -18,7 +18,7 @@ struct system_time
 {
     typedef int64_t type;
     static const type resolution = (1000 * 1000 * 1000) / 100; // 100ns
-    
+
     static const type& infinite()
     {
       static const type* const null = 0;
@@ -69,8 +69,11 @@ struct shared_data_32
   static const size_t processor_features_max    = 64;
   static const size_t max_wow64_shared_entries  = 16;
 
-  static const uintptr_t km_base = sizeof(uintptr_t) > sizeof(int)
-                                   ? 0xFFFFF78000000000UI64 : 0xffdf0000;
+#ifdef _M_X64
+  static const uintptr_t km_base = 0xFFFFF78000000000UI64;
+#else
+	static const uintptr_t km_base = 0xffdf0000;
+#endif
 
   static const uintptr_t um_base = 0x7ffe0000;
 
