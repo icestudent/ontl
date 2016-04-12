@@ -396,7 +396,7 @@ class ndis
 
           explicit
             characteristics(
-              const string &  name,
+              const string_ref &  name,
               uint8_t         major = 0x04,
               uint8_t         minor = 0x00)
               : Name(name), MajorNdisVersion(major), MinorNdisVersion(minor)

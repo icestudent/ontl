@@ -533,7 +533,7 @@ class file_handler : public handle, public device_traits<file_handler>
     __forceinline
     ntstatus
       create(
-        const std::wstring &        file_name,
+        const std::wstring_ref&     file_name,
         const creation_disposition  cd              = creation_disposition_default,
         const access_mask           desired_access  = access_mask_default,
         const share_mode            share           = share_mode_default,
@@ -566,7 +566,7 @@ class file_handler : public handle, public device_traits<file_handler>
 
     ntstatus
       open(
-        const std::wstring&         file_name,
+        const std::wstring_ref&     file_name,
         const access_mask           desired_access  = access_mask_default,
         const share_mode            share           = share_mode_default,
         const creation_options      co              = creation_options_default

@@ -449,7 +449,7 @@ struct system_modules_information //RTL_PROCESS_MODULES
 
   __forceinline
   const rtl_process_module_information *
-    find_module(const std::string & file_name) const
+    find_module(const std::string_ref & file_name) const
   {
     for ( uint32_t i = 0; i != NumberOfModules; ++i )
       if ( ! _strnicmp(file_name.data(), Modules[i].file_name(), file_name.size())  )

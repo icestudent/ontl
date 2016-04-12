@@ -911,9 +911,9 @@ namespace std
     random_device()
     {}
     /** Constructs generator with initial state determined by \p token (which must be a number). */
-    explicit random_device(const string& token)
+    explicit random_device(const string_ref& token)
     {
-      result_type s = ntl::numeric::strtoul(token.c_str());
+      result_type s = ntl::numeric::strtoul(token.data(), token.size());
       if(s)
         gen.seed(s);
     }

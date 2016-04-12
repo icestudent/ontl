@@ -272,7 +272,7 @@ class key : public handle, public device_traits<key>
     __forceinline
     explicit key(
         const handle &        root,
-        const std::wstring &  name,
+        const std::wstring_ref& name,
         const access_mask     desired_access  = access_mask_default
         )
     {

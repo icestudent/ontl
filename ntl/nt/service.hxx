@@ -47,14 +47,14 @@ ntstatus
 
 static inline
 ntstatus
-  load_driver(const std::wstring & service_name)
+  load_driver(const std::wstring_ref & service_name)
 {
   return load_driver(const_unicode_string(service_name));
 }
 
 static inline
 ntstatus
-  unload_driver(const std::wstring & service_name)
+  unload_driver(const std::wstring_ref & service_name)
 {
   return unload_driver(const_unicode_string(service_name));
 }
