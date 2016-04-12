@@ -18,13 +18,13 @@
 #include <km/file.hxx>
 #include <km/time.hxx>
 #include <km/driver_object.hxx>
-#include <km/event.hxx>
+#include <km/mutex.hxx>
 
 #include <km/debug.hxx>
 
 #include <cstdio>
 #ifdef _DEBUG
-  #define TRACE_STATUS(st, msg) ntl::km::dbg::trace.printf("["DRVNAME"]"__FUNCTION__ ": " msg " returned 0x%X\n", st);
+  #define TRACE_STATUS(st, msg) ntl::km::dbg::trace.printf("[" DRVNAME "]" __FUNCTION__ ": " msg " returned 0x%X\n", st);
   #define CHECK_STATUS(st, msg) TRACE_STATUS(st, msg); if(!success(st)) return st;
   #define CHECK_STATUSV(st, msg) TRACE_STATUS(st, msg); if(!success(st)) return;
 #else
@@ -54,17 +54,10 @@ ntstatus __stdcall GenerateRandom(device_object* DeviceObject, irp* Irp);
 ntstatus __stdcall GenerateRandomLocked(device_object* DeviceObject, irp* Irp);
 
 //////////////////////////////////////////////////////////////////////////
-void GetTime(ntl::km::time_fields* tm)
-{
-  int64_t st, lt;
-  KeQuerySystemTime(&st);
-  ExSystemTimeToLocalTime(&st, &lt);
-  RtlTimeToTimeFields(&lt, tm);
-}
 
 uint32_t efilter(exception::pointers* einfo, const char* function)
 {
-  dbg::error.printf("*** "DRVNAME" %s: Unhandled exception caught!\n\tcode: 0x%p, flags: 0x%X, at address: 0x%p\n", 
+  dbg::error.printf("*** " DRVNAME " %s: Unhandled exception caught!\n\tcode: 0x%p, flags: 0x%X, at address: 0x%p\n", 
     function, einfo->ExceptionRecord->ExceptionCode, einfo->ExceptionRecord->ExceptionFlags,
     einfo->ExceptionRecord->ExceptionAddress);
 
@@ -184,7 +177,7 @@ ntstatus __stdcall DrvEntry(driver_object* DriverObject, unicode_string* /*Regis
 ntstatus RandomData(void* Buffer, uint32_t Length)
 {
   int64_t seed;
-  KeQueryTickCount(&seed);
+  KeQueryTickCount(seed);
   __try{
     uint32_t* data = reinterpret_cast<uint32_t*>(Buffer);
     for(uint32_t i = 0; i < Length / 4; i++)
