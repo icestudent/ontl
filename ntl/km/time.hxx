@@ -30,20 +30,20 @@ namespace ntl {
     };
 
     __forceinline
-      void KeQuerySystemTime(systime_t* CurrentTime)
+      void KeQuerySystemTime(systime_t& CurrentTime)
     {
-      *CurrentTime = user_shared_data::instance().SystemTime.get();
+      CurrentTime = user_shared_data::instance().SystemTime.get();
     }
 
     __forceinline
-      void KeQueryTickCount(int64_t* TickCount)
+      void KeQueryTickCount(int64_t& TickCount)
     {
-      *TickCount = user_shared_data::instance().TickCountQuad;
+      TickCount = user_shared_data::instance().TickCountQuad;
     }
 
     NTL_EXTERNAPI
       void __stdcall
-      ExSystemTimeToLocalTime(systime_t* SystemTime, systime_t* LocalTime);
+      ExSystemTimeToLocalTime(const systime_t& SystemTime, systime_t& LocalTime);
 
 
   }//namespace km

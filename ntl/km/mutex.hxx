@@ -27,7 +27,8 @@ namespace ntl {
     NTL_EXTERNVAR fast_mutex_control_routine ExiAcquireFastMutex, ExiReleaseFastMutex;
     NTL_EXTERNAPI bool __fastcall ExiTryToAcquireFastMutex (fast_mutex* FastMutex);
 #else
-    NTL_EXTERNVAR fast_mutex_control_routine ExAcquireFastMutex, ExReleaseFastMutex;
+    NTL_EXTERNAPI void __fastcall ExAcquireFastMutex(fast_mutex* FastMutex);
+    NTL_EXTERNAPI void __fastcall ExReleaseFastMutex(fast_mutex* FastMutex);
     NTL_EXTERNAPI bool __fastcall ExTryToAcquireFastMutex (fast_mutex* FastMutex);
 #endif // _NTHAL_ && _M_IX86
 
