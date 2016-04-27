@@ -147,14 +147,23 @@ namespace std { namespace tr2 { namespace sys {
         {
           using std::tr2::sys::io_handler_deallocate;
           if(op) {
-            Op* derived = static_cast<Op*>(op);
-            derived->~Op();
+            reset(std::is_destructible<Op>());
             op = nullptr;
           }
           if(v) {
             io_handler_deallocate(v, sizeof(Op), this->fn);
             v = nullptr;
           }
+        }
+
+      protected:
+        void reset(std::false_type)
+        {}
+
+        void reset(std::true_type)
+        {
+          Op* derived = static_cast<Op*>(op);
+          derived->~Op();
         }
       };
 
