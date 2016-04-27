@@ -222,7 +222,7 @@ namespace ntl { namespace km {
       int32_t     socktype;
       int32_t     protocol;
       size_t      addrlen;
-      wchar_t*    caconname;
+      wchar_t*    canonname;
       sockaddr*   addr;
       void*       blob;
       size_t      bloblen;
