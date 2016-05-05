@@ -21,6 +21,28 @@
 //#define constexpr const
 #endif
 
+namespace ntl
+{
+#ifdef _MSC_VER_PURE
+  namespace intrinsic
+  {
+    NTL_EXTERNAPI void __cdecl __cpuid(int cpuInfo[4], int function_id);
+    NTL_EXTERNAPI void __cdecl __cpuidex(int cpuInfo[4], int function_id, int subfunction_id);
+
+    NTL_EXTERNAPI int __cdecl _rdrand16_step(uint16_t* val);
+    NTL_EXTERNAPI int __cdecl _rdrand32_step(uint32_t* val);
+    NTL_EXTERNAPI int __cdecl _rdseed16_step(uint16_t* val);
+    NTL_EXTERNAPI int __cdecl _rdseed32_step(uint32_t* val);
+
+    #pragma intrinsic(_rdrand16_step, _rdrand32_step, _rdseed16_step, _rdseed32_step, __cpuid, __cpuidex)
+#ifdef _M_X64
+    NTL_EXTERNAPI int __cdecl _rdrand64_step(uint64_t* val);
+    NTL_EXTERNAPI int __cdecl _rdseed64_step(uint64_t* val);
+    #pragma intrinsic(_rdrand64_step, _rdseed64_step)
+#endif
+  }
+#endif // _MSC_VER
+}
 
 namespace std
 {
@@ -1114,6 +1136,194 @@ namespace std
   /**@} lib_numeric_rand_util */
 
 
+  /**
+   *	@brief Hardware Random Number Generator
+   *	@note Currently uses Intel \c RDRAND instruction.
+   **/
+  template<typename UIntType>
+  class rdrand_engine
+  {
+  public:
+    // types
+    typedef UIntType result_type;
+
+    ///\name engine characteristics
+    static const size_t retry_limit = 16;
+
+    static_assert(is_integral<UIntType>::value && is_unsigned<UIntType>::value, "UIntType shall denote an unsigned integral type.");
+
+    static constexpr result_type min() { return std::numeric_limits<result_type>::min(); }
+    static constexpr result_type max() { return std::numeric_limits<result_type>::max(); }
+
+    ///\name constructors and seeding functions
+    explicit rdrand_engine()
+      : state()
+      , avail(available())
+    {}
+
+    static bool available()
+    {
+       // eax, ebx, ecx, edx
+      int r[4] = {};
+      ntl::intrinsic::__cpuid(r, 0x01);
+      unsigned present = (r[2] >> 30) & 0x01;
+      return present != 0;
+    }
+
+    result_type operator()()
+    {
+      return produce();
+    }
+
+    void discard(unsigned long long z)
+    {
+      while(z--)
+        produce();
+    }
+
+    ///\name comparison
+    friend bool operator== (const rdrand_engine& x, const rdrand_engine& y) { return x.state == y.state; }
+    friend bool operator!= (const rdrand_engine& x, const rdrand_engine& y) { return !(x == y); }
+
+    ///\name I/O support
+    template<typename charT, typename traits>
+    friend basic_ostream<charT, traits>& operator<<(basic_ostream<charT, traits>& os, const rdrand_engine& x)
+    {
+      saveiostate s(os); os.flags(ios_base::dec|ios_base::left); //-V808
+      return os << setfill(' ') << x.state;
+    }
+    ///\}
+
+  protected:
+    result_type produce()
+    {
+      for (size_t i = 0; i < retry_limit && avail; i++) {
+        if (produce(state))
+          return state;
+      }
+      return 0;
+    }
+
+    template<typename T>
+    static bool produce(T& /*val*/)
+    {
+      static_assert(false, "RDRAND is available only for uint16_t, uint32_t and uint64_t types.");
+      return false;
+    }
+
+    static bool produce(uint16_t& val)
+    {
+      return ntl::intrinsic::_rdrand16_step(&val) != 0;
+    }
+    static bool produce(uint32_t& val)
+    {
+      return ntl::intrinsic::_rdrand32_step(&val) != 0;
+    }
+    static bool produce(uint64_t& val)
+    {
+      static_assert(sizeof(void*) == sizeof(uint64_t), "RDRAND-64 available only at x64 mode.");
+      return ntl::intrinsic::_rdrand64_step(&val) != 0;
+    }
+
+  private:
+    result_type state;
+    const bool avail;
+  };
+
+  /**
+   *	@brief Hardware Random Number Seed
+   *	@note Currently uses Intel \c RDRAND instruction.
+   **/
+  template<typename UIntType>
+  class rdrand_seed:
+    noncopyable
+  {
+  public:
+    ///\name types
+    typedef UIntType result_type;
+
+    ///\name engine characteristics
+    static const size_t retry_limit = 16;
+
+    static_assert(is_integral<UIntType>::value && is_unsigned<UIntType>::value, "UIntType shall denote an unsigned integral type.");
+
+
+    ///\name constructors
+    /** Constructs a seed_seq object */
+    rdrand_seed()
+      : avail(available())
+    {}
+
+    static bool available()
+    {
+      // eax, ebx, ecx, edx
+      int r[4] = {};
+      ntl::intrinsic::__cpuid(r, 0x07);
+      unsigned present = (r[1] >> 18) & 0x01;
+      return present != 0;
+    }
+
+    ///\name generating functions
+    template<class OutputIterator>
+    void generate(OutputIterator begin, OutputIterator end) const
+    {
+      typedef typename iterator_traits<OutputIterator>::value_type value_type;
+      if(begin == end || avail == false)
+        return;
+
+      while(begin != end) {
+        *begin = static_cast<value_type>( produce() );
+        ++begin;
+      }
+    }
+
+    ///\name property functions
+    /** Returns the number of 32-bit units that would be returned by a call to param(). */
+    size_t size() const { 0; }
+
+    /** Copies the sequence of prepared 32-bit units to the given destination. */
+    template<class OutputIterator>
+    void param(OutputIterator /*dest*/) const
+    {
+    }
+
+    ///\}
+
+  protected:
+    result_type produce() const
+    {
+      result_type state = 0;
+      for (size_t i = 0; i < retry_limit && avail; i++) {
+        if (produce(state))
+          return state;
+      }
+      return 0;
+    }
+
+    template<typename T>
+    bool produce(T& /*val*/) const
+    {
+      static_assert(false, "RDSEED is available only for uint16_t, uint32_t and uint64_t types.");
+      return false;
+    }
+
+    static bool produce(uint16_t& val)
+    {
+      return ntl::intrinsic::_rdseed16_step(&val) != 0;
+    }
+    static bool produce(uint32_t& val)
+    {
+      return ntl::intrinsic::_rdseed32_step(&val) != 0;
+    }
+    static bool produce(uint64_t& val)
+    {
+      static_assert(sizeof(void*) == sizeof(uint64_t), "RDSEED-64 available only at x64 mode.");
+      return ntl::intrinsic::_rdseed64_step(&val) != 0;
+    }
+
+  private:
+    const bool avail;
+  };
 
   /**@} lib_numeric_rand */
   /**@} lib_numeric */
